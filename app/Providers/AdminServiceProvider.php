@@ -116,36 +116,41 @@ class AdminServiceProvider extends ServiceProvider
         wp_dequeue_style('forms');
         wp_deregister_style('forms');
 
-        // Enqueue compiled React app
-        $app_css = YATRA_PLUGIN_PATH . 'public/css/app.css';
-        $app_js = YATRA_PLUGIN_PATH . 'public/js/app.js';
+        // Enqueue admin app - always load compiled assets
+        // For development with auto-rebuild, use: npm run build -- --watch
+        {
+            // Enqueue compiled React app
+            $app_css = YATRA_PLUGIN_PATH . 'public/css/app.css';
+            $app_js = YATRA_PLUGIN_PATH . 'public/js/app.js';
 
-        if (file_exists($app_css)) {
-            $css_version = YATRA_VERSION . '.' . filemtime($app_css);
-            wp_enqueue_style(
-                'yatra-admin',
-                YATRA_PLUGIN_URL . 'public/css/app.css',
-                [],
-                $css_version
-            );
+            if (file_exists($app_css)) {
+                $css_version = YATRA_VERSION . '.' . filemtime($app_css);
+                wp_enqueue_style(
+                    'yatra-admin',
+                    YATRA_PLUGIN_URL . 'public/css/app.css',
+                    [],
+                    $css_version
+                );
+            }
+
+            if (file_exists($app_js)) {
+                $js_version = YATRA_VERSION . '.' . filemtime($app_js) . '.currency-fix';
+                // Enqueue our script with media library as dependency
+                // Note: wp_enqueue_media() registers these scripts: media-models, media-views, etc.
+                // We need to ensure they load before our React app
+                wp_enqueue_script(
+                    'yatra-admin',
+                    YATRA_PLUGIN_URL . 'public/js/app.js',
+                    ['jquery', 'underscore', 'backbone', 'media-models', 'wp-mediaelement', 'media-editor', 'media-audiovideo', 'media-views'], // Dependencies to ensure media library loads first
+                    $js_version,
+                    true
+                );
+            }
         }
 
-        if (file_exists($app_js)) {
-            $js_version = YATRA_VERSION . '.' . filemtime($app_js) . '.currency-fix';
-            // Enqueue our script with media library as dependency
-            // Note: wp_enqueue_media() registers these scripts: media-models, media-views, etc.
-            // We need to ensure they load before our React app
-            wp_enqueue_script(
-                'yatra-admin',
-                YATRA_PLUGIN_URL . 'public/js/app.js',
-                ['jquery', 'underscore', 'backbone', 'media-models', 'wp-mediaelement', 'media-editor', 'media-audiovideo', 'media-views'], // Dependencies to ensure media library loads first
-                $js_version,
-                true
-            );
-            
-            // Add inline script to preserve wp.media reference before it gets overwritten
-            // This runs after media scripts load but before React app
-            wp_add_inline_script('yatra-admin', '
+        // Add inline script to preserve wp.media reference before it gets overwritten
+        // This runs after media scripts load but before React app
+        wp_add_inline_script('yatra-admin', '
                 (function() {
                     // Preserve wp.media reference in a safe location
                     if (typeof wp !== "undefined" && typeof wp.media === "function") {
@@ -159,8 +164,8 @@ class AdminServiceProvider extends ServiceProvider
                 })();
             ', 'before');
 
-            // Get current user
-            $current_user = wp_get_current_user();
+        // Get current user
+        $current_user = wp_get_current_user();
             
             // Get user capabilities
             $capabilities = [];
@@ -288,21 +293,20 @@ class AdminServiceProvider extends ServiceProvider
                 'Tibet' => __('Tibet', 'yatra'),
             ];
             
-            // Localize script with API data, permissions, and translations
-            wp_localize_script('yatra-admin', 'yatraAdmin', [
-                'apiUrl' => rest_url('yatra/v1'),
-                'nonce' => wp_create_nonce('wp_rest'),
-                'currentUser' => $current_user->ID,
-                'siteUrl' => home_url(),
-                'permissions' => array_keys($capabilities),
-                'capabilities' => $capabilities,
-                'roles' => $current_user->roles,
-                'isPro' => defined('YATRA_PRO_VERSION'),
-                'translations' => $translations,
-                'locale' => get_locale(),
-                'currency' => \Yatra\Services\SettingsService::getCurrency(),
-            ]);
-        }
+        // Localize script with API data, permissions, and translations
+        wp_localize_script('yatra-admin', 'yatraAdmin', [
+            'apiUrl' => rest_url('yatra/v1'),
+            'nonce' => wp_create_nonce('wp_rest'),
+            'currentUser' => $current_user->ID,
+            'siteUrl' => home_url(),
+            'permissions' => array_keys($capabilities),
+            'capabilities' => $capabilities,
+            'roles' => $current_user->roles,
+            'isPro' => defined('YATRA_PRO_VERSION'),
+            'translations' => $translations,
+            'locale' => get_locale(),
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+        ]);
     }
 
 

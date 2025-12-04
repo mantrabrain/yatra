@@ -3,18 +3,18 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-CfZw3dNY.js": {
-    "file": "js/index-CfZw3dNY.js",
+  "_index-BfnVJaob.js": {
+    "file": "js/index-BfnVJaob.js",
     "name": "index",
     "imports": [
-      "_react-vendor-CU8MdjjT.js"
+      "_react-vendor-Bv4qn3Ai.js"
     ],
     "css": [
       "css/index.css"
     ]
   },
-  "_react-vendor-CU8MdjjT.js": {
-    "file": "js/react-vendor-CU8MdjjT.js",
+  "_react-vendor-Bv4qn3Ai.js": {
+    "file": "js/react-vendor-Bv4qn3Ai.js",
     "name": "react-vendor"
   },
   "resources/js/account-page.tsx": {
@@ -23,8 +23,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-CU8MdjjT.js",
-      "_index-CfZw3dNY.js"
+      "_react-vendor-Bv4qn3Ai.js",
+      "_index-BfnVJaob.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -33,8 +33,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-CU8MdjjT.js",
-      "_index-CfZw3dNY.js"
+      "_react-vendor-Bv4qn3Ai.js",
+      "_index-BfnVJaob.js"
     ]
   }
 }

@@ -14,9 +14,8 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
-import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Pagination, Table as SharedTable, BulkActionToolbar } from '../components/shared';
 
 interface Review {
   id: number;
@@ -43,6 +42,33 @@ const Reviews: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; review: Review | null }>({
     isOpen: false,
     review: null,
+  });
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        trip: true,
+        customer: true,
+        rating: true,
+        review: true,
+        status: true,
+        date: true,
+      };
+    }
+
+    const saved = window.localStorage.getItem('yatra-reviews-visible-columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          trip: true,
+          customer: true,
+          rating: true,
+          review: true,
+          status: true,
+          date: true,
+        };
   });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
@@ -226,6 +252,195 @@ const Reviews: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || ratingFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc';
 
+  // Bulk action options depend on current status filter
+  const bulkActionOptions = useMemo(() => {
+    // In trash view, only allow permanent delete
+    if (statusFilter === 'trash') {
+      return [
+        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      ];
+    }
+
+    // In spam view, allow move to trash or delete
+    if (statusFilter === 'spam') {
+      return [
+        { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
+        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      ];
+    }
+
+    // Default view: allow approve, pending, spam, trash, delete
+    return [
+      { value: 'mark_approved', label: __('Mark as Approved', 'Mark as Approved') },
+      { value: 'mark_pending', label: __('Mark as Pending', 'Mark as Pending') },
+      { value: 'mark_spam', label: __('Mark as Spam', 'Mark as Spam') },
+      { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
+      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+    ];
+  }, [statusFilter]);
+
+  // Bulk actions
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+
+    const run = async () => {
+      try {
+        const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+        const nonce = (window as any)?.yatraAdmin?.nonce || '';
+
+        await fetch(`${baseUrl}/reviews/bulk`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': nonce,
+          },
+          body: JSON.stringify({ action: bulkAction, ids: selectedIds }),
+        });
+
+        queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Bulk review action error', error);
+      } finally {
+        setSelectedIds([]);
+        setBulkAction('');
+      }
+    };
+
+    void run();
+  };
+
+  const toggleColumn = (columnKey: string) => {
+    const newVisible = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
+    };
+    setVisibleColumns(newVisible);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-reviews-visible-columns', JSON.stringify(newVisible));
+    }
+  };
+
+  const columnOptions = [
+    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
+    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
+    { key: 'rating', label: __('Rating', 'Rating'), visible: visibleColumns.rating },
+    { key: 'review', label: __('Review', 'Review'), visible: visibleColumns.review },
+    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+    { key: 'date', label: __('Date', 'Date'), visible: visibleColumns.date },
+  ];
+
+  const handleApprove = async (review: Review) => {
+    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+    const nonce = (window as any)?.yatraAdmin?.nonce || '';
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+      body: JSON.stringify({ status: 'approved' }),
+    });
+    queryClient.invalidateQueries({ queryKey: ['reviews'] });
+  };
+
+  const handleMarkPending = async (review: Review) => {
+    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+    const nonce = (window as any)?.yatraAdmin?.nonce || '';
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+      body: JSON.stringify({ status: 'pending' }),
+    });
+    queryClient.invalidateQueries({ queryKey: ['reviews'] });
+  };
+
+  const handleMarkSpam = async (review: Review) => {
+    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+    const nonce = (window as any)?.yatraAdmin?.nonce || '';
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+      body: JSON.stringify({ status: 'spam' }),
+    });
+    queryClient.invalidateQueries({ queryKey: ['reviews'] });
+  };
+
+  const handleMarkTrash = async (review: Review) => {
+    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+    const nonce = (window as any)?.yatraAdmin?.nonce || '';
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+      body: JSON.stringify({ status: 'trash' }),
+    });
+    queryClient.invalidateQueries({ queryKey: ['reviews'] });
+  };
+
+  const actions = [
+    {
+      key: 'view',
+      label: __('View', 'View'),
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (review: Review) => handleView(review),
+      condition: () => can('yatra_view_reviews'),
+    },
+    {
+      key: 'approve',
+      label: __('Approve', 'Approve'),
+      icon: <Star className="w-4 h-4" />,
+      onClick: (review: Review) => handleApprove(review),
+      condition: (review: Review) => can('yatra_edit_reviews') && review.status !== 'approved',
+    },
+    {
+      key: 'mark_pending',
+      label: __('Mark as Pending', 'Mark as Pending'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (review: Review) => handleMarkPending(review),
+      condition: (review: Review) => can('yatra_edit_reviews') && review.status !== 'pending',
+    },
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (review: Review) => handleEdit(review),
+      condition: () => can('yatra_edit_reviews'),
+    },
+    {
+      key: 'mark_spam',
+      label: __('Mark as Spam', 'Mark as Spam'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (review: Review) => handleMarkSpam(review),
+      condition: (review: Review) => can('yatra_edit_reviews') && review.status !== 'spam',
+    },
+    {
+      key: 'mark_trash',
+      label: __('Move to Trash', 'Move to Trash'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (review: Review) => handleMarkTrash(review),
+      condition: (review: Review) => can('yatra_edit_reviews') && review.status !== 'trash',
+    },
+    {
+      key: 'delete',
+      label: __('Delete Permanently', 'Delete Permanently'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (review: Review) => handleDelete(review),
+      variant: 'destructive' as const,
+      condition: () => can('yatra_delete_reviews'),
+    },
+  ];
+
   return (
     <div className="space-y-3">
       <ConfirmationDialog
@@ -341,265 +556,154 @@ const Reviews: React.FC = () => {
         </CardContent>
       </Card>
 
-      <ConditionalRender capability="yatra_view_reviews">
-        {/* Table */}
-        {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading reviews', 'Error loading reviews')}
-            </CardContent>
-          </Card>
-        ) : isLoading ? (
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>{__('Trip', 'Trip')}</TableHead>
-                    <TableHead>{__('Customer', 'Customer')}</TableHead>
-                    <TableHead>{__('Rating', 'Rating')}</TableHead>
-                    <TableHead>{__('Review', 'Review')}</TableHead>
-                    <TableHead>{__('Status', 'Status')}</TableHead>
-                    <TableHead>{__('Date', 'Date')}</TableHead>
-                    <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {[...Array(5)].map((_, index) => (
-                    <TableRow key={`skeleton-${index}`}>
-                      <TableCell>
-                        <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          <div className="h-3 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-0.5">
-                          {[...Array(5)].map((_, i) => (
-                            <div key={i} className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          <div className="h-3 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                      </TableCell>
-                      <TableCell>
-                        <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        ) : reviews.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center text-gray-500">
-              {__('No reviews found', 'No reviews found')}
-            </CardContent>
-          </Card>
-        ) : (
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('trip_title')}
-                        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {__('Trip', 'Trip')}
-                        {getSortIcon('trip_title')}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('customer_name')}
-                        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {__('Customer', 'Customer')}
-                        {getSortIcon('customer_name')}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('rating')}
-                        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {__('Rating', 'Rating')}
-                        {getSortIcon('rating')}
-                      </button>
-                    </TableHead>
-                    <TableHead>{__('Review', 'Review')}</TableHead>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('status')}
-                        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {__('Status', 'Status')}
-                        {getSortIcon('status')}
-                      </button>
-                    </TableHead>
-                    <TableHead>
-                      <button
-                        onClick={() => handleSort('created_at')}
-                        className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                      >
-                        {__('Date', 'Date')}
-                        {getSortIcon('created_at')}
-                      </button>
-                    </TableHead>
-                    <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {reviews.map((review) => (
-                    <TableRow key={review.id}>
-                      <TableCell>
-                        {review.trip_id ? (
-                          <a 
-                            href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`}
-                            className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-                          >
-                            {review.trip_title}
-                          </a>
-                        ) : (
-                          <span className="font-medium text-gray-500 dark:text-gray-400">
-                            {review.trip_title}
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white">
-                            {review.customer_name}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {review.customer_email}
-                          </div>
-                          {review.verified && (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 mt-1">
-                              {__('Verified', 'Verified')}
-                            </span>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {renderStars(review.rating)}
-                      </TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white mb-1">
-                            {review.title}
-                          </div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                            {review.comment}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {getStatusBadge(review.status)}
-                      </TableCell>
-                      <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                        {formatDate(review.created_at)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <ConditionalRender capability="yatra_view_reviews">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleView(review)}
-                              className="h-8 w-8"
-                              aria-label={__('View review', 'View review')}
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                          </ConditionalRender>
+      {/* Bulk actions toolbar - shared component */}
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkApply}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter={statusFilter}
+        setStatusFilter={(value: string) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction('');
+        }}
+        statusOptions={[
+          { key: 'all', label: __('All', 'All'), count: total },
+          { key: 'approved', label: __('Approved', 'Approved'), count: reviews.filter(r => r.status === 'approved').length },
+          { key: 'pending', label: __('Pending', 'Pending'), count: reviews.filter(r => r.status === 'pending').length },
+          { key: 'spam', label: __('Spam', 'Spam'), count: reviews.filter(r => r.status === 'spam').length },
+          { key: 'trash', label: __('Trash', 'Trash'), count: reviews.filter(r => r.status === 'trash').length },
+        ]}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={columnOptions}
+        onToggleColumn={toggleColumn}
+        bulkMutationPending={deleteMutation.isPending}
+        totalItems={reviews.length}
+        bulkActionOptions={bulkActionOptions}
+      />
 
-                          <ConditionalRender capability="yatra_edit_reviews">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEdit(review)}
-                              className="h-8 w-8"
-                              aria-label={__('Edit review', 'Edit review')}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                          </ConditionalRender>
+      <Card>
+        <CardContent className="p-0 overflow-x-auto">
+          <SharedTable
+            data={reviews}
+            columns={[
+              visibleColumns.trip && {
+                key: 'trip',
+                label: __('Trip', 'Trip'),
+                render: (review: Review) => (
+                  review.trip_id ? (
+                    <a
+                      href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`}
+                      className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+                    >
+                      {review.trip_title}
+                    </a>
+                  ) : (
+                    <span className="font-medium text-gray-500 dark:text-gray-400">
+                      {review.trip_title}
+                    </span>
+                  )
+                ),
+              },
+              visibleColumns.customer && {
+                key: 'customer',
+                label: __('Customer', 'Customer'),
+                render: (review: Review) => (
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white">
+                      {review.customer_name}
+                    </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {review.customer_email}
+                    </div>
+                    {review.verified && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 mt-1">
+                        {__('Verified', 'Verified')}
+                      </span>
+                    )}
+                  </div>
+                ),
+              },
+              visibleColumns.rating && {
+                key: 'rating',
+                label: __('Rating', 'Rating'),
+                render: (review: Review) => renderStars(review.rating),
+              },
+              visibleColumns.review && {
+                key: 'review',
+                label: __('Review', 'Review'),
+                render: (review: Review) => (
+                  <div>
+                    <div className="font-medium text-gray-900 dark:text-white mb-1">
+                      {review.title}
+                    </div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {review.comment}
+                    </div>
+                  </div>
+                ),
+              },
+              visibleColumns.status && {
+                key: 'status',
+                label: __('Status', 'Status'),
+                render: (review: Review) => getStatusBadge(review.status),
+              },
+              visibleColumns.date && {
+                key: 'date',
+                label: __('Date', 'Date'),
+                render: (review: Review) => (
+                  <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    {formatDate(review.created_at)}
+                  </span>
+                ),
+              },
+            ].filter(Boolean)}
+            actions={actions}
+            isLoading={isLoading}
+            isError={!!error}
+            errorText={__('Error loading reviews', 'Error loading reviews')}
+            emptyText={__('No reviews found', 'No reviews found')}
+            emptyDescription={__('When customers submit reviews, they will appear here.', 'When customers submit reviews, they will appear here.')}
+            onSort={handleSort}
+            getSortIcon={getSortIcon}
+            selectedItemIds={selectedIds}
+            onSelectItem={(id: string | number, checked: boolean) => {
+              if (checked) {
+                setSelectedIds(prev => (prev.includes(id) ? prev : [...prev, id]));
+              } else {
+                setSelectedIds(prev => prev.filter(existingId => existingId !== id));
+              }
+            }}
+            onSelectAll={(checked: boolean) => {
+              if (checked) {
+                setSelectedIds(reviews.map(r => r.id));
+              } else {
+                setSelectedIds([]);
+              }
+            }}
+            isAllSelected={reviews.length > 0 && selectedIds.length === reviews.length}
+            getItemId={(review: Review) => review.id}
+            capability="yatra_view_reviews"
+            skeletonRows={5}
+          />
+        </CardContent>
+      </Card>
 
-                          <ConditionalRender capability="yatra_delete_reviews">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(review)}
-                              className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                              aria-label={__('Delete review', 'Delete review')}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          </ConditionalRender>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Pagination - Always Visible */}
-        {total > 0 && (
-          <Card>
-            <CardContent className="p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('reviews', 'reviews')}
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="h-8"
-                  >
-                    {__('Previous', 'Previous')}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                    disabled={page >= totalPages}
-                    className="h-8"
-                  >
-                    {__('Next', 'Next')}
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-      </ConditionalRender>
+      {/* Pagination - shared component, no extra white background */}
+      {total > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={total}
+          itemsPerPage={10}
+          onPageChange={setPage}
+          itemName={__('reviews', 'reviews')}
+        />
+      )}
     </div>
   );
 };

@@ -263,6 +263,57 @@ class ReviewRepository extends BaseRepository
     }
 
     /**
+     * Bulk update review status
+     *
+     * @param array  $ids    Review IDs
+     * @param string $status New status
+     * @return int Number of affected rows
+     */
+    public function bulkUpdateStatus(array $ids, string $status): int
+    {
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $table = $this->getTableName();
+        $ids   = array_map('intval', $ids);
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        $query = $this->wpdb->prepare(
+            "UPDATE {$table} SET status = %s, updated_at = %s WHERE id IN ({$placeholders})",
+            array_merge([sanitize_text_field($status), current_time('mysql')], $ids)
+        );
+
+        $this->wpdb->query($query);
+
+        return (int) $this->wpdb->rows_affected;
+    }
+
+    /**
+     * Bulk delete reviews
+     *
+     * @param array $ids Review IDs
+     * @return int Number of deleted rows
+     */
+    public function bulkDelete(array $ids): int
+    {
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $table = $this->getTableName();
+        $ids   = array_map('intval', $ids);
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        $this->wpdb->query($this->wpdb->prepare(
+            "DELETE FROM {$table} WHERE id IN ({$placeholders})",
+            $ids
+        ));
+
+        return (int) $this->wpdb->rows_affected;
+    }
+
+    /**
      * Update review status
      * 
      * @param int    $id     Review ID

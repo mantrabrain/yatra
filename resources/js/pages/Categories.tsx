@@ -254,35 +254,53 @@ const Categories: React.FC = () => {
       subcategories: Array.isArray(cat.subcategories) ? cat.subcategories : [],
     }));
 
-    // Apply status filtering to both parents and children
-    const filterByStatus = (items: Category[]): Category[] => {
+    const term = searchTerm.trim().toLowerCase();
+
+    const matchesSearch = (cat: Category): boolean => {
+      if (!term) return true;
+      const name = cat.name?.toLowerCase() || '';
+      const slug = cat.slug?.toLowerCase() || '';
+      const desc = cat.description?.toLowerCase() || '';
+      return (
+        name.includes(term) ||
+        slug.includes(term) ||
+        desc.includes(term)
+      );
+    };
+
+    // Apply status + search filtering to both parents and children
+    const filterByStatusAndSearch = (items: Category[]): Category[] => {
       return items.map((cat: Category) => {
-        // Filter subcategories by status
-        const filteredSubcategories = cat.subcategories ? 
-          cat.subcategories.filter((sub: Category) => 
-            statusFilter === 'all' || sub.status === statusFilter
-          ) : [];
+        // Filter subcategories by status + search
+        const filteredSubcategories = cat.subcategories
+          ? cat.subcategories.filter((sub: Category) => {
+              const statusOk = statusFilter === 'all' || sub.status === statusFilter;
+              const searchOk = matchesSearch(sub);
+              return statusOk && searchOk;
+            })
+          : [];
 
         return {
           ...cat,
           subcategories: filteredSubcategories,
         };
       }).filter((cat: Category) => {
-        // Filter parent categories by status
-        if (statusFilter === 'all') return true;
-        
-        // Show parent if it matches status OR if it has children that match status
-        const parentMatches = cat.status === statusFilter;
+        // When no status/search filters, keep all
+        if (statusFilter === 'all' && !term) return true;
+
+        const statusOk = statusFilter === 'all' || cat.status === statusFilter;
+        const searchOk = matchesSearch(cat);
         const hasMatchingChildren = cat.subcategories && cat.subcategories.length > 0;
-        
-        return parentMatches || hasMatchingChildren;
+
+        // Show parent if it itself matches filters OR has children that match
+        return (statusOk && searchOk) || hasMatchingChildren;
       });
     };
 
-    const statusFiltered = filterByStatus(normalized);
+    const filtered = filterByStatusAndSearch(normalized);
 
     if (parentFilter === 'subcategories') {
-      const onlySubs: Category[] = statusFiltered.flatMap((cat: Category) =>
+      const onlySubs: Category[] = filtered.flatMap((cat: Category) =>
         (cat.subcategories || []).map(sub => ({
           ...sub,
           parent_name: cat.name,
@@ -294,14 +312,14 @@ const Categories: React.FC = () => {
     }
 
     if (parentFilter === 'top-level') {
-      return statusFiltered.map(cat => ({
+      return filtered.map(cat => ({
         ...cat,
         subcategories: [], // Don't show subcategories when filtering for top-level only
       }));
     }
 
-    return statusFiltered;
-  }, [categories, parentFilter, statusFilter]);
+    return filtered;
+  }, [categories, parentFilter, statusFilter, searchTerm]);
 
   // Expand all parent categories that have subcategories by default
   useEffect(() => {
@@ -656,16 +674,18 @@ const Categories: React.FC = () => {
               />
             </div>
 
-            {/* Parent filter - narrower on large screens */}
-            <Select
-              value={parentFilter}
-              onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
-              className="w-full lg:w-28 lg:flex-none text-sm"
-            >
-              <option value="all">{__('All Categories', 'All Categories')}</option>
-              <option value="top-level">{__('Top Level Only', 'Top Level Only')}</option>
-              <option value="subcategories">{__('Subcategories Only', 'Subcategories Only')}</option>
-            </Select>
+            {/* Parent filter - constrained width on large screens */}
+            <div className="w-full lg:w-24 lg:flex-none">
+              <Select
+                value={parentFilter}
+                onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
+                className="w-full text-sm truncate"
+              >
+                <option value="all">{__('All Categories', 'All Categories')}</option>
+                <option value="top-level">{__('Top Level Only', 'Top Level Only')}</option>
+                <option value="subcategories">{__('Subcategories Only', 'Subcategories Only')}</option>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>

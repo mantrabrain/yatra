@@ -204,7 +204,8 @@ class EnquiryService
      */
     public function bulkUpdateStatus(array $ids, string $status): array
     {
-        $validStatuses = ['pending', 'read', 'responded', 'archived', 'spam'];
+        // Allowed statuses for bulk updates. This list is mirrored in the admin UI.
+        $validStatuses = ['pending', 'read', 'responded', 'archived', 'spam', 'trash'];
 
         if (!in_array($status, $validStatuses, true)) {
             return ['success' => false, 'affected' => 0, 'message' => __('Invalid status.', 'yatra')];

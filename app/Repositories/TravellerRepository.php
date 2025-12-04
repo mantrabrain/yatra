@@ -747,5 +747,53 @@ class TravellerRepository
             ],
         ];
     }
+
+    /**
+     * Bulk delete travellers and their meta
+     * 
+     * @param int[] $ids Traveller IDs
+     * @return array {success: bool, deleted: int, message: string}
+     */
+    public function bulkDelete(array $ids): array
+    {
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+
+        if (empty($ids)) {
+            return [
+                'success' => false,
+                'deleted' => 0,
+                'message' => __('No travelers selected.', 'yatra'),
+            ];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ids), '%d'));
+
+        // Delete meta first
+        $metaDeleted = 0;
+        if (!empty($this->meta_table)) {
+            $metaSql = "DELETE FROM {$this->meta_table} WHERE traveller_id IN ($placeholders)";
+            $metaDeleted = $this->wpdb->query($this->wpdb->prepare($metaSql, ...$ids));
+        }
+
+        // Delete travellers
+        $travellerSql = "DELETE FROM {$this->travellers_table} WHERE id IN ($placeholders)";
+        $travellersDeleted = $this->wpdb->query($this->wpdb->prepare($travellerSql, ...$ids));
+
+        $deletedCount = (int) $travellersDeleted;
+
+        if ($deletedCount <= 0) {
+            return [
+                'success' => false,
+                'deleted' => 0,
+                'message' => __('Failed to delete travelers.', 'yatra'),
+            ];
+        }
+
+        return [
+            'success' => true,
+            'deleted' => $deletedCount,
+            'message' => sprintf(_n('%d traveler deleted.', '%d travelers deleted.', $deletedCount, 'yatra'), $deletedCount),
+        ];
+    }
 }
 

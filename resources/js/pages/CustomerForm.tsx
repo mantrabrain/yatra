@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -49,6 +50,7 @@ interface CustomerFormData {
 const CustomerForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<CustomerFormData>({
     first_name: '',
     last_name: '',
@@ -95,7 +97,7 @@ const CustomerForm: React.FC = () => {
   const isEditMode = action === 'edit' && customerId !== null;
 
   // Fetch customer data if editing
-  const { data: customerData, isLoading: isLoadingCustomer } = useQuery({
+  const { data: customerData, isLoading: isLoadingCustomer } = useQuery<{ data?: any } | CustomerFormData | null>({
     queryKey: ['customer', customerId],
     queryFn: async () => {
       if (!customerId) return null;
@@ -103,7 +105,41 @@ const CustomerForm: React.FC = () => {
         headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
       });
       if (!response.ok) throw new Error('Failed to fetch customer');
-      return response.json();
+
+      const json = await response.json();
+      const data = json && typeof json === 'object' && 'data' in json ? (json.data as any) : json;
+
+      const emergency = (data as any).emergency_contact || {};
+
+      return {
+        first_name: data.first_name || '',
+        last_name: data.last_name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        secondary_phone: data.secondary_phone || '',
+        country: data.country || '',
+        city: data.city || '',
+        state: data.state || '',
+        address: data.address || '',
+        postal_code: data.postal_code || '',
+        nationality: data.nationality || '',
+        date_of_birth: data.date_of_birth || '',
+        gender: data.gender || '',
+        passport_number: data.passport_number || '',
+        passport_expiry: data.passport_expiry || '',
+        emergency_name: (data as any).emergency_name || emergency.name || '',
+        emergency_phone: (data as any).emergency_phone || emergency.phone || '',
+        emergency_relationship: (data as any).emergency_relationship || emergency.relationship || '',
+        dietary_requirements: data.dietary_requirements || '',
+        medical_conditions: data.medical_conditions || '',
+        special_needs: data.special_needs || '',
+        newsletter_optin: Boolean(data.newsletter_optin),
+        marketing_optin: Boolean(data.marketing_optin),
+        status: data.status || 'active',
+        notes: data.notes || '',
+        loyalty_tier: data.loyalty_tier || 'bronze',
+        loyalty_points: typeof data.loyalty_points === 'number' ? data.loyalty_points : parseInt(data.loyalty_points || '0', 10) || 0,
+      } as CustomerFormData;
     },
     enabled: isEditMode && can('yatra_view_bookings'),
   });
@@ -111,35 +147,7 @@ const CustomerForm: React.FC = () => {
   // Load customer data into form when editing
   useEffect(() => {
     if (customerData && isEditMode) {
-      setFormData({
-        first_name: customerData.first_name || '',
-        last_name: customerData.last_name || '',
-        email: customerData.email || '',
-        phone: customerData.phone || '',
-        secondary_phone: customerData.secondary_phone || '',
-        country: customerData.country || '',
-        city: customerData.city || '',
-        state: customerData.state || '',
-        address: customerData.address || '',
-        postal_code: customerData.postal_code || '',
-        nationality: customerData.nationality || '',
-        date_of_birth: customerData.date_of_birth || '',
-        gender: customerData.gender || '',
-        passport_number: customerData.passport_number || '',
-        passport_expiry: customerData.passport_expiry || '',
-        emergency_name: customerData.emergency_name || '',
-        emergency_phone: customerData.emergency_phone || '',
-        emergency_relationship: customerData.emergency_relationship || '',
-        dietary_requirements: customerData.dietary_requirements || '',
-        medical_conditions: customerData.medical_conditions || '',
-        special_needs: customerData.special_needs || '',
-        newsletter_optin: customerData.newsletter_optin || false,
-        marketing_optin: customerData.marketing_optin || false,
-        status: customerData.status || 'active',
-        notes: customerData.notes || '',
-        loyalty_tier: customerData.loyalty_tier || 'bronze',
-        loyalty_points: customerData.loyalty_points || 0,
-      });
+      setFormData(customerData as CustomerFormData);
     }
   }, [customerData, isEditMode]);
 
@@ -193,13 +201,14 @@ const CustomerForm: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       queryClient.invalidateQueries({ queryKey: ['customer', customerId] });
-      // Redirect to customers list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers`;
+      setIsSubmitting(false);
+      showToast(__('Customer updated successfully', 'Customer updated successfully'), 'success');
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the customer', 'An error occurred while saving the customer');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
+      showToast(errorMessage, 'error');
     },
   });
 

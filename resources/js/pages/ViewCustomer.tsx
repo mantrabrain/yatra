@@ -88,7 +88,19 @@ const ViewCustomer: React.FC = () => {
         headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
       });
       if (!response.ok) throw new Error('Failed to fetch customer');
-      return response.json();
+
+      const json = await response.json();
+      const data = json && typeof json === 'object' && 'data' in json ? (json.data as any) : json;
+
+      // Normalize nested emergency_contact structure to flat fields expected by the UI
+      const emergency = (data as any).emergency_contact || {};
+
+      return {
+        ...data,
+        emergency_name: (data as any).emergency_name ?? emergency.name ?? null,
+        emergency_phone: (data as any).emergency_phone ?? emergency.phone ?? null,
+        emergency_relationship: (data as any).emergency_relationship ?? emergency.relationship ?? null,
+      } as Customer;
     },
     enabled: !!customerId && can('yatra_view_bookings'),
   });
@@ -102,7 +114,15 @@ const ViewCustomer: React.FC = () => {
         headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
       });
       if (!response.ok) throw new Error('Failed to fetch bookings');
-      return response.json();
+      const json = await response.json();
+      // API returns an object with data property; ensure we always return an array
+      if (Array.isArray(json)) {
+        return json;
+      }
+      if (json && Array.isArray(json.data)) {
+        return json.data;
+      }
+      return [];
     },
     enabled: !!customerId && can('yatra_view_bookings'),
   });
@@ -384,7 +404,12 @@ const ViewCustomer: React.FC = () => {
                     {__('Full Name', 'Full Name')}
                   </div>
                   <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {customer.name || `${customer.first_name} ${customer.last_name}`}
+                    <a
+                      href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`}
+                      className="hover:underline text-primary-600 dark:text-primary-400"
+                    >
+                      {customer.name || `${customer.first_name} ${customer.last_name}`}
+                    </a>
                   </div>
                 </div>
 

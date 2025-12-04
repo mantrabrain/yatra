@@ -209,7 +209,7 @@ class ReviewService
      */
     public function updateStatus(int $id, string $status): array
     {
-        $validStatuses = ['pending', 'approved', 'rejected', 'spam'];
+        $validStatuses = ['pending', 'approved', 'rejected', 'spam', 'trash'];
 
         if (!in_array($status, $validStatuses, true)) {
             return ['success' => false, 'message' => __('Invalid status.', 'yatra')];
@@ -233,6 +233,47 @@ class ReviewService
         return [
             'success' => true,
             'message' => sprintf(__('Review status updated to %s.', 'yatra'), $status),
+        ];
+    }
+
+    /**
+     * Bulk update review status
+     *
+     * @param array  $ids    Review IDs
+     * @param string $status New status
+     * @return array {success: bool, affected: int, message: string}
+     */
+    public function bulkUpdateStatus(array $ids, string $status): array
+    {
+        $validStatuses = ['pending', 'approved', 'rejected', 'spam', 'trash'];
+
+        if (!in_array($status, $validStatuses, true)) {
+            return ['success' => false, 'affected' => 0, 'message' => __('Invalid status.', 'yatra')];
+        }
+
+        $affected = $this->reviewRepository->bulkUpdateStatus($ids, $status);
+
+        return [
+            'success'  => true,
+            'affected' => $affected,
+            'message'  => sprintf(__('%d reviews updated.', 'yatra'), $affected),
+        ];
+    }
+
+    /**
+     * Bulk delete reviews
+     *
+     * @param array $ids Review IDs
+     * @return array {success: bool, affected: int, message: string}
+     */
+    public function bulkDelete(array $ids): array
+    {
+        $affected = $this->reviewRepository->bulkDelete($ids);
+
+        return [
+            'success'  => true,
+            'affected' => $affected,
+            'message'  => sprintf(__('%d reviews deleted.', 'yatra'), $affected),
         ];
     }
 

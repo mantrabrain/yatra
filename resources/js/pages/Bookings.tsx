@@ -5,15 +5,15 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Skeleton } from '../components/ui/skeleton';
@@ -44,11 +44,46 @@ const Bookings: React.FC = () => {
   const [sortBy, setSortBy] = useState('booking_date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [isBulkPending, setIsBulkPending] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        booking_number: true,
+        customer: true,
+        trip: true,
+        travelers: true,
+        booking_date: true,
+        travel_date: true,
+        amount: true,
+        payment_status: true,
+        booking_status: true,
+      };
+    }
+    const saved = window.localStorage.getItem('yatra-bookings-visible-columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          booking_number: true,
+          customer: true,
+          trip: true,
+          travelers: true,
+          booking_date: true,
+          travel_date: true,
+          amount: true,
+          payment_status: true,
+          booking_status: true,
+        };
+  });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
+  const apiBase = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -168,6 +203,10 @@ const Bookings: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      showToast(__('Booking deleted successfully', 'Booking deleted successfully'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete booking', 'Failed to delete booking'), 'error');
     },
   });
 
@@ -317,6 +356,351 @@ const Bookings: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || paymentFilter !== 'all' || sortBy !== 'booking_date' || sortOrder !== 'desc';
 
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-bookings-visible-columns', JSON.stringify(newVisibleColumns));
+    }
+  };
+
+  const handleSelectItem = (id: string | number, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id)));
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(bookings.map((booking: Booking) => booking.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const isAllSelected = bookings.length > 0 && selectedIds.length === bookings.length;
+
+  const updateStatusForIds = async (
+    ids: (string | number)[],
+    newStatus: string
+  ) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        const response = await fetch(`${apiBase}/bookings/${id}/status`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
+          },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to update booking status');
+        }
+      })
+    );
+  };
+
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+
+    try {
+      setIsBulkPending(true);
+
+      if (bulkAction === 'delete') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`${apiBase}/bookings/${id}`, {
+              method: 'DELETE',
+              headers: {
+                'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
+              },
+            })
+          )
+        );
+        showToast(__('Selected bookings deleted successfully', 'Selected bookings deleted successfully'), 'success');
+      } else {
+        await updateStatusForIds(selectedIds, bulkAction);
+        showToast(__('Bulk booking status updated successfully', 'Bulk booking status updated successfully'), 'success');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    } catch (error: any) {
+      showToast(
+        error?.message || __('Failed to perform bulk action on bookings', 'Failed to perform bulk action on bookings'),
+        'error'
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+
+  const allBulkActionOptions = [
+    { value: 'confirmed', label: __('Mark as Confirmed', 'Mark as Confirmed') },
+    { value: 'pending', label: __('Mark as Pending', 'Mark as Pending') },
+    { value: 'cancelled', label: __('Mark as Cancelled', 'Mark as Cancelled') },
+    { value: 'completed', label: __('Mark as Completed', 'Mark as Completed') },
+    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+  ];
+
+  const getBulkActionOptionsForStatus = (view: string) => {
+    switch (view) {
+      case 'confirmed':
+        return allBulkActionOptions.filter((opt) =>
+          ['pending', 'cancelled', 'completed', 'delete'].includes(opt.value)
+        );
+      case 'pending':
+        return allBulkActionOptions.filter((opt) =>
+          ['confirmed', 'cancelled', 'completed', 'delete'].includes(opt.value)
+        );
+      case 'cancelled':
+        return allBulkActionOptions.filter((opt) =>
+          ['pending', 'confirmed', 'delete'].includes(opt.value)
+        );
+      case 'completed':
+        return allBulkActionOptions.filter((opt) =>
+          ['confirmed', 'cancelled', 'delete'].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+
+  const statusOptions = [
+    { value: 'all', label: __('All Status', 'All Status') },
+    { value: 'confirmed', label: __('Confirmed', 'Confirmed') },
+    { value: 'pending', label: __('Pending', 'Pending') },
+    { value: 'cancelled', label: __('Cancelled', 'Cancelled') },
+    { value: 'completed', label: __('Completed', 'Completed') },
+  ];
+
+  const sortOptions = [
+    { value: 'booking_date', label: __('Booking Date', 'Booking Date') },
+    { value: 'travel_date', label: __('Travel Date', 'Travel Date') },
+    { value: 'booking_number', label: __('Booking Number', 'Booking Number') },
+    { value: 'customer_name', label: __('Customer', 'Customer') },
+    { value: 'trip_title', label: __('Trip', 'Trip') },
+    { value: 'total_amount', label: __('Amount', 'Amount') },
+    { value: 'booking_status', label: __('Status', 'Status') },
+  ];
+
+  const columnOptions = [
+    { key: 'booking_number', label: __('Booking #', 'Booking #'), visible: visibleColumns.booking_number },
+    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
+    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
+    { key: 'travelers', label: __('Travelers', 'Travelers'), visible: visibleColumns.travelers },
+    { key: 'booking_date', label: __('Booking Date', 'Booking Date'), visible: visibleColumns.booking_date },
+    { key: 'travel_date', label: __('Travel Date', 'Travel Date'), visible: visibleColumns.travel_date },
+    { key: 'amount', label: __('Amount', 'Amount'), visible: visibleColumns.amount },
+    { key: 'payment_status', label: __('Payment', 'Payment'), visible: visibleColumns.payment_status },
+    { key: 'booking_status', label: __('Status', 'Status'), visible: visibleColumns.booking_status },
+  ];
+
+  const columns = [
+    {
+      key: 'booking_number',
+      label: __('Booking #', 'Booking #'),
+      sortable: true,
+      visible: visibleColumns.booking_number,
+      width: 'w-[140px]',
+      render: (booking: Booking) => (
+        <button
+          type="button"
+          onClick={() => handleView(booking)}
+          className="text-sm font-mono font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline"
+        >
+          {booking.booking_number}
+        </button>
+      ),
+    },
+    {
+      key: 'customer',
+      label: __('Customer', 'Customer'),
+      sortable: true,
+      visible: visibleColumns.customer,
+      render: (booking: Booking) => (
+        <div>
+          <div className="font-medium text-gray-900 dark:text-white">
+            {booking.customer_name}
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            {booking.customer_email}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'trip',
+      label: __('Trip', 'Trip'),
+      sortable: true,
+      visible: visibleColumns.trip,
+      render: (booking: Booking) => (
+        <span className="text-gray-900 dark:text-white">{booking.trip_title}</span>
+      ),
+    },
+    {
+      key: 'travelers',
+      label: __('Travelers', 'Travelers'),
+      sortable: false,
+      visible: visibleColumns.travelers,
+      render: (booking: Booking) => (
+        <span className="text-gray-600 dark:text-gray-400">{booking.travelers}</span>
+      ),
+    },
+    {
+      key: 'booking_date',
+      label: __('Booking Date', 'Booking Date'),
+      sortable: true,
+      visible: visibleColumns.booking_date,
+      render: (booking: Booking) => (
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
+          {formatDate(booking.booking_date)}
+        </span>
+      ),
+    },
+    {
+      key: 'travel_date',
+      label: __('Travel Date', 'Travel Date'),
+      sortable: true,
+      visible: visibleColumns.travel_date,
+      render: (booking: Booking) => (
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
+          {formatDate(booking.travel_date)}
+        </span>
+      ),
+    },
+    {
+      key: 'amount',
+      label: __('Amount', 'Amount'),
+      sortable: true,
+      visible: visibleColumns.amount,
+      render: (booking: Booking) => (
+        <span className="font-medium">
+          {formatPrice(booking.total_amount, booking.currency || defaultCurrency)}
+        </span>
+      ),
+    },
+    {
+      key: 'payment_status',
+      label: __('Payment', 'Payment'),
+      sortable: true,
+      visible: visibleColumns.payment_status,
+      render: (booking: Booking) => getPaymentStatusBadge(booking.payment_status),
+    },
+    {
+      key: 'booking_status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.booking_status,
+      render: (booking: Booking) => getBookingStatusBadge(booking.booking_status),
+    },
+  ];
+
+  const actions = [
+    {
+      key: 'view',
+      label: __('View', 'View'),
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (booking: Booking) => handleView(booking),
+    },
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (booking: Booking) => handleEdit(booking),
+      condition: () => can('yatra_edit_bookings'),
+    },
+    {
+      key: 'mark_confirmed',
+      label: __('Mark as Confirmed', 'Mark as Confirmed'),
+      icon: <ArrowUp className="w-4 h-4" />,
+      onClick: async (booking: Booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], 'confirmed');
+          queryClient.invalidateQueries({ queryKey: ['bookings'] });
+          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'confirmed',
+    },
+    {
+      key: 'mark_pending',
+      label: __('Mark as Pending', 'Mark as Pending'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (booking: Booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], 'pending');
+          queryClient.invalidateQueries({ queryKey: ['bookings'] });
+          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'pending',
+    },
+    {
+      key: 'mark_cancelled',
+      label: __('Mark as Cancelled', 'Mark as Cancelled'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (booking: Booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], 'cancelled');
+          queryClient.invalidateQueries({ queryKey: ['bookings'] });
+          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'cancelled',
+    },
+    {
+      key: 'mark_completed',
+      label: __('Mark as Completed', 'Mark as Completed'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (booking: Booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], 'completed');
+          queryClient.invalidateQueries({ queryKey: ['bookings'] });
+          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'completed',
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (booking: Booking) => handleDelete(booking),
+      variant: 'destructive' as const,
+      condition: () => can('yatra_delete_bookings'),
+    },
+  ];
+
   return (
     <div className="space-y-3">
       <PageHeader
@@ -331,42 +715,44 @@ const Bookings: React.FC = () => {
         }
       />
 
-      {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-4">
           <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
-            {/* Search */}
-            <div className="flex-1 min-w-0 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-              <Input
-                type="text"
+            <div className="flex-1 min-w-0">
+              <SearchFilterToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+                statusOptions={statusOptions}
+                sortBy={sortBy}
+                onSortByChange={(field) => {
+                  setSortBy(field);
+                  setPage(1);
+                }}
+                sortOrder={sortOrder}
+                onSortOrderChange={(order) => {
+                  setSortOrder(order);
+                  setPage(1);
+                }}
+                sortOptions={sortOptions}
+                onResetFilters={handleResetFilters}
+                hasFilters={!!hasFilters}
                 placeholder={__('Search bookings...', 'Search bookings...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
               />
-            </div>
-
-            {/* Booking Status Filter */}
-            <div className="w-full lg:w-auto lg:min-w-[160px]">
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full"
-              >
-                <option value="all">{__('All Status', 'All Status')}</option>
-                <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
-                <option value="pending">{__('Pending', 'Pending')}</option>
-                <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
-                <option value="completed">{__('Completed', 'Completed')}</option>
-              </Select>
             </div>
 
             {/* Payment Status Filter */}
             <div className="w-full lg:w-auto lg:min-w-[160px]">
               <Select
                 value={paymentFilter}
-                onChange={(e) => setPaymentFilter(e.target.value)}
+                onChange={(e) => {
+                  setPaymentFilter(e.target.value);
+                  setPage(1);
+                }}
                 className="w-full"
               >
                 <option value="all">{__('All Payments', 'All Payments')}</option>
@@ -376,60 +762,11 @@ const Bookings: React.FC = () => {
                 <option value="refunded">{__('Refunded', 'Refunded')}</option>
               </Select>
             </div>
-
-            {/* Sort By */}
-            <div className="w-full lg:w-auto lg:min-w-[160px]">
-              <Select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="w-full"
-              >
-                <option value="booking_date">{__('Booking Date', 'Booking Date')}</option>
-                <option value="travel_date">{__('Travel Date', 'Travel Date')}</option>
-                <option value="booking_number">{__('Booking Number', 'Booking Number')}</option>
-                <option value="customer_name">{__('Customer', 'Customer')}</option>
-                <option value="trip_title">{__('Trip', 'Trip')}</option>
-                <option value="total_amount">{__('Amount', 'Amount')}</option>
-                <option value="booking_status">{__('Status', 'Status')}</option>
-              </Select>
-            </div>
-
-            {/* Sort Order */}
-            <div className="w-full lg:w-auto lg:flex-shrink-0">
-              <Button
-                variant="outline"
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="px-4 flex items-center gap-2 w-full lg:w-auto"
-                title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-              >
-                {sortOrder === 'asc' ? (
-                  <ArrowUp className="w-4 h-4" />
-                ) : (
-                  <ArrowDown className="w-4 h-4" />
-                )}
-                <span className="text-sm whitespace-nowrap">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-              </Button>
-            </div>
-
-            {/* Reset Button */}
-            {hasFilters && (
-              <div className="w-full lg:w-auto lg:flex-shrink-0">
-                <Button
-                  variant="outline"
-                  onClick={handleResetFilters}
-                  className="flex items-center gap-2 w-full lg:w-auto"
-                >
-                  <X className="w-4 h-4" />
-                  <span className="text-sm">{__('Reset', 'Reset')}</span>
-                </Button>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {/* Table */}
         {error ? (
           <Card>
             <CardContent className="p-8 text-center text-red-500">
@@ -438,12 +775,42 @@ const Bookings: React.FC = () => {
           </Card>
         ) : (
           <>
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={() => setSelectedIds([])}
+              statusFilter={statusFilter}
+              setStatusFilter={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
+              statusOptions={[
+                { key: 'all', label: __('All', 'All'), count: 0 },
+                { key: 'confirmed', label: __('Confirmed', 'Confirmed'), count: 0 },
+                { key: 'pending', label: __('Pending', 'Pending'), count: 0 },
+                { key: 'cancelled', label: __('Cancelled', 'Cancelled'), count: 0 },
+                { key: 'completed', label: __('Completed', 'Completed'), count: 0 },
+              ]}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={columnOptions}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={isBulkPending}
+              totalItems={total}
+              bulkActionOptions={bulkActionOptions}
+            />
+
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
                   <div className="p-4 space-y-3">
                     {[...Array(5)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                      <div
+                        key={i}
+                        className="flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                      >
                         <Skeleton className="h-4 w-24" />
                         <div className="flex-1 space-y-2">
                           <Skeleton className="h-4 w-32" />
@@ -462,205 +829,48 @@ const Bookings: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                ) : bookings.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No bookings found', 'No bookings found')}
-                  </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[120px]">
-                          <button
-                            onClick={() => handleSort('booking_number')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Booking #', 'Booking #')}
-                            {getSortIcon('booking_number')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('customer_name')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Customer', 'Customer')}
-                            {getSortIcon('customer_name')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('trip_title')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Trip', 'Trip')}
-                            {getSortIcon('trip_title')}
-                          </button>
-                        </TableHead>
-                        <TableHead>{__('Travelers', 'Travelers')}</TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('booking_date')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Booking Date', 'Booking Date')}
-                            {getSortIcon('booking_date')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('travel_date')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Travel Date', 'Travel Date')}
-                            {getSortIcon('travel_date')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('total_amount')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Amount', 'Amount')}
-                            {getSortIcon('total_amount')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('payment_status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Payment', 'Payment')}
-                            {getSortIcon('payment_status')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('booking_status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('booking_status')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {bookings.map((booking) => (
-                        <TableRow key={booking.id}>
-                          <TableCell className="font-medium text-gray-900 dark:text-white">
-                            {booking.booking_number}
-                          </TableCell>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-white">
-                                {booking.customer_name}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                {booking.customer_email}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-900 dark:text-white">
-                            {booking.trip_title}
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400">
-                            {booking.travelers}
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(booking.booking_date)}
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(booking.travel_date)}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatPrice(booking.total_amount, booking.currency || defaultCurrency)}
-                          </TableCell>
-                          <TableCell>
-                            {getPaymentStatusBadge(booking.payment_status)}
-                          </TableCell>
-                          <TableCell>
-                            {getBookingStatusBadge(booking.booking_status)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_view_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleView(booking)}
-                                  className="h-8 w-8"
-                                  aria-label={__('View booking', 'View booking')}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_edit_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(booking)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Edit booking', 'Edit booking')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(booking)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete booking', 'Delete booking')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <SharedTable
+                    data={bookings}
+                    columns={columns}
+                    actions={actions}
+                    isLoading={isLoading}
+                    isError={!!error}
+                    errorText={__('Error loading bookings', 'Error loading bookings')}
+                    emptyText={__('No bookings found', 'No bookings found')}
+                    emptyDescription={
+                      hasFilters
+                        ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                        : __('Get started by creating your first booking.', 'Get started by creating your first booking.')
+                    }
+                    onCreateClick={
+                      can('yatra_edit_bookings') ? handleCreateBooking : undefined
+                    }
+                    onSort={handleSort}
+                    getSortIcon={getSortIcon}
+                    selectedItemIds={selectedIds}
+                    onSelectItem={handleSelectItem}
+                    onSelectAll={handleSelectAll}
+                    isAllSelected={isAllSelected}
+                    getItemId={(booking: Booking) => booking.id}
+                    skeletonRows={5}
+                    capability="yatra_view_bookings"
+                  />
                 )}
               </CardContent>
             </Card>
 
-            {/* Pagination - Always Visible */}
             {total > 0 && (
-              <Card>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('bookings', 'bookings')}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  totalItems={total}
+                  itemsPerPage={10}
+                  onPageChange={(newPage) => setPage(newPage)}
+                  itemName={__('bookings', 'bookings')}
+                />
+              </div>
             )}
           </>
         )}

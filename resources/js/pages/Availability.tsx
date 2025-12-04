@@ -32,7 +32,6 @@ import { Select } from '../components/ui/select';
 import { SearchableSelect } from '../components/ui/searchable-select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
@@ -40,6 +39,8 @@ import { AvailabilityCalendar } from '../components/availability/AvailabilityCal
 import { RecurringRules } from '../components/availability/RecurringRules';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
+import { BulkActionToolbar, Table as SharedTable } from '../components/shared';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface Trip {
   id: number;
@@ -157,6 +158,29 @@ const Availability: React.FC = () => {
   // Pagination
   const [page, setPage] = useState(1);
 
+  // Bulk selection & columns state
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    departure: true,
+    arrival: true,
+    locations: true,
+    capacity: true,
+    booked: true,
+    available: true,
+    waitlist: true,
+    price: true,
+    status: true,
+  });
+
+  const toggleColumn = (key: keyof typeof visibleColumns) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
   // Fetch all trips for dropdown
   const { data: tripsData } = useQuery({
     queryKey: ['trips', 'all'],
@@ -233,6 +257,7 @@ const Availability: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
       showToast(__('Availability date deleted successfully', 'Availability date deleted successfully'), 'success');
+      setDeleteConfirm({ isOpen: false, date: null });
     },
     onError: (error: any) => {
       showToast(error?.message || __('Failed to delete availability date', 'Failed to delete availability date'), 'error');
@@ -382,8 +407,301 @@ const Availability: React.FC = () => {
     return filteredDates.filter(date => date.is_blocked);
   }, [filteredDates]);
 
+  // Status counts for bulk toolbar
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: 0,
+      available: 0,
+      limited: 0,
+      sold_out: 0,
+      closed: 0,
+      blocked: 0,
+    };
+
+    if (!availabilityData?.dates) return counts;
+
+    availabilityData.dates.forEach((date) => {
+      counts.all++;
+      if (date.status === 'available') counts.available++;
+      else if (date.status === 'limited') counts.limited++;
+      else if (date.status === 'sold_out') counts.sold_out++;
+      else if (date.status === 'closed') counts.closed++;
+      else if (date.status === 'blocked') counts.blocked++;
+    });
+
+    return counts;
+  }, [availabilityData]);
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => apiClient.delete(`/availability/${id}`)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['availability'] });
+      showToast(__('Selected availability dates deleted successfully', 'Selected availability dates deleted successfully'), 'success');
+      setSelectedIds([]);
+      setBulkAction('');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete selected availability dates', 'Failed to delete selected availability dates'), 'error');
+    },
+  });
+
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      showToast(__('Select at least one availability date.', 'Select at least one availability date.'), 'warning');
+      return;
+    }
+
+    if (bulkAction === 'delete') {
+      bulkDeleteMutation.mutate(selectedIds);
+    } else {
+      showToast(__('Unsupported bulk action for availability.', 'Unsupported bulk action for availability.'), 'warning');
+    }
+  };
+
+  const bulkStatusOptions = [
+    { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+  ];
+
+  const totalFiltered = filteredDates.length;
+
+  // Single delete confirmation state
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; date: AvailabilityDate | null }>({
+    isOpen: false,
+    date: null,
+  });
+
+  // Table columns and actions for shared Table
+  const tableColumns = useMemo(() => {
+    const cols: { key: string; label: string; visible?: boolean; render?: (date: AvailabilityDate, index: number) => React.ReactNode }[] = [];
+
+    // Departure
+    cols.push({
+      key: 'departure',
+      label: selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure'),
+      visible: visibleColumns.departure,
+      render: (date) => (
+        selectedTrip?.trip_type === 'single_day' ? (
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-gray-400" />
+            <div>
+              <div className="text-sm font-medium">{formatDate(date.departure_date)}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">{date.departure_time ? formatTime(date.departure_time) : ''}</div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-gray-400" />
+            <span className="text-sm font-medium">{formatDate(date.departure_date)}</span>
+          </div>
+        )
+      ),
+    });
+
+    // Arrival
+    cols.push({
+      key: 'arrival',
+      label: selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival'),
+      visible: visibleColumns.arrival,
+      render: (date) => (
+        selectedTrip?.trip_type === 'single_day' ? (
+          <div>
+            <div className="text-sm font-medium">{formatDate(date.arrival_date)}</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">{date.arrival_time ? formatTime(date.arrival_time) : ''}</div>
+          </div>
+        ) : (
+          <span className="text-sm">{formatDate(date.arrival_date)}</span>
+        )
+      ),
+    });
+
+    // From/To
+    cols.push({
+      key: 'locations',
+      label: __('From/To', 'From/To'),
+      visible: visibleColumns.locations,
+      render: (date) => (
+        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+          <MapPin className="w-3 h-3" />
+          <span>{date.from_location || selectedTrip?.starting_location}</span>
+          <span>→</span>
+          <span>{date.to_location || selectedTrip?.ending_location}</span>
+        </div>
+      ),
+    });
+
+    // Capacity
+    cols.push({
+      key: 'capacity',
+      label: __('Capacity', 'Capacity'),
+      visible: visibleColumns.capacity,
+      render: (date) => (
+        <div className="flex flex-col items-center">
+          <span className="text-sm font-medium text-gray-900 dark:text-white">{date.total_seats || 0}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
+        </div>
+      ),
+    });
+
+    // Booked
+    cols.push({
+      key: 'booked',
+      label: __('Booked', 'Booked'),
+      visible: visibleColumns.booked,
+      render: (date) => (
+        <div className="flex flex-col items-center">
+          <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{date.booked_seats || 0}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('booked', 'booked')}</span>
+        </div>
+      ),
+    });
+
+    // Available
+    cols.push({
+      key: 'available',
+      label: __('Available', 'Available'),
+      visible: visibleColumns.available,
+      render: (date) => (
+        <div className="flex flex-col items-center">
+          <span
+            className={`text-sm font-semibold ${
+              date.available_seats === 0
+                ? 'text-red-600 dark:text-red-400'
+                : date.available_seats <= (date.alert_threshold || 5)
+                ? 'text-yellow-600 dark:text-yellow-400'
+                : 'text-green-600 dark:text-green-400'
+            }`}
+          >
+            {date.available_seats || 0}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('available', 'available')}</span>
+          {date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && (
+            <Bell className="w-3 h-3 text-yellow-500 mt-0.5" />
+          )}
+        </div>
+      ),
+    });
+
+    // Waitlist
+    cols.push({
+      key: 'waitlist',
+      label: __('Waitlist', 'Waitlist'),
+      visible: visibleColumns.waitlist,
+      render: (date) => (
+        date.waitlist_count > 0 ? (
+          <div className="flex flex-col items-center">
+            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs">
+              {date.waitlist_count}
+            </Badge>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('people', 'people')}</span>
+          </div>
+        ) : (
+          <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
+        )
+      ),
+    });
+
+    // Price
+    cols.push({
+      key: 'price',
+      label: __('Price', 'Price'),
+      visible: visibleColumns.price,
+      render: (date) => (
+        <div className="flex flex-col gap-1">
+          {date.discounted_price && parseFloat(date.discounted_price) < parseFloat(date.original_price) ? (
+            <>
+              <span className="text-sm line-through text-gray-400">
+                {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.original_price).toLocaleString()}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.discounted_price).toLocaleString()}
+                </span>
+                {date.discount_percentage && parseFloat(date.discount_percentage) > 0 && (
+                  <Badge variant="error" className="text-xs">
+                    {date.discount_percentage}% {__('OFF', 'OFF')}
+                  </Badge>
+                )}
+              </div>
+            </>
+          ) : (
+            <span className="text-sm font-semibold">
+              {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.original_price).toLocaleString()}
+            </span>
+          )}
+        </div>
+      ),
+    });
+
+    // Status
+    cols.push({
+      key: 'status',
+      label: __('Status', 'Status'),
+      visible: visibleColumns.status,
+      render: (date) => (
+        <div className="flex flex-col gap-1">
+          {getStatusBadge(date.status, date.is_blocked)}
+          {date.is_blocked && date.block_reason && (
+            <span className="text-xs text-gray-500 dark:text-gray-400 italic">
+              {date.block_reason}
+            </span>
+          )}
+          {date.last_synced_at && (
+            <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+              <Clock className="w-3 h-3" />
+              <span>{new Date(date.last_synced_at).toLocaleTimeString()}</span>
+            </div>
+          )}
+        </div>
+      ),
+    });
+
+    return cols;
+  }, [selectedTrip, visibleColumns, getCurrencySymbol, formatDate, formatTime, getStatusBadge]);
+
+  const tableActions = [
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (date: AvailabilityDate) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id }),
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (date: AvailabilityDate) => setDeleteConfirm({ isOpen: true, date }),
+      variant: 'destructive' as const,
+    },
+  ];
+
   return (
     <div className="space-y-6">
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, date: null })}
+        onConfirm={() => {
+          if (deleteConfirm.date) {
+            deleteMutation.mutate(deleteConfirm.date.id);
+          }
+        }}
+        title={__('Delete Availability Date', 'Delete Availability Date')}
+        message={deleteConfirm.date
+          ? __('Are you sure you want to delete this availability date on {date}? This action cannot be undone.', 'Are you sure you want to delete this availability date on {date}? This action cannot be undone.')
+              .replace('{date}', formatDate(deleteConfirm.date.departure_date))
+          : __('Are you sure you want to delete this availability date? This action cannot be undone.', 'Are you sure you want to delete this availability date? This action cannot be undone.')}
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
       <PageHeader
         title={__('Availability Management', 'Availability Management')}
         description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.')}
@@ -710,9 +1028,10 @@ const Availability: React.FC = () => {
               </CardContent>
             </Card>
           )}
-              {/* Filters */}
-              <Card>
-                <CardContent className="pt-6">
+
+          {/* Filters */}
+          <Card>
+            <CardContent className="pt-6">
               <div className={`grid grid-cols-1 ${selectedTrip?.trip_type === 'single_day' ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-4`}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -785,6 +1104,42 @@ const Availability: React.FC = () => {
             </CardContent>
           </Card>
 
+          {/* Bulk actions toolbar for availability list (directly above table, no extra card background) */}
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            statusOptions={[
+              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+              { key: 'available', label: __('Available', 'Available'), count: statusCounts.available },
+              { key: 'limited', label: __('Limited', 'Limited'), count: statusCounts.limited },
+              { key: 'sold_out', label: __('Sold Out', 'Sold Out'), count: statusCounts.sold_out },
+              { key: 'closed', label: __('Closed', 'Closed'), count: statusCounts.closed },
+              { key: 'blocked', label: __('Blocked', 'Blocked'), count: statusCounts.blocked },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={[
+              { key: 'departure', label: __('Departure', 'Departure'), visible: visibleColumns.departure },
+              { key: 'arrival', label: __('Arrival', 'Arrival'), visible: visibleColumns.arrival },
+              { key: 'locations', label: __('From/To', 'From/To'), visible: visibleColumns.locations },
+              { key: 'capacity', label: __('Capacity', 'Capacity'), visible: visibleColumns.capacity },
+              { key: 'booked', label: __('Booked', 'Booked'), visible: visibleColumns.booked },
+              { key: 'available', label: __('Available', 'Available'), visible: visibleColumns.available },
+              { key: 'waitlist', label: __('Waitlist', 'Waitlist'), visible: visibleColumns.waitlist },
+              { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
+              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+            ]}
+            onToggleColumn={(key) => toggleColumn(key as keyof typeof visibleColumns)}
+            bulkMutationPending={bulkDeleteMutation.isPending}
+            totalItems={totalFiltered}
+            bulkActionOptions={bulkStatusOptions}
+          />
+
           {/* Availability Dates List */}
           <Card>
             <CardHeader>
@@ -803,268 +1158,56 @@ const Availability: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure')}</TableHead>
-                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival')}</TableHead>
-                        <TableHead>{__('From/To', 'From/To')}</TableHead>
-                        <TableHead className="text-center">{__('Capacity', 'Capacity')}</TableHead>
-                        <TableHead className="text-center">{__('Booked', 'Booked')}</TableHead>
-                        <TableHead className="text-center">{__('Available', 'Available')}</TableHead>
-                        <TableHead className="text-center">{__('Waitlist', 'Waitlist')}</TableHead>
-                        <TableHead>{__('Price', 'Price')}</TableHead>
-                        <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(10)].map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div>
-                                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" />
-                                <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" />
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              ) : filteredDates.length === 0 ? (
-                <div className="text-center py-12">
-                  <CalendarDays className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                    {searchTerm || statusFilter !== 'all' || monthFilter !== 'all'
-                      ? __('No availability dates match your filters', 'No availability dates match your filters')
-                      : __('No availability dates added yet', 'No availability dates added yet')}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                    {__('Add departure dates with pricing and seat availability for this trip', 'Add departure dates with pricing and seat availability for this trip')}
-                  </p>
-                  <Button
-                    onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add First Availability Date', 'Add First Availability Date')}
-                  </Button>
-                </div>
-              ) : viewMode === 'calendar' ? (
-                <div className="p-4">
-                  <AvailabilityCalendar
-                    dates={filteredDates}
-                    tripType={selectedTrip?.trip_type}
-                    currency={selectedTrip?.currency || 'USD'}
-                    onDateClick={(date) => {
-                      navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id });
-                    }}
-                  />
-                </div>
+              {viewMode === 'calendar' ? (
+                filteredDates.length === 0 ? (
+                  <div className="py-12 text-center text-gray-500 dark:text-gray-400">
+                    <Calendar className="w-10 h-10 mx-auto mb-3 text-gray-400 dark:text-gray-600" />
+                    <p className="text-sm font-medium mb-1">{__('No availability dates found for this trip.', 'No availability dates found for this trip.')}</p>
+                    <p className="text-xs">{__('Try adjusting your filters or add a new availability date.', 'Try adjusting your filters or add a new availability date.')}</p>
+                  </div>
+                ) : (
+                  <div className="mt-4">
+                    <AvailabilityCalendar
+                      dates={filteredDates}
+                      tripType={selectedTrip?.trip_type}
+                      currency={selectedTrip?.currency || 'USD'}
+                      onDateClick={(date) => {
+                        navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id });
+                      }}
+                    />
+                  </div>
+                )
               ) : (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure')}</TableHead>
-                        <TableHead>{selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival')}</TableHead>
-                        <TableHead>{__('From/To', 'From/To')}</TableHead>
-                        <TableHead className="text-center">{__('Capacity', 'Capacity')}</TableHead>
-                        <TableHead className="text-center">{__('Booked', 'Booked')}</TableHead>
-                        <TableHead className="text-center">{__('Available', 'Available')}</TableHead>
-                        <TableHead className="text-center">{__('Waitlist', 'Waitlist')}</TableHead>
-                        <TableHead>{__('Price', 'Price')}</TableHead>
-                        <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="text-right w-[120px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredDates.map((date) => (
-                        <TableRow key={date.id}>
-                          <TableCell>
-                            {selectedTrip?.trip_type === 'single_day' ? (
-                              <div className="flex items-center gap-2">
-                                <CalendarDays className="w-4 h-4 text-gray-400" />
-                                <div>
-                                  <div className="text-sm font-medium">{formatDate(date.departure_date)}</div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">{date.departure_time ? formatTime(date.departure_time) : ''}</div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <CalendarDays className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm font-medium">{formatDate(date.departure_date)}</span>
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {selectedTrip?.trip_type === 'single_day' ? (
-                              <div>
-                                <div className="text-sm font-medium">{formatDate(date.arrival_date)}</div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400">{date.arrival_time ? formatTime(date.arrival_time) : ''}</div>
-                              </div>
-                            ) : (
-                              <span className="text-sm">{formatDate(date.arrival_date)}</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                              <MapPin className="w-3 h-3" />
-                              <span>{date.from_location || selectedTrip?.starting_location}</span>
-                              <span>→</span>
-                              <span>{date.to_location || selectedTrip?.ending_location}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex flex-col items-center">
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">{date.total_seats || 0}</span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex flex-col items-center">
-                              <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{date.booked_seats || 0}</span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('booked', 'booked')}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="flex flex-col items-center">
-                              <span className={`text-sm font-semibold ${
-                                date.available_seats === 0 
-                                  ? 'text-red-600 dark:text-red-400' 
-                                  : date.available_seats <= (date.alert_threshold || 5)
-                                  ? 'text-yellow-600 dark:text-yellow-400'
-                                  : 'text-green-600 dark:text-green-400'
-                              }`}>
-                                {date.available_seats || 0}
-                              </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">{__('available', 'available')}</span>
-                              {date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && (
-                                <Bell className="w-3 h-3 text-yellow-500 mt-0.5" />
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-center">
-                            {date.waitlist_count > 0 ? (
-                              <div className="flex flex-col items-center">
-                                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs">
-                                  {date.waitlist_count}
-                                </Badge>
-                                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('people', 'people')}</span>
-                              </div>
-                            ) : (
-                              <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col gap-1">
-                              {date.discounted_price && parseFloat(date.discounted_price) < parseFloat(date.original_price) ? (
-                                <>
-                                  <span className="text-sm line-through text-gray-400">
-                                    {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.original_price).toLocaleString()}
-                                  </span>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                                      {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.discounted_price).toLocaleString()}
-                                    </span>
-                                    {date.discount_percentage && parseFloat(date.discount_percentage) > 0 && (
-                                      <Badge variant="error" className="text-xs">
-                                        {date.discount_percentage}% {__('OFF', 'OFF')}
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </>
-                              ) : (
-                                <span className="text-sm font-semibold">
-                                  {getCurrencySymbol(selectedTrip?.currency || 'USD')}{parseFloat(date.original_price).toLocaleString()}
-                                </span>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col gap-1">
-                              {getStatusBadge(date.status, date.is_blocked)}
-                              {date.is_blocked && date.block_reason && (
-                                <span className="text-xs text-gray-500 dark:text-gray-400 italic">
-                                  {date.block_reason}
-                                </span>
-                              )}
-                              {date.last_synced_at && (
-                                <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
-                                  <Clock className="w-3 h-3" />
-                                  <span>{new Date(date.last_synced_at).toLocaleTimeString()}</span>
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id })}
-                                className="h-8 w-8"
-                                title={__('Edit', 'Edit')}
-                                aria-label={__('Edit availability date', 'Edit availability date')}
-                              >
-                                <Edit className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => {
-                                  if (confirm(__('Are you sure you want to delete this availability date?', 'Are you sure you want to delete this availability date?'))) {
-                                    deleteMutation.mutate(date.id);
-                                  }
-                                }}
-                                className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                title={__('Delete', 'Delete')}
-                                aria-label={__('Delete availability date', 'Delete availability date')}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                <SharedTable
+                  data={filteredDates}
+                  columns={tableColumns}
+                  actions={tableActions}
+                  isLoading={isLoading}
+                  isError={false}
+                  emptyText={__('No availability dates found for this trip.', 'No availability dates found for this trip.')}
+                  emptyDescription={__('Try adjusting your filters or add a new availability date.', 'Try adjusting your filters or add a new availability date.')}
+                  selectedItemIds={selectedIds}
+                  onSelectItem={(id, checked) => {
+                    if (checked) {
+                      setSelectedIds(prev => Array.from(new Set([...prev, id as string])));
+                    } else {
+                      setSelectedIds(prev => prev.filter(existingId => existingId !== id));
+                    }
+                  }}
+                  onSelectAll={(checked) => {
+                    if (checked) {
+                      setSelectedIds(filteredDates.map(d => d.id));
+                    } else {
+                      setSelectedIds([]);
+                    }
+                  }}
+                  isAllSelected={filteredDates.length > 0 && selectedIds.length === filteredDates.length}
+                  getItemId={(date: AvailabilityDate) => date.id}
+                  getItemStatus={(date: AvailabilityDate) => date.status}
+                  statusFilter={statusFilter}
+                  skeletonRows={5}
+                  capability="yatra_view_trips"
+                />
               )}
             </CardContent>
           </Card>

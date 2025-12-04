@@ -249,6 +249,135 @@ class CustomerRepository extends BaseRepository
     }
 
     /**
+     * Update customer from admin form
+     * 
+     * This is used by the CustomerService::updateCustomer method when saving
+     * changes from the admin Edit Customer screen.
+     *
+     * @param int   $customerId Customer ID
+     * @param array $data       Data to update
+     * @return bool
+     */
+    public function updateCustomer(int $customerId, array $data): bool
+    {
+        global $wpdb;
+
+        $table = $this->getTableName();
+
+        $updateData = [
+            'updated_at' => current_time('mysql'),
+        ];
+
+        // Simple text fields
+        if (array_key_exists('first_name', $data)) {
+            $updateData['first_name'] = sanitize_text_field($data['first_name']);
+        }
+        if (array_key_exists('last_name', $data)) {
+            $updateData['last_name'] = sanitize_text_field($data['last_name']);
+        }
+        if (array_key_exists('email', $data)) {
+            $updateData['email'] = sanitize_email($data['email']);
+        }
+        if (array_key_exists('phone', $data)) {
+            $updateData['phone'] = sanitize_text_field($data['phone']);
+        }
+        if (array_key_exists('secondary_phone', $data)) {
+            $updateData['secondary_phone'] = sanitize_text_field($data['secondary_phone']);
+        }
+        if (array_key_exists('country', $data)) {
+            $updateData['country'] = sanitize_text_field($data['country']);
+        }
+        if (array_key_exists('city', $data)) {
+            $updateData['city'] = sanitize_text_field($data['city']);
+        }
+        if (array_key_exists('state', $data)) {
+            $updateData['state'] = sanitize_text_field($data['state']);
+        }
+        if (array_key_exists('address', $data)) {
+            $updateData['address'] = sanitize_text_field($data['address']);
+        }
+        if (array_key_exists('postal_code', $data)) {
+            $updateData['postal_code'] = sanitize_text_field($data['postal_code']);
+        }
+        if (array_key_exists('nationality', $data)) {
+            $updateData['nationality'] = sanitize_text_field($data['nationality']);
+        }
+        if (array_key_exists('date_of_birth', $data)) {
+            $updateData['date_of_birth'] = sanitize_text_field($data['date_of_birth']);
+        }
+        if (array_key_exists('gender', $data)) {
+            $updateData['gender'] = sanitize_text_field($data['gender']);
+        }
+
+        // Passport
+        if (array_key_exists('passport_number', $data)) {
+            $updateData['passport_number'] = sanitize_text_field($data['passport_number']);
+        }
+        if (array_key_exists('passport_expiry', $data)) {
+            $updateData['passport_expiry'] = sanitize_text_field($data['passport_expiry']);
+        }
+
+        // Emergency contact
+        if (array_key_exists('emergency_name', $data)) {
+            $updateData['emergency_name'] = sanitize_text_field($data['emergency_name']);
+        }
+        if (array_key_exists('emergency_phone', $data)) {
+            $updateData['emergency_phone'] = sanitize_text_field($data['emergency_phone']);
+        }
+        if (array_key_exists('emergency_relationship', $data)) {
+            $updateData['emergency_relationship'] = sanitize_text_field($data['emergency_relationship']);
+        }
+
+        // Special requirements & notes
+        if (array_key_exists('dietary_requirements', $data)) {
+            $updateData['dietary_requirements'] = sanitize_text_field($data['dietary_requirements']);
+        }
+        if (array_key_exists('medical_conditions', $data)) {
+            $updateData['medical_conditions'] = sanitize_textarea_field($data['medical_conditions']);
+        }
+        if (array_key_exists('special_needs', $data)) {
+            $updateData['special_needs'] = sanitize_textarea_field($data['special_needs']);
+        }
+        if (array_key_exists('notes', $data)) {
+            $updateData['notes'] = sanitize_textarea_field($data['notes']);
+        }
+
+        // Status & loyalty
+        if (array_key_exists('status', $data)) {
+            $updateData['status'] = sanitize_text_field($data['status']);
+        }
+        if (array_key_exists('loyalty_tier', $data)) {
+            $updateData['loyalty_tier'] = sanitize_text_field($data['loyalty_tier']);
+        }
+        if (array_key_exists('loyalty_points', $data)) {
+            $updateData['loyalty_points'] = (int) $data['loyalty_points'];
+        }
+
+        // Preferences
+        if (array_key_exists('newsletter_optin', $data)) {
+            $updateData['newsletter_optin'] = !empty($data['newsletter_optin']) ? 1 : 0;
+        }
+        if (array_key_exists('marketing_optin', $data)) {
+            $updateData['marketing_optin'] = !empty($data['marketing_optin']) ? 1 : 0;
+        }
+
+        // Nothing to update
+        if (count($updateData) === 1) {
+            return true;
+        }
+
+        $result = $wpdb->update(
+            $table,
+            $updateData,
+            ['id' => $customerId],
+            null,
+            ['%d']
+        );
+
+        return $result !== false;
+    }
+
+    /**
      * Update gateway customer ID
      * 
      * @param int $customerId

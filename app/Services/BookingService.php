@@ -700,6 +700,29 @@ class BookingService
     }
 
     /**
+     * Perform bulk actions on travelers
+     *
+     * Currently supports only delete.
+     *
+     * @param int[]  $ids    Traveler IDs
+     * @param string $action Action key (e.g. 'delete')
+     * @return array {success: bool, message: string}
+     */
+    public function bulkTravelers(array $ids, string $action): array
+    {
+        $action = trim($action);
+
+        if ($action !== 'delete') {
+            return [
+                'success' => false,
+                'message' => __('Invalid traveler bulk action.', 'yatra'),
+            ];
+        }
+
+        return $this->travellerRepository->bulkDelete($ids);
+    }
+
+    /**
      * Send booking email
      * 
      * @param int    $bookingId Booking ID

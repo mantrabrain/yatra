@@ -25,9 +25,18 @@ interface Enquiry {
   trip_id?: number;
   trip_title?: string;
   message: string;
-  number_of_travelers?: number;
-  preferred_travel_date?: string;
-  status: 'new' | 'responded' | 'closed' | 'converted';
+  travelers_count?: number;
+  travel_date?: string;
+  status:
+    | 'new'
+    | 'pending'
+    | 'responded'
+    | 'closed'
+    | 'converted'
+    | 'read'
+    | 'archived'
+    | 'spam'
+    | 'trash';
   response_notes?: string;
   created_at: string;
   responded_at?: string;
@@ -50,8 +59,8 @@ const EnquiryForm: React.FC = () => {
     phone: '',
     trip_id: undefined,
     message: '',
-    number_of_travelers: 1,
-    preferred_travel_date: '',
+    travelers_count: 1,
+    travel_date: '',
     status: 'new',
     response_notes: '',
   });
@@ -80,8 +89,14 @@ const EnquiryForm: React.FC = () => {
       if (!response.ok) {
         throw new Error('Failed to fetch enquiry');
       }
-      
-      return response.json();
+
+      const result = await response.json();
+
+      if (result.success && result.data) {
+        return result.data as Enquiry;
+      }
+
+      throw new Error(result.message || 'Enquiry not found');
     },
     enabled: !!enquiryId && can('yatra_edit_bookings'),
   });
@@ -118,8 +133,8 @@ const EnquiryForm: React.FC = () => {
         phone: enquiry.phone || '',
         trip_id: enquiry.trip_id,
         message: enquiry.message || '',
-        number_of_travelers: enquiry.number_of_travelers || 1,
-        preferred_travel_date: enquiry.preferred_travel_date || '',
+        travelers_count: enquiry.travelers_count || 1,
+        travel_date: enquiry.travel_date || '',
         status: enquiry.status || 'new',
         response_notes: enquiry.response_notes || '',
       });
@@ -331,8 +346,8 @@ const EnquiryForm: React.FC = () => {
                       <Input
                         type="number"
                         min="1"
-                        value={formData.number_of_travelers || ''}
-                        onChange={(e) => handleChange('number_of_travelers', parseInt(e.target.value) || 1)}
+                        value={formData.travelers_count || ''}
+                        onChange={(e) => handleChange('travelers_count', parseInt(e.target.value, 10) || 1)}
                         placeholder="1"
                       />
                     </div>
@@ -342,8 +357,8 @@ const EnquiryForm: React.FC = () => {
                       </label>
                       <Input
                         type="date"
-                        value={formData.preferred_travel_date || ''}
-                        onChange={(e) => handleChange('preferred_travel_date', e.target.value)}
+                        value={formData.travel_date || ''}
+                        onChange={(e) => handleChange('travel_date', e.target.value)}
                       />
                     </div>
                   </div>
@@ -382,9 +397,12 @@ const EnquiryForm: React.FC = () => {
                     onChange={(e) => handleChange('status', e.target.value)}
                   >
                     <option value="new">{__('New', 'New')}</option>
+                    <option value="pending">{__('Pending', 'Pending')}</option>
                     <option value="responded">{__('Responded', 'Responded')}</option>
                     <option value="converted">{__('Converted', 'Converted')}</option>
                     <option value="closed">{__('Closed', 'Closed')}</option>
+                    <option value="spam">{__('Spam', 'Spam')}</option>
+                    <option value="trash">{__('Trash', 'Trash')}</option>
                   </Select>
                 </CardContent>
               </Card>

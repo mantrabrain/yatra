@@ -186,6 +186,13 @@ class BookingsController extends BaseController
             'permission_callback' => [$this, 'checkAdminPermission'],
         ]);
 
+        // Traveler bulk actions
+        register_rest_route($this->namespace, '/travelers/bulk', [
+            'methods' => 'PUT',
+            'callback' => [$this, 'bulkTravelers'],
+            'permission_callback' => [$this, 'checkAdminPermission'],
+        ]);
+
         // =====================
         // SCHEDULED PAYMENTS
         // =====================
@@ -553,6 +560,36 @@ class BookingsController extends BaseController
             'data' => $result['data'],
             'meta' => $result['meta'] ?? [],
         ]);
+    }
+
+    /**
+     * PUT /travelers/bulk - Bulk traveler actions
+     */
+    public function bulkTravelers(WP_REST_Request $request): WP_REST_Response
+    {
+        $data   = $request->get_json_params();
+        $action = $data['action'] ?? '';
+        $ids    = $data['ids'] ?? [];
+
+        if (empty($action) || empty($ids) || !is_array($ids)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Action and IDs are required.', 'yatra'),
+            ], 400);
+        }
+
+        $ids = array_filter(array_map('intval', $ids));
+
+        if (empty($ids)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('No valid traveler IDs provided.', 'yatra'),
+            ], 400);
+        }
+
+        $result = $this->bookingService->bulkTravelers($ids, (string) $action);
+
+        return new WP_REST_Response($result, $result['success'] ? 200 : 400);
     }
 
     // =========================================================================

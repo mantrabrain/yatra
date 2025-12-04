@@ -4,18 +4,19 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Users, Search, Eye, Mail, Phone, Calendar, MapPin } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Users, Search, Eye, Mail, Phone, Calendar, MapPin, Trash2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
-import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { Pagination, Table as SharedTable, BulkActionToolbar } from '../components/shared';
 import { Skeleton } from '../components/ui/skeleton';
 import { Badge } from '../components/ui/badge';
+import { useToast } from '../components/ui/toast';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
 interface FormField {
   id: string;
@@ -111,11 +112,37 @@ const getCountryName = (code: string): string => {
 };
 
 const Travelers: React.FC = () => {
+  const queryClient = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [travelerToDelete, setTravelerToDelete] = useState<Traveler | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [tripFilter, setTripFilter] = useState('');
   const [page, setPage] = useState(1);
   const perPage = 20;
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        traveler_info: true,
+        trip: true,
+        travel_date: true,
+        booking_reference: true,
+      };
+    }
+    const saved = window.localStorage.getItem('yatra-travelers-visible-columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          traveler_info: true,
+          trip: true,
+          travel_date: true,
+          booking_reference: true,
+        };
+  });
 
   // Fetch form configuration for dynamic columns
   const { data: formConfigData } = useQuery({
@@ -213,6 +240,100 @@ const Travelers: React.FC = () => {
     }
   };
 
+  // Bulk delete travelers
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
+      const response = await fetch(
+        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/travelers/bulk`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+          },
+          body: JSON.stringify({ action, ids }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to perform bulk traveler action');
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['travelers'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    },
+  });
+
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
+
+  // Handle single traveler delete
+  const handleDelete = (traveler: Traveler) => {
+    setTravelerToDelete(traveler);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!travelerToDelete) return;
+
+    try {
+      await bulkMutation.mutateAsync({ action: 'delete', ids: [travelerToDelete.id] });
+      showToast(__('Traveler deleted successfully', 'Traveler deleted successfully'), 'success');
+      setDeleteDialogOpen(false);
+      setTravelerToDelete(null);
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to delete traveler', 'Failed to delete traveler'), 'error');
+    }
+  };
+
+  // Toggle column visibility
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey],
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-travelers-visible-columns', JSON.stringify(newVisibleColumns));
+    }
+  };
+
+  // Column options for the columns dropdown
+  const columnOptions = [
+    { key: 'traveler_info', label: __('Traveler', 'Traveler'), visible: visibleColumns.traveler_info },
+    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
+    { key: 'travel_date', label: __('Travel Date', 'Travel Date'), visible: visibleColumns.travel_date },
+    { key: 'booking_reference', label: __('Booking', 'Booking'), visible: visibleColumns.booking_reference },
+  ];
+
+  // Actions for the 3-dot menu
+  const actions = [
+    {
+      key: 'view',
+      label: __('View Booking', 'View Booking'),
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (traveler: Traveler) => handleViewBooking(traveler.booking_id),
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (traveler: Traveler) => handleDelete(traveler),
+      variant: 'destructive' as const,
+      condition: () => can('yatra_delete_bookings'),
+    },
+  ];
+
   // Format cell value based on field type
   const formatCellValue = (value: any, fieldType: string): React.ReactNode => {
     if (value === undefined || value === null || value === '') {
@@ -246,20 +367,6 @@ const Travelers: React.FC = () => {
       default:
         return <span className="text-sm">{String(value)}</span>;
     }
-  };
-
-  // Render skeleton rows
-  const renderSkeletonRows = () => {
-    const columnCount = 5 + dynamicColumns.length; // Fixed columns + dynamic
-    return [...Array(5)].map((_, i) => (
-      <TableRow key={i}>
-        {[...Array(columnCount)].map((_, j) => (
-          <TableCell key={j}>
-            <Skeleton className="h-8 w-full" />
-          </TableCell>
-        ))}
-      </TableRow>
-    ));
   };
 
   return (
@@ -323,173 +430,174 @@ const Travelers: React.FC = () => {
         </Card>
       </div>
 
+      {/* Bulk actions toolbar */}
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkApply}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter="all"
+        setStatusFilter={() => {}}
+        statusOptions={[
+          { key: 'all', label: __('All', 'All'), count: totalTravelers },
+        ]}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={columnOptions}
+        onToggleColumn={toggleColumn}
+        bulkMutationPending={bulkMutation.isPending}
+        totalItems={travelers.length}
+        bulkActionOptions={[
+          { value: 'delete', label: __('Delete', 'Delete') },
+        ]}
+      />
+
       {/* Travelers Table */}
       <Card>
         <CardContent className="p-0 overflow-x-auto">
-          {isLoading ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{__('Traveler', 'Traveler')}</TableHead>
-                  {dynamicColumns.map(col => (
-                    <TableHead key={col.id}>{col.label}</TableHead>
-                  ))}
-                  <TableHead>{__('Trip', 'Trip')}</TableHead>
-                  <TableHead>{__('Travel Date', 'Travel Date')}</TableHead>
-                  <TableHead>{__('Booking', 'Booking')}</TableHead>
-                  <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {renderSkeletonRows()}
-              </TableBody>
-            </Table>
-          ) : travelers.length === 0 ? (
-            <div className="p-8 text-center">
-              <Users className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400">
-                {searchTerm || tripFilter
-                  ? __('No travelers found matching your criteria', 'No travelers found matching your criteria')
-                  : __('No travelers found', 'No travelers found')
-                }
-              </p>
-            </div>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  {/* Fixed: Traveler Info Column */}
-                  <TableHead>{__('Traveler', 'Traveler')}</TableHead>
-                  
-                  {/* Dynamic columns from Form Builder */}
-                  {dynamicColumns.map(col => (
-                    <TableHead key={col.id}>{col.label}</TableHead>
-                  ))}
-                  
-                  {/* Fixed: Trip, Date, Booking, Actions */}
-                  <TableHead>{__('Trip', 'Trip')}</TableHead>
-                  <TableHead>{__('Travel Date', 'Travel Date')}</TableHead>
-                  <TableHead>{__('Booking', 'Booking')}</TableHead>
-                  <TableHead className="text-right w-[80px]">{__('Actions', 'Actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {travelers.map((traveler: Traveler) => (
-                  <TableRow key={traveler.id}>
-                    {/* Traveler Info */}
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
-                          {(traveler.first_name?.[0] || '?').toUpperCase()}
-                          {(traveler.last_name?.[0] || '').toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                            {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ') || 'N/A'}
-                            {traveler.is_lead && (
-                              <Badge variant="info" className="text-xs">
-                                {__('Lead', 'Lead')}
-                              </Badge>
-                            )}
+          <SharedTable
+            data={travelers}
+            isLoading={isLoading}
+            isError={false}
+            skeletonRows={5}
+            emptyText={
+              (searchTerm || tripFilter)
+                ? __('No travelers found matching your criteria', 'No travelers found matching your criteria')
+                : __('No travelers found', 'No travelers found')
+            }
+            emptyDescription={__('View and manage travelers collected from your bookings.', 'View and manage travelers collected from your bookings.')}
+            capability="yatra_view_bookings"
+            selectedItemIds={selectedIds}
+            onSelectItem={(id: string | number, checked: boolean) => {
+              if (checked) {
+                setSelectedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+              } else {
+                setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+              }
+            }}
+            onSelectAll={(checked: boolean) => {
+              if (checked) {
+                setSelectedIds(travelers.map((t: Traveler) => t.id));
+              } else {
+                setSelectedIds([]);
+              }
+            }}
+            isAllSelected={travelers.length > 0 && selectedIds.length === travelers.length}
+            getItemId={(traveler: Traveler) => traveler.id}
+            actions={actions}
+            columns={[
+              visibleColumns.traveler_info && {
+                key: 'traveler_info',
+                label: __('Traveler', 'Traveler'),
+                render: (traveler: Traveler) => (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
+                      {(traveler.first_name?.[0] || '?').toUpperCase()}
+                      {(traveler.last_name?.[0] || '').toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                        {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ') || 'N/A'}
+                        {traveler.is_lead && (
+                          <Badge variant="info" className="text-xs">
+                            {__('Lead', 'Lead')}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 space-y-0.5">
+                        {traveler.phone && (
+                          <div className="flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            <span>{traveler.phone}</span>
                           </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 space-y-0.5">
-                            {traveler.phone && (
-                              <div className="flex items-center gap-1">
-                                <Phone className="w-3 h-3" />
-                                <span>{traveler.phone}</span>
-                              </div>
-                            )}
-                            <div className="flex items-center gap-2">
-                              {traveler.gender && <span className="capitalize">{traveler.gender}</span>}
-                              {traveler.nationality && (
-                                <>
-                                  {traveler.gender && <span>•</span>}
-                                  <span>{getCountryName(traveler.nationality)}</span>
-                                </>
-                              )}
-                            </div>
-                          </div>
+                        )}
+                        <div className="flex items-center gap-2">
+                          {traveler.gender && <span className="capitalize">{traveler.gender}</span>}
+                          {traveler.nationality && (
+                            <>
+                              {traveler.gender && <span>•</span>}
+                              <span>{getCountryName(traveler.nationality)}</span>
+                            </>
+                          )}
                         </div>
                       </div>
-                    </TableCell>
-
-                    {/* Dynamic Field Columns */}
-                    {dynamicColumns.map(col => (
-                      <TableCell key={col.id}>
-                        {formatCellValue(traveler[col.id], col.type)}
-                      </TableCell>
-                    ))}
-
-                    {/* Trip */}
-                    <TableCell>
-                      <div className="max-w-[200px] truncate" title={traveler.trip_title}>
-                        {traveler.trip_title || `Trip #${traveler.trip_id}`}
-                      </div>
-                    </TableCell>
-
-                    {/* Travel Date */}
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <Calendar className="w-3 h-3 text-gray-400" />
-                        {formatDate(traveler.travel_date)}
-                      </div>
-                    </TableCell>
-
-                    {/* Booking Reference */}
-                    <TableCell>
-                      <a
-                        href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-mono text-sm"
-                      >
-                        {traveler.booking_reference}
-                      </a>
-                    </TableCell>
-
-                    {/* Actions */}
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleViewBooking(traveler.booking_id)}
-                        title={__('View Booking', 'View Booking')}
-                      >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+                    </div>
+                  </div>
+                ),
+              },
+              ...dynamicColumns.map(col => ({
+                key: `dynamic_${col.id}`,
+                label: col.label,
+                render: (traveler: Traveler) => formatCellValue(traveler[col.id], col.type),
+              })),
+              visibleColumns.trip && {
+                key: 'trip',
+                label: __('Trip', 'Trip'),
+                render: (traveler: Traveler) => (
+                  <div className="max-w-[200px] truncate" title={traveler.trip_title}>
+                    {traveler.trip_title || `Trip #${traveler.trip_id}`}
+                  </div>
+                ),
+              },
+              visibleColumns.travel_date && {
+                key: 'travel_date',
+                label: __('Travel Date', 'Travel Date'),
+                render: (traveler: Traveler) => (
+                  <div className="flex items-center gap-1 text-sm">
+                    <Calendar className="w-3 h-3 text-gray-400" />
+                    {formatDate(traveler.travel_date)}
+                  </div>
+                ),
+              },
+              visibleColumns.booking_reference && {
+                key: 'booking_reference',
+                label: __('Booking', 'Booking'),
+                render: (traveler: Traveler) => (
+                  <a
+                    href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`}
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-mono text-sm"
+                  >
+                    {traveler.booking_reference}
+                  </a>
+                ),
+              },
+            ].filter(Boolean)}
+          />
         </CardContent>
       </Card>
 
       {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Showing', 'Showing')} {((page - 1) * perPage) + 1} - {Math.min(page * perPage, totalTravelers)} {__('of', 'of')} {totalTravelers}
-          </p>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page === 1}
-              onClick={() => setPage(p => p - 1)}
-            >
-              {__('Previous', 'Previous')}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= totalPages}
-              onClick={() => setPage(p => p + 1)}
-            >
-              {__('Next', 'Next')}
-            </Button>
-          </div>
-        </div>
+      {totalTravelers > 0 && (
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalItems={totalTravelers}
+          itemsPerPage={perPage}
+          onPageChange={setPage}
+          itemName={__('travelers', 'travelers')}
+        />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setTravelerToDelete(null);
+        }}
+        onConfirm={confirmDelete}
+        title={__('Delete Traveler', 'Delete Traveler')}
+        message={
+          travelerToDelete
+            ? __(`Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(' ')}? This action cannot be undone.`, `Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(' ')}? This action cannot be undone.`)
+            : __('Are you sure you want to delete this traveler?', 'Are you sure you want to delete this traveler?')
+        }
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={bulkMutation.isPending}
+      />
     </div>
   );
 };

@@ -136,7 +136,8 @@ const CategoryForm: React.FC = () => {
   }, [categoryData, isEditMode]);
 
   const handleNameChange = (value: string) => {
-    if (!isSlugEditable) {
+    // Only auto-generate slug on create; in edit mode, keep existing slug
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData(prev => ({
         ...prev,

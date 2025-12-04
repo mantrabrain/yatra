@@ -54,6 +54,15 @@ class ReviewController extends BaseController
             ],
         ]);
 
+        // Bulk actions
+        register_rest_route($namespace, '/' . $base . '/bulk', [
+            [
+                'methods'  => \WP_REST_Server::EDITABLE,
+                'callback' => [$this, 'bulkAction'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
+            ],
+        ]);
+
         // Get single review
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
@@ -229,6 +238,48 @@ class ReviewController extends BaseController
 
         if (!$result['success']) {
             return new WP_REST_Response($result, 400);
+        }
+
+        return new WP_REST_Response($result);
+    }
+
+    /**
+     * PUT /reviews/bulk - Bulk actions
+     */
+    public function bulkAction(WP_REST_Request $request): WP_REST_Response
+    {
+        $data   = $request->get_json_params();
+        $action = $data['action'] ?? '';
+        $ids    = $data['ids'] ?? [];
+
+        if (empty($ids) || !is_array($ids)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('No items selected.', 'yatra'),
+            ], 400);
+        }
+
+        switch ($action) {
+            case 'delete':
+                $result = $this->reviewService->bulkDelete($ids);
+                break;
+            case 'mark_approved':
+                $result = $this->reviewService->bulkUpdateStatus($ids, 'approved');
+                break;
+            case 'mark_pending':
+                $result = $this->reviewService->bulkUpdateStatus($ids, 'pending');
+                break;
+            case 'mark_spam':
+                $result = $this->reviewService->bulkUpdateStatus($ids, 'spam');
+                break;
+            case 'mark_trash':
+                $result = $this->reviewService->bulkUpdateStatus($ids, 'trash');
+                break;
+            default:
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => __('Invalid action.', 'yatra'),
+                ], 400);
         }
 
         return new WP_REST_Response($result);

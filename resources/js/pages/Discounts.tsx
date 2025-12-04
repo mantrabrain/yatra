@@ -5,17 +5,16 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Copy, Tag, Users } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Copy, Tag, Users } from 'lucide-react';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
@@ -32,7 +31,7 @@ interface Discount {
   usage_count: number;
   valid_from?: string;
   expiry_date?: string;
-  status: 'draft' | 'publish' | 'trash';
+  status: 'publish' | 'draft' | 'trash' | 'expired';
   applicable_to: 'all' | 'specific_trips';
   trip_ids?: number[];
   min_amount?: number;
@@ -57,6 +56,33 @@ const Discounts: React.FC = () => {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; discount: Discount | null }>({ isOpen: false, discount: null });
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [isBulkPending, setIsBulkPending] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        code: true,
+        type: true,
+        discount: true,
+        usage: true,
+        expiry_date: true,
+        status: true,
+      };
+    }
+    const saved = window.localStorage.getItem('yatra-discounts-visible-columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          code: true,
+          type: true,
+          discount: true,
+          usage: true,
+          expiry_date: true,
+          status: true,
+        };
+  });
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -117,7 +143,8 @@ const Discounts: React.FC = () => {
 
   const discounts = data?.data || [];
   const total = data?.total || 0;
-  const totalPages = Math.ceil(total / 10);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(total / itemsPerPage);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -144,17 +171,25 @@ const Discounts: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'publish': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
+      publish: {
+        className:
+          'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
         label: __('Publish', 'Publish'),
       },
-      'draft': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      draft: {
+        className:
+          'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         label: __('Draft', 'Draft'),
       },
-      'trash': {
-        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
+      trash: {
+        className:
+          'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
         label: __('Trash', 'Trash'),
+      },
+      expired: {
+        className:
+          'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
+        label: __('Expired', 'Expired'),
       },
     };
 
@@ -222,6 +257,404 @@ const Discounts: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || typeFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc';
 
+  const toggleColumn = (columnKey: string) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-discounts-visible-columns', JSON.stringify(newVisibleColumns));
+    }
+  };
+
+  const handleSelectItem = (id: string | number, checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(discounts.map((discount: Discount) => discount.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const isAllSelected =
+    discounts.length > 0 && selectedIds.length === discounts.length;
+
+  const updateStatusForIds = async (
+    ids: (string | number)[],
+    newStatus: Discount['status']
+  ) => {
+    await Promise.all(
+      ids.map((id) => {
+        const discount = discounts.find((item: Discount) => item.id === id);
+        if (!discount) {
+          return Promise.resolve();
+        }
+
+        const payload: Partial<Discount> = {
+          ...discount,
+          status: newStatus,
+        };
+
+        return apiClient.put(`/discounts/${id}`, payload);
+      })
+    );
+  };
+
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+
+    try {
+      setIsBulkPending(true);
+
+      if (bulkAction === 'delete') {
+        await Promise.all(
+          selectedIds.map((id) => apiClient.delete(`/discounts/${id}`))
+        );
+        showToast(
+          __('Selected discounts deleted successfully', 'Selected discounts deleted successfully'),
+          'success'
+        );
+      } else {
+        const newStatus = bulkAction as Discount['status'];
+        await updateStatusForIds(selectedIds, newStatus);
+        showToast(
+          __('Bulk status updated successfully', 'Bulk status updated successfully'),
+          'success'
+        );
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['discounts'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    } catch (error: any) {
+      showToast(
+        error?.message ||
+          __('Failed to perform bulk action on discounts', 'Failed to perform bulk action on discounts'),
+        'error'
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+
+  const allBulkActionOptions = [
+    { value: 'publish', label: __('Mark as Publish', 'Mark as Publish') },
+    { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
+    { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
+    { value: 'expired', label: __('Mark as Expired', 'Mark as Expired') },
+    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+  ];
+
+  const getBulkActionOptionsForStatus = (view: string) => {
+    switch (view) {
+      case 'publish':
+        return allBulkActionOptions.filter((opt) =>
+          ['draft', 'trash', 'expired', 'delete'].includes(opt.value)
+        );
+      case 'draft':
+        return allBulkActionOptions.filter((opt) =>
+          ['publish', 'trash', 'expired', 'delete'].includes(opt.value)
+        );
+      case 'trash':
+        return allBulkActionOptions.filter((opt) =>
+          ['publish', 'draft', 'delete'].includes(opt.value)
+        );
+      case 'expired':
+        return allBulkActionOptions.filter((opt) =>
+          ['publish', 'draft', 'trash', 'delete'].includes(opt.value)
+        );
+      default:
+        // "all" view: allow all actions
+        return allBulkActionOptions;
+    }
+  };
+
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+
+  const statusOptions = [
+    { value: 'all', label: __('All Status', 'All Status') },
+    { value: 'publish', label: __('Publish', 'Publish') },
+    { value: 'draft', label: __('Draft', 'Draft') },
+    { value: 'trash', label: __('Trash', 'Trash') },
+    { value: 'expired', label: __('Expired', 'Expired') },
+  ];
+
+  const sortOptions = [
+    { value: 'created_at', label: __('Created Date', 'Created Date') },
+    { value: 'code', label: __('Code', 'Code') },
+    { value: 'type', label: __('Type', 'Type') },
+    { value: 'amount', label: __('Amount', 'Amount') },
+    { value: 'usage_count', label: __('Usage', 'Usage') },
+    { value: 'expiry_date', label: __('Expiry Date', 'Expiry Date') },
+    { value: 'status', label: __('Status', 'Status') },
+  ];
+
+  const columnOptions = [
+    {
+      key: 'code',
+      label: __('Coupon Code', 'Coupon Code'),
+      visible: visibleColumns.code,
+    },
+    {
+      key: 'type',
+      label: __('Type', 'Type'),
+      visible: visibleColumns.type,
+    },
+    {
+      key: 'discount',
+      label: __('Discount', 'Discount'),
+      visible: visibleColumns.discount,
+    },
+    {
+      key: 'usage',
+      label: __('Usage', 'Usage'),
+      visible: visibleColumns.usage,
+    },
+    {
+      key: 'expiry_date',
+      label: __('Expiry Date', 'Expiry Date'),
+      visible: visibleColumns.expiry_date,
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      visible: visibleColumns.status,
+    },
+  ];
+
+  const columns = [
+    {
+      key: 'code',
+      label: __('Coupon Code', 'Coupon Code'),
+      sortable: true,
+      visible: visibleColumns.code,
+      width: 'w-[260px]',
+      render: (discount: Discount) => (
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Tag className="w-4 h-4 text-gray-400" />
+            <span className="font-medium text-gray-900 dark:text-white font-mono text-sm">
+              {discount.code}
+            </span>
+            {discount.is_group_discount && (
+              <Badge variant="info" className="text-xs flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                {__('Group', 'Group')}
+              </Badge>
+            )}
+          </div>
+          {discount.description && (
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {discount.description}
+            </div>
+          )}
+          {discount.is_group_discount && discount.min_group_size && (
+            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
+              <Users className="w-3 h-3" />
+              {__('Min', 'Min')} {discount.min_group_size}{' '}
+              {__('people', 'people')} -{' '}
+              {discount.group_discount_type === 'percentage'
+                ? `${discount.group_discount_amount}%`
+                : `$${discount.group_discount_amount}`}{' '}
+              {__('extra discount', 'extra discount')}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'type',
+      label: __('Type', 'Type'),
+      sortable: true,
+      visible: visibleColumns.type,
+      render: (discount: Discount) => (
+        <Badge
+          variant={discount.type === 'percentage' ? 'info' : 'default'}
+          className="text-xs"
+        >
+          {discount.type === 'percentage'
+            ? __('Percentage', 'Percentage')
+            : __('Fixed', 'Fixed')}
+        </Badge>
+      ),
+    },
+    {
+      key: 'discount',
+      label: __('Discount', 'Discount'),
+      sortable: true,
+      visible: visibleColumns.discount,
+      render: (discount: Discount) => (
+        <span className="font-medium text-gray-900 dark:text-white">
+          {formatDiscount(discount)}
+        </span>
+      ),
+    },
+    {
+      key: 'usage',
+      label: __('Usage', 'Usage'),
+      sortable: true,
+      visible: visibleColumns.usage,
+      render: (discount: Discount) => (
+        <div className="text-center">
+          <Badge variant="outline" className="font-medium">
+            {discount.usage_count} /{' '}
+            {discount.usage_limit === 0 ? '∞' : discount.usage_limit}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      key: 'expiry_date',
+      label: __('Expiry Date', 'Expiry Date'),
+      sortable: true,
+      visible: visibleColumns.expiry_date,
+      render: (discount: Discount) => (
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
+          {discount.expiry_date
+            ? formatDate(discount.expiry_date)
+            : __('No expiry', 'No expiry')}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (discount: Discount) => getStatusBadge(discount.status),
+    },
+  ];
+
+  const actions = [
+    {
+      key: 'duplicate',
+      label: __('Duplicate', 'Duplicate'),
+      icon: <Copy className="w-4 h-4" />,
+      onClick: (discount: Discount) => handleDuplicate(discount),
+    },
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (discount: Discount) => handleEdit(discount),
+    },
+    {
+      key: 'mark_publish',
+      label: __('Mark as Publish', 'Mark as Publish'),
+      icon: <ArrowUp className="w-4 h-4" />,
+      onClick: async (discount: Discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], 'publish');
+          queryClient.invalidateQueries({ queryKey: ['discounts'] });
+          showToast(
+            __('Discount status updated', 'Discount status updated'),
+            'success'
+          );
+        } catch (error: any) {
+          showToast(
+            error?.message ||
+              __('Failed to update discount status', 'Failed to update discount status'),
+            'error'
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount: Discount) => discount.status !== 'publish',
+    },
+    {
+      key: 'mark_draft',
+      label: __('Mark as Draft', 'Mark as Draft'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (discount: Discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], 'draft');
+          queryClient.invalidateQueries({ queryKey: ['discounts'] });
+          showToast(
+            __('Discount status updated', 'Discount status updated'),
+            'success'
+          );
+        } catch (error: any) {
+          showToast(
+            error?.message ||
+              __('Failed to update discount status', 'Failed to update discount status'),
+            'error'
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount: Discount) => discount.status !== 'draft',
+    },
+    {
+      key: 'move_trash',
+      label: __('Move to Trash', 'Move to Trash'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: async (discount: Discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], 'trash');
+          queryClient.invalidateQueries({ queryKey: ['discounts'] });
+          showToast(
+            __('Discount moved to trash', 'Discount moved to trash'),
+            'success'
+          );
+        } catch (error: any) {
+          showToast(
+            error?.message ||
+              __('Failed to move discount to trash', 'Failed to move discount to trash'),
+            'error'
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount: Discount) => discount.status !== 'trash',
+    },
+    {
+      key: 'mark_expired',
+      label: __('Mark as Expired', 'Mark as Expired'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (discount: Discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], 'expired');
+          queryClient.invalidateQueries({ queryKey: ['discounts'] });
+          showToast(
+            __('Discount status updated', 'Discount status updated'),
+            'success'
+          );
+        } catch (error: any) {
+          showToast(
+            error?.message ||
+              __('Failed to update discount status', 'Failed to update discount status'),
+            'error'
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount: Discount) => discount.status !== 'expired',
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (discount: Discount) => handleDelete(discount),
+      variant: 'destructive' as const,
+    },
+  ];
+
   return (
     <div className="space-y-3">
       <ConfirmationDialog
@@ -242,88 +675,59 @@ const Discounts: React.FC = () => {
       <PageHeader
         title={__('Discount Coupons', 'Discount Coupons')}
         description={__('Create and manage discount coupons for your trips', 'Create and manage discount coupons for your trips')}
+        actionCapability="yatra_edit_bookings"
+        actions={
+          <Button onClick={handleCreateDiscount} className="flex items-center gap-2">
+            <Plus className="w-4 h-4" />
+            {__('Create Discount', 'Create Discount')}
+          </Button>
+        }
       />
 
-      {/* Filters, Search, and Sorting - Always Visible */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <SearchFilterToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+                statusOptions={statusOptions}
+                sortBy={sortBy}
+                onSortByChange={(field) => {
+                  setSortBy(field);
+                  setPage(1);
+                }}
+                sortOrder={sortOrder}
+                onSortOrderChange={(order) => {
+                  setSortOrder(order);
+                  setPage(1);
+                }}
+                sortOptions={sortOptions}
+                onResetFilters={handleResetFilters}
+                hasFilters={!!hasFilters}
                 placeholder={__('Search by code...', 'Search by code...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-9"
               />
             </div>
 
-            {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-40"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
-              <option value="expired">{__('Expired', 'Expired')}</option>
-            </Select>
-
-            {/* Type Filter */}
-            <Select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="w-full md:w-40"
-            >
-              <option value="all">{__('All Types', 'All Types')}</option>
-              <option value="percentage">{__('Percentage', 'Percentage')}</option>
-              <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
-            </Select>
-
-            {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40"
-            >
-              <option value="created_at">{__('Created Date', 'Created Date')}</option>
-              <option value="code">{__('Code', 'Code')}</option>
-              <option value="type">{__('Type', 'Type')}</option>
-              <option value="amount">{__('Amount', 'Amount')}</option>
-              <option value="usage_count">{__('Usage', 'Usage')}</option>
-              <option value="expiry_date">{__('Expiry Date', 'Expiry Date')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-            </Select>
-
-            {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
-
-            {/* Reset Button */}
-            {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="flex items-center gap-2"
+            <div className="w-full lg:w-auto flex lg:justify-end">
+              <Select
+                value={typeFilter}
+                onChange={(e) => {
+                  setTypeFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full lg:w-48 max-w-xs"
               >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
+                <option value="all">{__('All Types', 'All Types')}</option>
+                <option value="percentage">{__('Percentage', 'Percentage')}</option>
+                <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -337,300 +741,103 @@ const Discounts: React.FC = () => {
           </Card>
         ) : (
           <>
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={() => setSelectedIds([])}
+              statusFilter={statusFilter}
+              setStatusFilter={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
+              statusOptions={[
+                {
+                  key: 'all',
+                  label: __('All', 'All'),
+                  count: 0,
+                },
+                {
+                  key: 'publish',
+                  label: __('Publish', 'Publish'),
+                  count: 0,
+                },
+                {
+                  key: 'draft',
+                  label: __('Draft', 'Draft'),
+                  count: 0,
+                },
+                {
+                  key: 'trash',
+                  label: __('Trash', 'Trash'),
+                  count: 0,
+                },
+                {
+                  key: 'expired',
+                  label: __('Expired', 'Expired'),
+                  count: 0,
+                },
+              ]}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={columnOptions}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={isBulkPending}
+              totalItems={total}
+              bulkActionOptions={bulkActionOptions}
+            />
+
             <Card>
               <CardContent className="p-0">
-                {isLoading ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">{__('Coupon Code', 'Coupon Code')}</TableHead>
-                        <TableHead>{__('Type', 'Type')}</TableHead>
-                        <TableHead>{__('Discount', 'Discount')}</TableHead>
-                        <TableHead>{__('Usage', 'Usage')}</TableHead>
-                        <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
-                        <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(5)].map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell>
-                            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : discounts.length === 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">{__('Coupon Code', 'Coupon Code')}</TableHead>
-                        <TableHead>{__('Type', 'Type')}</TableHead>
-                        <TableHead>{__('Discount', 'Discount')}</TableHead>
-                        <TableHead>{__('Usage', 'Usage')}</TableHead>
-                        <TableHead>{__('Expiry Date', 'Expiry Date')}</TableHead>
-                        <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={7} className="h-64">
-                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                              {__('No discounts found', 'No discounts found')}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
-                              {hasFilters
-                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                                : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
-                              }
-                            </p>
-                            {hasFilters ? (
-                              <Button
-                                variant="outline"
-                                onClick={handleResetFilters}
-                                className="flex items-center gap-2"
-                              >
-                                <X className="w-4 h-4" />
-                                {__('Clear Filters', 'Clear Filters')}
-                              </Button>
-                            ) : (
-                              can('yatra_edit_bookings') && (
-                                <Button
-                                  onClick={handleCreateDiscount}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                  {__('Create Discount', 'Create Discount')}
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">
-                          <button
-                            onClick={() => handleSort('code')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Coupon Code', 'Coupon Code')}
-                            {getSortIcon('code')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('type')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Type', 'Type')}
-                            {getSortIcon('type')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('amount')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Discount', 'Discount')}
-                            {getSortIcon('amount')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('usage_count')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Usage', 'Usage')}
-                            {getSortIcon('usage_count')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('expiry_date')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Expiry Date', 'Expiry Date')}
-                            {getSortIcon('expiry_date')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="text-right w-[180px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {discounts.map((discount: Discount) => (
-                        <TableRow key={discount.id}>
-                          <TableCell>
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <Tag className="w-4 h-4 text-gray-400" />
-                                <span className="font-medium text-gray-900 dark:text-white font-mono text-sm">
-                                  {discount.code}
-                                </span>
-                                {discount.is_group_discount && (
-                                  <Badge variant="info" className="text-xs flex items-center gap-1">
-                                    <Users className="w-3 h-3" />
-                                    {__('Group', 'Group')}
-                                  </Badge>
-                                )}
-                              </div>
-                              {discount.description && (
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                  {discount.description}
-                                </div>
-                              )}
-                              {discount.is_group_discount && discount.min_group_size && (
-                                <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
-                                  <Users className="w-3 h-3" />
-                                  {__('Min', 'Min')} {discount.min_group_size} {__('people', 'people')} - {discount.group_discount_type === 'percentage' ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`} {__('extra discount', 'extra discount')}
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={discount.type === 'percentage' ? 'info' : 'default'} className="text-xs">
-                              {discount.type === 'percentage' ? __('Percentage', 'Percentage') : __('Fixed', 'Fixed')}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="font-medium text-gray-900 dark:text-white">
-                            {formatDiscount(discount)}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline" className="font-medium">
-                              {discount.usage_count} / {discount.usage_limit === 0 ? '∞' : discount.usage_limit}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {discount.expiry_date ? formatDate(discount.expiry_date) : __('No expiry', 'No expiry')}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(discount.status)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_edit_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDuplicate(discount)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Duplicate coupon', 'Duplicate coupon')}
-                                  title={__('Duplicate', 'Duplicate')}
-                                >
-                                  <Copy className="w-4 h-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(discount)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Edit coupon', 'Edit coupon')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(discount)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete coupon', 'Delete coupon')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
+                <SharedTable
+                  data={discounts}
+                  columns={columns}
+                  actions={actions}
+                  isLoading={isLoading}
+                  isError={!!error}
+                  errorText={__('Error loading discounts', 'Error loading discounts')}
+                  emptyText={__('No discounts found', 'No discounts found')}
+                  emptyDescription={
+                    hasFilters
+                      ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                      : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
+                  }
+                  onCreateClick={
+                    can('yatra_edit_bookings') ? handleCreateDiscount : undefined
+                  }
+                  onSort={handleSort}
+                  getSortIcon={getSortIcon}
+                  selectedItemIds={selectedIds}
+                  onSelectItem={handleSelectItem}
+                  onSelectAll={handleSelectAll}
+                  isAllSelected={isAllSelected}
+                  getItemId={(discount: Discount) => discount.id}
+                  skeletonRows={5}
+                  capability="yatra_view_bookings"
+                />
               </CardContent>
             </Card>
 
-            {/* Pagination - Always Visible */}
             {total > 0 && (
-              <Card>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('coupons', 'coupons')}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  totalItems={total}
+                  itemsPerPage={itemsPerPage}
+                  onPageChange={(newPage) => setPage(newPage)}
+                  itemName={__('coupons', 'coupons')}
+                />
+              </div>
             )}
           </>
         )}
       </ConditionalRender>
     </div>
   );
-};
+}
+;
 
 export default Discounts;
 

@@ -95,8 +95,8 @@ const TravelerCategoryForm: React.FC = () => {
   }, [categoryData, isEditMode]);
 
   const handleLabelChange = (value: string) => {
-    // Auto-generate slug from label (only if slug is not manually edited)
-    if (!isSlugEditable) {
+    // Auto-generate slug from label only on create (and when slug is not manually edited)
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData(prev => ({
         ...prev,

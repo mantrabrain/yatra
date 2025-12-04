@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as React, aC as Columns, aD as MoreVertical, aE as RotateCcw, aF as ArrowLeft, aG as Pen, aH as Phone, aI as Award, aJ as Globe, aK as Download, aL as TrendingDown, aM as PieChart, aN as ClipboardList, aO as Receipt, aP as Plug, aQ as Shield, aR as Lock, aS as EyeOff, aT as Ban, aU as Send, aV as Crown, aW as reactDomExports, aX as Filter, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-CU8MdjjT.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-CfZw3dNY.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as AlertCircle, X as XCircle, G as CheckCircle, J as X, K as Plus, N as Search, O as ArrowUp, Q as ArrowDown, V as Package, W as Mountain, Y as Eye, Z as PenSquare, _ as Trash2, $ as ArrowUpDown, a0 as Flame, a1 as Zap, a2 as Heart, a3 as ShoppingBag, a4 as BookOpen, a5 as Gamepad2, a6 as Music, a7 as Image, a8 as Footprints, a9 as Bed, aa as Coffee, ab as Hotel, ac as Car, ad as Palette, ae as Waves, af as Camera, ag as Target, ah as Bus, ai as Building2, aj as UtensilsCrossed, ak as ExternalLink, al as CheckCircle2, am as GripVertical, an as Pencil, ao as Copy, ap as AlertTriangle, aq as Check, ar as Mail, as as Lightbulb, at as Database, au as History, av as Save, aw as Sparkles, ax as ChevronLeft, ay as Box, az as ChevronUp, aA as Upload, aB as React, aC as Columns, aD as MoreVertical, aE as RotateCcw, aF as ArrowLeft, aG as Pen, aH as Phone, aI as Globe, aJ as Award, aK as Download, aL as TrendingDown, aM as PieChart, aN as ClipboardList, aO as Receipt, aP as Plug, aQ as Shield, aR as Lock, aS as EyeOff, aT as Ban, aU as Send, aV as Crown, aW as reactDomExports, aX as Filter, aY as QueryClient, aZ as client, a_ as QueryClientProvider } from "./react-vendor-Bv4qn3Ai.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BfnVJaob.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -11534,25 +11534,37 @@ const Categories = () => {
       ...cat,
       subcategories: Array.isArray(cat.subcategories) ? cat.subcategories : []
     }));
-    const filterByStatus = (items) => {
+    const term = searchTerm.trim().toLowerCase();
+    const matchesSearch = (cat) => {
+      var _a, _b, _c;
+      if (!term) return true;
+      const name = ((_a = cat.name) == null ? void 0 : _a.toLowerCase()) || "";
+      const slug = ((_b = cat.slug) == null ? void 0 : _b.toLowerCase()) || "";
+      const desc = ((_c = cat.description) == null ? void 0 : _c.toLowerCase()) || "";
+      return name.includes(term) || slug.includes(term) || desc.includes(term);
+    };
+    const filterByStatusAndSearch = (items) => {
       return items.map((cat) => {
-        const filteredSubcategories = cat.subcategories ? cat.subcategories.filter(
-          (sub) => statusFilter === "all" || sub.status === statusFilter
-        ) : [];
+        const filteredSubcategories = cat.subcategories ? cat.subcategories.filter((sub) => {
+          const statusOk = statusFilter === "all" || sub.status === statusFilter;
+          const searchOk = matchesSearch(sub);
+          return statusOk && searchOk;
+        }) : [];
         return {
           ...cat,
           subcategories: filteredSubcategories
         };
       }).filter((cat) => {
-        if (statusFilter === "all") return true;
-        const parentMatches = cat.status === statusFilter;
+        if (statusFilter === "all" && !term) return true;
+        const statusOk = statusFilter === "all" || cat.status === statusFilter;
+        const searchOk = matchesSearch(cat);
         const hasMatchingChildren = cat.subcategories && cat.subcategories.length > 0;
-        return parentMatches || hasMatchingChildren;
+        return statusOk && searchOk || hasMatchingChildren;
       });
     };
-    const statusFiltered = filterByStatus(normalized);
+    const filtered = filterByStatusAndSearch(normalized);
     if (parentFilter === "subcategories") {
-      const onlySubs = statusFiltered.flatMap(
+      const onlySubs = filtered.flatMap(
         (cat) => (cat.subcategories || []).map((sub) => ({
           ...sub,
           parent_name: cat.name,
@@ -11563,14 +11575,14 @@ const Categories = () => {
       return onlySubs;
     }
     if (parentFilter === "top-level") {
-      return statusFiltered.map((cat) => ({
+      return filtered.map((cat) => ({
         ...cat,
         subcategories: []
         // Don't show subcategories when filtering for top-level only
       }));
     }
-    return statusFiltered;
-  }, [categories, parentFilter, statusFilter]);
+    return filtered;
+  }, [categories, parentFilter, statusFilter, searchTerm]);
   reactExports.useEffect(() => {
     if (expandedCategories.size > 0) return;
     const initialExpanded = /* @__PURE__ */ new Set();
@@ -11878,19 +11890,19 @@ const Categories = () => {
           placeholder: __("Search categories...", "Search categories...")
         }
       ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-24 lg:flex-none", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: parentFilter,
           onChange: (e) => setParentFilter(e.target.value),
-          className: "w-full lg:w-28 lg:flex-none text-sm",
+          className: "w-full text-sm truncate",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Categories", "All Categories") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "top-level", children: __("Top Level Only", "Top Level Only") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "subcategories", children: __("Subcategories Only", "Subcategories Only") })
           ]
         }
-      )
+      ) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       BulkActionToolbar,
@@ -12070,7 +12082,7 @@ const CategoryForm = () => {
     }
   }, [categoryData, isEditMode]);
   const handleNameChange = (value) => {
-    if (!isSlugEditable) {
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData((prev) => ({
         ...prev,
@@ -13202,18 +13214,51 @@ const Skeleton = ({ className = "" }) => {
   );
 };
 const Bookings = () => {
-  var _a, _b;
+  var _a, _b, _c;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [paymentFilter, setPaymentFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("booking_date");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
   const [bookingToDelete, setBookingToDelete] = reactExports.useState(null);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        booking_number: true,
+        customer: true,
+        trip: true,
+        travelers: true,
+        booking_date: true,
+        travel_date: true,
+        amount: true,
+        payment_status: true,
+        booking_status: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-bookings-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      booking_number: true,
+      customer: true,
+      trip: true,
+      travelers: true,
+      booking_date: true,
+      travel_date: true,
+      amount: true,
+      payment_status: true,
+      booking_status: true
+    };
+  });
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const defaultCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || ((_b = window == null ? void 0 : window.yatraBookingData) == null ? void 0 : _b.currency) || "USD";
+  const apiBase = ((_c = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _c.apiUrl) || "/wp-json/yatra/v1";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -13313,6 +13358,10 @@ const Bookings = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+      showToast(__("Booking deleted successfully", "Booking deleted successfully"), "success");
+    },
+    onError: (error2) => {
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to delete booking", "Failed to delete booking"), "error");
     }
   });
   const bookings = (data == null ? void 0 : data.data) || [];
@@ -13434,6 +13483,312 @@ const Bookings = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || paymentFilter !== "all" || sortBy !== "booking_date" || sortOrder !== "desc";
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-bookings-visible-columns", JSON.stringify(newVisibleColumns));
+    }
+  };
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds((prev) => checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id));
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(bookings.map((booking) => booking.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const isAllSelected = bookings.length > 0 && selectedIds.length === bookings.length;
+  const updateStatusForIds = async (ids, newStatus) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        var _a2;
+        const response = await fetch(`${apiBase}/bookings/${id}/status`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to update booking status");
+        }
+      })
+    );
+  };
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    try {
+      setIsBulkPending(true);
+      if (bulkAction === "delete") {
+        await Promise.all(
+          selectedIds.map(
+            (id) => {
+              var _a2;
+              return fetch(`${apiBase}/bookings/${id}`, {
+                method: "DELETE",
+                headers: {
+                  "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+                }
+              });
+            }
+          )
+        );
+        showToast(__("Selected bookings deleted successfully", "Selected bookings deleted successfully"), "success");
+      } else {
+        await updateStatusForIds(selectedIds, bulkAction);
+        showToast(__("Bulk booking status updated successfully", "Bulk booking status updated successfully"), "success");
+      }
+      queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to perform bulk action on bookings", "Failed to perform bulk action on bookings"),
+        "error"
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+  const allBulkActionOptions = [
+    { value: "confirmed", label: __("Mark as Confirmed", "Mark as Confirmed") },
+    { value: "pending", label: __("Mark as Pending", "Mark as Pending") },
+    { value: "cancelled", label: __("Mark as Cancelled", "Mark as Cancelled") },
+    { value: "completed", label: __("Mark as Completed", "Mark as Completed") },
+    { value: "delete", label: __("Delete permanently", "Delete permanently") }
+  ];
+  const getBulkActionOptionsForStatus = (view) => {
+    switch (view) {
+      case "confirmed":
+        return allBulkActionOptions.filter(
+          (opt) => ["pending", "cancelled", "completed", "delete"].includes(opt.value)
+        );
+      case "pending":
+        return allBulkActionOptions.filter(
+          (opt) => ["confirmed", "cancelled", "completed", "delete"].includes(opt.value)
+        );
+      case "cancelled":
+        return allBulkActionOptions.filter(
+          (opt) => ["pending", "confirmed", "delete"].includes(opt.value)
+        );
+      case "completed":
+        return allBulkActionOptions.filter(
+          (opt) => ["confirmed", "cancelled", "delete"].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+  const statusOptions = [
+    { value: "all", label: __("All Status", "All Status") },
+    { value: "confirmed", label: __("Confirmed", "Confirmed") },
+    { value: "pending", label: __("Pending", "Pending") },
+    { value: "cancelled", label: __("Cancelled", "Cancelled") },
+    { value: "completed", label: __("Completed", "Completed") }
+  ];
+  const sortOptions = [
+    { value: "booking_date", label: __("Booking Date", "Booking Date") },
+    { value: "travel_date", label: __("Travel Date", "Travel Date") },
+    { value: "booking_number", label: __("Booking Number", "Booking Number") },
+    { value: "customer_name", label: __("Customer", "Customer") },
+    { value: "trip_title", label: __("Trip", "Trip") },
+    { value: "total_amount", label: __("Amount", "Amount") },
+    { value: "booking_status", label: __("Status", "Status") }
+  ];
+  const columnOptions = [
+    { key: "booking_number", label: __("Booking #", "Booking #"), visible: visibleColumns.booking_number },
+    { key: "customer", label: __("Customer", "Customer"), visible: visibleColumns.customer },
+    { key: "trip", label: __("Trip", "Trip"), visible: visibleColumns.trip },
+    { key: "travelers", label: __("Travelers", "Travelers"), visible: visibleColumns.travelers },
+    { key: "booking_date", label: __("Booking Date", "Booking Date"), visible: visibleColumns.booking_date },
+    { key: "travel_date", label: __("Travel Date", "Travel Date"), visible: visibleColumns.travel_date },
+    { key: "amount", label: __("Amount", "Amount"), visible: visibleColumns.amount },
+    { key: "payment_status", label: __("Payment", "Payment"), visible: visibleColumns.payment_status },
+    { key: "booking_status", label: __("Status", "Status"), visible: visibleColumns.booking_status }
+  ];
+  const columns = [
+    {
+      key: "booking_number",
+      label: __("Booking #", "Booking #"),
+      sortable: true,
+      visible: visibleColumns.booking_number,
+      width: "w-[140px]",
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "button",
+        {
+          type: "button",
+          onClick: () => handleView(booking),
+          className: "text-sm font-mono font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline",
+          children: booking.booking_number
+        }
+      )
+    },
+    {
+      key: "customer",
+      label: __("Customer", "Customer"),
+      sortable: true,
+      visible: visibleColumns.customer,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: booking.customer_name }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: booking.customer_email })
+      ] })
+    },
+    {
+      key: "trip",
+      label: __("Trip", "Trip"),
+      sortable: true,
+      visible: visibleColumns.trip,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-900 dark:text-white", children: booking.trip_title })
+    },
+    {
+      key: "travelers",
+      label: __("Travelers", "Travelers"),
+      sortable: false,
+      visible: visibleColumns.travelers,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: booking.travelers })
+    },
+    {
+      key: "booking_date",
+      label: __("Booking Date", "Booking Date"),
+      sortable: true,
+      visible: visibleColumns.booking_date,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.booking_date) })
+    },
+    {
+      key: "travel_date",
+      label: __("Travel Date", "Travel Date"),
+      sortable: true,
+      visible: visibleColumns.travel_date,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.travel_date) })
+    },
+    {
+      key: "amount",
+      label: __("Amount", "Amount"),
+      sortable: true,
+      visible: visibleColumns.amount,
+      render: (booking) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: formatPrice(booking.total_amount, booking.currency || defaultCurrency) })
+    },
+    {
+      key: "payment_status",
+      label: __("Payment", "Payment"),
+      sortable: true,
+      visible: visibleColumns.payment_status,
+      render: (booking) => getPaymentStatusBadge(booking.payment_status)
+    },
+    {
+      key: "booking_status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.booking_status,
+      render: (booking) => getBookingStatusBadge(booking.booking_status)
+    }
+  ];
+  const actions = [
+    {
+      key: "view",
+      label: __("View", "View"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (booking) => handleView(booking)
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (booking) => handleEdit(booking),
+      condition: () => can("yatra_edit_bookings")
+    },
+    {
+      key: "mark_confirmed",
+      label: __("Mark as Confirmed", "Mark as Confirmed"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+      onClick: async (booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], "confirmed");
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Booking status updated", "Booking status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update booking status", "Failed to update booking status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking) => can("yatra_edit_bookings") && booking.booking_status !== "confirmed"
+    },
+    {
+      key: "mark_pending",
+      label: __("Mark as Pending", "Mark as Pending"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], "pending");
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Booking status updated", "Booking status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update booking status", "Failed to update booking status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking) => can("yatra_edit_bookings") && booking.booking_status !== "pending"
+    },
+    {
+      key: "mark_cancelled",
+      label: __("Mark as Cancelled", "Mark as Cancelled"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], "cancelled");
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Booking status updated", "Booking status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update booking status", "Failed to update booking status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking) => can("yatra_edit_bookings") && booking.booking_status !== "cancelled"
+    },
+    {
+      key: "mark_completed",
+      label: __("Mark as Completed", "Mark as Completed"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (booking) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([booking.id], "completed");
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Booking status updated", "Booking status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update booking status", "Failed to update booking status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (booking) => can("yatra_edit_bookings") && booking.booking_status !== "completed"
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (booking) => handleDelete(booking),
+      variant: "destructive",
+      condition: () => can("yatra_delete_bookings")
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -13448,39 +13803,41 @@ const Bookings = () => {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search bookings...", "Search bookings..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-10 w-full"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto lg:min-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SearchFilterToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "confirmed", children: __("Confirmed", "Confirmed") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "cancelled", children: __("Cancelled", "Cancelled") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") })
-          ]
+          searchTerm,
+          onSearchChange: setSearchTerm,
+          statusFilter,
+          onStatusChange: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions,
+          sortBy,
+          onSortByChange: (field) => {
+            setSortBy(field);
+            setPage(1);
+          },
+          sortOrder,
+          onSortOrderChange: (order) => {
+            setSortOrder(order);
+            setPage(1);
+          },
+          sortOptions,
+          onResetFilters: handleResetFilters,
+          hasFilters: !!hasFilters,
+          placeholder: __("Search bookings...", "Search bookings...")
         }
       ) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto lg:min-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: paymentFilter,
-          onChange: (e) => setPaymentFilter(e.target.value),
+          onChange: (e) => {
+            setPaymentFilter(e.target.value);
+            setPage(1);
+          },
           className: "w-full",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Payments", "All Payments") }),
@@ -13490,249 +13847,95 @@ const Bookings = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "refunded", children: __("Refunded", "Refunded") })
           ]
         }
-      ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto lg:min-w-[160px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking_date", children: __("Booking Date", "Booking Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "travel_date", children: __("Travel Date", "Travel Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking_number", children: __("Booking Number", "Booking Number") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "customer_name", children: __("Customer", "Customer") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trip_title", children: __("Trip", "Trip") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_amount", children: __("Amount", "Amount") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking_status", children: __("Status", "Status") })
-          ]
-        }
-      ) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto lg:flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "px-4 flex items-center gap-2 w-full lg:w-auto",
-          title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
-          children: [
-            sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm whitespace-nowrap", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
-          ]
-        }
-      ) }),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto lg:flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "flex items-center gap-2 w-full lg:w-auto",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: __("Reset", "Reset") })
-          ]
-        }
       ) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading bookings", "Error loading bookings") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-3", children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-48" })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
-        ] })
-      ] }, i)) }) : bookings.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No bookings found", "No bookings found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[120px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("booking_number"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Booking #", "Booking #"),
-                getSortIcon("booking_number")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("customer_name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Customer", "Customer"),
-                getSortIcon("customer_name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("trip_title"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Trip", "Trip"),
-                getSortIcon("trip_title")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travelers", "Travelers") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("booking_date"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Booking Date", "Booking Date"),
-                getSortIcon("booking_date")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("travel_date"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Travel Date", "Travel Date"),
-                getSortIcon("travel_date")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("total_amount"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Amount", "Amount"),
-                getSortIcon("total_amount")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("payment_status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Payment", "Payment"),
-                getSortIcon("payment_status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("booking_status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("booking_status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: bookings.map((booking) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium text-gray-900 dark:text-white", children: booking.booking_number }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: booking.customer_name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: booking.customer_email })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-900 dark:text-white", children: booking.trip_title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: booking.travelers }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.booking_date) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(booking.travel_date) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(booking.total_amount, booking.currency || defaultCurrency) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getPaymentStatusBadge(booking.payment_status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getBookingStatusBadge(booking.booking_status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleView(booking),
-                className: "h-8 w-8",
-                "aria-label": __("View booking", "View booking"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(booking),
-                className: "h-8 w-8",
-                "aria-label": __("Edit booking", "Edit booking"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(booking),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete booking", "Delete booking"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, booking.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("bookings", "bookings")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions: [
+            { key: "all", label: __("All", "All"), count: 0 },
+            { key: "confirmed", label: __("Confirmed", "Confirmed"), count: 0 },
+            { key: "pending", label: __("Pending", "Pending"), count: 0 },
+            { key: "cancelled", label: __("Cancelled", "Cancelled"), count: 0 },
+            { key: "completed", label: __("Completed", "Completed"), count: 0 }
+          ],
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending: isBulkPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-3", children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "div",
+        {
+          className: "flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-48" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-28" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16 rounded-full" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
+            ] })
+          ]
+        },
+        i
+      )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: bookings,
+          columns,
+          actions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading bookings", "Error loading bookings"),
+          emptyText: __("No bookings found", "No bookings found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first booking.", "Get started by creating your first booking."),
+          onCreateClick: can("yatra_edit_bookings") ? handleCreateBooking : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (booking) => booking.id,
+          skeletonRows: 5,
+          capability: "yatra_view_bookings"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: (newPage) => setPage(newPage),
+          itemName: __("bookings", "bookings")
+        }
+      ) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -15477,16 +15680,46 @@ const ViewBooking = () => {
   ] });
 };
 const Customers = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [loyaltyFilter, setLoyaltyFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("created_at");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
   const [customerToDelete, setCustomerToDelete] = reactExports.useState(null);
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
+  const { showToast } = useToast();
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        customer: true,
+        location: true,
+        total_bookings: true,
+        total_spent: true,
+        loyalty: true,
+        status: true,
+        created_at: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-customers-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      customer: true,
+      location: true,
+      total_bookings: true,
+      total_spent: true,
+      loyalty: true,
+      status: true,
+      created_at: true
+    };
+  });
+  const apiBase = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -15508,14 +15741,14 @@ const Customers = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["customers", queryParams],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b;
       const params = new URLSearchParams();
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== void 0 && value !== null && value !== "") {
           params.append(key, String(value));
         }
       });
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers?${params.toString()}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers?${params.toString()}`, {
         headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch customers");
@@ -15525,10 +15758,10 @@ const Customers = () => {
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      var _a, _b;
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${id}`, {
+      var _a2;
+      const response = await fetch(`${apiBase}/customers/${id}`, {
         method: "DELETE",
-        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+        headers: { "X-WP-Nonce": ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to delete customer");
       return response.json();
@@ -15537,6 +15770,10 @@ const Customers = () => {
       queryClient2.invalidateQueries({ queryKey: ["customers"] });
       setDeleteDialogOpen(false);
       setCustomerToDelete(null);
+      showToast(__("Customer deleted successfully", "Customer deleted successfully"), "success");
+    },
+    onError: (error2) => {
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to delete customer", "Failed to delete customer"), "error");
     }
   });
   const customers = (data == null ? void 0 : data.data) || [];
@@ -15606,8 +15843,8 @@ const Customers = () => {
     ] });
   };
   const handleEdit = (customer) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
   };
   const handleDelete = (customer) => {
     setCustomerToDelete(customer);
@@ -15619,12 +15856,12 @@ const Customers = () => {
     }
   };
   const handleView = (customer) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`;
   };
   const handleCreateCustomer = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=create`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -15649,6 +15886,285 @@ const Customers = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || loyaltyFilter !== "all" || sortBy !== "created_at" || sortOrder !== "desc";
+  const toggleColumn = (key) => {
+    const next = {
+      ...visibleColumns,
+      [key]: !visibleColumns[key]
+    };
+    setVisibleColumns(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-customers-visible-columns", JSON.stringify(next));
+    }
+  };
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds((prev) => checked ? [...prev, id] : prev.filter((v) => v !== id));
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(customers.map((customer) => customer.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const isAllSelected = customers.length > 0 && selectedIds.length === customers.length;
+  const updateStatusForIds = async (ids, newStatus) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        var _a2;
+        const response = await fetch(`${apiBase}/customers/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to update customer status");
+        }
+      })
+    );
+  };
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    try {
+      setIsBulkPending(true);
+      if (bulkAction === "delete") {
+        await Promise.all(
+          selectedIds.map(
+            (id) => {
+              var _a2;
+              return fetch(`${apiBase}/customers/${id}`, {
+                method: "DELETE",
+                headers: { "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || "" }
+              });
+            }
+          )
+        );
+        showToast(__("Selected customers deleted successfully", "Selected customers deleted successfully"), "success");
+      } else {
+        await updateStatusForIds(selectedIds, bulkAction);
+        showToast(__("Customer statuses updated successfully", "Customer statuses updated successfully"), "success");
+      }
+      queryClient2.invalidateQueries({ queryKey: ["customers"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to perform bulk action on customers", "Failed to perform bulk action on customers"),
+        "error"
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+  const allBulkActionOptions = [
+    { value: "active", label: __("Mark as Active", "Mark as Active") },
+    { value: "inactive", label: __("Mark as Inactive", "Mark as Inactive") },
+    { value: "blocked", label: __("Mark as Blocked", "Mark as Blocked") },
+    { value: "delete", label: __("Delete permanently", "Delete permanently") }
+  ];
+  const getBulkActionOptionsForStatus = (view) => {
+    switch (view) {
+      case "active":
+        return allBulkActionOptions.filter(
+          (opt) => ["inactive", "blocked", "delete"].includes(opt.value)
+        );
+      case "inactive":
+        return allBulkActionOptions.filter(
+          (opt) => ["active", "blocked", "delete"].includes(opt.value)
+        );
+      case "blocked":
+        return allBulkActionOptions.filter(
+          (opt) => ["active", "inactive", "delete"].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+  const statusOptions = [
+    { value: "all", label: __("All Status", "All Status") },
+    { value: "active", label: __("Active", "Active") },
+    { value: "inactive", label: __("Inactive", "Inactive") },
+    { value: "blocked", label: __("Blocked", "Blocked") }
+  ];
+  const sortOptions = [
+    { value: "created_at", label: __("Registration Date", "Registration Date") },
+    { value: "name", label: __("Name", "Name") },
+    { value: "email", label: __("Email", "Email") },
+    { value: "country", label: __("Country", "Country") },
+    { value: "total_bookings", label: __("Bookings", "Bookings") },
+    { value: "total_spent", label: __("Total Spent", "Total Spent") },
+    { value: "status", label: __("Status", "Status") }
+  ];
+  const columnOptions = [
+    { key: "customer", label: __("Customer", "Customer"), visible: visibleColumns.customer },
+    { key: "location", label: __("Location", "Location"), visible: visibleColumns.location },
+    { key: "total_bookings", label: __("Bookings", "Bookings"), visible: visibleColumns.total_bookings },
+    { key: "total_spent", label: __("Total Spent", "Total Spent"), visible: visibleColumns.total_spent },
+    { key: "loyalty", label: __("Loyalty", "Loyalty"), visible: visibleColumns.loyalty },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "created_at", label: __("Registered", "Registered"), visible: visibleColumns.created_at }
+  ];
+  const columns = [
+    {
+      key: "customer",
+      label: __("Customer", "Customer"),
+      sortable: true,
+      visible: visibleColumns.customer,
+      width: "w-[250px]",
+      render: (customer) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            type: "button",
+            onClick: () => handleView(customer),
+            className: "font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline",
+            children: customer.name || `${customer.first_name} ${customer.last_name}`
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
+            customer.email
+          ] }),
+          customer.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+            customer.phone
+          ] })
+        ] })
+      ] })
+    },
+    {
+      key: "location",
+      label: __("Location", "Location"),
+      sortable: true,
+      visible: visibleColumns.location,
+      render: (customer) => customer.country ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+          customer.city ? `${customer.city}, ` : "",
+          customer.country
+        ] })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" })
+    },
+    isPro && {
+      key: "total_bookings",
+      label: __("Bookings", "Bookings"),
+      sortable: true,
+      visible: visibleColumns.total_bookings,
+      render: (customer) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: customer.total_bookings })
+    },
+    isPro && {
+      key: "total_spent",
+      label: __("Total Spent", "Total Spent"),
+      sortable: true,
+      visible: visibleColumns.total_spent,
+      render: (customer) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: formatPrice(customer.total_spent) })
+    },
+    {
+      key: "loyalty",
+      label: __("Loyalty", "Loyalty"),
+      sortable: false,
+      visible: visibleColumns.loyalty,
+      render: (customer) => getLoyaltyBadge(customer.loyalty_tier || "bronze")
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (customer) => getStatusBadge(customer.status)
+    },
+    {
+      key: "created_at",
+      label: __("Registered", "Registered"),
+      sortable: true,
+      visible: visibleColumns.created_at,
+      render: (customer) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(customer.created_at) })
+    }
+  ].filter(Boolean);
+  const actions = [
+    {
+      key: "view",
+      label: __("View", "View"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (customer) => handleView(customer)
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (customer) => handleEdit(customer),
+      condition: () => can("yatra_edit_bookings")
+    },
+    {
+      key: "mark_active",
+      label: __("Mark as Active", "Mark as Active"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+      onClick: async (customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], "active");
+          queryClient2.invalidateQueries({ queryKey: ["customers"] });
+          showToast(__("Customer status updated", "Customer status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update customer status", "Failed to update customer status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer) => can("yatra_edit_bookings") && customer.status !== "active"
+    },
+    {
+      key: "mark_inactive",
+      label: __("Mark as Inactive", "Mark as Inactive"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], "inactive");
+          queryClient2.invalidateQueries({ queryKey: ["customers"] });
+          showToast(__("Customer status updated", "Customer status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update customer status", "Failed to update customer status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer) => can("yatra_edit_bookings") && customer.status !== "inactive"
+    },
+    {
+      key: "mark_blocked",
+      label: __("Mark as Blocked", "Mark as Blocked"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], "blocked");
+          queryClient2.invalidateQueries({ queryKey: ["customers"] });
+          showToast(__("Customer status updated", "Customer status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update customer status", "Failed to update customer status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer) => can("yatra_edit_bookings") && customer.status !== "blocked"
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (customer) => handleDelete(customer),
+      variant: "destructive",
+      condition: () => can("yatra_delete_bookings")
+    }
+  ];
   const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Customer", "Customer") }),
@@ -15692,38 +16208,41 @@ const Customers = () => {
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search customers...", "Search customers..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-10 w-full"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative min-w-0 w-full lg:flex-[2]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SearchFilterToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-36",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "blocked", children: __("Blocked", "Blocked") })
-          ]
+          searchTerm,
+          onSearchChange: setSearchTerm,
+          statusFilter,
+          onStatusChange: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions,
+          sortBy,
+          onSortByChange: (field) => {
+            setSortBy(field);
+            setPage(1);
+          },
+          sortOrder,
+          onSortOrderChange: (order) => {
+            setSortOrder(order);
+            setPage(1);
+          },
+          sortOptions,
+          onResetFilters: handleResetFilters,
+          hasFilters: !!hasFilters,
+          placeholder: __("Search customers...", "Search customers...")
         }
-      ),
+      ) }),
       isPro && /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: loyaltyFilter,
-          onChange: (e) => setLoyaltyFilter(e.target.value),
+          onChange: (e) => {
+            setLoyaltyFilter(e.target.value);
+            setPage(1);
+          },
           className: "w-full md:w-36",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Tiers", "All Tiers") }),
@@ -15733,231 +16252,71 @@ const Customers = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "platinum", children: __("Platinum", "Platinum") })
           ]
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Registration Date", "Registration Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "name", children: __("Name", "Name") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "email", children: __("Email", "Email") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "country", children: __("Country", "Country") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_bookings", children: __("Bookings", "Bookings") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total_spent", children: __("Total Spent", "Total Spent") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "px-3 flex items-center gap-1.5",
-          title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
-          children: [
-            sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
-          ]
-        }
-      ),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "flex items-center gap-2",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            __("Reset", "Reset")
-          ]
-        }
       )
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading customers", "Error loading customers") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? renderSkeleton() : customers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg font-medium", children: __("No customers found", "No customers found") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm mt-1", children: __("Customers will appear here when bookings are made", "Customers will appear here when bookings are made") })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Customer", "Customer"),
-                getSortIcon("name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("country"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Location", "Location"),
-                getSortIcon("country")
-              ]
-            }
-          ) }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("total_bookings"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Bookings", "Bookings"),
-                getSortIcon("total_bookings")
-              ]
-            }
-          ) }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("total_spent"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Total Spent", "Total Spent"),
-                getSortIcon("total_spent")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Award, { className: "w-3.5 h-3.5" }),
-            __("Loyalty", "Loyalty")
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Registered", "Registered"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: customers.map((customer) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: customer.name || `${customer.first_name} ${customer.last_name}` }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
-                customer.email
-              ] }),
-              customer.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
-                customer.phone
-              ] })
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: customer.country ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-              customer.city ? `${customer.city}, ` : "",
-              customer.country
-            ] })
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" }) }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: customer.total_bookings }),
-          isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium", children: formatPrice(customer.total_spent) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getLoyaltyBadge(customer.loyalty_tier || "bronze") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(customer.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(customer.created_at) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleView(customer),
-                className: "h-8 w-8",
-                "aria-label": __("View customer", "View customer"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(customer),
-                className: "h-8 w-8",
-                "aria-label": __("Edit customer", "Edit customer"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(customer),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete customer", "Delete customer"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, customer.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("customers", "customers")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions: [
+            { key: "all", label: __("All", "All"), count: 0 },
+            { key: "active", label: __("Active", "Active"), count: 0 },
+            { key: "inactive", label: __("Inactive", "Inactive"), count: 0 },
+            { key: "blocked", label: __("Blocked", "Blocked"), count: 0 }
+          ],
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending: isBulkPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? renderSkeleton() : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: customers,
+          columns,
+          actions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading customers", "Error loading customers"),
+          emptyText: __("No customers found", "No customers found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Customers will appear here when bookings are made", "Customers will appear here when bookings are made"),
+          onCreateClick: can("yatra_edit_bookings") ? handleCreateCustomer : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (customer) => customer.id,
+          skeletonRows: 5,
+          capability: "yatra_view_bookings"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: (newPage) => setPage(newPage),
+          itemName: __("customers", "customers")
+        }
+      ) })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -15978,6 +16337,7 @@ const Customers = () => {
 const CustomerForm = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const [formData, setFormData] = reactExports.useState({
     first_name: "",
     last_name: "",
@@ -16027,41 +16387,44 @@ const CustomerForm = () => {
         headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch customer");
-      return response.json();
+      const json = await response.json();
+      const data = json && typeof json === "object" && "data" in json ? json.data : json;
+      const emergency = data.emergency_contact || {};
+      return {
+        first_name: data.first_name || "",
+        last_name: data.last_name || "",
+        email: data.email || "",
+        phone: data.phone || "",
+        secondary_phone: data.secondary_phone || "",
+        country: data.country || "",
+        city: data.city || "",
+        state: data.state || "",
+        address: data.address || "",
+        postal_code: data.postal_code || "",
+        nationality: data.nationality || "",
+        date_of_birth: data.date_of_birth || "",
+        gender: data.gender || "",
+        passport_number: data.passport_number || "",
+        passport_expiry: data.passport_expiry || "",
+        emergency_name: data.emergency_name || emergency.name || "",
+        emergency_phone: data.emergency_phone || emergency.phone || "",
+        emergency_relationship: data.emergency_relationship || emergency.relationship || "",
+        dietary_requirements: data.dietary_requirements || "",
+        medical_conditions: data.medical_conditions || "",
+        special_needs: data.special_needs || "",
+        newsletter_optin: Boolean(data.newsletter_optin),
+        marketing_optin: Boolean(data.marketing_optin),
+        status: data.status || "active",
+        notes: data.notes || "",
+        loyalty_tier: data.loyalty_tier || "bronze",
+        loyalty_points: typeof data.loyalty_points === "number" ? data.loyalty_points : parseInt(data.loyalty_points || "0", 10) || 0
+      };
     },
     enabled: isEditMode && can("yatra_view_bookings")
   });
   reactExports.useEffect(() => {
     if (customerData && isEditMode) {
-      setFormData({
-        first_name: customerData.first_name || "",
-        last_name: customerData.last_name || "",
-        email: customerData.email || "",
-        phone: customerData.phone || "",
-        secondary_phone: customerData.secondary_phone || "",
-        country: customerData.country || "",
-        city: customerData.city || "",
-        state: customerData.state || "",
-        address: customerData.address || "",
-        postal_code: customerData.postal_code || "",
-        nationality: customerData.nationality || "",
-        date_of_birth: customerData.date_of_birth || "",
-        gender: customerData.gender || "",
-        passport_number: customerData.passport_number || "",
-        passport_expiry: customerData.passport_expiry || "",
-        emergency_name: customerData.emergency_name || "",
-        emergency_phone: customerData.emergency_phone || "",
-        emergency_relationship: customerData.emergency_relationship || "",
-        dietary_requirements: customerData.dietary_requirements || "",
-        medical_conditions: customerData.medical_conditions || "",
-        special_needs: customerData.special_needs || "",
-        newsletter_optin: customerData.newsletter_optin || false,
-        marketing_optin: customerData.marketing_optin || false,
-        status: customerData.status || "active",
-        notes: customerData.notes || "",
-        loyalty_tier: customerData.loyalty_tier || "bronze",
-        loyalty_points: customerData.loyalty_points || 0
-      });
+      setFormData(customerData);
     }
   }, [customerData, isEditMode]);
   const handleFieldChange = (field, value) => {
@@ -16103,15 +16466,16 @@ const CustomerForm = () => {
       }
     },
     onSuccess: () => {
-      var _a;
       queryClient2.invalidateQueries({ queryKey: ["customers"] });
       queryClient2.invalidateQueries({ queryKey: ["customer", customerId] });
-      window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
+      setIsSubmitting(false);
+      showToast(__("Customer updated successfully", "Customer updated successfully"), "success");
     },
     onError: (error) => {
       const errorMessage = (error == null ? void 0 : error.message) || __("An error occurred while saving the customer", "An error occurred while saving the customer");
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
+      showToast(errorMessage, "error");
     }
   });
   const handleSubmit = async (e) => {
@@ -16652,6 +17016,7 @@ const CustomerForm = () => {
   ] });
 };
 const ViewCustomer = () => {
+  var _a;
   const { can, isPro } = usePermissions();
   const customerId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -16660,26 +17025,41 @@ const ViewCustomer = () => {
   const { data: customer, isLoading, error } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b;
       if (!customerId) throw new Error("No customer ID");
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
         headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch customer");
-      return response.json();
+      const json = await response.json();
+      const data = json && typeof json === "object" && "data" in json ? json.data : json;
+      const emergency = data.emergency_contact || {};
+      return {
+        ...data,
+        emergency_name: data.emergency_name ?? emergency.name ?? null,
+        emergency_phone: data.emergency_phone ?? emergency.phone ?? null,
+        emergency_relationship: data.emergency_relationship ?? emergency.relationship ?? null
+      };
     },
     enabled: !!customerId && can("yatra_view_bookings")
   });
   const { data: bookings, isLoading: isLoadingBookings } = useQuery({
     queryKey: ["customer-bookings", customerId],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b;
       if (!customerId) return [];
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}/bookings`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}/bookings`, {
         headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch bookings");
-      return response.json();
+      const json = await response.json();
+      if (Array.isArray(json)) {
+        return json;
+      }
+      if (json && Array.isArray(json.data)) {
+        return json.data;
+      }
+      return [];
     },
     enabled: !!customerId && can("yatra_view_bookings")
   });
@@ -16781,16 +17161,16 @@ const ViewCustomer = () => {
     ] });
   };
   const handleBack = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
   };
   const handleEdit = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customerId}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customerId}`;
   };
   const handleViewBooking = (bookingId) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
+    var _a2;
+    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
   const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
@@ -16922,7 +17302,14 @@ const ViewCustomer = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-3 h-3" }),
                 __("Full Name", "Full Name")
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: customer.name || `${customer.first_name} ${customer.last_name}` })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`,
+                  className: "hover:underline text-primary-600 dark:text-primary-400",
+                  children: customer.name || `${customer.first_name} ${customer.last_name}`
+                }
+              ) })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -17164,6 +17551,30 @@ const Reviews = () => {
     isOpen: false,
     review: null
   });
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        trip: true,
+        customer: true,
+        rating: true,
+        review: true,
+        status: true,
+        date: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-reviews-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      trip: true,
+      customer: true,
+      rating: true,
+      review: true,
+      status: true,
+      date: true
+    };
+  });
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const queryParams = reactExports.useMemo(() => {
@@ -17310,6 +17721,179 @@ const Reviews = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || ratingFilter !== "all" || sortBy !== "created_at" || sortOrder !== "desc";
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    if (statusFilter === "spam") {
+      return [
+        { value: "mark_trash", label: __("Move to Trash", "Move to Trash") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "mark_approved", label: __("Mark as Approved", "Mark as Approved") },
+      { value: "mark_pending", label: __("Mark as Pending", "Mark as Pending") },
+      { value: "mark_spam", label: __("Mark as Spam", "Mark as Spam") },
+      { value: "mark_trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    const run = async () => {
+      var _a, _b;
+      try {
+        const baseUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+        const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+        await fetch(`${baseUrl}/reviews/bulk`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": nonce
+          },
+          body: JSON.stringify({ action: bulkAction, ids: selectedIds })
+        });
+        queryClient2.invalidateQueries({ queryKey: ["reviews"] });
+      } catch (error2) {
+        console.error("Bulk review action error", error2);
+      } finally {
+        setSelectedIds([]);
+        setBulkAction("");
+      }
+    };
+    void run();
+  };
+  const toggleColumn = (columnKey) => {
+    const newVisible = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisible);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-reviews-visible-columns", JSON.stringify(newVisible));
+    }
+  };
+  const columnOptions = [
+    { key: "trip", label: __("Trip", "Trip"), visible: visibleColumns.trip },
+    { key: "customer", label: __("Customer", "Customer"), visible: visibleColumns.customer },
+    { key: "rating", label: __("Rating", "Rating"), visible: visibleColumns.rating },
+    { key: "review", label: __("Review", "Review"), visible: visibleColumns.review },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "date", label: __("Date", "Date"), visible: visibleColumns.date }
+  ];
+  const handleApprove = async (review) => {
+    var _a, _b;
+    const baseUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+    const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-WP-Nonce": nonce
+      },
+      body: JSON.stringify({ status: "approved" })
+    });
+    queryClient2.invalidateQueries({ queryKey: ["reviews"] });
+  };
+  const handleMarkPending = async (review) => {
+    var _a, _b;
+    const baseUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+    const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-WP-Nonce": nonce
+      },
+      body: JSON.stringify({ status: "pending" })
+    });
+    queryClient2.invalidateQueries({ queryKey: ["reviews"] });
+  };
+  const handleMarkSpam = async (review) => {
+    var _a, _b;
+    const baseUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+    const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-WP-Nonce": nonce
+      },
+      body: JSON.stringify({ status: "spam" })
+    });
+    queryClient2.invalidateQueries({ queryKey: ["reviews"] });
+  };
+  const handleMarkTrash = async (review) => {
+    var _a, _b;
+    const baseUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+    const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "X-WP-Nonce": nonce
+      },
+      body: JSON.stringify({ status: "trash" })
+    });
+    queryClient2.invalidateQueries({ queryKey: ["reviews"] });
+  };
+  const actions = [
+    {
+      key: "view",
+      label: __("View", "View"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (review) => handleView(review),
+      condition: () => can("yatra_view_reviews")
+    },
+    {
+      key: "approve",
+      label: __("Approve", "Approve"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Star, { className: "w-4 h-4" }),
+      onClick: (review) => handleApprove(review),
+      condition: (review) => can("yatra_edit_reviews") && review.status !== "approved"
+    },
+    {
+      key: "mark_pending",
+      label: __("Mark as Pending", "Mark as Pending"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (review) => handleMarkPending(review),
+      condition: (review) => can("yatra_edit_reviews") && review.status !== "pending"
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (review) => handleEdit(review),
+      condition: () => can("yatra_edit_reviews")
+    },
+    {
+      key: "mark_spam",
+      label: __("Mark as Spam", "Mark as Spam"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (review) => handleMarkSpam(review),
+      condition: (review) => can("yatra_edit_reviews") && review.status !== "spam"
+    },
+    {
+      key: "mark_trash",
+      label: __("Move to Trash", "Move to Trash"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (review) => handleMarkTrash(review),
+      condition: (review) => can("yatra_edit_reviews") && review.status !== "trash"
+    },
+    {
+      key: "delete",
+      label: __("Delete Permanently", "Delete Permanently"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (review) => handleDelete(review),
+      variant: "destructive",
+      condition: () => can("yatra_delete_reviews")
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -17423,197 +18007,130 @@ const Reviews = () => {
         }
       )
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_view_reviews", children: [
-      error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading reviews", "Error loading reviews") }) }) : isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Customer", "Customer") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Rating", "Rating") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Review", "Review") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-0.5", children: [...Array(5)].map((_2, i) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }, i)) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) })
-        ] }, `skeleton-${index}`)) })
-      ] }) }) }) : reviews.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-gray-500", children: __("No reviews found", "No reviews found") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("trip_title"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Trip", "Trip"),
-                getSortIcon("trip_title")
-              ]
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BulkActionToolbar,
+      {
+        selectedIds,
+        bulkAction,
+        setBulkAction,
+        onApply: handleBulkApply,
+        onClearSelection: () => setSelectedIds([]),
+        statusFilter,
+        setStatusFilter: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction("");
+        },
+        statusOptions: [
+          { key: "all", label: __("All", "All"), count: total },
+          { key: "approved", label: __("Approved", "Approved"), count: reviews.filter((r) => r.status === "approved").length },
+          { key: "pending", label: __("Pending", "Pending"), count: reviews.filter((r) => r.status === "pending").length },
+          { key: "spam", label: __("Spam", "Spam"), count: reviews.filter((r) => r.status === "spam").length },
+          { key: "trash", label: __("Trash", "Trash"), count: reviews.filter((r) => r.status === "trash").length }
+        ],
+        showColumnsDropdown,
+        setShowColumnsDropdown,
+        columnOptions,
+        onToggleColumn: toggleColumn,
+        bulkMutationPending: deleteMutation.isPending,
+        totalItems: reviews.length,
+        bulkActionOptions
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Table,
+      {
+        data: reviews,
+        columns: [
+          visibleColumns.trip && {
+            key: "trip",
+            label: __("Trip", "Trip"),
+            render: (review) => {
+              var _a;
+              return review.trip_id ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`,
+                  className: "font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline",
+                  children: review.trip_title
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-500 dark:text-gray-400", children: review.trip_title });
             }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("customer_name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Customer", "Customer"),
-                getSortIcon("customer_name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("rating"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Rating", "Rating"),
-                getSortIcon("rating")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Review", "Review") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: reviews.map((review) => {
-          var _a;
-          return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: review.trip_id ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "a",
-              {
-                href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${review.trip_id}`,
-                className: "font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline",
-                children: review.trip_title
-              }
-            ) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-500 dark:text-gray-400", children: review.trip_title }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          },
+          visibleColumns.customer && {
+            key: "customer",
+            label: __("Customer", "Customer"),
+            render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: review.customer_name }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: review.customer_email }),
               review.verified && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 mt-1", children: __("Verified", "Verified") })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: renderStars(review.rating) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            ] })
+          },
+          visibleColumns.rating && {
+            key: "rating",
+            label: __("Rating", "Rating"),
+            render: (review) => renderStars(review.rating)
+          },
+          visibleColumns.review && {
+            key: "review",
+            label: __("Review", "Review"),
+            render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white mb-1", children: review.title }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: review.comment })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(review.status) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(review.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleView(review),
-                  className: "h-8 w-8",
-                  "aria-label": __("View review", "View review"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleEdit(review),
-                  className: "h-8 w-8",
-                  "aria-label": __("Edit review", "Edit review"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-                }
-              ) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_reviews", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleDelete(review),
-                  className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                  "aria-label": __("Delete review", "Delete review"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-                }
-              ) })
-            ] }) })
-          ] }, review.id);
-        }) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("reviews", "reviews")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
-    ] })
+            ] })
+          },
+          visibleColumns.status && {
+            key: "status",
+            label: __("Status", "Status"),
+            render: (review) => getStatusBadge(review.status)
+          },
+          visibleColumns.date && {
+            key: "date",
+            label: __("Date", "Date"),
+            render: (review) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(review.created_at) })
+          }
+        ].filter(Boolean),
+        actions,
+        isLoading,
+        isError: !!error,
+        errorText: __("Error loading reviews", "Error loading reviews"),
+        emptyText: __("No reviews found", "No reviews found"),
+        emptyDescription: __("When customers submit reviews, they will appear here.", "When customers submit reviews, they will appear here."),
+        onSort: handleSort,
+        getSortIcon,
+        selectedItemIds: selectedIds,
+        onSelectItem: (id, checked) => {
+          if (checked) {
+            setSelectedIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+          } else {
+            setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+          }
+        },
+        onSelectAll: (checked) => {
+          if (checked) {
+            setSelectedIds(reviews.map((r) => r.id));
+          } else {
+            setSelectedIds([]);
+          }
+        },
+        isAllSelected: reviews.length > 0 && selectedIds.length === reviews.length,
+        getItemId: (review) => review.id,
+        capability: "yatra_view_reviews",
+        skeletonRows: 5
+      }
+    ) }) }),
+    total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Pagination,
+      {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: 10,
+        onPageChange: setPage,
+        itemName: __("reviews", "reviews")
+      }
+    )
   ] });
 };
 const ReviewForm = () => {
@@ -27340,6 +27857,31 @@ const Discounts = () => {
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
   const [deleteConfirm, setDeleteConfirm] = reactExports.useState({ isOpen: false, discount: null });
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        code: true,
+        type: true,
+        discount: true,
+        usage: true,
+        expiry_date: true,
+        status: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-discounts-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      code: true,
+      type: true,
+      discount: true,
+      usage: true,
+      expiry_date: true,
+      status: true
+    };
+  });
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -27389,7 +27931,8 @@ const Discounts = () => {
   });
   const discounts = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
-  const totalPages = Math.ceil(total / 10);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil(total / itemsPerPage);
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -27412,17 +27955,21 @@ const Discounts = () => {
   };
   const getStatusBadge = (status) => {
     const statusMap = {
-      "publish": {
+      publish: {
         className: "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
         label: __("Publish", "Publish")
       },
-      "draft": {
+      draft: {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Draft", "Draft")
       },
-      "trash": {
+      trash: {
         className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
         label: __("Trash", "Trash")
+      },
+      expired: {
+        className: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Expired", "Expired")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -27475,6 +28022,353 @@ const Discounts = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || typeFilter !== "all" || sortBy !== "created_at" || sortOrder !== "desc";
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-discounts-visible-columns", JSON.stringify(newVisibleColumns));
+    }
+  };
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds(
+      (prev) => checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id)
+    );
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(discounts.map((discount) => discount.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const isAllSelected = discounts.length > 0 && selectedIds.length === discounts.length;
+  const updateStatusForIds = async (ids, newStatus) => {
+    await Promise.all(
+      ids.map((id) => {
+        const discount = discounts.find((item) => item.id === id);
+        if (!discount) {
+          return Promise.resolve();
+        }
+        const payload = {
+          ...discount,
+          status: newStatus
+        };
+        return apiClient.put(`/discounts/${id}`, payload);
+      })
+    );
+  };
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    try {
+      setIsBulkPending(true);
+      if (bulkAction === "delete") {
+        await Promise.all(
+          selectedIds.map((id) => apiClient.delete(`/discounts/${id}`))
+        );
+        showToast(
+          __("Selected discounts deleted successfully", "Selected discounts deleted successfully"),
+          "success"
+        );
+      } else {
+        const newStatus = bulkAction;
+        await updateStatusForIds(selectedIds, newStatus);
+        showToast(
+          __("Bulk status updated successfully", "Bulk status updated successfully"),
+          "success"
+        );
+      }
+      queryClient2.invalidateQueries({ queryKey: ["discounts"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to perform bulk action on discounts", "Failed to perform bulk action on discounts"),
+        "error"
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+  const allBulkActionOptions = [
+    { value: "publish", label: __("Mark as Publish", "Mark as Publish") },
+    { value: "draft", label: __("Mark as Draft", "Mark as Draft") },
+    { value: "trash", label: __("Move to Trash", "Move to Trash") },
+    { value: "expired", label: __("Mark as Expired", "Mark as Expired") },
+    { value: "delete", label: __("Delete permanently", "Delete permanently") }
+  ];
+  const getBulkActionOptionsForStatus = (view) => {
+    switch (view) {
+      case "publish":
+        return allBulkActionOptions.filter(
+          (opt) => ["draft", "trash", "expired", "delete"].includes(opt.value)
+        );
+      case "draft":
+        return allBulkActionOptions.filter(
+          (opt) => ["publish", "trash", "expired", "delete"].includes(opt.value)
+        );
+      case "trash":
+        return allBulkActionOptions.filter(
+          (opt) => ["publish", "draft", "delete"].includes(opt.value)
+        );
+      case "expired":
+        return allBulkActionOptions.filter(
+          (opt) => ["publish", "draft", "trash", "delete"].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+  const statusOptions = [
+    { value: "all", label: __("All Status", "All Status") },
+    { value: "publish", label: __("Publish", "Publish") },
+    { value: "draft", label: __("Draft", "Draft") },
+    { value: "trash", label: __("Trash", "Trash") },
+    { value: "expired", label: __("Expired", "Expired") }
+  ];
+  const sortOptions = [
+    { value: "created_at", label: __("Created Date", "Created Date") },
+    { value: "code", label: __("Code", "Code") },
+    { value: "type", label: __("Type", "Type") },
+    { value: "amount", label: __("Amount", "Amount") },
+    { value: "usage_count", label: __("Usage", "Usage") },
+    { value: "expiry_date", label: __("Expiry Date", "Expiry Date") },
+    { value: "status", label: __("Status", "Status") }
+  ];
+  const columnOptions = [
+    {
+      key: "code",
+      label: __("Coupon Code", "Coupon Code"),
+      visible: visibleColumns.code
+    },
+    {
+      key: "type",
+      label: __("Type", "Type"),
+      visible: visibleColumns.type
+    },
+    {
+      key: "discount",
+      label: __("Discount", "Discount"),
+      visible: visibleColumns.discount
+    },
+    {
+      key: "usage",
+      label: __("Usage", "Usage"),
+      visible: visibleColumns.usage
+    },
+    {
+      key: "expiry_date",
+      label: __("Expiry Date", "Expiry Date"),
+      visible: visibleColumns.expiry_date
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      visible: visibleColumns.status
+    }
+  ];
+  const columns = [
+    {
+      key: "code",
+      label: __("Coupon Code", "Coupon Code"),
+      sortable: true,
+      visible: visibleColumns.code,
+      width: "w-[260px]",
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-4 h-4 text-gray-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white font-mono text-sm", children: discount.code }),
+          discount.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+            __("Group", "Group")
+          ] })
+        ] }),
+        discount.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: discount.description }),
+        discount.is_group_discount && discount.min_group_size && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+          __("Min", "Min"),
+          " ",
+          discount.min_group_size,
+          " ",
+          __("people", "people"),
+          " -",
+          " ",
+          discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`,
+          " ",
+          __("extra discount", "extra discount")
+        ] })
+      ] })
+    },
+    {
+      key: "type",
+      label: __("Type", "Type"),
+      sortable: true,
+      visible: visibleColumns.type,
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Badge,
+        {
+          variant: discount.type === "percentage" ? "info" : "default",
+          className: "text-xs",
+          children: discount.type === "percentage" ? __("Percentage", "Percentage") : __("Fixed", "Fixed")
+        }
+      )
+    },
+    {
+      key: "discount",
+      label: __("Discount", "Discount"),
+      sortable: true,
+      visible: visibleColumns.discount,
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: formatDiscount(discount) })
+    },
+    {
+      key: "usage",
+      label: __("Usage", "Usage"),
+      sortable: true,
+      visible: visibleColumns.usage,
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "outline", className: "font-medium", children: [
+        discount.usage_count,
+        " /",
+        " ",
+        discount.usage_limit === 0 ? "∞" : discount.usage_limit
+      ] }) })
+    },
+    {
+      key: "expiry_date",
+      label: __("Expiry Date", "Expiry Date"),
+      sortable: true,
+      visible: visibleColumns.expiry_date,
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: discount.expiry_date ? formatDate2(discount.expiry_date) : __("No expiry", "No expiry") })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (discount) => getStatusBadge(discount.status)
+    }
+  ];
+  const actions = [
+    {
+      key: "duplicate",
+      label: __("Duplicate", "Duplicate"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-4 h-4" }),
+      onClick: (discount) => handleDuplicate(discount)
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (discount) => handleEdit(discount)
+    },
+    {
+      key: "mark_publish",
+      label: __("Mark as Publish", "Mark as Publish"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+      onClick: async (discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], "publish");
+          queryClient2.invalidateQueries({ queryKey: ["discounts"] });
+          showToast(
+            __("Discount status updated", "Discount status updated"),
+            "success"
+          );
+        } catch (error2) {
+          showToast(
+            (error2 == null ? void 0 : error2.message) || __("Failed to update discount status", "Failed to update discount status"),
+            "error"
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount) => discount.status !== "publish"
+    },
+    {
+      key: "mark_draft",
+      label: __("Mark as Draft", "Mark as Draft"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], "draft");
+          queryClient2.invalidateQueries({ queryKey: ["discounts"] });
+          showToast(
+            __("Discount status updated", "Discount status updated"),
+            "success"
+          );
+        } catch (error2) {
+          showToast(
+            (error2 == null ? void 0 : error2.message) || __("Failed to update discount status", "Failed to update discount status"),
+            "error"
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount) => discount.status !== "draft"
+    },
+    {
+      key: "move_trash",
+      label: __("Move to Trash", "Move to Trash"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: async (discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], "trash");
+          queryClient2.invalidateQueries({ queryKey: ["discounts"] });
+          showToast(
+            __("Discount moved to trash", "Discount moved to trash"),
+            "success"
+          );
+        } catch (error2) {
+          showToast(
+            (error2 == null ? void 0 : error2.message) || __("Failed to move discount to trash", "Failed to move discount to trash"),
+            "error"
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount) => discount.status !== "trash"
+    },
+    {
+      key: "mark_expired",
+      label: __("Mark as Expired", "Mark as Expired"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (discount) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([discount.id], "expired");
+          queryClient2.invalidateQueries({ queryKey: ["discounts"] });
+          showToast(
+            __("Discount status updated", "Discount status updated"),
+            "success"
+          );
+        } catch (error2) {
+          showToast(
+            (error2 == null ? void 0 : error2.message) || __("Failed to update discount status", "Failed to update discount status"),
+            "error"
+          );
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (discount) => discount.status !== "expired"
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (discount) => handleDelete(discount),
+      variant: "destructive"
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -27494,336 +28388,143 @@ const Discounts = () => {
       PageHeader,
       {
         title: __("Discount Coupons", "Discount Coupons"),
-        description: __("Create and manage discount coupons for your trips", "Create and manage discount coupons for your trips")
+        description: __("Create and manage discount coupons for your trips", "Create and manage discount coupons for your trips"),
+        actionCapability: "yatra_edit_bookings",
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateDiscount, className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+          __("Create Discount", "Create Discount")
+        ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search by code...", "Search by code..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SearchFilterToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "active", children: __("Active", "Active") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "inactive", children: __("Inactive", "Inactive") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "expired", children: __("Expired", "Expired") })
-          ]
+          searchTerm,
+          onSearchChange: setSearchTerm,
+          statusFilter,
+          onStatusChange: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions,
+          sortBy,
+          onSortByChange: (field) => {
+            setSortBy(field);
+            setPage(1);
+          },
+          sortOrder,
+          onSortOrderChange: (order) => {
+            setSortOrder(order);
+            setPage(1);
+          },
+          sortOptions,
+          onResetFilters: handleResetFilters,
+          hasFilters: !!hasFilters,
+          placeholder: __("Search by code...", "Search by code...")
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto flex lg:justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: typeFilter,
-          onChange: (e) => setTypeFilter(e.target.value),
-          className: "w-full md:w-40",
+          onChange: (e) => {
+            setTypeFilter(e.target.value);
+            setPage(1);
+          },
+          className: "w-full lg:w-48 max-w-xs",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Types", "All Types") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage", "Percentage") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "fixed", children: __("Fixed Amount", "Fixed Amount") })
           ]
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Created Date", "Created Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "code", children: __("Code", "Code") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "type", children: __("Type", "Type") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "amount", children: __("Amount", "Amount") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "usage_count", children: __("Usage", "Usage") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "expiry_date", children: __("Expiry Date", "Expiry Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "px-3 flex items-center gap-1.5",
-          title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
-          children: [
-            sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
-          ]
-        }
-      ),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "flex items-center gap-2",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            __("Reset", "Reset")
-          ]
-        }
-      )
+      ) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading discounts", "Error loading discounts") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Coupon Code", "Coupon Code") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Discount", "Discount") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Usage", "Usage") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Expiry Date", "Expiry Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[180px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) })
-        ] }, `skeleton-${index}`)) })
-      ] }) : discounts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Coupon Code", "Coupon Code") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Discount", "Discount") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Usage", "Usage") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Expiry Date", "Expiry Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[180px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 7, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No discounts found", "No discounts found") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first discount coupon.", "Get started by creating your first discount coupon.") }),
-          hasFilters ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions: [
             {
-              variant: "outline",
-              onClick: handleResetFilters,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-                __("Clear Filters", "Clear Filters")
-              ]
-            }
-          ) : can("yatra_edit_bookings") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
+              key: "all",
+              label: __("All", "All"),
+              count: 0
+            },
             {
-              onClick: handleCreateDiscount,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                __("Create Discount", "Create Discount")
-              ]
-            }
-          )
-        ] }) }) }) })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
+              key: "publish",
+              label: __("Publish", "Publish"),
+              count: 0
+            },
             {
-              onClick: () => handleSort("code"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Coupon Code", "Coupon Code"),
-                getSortIcon("code")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
+              key: "draft",
+              label: __("Draft", "Draft"),
+              count: 0
+            },
             {
-              onClick: () => handleSort("type"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Type", "Type"),
-                getSortIcon("type")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
+              key: "trash",
+              label: __("Trash", "Trash"),
+              count: 0
+            },
             {
-              onClick: () => handleSort("amount"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Discount", "Discount"),
-                getSortIcon("amount")
-              ]
+              key: "expired",
+              label: __("Expired", "Expired"),
+              count: 0
             }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("usage_count"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Usage", "Usage"),
-                getSortIcon("usage_count")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("expiry_date"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Expiry Date", "Expiry Date"),
-                getSortIcon("expiry_date")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[180px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: discounts.map((discount) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-4 h-4 text-gray-400" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white font-mono text-sm", children: discount.code }),
-              discount.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
-                __("Group", "Group")
-              ] })
-            ] }),
-            discount.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: discount.description }),
-            discount.is_group_discount && discount.min_group_size && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
-              __("Min", "Min"),
-              " ",
-              discount.min_group_size,
-              " ",
-              __("people", "people"),
-              " - ",
-              discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`,
-              " ",
-              __("extra discount", "extra discount")
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: discount.type === "percentage" ? "info" : "default", className: "text-xs", children: discount.type === "percentage" ? __("Percentage", "Percentage") : __("Fixed", "Fixed") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-medium text-gray-900 dark:text-white", children: formatDiscount(discount) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "outline", className: "font-medium", children: [
-            discount.usage_count,
-            " / ",
-            discount.usage_limit === 0 ? "∞" : discount.usage_limit
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: discount.expiry_date ? formatDate2(discount.expiry_date) : __("No expiry", "No expiry") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(discount.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_edit_bookings", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleDuplicate(discount),
-                  className: "h-8 w-8",
-                  "aria-label": __("Duplicate coupon", "Duplicate coupon"),
-                  title: __("Duplicate", "Duplicate"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-4 h-4" })
-                }
-              ),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(
-                Button,
-                {
-                  variant: "ghost",
-                  size: "icon",
-                  onClick: () => handleEdit(discount),
-                  className: "h-8 w-8",
-                  "aria-label": __("Edit coupon", "Edit coupon"),
-                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-                }
-              )
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(discount),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete coupon", "Delete coupon"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, discount.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("coupons", "coupons")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+          ],
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending: isBulkPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: discounts,
+          columns,
+          actions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading discounts", "Error loading discounts"),
+          emptyText: __("No discounts found", "No discounts found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first discount coupon.", "Get started by creating your first discount coupon."),
+          onCreateClick: can("yatra_edit_bookings") ? handleCreateDiscount : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (discount) => discount.id,
+          skeletonRows: 5,
+          capability: "yatra_view_bookings"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage,
+          onPageChange: (newPage) => setPage(newPage),
+          itemName: __("coupons", "coupons")
+        }
+      ) })
     ] }) })
   ] });
 };
@@ -32358,16 +33059,49 @@ const DiscountForm = () => {
   ] });
 };
 const Payments = () => {
-  var _a, _b;
+  var _a, _b, _c;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [methodFilter, setMethodFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("payment_date");
   const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
+  const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
+    isOpen: false,
+    payment: null
+  });
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        payment: true,
+        customer: true,
+        booking: true,
+        amount: true,
+        method: true,
+        status: true,
+        date: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-payments-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      payment: true,
+      customer: true,
+      booking: true,
+      amount: true,
+      method: true,
+      status: true,
+      date: true
+    };
+  });
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
   const defaultCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || ((_b = window == null ? void 0 : window.yatraBookingData) == null ? void 0 : _b.currency) || "USD";
+  const apiBase = ((_c = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _c.apiUrl) || "/wp-json/yatra/v1";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -32462,6 +33196,11 @@ const Payments = () => {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["payments"] });
       queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+      showToast(__("Payment deleted successfully", "Payment deleted successfully"), "success");
+      setDeleteConfirm({ isOpen: false, payment: null });
+    },
+    onError: (error2) => {
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to delete payment", "Failed to delete payment"), "error");
     }
   });
   const payments = (data == null ? void 0 : data.data) || [];
@@ -32504,6 +33243,10 @@ const Payments = () => {
       "refunded": {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Refunded", "Refunded")
+      },
+      "cancelled": {
+        className: "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Cancelled", "Cancelled")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -32517,8 +33260,11 @@ const Payments = () => {
     window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=edit&id=${payment.id}`;
   };
   const handleDelete = (payment) => {
-    if (confirm(__("Are you sure you want to delete this payment?", "Are you sure you want to delete this payment?"))) {
-      deleteMutation.mutate(payment.id);
+    setDeleteConfirm({ isOpen: true, payment });
+  };
+  const confirmDelete = () => {
+    if (deleteConfirm.payment) {
+      deleteMutation.mutate(deleteConfirm.payment.id);
     }
   };
   const handleView = (payment) => {
@@ -32552,7 +33298,336 @@ const Payments = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || methodFilter !== "all" || sortBy !== "payment_date" || sortOrder !== "desc";
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-payments-visible-columns", JSON.stringify(newVisibleColumns));
+    }
+  };
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds((prev) => checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id));
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(payments.map((payment) => payment.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const isAllSelected = payments.length > 0 && selectedIds.length === payments.length;
+  const updateStatusForIds = async (ids, newStatus) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        var _a2;
+        const response = await fetch(`${apiBase}/payments/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+          },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || "Failed to update payment status");
+        }
+      })
+    );
+  };
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    try {
+      setIsBulkPending(true);
+      if (bulkAction === "delete") {
+        await Promise.all(
+          selectedIds.map(
+            (id) => {
+              var _a2;
+              return fetch(`${apiBase}/payments/${id}`, {
+                method: "DELETE",
+                headers: {
+                  "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+                }
+              });
+            }
+          )
+        );
+        showToast(__("Selected payments deleted successfully", "Selected payments deleted successfully"), "success");
+      } else {
+        const newStatus = bulkAction;
+        await updateStatusForIds(selectedIds, newStatus);
+        showToast(__("Bulk status updated successfully", "Bulk status updated successfully"), "success");
+      }
+      queryClient2.invalidateQueries({ queryKey: ["payments"] });
+      queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(
+        (error2 == null ? void 0 : error2.message) || __("Failed to perform bulk action on payments", "Failed to perform bulk action on payments"),
+        "error"
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+  const allBulkActionOptions = [
+    { value: "completed", label: __("Mark as Completed", "Mark as Completed") },
+    { value: "failed", label: __("Mark as Failed", "Mark as Failed") },
+    { value: "refunded", label: __("Mark as Refunded", "Mark as Refunded") },
+    { value: "cancelled", label: __("Mark as Cancelled", "Mark as Cancelled") },
+    { value: "delete", label: __("Delete permanently", "Delete permanently") }
+  ];
+  const getBulkActionOptionsForStatus = (view) => {
+    switch (view) {
+      case "completed":
+        return allBulkActionOptions.filter(
+          (opt) => ["failed", "refunded", "cancelled", "delete"].includes(opt.value)
+        );
+      case "pending":
+        return allBulkActionOptions.filter(
+          (opt) => ["completed", "failed", "cancelled", "delete"].includes(opt.value)
+        );
+      case "partial":
+        return allBulkActionOptions.filter(
+          (opt) => ["completed", "cancelled", "delete"].includes(opt.value)
+        );
+      case "failed":
+        return allBulkActionOptions.filter(
+          (opt) => ["completed", "cancelled", "delete"].includes(opt.value)
+        );
+      case "refunded":
+        return allBulkActionOptions.filter(
+          (opt) => ["completed", "cancelled", "delete"].includes(opt.value)
+        );
+      case "cancelled":
+        return allBulkActionOptions.filter(
+          (opt) => ["completed", "delete"].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+  const statusOptions = [
+    { value: "all", label: __("All Status", "All Status") },
+    { value: "completed", label: __("Completed", "Completed") },
+    { value: "partial", label: __("Partial", "Partial") },
+    { value: "failed", label: __("Failed", "Failed") },
+    { value: "refunded", label: __("Refunded", "Refunded") },
+    { value: "cancelled", label: __("Cancelled", "Cancelled") }
+  ];
+  const sortOptions = [
+    { value: "payment_date", label: __("Payment Date", "Payment Date") },
+    { value: "payment_number", label: __("Payment Number", "Payment Number") },
+    { value: "customer_name", label: __("Customer", "Customer") },
+    { value: "amount", label: __("Amount", "Amount") },
+    { value: "payment_method", label: __("Payment Method", "Payment Method") },
+    { value: "payment_status", label: __("Status", "Status") }
+  ];
+  const columnOptions = [
+    { key: "payment", label: __("Payment", "Payment"), visible: visibleColumns.payment },
+    { key: "customer", label: __("Customer", "Customer"), visible: visibleColumns.customer },
+    { key: "booking", label: __("Booking", "Booking"), visible: visibleColumns.booking },
+    { key: "amount", label: __("Amount", "Amount"), visible: visibleColumns.amount },
+    { key: "method", label: __("Method", "Method"), visible: visibleColumns.method },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "date", label: __("Date", "Date"), visible: visibleColumns.date }
+  ];
+  const columns = [
+    {
+      key: "payment",
+      label: __("Payment", "Payment"),
+      sortable: true,
+      visible: visibleColumns.payment,
+      width: "w-[220px]",
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            type: "button",
+            onClick: () => handleView(payment),
+            className: "flex items-center gap-2 mb-1 group cursor-pointer",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4 text-blue-500 dark:text-blue-400 group-hover:text-blue-600 dark:group-hover:text-blue-300" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-blue-600 dark:text-blue-400 font-mono text-sm group-hover:text-blue-700 dark:group-hover:text-blue-300 group-hover:underline", children: payment.payment_number })
+            ]
+          }
+        ),
+        payment.transaction_id && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: [
+          __("TXN", "TXN"),
+          ": ",
+          payment.transaction_id
+        ] })
+      ] })
+    },
+    {
+      key: "customer",
+      label: __("Customer", "Customer"),
+      sortable: true,
+      visible: visibleColumns.customer,
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.customer_name }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: payment.customer_email })
+      ] })
+    },
+    {
+      key: "booking",
+      label: __("Booking", "Booking"),
+      sortable: false,
+      visible: visibleColumns.booking,
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.booking_number }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: payment.trip_title })
+      ] })
+    },
+    {
+      key: "amount",
+      label: __("Amount", "Amount"),
+      sortable: true,
+      visible: visibleColumns.amount,
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-900 dark:text-white", children: formatPrice(payment.amount, payment.currency || defaultCurrency) })
+    },
+    {
+      key: "method",
+      label: __("Method", "Method"),
+      sortable: true,
+      visible: visibleColumns.method,
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (payment) => getStatusBadge(payment.payment_status)
+    },
+    {
+      key: "date",
+      label: __("Date", "Date"),
+      sortable: true,
+      visible: visibleColumns.date,
+      render: (payment) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(payment.payment_date) })
+    }
+  ];
+  const actions = [
+    {
+      key: "view",
+      label: __("View", "View"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (payment) => handleView(payment)
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (payment) => handleEdit(payment)
+    },
+    {
+      key: "mark_completed",
+      label: __("Mark as Completed", "Mark as Completed"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+      onClick: async (payment) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([payment.id], "completed");
+          queryClient2.invalidateQueries({ queryKey: ["payments"] });
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "Payment status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update payment status", "Failed to update payment status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (payment) => can("yatra_edit_bookings") && payment.payment_status !== "completed"
+    },
+    {
+      key: "mark_failed",
+      label: __("Mark as Failed", "Mark as Failed"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (payment) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([payment.id], "failed");
+          queryClient2.invalidateQueries({ queryKey: ["payments"] });
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "Payment status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update payment status", "Failed to update payment status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (payment) => can("yatra_edit_bookings") && payment.payment_status !== "failed"
+    },
+    {
+      key: "mark_refunded",
+      label: __("Mark as Refunded", "Mark as Refunded"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (payment) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([payment.id], "refunded");
+          queryClient2.invalidateQueries({ queryKey: ["payments"] });
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "Payment status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update payment status", "Failed to update payment status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (payment) => can("yatra_edit_bookings") && payment.payment_status !== "refunded"
+    },
+    {
+      key: "mark_cancelled",
+      label: __("Mark as Cancelled", "Mark as Cancelled"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+      onClick: async (payment) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([payment.id], "cancelled");
+          queryClient2.invalidateQueries({ queryKey: ["payments"] });
+          queryClient2.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "Payment status updated"), "success");
+        } catch (error2) {
+          showToast((error2 == null ? void 0 : error2.message) || __("Failed to update payment status", "Failed to update payment status"), "error");
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (payment) => can("yatra_edit_bookings") && payment.payment_status !== "cancelled"
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (payment) => handleDelete(payment),
+      variant: "destructive"
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteConfirm.isOpen,
+        onClose: () => setDeleteConfirm({ isOpen: false, payment: null }),
+        onConfirm: confirmDelete,
+        title: __("Delete Payment", "Delete Payment"),
+        message: deleteConfirm.payment ? __('Are you sure you want to delete payment "{number}"? This action cannot be undone.', 'Are you sure you want to delete payment "{number}"? This action cannot be undone.').replace("{number}", deleteConfirm.payment.payment_number) : __("Are you sure you want to delete this payment? This action cannot be undone.", "Are you sure you want to delete this payment? This action cannot be undone."),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
@@ -32565,42 +33640,43 @@ const Payments = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search payments...", "Search payments..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        SearchFilterToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "partial", children: __("Partial", "Partial") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "failed", children: __("Failed", "Failed") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "refunded", children: __("Refunded", "Refunded") })
-          ]
+          searchTerm,
+          onSearchChange: setSearchTerm,
+          statusFilter,
+          onStatusChange: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions,
+          sortBy,
+          onSortByChange: (field) => {
+            setSortBy(field);
+            setPage(1);
+          },
+          sortOrder,
+          onSortOrderChange: (order) => {
+            setSortOrder(order);
+            setPage(1);
+          },
+          sortOptions,
+          onResetFilters: handleResetFilters,
+          hasFilters: !!hasFilters,
+          placeholder: __("Search payments...", "Search payments...")
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      ) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full lg:w-auto flex lg:justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Select,
         {
           value: methodFilter,
-          onChange: (e) => setMethodFilter(e.target.value),
-          className: "w-full md:w-40",
+          onChange: (e) => {
+            setMethodFilter(e.target.value);
+            setPage(1);
+          },
+          className: "w-full lg:w-48 max-w-xs",
           children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Methods", "All Methods") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Credit Card", children: __("Credit Card", "Credit Card") }),
@@ -32609,242 +33685,74 @@ const Payments = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Cash", children: __("Cash", "Cash") })
           ]
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
-        {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_date", children: __("Payment Date", "Payment Date") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_number", children: __("Payment Number", "Payment Number") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "customer_name", children: __("Customer", "Customer") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "amount", children: __("Amount", "Amount") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_method", children: __("Payment Method", "Payment Method") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "payment_status", children: __("Status", "Status") })
-          ]
-        }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "px-3 flex items-center gap-1.5",
-          title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
-          children: [
-            sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
-          ]
-        }
-      ),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "flex items-center gap-2",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            __("Reset", "Reset")
-          ]
-        }
-      )
+      ) })
     ] }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading payments", "Error loading payments") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Payment", "Payment") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Customer", "Customer") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Amount", "Amount") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Method", "Method") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-32" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-28" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-24" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-16" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20 ml-auto" }) })
-        ] }, i)) })
-      ] }) : payments.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-8 text-center text-gray-500 dark:text-gray-400", children: __("No payments found", "No payments found") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("payment_number"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Payment", "Payment"),
-                getSortIcon("payment_number")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("customer_name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Customer", "Customer"),
-                getSortIcon("customer_name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("amount"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Amount", "Amount"),
-                getSortIcon("amount")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("payment_method"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Method", "Method"),
-                getSortIcon("payment_method")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("payment_status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("payment_status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("payment_date"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("payment_date")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: payments.map((payment) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4 text-gray-400" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white font-mono text-sm", children: payment.payment_number })
-            ] }),
-            payment.transaction_id && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: [
-              __("TXN", "TXN"),
-              ": ",
-              payment.transaction_id
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.customer_name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: payment.customer_email })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: payment.booking_number }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: payment.trip_title })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "font-semibold text-gray-900 dark:text-white", children: formatPrice(payment.amount, payment.currency || defaultCurrency) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400", children: payment.payment_method }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(payment.payment_status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(payment.payment_date) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleView(payment),
-                className: "h-8 w-8",
-                "aria-label": __("View payment", "View payment"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(payment),
-                className: "h-8 w-8",
-                "aria-label": __("Edit payment", "Edit payment"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(payment),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete payment", "Delete payment"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, payment.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("payments", "payments")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+          },
+          statusOptions: [
+            { key: "all", label: __("All", "All"), count: 0 },
+            { key: "completed", label: __("Completed", "Completed"), count: 0 },
+            { key: "pending", label: __("Pending", "Pending"), count: 0 },
+            { key: "partial", label: __("Partial", "Partial"), count: 0 },
+            { key: "failed", label: __("Failed", "Failed"), count: 0 },
+            { key: "refunded", label: __("Refunded", "Refunded"), count: 0 },
+            { key: "cancelled", label: __("Cancelled", "Cancelled"), count: 0 }
+          ],
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending: isBulkPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: payments,
+          columns,
+          actions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading payments", "Error loading payments"),
+          emptyText: __("No payments found", "No payments found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by recording your first payment.", "Get started by recording your first payment."),
+          onCreateClick: can("yatra_edit_bookings") ? handleCreatePayment : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (payment) => payment.id,
+          skeletonRows: 5,
+          capability: "yatra_view_bookings"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: (newPage) => setPage(newPage),
+          itemName: __("payments", "payments")
+        }
+      ) })
     ] }) })
   ] });
 };
@@ -33723,6 +34631,203 @@ const TravelerCategories = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || sortBy !== "label" || sortOrder !== "asc";
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState({
+    category: true,
+    description: true,
+    age_range: true,
+    status: true,
+    dates: true,
+    author: true
+  });
+  const toggleColumnVisibility = (key) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+  const statusCounts = reactExports.useMemo(() => {
+    const counts = {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0
+    };
+    categories.forEach((cat) => {
+      counts.all++;
+      if (cat.status === "publish") counts.publish++;
+      else if (cat.status === "draft") counts.draft++;
+      else if (cat.status === "trash") counts.trash++;
+    });
+    return counts;
+  }, [categories]);
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }) => {
+      if (action === "delete") {
+        await Promise.all(ids.map((id) => apiClient.delete(`/traveler-categories/${id}`)));
+      } else {
+        await Promise.all(
+          ids.map(async (id) => {
+            try {
+              const response = await apiClient.get(`/traveler-categories/${id}`);
+              const category = response;
+              if (!category || !category.label) {
+                return;
+              }
+              await apiClient.put(`/traveler-categories/${id}`, {
+                label: category.label,
+                slug: category.slug,
+                description: category.description,
+                age_min: category.age_min,
+                age_max: category.age_max,
+                icon: category.icon,
+                status: action
+              });
+            } catch {
+              throw new Error("bulk_item_failed");
+            }
+          })
+        );
+      }
+    },
+    onSuccess: (_data, variables) => {
+      queryClient2.invalidateQueries({ queryKey: ["traveler-categories"] });
+      const msgMap = {
+        delete: __("Selected traveler categories deleted successfully", "Selected traveler categories deleted successfully"),
+        trash: __("Selected traveler categories moved to trash", "Selected traveler categories moved to trash"),
+        draft: __("Selected traveler categories marked as draft", "Selected traveler categories marked as draft"),
+        publish: __("Selected traveler categories published", "Selected traveler categories published")
+      };
+      showToast(msgMap[variables.action] || __("Bulk action completed", "Bulk action completed"), "success");
+      setSelectedIds([]);
+      setBulkAction("");
+    },
+    onError: (error2, variables) => {
+      const msgMapError = {
+        delete: __("Failed to delete selected traveler categories", "Failed to delete selected traveler categories"),
+        trash: __("Failed to move traveler categories to trash", "Failed to move traveler categories to trash"),
+        draft: __("Failed to mark traveler categories as draft", "Failed to mark traveler categories as draft"),
+        publish: __("Failed to publish traveler categories", "Failed to publish traveler categories")
+      };
+      showToast(
+        (error2 == null ? void 0 : error2.message) || msgMapError[variables.action] || __("Bulk action failed", "Bulk action failed"),
+        "error"
+      );
+    }
+  });
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__("Select a bulk action first.", "Select a bulk action first."), "warning");
+      return;
+    }
+    if (selectedIds.length === 0) {
+      showToast(__("Select at least one traveler category.", "Select at least one traveler category."), "warning");
+      return;
+    }
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
+  const columns = [
+    {
+      key: "category",
+      label: __("Category", "Category"),
+      sortable: true,
+      visible: visibleColumns.category,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        renderIcon(category.icon),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: category.label }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: category.slug })
+        ] })
+      ] })
+    },
+    {
+      key: "description",
+      label: __("Description", "Description"),
+      visible: visibleColumns.description,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-gray-600 dark:text-gray-400 text-sm line-clamp-2", children: category.description || __("No description", "No description") })
+    },
+    {
+      key: "age_range",
+      label: __("Age Range", "Age Range"),
+      visible: visibleColumns.age_range,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm", children: formatAgeRange(category.age_min, category.age_max) })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (category) => getStatusBadge(category.status)
+    },
+    {
+      key: "dates",
+      label: __("Date", "Date"),
+      sortable: true,
+      visible: visibleColumns.dates,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(category.created_at) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated", "Updated"),
+          ": ",
+          formatDate2(category.updated_at)
+        ] })
+      ] })
+    },
+    {
+      key: "author",
+      label: __("Author", "Author"),
+      visible: visibleColumns.author,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-600 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(category.created_by, category.created_by_name) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated by", "Updated by"),
+          ": ",
+          formatUser(category.updated_by, category.updated_by_name)
+        ] })
+      ] })
+    }
+  ];
+  const actions = [
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (category) => handleEdit(category),
+      condition: () => can("yatra_edit_trips")
+    },
+    {
+      key: "publish",
+      label: __("Make Published", "Make Published"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (category) => bulkMutation.mutate({ action: "publish", ids: [category.id] }),
+      condition: (category) => can("yatra_edit_trips") && category.status !== "publish"
+    },
+    {
+      key: "draft",
+      label: __("Make Draft", "Make Draft"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (category) => bulkMutation.mutate({ action: "draft", ids: [category.id] }),
+      condition: (category) => can("yatra_edit_trips") && category.status !== "draft"
+    },
+    {
+      key: "trash",
+      label: __("Move to Trash", "Move to Trash"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (category) => bulkMutation.mutate({ action: "trash", ids: [category.id] }),
+      variant: "destructive",
+      condition: (category) => can("yatra_edit_trips") && category.status !== "trash"
+    },
+    {
+      key: "delete",
+      label: __("Delete Permanently", "Delete Permanently"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (category) => handleDelete(category),
+      variant: "destructive",
+      condition: (category) => can("yatra_delete_trips") && category.status === "trash"
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -33750,276 +34855,130 @@ const TravelerCategories = () => {
         ] })
       }
     ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col md:flex-row gap-2 items-stretch md:items-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 relative", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Input,
-          {
-            type: "text",
-            placeholder: __("Search categories...", "Search categories..."),
-            value: searchTerm,
-            onChange: (e) => setSearchTerm(e.target.value),
-            className: "pl-9"
-          }
-        )
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      SearchFilterToolbar,
+      {
+        searchTerm,
+        onSearchChange: setSearchTerm,
+        statusFilter,
+        onStatusChange: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+        },
+        statusOptions: [
+          { value: "all", label: __("All Status", "All Status") },
+          { value: "publish", label: __("Publish", "Publish") },
+          { value: "draft", label: __("Draft", "Draft") },
+          { value: "trash", label: __("Trash", "Trash") }
+        ],
+        sortBy,
+        onSortByChange: (value) => {
+          setSortBy(value);
+          setSortOrder("asc");
+          setPage(1);
+        },
+        sortOrder,
+        onSortOrderChange: (order) => {
+          setSortOrder(order);
+          setPage(1);
+        },
+        sortOptions: [
+          { value: "label", label: __("Label", "Label") },
+          { value: "status", label: __("Status", "Status") },
+          { value: "created_at", label: __("Created At", "Created At") },
+          { value: "updated_at", label: __("Updated At", "Updated At") }
+        ],
+        onResetFilters: handleResetFilters,
+        hasFilters: !!hasFilters,
+        placeholder: __("Search categories...", "Search categories...")
+      }
+    ) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(ConditionalRender, { capability: "yatra_view_trips", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
         {
-          value: statusFilter,
-          onChange: (e) => setStatusFilter(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Status", "All Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft", "Draft") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Publish", "Publish") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
-          ]
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+            setSelectedIds([]);
+            setBulkAction("");
+          },
+          statusOptions: [
+            { key: "all", label: __("All", "All"), count: statusCounts.all },
+            { key: "publish", label: __("Published", "Published"), count: statusCounts.publish },
+            { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+            { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+          ],
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions: [
+            { key: "category", label: __("Category", "Category"), visible: visibleColumns.category },
+            { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+            { key: "age_range", label: __("Age Range", "Age Range"), visible: visibleColumns.age_range },
+            { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+            { key: "dates", label: __("Date", "Date"), visible: visibleColumns.dates },
+            { key: "author", label: __("Author", "Author"), visible: visibleColumns.author }
+          ],
+          onToggleColumn: (key) => toggleColumnVisibility(key),
+          bulkMutationPending: bulkMutation.isPending,
+          totalItems: categories.length,
+          bulkActionOptions: getDefaultBulkStatusOptions(statusFilter)
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Select,
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
         {
-          value: sortBy,
-          onChange: (e) => setSortBy(e.target.value),
-          className: "w-full md:w-40",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "label", children: __("Label", "Label") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "status", children: __("Status", "Status") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "created_at", children: __("Created At", "Created At") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "updated_at", children: __("Updated At", "Updated At") })
-          ]
+          data: categories,
+          columns,
+          actions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading traveler categories", "Error loading traveler categories"),
+          emptyText: __("No traveler categories found", "No traveler categories found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first traveler category.", "Get started by creating your first traveler category."),
+          onCreateClick: can("yatra_edit_trips") ? handleCreateCategory : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          capability: "yatra_view_trips",
+          selectedItemIds: selectedIds,
+          onSelectItem: (id, checked) => {
+            if (checked) {
+              setSelectedIds((prev) => Array.from(/* @__PURE__ */ new Set([...prev, id])));
+            } else {
+              setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+            }
+          },
+          onSelectAll: (checked) => {
+            if (checked) {
+              setSelectedIds(categories.map((cat) => cat.id));
+            } else {
+              setSelectedIds([]);
+            }
+          },
+          isAllSelected: categories.length > 0 && selectedIds.length === categories.length,
+          getItemId: (cat) => cat.id,
+          getItemStatus: (cat) => cat.status,
+          statusFilter
         }
-      ),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
         {
-          variant: "outline",
-          onClick: () => setSortOrder(sortOrder === "asc" ? "desc" : "asc"),
-          className: "px-3 flex items-center gap-1.5",
-          title: sortOrder === "asc" ? __("Ascending", "Ascending") : __("Descending", "Descending"),
-          children: [
-            sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs", children: sortOrder === "asc" ? __("Asc", "Asc") : __("Desc", "Desc") })
-          ]
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: setPage,
+          itemName: __("categories", "categories")
         }
-      ),
-      hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          variant: "outline",
-          onClick: handleResetFilters,
-          className: "flex items-center gap-2",
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-            __("Reset", "Reset")
-          ]
-        }
-      )
-    ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading traveler categories", "Error loading traveler categories") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Category", "Category") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[120px]", children: __("Age Range", "Age Range") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) })
-        ] }, `skeleton-${index}`)) })
-      ] }) : categories.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: __("Category", "Category") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[120px]", children: __("Age Range", "Age Range") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 7, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No traveler categories found", "No traveler categories found") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first traveler category.", "Get started by creating your first traveler category.") }),
-          hasFilters ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              onClick: handleResetFilters,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-                __("Clear Filters", "Clear Filters")
-              ]
-            }
-          ) : can("yatra_edit_trips") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              onClick: handleCreateCategory,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                __("Create Category", "Create Category")
-              ]
-            }
-          )
-        ] }) }) }) })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[250px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("label"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Category", "Category"),
-                getSortIcon("label")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[120px]", children: __("Age Range", "Age Range") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: categories.map((category) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            renderIcon(category.icon),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: category.label }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: category.slug })
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "line-clamp-2", children: category.description || __("No description", "No description") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: formatAgeRange(category.age_min, category.age_max) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(category.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(category.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated", "Updated"),
-              ": ",
-              formatDate2(category.updated_at)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(category.created_by, category.created_by_name) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated by", "Updated by"),
-              ": ",
-              formatUser(category.updated_by, category.updated_by_name)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(category),
-                className: "h-8 w-8",
-                "aria-label": __("Edit category", "Edit category"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(category),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete category", "Delete category"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, category.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("categories", "categories")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
-    ] }) })
+      ) }) })
+    ] })
   ] });
 };
 const TravelerCategoryForm = () => {
@@ -34076,7 +35035,7 @@ const TravelerCategoryForm = () => {
     }
   }, [categoryData, isEditMode]);
   const handleLabelChange = (value) => {
-    if (!isSlugEditable) {
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData((prev) => ({
         ...prev,
@@ -35155,6 +36114,26 @@ const Availability = () => {
   const [lastSyncTime, setLastSyncTime] = reactExports.useState(null);
   const [showAlerts, setShowAlerts] = reactExports.useState(true);
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState({
+    departure: true,
+    arrival: true,
+    locations: true,
+    capacity: true,
+    booked: true,
+    available: true,
+    waitlist: true,
+    price: true,
+    status: true
+  });
+  const toggleColumn = (key) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
   const { data: tripsData } = useQuery({
     queryKey: ["trips", "all"],
     queryFn: async () => {
@@ -35227,6 +36206,7 @@ const Availability = () => {
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["availability"] });
       showToast(__("Availability date deleted successfully", "Availability date deleted successfully"), "success");
+      setDeleteConfirm({ isOpen: false, date: null });
     },
     onError: (error) => {
       showToast((error == null ? void 0 : error.message) || __("Failed to delete availability date", "Failed to delete availability date"), "error");
@@ -35340,7 +36320,217 @@ const Availability = () => {
     if (!filteredDates || filteredDates.length === 0) return [];
     return filteredDates.filter((date) => date.is_blocked);
   }, [filteredDates]);
+  const statusCounts = reactExports.useMemo(() => {
+    const counts = {
+      all: 0,
+      available: 0,
+      limited: 0,
+      sold_out: 0,
+      closed: 0,
+      blocked: 0
+    };
+    if (!(availabilityData == null ? void 0 : availabilityData.dates)) return counts;
+    availabilityData.dates.forEach((date) => {
+      counts.all++;
+      if (date.status === "available") counts.available++;
+      else if (date.status === "limited") counts.limited++;
+      else if (date.status === "sold_out") counts.sold_out++;
+      else if (date.status === "closed") counts.closed++;
+      else if (date.status === "blocked") counts.blocked++;
+    });
+    return counts;
+  }, [availabilityData]);
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids) => {
+      await Promise.all(ids.map((id) => apiClient.delete(`/availability/${id}`)));
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["availability"] });
+      showToast(__("Selected availability dates deleted successfully", "Selected availability dates deleted successfully"), "success");
+      setSelectedIds([]);
+      setBulkAction("");
+    },
+    onError: (error) => {
+      showToast((error == null ? void 0 : error.message) || __("Failed to delete selected availability dates", "Failed to delete selected availability dates"), "error");
+    }
+  });
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__("Select a bulk action first.", "Select a bulk action first."), "warning");
+      return;
+    }
+    if (selectedIds.length === 0) {
+      showToast(__("Select at least one availability date.", "Select at least one availability date."), "warning");
+      return;
+    }
+    if (bulkAction === "delete") {
+      bulkDeleteMutation.mutate(selectedIds);
+    } else {
+      showToast(__("Unsupported bulk action for availability.", "Unsupported bulk action for availability."), "warning");
+    }
+  };
+  const bulkStatusOptions = [
+    { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+  ];
+  const totalFiltered = filteredDates.length;
+  const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
+    isOpen: false,
+    date: null
+  });
+  const tableColumns = reactExports.useMemo(() => {
+    const cols = [];
+    cols.push({
+      key: "departure",
+      label: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Departure Time", "Departure Time") : __("Departure", "Departure"),
+      visible: visibleColumns.departure,
+      render: (date) => (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.departure_date) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.departure_time ? formatTime(date.departure_time) : "" })
+        ] })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium", children: formatDate2(date.departure_date) })
+      ] })
+    });
+    cols.push({
+      key: "arrival",
+      label: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Arrival Time", "Arrival Time") : __("Arrival", "Arrival"),
+      visible: visibleColumns.arrival,
+      render: (date) => (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.arrival_date) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.arrival_time ? formatTime(date.arrival_time) : "" })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: formatDate2(date.arrival_date) })
+    });
+    cols.push({
+      key: "locations",
+      label: __("From/To", "From/To"),
+      visible: visibleColumns.locations,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: date.from_location || (selectedTrip == null ? void 0 : selectedTrip.starting_location) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "→" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: date.to_location || (selectedTrip == null ? void 0 : selectedTrip.ending_location) })
+      ] })
+    });
+    cols.push({
+      key: "capacity",
+      label: __("Capacity", "Capacity"),
+      visible: visibleColumns.capacity,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: date.total_seats || 0 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("total", "total") })
+      ] })
+    });
+    cols.push({
+      key: "booked",
+      label: __("Booked", "Booked"),
+      visible: visibleColumns.booked,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-orange-600 dark:text-orange-400", children: date.booked_seats || 0 }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("booked", "booked") })
+      ] })
+    });
+    cols.push({
+      key: "available",
+      label: __("Available", "Available"),
+      visible: visibleColumns.available,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "span",
+          {
+            className: `text-sm font-semibold ${date.available_seats === 0 ? "text-red-600 dark:text-red-400" : date.available_seats <= (date.alert_threshold || 5) ? "text-yellow-600 dark:text-yellow-400" : "text-green-600 dark:text-green-400"}`,
+            children: date.available_seats || 0
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("available", "available") }),
+        date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Bell, { className: "w-3 h-3 text-yellow-500 mt-0.5" })
+      ] })
+    });
+    cols.push({
+      key: "waitlist",
+      label: __("Waitlist", "Waitlist"),
+      visible: visibleColumns.waitlist,
+      render: (date) => date.waitlist_count > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs", children: date.waitlist_count }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("people", "people") })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400 dark:text-gray-500", children: "-" })
+    });
+    cols.push({
+      key: "price",
+      label: __("Price", "Price"),
+      visible: visibleColumns.price,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-1", children: date.discounted_price && parseFloat(date.discounted_price) < parseFloat(date.original_price) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm line-through text-gray-400", children: [
+          getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
+          parseFloat(date.original_price).toLocaleString()
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+            getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
+            parseFloat(date.discounted_price).toLocaleString()
+          ] }),
+          date.discount_percentage && parseFloat(date.discount_percentage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", className: "text-xs", children: [
+            date.discount_percentage,
+            "% ",
+            __("OFF", "OFF")
+          ] })
+        ] })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold", children: [
+        getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
+        parseFloat(date.original_price).toLocaleString()
+      ] }) })
+    });
+    cols.push({
+      key: "status",
+      label: __("Status", "Status"),
+      visible: visibleColumns.status,
+      render: (date) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
+        getStatusBadge(date.status, date.is_blocked),
+        date.is_blocked && date.block_reason && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: date.block_reason }),
+        date.last_synced_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: new Date(date.last_synced_at).toLocaleTimeString() })
+        ] })
+      ] })
+    });
+    return cols;
+  }, [selectedTrip, visibleColumns, getCurrencySymbol2, formatDate2, formatTime, getStatusBadge]);
+  const tableActions = [
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (date) => navigate({ subpage: "trips", tab: "availability", action: "edit", id: date.id })
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (date) => setDeleteConfirm({ isOpen: true, date }),
+      variant: "destructive"
+    }
+  ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteConfirm.isOpen,
+        onClose: () => setDeleteConfirm({ isOpen: false, date: null }),
+        onConfirm: () => {
+          if (deleteConfirm.date) {
+            deleteMutation.mutate(deleteConfirm.date.id);
+          }
+        },
+        title: __("Delete Availability Date", "Delete Availability Date"),
+        message: deleteConfirm.date ? __("Are you sure you want to delete this availability date on {date}? This action cannot be undone.", "Are you sure you want to delete this availability date on {date}? This action cannot be undone.").replace("{date}", formatDate2(deleteConfirm.date.departure_date)) : __("Are you sure you want to delete this availability date? This action cannot be undone.", "Are you sure you want to delete this availability date? This action cannot be undone."),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: deleteMutation.isPending
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
@@ -35693,6 +36883,43 @@ const Availability = () => {
             }
           ) })
         ] }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          BulkActionToolbar,
+          {
+            selectedIds,
+            bulkAction,
+            setBulkAction,
+            onApply: handleBulkApply,
+            onClearSelection: () => setSelectedIds([]),
+            statusFilter,
+            setStatusFilter,
+            statusOptions: [
+              { key: "all", label: __("All", "All"), count: statusCounts.all },
+              { key: "available", label: __("Available", "Available"), count: statusCounts.available },
+              { key: "limited", label: __("Limited", "Limited"), count: statusCounts.limited },
+              { key: "sold_out", label: __("Sold Out", "Sold Out"), count: statusCounts.sold_out },
+              { key: "closed", label: __("Closed", "Closed"), count: statusCounts.closed },
+              { key: "blocked", label: __("Blocked", "Blocked"), count: statusCounts.blocked }
+            ],
+            showColumnsDropdown,
+            setShowColumnsDropdown,
+            columnOptions: [
+              { key: "departure", label: __("Departure", "Departure"), visible: visibleColumns.departure },
+              { key: "arrival", label: __("Arrival", "Arrival"), visible: visibleColumns.arrival },
+              { key: "locations", label: __("From/To", "From/To"), visible: visibleColumns.locations },
+              { key: "capacity", label: __("Capacity", "Capacity"), visible: visibleColumns.capacity },
+              { key: "booked", label: __("Booked", "Booked"), visible: visibleColumns.booked },
+              { key: "available", label: __("Available", "Available"), visible: visibleColumns.available },
+              { key: "waitlist", label: __("Waitlist", "Waitlist"), visible: visibleColumns.waitlist },
+              { key: "price", label: __("Price", "Price"), visible: visibleColumns.price },
+              { key: "status", label: __("Status", "Status"), visible: visibleColumns.status }
+            ],
+            onToggleColumn: (key) => toggleColumn(key),
+            bulkMutationPending: bulkDeleteMutation.isPending,
+            totalItems: totalFiltered,
+            bulkActionOptions: bulkStatusOptions
+          }
+        ),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Availability Dates", "Availability Dates") }),
@@ -35709,55 +36936,11 @@ const Availability = () => {
               ] })
             ] }) })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Departure Time", "Departure Time") : __("Departure", "Departure") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Arrival Time", "Arrival Time") : __("Arrival", "Arrival") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("From/To", "From/To") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Capacity", "Capacity") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Booked", "Booked") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Available", "Available") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Waitlist", "Waitlist") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Price", "Price") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[120px]", children: __("Actions", "Actions") })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(10)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-20 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-              ] }) })
-            ] }, `skeleton-${index}`)) })
-          ] }) }) : filteredDates.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: searchTerm || statusFilter !== "all" || monthFilter !== "all" ? __("No availability dates match your filters", "No availability dates match your filters") : __("No availability dates added yet", "No availability dates added yet") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-500 mb-4", children: __("Add departure dates with pricing and seat availability for this trip", "Add departure dates with pricing and seat availability for this trip") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Button,
-              {
-                onClick: () => navigate({ subpage: "trips", tab: "availability", action: "create", trip_id: selectedTripId.toString() }),
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-                  __("Add First Availability Date", "Add First Availability Date")
-                ]
-              }
-            )
-          ] }) : viewMode === "calendar" ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: viewMode === "calendar" ? filteredDates.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "py-12 text-center text-gray-500 dark:text-gray-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-10 h-10 mx-auto mb-3 text-gray-400 dark:text-gray-600" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-1", children: __("No availability dates found for this trip.", "No availability dates found for this trip.") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs", children: __("Try adjusting your filters or add a new availability date.", "Try adjusting your filters or add a new availability date.") })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
             AvailabilityCalendar,
             {
               dates: filteredDates,
@@ -35767,117 +36950,39 @@ const Availability = () => {
                 navigate({ subpage: "trips", tab: "availability", action: "edit", id: date.id });
               }
             }
-          ) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Departure Time", "Departure Time") : __("Departure", "Departure") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? __("Arrival Time", "Arrival Time") : __("Arrival", "Arrival") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("From/To", "From/To") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Capacity", "Capacity") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Booked", "Booked") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Available", "Available") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-center", children: __("Waitlist", "Waitlist") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Price", "Price") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[120px]", children: __("Actions", "Actions") })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: filteredDates.map((date) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.departure_date) }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.departure_time ? formatTime(date.departure_time) : "" })
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-4 h-4 text-gray-400" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium", children: formatDate2(date.departure_date) })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium", children: formatDate2(date.arrival_date) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: date.arrival_time ? formatTime(date.arrival_time) : "" })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: formatDate2(date.arrival_date) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3 h-3" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: date.from_location || (selectedTrip == null ? void 0 : selectedTrip.starting_location) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "→" }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: date.to_location || (selectedTrip == null ? void 0 : selectedTrip.ending_location) })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: date.total_seats || 0 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("total", "total") })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-orange-600 dark:text-orange-400", children: date.booked_seats || 0 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("booked", "booked") })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `text-sm font-semibold ${date.available_seats === 0 ? "text-red-600 dark:text-red-400" : date.available_seats <= (date.alert_threshold || 5) ? "text-yellow-600 dark:text-yellow-400" : "text-green-600 dark:text-green-400"}`, children: date.available_seats || 0 }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("available", "available") }),
-                date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Bell, { className: "w-3 h-3 text-yellow-500 mt-0.5" })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: date.waitlist_count > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs", children: date.waitlist_count }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("people", "people") })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400 dark:text-gray-500", children: "-" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-1", children: date.discounted_price && parseFloat(date.discounted_price) < parseFloat(date.original_price) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm line-through text-gray-400", children: [
-                  getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
-                  parseFloat(date.original_price).toLocaleString()
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
-                    getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
-                    parseFloat(date.discounted_price).toLocaleString()
-                  ] }),
-                  date.discount_percentage && parseFloat(date.discount_percentage) > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", className: "text-xs", children: [
-                    date.discount_percentage,
-                    "% ",
-                    __("OFF", "OFF")
-                  ] })
-                ] })
-              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-semibold", children: [
-                getCurrencySymbol2((selectedTrip == null ? void 0 : selectedTrip.currency) || "USD"),
-                parseFloat(date.original_price).toLocaleString()
-              ] }) }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
-                getStatusBadge(date.status, date.is_blocked),
-                date.is_blocked && date.block_reason && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400 italic", children: date.block_reason }),
-                date.last_synced_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3 h-3" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: new Date(date.last_synced_at).toLocaleTimeString() })
-                ] })
-              ] }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Button,
-                  {
-                    variant: "ghost",
-                    size: "icon",
-                    onClick: () => navigate({ subpage: "trips", tab: "availability", action: "edit", id: date.id }),
-                    className: "h-8 w-8",
-                    title: __("Edit", "Edit"),
-                    "aria-label": __("Edit availability date", "Edit availability date"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Button,
-                  {
-                    variant: "ghost",
-                    size: "icon",
-                    onClick: () => {
-                      if (confirm(__("Are you sure you want to delete this availability date?", "Are you sure you want to delete this availability date?"))) {
-                        deleteMutation.mutate(date.id);
-                      }
-                    },
-                    className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                    title: __("Delete", "Delete"),
-                    "aria-label": __("Delete availability date", "Delete availability date"),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-                  }
-                )
-              ] }) })
-            ] }, date.id)) })
-          ] }) }) })
+          ) }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Table,
+            {
+              data: filteredDates,
+              columns: tableColumns,
+              actions: tableActions,
+              isLoading,
+              isError: false,
+              emptyText: __("No availability dates found for this trip.", "No availability dates found for this trip."),
+              emptyDescription: __("Try adjusting your filters or add a new availability date.", "Try adjusting your filters or add a new availability date."),
+              selectedItemIds: selectedIds,
+              onSelectItem: (id, checked) => {
+                if (checked) {
+                  setSelectedIds((prev) => Array.from(/* @__PURE__ */ new Set([...prev, id])));
+                } else {
+                  setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+                }
+              },
+              onSelectAll: (checked) => {
+                if (checked) {
+                  setSelectedIds(filteredDates.map((d) => d.id));
+                } else {
+                  setSelectedIds([]);
+                }
+              },
+              isAllSelected: filteredDates.length > 0 && selectedIds.length === filteredDates.length,
+              getItemId: (date) => date.id,
+              getItemStatus: (date) => date.status,
+              statusFilter,
+              skeletonRows: 5,
+              capability: "yatra_view_trips"
+            }
+          ) })
         ] })
       ] })
     ] })
@@ -39494,7 +40599,7 @@ const DepartureForm = () => {
   ] });
 };
 const Enquiries = () => {
-  var _a;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("created_at");
@@ -39505,6 +40610,50 @@ const Enquiries = () => {
   const [responseMessage, setResponseMessage] = reactExports.useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
   const [enquiryToDelete, setEnquiryToDelete] = reactExports.useState(null);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        customer: true,
+        trip: true,
+        message: true,
+        travelers: true,
+        preferred_date: true,
+        status: true,
+        date: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-enquiries-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      customer: true,
+      trip: true,
+      message: true,
+      travelers: true,
+      preferred_date: true,
+      status: true,
+      date: true
+    };
+  });
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    if (statusFilter === "spam") {
+      return [
+        { value: "mark_trash", label: __("Move to Trash", "Move to Trash") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "mark_spam", label: __("Mark as Spam", "Mark as Spam") },
+      { value: "mark_trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { navigate } = useNavigate();
@@ -39523,10 +40672,125 @@ const Enquiries = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["enquiries-stats"],
+    queryFn: async () => {
+      var _a2, _b2;
+      const baseUrl = ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const response = await fetch(`${baseUrl}/enquiries/stats`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch enquiry stats");
+      }
+      const result = await response.json();
+      return result.data || {};
+    },
+    enabled: can("yatra_view_bookings")
+  });
+  const statusCounts = {
+    all: (statsData == null ? void 0 : statsData.total) || 0,
+    new: ((_b = (_a = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _a.new) == null ? void 0 : _b.count) || 0,
+    pending: ((_d = (_c = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _c.pending) == null ? void 0 : _d.count) || 0,
+    responded: ((_f = (_e = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _e.responded) == null ? void 0 : _f.count) || 0,
+    converted: ((_h = (_g = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _g.converted) == null ? void 0 : _h.count) || 0,
+    closed: ((_j = (_i = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _i.closed) == null ? void 0 : _j.count) || 0,
+    spam: ((_l = (_k = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _k.spam) == null ? void 0 : _l.count) || 0,
+    trash: ((_n = (_m = statsData == null ? void 0 : statsData.by_status) == null ? void 0 : _m.trash) == null ? void 0 : _n.count) || 0
+  };
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    const run = async () => {
+      var _a2, _b2;
+      const baseUrl = ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const nonce = ((_b2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b2.nonce) || "";
+      try {
+        if (["delete", "mark_spam", "mark_trash"].includes(bulkAction)) {
+          const response = await fetch(`${baseUrl}/enquiries/bulk`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "X-WP-Nonce": nonce
+            },
+            body: JSON.stringify({
+              action: bulkAction,
+              ids: selectedIds
+            })
+          });
+          if (!response.ok) {
+            console.error("Failed to perform bulk enquiry action", await response.text());
+          } else {
+            queryClient2.invalidateQueries({ queryKey: ["enquiries"] });
+          }
+        }
+      } catch (error2) {
+        console.error("Bulk enquiry action error", error2);
+      } finally {
+        setSelectedIds([]);
+        setBulkAction("");
+      }
+    };
+    void run();
+  };
+  const toggleColumn = (columnKey) => {
+    const newVisible = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisible);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-enquiries-visible-columns", JSON.stringify(newVisible));
+    }
+  };
+  const columnOptions = [
+    { key: "customer", label: __("Customer", "Customer"), visible: visibleColumns.customer },
+    { key: "trip", label: __("Trip", "Trip"), visible: visibleColumns.trip },
+    { key: "message", label: __("Message", "Message"), visible: visibleColumns.message },
+    { key: "travelers", label: __("Travelers", "Travelers"), visible: visibleColumns.travelers },
+    { key: "preferred_date", label: __("Preferred Date", "Preferred Date"), visible: visibleColumns.preferred_date },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "date", label: __("Date", "Date"), visible: visibleColumns.date }
+  ];
+  const actions = [
+    {
+      key: "view",
+      label: __("View", "View"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (enquiry) => handleView(enquiry),
+      condition: () => can("yatra_view_bookings")
+    },
+    {
+      key: "respond",
+      label: __("Respond", "Respond"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4" }),
+      onClick: (enquiry) => handleRespond(enquiry),
+      // Only allow respond on active enquiries (not closed, spam, trash, or archived)
+      condition: (enquiry) => can("yatra_edit_bookings") && !["closed", "spam", "trash", "archived"].includes(enquiry.status)
+    },
+    {
+      key: "edit",
+      label: __("Edit", "Edit"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+      onClick: (enquiry) => handleEdit(enquiry),
+      condition: () => can("yatra_edit_bookings")
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (enquiry) => handleDelete(enquiry),
+      variant: "destructive",
+      condition: () => can("yatra_delete_bookings")
+    }
+  ];
   const { data, isLoading, error } = useQuery({
     queryKey: ["enquiries", queryParams],
     queryFn: async () => {
-      var _a2, _b, _c, _d, _e;
+      var _a2, _b2, _c2, _d2, _e2;
       const params = new URLSearchParams();
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== void 0 && value !== null) {
@@ -39536,7 +40800,7 @@ const Enquiries = () => {
       const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
       const response = await fetch(`${baseUrl}/enquiries?${params.toString()}`, {
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -39545,21 +40809,21 @@ const Enquiries = () => {
       const result = await response.json();
       return {
         data: result.data || [],
-        total: ((_c = result.meta) == null ? void 0 : _c.total) || result.total || 0,
-        page: ((_d = result.meta) == null ? void 0 : _d.page) || result.page || 1,
-        per_page: ((_e = result.meta) == null ? void 0 : _e.per_page) || result.per_page || 10
+        total: ((_c2 = result.meta) == null ? void 0 : _c2.total) || result.total || 0,
+        page: ((_d2 = result.meta) == null ? void 0 : _d2.page) || result.page || 1,
+        per_page: ((_e2 = result.meta) == null ? void 0 : _e2.per_page) || result.per_page || 10
       };
     },
     enabled: can("yatra_view_bookings")
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      var _a2, _b;
+      var _a2, _b2;
       const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
       const response = await fetch(`${baseUrl}/enquiries/${id}`, {
         method: "DELETE",
         headers: {
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         }
       });
       if (!response.ok) {
@@ -39575,13 +40839,13 @@ const Enquiries = () => {
   });
   const respondMutation = useMutation({
     mutationFn: async ({ id, message: message2 }) => {
-      var _a2, _b;
+      var _a2, _b2;
       const baseUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
       const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
         },
         body: JSON.stringify({ response: message2 })
       });
@@ -39600,7 +40864,8 @@ const Enquiries = () => {
   });
   const enquiries = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
-  const totalPages = Math.ceil(total / 10);
+  const perPage = 10;
+  const totalPages = Math.ceil(total / perPage || 1);
   const formatDate2 = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       month: "short",
@@ -39629,6 +40894,14 @@ const Enquiries = () => {
       "closed": {
         className: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
         label: __("Closed", "Closed")
+      },
+      "spam": {
+        className: "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        label: __("Spam", "Spam")
+      },
+      "trash": {
+        className: "bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 line-through",
+        label: __("Trash", "Trash")
       }
     };
     const statusInfo = statusMap[status] || {
@@ -39721,7 +40994,9 @@ const Enquiries = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "Responded") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "Converted") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "spam", children: __("Spam", "Spam") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
           ]
         }
       ),
@@ -39766,219 +41041,139 @@ const Enquiries = () => {
         }
       )
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading enquiries", "Error loading enquiries") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Customer", "Customer") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[300px]", children: __("Message", "Message") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travelers", "Travelers") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Preferred Date", "Preferred Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[150px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-32" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-40" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-3 w-28" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-36" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-8" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-20" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-5 w-20 rounded-full" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-4 w-24" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-8 rounded" })
-          ] }) })
-        ] }, i)) })
-      ] }) : enquiries.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-12 text-center", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No enquiries found", "No enquiries found") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 max-w-sm mx-auto", children: hasFilters ? __("Try adjusting your search or filter criteria to find what you're looking for.", "Try adjusting your search or filter criteria to find what you're looking for.") : __("When customers submit enquiries, they will appear here.", "When customers submit enquiries, they will appear here.") }),
-        hasFilters && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            variant: "outline",
-            onClick: handleResetFilters,
-            className: "mt-4",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4 mr-2" }),
-              __("Clear Filters", "Clear Filters")
-            ]
-          }
-        )
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Customer", "Customer"),
-                getSortIcon("name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("trip_title"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Trip", "Trip"),
-                getSortIcon("trip_title")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[300px]", children: __("Message", "Message") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travelers", "Travelers") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Preferred Date", "Preferred Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[120px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: enquiries.map((enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white text-sm", children: enquiry.name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
-                enquiry.email
-              ] }),
-              enquiry.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
-                enquiry.phone
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BulkActionToolbar,
+      {
+        selectedIds,
+        bulkAction,
+        setBulkAction,
+        onApply: handleBulkApply,
+        onClearSelection: () => setSelectedIds([]),
+        statusFilter,
+        setStatusFilter: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction("");
+        },
+        statusOptions: [
+          { key: "all", label: __("All", "All"), count: statusCounts.all },
+          { key: "new", label: __("New", "New"), count: statusCounts.new },
+          { key: "pending", label: __("Pending", "Pending"), count: statusCounts.pending },
+          { key: "responded", label: __("Responded", "Responded"), count: statusCounts.responded },
+          { key: "converted", label: __("Converted", "Converted"), count: statusCounts.converted },
+          { key: "closed", label: __("Closed", "Closed"), count: statusCounts.closed },
+          { key: "spam", label: __("Spam", "Spam"), count: statusCounts.spam },
+          { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+        ],
+        showColumnsDropdown,
+        setShowColumnsDropdown,
+        columnOptions,
+        onToggleColumn: toggleColumn,
+        bulkMutationPending: deleteMutation.isPending,
+        totalItems: enquiries.length,
+        bulkActionOptions
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Table,
+      {
+        data: enquiries,
+        columns: [
+          visibleColumns.customer && {
+            key: "customer",
+            label: __("Customer", "Customer"),
+            render: (enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white text-sm", children: enquiry.name }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
+                  enquiry.email
+                ] }),
+                enquiry.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+                  enquiry.phone
+                ] })
               ] })
             ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: enquiry.trip_title ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: enquiry.trip_title })
-          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400 dark:text-gray-500 italic", children: __("General Inquiry", "General Inquiry") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: enquiry.message })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: enquiry.travelers_count || "-" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.travel_date ? formatDate2(enquiry.travel_date) : "-" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(enquiry.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(enquiry.created_at) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleView(enquiry),
-                className: "h-8 w-8",
-                "aria-label": __("View enquiry", "View enquiry"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleRespond(enquiry),
-                className: "h-8 w-8 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
-                "aria-label": __("Respond to enquiry", "Respond to enquiry"),
-                title: __("Send response email", "Send response email"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(enquiry),
-                className: "h-8 w-8",
-                "aria-label": __("Edit enquiry", "Edit enquiry"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_bookings", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(enquiry),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete enquiry", "Delete enquiry"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, enquiry.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("enquiries", "enquiries")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
-    ] }) }),
+          },
+          visibleColumns.trip && {
+            key: "trip",
+            label: __("Trip", "Trip"),
+            render: (enquiry) => enquiry.trip_title ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: enquiry.trip_title })
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-400 dark:text-gray-500 italic", children: __("General Inquiry", "General Inquiry") })
+          },
+          visibleColumns.message && {
+            key: "message",
+            label: __("Message", "Message"),
+            render: (enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(MessageSquare, { className: "w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 line-clamp-2", children: enquiry.message })
+            ] })
+          },
+          visibleColumns.travelers && {
+            key: "travelers",
+            label: __("Travelers", "Travelers"),
+            render: (enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm", children: enquiry.travelers_count || "-" })
+          },
+          visibleColumns.preferred_date && {
+            key: "preferred_date",
+            label: __("Preferred Date", "Preferred Date"),
+            render: (enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: enquiry.travel_date ? formatDate2(enquiry.travel_date) : "-" })
+          },
+          visibleColumns.status && {
+            key: "status",
+            label: __("Status", "Status"),
+            render: (enquiry) => getStatusBadge(enquiry.status)
+          },
+          visibleColumns.date && {
+            key: "date",
+            label: __("Date", "Date"),
+            render: (enquiry) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500 dark:text-gray-400 text-sm", children: formatDate2(enquiry.created_at) })
+          }
+        ].filter(Boolean),
+        actions,
+        isLoading,
+        isError: !!error,
+        errorText: __("Error loading enquiries", "Error loading enquiries"),
+        emptyText: __("No enquiries found", "No enquiries found"),
+        emptyDescription: hasFilters ? __("Try adjusting your search or filter criteria to find what you're looking for.", "Try adjusting your search or filter criteria to find what you're looking for.") : __("When customers submit enquiries, they will appear here.", "When customers submit enquiries, they will appear here."),
+        onSort: handleSort,
+        getSortIcon,
+        selectedItemIds: selectedIds,
+        onSelectItem: (id, checked) => {
+          if (checked) {
+            setSelectedIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+          } else {
+            setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+          }
+        },
+        onSelectAll: (checked) => {
+          if (checked) {
+            setSelectedIds(enquiries.map((e) => e.id));
+          } else {
+            setSelectedIds([]);
+          }
+        },
+        isAllSelected: enquiries.length > 0 && selectedIds.length === enquiries.length,
+        getItemId: (enquiry) => enquiry.id,
+        capability: "yatra_view_bookings",
+        skeletonRows: 5
+      }
+    ) }) }),
+    total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Pagination,
+      {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: perPage,
+        onPageChange: setPage,
+        itemName: __("enquiries", "enquiries")
+      }
+    ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
       {
@@ -40066,7 +41261,7 @@ const Enquiries = () => {
                 }
               )
             ] }),
-            respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_a = respondMutation.error) == null ? void 0 : _a.message) || __("Failed to send response. Please try again.", "Failed to send response. Please try again.") }),
+            respondMutation.isError && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400", children: ((_o = respondMutation.error) == null ? void 0 : _o.message) || __("Failed to send response. Please try again.", "Failed to send response. Please try again.") }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(
                 Button,
@@ -40524,8 +41719,8 @@ const EnquiryForm = () => {
     phone: "",
     trip_id: void 0,
     message: "",
-    number_of_travelers: 1,
-    preferred_travel_date: "",
+    travelers_count: 1,
+    travel_date: "",
     status: "new",
     response_notes: ""
   });
@@ -40549,7 +41744,11 @@ const EnquiryForm = () => {
       if (!response.ok) {
         throw new Error("Failed to fetch enquiry");
       }
-      return response.json();
+      const result = await response.json();
+      if (result.success && result.data) {
+        return result.data;
+      }
+      throw new Error(result.message || "Enquiry not found");
     },
     enabled: !!enquiryId && can("yatra_edit_bookings")
   });
@@ -40580,8 +41779,8 @@ const EnquiryForm = () => {
         phone: enquiry.phone || "",
         trip_id: enquiry.trip_id,
         message: enquiry.message || "",
-        number_of_travelers: enquiry.number_of_travelers || 1,
-        preferred_travel_date: enquiry.preferred_travel_date || "",
+        travelers_count: enquiry.travelers_count || 1,
+        travel_date: enquiry.travel_date || "",
         status: enquiry.status || "new",
         response_notes: enquiry.response_notes || ""
       });
@@ -40776,8 +41975,8 @@ const EnquiryForm = () => {
                     {
                       type: "number",
                       min: "1",
-                      value: formData.number_of_travelers || "",
-                      onChange: (e) => handleChange("number_of_travelers", parseInt(e.target.value) || 1),
+                      value: formData.travelers_count || "",
+                      onChange: (e) => handleChange("travelers_count", parseInt(e.target.value, 10) || 1),
                       placeholder: "1"
                     }
                   )
@@ -40788,8 +41987,8 @@ const EnquiryForm = () => {
                     Input,
                     {
                       type: "date",
-                      value: formData.preferred_travel_date || "",
-                      onChange: (e) => handleChange("preferred_travel_date", e.target.value)
+                      value: formData.travel_date || "",
+                      onChange: (e) => handleChange("travel_date", e.target.value)
                     }
                   )
                 ] })
@@ -40820,9 +42019,12 @@ const EnquiryForm = () => {
                 onChange: (e) => handleChange("status", e.target.value),
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "new", children: __("New", "New") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "responded", children: __("Responded", "Responded") }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "converted", children: __("Converted", "Converted") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") })
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "closed", children: __("Closed", "Closed") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "spam", children: __("Spam", "Spam") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "trash", children: __("Trash", "Trash") })
                 ]
               }
             ) })
@@ -41615,11 +42817,35 @@ const getCountryName = (code) => {
 };
 const Travelers = () => {
   var _a, _b;
+  const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const { showToast } = useToast();
+  const [deleteDialogOpen, setDeleteDialogOpen] = reactExports.useState(false);
+  const [travelerToDelete, setTravelerToDelete] = reactExports.useState(null);
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [tripFilter, setTripFilter] = reactExports.useState("");
   const [page, setPage] = reactExports.useState(1);
   const perPage = 20;
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    if (typeof window === "undefined") {
+      return {
+        traveler_info: true,
+        trip: true,
+        travel_date: true,
+        booking_reference: true
+      };
+    }
+    const saved = window.localStorage.getItem("yatra-travelers-visible-columns");
+    return saved ? JSON.parse(saved) : {
+      traveler_info: true,
+      trip: true,
+      travel_date: true,
+      booking_reference: true
+    };
+  });
   const { data: formConfigData } = useQuery({
     queryKey: ["booking-form-config"],
     queryFn: async () => {
@@ -41696,6 +42922,85 @@ const Travelers = () => {
       return dateString;
     }
   };
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }) => {
+      var _a2, _b2;
+      const response = await fetch(
+        `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/travelers/bulk`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+          },
+          body: JSON.stringify({ action, ids })
+        }
+      );
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to perform bulk traveler action");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["travelers"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    }
+  });
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
+  const handleDelete = (traveler) => {
+    setTravelerToDelete(traveler);
+    setDeleteDialogOpen(true);
+  };
+  const confirmDelete = async () => {
+    if (!travelerToDelete) return;
+    try {
+      await bulkMutation.mutateAsync({ action: "delete", ids: [travelerToDelete.id] });
+      showToast(__("Traveler deleted successfully", "Traveler deleted successfully"), "success");
+      setDeleteDialogOpen(false);
+      setTravelerToDelete(null);
+    } catch (error) {
+      showToast((error == null ? void 0 : error.message) || __("Failed to delete traveler", "Failed to delete traveler"), "error");
+    }
+  };
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("yatra-travelers-visible-columns", JSON.stringify(newVisibleColumns));
+    }
+  };
+  const columnOptions = [
+    { key: "traveler_info", label: __("Traveler", "Traveler"), visible: visibleColumns.traveler_info },
+    { key: "trip", label: __("Trip", "Trip"), visible: visibleColumns.trip },
+    { key: "travel_date", label: __("Travel Date", "Travel Date"), visible: visibleColumns.travel_date },
+    { key: "booking_reference", label: __("Booking", "Booking"), visible: visibleColumns.booking_reference }
+  ];
+  const actions = [
+    {
+      key: "view",
+      label: __("View Booking", "View Booking"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+      onClick: (traveler) => handleViewBooking(traveler.booking_id)
+    },
+    {
+      key: "delete",
+      label: __("Delete", "Delete"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+      onClick: (traveler) => handleDelete(traveler),
+      variant: "destructive",
+      condition: () => can("yatra_delete_bookings")
+    }
+  ];
   const formatCellValue = (value, fieldType) => {
     if (value === void 0 || value === null || value === "") {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "-" });
@@ -41721,10 +43026,6 @@ const Travelers = () => {
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm", children: String(value) });
     }
-  };
-  const renderSkeletonRows = () => {
-    const columnCount = 5 + dynamicColumns.length;
-    return [...Array(5)].map((_, i) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: [...Array(columnCount)].map((_2, j) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-8 w-full" }) }, j)) }, i));
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -41774,118 +43075,156 @@ const Travelers = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsx(Skeleton, { className: "h-6 w-16" }) : totalTravelers })
       ] })
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-x-auto", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
-        dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: col.label }, col.id)),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right", children: __("Actions", "Actions") })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: renderSkeletonRows() })
-    ] }) : travelers.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-8 text-center", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-4" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400", children: searchTerm || tripFilter ? __("No travelers found matching your criteria", "No travelers found matching your criteria") : __("No travelers found", "No travelers found") })
-    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Traveler", "Traveler") }),
-        dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: col.label }, col.id)),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Trip", "Trip") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Travel Date", "Travel Date") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { children: __("Booking", "Booking") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[80px]", children: __("Actions", "Actions") })
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: travelers.map((traveler) => {
-        var _a2, _b2, _c;
-        return /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300", children: [
-              (((_a2 = traveler.first_name) == null ? void 0 : _a2[0]) || "?").toUpperCase(),
-              (((_b2 = traveler.last_name) == null ? void 0 : _b2[0]) || "").toUpperCase()
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-gray-900 dark:text-white flex items-center gap-2", children: [
-                [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "N/A",
-                traveler.is_lead && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", className: "text-xs", children: __("Lead", "Lead") })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 space-y-0.5", children: [
-                traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.phone })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      BulkActionToolbar,
+      {
+        selectedIds,
+        bulkAction,
+        setBulkAction,
+        onApply: handleBulkApply,
+        onClearSelection: () => setSelectedIds([]),
+        statusFilter: "all",
+        setStatusFilter: () => {
+        },
+        statusOptions: [
+          { key: "all", label: __("All", "All"), count: totalTravelers }
+        ],
+        showColumnsDropdown,
+        setShowColumnsDropdown,
+        columnOptions,
+        onToggleColumn: toggleColumn,
+        bulkMutationPending: bulkMutation.isPending,
+        totalItems: travelers.length,
+        bulkActionOptions: [
+          { value: "delete", label: __("Delete", "Delete") }
+        ]
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Table,
+      {
+        data: travelers,
+        isLoading,
+        isError: false,
+        skeletonRows: 5,
+        emptyText: searchTerm || tripFilter ? __("No travelers found matching your criteria", "No travelers found matching your criteria") : __("No travelers found", "No travelers found"),
+        emptyDescription: __("View and manage travelers collected from your bookings.", "View and manage travelers collected from your bookings."),
+        capability: "yatra_view_bookings",
+        selectedItemIds: selectedIds,
+        onSelectItem: (id, checked) => {
+          if (checked) {
+            setSelectedIds((prev) => prev.includes(id) ? prev : [...prev, id]);
+          } else {
+            setSelectedIds((prev) => prev.filter((existingId) => existingId !== id));
+          }
+        },
+        onSelectAll: (checked) => {
+          if (checked) {
+            setSelectedIds(travelers.map((t) => t.id));
+          } else {
+            setSelectedIds([]);
+          }
+        },
+        isAllSelected: travelers.length > 0 && selectedIds.length === travelers.length,
+        getItemId: (traveler) => traveler.id,
+        actions,
+        columns: [
+          visibleColumns.traveler_info && {
+            key: "traveler_info",
+            label: __("Traveler", "Traveler"),
+            render: (traveler) => {
+              var _a2, _b2;
+              return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300", children: [
+                  (((_a2 = traveler.first_name) == null ? void 0 : _a2[0]) || "?").toUpperCase(),
+                  (((_b2 = traveler.last_name) == null ? void 0 : _b2[0]) || "").toUpperCase()
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                  traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: traveler.gender }),
-                  traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-                    traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getCountryName(traveler.nationality) })
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-gray-900 dark:text-white flex items-center gap-2", children: [
+                    [traveler.first_name, traveler.last_name].filter(Boolean).join(" ") || "N/A",
+                    traveler.is_lead && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", className: "text-xs", children: __("Lead", "Lead") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 space-y-0.5", children: [
+                    traveler.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: traveler.phone })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                      traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: traveler.gender }),
+                      traveler.nationality && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                        traveler.gender && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: getCountryName(traveler.nationality) })
+                      ] })
+                    ] })
                   ] })
                 ] })
-              ] })
+              ] });
+            }
+          },
+          ...dynamicColumns.map((col) => ({
+            key: `dynamic_${col.id}`,
+            label: col.label,
+            render: (traveler) => formatCellValue(traveler[col.id], col.type)
+          })),
+          visibleColumns.trip && {
+            key: "trip",
+            label: __("Trip", "Trip"),
+            render: (traveler) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[200px] truncate", title: traveler.trip_title, children: traveler.trip_title || `Trip #${traveler.trip_id}` })
+          },
+          visibleColumns.travel_date && {
+            key: "travel_date",
+            label: __("Travel Date", "Travel Date"),
+            render: (traveler) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3 text-gray-400" }),
+              formatDate2(traveler.travel_date)
             ] })
-          ] }) }),
-          dynamicColumns.map((col) => /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: formatCellValue(traveler[col.id], col.type) }, col.id)),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-[200px] truncate", title: traveler.trip_title, children: traveler.trip_title || `Trip #${traveler.trip_id}` }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3 text-gray-400" }),
-            formatDate2(traveler.travel_date)
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "a",
-            {
-              href: `${((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`,
-              className: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-mono text-sm",
-              children: traveler.booking_reference
+          },
+          visibleColumns.booking_reference && {
+            key: "booking_reference",
+            label: __("Booking", "Booking"),
+            render: (traveler) => {
+              var _a2;
+              return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`,
+                  className: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-mono text-sm",
+                  children: traveler.booking_reference
+                }
+              );
             }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "ghost",
-              size: "sm",
-              onClick: () => handleViewBooking(traveler.booking_id),
-              title: __("View Booking", "View Booking"),
-              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" })
-            }
-          ) })
-        ] }, traveler.id);
-      }) })
-    ] }) }) }),
-    totalPages > 1 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
-        __("Showing", "Showing"),
-        " ",
-        (page - 1) * perPage + 1,
-        " - ",
-        Math.min(page * perPage, totalTravelers),
-        " ",
-        __("of", "of"),
-        " ",
-        totalTravelers
-      ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: "outline",
-            size: "sm",
-            disabled: page === 1,
-            onClick: () => setPage((p) => p - 1),
-            children: __("Previous", "Previous")
           }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          Button,
-          {
-            variant: "outline",
-            size: "sm",
-            disabled: page >= totalPages,
-            onClick: () => setPage((p) => p + 1),
-            children: __("Next", "Next")
-          }
-        )
-      ] })
-    ] })
+        ].filter(Boolean)
+      }
+    ) }) }),
+    totalTravelers > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(
+      Pagination,
+      {
+        currentPage: page,
+        totalPages,
+        totalItems: totalTravelers,
+        itemsPerPage: perPage,
+        onPageChange: setPage,
+        itemName: __("travelers", "travelers")
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: deleteDialogOpen,
+        onClose: () => {
+          setDeleteDialogOpen(false);
+          setTravelerToDelete(null);
+        },
+        onConfirm: confirmDelete,
+        title: __("Delete Traveler", "Delete Traveler"),
+        message: travelerToDelete ? __(`Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(" ")}? This action cannot be undone.`, `Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(" ")}? This action cannot be undone.`) : __("Are you sure you want to delete this traveler?", "Are you sure you want to delete this traveler?"),
+        confirmText: __("Delete", "Delete"),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "danger",
+        isLoading: bulkMutation.isPending
+      }
+    )
   ] });
 };
 const App = () => {

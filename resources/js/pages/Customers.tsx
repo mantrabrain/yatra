@@ -5,18 +5,19 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MapPin, Award, Users } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MapPin } from 'lucide-react';
+import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
 interface Customer {
@@ -52,10 +53,43 @@ const Customers: React.FC = () => {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [isBulkPending, setIsBulkPending] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
+  const { showToast } = useToast();
+
+  const [visibleColumns, setVisibleColumns] = useState(() => {
+    if (typeof window === 'undefined') {
+      return {
+        customer: true,
+        location: true,
+        total_bookings: true,
+        total_spent: true,
+        loyalty: true,
+        status: true,
+        created_at: true,
+      };
+    }
+    const saved = window.localStorage.getItem('yatra-customers-visible-columns');
+    return saved
+      ? JSON.parse(saved)
+      : {
+          customer: true,
+          location: true,
+          total_bookings: true,
+          total_spent: true,
+          loyalty: true,
+          status: true,
+          created_at: true,
+        };
+  });
+
+  const apiBase = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -103,7 +137,7 @@ const Customers: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${id}`, {
+      const response = await fetch(`${apiBase}/customers/${id}`, {
         method: 'DELETE',
         headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
       });
@@ -114,6 +148,10 @@ const Customers: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       setDeleteDialogOpen(false);
       setCustomerToDelete(null);
+      showToast(__('Customer deleted successfully', 'Customer deleted successfully'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete customer', 'Failed to delete customer'), 'error');
     },
   });
 
@@ -251,6 +289,317 @@ const Customers: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || loyaltyFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc';
 
+  const toggleColumn = (key: string) => {
+    const next = {
+      ...visibleColumns,
+      [key]: !visibleColumns[key as keyof typeof visibleColumns],
+    };
+    setVisibleColumns(next);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('yatra-customers-visible-columns', JSON.stringify(next));
+    }
+  };
+
+  const handleSelectItem = (id: string | number, checked: boolean) => {
+    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((v) => v !== id)));
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(customers.map((customer) => customer.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const isAllSelected = customers.length > 0 && selectedIds.length === customers.length;
+
+  const updateStatusForIds = async (
+    ids: (string | number)[],
+    newStatus: string
+  ) => {
+    await Promise.all(
+      ids.map(async (id) => {
+        const response = await fetch(`${apiBase}/customers/${id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
+          },
+          body: JSON.stringify({ status: newStatus }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.message || 'Failed to update customer status');
+        }
+      })
+    );
+  };
+
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      return;
+    }
+
+    try {
+      setIsBulkPending(true);
+
+      if (bulkAction === 'delete') {
+        await Promise.all(
+          selectedIds.map((id) =>
+            fetch(`${apiBase}/customers/${id}`, {
+              method: 'DELETE',
+              headers: { 'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '' },
+            })
+          )
+        );
+        showToast(__('Selected customers deleted successfully', 'Selected customers deleted successfully'), 'success');
+      } else {
+        await updateStatusForIds(selectedIds, bulkAction);
+        showToast(__('Customer statuses updated successfully', 'Customer statuses updated successfully'), 'success');
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    } catch (error: any) {
+      showToast(
+        error?.message || __('Failed to perform bulk action on customers', 'Failed to perform bulk action on customers'),
+        'error'
+      );
+    } finally {
+      setIsBulkPending(false);
+    }
+  };
+
+  const allBulkActionOptions = [
+    { value: 'active', label: __('Mark as Active', 'Mark as Active') },
+    { value: 'inactive', label: __('Mark as Inactive', 'Mark as Inactive') },
+    { value: 'blocked', label: __('Mark as Blocked', 'Mark as Blocked') },
+    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+  ];
+
+  const getBulkActionOptionsForStatus = (view: string) => {
+    switch (view) {
+      case 'active':
+        return allBulkActionOptions.filter((opt) =>
+          ['inactive', 'blocked', 'delete'].includes(opt.value)
+        );
+      case 'inactive':
+        return allBulkActionOptions.filter((opt) =>
+          ['active', 'blocked', 'delete'].includes(opt.value)
+        );
+      case 'blocked':
+        return allBulkActionOptions.filter((opt) =>
+          ['active', 'inactive', 'delete'].includes(opt.value)
+        );
+      default:
+        return allBulkActionOptions;
+    }
+  };
+
+  const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
+
+  const statusOptions = [
+    { value: 'all', label: __('All Status', 'All Status') },
+    { value: 'active', label: __('Active', 'Active') },
+    { value: 'inactive', label: __('Inactive', 'Inactive') },
+    { value: 'blocked', label: __('Blocked', 'Blocked') },
+  ];
+
+  const sortOptions = [
+    { value: 'created_at', label: __('Registration Date', 'Registration Date') },
+    { value: 'name', label: __('Name', 'Name') },
+    { value: 'email', label: __('Email', 'Email') },
+    { value: 'country', label: __('Country', 'Country') },
+    { value: 'total_bookings', label: __('Bookings', 'Bookings') },
+    { value: 'total_spent', label: __('Total Spent', 'Total Spent') },
+    { value: 'status', label: __('Status', 'Status') },
+  ];
+
+  const columnOptions = [
+    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
+    { key: 'location', label: __('Location', 'Location'), visible: visibleColumns.location },
+    { key: 'total_bookings', label: __('Bookings', 'Bookings'), visible: visibleColumns.total_bookings },
+    { key: 'total_spent', label: __('Total Spent', 'Total Spent'), visible: visibleColumns.total_spent },
+    { key: 'loyalty', label: __('Loyalty', 'Loyalty'), visible: visibleColumns.loyalty },
+    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+    { key: 'created_at', label: __('Registered', 'Registered'), visible: visibleColumns.created_at },
+  ];
+
+  const columns = [
+    {
+      key: 'customer',
+      label: __('Customer', 'Customer'),
+      sortable: true,
+      visible: visibleColumns.customer,
+      width: 'w-[250px]',
+      render: (customer: Customer) => (
+        <div>
+          <button
+            type="button"
+            onClick={() => handleView(customer)}
+            className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+          >
+            {customer.name || `${customer.first_name} ${customer.last_name}`}
+          </button>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
+            <div className="flex items-center gap-1">
+              <Mail className="w-3 h-3" />
+              {customer.email}
+            </div>
+            {customer.phone && (
+              <div className="flex items-center gap-1">
+                <Phone className="w-3 h-3" />
+                {customer.phone}
+              </div>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'location',
+      label: __('Location', 'Location'),
+      sortable: true,
+      visible: visibleColumns.location,
+      render: (customer: Customer) => (
+        customer.country ? (
+          <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+            <MapPin className="w-3.5 h-3.5" />
+            <span>
+              {customer.city ? `${customer.city}, ` : ''}{customer.country}
+            </span>
+          </div>
+        ) : (
+          <span className="text-gray-400">-</span>
+        )
+      ),
+    },
+    isPro && {
+      key: 'total_bookings',
+      label: __('Bookings', 'Bookings'),
+      sortable: true,
+      visible: visibleColumns.total_bookings,
+      render: (customer: Customer) => (
+        <span className="text-gray-600 dark:text-gray-400">{customer.total_bookings}</span>
+      ),
+    },
+    isPro && {
+      key: 'total_spent',
+      label: __('Total Spent', 'Total Spent'),
+      sortable: true,
+      visible: visibleColumns.total_spent,
+      render: (customer: Customer) => (
+        <span className="font-medium">{formatPrice(customer.total_spent)}</span>
+      ),
+    },
+    {
+      key: 'loyalty',
+      label: __('Loyalty', 'Loyalty'),
+      sortable: false,
+      visible: visibleColumns.loyalty,
+      render: (customer: Customer) => getLoyaltyBadge(customer.loyalty_tier || 'bronze'),
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      visible: visibleColumns.status,
+      render: (customer: Customer) => getStatusBadge(customer.status),
+    },
+    {
+      key: 'created_at',
+      label: __('Registered', 'Registered'),
+      sortable: true,
+      visible: visibleColumns.created_at,
+      render: (customer: Customer) => (
+        <span className="text-gray-500 dark:text-gray-400 text-sm">
+          {formatDate(customer.created_at)}
+        </span>
+      ),
+    },
+  ].filter(Boolean);
+
+  const actions = [
+    {
+      key: 'view',
+      label: __('View', 'View'),
+      icon: <Eye className="w-4 h-4" />,
+      onClick: (customer: Customer) => handleView(customer),
+    },
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (customer: Customer) => handleEdit(customer),
+      condition: () => can('yatra_edit_bookings'),
+    },
+    {
+      key: 'mark_active',
+      label: __('Mark as Active', 'Mark as Active'),
+      icon: <ArrowUp className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], 'active');
+          queryClient.invalidateQueries({ queryKey: ['customers'] });
+          showToast(__('Customer status updated', 'Customer status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'active',
+    },
+    {
+      key: 'mark_inactive',
+      label: __('Mark as Inactive', 'Mark as Inactive'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], 'inactive');
+          queryClient.invalidateQueries({ queryKey: ['customers'] });
+          showToast(__('Customer status updated', 'Customer status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'inactive',
+    },
+    {
+      key: 'mark_blocked',
+      label: __('Mark as Blocked', 'Mark as Blocked'),
+      icon: <ArrowDown className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        setIsBulkPending(true);
+        try {
+          await updateStatusForIds([customer.id], 'blocked');
+          queryClient.invalidateQueries({ queryKey: ['customers'] });
+          showToast(__('Customer status updated', 'Customer status updated'), 'success');
+        } catch (error: any) {
+          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
+        } finally {
+          setIsBulkPending(false);
+        }
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'blocked',
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (customer: Customer) => handleDelete(customer),
+      variant: 'destructive' as const,
+      condition: () => can('yatra_delete_bookings'),
+    },
+  ];
+
   // Skeleton loader
   const renderSkeleton = () => (
     <Table>
@@ -308,39 +657,44 @@ const Customers: React.FC = () => {
         }
       />
 
-      {/* Filters, Search, and Sorting */}
       <Card>
         <CardContent className="p-3">
           <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-            {/* Search */}
             <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
+              <SearchFilterToolbar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                statusFilter={statusFilter}
+                onStatusChange={(value) => {
+                  setStatusFilter(value);
+                  setPage(1);
+                }}
+                statusOptions={statusOptions}
+                sortBy={sortBy}
+                onSortByChange={(field) => {
+                  setSortBy(field);
+                  setPage(1);
+                }}
+                sortOrder={sortOrder}
+                onSortOrderChange={(order) => {
+                  setSortOrder(order);
+                  setPage(1);
+                }}
+                sortOptions={sortOptions}
+                onResetFilters={handleResetFilters}
+                hasFilters={!!hasFilters}
                 placeholder={__('Search customers...', 'Search customers...')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full"
               />
             </div>
-
-            {/* Status Filter */}
-            <Select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full md:w-36"
-            >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="active">{__('Active', 'Active')}</option>
-              <option value="inactive">{__('Inactive', 'Inactive')}</option>
-              <option value="blocked">{__('Blocked', 'Blocked')}</option>
-            </Select>
 
             {/* Loyalty Filter */}
             {isPro && (
               <Select
                 value={loyaltyFilter}
-                onChange={(e) => setLoyaltyFilter(e.target.value)}
+                onChange={(e) => {
+                  setLoyaltyFilter(e.target.value);
+                  setPage(1);
+                }}
                 className="w-full md:w-36"
               >
                 <option value="all">{__('All Tiers', 'All Tiers')}</option>
@@ -350,54 +704,11 @@ const Customers: React.FC = () => {
                 <option value="platinum">{__('Platinum', 'Platinum')}</option>
               </Select>
             )}
-
-            {/* Sort By */}
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-40"
-            >
-              <option value="created_at">{__('Registration Date', 'Registration Date')}</option>
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="email">{__('Email', 'Email')}</option>
-              <option value="country">{__('Country', 'Country')}</option>
-              <option value="total_bookings">{__('Bookings', 'Bookings')}</option>
-              <option value="total_spent">{__('Total Spent', 'Total Spent')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-            </Select>
-
-            {/* Sort Order */}
-            <Button
-              variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
-            >
-              {sortOrder === 'asc' ? (
-                <ArrowUp className="w-4 h-4" />
-              ) : (
-                <ArrowDown className="w-4 h-4" />
-              )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
-            </Button>
-
-            {/* Reset Button */}
-            {hasFilters && (
-              <Button
-                variant="outline"
-                onClick={handleResetFilters}
-                className="flex items-center gap-2"
-              >
-                <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {/* Table */}
         {error ? (
           <Card>
             <CardContent className="p-8 text-center text-red-500">
@@ -406,218 +717,78 @@ const Customers: React.FC = () => {
           </Card>
         ) : (
           <>
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={() => setSelectedIds([])}
+              statusFilter={statusFilter}
+              setStatusFilter={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
+              statusOptions={[
+                { key: 'all', label: __('All', 'All'), count: 0 },
+                { key: 'active', label: __('Active', 'Active'), count: 0 },
+                { key: 'inactive', label: __('Inactive', 'Inactive'), count: 0 },
+                { key: 'blocked', label: __('Blocked', 'Blocked'), count: 0 },
+              ]}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={columnOptions}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={isBulkPending}
+              totalItems={total}
+              bulkActionOptions={bulkActionOptions}
+            />
+
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
                   renderSkeleton()
-                ) : customers.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    <Users className="w-12 h-12 mx-auto mb-3 text-gray-300 dark:text-gray-600" />
-                    <p className="text-lg font-medium">{__('No customers found', 'No customers found')}</p>
-                    <p className="text-sm mt-1">{__('Customers will appear here when bookings are made', 'Customers will appear here when bookings are made')}</p>
-                  </div>
                 ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[250px]">
-                          <button
-                            onClick={() => handleSort('name')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Customer', 'Customer')}
-                            {getSortIcon('name')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('country')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Location', 'Location')}
-                            {getSortIcon('country')}
-                          </button>
-                        </TableHead>
-                        {isPro && (
-                          <TableHead>
-                            <button
-                              onClick={() => handleSort('total_bookings')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Bookings', 'Bookings')}
-                              {getSortIcon('total_bookings')}
-                            </button>
-                          </TableHead>
-                        )}
-                        {isPro && (
-                          <TableHead>
-                            <button
-                              onClick={() => handleSort('total_spent')}
-                              className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                            >
-                              {__('Total Spent', 'Total Spent')}
-                              {getSortIcon('total_spent')}
-                            </button>
-                          </TableHead>
-                        )}
-                        <TableHead>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-3.5 h-3.5" />
-                            {__('Loyalty', 'Loyalty')}
-                          </div>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button
-                            onClick={() => handleSort('created_at')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Registered', 'Registered')}
-                            {getSortIcon('created_at')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {customers.map((customer) => (
-                        <TableRow key={customer.id}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-white">
-                                {customer.name || `${customer.first_name} ${customer.last_name}`}
-                              </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
-                                <div className="flex items-center gap-1">
-                                  <Mail className="w-3 h-3" />
-                                  {customer.email}
-                                </div>
-                                {customer.phone && (
-                                  <div className="flex items-center gap-1">
-                                    <Phone className="w-3 h-3" />
-                                    {customer.phone}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {customer.country ? (
-                              <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
-                                <MapPin className="w-3.5 h-3.5" />
-                                <span>
-                                  {customer.city ? `${customer.city}, ` : ''}{customer.country}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-400">-</span>
-                            )}
-                          </TableCell>
-                          {isPro && (
-                            <TableCell className="text-gray-600 dark:text-gray-400">
-                              {customer.total_bookings}
-                            </TableCell>
-                          )}
-                          {isPro && (
-                            <TableCell className="font-medium">
-                              {formatPrice(customer.total_spent)}
-                            </TableCell>
-                          )}
-                          <TableCell>
-                            {getLoyaltyBadge(customer.loyalty_tier || 'bronze')}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(customer.status)}
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            {formatDate(customer.created_at)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_view_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleView(customer)}
-                                  className="h-8 w-8"
-                                  aria-label={__('View customer', 'View customer')}
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_edit_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(customer)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Edit customer', 'Edit customer')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-
-                              <ConditionalRender capability="yatra_delete_bookings">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(customer)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete customer', 'Delete customer')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <SharedTable
+                    data={customers}
+                    columns={columns as any}
+                    actions={actions as any}
+                    isLoading={isLoading}
+                    isError={!!error}
+                    errorText={__('Error loading customers', 'Error loading customers')}
+                    emptyText={__('No customers found', 'No customers found')}
+                    emptyDescription={
+                      hasFilters
+                        ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                        : __('Customers will appear here when bookings are made', 'Customers will appear here when bookings are made')
+                    }
+                    onCreateClick={
+                      can('yatra_edit_bookings') ? handleCreateCustomer : undefined
+                    }
+                    onSort={handleSort}
+                    getSortIcon={getSortIcon}
+                    selectedItemIds={selectedIds}
+                    onSelectItem={handleSelectItem}
+                    onSelectAll={handleSelectAll}
+                    isAllSelected={isAllSelected}
+                    getItemId={(customer: Customer) => customer.id}
+                    skeletonRows={5}
+                    capability="yatra_view_bookings"
+                  />
                 )}
               </CardContent>
             </Card>
 
-            {/* Pagination */}
             {total > 0 && (
-              <Card>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('customers', 'customers')}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="mt-4">
+                <Pagination
+                  currentPage={page}
+                  totalPages={totalPages}
+                  totalItems={total}
+                  itemsPerPage={10}
+                  onPageChange={(newPage) => setPage(newPage)}
+                  itemName={__('customers', 'customers')}
+                />
+              </div>
             )}
           </>
         )}

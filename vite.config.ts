@@ -3,7 +3,14 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react({
+      // Disable babel plugins that inject preamble code
+      babel: {
+        plugins: [],
+      },
+    }),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './resources/js'),
@@ -70,6 +77,16 @@ export default defineConfig({
     hmr: {
       host: 'localhost',
     },
+    // Allow WordPress admin on http://yatra.local to load assets from this dev server
+    cors: true,
+    // Disable module preload in dev to prevent chunk loader generation
+    preTransformRequests: false,
+  },
+  optimizeDeps: {
+    // Force include all dependencies to avoid dynamic imports
+    include: ['react', 'react-dom', 'react-router-dom', '@tanstack/react-query'],
+    // Force Vite to not generate separate chunks in dev
+    force: true,
   },
 });
 
