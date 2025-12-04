@@ -8745,7 +8745,7 @@ const BulkActionToolbar = ({
     }
   }, [showColumnsDropdown, setShowColumnsDropdown]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "py-3 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-nowrap", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Select,

@@ -106,7 +106,7 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
   return (
     <>
       {/* Bulk actions toolbar - Always above the table */}
-      <div className="px-4 py-3 space-y-3">
+      <div className="py-3 space-y-3">
         {/* Top row: Bulk actions and status tabs */}
         <div className="flex items-center justify-between gap-4">
           {/* Left: Bulk actions - all in one line */}
