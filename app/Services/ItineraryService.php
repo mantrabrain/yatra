@@ -65,6 +65,13 @@ class ItineraryService
         // Check for duplicate day numbers
         // Only check if item_type_id and item_id are null (meaning it's a day creation/update, not an activity)
         if (empty($data['item_type_id']) && empty($data['item_id'])) {
+            global $wpdb;
+
+            if (!$wpdb) {
+                // If for some reason the global $wpdb is not available, skip duplicate-day validation
+                return;
+            }
+
             $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
             $tableEntries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
             

@@ -87,6 +87,8 @@ const Discounts: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
 
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
+
   // Build query params
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
@@ -213,7 +215,7 @@ const Discounts: React.FC = () => {
   };
 
   const handleEdit = (discount: Discount) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
   };
 
   const handleDelete = (discount: Discount) => {
@@ -221,11 +223,11 @@ const Discounts: React.FC = () => {
   };
 
   const handleDuplicate = (discount: Discount) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts&action=create&duplicate=${discount.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&duplicate=${discount.id}`;
   };
 
   const handleCreateDiscount = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create`;
   };
 
   const handleResetFilters = () => {
@@ -441,9 +443,12 @@ const Discounts: React.FC = () => {
         <div>
           <div className="flex items-center gap-2 mb-1">
             <Tag className="w-4 h-4 text-gray-400" />
-            <span className="font-medium text-gray-900 dark:text-white font-mono text-sm">
+            <a
+              href={`${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`}
+              className="font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
+            >
               {discount.code}
-            </span>
+            </a>
             {discount.is_group_discount && (
               <Badge variant="info" className="text-xs flex items-center gap-1">
                 <Users className="w-3 h-3" />

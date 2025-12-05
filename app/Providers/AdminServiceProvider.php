@@ -299,6 +299,7 @@ class AdminServiceProvider extends ServiceProvider
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
             'siteUrl' => home_url(),
+            'adminUrl' => admin_url('admin.php'),
             'permissions' => array_keys($capabilities),
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,

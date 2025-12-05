@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MapPin } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Phone, MapPin } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -62,6 +62,8 @@ const Customers: React.FC = () => {
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
 
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === 'undefined') {
@@ -238,7 +240,7 @@ const Customers: React.FC = () => {
   };
 
   const handleEdit = (customer: Customer) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
   };
 
   const handleDelete = (customer: Customer) => {
@@ -253,11 +255,11 @@ const Customers: React.FC = () => {
   };
 
   const handleView = (customer: Customer) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`;
   };
 
   const handleCreateCustomer = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=create`;
   };
 
   const handleResetFilters = () => {
@@ -434,28 +436,25 @@ const Customers: React.FC = () => {
       label: __('Customer', 'Customer'),
       sortable: true,
       visible: visibleColumns.customer,
-      width: 'w-[250px]',
       render: (customer: Customer) => (
         <div>
-          <button
-            type="button"
-            onClick={() => handleView(customer)}
-            className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
-          >
-            {customer.name || `${customer.first_name} ${customer.last_name}`}
-          </button>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5">
-            <div className="flex items-center gap-1">
-              <Mail className="w-3 h-3" />
-              {customer.email}
-            </div>
-            {customer.phone && (
-              <div className="flex items-center gap-1">
-                <Phone className="w-3 h-3" />
-                {customer.phone}
-              </div>
-            )}
+          <div className="font-medium text-gray-900 dark:text-white">
+            <a
+              href={`${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`}
+              className="hover:underline underline-offset-2 text-blue-600 dark:text-blue-400"
+            >
+              {customer.name || `${customer.first_name} ${customer.last_name}`}
+            </a>
           </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {customer.email || __('No email provided', 'No email provided')}
+          </div>
+          {customer.phone && (
+            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              <Phone className="w-3 h-3" />
+              {customer.phone}
+            </div>
+          )}
         </div>
       ),
     },

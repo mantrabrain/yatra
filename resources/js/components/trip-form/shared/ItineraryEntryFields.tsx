@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { MapPin, Clock, DollarSign, X, Plus, Info } from 'lucide-react';
+import { MapPin, Clock, X, Plus, Info } from 'lucide-react';
 import { __ } from '../../../lib/i18n';
 import { ItineraryEntry } from '../types';
 import { Input } from '../../ui/input';
@@ -13,6 +13,7 @@ import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { HelpText } from '../../ui/help-text';
 import { Card, CardContent } from '../../ui/card';
+import { getCurrencySymbol } from '../../../data/currencies';
 
 interface ItineraryEntryFieldsProps {
   entry: Partial<ItineraryEntry>;
@@ -57,6 +58,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
   const autoDuration = calculateDuration 
     ? calculateDuration(entry.start_time || '', entry.end_time || '', entry.time_type || 'exact')
     : '';
+
+  // Global currency symbol (same logic as other admin pages)
+  const globalCurrency = (window as any).yatraAdmin?.currency || 'USD';
+  const currencySymbol = getCurrencySymbol(globalCurrency) || '';
 
   const renderField = (content: React.ReactNode) => {
     if (showCardWrapper) {
@@ -383,7 +388,9 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               className="mb-2"
             />
             <div className="relative">
-              <DollarSign className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                {currencySymbol}
+              </span>
               <Input
                 type="number"
                 min="0"
@@ -391,7 +398,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 value={entry.cost || ''}
                 onChange={(e) => onFieldChange('cost', e.target.value)}
                 placeholder="0.00"
-                className={`pl-9 ${textSize}`}
+                className={`pl-8 ${textSize}`}
               />
             </div>
           </div>

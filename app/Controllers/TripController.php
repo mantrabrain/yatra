@@ -117,6 +117,28 @@ class TripController extends BaseController
                 'permission_callback' => '__return_true', // Public endpoint
             ],
         ]);
+
+        // Status statistics for admin views
+        register_rest_route($namespace, '/' . $base . '/stats', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getStats'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+    }
+
+    /**
+     * Get statistics for admin trip views (status counts)
+     */
+    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $stats = $this->service->getStatusCounts();
+            return $this->success_response($stats);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 
     /**

@@ -527,6 +527,41 @@ class TripService extends BaseService
     }
 
     /**
+     * Get status counts for admin list views
+     *
+     * Returns a stable set of counts that do not change with filters
+     * so that the UI can show consistent "All / Published / Draft / ..." tabs.
+     */
+    public function getStatusCounts(): array
+    {
+        $statuses = [
+            'published',
+            'draft',
+            'review',
+            'approved',
+            'archived',
+            'trash',
+        ];
+
+        $counts = [];
+        foreach ($statuses as $status) {
+            $counts[$status] = $this->countByStatus($status);
+        }
+
+        $all = array_sum(array_values($counts));
+
+        return [
+            'all' => (int) $all,
+            'published' => (int) ($counts['published'] ?? 0),
+            'draft' => (int) ($counts['draft'] ?? 0),
+            'review' => (int) ($counts['review'] ?? 0),
+            'approved' => (int) ($counts['approved'] ?? 0),
+            'archived' => (int) ($counts['archived'] ?? 0),
+            'trash' => (int) ($counts['trash'] ?? 0),
+        ];
+    }
+
+    /**
      * Restore a revision (WordPress-style)
      * 
      * This method works like WordPress's revision restore:

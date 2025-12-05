@@ -51,6 +51,8 @@ const CustomerForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
   const [formData, setFormData] = useState<CustomerFormData>({
     first_name: '',
     last_name: '',
@@ -225,7 +227,7 @@ const CustomerForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
   };
 
   // Skeleton loader

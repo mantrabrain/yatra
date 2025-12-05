@@ -180,52 +180,54 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                 </button>
               );
             })}
-            
-            {/* Columns visibility toggle */}
-            <div className="relative ml-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setShowColumnsDropdown(!showColumnsDropdown);
-                }}
-                className="h-10 px-3 flex items-center gap-2"
-                data-columns-trigger
-              >
-                <Columns className="w-4 h-4" />
-                {__('Columns', 'Columns')}
-              </Button>
-              
-              {/* Columns dropdown */}
-              {showColumnsDropdown && (
-                <div 
-                  className="absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2"
-                  style={{ width: '240px', minWidth: '240px' }}
-                  data-columns-content
-                  onClick={(e) => e.stopPropagation()}
+
+            {/* Columns visibility toggle - only when there are column options */}
+            {columnOptions.length > 0 && (
+              <div className="relative ml-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowColumnsDropdown(!showColumnsDropdown);
+                  }}
+                  className="h-10 px-3 flex items-center gap-2"
+                  data-columns-trigger
                 >
-                  <div className="px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
-                    {__('Show Columns', 'Show Columns')}
+                  <Columns className="w-4 h-4" />
+                  {__('Columns', 'Columns')}
+                </Button>
+                
+                {/* Columns dropdown */}
+                {showColumnsDropdown && (
+                  <div 
+                    className="absolute right-0 top-11 z-[9999] bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg py-2"
+                    style={{ width: '240px', minWidth: '240px' }}
+                    data-columns-content
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
+                      {__('Show Columns', 'Show Columns')}
+                    </div>
+                    
+                    <div className="py-1">
+                      {columnOptions.map(option => (
+                        <label key={option.key} className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={option.visible}
+                            onChange={() => onToggleColumn(option.key)}
+                            className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
                   </div>
-                  
-                  <div className="py-1">
-                    {columnOptions.map(option => (
-                      <label key={option.key} className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer whitespace-nowrap">
-                        <input
-                          type="checkbox"
-                          checked={option.visible}
-                          onChange={() => onToggleColumn(option.key)}
-                          className="rounded border-gray-300 dark:border-gray-600 h-4 w-4 mr-3 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="text-sm text-gray-700 dark:text-gray-300 ml-2">{option.label}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

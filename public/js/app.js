@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as React, G as MoreVertical, J as AlertTriangle, X, K as Columns, N as Mountain, O as Eye, Q as PenSquare, V as ArrowUp, W as ArrowDown, Y as Archive, Z as Trash2, _ as Plus, $ as Search, a0 as ArrowUpDown, a1 as AlertCircle, a2 as XCircle, a3 as CheckCircle, a4 as Flame, a5 as Zap, a6 as Heart, a7 as ShoppingBag, a8 as BookOpen, a9 as Gamepad2, aa as Music, ab as Image, ac as Footprints, ad as Bed, ae as Coffee, af as Hotel, ag as Car, ah as Palette, ai as Waves, aj as Camera, ak as Target, al as Package, am as Bus, an as Building2, ao as UtensilsCrossed, ap as ExternalLink, aq as CheckCircle2, ar as GripVertical, as as Pencil, at as Copy, au as Check, av as Mail, aw as Lightbulb, ax as Database, ay as History, az as Save, aA as Sparkles, aB as ChevronLeft, aC as Box, aD as ChevronUp, aE as Upload, aF as RotateCcw, aG as ArrowLeft, aH as Pen, aI as Phone, aJ as Globe, aK as Award, aL as Download, aM as TrendingDown, aN as PieChart, aO as ClipboardList, aP as Receipt, aQ as Plug, aR as Shield, aS as Lock, aT as EyeOff, aU as Ban, aV as Send, aW as Crown, aX as reactDomExports, aY as Filter, aZ as QueryClient, a_ as client, a$ as QueryClientProvider } from "./react-vendor-iXoRXq_s.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-DmH2XHoI.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$1, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as Users, y as Clock, D as DollarSign, z as ArrowRight, I as Info, H as HelpCircle, E as React, G as MoreVertical, J as AlertTriangle, X, K as Columns, N as ExternalLink, O as Mountain, Q as PenSquare, V as ArrowUp, W as ArrowDown, Y as Archive, Z as Trash2, _ as Plus, $ as Search, a0 as ArrowUpDown, a1 as AlertCircle, a2 as XCircle, a3 as CheckCircle, a4 as Flame, a5 as Zap, a6 as Heart, a7 as ShoppingBag, a8 as BookOpen, a9 as Gamepad2, aa as Music, ab as Image, ac as Eye, ad as Footprints, ae as Bed, af as Coffee, ag as Hotel, ah as Car, ai as Palette, aj as Waves, ak as Camera, al as Target, am as Package, an as Bus, ao as Building2, ap as UtensilsCrossed, aq as CheckCircle2, ar as GripVertical, as as Pencil, at as Copy, au as Check, av as Mail, aw as Lightbulb, ax as Database, ay as History, az as Save, aA as Sparkles, aB as ChevronLeft, aC as Box, aD as ChevronUp, aE as Upload, aF as RotateCcw, aG as ArrowLeft, aH as Pen, aI as Phone, aJ as Globe, aK as Award, aL as Download, aM as TrendingDown, aN as PieChart, aO as ClipboardList, aP as Receipt, aQ as Plug, aR as Shield, aS as Lock, aT as EyeOff, aU as Ban, aV as Send, aW as Crown, aX as reactDomExports, aY as Filter, aZ as QueryClient, a_ as client, a$ as QueryClientProvider } from "./react-vendor-Dijr8EsL.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BfbQDnag.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -2296,7 +2296,7 @@ const BulkActionToolbar = ({
             filter.key
           );
         }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-2", children: [
+        columnOptions.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative ml-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(
             Button,
             {
@@ -2405,7 +2405,7 @@ const BulkActionToolbar = ({
   ] });
 };
 const Trips = () => {
-  var _a;
+  var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("title");
@@ -2424,6 +2424,26 @@ const Trips = () => {
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+  const { data: statsData } = useQuery({
+    queryKey: ["trips-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/trips/stats");
+        return response;
+      } catch (error2) {
+        return {
+          all: 0,
+          published: 0,
+          draft: 0,
+          review: 0,
+          approved: 0,
+          archived: 0,
+          trash: 0
+        };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -2453,6 +2473,7 @@ const Trips = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      queryClient2.invalidateQueries({ queryKey: ["trips-stats"] });
       setIsDeleteDialogOpen(false);
       setTripToDelete(null);
       showToast(__("Trip deleted permanently.", "Trip deleted permanently."), "success");
@@ -2477,6 +2498,7 @@ const Trips = () => {
     onSuccess: (data2) => {
       showToast(__("Trip created as draft. Redirecting to builder...", "Trip created as draft. Redirecting to builder..."), "success");
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      queryClient2.invalidateQueries({ queryKey: ["trips-stats"] });
       setIsCreateModalOpen(false);
       setNewTripTitle("");
       setNewTripSlug("");
@@ -2490,8 +2512,8 @@ const Trips = () => {
       }
     },
     onError: (error2) => {
-      var _a2, _b;
-      const message2 = ((_b = (_a2 = error2 == null ? void 0 : error2.response) == null ? void 0 : _a2.data) == null ? void 0 : _b.message) || (error2 == null ? void 0 : error2.message) || __("Failed to create trip. Please try again.", "Failed to create trip. Please try again.");
+      var _a2, _b2;
+      const message2 = ((_b2 = (_a2 = error2 == null ? void 0 : error2.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) || (error2 == null ? void 0 : error2.message) || __("Failed to create trip. Please try again.", "Failed to create trip. Please try again.");
       setCreateTripError(message2);
       showToast(message2, "error");
     }
@@ -2560,7 +2582,7 @@ const Trips = () => {
   };
   const formatPrice = (trip) => {
     const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
-    const currencyCode = trip.currency || "USD";
+    const currencyCode = defaultCurrency;
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
@@ -2646,6 +2668,7 @@ const Trips = () => {
     staleTime: 5 * 60 * 1e3
     // Cache for 5 minutes
   });
+  const defaultCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || (settings == null ? void 0 : settings.default_currency) || "USD";
   const handleView = (trip) => {
     var _a2;
     const siteUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || "";
@@ -2712,6 +2735,8 @@ const Trips = () => {
       title: trip.title,
       slug: trip.slug
     });
+    queryClient2.invalidateQueries({ queryKey: ["trips"] });
+    queryClient2.invalidateQueries({ queryKey: ["trips-stats"] });
   };
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     const defaults = {
@@ -2771,8 +2796,19 @@ const Trips = () => {
     }
   };
   const statusCounts = reactExports.useMemo(() => {
-    const counts = {
-      all: total,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        published: statsData.published ?? 0,
+        draft: statsData.draft ?? 0,
+        review: statsData.review ?? 0,
+        approved: statsData.approved ?? 0,
+        archived: statsData.archived ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
       published: 0,
       draft: 0,
       review: 0,
@@ -2780,13 +2816,7 @@ const Trips = () => {
       archived: 0,
       trash: 0
     };
-    trips.forEach((trip) => {
-      if (counts[trip.status] !== void 0) {
-        counts[trip.status] += 1;
-      }
-    });
-    return counts;
-  }, [trips, total]);
+  }, [statsData]);
   const statusOptions = [
     { key: "all", label: __("All", "All"), count: statusCounts.all },
     { key: "published", label: __("Published", "Published"), count: statusCounts.published },
@@ -2833,6 +2863,7 @@ const Trips = () => {
         showToast(__("Trip status updated successfully", "Trip status updated successfully"), "success");
       }
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      queryClient2.invalidateQueries({ queryKey: ["trips-stats"] });
       setSelectedIds([]);
       setBulkAction("");
     } catch (error2) {
@@ -2847,39 +2878,70 @@ const Trips = () => {
       sortable: true,
       visible: visibleColumns.trip,
       width: "w-[300px]",
-      render: (trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: trip.title }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: trip.slug }),
-          (() => {
-            const destinationLabel = summarizeDestinations(trip);
-            const durationLabel = trip.duration_days ? `${trip.duration_days}${__("d", "d")}${trip.duration_nights ? ` / ${trip.duration_nights}${__("n", "n")}` : ""}` : null;
-            const travelerLabel = summarizeTravelers(trip);
-            const categoryLabel = summarizeCategories(trip);
-            const difficultyLabel = formatLabel(trip.difficulty_level);
-            const chips = [
-              destinationLabel && { key: "dest", label: destinationLabel, icon: MapPin },
-              durationLabel && { key: "duration", label: durationLabel, icon: Calendar$1 },
-              travelerLabel && { key: "traveler", label: travelerLabel, icon: Users },
-              categoryLabel && { key: "category", label: categoryLabel, icon: Tag },
-              difficultyLabel && { key: "difficulty", label: difficultyLabel, icon: Mountain }
-            ].filter(Boolean);
-            if (!chips.length) return null;
-            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2 mt-1", children: chips.map(({ key, label, icon: Icon }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "span",
-              {
-                className: "inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3" }),
-                  label
-                ]
-              },
-              `${trip.id}-${key}`
-            )) });
-          })()
-        ] }),
-        trip.featured_priority && trip.featured_priority !== "none" && isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: trip.featured_priority === "featured" ? __("Featured", "Featured") : trip.featured_priority === "popular" ? __("Popular", "Popular") : trip.featured_priority === "new" ? __("New", "New") : trip.featured_priority === "limited" ? __("Limited", "Limited") : trip.featured_priority === "bestseller" ? __("Bestseller", "Bestseller") : trip.featured_priority })
-      ] })
+      render: (trip) => {
+        var _a2;
+        const editUrl = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${trip.id}`;
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "a",
+                {
+                  href: editUrl,
+                  onClick: (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEdit(trip);
+                  },
+                  className: "font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-2 hover:underline truncate",
+                  children: trip.title
+                }
+              ),
+              can("yatra_view_trips") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: (e) => {
+                    e.stopPropagation();
+                    handleView(trip);
+                  },
+                  className: "ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800",
+                  title: __("View trip in new tab", "View trip in new tab"),
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3.5 h-3.5" })
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate", children: trip.slug }),
+            (() => {
+              const destinationLabel = summarizeDestinations(trip);
+              const durationLabel = trip.duration_days ? `${trip.duration_days}${__("d", "d")}${trip.duration_nights ? ` / ${trip.duration_nights}${__("n", "n")}` : ""}` : null;
+              const travelerLabel = summarizeTravelers(trip);
+              const categoryLabel = summarizeCategories(trip);
+              const difficultyLabel = formatLabel(trip.difficulty_level);
+              const chips = [
+                destinationLabel && { key: "dest", label: destinationLabel, icon: MapPin },
+                durationLabel && { key: "duration", label: durationLabel, icon: Calendar$1 },
+                travelerLabel && { key: "traveler", label: travelerLabel, icon: Users },
+                categoryLabel && { key: "category", label: categoryLabel, icon: Tag },
+                difficultyLabel && { key: "difficulty", label: difficultyLabel, icon: Mountain }
+              ].filter(Boolean);
+              if (!chips.length) return null;
+              return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2 mt-1", children: chips.map(({ key, label, icon: Icon }) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "span",
+                {
+                  className: "inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3" }),
+                    label
+                  ]
+                },
+                `${trip.id}-${key}`
+              )) });
+            })()
+          ] }),
+          trip.featured_priority && trip.featured_priority !== "none" && isPro && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400", children: trip.featured_priority === "featured" ? __("Featured", "Featured") : trip.featured_priority === "popular" ? __("Popular", "Popular") : trip.featured_priority === "new" ? __("New", "New") : trip.featured_priority === "limited" ? __("Limited", "Limited") : trip.featured_priority === "bestseller" ? __("Bestseller", "Bestseller") : trip.featured_priority })
+        ] });
+      }
     });
     cols.push({
       key: "price",
@@ -2959,8 +3021,8 @@ const Trips = () => {
     if (can("yatra_view_trips")) {
       actions.push({
         key: "view",
-        label: __("View", "View"),
-        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+        label: __("View (frontend)", "View (frontend)"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" }),
         onClick: (trip) => handleView(trip)
       });
     }
@@ -3266,7 +3328,7 @@ const Trips = () => {
                   ),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: isSlugManuallyEdited ? __("Editing slug manually. Keep it short, lowercase, and hyphen-separated.", "Editing slug manually. Keep it short, lowercase, and hyphen-separated.") : __('Auto-generated from the title. Click "Customize URL" if you need a custom slug.', 'Auto-generated from the title. Click "Customize URL" if you need a custom slug.') }),
                   (newTripSlug || newTripTitle) && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 font-mono", children: [
-                    ((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || "https://example.com",
+                    ((_b = window.yatraAdmin) == null ? void 0 : _b.siteUrl) || "https://example.com",
                     "/trips/",
                     newTripSlug || generateSlug(newTripTitle)
                   ] })
@@ -3399,10 +3461,13 @@ const ItineraryEntryFields = ({
   size = "default",
   showCardWrapper = false
 }) => {
+  var _a;
   const isCompact = size === "compact";
   const textSize = isCompact ? "text-xs" : "text-sm";
   const labelSize = isCompact ? "text-xs" : "text-sm";
   const autoDuration = calculateDuration ? calculateDuration(entry.start_time || "", entry.end_time || "", entry.time_type || "exact") : "";
+  const globalCurrency = ((_a = window.yatraAdmin) == null ? void 0 : _a.currency) || "USD";
+  const currencySymbol = getCurrencySymbol(globalCurrency) || "";
   const renderField = (content2) => {
     if (showCardWrapper) {
       return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: content2 }) });
@@ -3712,7 +3777,7 @@ const ItineraryEntryFields = ({
             }
           ),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(DollarSign, { className: "absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: currencySymbol }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Input,
               {
@@ -3722,7 +3787,7 @@ const ItineraryEntryFields = ({
                 value: entry.cost || "",
                 onChange: (e) => onFieldChange("cost", e.target.value),
                 placeholder: "0.00",
-                className: `pl-9 ${textSize}`
+                className: `pl-8 ${textSize}`
               }
             )
           ] })
@@ -12711,6 +12776,18 @@ const DifficultyLevels = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["difficulty-levels-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/difficulty-levels/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const { data, isLoading, error } = useQuery({
     queryKey: ["difficulty-levels", queryParams],
     queryFn: async () => {
@@ -12728,6 +12805,7 @@ const DifficultyLevels = () => {
     mutationFn: async (id) => apiClient.delete(`/difficulty-levels/${id}`),
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
+      queryClient2.invalidateQueries({ queryKey: ["difficulty-levels-stats"] });
       showToast(__("Difficulty level deleted successfully", "Difficulty level deleted successfully"), "success");
     },
     onError: (error2) => {
@@ -12749,6 +12827,7 @@ const DifficultyLevels = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
+      queryClient2.invalidateQueries({ queryKey: ["difficulty-levels-stats"] });
       const msgMap = {
         trash: __("Difficulty level moved to trash", "Difficulty level moved to trash"),
         draft: __("Difficulty level marked as draft", "Difficulty level marked as draft"),
@@ -12771,19 +12850,21 @@ const DifficultyLevels = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 20);
   const statusCounts = reactExports.useMemo(() => {
-    const counts = {
-      all: levels.length,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
       publish: 0,
       draft: 0,
       trash: 0
     };
-    levels.forEach((level) => {
-      if (level.status === "publish") counts.publish += 1;
-      else if (level.status === "draft") counts.draft += 1;
-      else if (level.status === "trash") counts.trash += 1;
-    });
-    return counts;
-  }, [levels]);
+  }, [statsData]);
   const formatDate2 = (dateString) => {
     if (!dateString) return __("N/A", "N/A");
     try {
@@ -12923,6 +13004,7 @@ const DifficultyLevels = () => {
           showToast(msgMap[bulkAction], "success");
         }
         queryClient2.invalidateQueries({ queryKey: ["difficulty-levels"] });
+        queryClient2.invalidateQueries({ queryKey: ["difficulty-levels-stats"] });
         setSelectedIds([]);
         setBulkAction("");
       } catch (error2) {
@@ -15880,7 +15962,7 @@ const ViewBooking = () => {
   ] });
 };
 const Customers = () => {
-  var _a;
+  var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [loyaltyFilter, setLoyaltyFilter] = reactExports.useState("all");
@@ -15896,6 +15978,7 @@ const Customers = () => {
   const queryClient2 = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     if (typeof window === "undefined") {
       return {
@@ -15919,7 +16002,7 @@ const Customers = () => {
       created_at: true
     };
   });
-  const apiBase = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1";
+  const apiBase = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.apiUrl) || "/wp-json/yatra/v1";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -15941,7 +16024,7 @@ const Customers = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ["customers", queryParams],
     queryFn: async () => {
-      var _a2, _b;
+      var _a2, _b2;
       const params = new URLSearchParams();
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== void 0 && value !== null && value !== "") {
@@ -15949,7 +16032,7 @@ const Customers = () => {
         }
       });
       const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers?${params.toString()}`, {
-        headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
+        headers: { "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch customers");
       return response.json();
@@ -16043,8 +16126,7 @@ const Customers = () => {
     ] });
   };
   const handleEdit = (customer) => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=edit&id=${customer.id}`;
   };
   const handleDelete = (customer) => {
     setCustomerToDelete(customer);
@@ -16056,12 +16138,10 @@ const Customers = () => {
     }
   };
   const handleView = (customer) => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`;
   };
   const handleCreateCustomer = () => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -16216,26 +16296,19 @@ const Customers = () => {
       label: __("Customer", "Customer"),
       sortable: true,
       visible: visibleColumns.customer,
-      width: "w-[250px]",
       render: (customer) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "a",
           {
-            type: "button",
-            onClick: () => handleView(customer),
-            className: "font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline",
+            href: `${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`,
+            className: "hover:underline underline-offset-2 text-blue-600 dark:text-blue-400",
             children: customer.name || `${customer.first_name} ${customer.last_name}`
           }
-        ),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1 space-y-0.5", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-3 h-3" }),
-            customer.email
-          ] }),
-          customer.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
-            customer.phone
-          ] })
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: customer.email || __("No email provided", "No email provided") }),
+        customer.phone && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Phone, { className: "w-3 h-3" }),
+          customer.phone
         ] })
       ] })
     },
@@ -16535,9 +16608,11 @@ const Customers = () => {
   ] });
 };
 const CustomerForm = () => {
+  var _a;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const [formData, setFormData] = reactExports.useState({
     first_name: "",
     last_name: "",
@@ -16581,9 +16656,9 @@ const CustomerForm = () => {
   const { data: customerData, isLoading: isLoadingCustomer } = useQuery({
     queryKey: ["customer", customerId],
     queryFn: async () => {
-      var _a, _b;
+      var _a2, _b;
       if (!customerId) return null;
-      const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
         headers: { "X-WP-Nonce": ((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || "" }
       });
       if (!response.ok) throw new Error("Failed to fetch customer");
@@ -16648,10 +16723,10 @@ const CustomerForm = () => {
   };
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      var _a, _b;
+      var _a2, _b;
       const payload = { ...data };
       if (isEditMode && customerId) {
-        const response = await fetch(`${((_a = window.yatraAdmin) == null ? void 0 : _a.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
+        const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/customers/${customerId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -16688,8 +16763,7 @@ const CustomerForm = () => {
     saveMutation.mutate(formData);
   };
   const handleCancel = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
   };
   const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
@@ -17218,6 +17292,7 @@ const CustomerForm = () => {
 const ViewCustomer = () => {
   var _a;
   const { can, isPro } = usePermissions();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const customerId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("id") ? parseInt(params.get("id") || "0") : null;
@@ -17361,16 +17436,13 @@ const ViewCustomer = () => {
     ] });
   };
   const handleBack = () => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
   };
   const handleEdit = () => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customerId}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=edit&id=${customerId}`;
   };
   const handleViewBooking = (bookingId) => {
-    var _a2;
-    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
   const renderSkeleton = () => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "lg:col-span-2 space-y-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
@@ -17505,7 +17577,7 @@ const ViewCustomer = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "a",
                 {
-                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`,
+                  href: `${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`,
                   className: "hover:underline text-primary-600 dark:text-primary-400",
                   children: customer.name || `${customer.first_name} ${customer.last_name}`
                 }
@@ -23660,18 +23732,41 @@ const Settings = () => {
   ] });
 };
 const ItemTypes = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("name");
   const [sortOrder, setSortOrder] = reactExports.useState("asc");
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [bulkMutationPending, setBulkMutationPending] = reactExports.useState(false);
   const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
     isOpen: false,
     itemType: null
   });
+  const [statusActionConfirm, setStatusActionConfirm] = reactExports.useState({
+    isOpen: false,
+    itemType: null,
+    action: null
+  });
+  const updateItemTypeStatus = async (itemType, status) => {
+    await apiClient.put(`/item-types/${itemType.id}`, {
+      // Required for validation
+      name: itemType.name,
+      // Preserve current slug and other fields so a status change doesn't mutate core data
+      slug: itemType.slug,
+      description: itemType.description,
+      color: itemType.color,
+      status,
+      preserve_slug: true
+    });
+  };
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -23687,6 +23782,18 @@ const ItemTypes = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["item-types-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/item-types/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const { data, isLoading, error } = useQuery({
     queryKey: ["item-types", queryParams],
     queryFn: async () => {
@@ -23706,6 +23813,7 @@ const ItemTypes = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["item-types"] });
+      queryClient2.invalidateQueries({ queryKey: ["item-types-stats"] });
       showToast(__("Item type deleted successfully", "Item type deleted successfully"), "success");
       setDeleteConfirm({ isOpen: false, itemType: null });
     },
@@ -23799,12 +23907,10 @@ const ItemTypes = () => {
     ) });
   };
   const handleCreate = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=create`;
   };
   const handleEdit = (itemType) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`;
   };
   const handleDelete = (itemType) => {
     setDeleteConfirm({ isOpen: true, itemType });
@@ -23836,6 +23942,252 @@ const ItemTypes = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || statusFilter !== "all" || sortBy !== "name" || sortOrder !== "asc";
+  const [visibleColumns, setVisibleColumns] = reactExports.useState({
+    type: true,
+    description: true,
+    status: true,
+    items: true,
+    date: true,
+    author: true
+  });
+  const toggleColumn = (columnKey) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey]
+    }));
+  };
+  const columnOptions = [
+    { key: "type", label: __("Type", "Type"), visible: visibleColumns.type },
+    { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "items", label: __("Items", "Items"), visible: visibleColumns.items },
+    { key: "date", label: __("Date", "Date"), visible: visibleColumns.date },
+    { key: "author", label: __("Author", "Author"), visible: visibleColumns.author }
+  ];
+  const isAllSelected = itemTypes.length > 0 && selectedIds.length === itemTypes.length;
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds(
+      (prev) => checked ? [...prev, id] : prev.filter((existingId) => existingId !== id)
+    );
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(itemTypes.map((itemType) => itemType.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+  };
+  const statusCounts = reactExports.useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0
+    };
+  }, [statsData]);
+  const statusOptions = [
+    { key: "all", label: __("All", "All"), count: statusCounts.all },
+    { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+    { key: "publish", label: __("Publish", "Publish"), count: statusCounts.publish },
+    { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+  ];
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "restore", label: __("Restore to Draft", "Restore to Draft") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "publish", label: __("Mark as Published", "Mark as Published") },
+      { value: "draft", label: __("Mark as Draft", "Mark as Draft") },
+      { value: "trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      showToast(__("Please select item types and a bulk action first.", "Please select item types and a bulk action first."), "error");
+      return;
+    }
+    try {
+      setBulkMutationPending(true);
+      const selectedItemTypes = itemTypes.filter((itemType) => selectedIds.includes(itemType.id));
+      if (bulkAction === "delete") {
+        await Promise.all(selectedIds.map((id) => apiClient.delete(`/item-types/${id}`)));
+        showToast(__("Item types deleted successfully", "Item types deleted successfully"), "success");
+      } else if (bulkAction === "publish") {
+        await Promise.all(selectedItemTypes.map((itemType) => updateItemTypeStatus(itemType, "publish")));
+        showToast(__("Item types marked as published", "Item types marked as published"), "success");
+      } else if (bulkAction === "draft") {
+        const targetStatus = "draft";
+        await Promise.all(selectedItemTypes.map((itemType) => updateItemTypeStatus(itemType, targetStatus)));
+        showToast(
+          statusFilter === "trash" ? __("Item types restored to draft", "Item types restored to draft") : __("Item types marked as draft", "Item types marked as draft"),
+          "success"
+        );
+      } else if (bulkAction === "trash") {
+        await Promise.all(selectedItemTypes.map((itemType) => updateItemTypeStatus(itemType, "trash")));
+        showToast(__("Item types moved to trash", "Item types moved to trash"), "success");
+      } else if (bulkAction === "restore") {
+        await Promise.all(selectedItemTypes.map((itemType) => updateItemTypeStatus(itemType, "draft")));
+        showToast(__("Item types restored to draft", "Item types restored to draft"), "success");
+      }
+      await queryClient2.invalidateQueries({ queryKey: ["item-types"] });
+      await queryClient2.invalidateQueries({ queryKey: ["item-types-stats"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(__("Bulk action failed", "Bulk action failed"), "error");
+    } finally {
+      setBulkMutationPending(false);
+    }
+  };
+  const columns = [
+    {
+      key: "type",
+      label: __("Type", "Type"),
+      sortable: true,
+      width: "w-[200px]",
+      visible: visibleColumns.type,
+      render: (itemType) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        renderIcon(itemType.icon),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`,
+              className: "hover:underline underline-offset-2 text-blue-600 dark:text-blue-400",
+              children: itemType.name
+            }
+          ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: itemType.slug })
+        ] })
+      ] })
+    },
+    {
+      key: "description",
+      label: __("Description", "Description"),
+      sortable: false,
+      width: "w-[200px]",
+      render: (itemType) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm line-clamp-2", children: itemType.description || __("No description", "No description") })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      width: "w-[100px]",
+      visible: visibleColumns.status,
+      render: (itemType) => getStatusBadge(itemType.status)
+    },
+    {
+      key: "items",
+      label: __("Items", "Items"),
+      sortable: false,
+      width: "w-[100px]",
+      visible: visibleColumns.items,
+      render: (itemType) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: itemType.items_count ?? 0 }) })
+    },
+    {
+      key: "date",
+      label: __("Date", "Date"),
+      sortable: true,
+      width: "w-[150px]",
+      visible: visibleColumns.date,
+      render: (itemType) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(itemType.created_at) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated", "Updated"),
+          ": ",
+          formatDate2(itemType.updated_at)
+        ] })
+      ] })
+    },
+    {
+      key: "author",
+      label: __("Author", "Author"),
+      sortable: false,
+      width: "w-[150px]",
+      visible: visibleColumns.author,
+      render: (itemType) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-600 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(itemType.created_by, itemType.created_by_name) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated by", "Updated by"),
+          ": ",
+          formatUser(itemType.updated_by, itemType.updated_by_name)
+        ] })
+      ] })
+    }
+  ];
+  const tableActions = reactExports.useMemo(() => {
+    const actions = [];
+    if (can("yatra_edit_trips")) {
+      actions.push({
+        key: "edit",
+        label: __("Edit", "Edit"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+        onClick: (itemType) => handleEdit(itemType)
+      });
+      actions.push({
+        key: "publish",
+        label: __("Mark as Published", "Mark as Published"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: (itemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: "publish" });
+        },
+        condition: (itemType) => itemType.status !== "publish" && itemType.status !== "trash"
+      });
+      actions.push({
+        key: "draft",
+        label: __("Mark as Draft", "Mark as Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+        onClick: (itemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: "draft" });
+        },
+        condition: (itemType) => itemType.status !== "draft" && itemType.status !== "trash"
+      });
+      actions.push({
+        key: "trash",
+        label: __("Move to Trash", "Move to Trash"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: (itemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: "trash" });
+        },
+        condition: (itemType) => itemType.status !== "trash"
+      });
+      actions.push({
+        key: "restore",
+        label: __("Restore to Draft", "Restore to Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: (itemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: "restore" });
+        },
+        condition: (itemType) => itemType.status === "trash"
+      });
+    }
+    if (can("yatra_delete_trips")) {
+      actions.push({
+        key: "delete",
+        label: __("Delete Permanently", "Delete Permanently"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: (itemType) => handleDelete(itemType),
+        variant: "destructive",
+        condition: (itemType) => itemType.status === "trash"
+      });
+    }
+    return actions;
+  }, [can, queryClient2, showToast]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -23849,6 +24201,72 @@ const ItemTypes = () => {
         cancelText: __("Cancel", "Cancel"),
         variant: "danger",
         isLoading: deleteMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: statusActionConfirm.isOpen,
+        onClose: () => setStatusActionConfirm({ isOpen: false, itemType: null, action: null }),
+        onConfirm: async () => {
+          const { itemType, action } = statusActionConfirm;
+          if (!itemType || !action) {
+            return;
+          }
+          const targetStatus = action === "restore" ? "draft" : action;
+          await updateItemTypeStatus(itemType, targetStatus);
+          const successMessage = action === "publish" ? __("Item type marked as published.", "Item type marked as published.") : action === "draft" || action === "restore" ? __("Item type marked as draft.", "Item type marked as draft.") : __("Item type moved to trash.", "Item type moved to trash.");
+          showToast(successMessage, "success");
+          queryClient2.invalidateQueries({ queryKey: ["item-types"] });
+          queryClient2.invalidateQueries({ queryKey: ["item-types-stats"] });
+          setStatusActionConfirm({ isOpen: false, itemType: null, action: null });
+        },
+        title: (() => {
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __("Publish Item Type", "Publish Item Type");
+            case "draft":
+              return __("Mark as Draft", "Mark as Draft");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "restore":
+              return __("Restore Item Type", "Restore Item Type");
+            default:
+              return __("Confirm Action", "Confirm Action");
+          }
+        })(),
+        message: (() => {
+          var _a2;
+          const name = ((_a2 = statusActionConfirm.itemType) == null ? void 0 : _a2.name) || "";
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __('Are you sure you want to publish "{name}"?', 'Are you sure you want to publish "{name}"?').replace("{name}", name);
+            case "draft":
+              return __('Are you sure you want to mark "{name}" as draft?', 'Are you sure you want to mark "{name}" as draft?').replace("{name}", name);
+            case "trash":
+              return __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace("{name}", name);
+            case "restore":
+              return __('Are you sure you want to restore "{name}" to draft?', 'Are you sure you want to restore "{name}" to draft?').replace("{name}", name);
+            default:
+              return __("Are you sure you want to perform this action?", "Are you sure you want to perform this action?");
+          }
+        })(),
+        confirmText: (() => {
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __("Publish", "Publish");
+            case "draft":
+            case "restore":
+              return __("Mark as Draft", "Mark as Draft");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            default:
+              return __("Confirm", "Confirm");
+          }
+        })(),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "warning",
+        isLoading: false
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -23931,207 +24349,62 @@ const ItemTypes = () => {
         }
       )
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading item types", "Error loading item types") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Items", "Items") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) })
-        ] }, `skeleton-${index}`)) })
-      ] }) : itemTypes.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Items", "Items") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 7, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No item types found", "No item types found") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first item type.", "Get started by creating your first item type.") }),
-          hasFilters ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              onClick: handleResetFilters,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-                __("Clear Filters", "Clear Filters")
-              ]
-            }
-          ) : can("yatra_edit_trips") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              onClick: handleCreate,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                __("Create Item Type", "Create Item Type")
-              ]
-            }
-          )
-        ] }) }) }) })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Type", "Type"),
-                getSortIcon("name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Items", "Items") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: itemTypes.map((itemType) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            renderIcon(itemType.icon),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: itemType.name }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: itemType.slug })
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "line-clamp-2", children: itemType.description || __("No description", "No description") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(itemType.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: itemType.items_count ?? 0 }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(itemType.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated", "Updated"),
-              ": ",
-              formatDate2(itemType.updated_at)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(itemType.created_by, itemType.created_by_name) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated by", "Updated by"),
-              ": ",
-              formatUser(itemType.updated_by, itemType.updated_by_name)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(itemType),
-                className: "h-8 w-8",
-                "aria-label": __("Edit item type", "Edit item type"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(itemType),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete item type", "Delete item type"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, itemType.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("item types", "item types")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: handleClearSelection,
+          statusFilter,
+          setStatusFilter,
+          statusOptions,
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: itemTypes,
+          columns,
+          actions: tableActions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading item types", "Error loading item types"),
+          emptyText: __("No item types found", "No item types found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first item type.", "Get started by creating your first item type."),
+          onCreateClick: can("yatra_edit_trips") ? handleCreate : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (itemType) => itemType.id,
+          getItemStatus: (itemType) => itemType.status,
+          statusFilter,
+          capability: "yatra_view_trips"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: setPage,
+          itemName: __("item types", "item types")
+        }
+      ) })
     ] }) })
   ] });
 };
@@ -24483,19 +24756,42 @@ const ItemTypeForm = () => {
   ] });
 };
 const Items = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [typeFilter, setTypeFilter] = reactExports.useState("all");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("name");
   const [sortOrder, setSortOrder] = reactExports.useState("asc");
   const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [bulkMutationPending, setBulkMutationPending] = reactExports.useState(false);
   const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
     isOpen: false,
     item: null
   });
+  const [statusActionConfirm, setStatusActionConfirm] = reactExports.useState({
+    isOpen: false,
+    item: null,
+    action: null
+  });
+  const updateItemStatus = async (item, status) => {
+    await apiClient.put(`/items/${item.id}`, {
+      // Required for validation
+      name: item.name,
+      type_id: item.type_id,
+      // Preserve current slug and description so status change is safe
+      slug: item.slug,
+      description: item.description,
+      status,
+      preserve_slug: true
+    });
+  };
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -24514,6 +24810,18 @@ const Items = () => {
     }
     return params;
   }, [searchTerm, typeFilter, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["items-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/items/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const [availableTypes, setAvailableTypes] = reactExports.useState([]);
   const { data, isLoading, error } = useQuery({
     queryKey: ["items", queryParams],
@@ -24534,6 +24842,7 @@ const Items = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["items"] });
+      queryClient2.invalidateQueries({ queryKey: ["items-stats"] });
       showToast(__("Item deleted successfully", "Item deleted successfully"), "success");
       setDeleteConfirm({ isOpen: false, item: null });
     },
@@ -24545,8 +24854,8 @@ const Items = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
   reactExports.useEffect(() => {
-    var _a;
-    if ((_a = data == null ? void 0 : data.meta) == null ? void 0 : _a.available_types) {
+    var _a2;
+    if ((_a2 = data == null ? void 0 : data.meta) == null ? void 0 : _a2.available_types) {
       setAvailableTypes(data.meta.available_types);
     }
   }, [data]);
@@ -24594,12 +24903,10 @@ const Items = () => {
     return `User #${userId}`;
   };
   const handleCreate = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=items&action=create`;
   };
   const handleEdit = (item) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items&action=edit&id=${item.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=items&action=edit&id=${item.id}`;
   };
   const handleDelete = (item) => {
     setDeleteConfirm({ isOpen: true, item });
@@ -24632,6 +24939,269 @@ const Items = () => {
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
   const hasFilters = searchTerm || typeFilter !== "all" || statusFilter !== "all" || sortBy !== "name" || sortOrder !== "asc";
+  const [visibleColumns, setVisibleColumns] = reactExports.useState({
+    item: true,
+    type: true,
+    description: true,
+    status: true,
+    usage: true,
+    date: true,
+    author: true
+  });
+  const toggleColumn = (columnKey) => {
+    setVisibleColumns((prev) => ({
+      ...prev,
+      [columnKey]: !prev[columnKey]
+    }));
+  };
+  const columnOptions = [
+    { key: "item", label: __("Item", "Item"), visible: visibleColumns.item },
+    { key: "type", label: __("Type", "Type"), visible: visibleColumns.type },
+    { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+    { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
+    { key: "usage", label: __("Usage", "Usage"), visible: visibleColumns.usage },
+    { key: "date", label: __("Date", "Date"), visible: visibleColumns.date },
+    { key: "author", label: __("Author", "Author"), visible: visibleColumns.author }
+  ];
+  const isAllSelected = items.length > 0 && selectedIds.length === items.length;
+  const handleSelectItem = (id, checked) => {
+    setSelectedIds(
+      (prev) => checked ? [...prev, id] : prev.filter((existingId) => existingId !== id)
+    );
+  };
+  const handleSelectAll = (checked) => {
+    if (checked) {
+      setSelectedIds(items.map((item) => item.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+  };
+  const statusCounts = reactExports.useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0
+    };
+  }, [statsData]);
+  const statusOptions = [
+    { key: "all", label: __("All", "All"), count: statusCounts.all },
+    { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+    { key: "publish", label: __("Publish", "Publish"), count: statusCounts.publish },
+    { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+  ];
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "restore", label: __("Restore to Draft", "Restore to Draft") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "publish", label: __("Mark as Published", "Mark as Published") },
+      { value: "draft", label: __("Mark as Draft", "Mark as Draft") },
+      { value: "trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      showToast(__("Please select items and a bulk action first.", "Please select items and a bulk action first."), "error");
+      return;
+    }
+    try {
+      setBulkMutationPending(true);
+      const selectedItems = items.filter((item) => selectedIds.includes(item.id));
+      if (bulkAction === "delete") {
+        await Promise.all(selectedIds.map((id) => apiClient.delete(`/items/${id}`)));
+        showToast(__("Items deleted successfully", "Items deleted successfully"), "success");
+      } else if (bulkAction === "publish") {
+        await Promise.all(selectedItems.map((item) => updateItemStatus(item, "publish")));
+        showToast(__("Items marked as published", "Items marked as published"), "success");
+      } else if (bulkAction === "draft") {
+        const targetStatus = "draft";
+        await Promise.all(selectedItems.map((item) => updateItemStatus(item, targetStatus)));
+        showToast(
+          statusFilter === "trash" ? __("Items restored to draft", "Items restored to draft") : __("Items marked as draft", "Items marked as draft"),
+          "success"
+        );
+      } else if (bulkAction === "trash") {
+        await Promise.all(selectedItems.map((item) => updateItemStatus(item, "trash")));
+        showToast(__("Items moved to trash", "Items moved to trash"), "success");
+      } else if (bulkAction === "restore") {
+        await Promise.all(selectedItems.map((item) => updateItemStatus(item, "draft")));
+        showToast(__("Items restored to draft", "Items restored to draft"), "success");
+      }
+      await queryClient2.invalidateQueries({ queryKey: ["items"] });
+      await queryClient2.invalidateQueries({ queryKey: ["items-stats"] });
+      setSelectedIds([]);
+      setBulkAction("");
+    } catch (error2) {
+      showToast(__("Bulk action failed", "Bulk action failed"), "error");
+    } finally {
+      setBulkMutationPending(false);
+    }
+  };
+  const columns = [
+    {
+      key: "item",
+      label: __("Item", "Item"),
+      sortable: true,
+      width: "w-[200px]",
+      visible: visibleColumns.item,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "a",
+          {
+            href: `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=items&action=edit&id=${item.id}`,
+            className: "hover:underline underline-offset-2 text-blue-600 dark:text-blue-400",
+            children: item.name
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: item.slug })
+      ] })
+    },
+    {
+      key: "type",
+      label: __("Type", "Type"),
+      sortable: true,
+      width: "w-[150px]",
+      visible: visibleColumns.type,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        item.type_icon && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          IconSelector,
+          {
+            iconName: item.type_icon,
+            className: "w-4 h-4 text-gray-700 dark:text-gray-300"
+          }
+        ) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: item.type_name || __("Unknown", "Unknown") })
+      ] })
+    },
+    {
+      key: "description",
+      label: __("Description", "Description"),
+      sortable: false,
+      width: "w-[200px]",
+      visible: visibleColumns.description,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm line-clamp-2", children: item.description || __("No description", "No description") })
+    },
+    {
+      key: "status",
+      label: __("Status", "Status"),
+      sortable: true,
+      width: "w-[100px]",
+      visible: visibleColumns.status,
+      render: (item) => getStatusBadge(item.status)
+    },
+    {
+      key: "usage",
+      label: __("Usage", "Usage"),
+      sortable: false,
+      width: "w-[100px]",
+      visible: visibleColumns.usage,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: item.usage_count ?? 0 }) })
+    },
+    {
+      key: "date",
+      label: __("Date", "Date"),
+      sortable: true,
+      width: "w-[150px]",
+      visible: visibleColumns.date,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(item.created_at) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated", "Updated"),
+          ": ",
+          formatDate2(item.updated_at)
+        ] })
+      ] })
+    },
+    {
+      key: "author",
+      label: __("Author", "Author"),
+      sortable: false,
+      width: "w-[150px]",
+      visible: visibleColumns.author,
+      render: (item) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-600 dark:text-gray-400 text-sm", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(item.created_by, item.created_by_name) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
+          __("Updated by", "Updated by"),
+          ": ",
+          formatUser(item.updated_by, item.updated_by_name)
+        ] })
+      ] })
+    }
+  ];
+  const tableActions = reactExports.useMemo(() => {
+    const actions = [];
+    if (can("yatra_edit_trips")) {
+      actions.push({
+        key: "edit",
+        label: __("Edit", "Edit"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+        onClick: (item) => handleEdit(item)
+      });
+      actions.push({
+        key: "publish",
+        label: __("Mark as Published", "Mark as Published"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: (item) => {
+          setStatusActionConfirm({ isOpen: true, item, action: "publish" });
+        },
+        condition: (item) => item.status !== "publish" && item.status !== "trash"
+      });
+      actions.push({
+        key: "draft",
+        label: __("Mark as Draft", "Mark as Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-4 h-4" }),
+        onClick: (item) => {
+          setStatusActionConfirm({ isOpen: true, item, action: "draft" });
+        },
+        condition: (item) => item.status !== "draft" && item.status !== "trash"
+      });
+      actions.push({
+        key: "trash",
+        label: __("Move to Trash", "Move to Trash"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: (item) => {
+          setStatusActionConfirm({ isOpen: true, item, action: "trash" });
+        },
+        condition: (item) => item.status !== "trash"
+      });
+      actions.push({
+        key: "restore",
+        label: __("Restore to Draft", "Restore to Draft"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-4 h-4" }),
+        onClick: (item) => {
+          setStatusActionConfirm({ isOpen: true, item, action: "restore" });
+        },
+        condition: (item) => item.status === "trash"
+      });
+    }
+    if (can("yatra_delete_trips")) {
+      actions.push({
+        key: "delete",
+        label: __("Delete Permanently", "Delete Permanently"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+        onClick: (item) => handleDelete(item),
+        variant: "destructive",
+        condition: (item) => item.status === "trash"
+      });
+    }
+    return actions;
+  }, [can, queryClient2, showToast]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -24645,6 +25215,72 @@ const Items = () => {
         cancelText: __("Cancel", "Cancel"),
         variant: "danger",
         isLoading: deleteMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: statusActionConfirm.isOpen,
+        onClose: () => setStatusActionConfirm({ isOpen: false, item: null, action: null }),
+        onConfirm: async () => {
+          const { item, action } = statusActionConfirm;
+          if (!item || !action) {
+            return;
+          }
+          const targetStatus = action === "restore" ? "draft" : action;
+          await updateItemStatus(item, targetStatus);
+          const successMessage = action === "publish" ? __("Item marked as published.", "Item marked as published.") : action === "draft" || action === "restore" ? __("Item marked as draft.", "Item marked as draft.") : __("Item moved to trash.", "Item moved to trash.");
+          showToast(successMessage, "success");
+          queryClient2.invalidateQueries({ queryKey: ["items"] });
+          queryClient2.invalidateQueries({ queryKey: ["items-stats"] });
+          setStatusActionConfirm({ isOpen: false, item: null, action: null });
+        },
+        title: (() => {
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __("Publish Item", "Publish Item");
+            case "draft":
+              return __("Mark as Draft", "Mark as Draft");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            case "restore":
+              return __("Restore Item", "Restore Item");
+            default:
+              return __("Confirm Action", "Confirm Action");
+          }
+        })(),
+        message: (() => {
+          var _a2;
+          const name = ((_a2 = statusActionConfirm.item) == null ? void 0 : _a2.name) || "";
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __('Are you sure you want to publish "{name}"?', 'Are you sure you want to publish "{name}"?').replace("{name}", name);
+            case "draft":
+              return __('Are you sure you want to mark "{name}" as draft?', 'Are you sure you want to mark "{name}" as draft?').replace("{name}", name);
+            case "trash":
+              return __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace("{name}", name);
+            case "restore":
+              return __('Are you sure you want to restore "{name}" to draft?', 'Are you sure you want to restore "{name}" to draft?').replace("{name}", name);
+            default:
+              return __("Are you sure you want to perform this action?", "Are you sure you want to perform this action?");
+          }
+        })(),
+        confirmText: (() => {
+          switch (statusActionConfirm.action) {
+            case "publish":
+              return __("Publish", "Publish");
+            case "draft":
+            case "restore":
+              return __("Mark as Draft", "Mark as Draft");
+            case "trash":
+              return __("Move to Trash", "Move to Trash");
+            default:
+              return __("Confirm", "Confirm");
+          }
+        })(),
+        cancelText: __("Cancel", "Cancel"),
+        variant: "warning",
+        isLoading: false
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -24740,228 +25376,62 @@ const Items = () => {
         }
       )
     ] }) }) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading items", "Error loading items") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Item", "Item") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Usage", "Usage") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
-          ] }) })
-        ] }, `skeleton-${index}`)) })
-      ] }) : items.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Item", "Item") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Type", "Type") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: __("Status", "Status") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Usage", "Usage") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Date", "Date") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableRow, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { colSpan: 8, className: "h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center h-full text-center py-12", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "w-8 h-8 text-gray-400 dark:text-gray-500" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("No items found", "No items found") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm", children: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first item.", "Get started by creating your first item.") }),
-          hasFilters ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              onClick: handleResetFilters,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }),
-                __("Clear Filters", "Clear Filters")
-              ]
-            }
-          ) : can("yatra_edit_trips") && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              onClick: handleCreate,
-              className: "flex items-center gap-2",
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                __("Create Item", "Create Item")
-              ]
-            }
-          )
-        ] }) }) }) })
-      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Table$1, { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("name"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Item", "Item"),
-                getSortIcon("name")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("type_id"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Type", "Type"),
-                getSortIcon("type_id")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[200px]", children: __("Description", "Description") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("status"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Status", "Status"),
-                getSortIcon("status")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[100px] text-center", children: __("Usage", "Usage") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "button",
-            {
-              onClick: () => handleSort("created_at"),
-              className: "flex items-center hover:text-gray-900 dark:hover:text-white transition-colors",
-              children: [
-                __("Date", "Date"),
-                getSortIcon("created_at")
-              ]
-            }
-          ) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "w-[150px]", children: __("Author", "Author") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableHead, { className: "text-right w-[100px]", children: __("Actions", "Actions") })
-        ] }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(TableBody, { children: items.map((item) => /* @__PURE__ */ jsxRuntimeExports.jsxs(TableRow, { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(TableCell, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: item.name }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: item.slug })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-            item.type_icon && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded-md bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              IconSelector,
-              {
-                iconName: item.type_icon,
-                className: "w-4 h-4 text-gray-700 dark:text-gray-300"
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: item.type_name || __("Unknown", "Unknown") })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "line-clamp-2", children: item.description || __("No description", "No description") }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { children: getStatusBadge(item.status) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "font-medium", children: item.usage_count ?? 0 }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-500 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatDate2(item.created_at) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated", "Updated"),
-              ": ",
-              formatDate2(item.updated_at)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-gray-600 dark:text-gray-400 text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: formatUser(item.created_by, item.created_by_name) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-400 dark:text-gray-500 mt-0.5", children: [
-              __("Updated by", "Updated by"),
-              ": ",
-              formatUser(item.updated_by, item.updated_by_name)
-            ] })
-          ] }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(TableCell, { className: "text-right", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleEdit(item),
-                className: "h-8 w-8",
-                "aria-label": __("Edit item", "Edit item"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" })
-              }
-            ) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              Button,
-              {
-                variant: "ghost",
-                size: "icon",
-                onClick: () => handleDelete(item),
-                className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                "aria-label": __("Delete item", "Delete item"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-              }
-            ) })
-          ] }) })
-        ] }, item.id)) })
-      ] }) }) }),
-      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
-          __("Showing", "Showing"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: (page - 1) * 10 + 1 }),
-          " - ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: Math.min(page * 10, total) }),
-          " ",
-          __("of", "of"),
-          " ",
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: total }),
-          " ",
-          __("items", "items")
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.max(1, p - 1)),
-              disabled: page === 1,
-              className: "h-8",
-              children: __("Previous", "Previous")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: () => setPage((p) => Math.min(totalPages, p + 1)),
-              disabled: page >= totalPages,
-              className: "h-8",
-              children: __("Next", "Next")
-            }
-          )
-        ] })
-      ] }) }) })
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: handleClearSelection,
+          statusFilter,
+          setStatusFilter,
+          statusOptions,
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions,
+          onToggleColumn: toggleColumn,
+          bulkMutationPending,
+          totalItems: total,
+          bulkActionOptions
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: items,
+          columns,
+          actions: tableActions,
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading items", "Error loading items"),
+          emptyText: __("No items found", "No items found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.", "Try adjusting your filters to see more results.") : __("Get started by creating your first item.", "Get started by creating your first item."),
+          onCreateClick: can("yatra_edit_trips") ? handleCreate : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: handleSelectItem,
+          onSelectAll: handleSelectAll,
+          isAllSelected,
+          getItemId: (item) => item.id,
+          getItemStatus: (item) => item.status,
+          statusFilter,
+          capability: "yatra_view_trips"
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: setPage,
+          itemName: __("items", "items")
+        }
+      ) })
     ] }) })
   ] });
 };
@@ -25315,12 +25785,17 @@ const ItemForm = () => {
   ] });
 };
 const Itinerary = () => {
-  var _a, _b;
+  var _a, _b, _c, _d;
+  const globalCurrency = ((_a = window.yatraAdmin) == null ? void 0 : _a.currency) || "USD";
+  const currencySymbol = getCurrencySymbol(globalCurrency) || "";
+  const baseAdminUrl = ((_b = window.yatraAdmin) == null ? void 0 : _b.adminUrl) || "";
   const urlParams = new URLSearchParams(window.location.search);
   const tripIdParam = urlParams.get("trip_id");
   const dayParam = urlParams.get("day");
-  const [tripFilter, setTripFilter] = reactExports.useState(tripIdParam || "");
+  const storedTripId = !tripIdParam ? window.localStorage.getItem("yatra_itinerary_selected_trip") || "" : "";
+  const [tripFilter, setTripFilter] = reactExports.useState(tripIdParam || storedTripId);
   const [expandedDays, setExpandedDays] = reactExports.useState(/* @__PURE__ */ new Set());
+  const [selectedEmptyDays, setSelectedEmptyDays] = reactExports.useState(/* @__PURE__ */ new Set());
   const [selectedDay, setSelectedDay] = reactExports.useState(null);
   const [deleteConfirm, setDeleteConfirm] = reactExports.useState({
     isOpen: false,
@@ -25328,10 +25803,9 @@ const Itinerary = () => {
   });
   const [dayMenuOpen, setDayMenuOpen] = reactExports.useState(null);
   const [selectedEntries, setSelectedEntries] = reactExports.useState(/* @__PURE__ */ new Set());
-  const [bulkDeleteConfirm, setBulkDeleteConfirm] = reactExports.useState({
-    isOpen: false,
-    entryIds: []
-  });
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -25340,6 +25814,11 @@ const Itinerary = () => {
       setTripFilter(tripIdParam);
     }
   }, [tripIdParam]);
+  reactExports.useEffect(() => {
+    if (tripFilter) {
+      window.localStorage.setItem("yatra_itinerary_selected_trip", tripFilter);
+    }
+  }, [tripFilter]);
   const [itemTypesData, setItemTypesData] = reactExports.useState([]);
   const [itemsData, setItemsData] = reactExports.useState([]);
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
@@ -25433,6 +25912,7 @@ const Itinerary = () => {
         const trips = Array.isArray(tripsData) ? tripsData : [];
         const allEntries = [];
         const allDays = /* @__PURE__ */ new Map();
+        const dayStatuses = /* @__PURE__ */ new Map();
         if (!tripFilter) {
           return [];
         }
@@ -25451,11 +25931,15 @@ const Itinerary = () => {
               const dayNumber = day.day_number || day.day || 1;
               const dayTitle = day.title || day.day_title || "";
               const entries = day.entries || [];
+              const dayKey = `${trip.id}-${dayNumber}`;
               for (const entry of entries) {
                 if (!entry || !entry.id) {
                   continue;
                 }
                 if ((entry.item_type_id === null || entry.item_type_id === void 0 || entry.item_type_id === 0) && (entry.item_id === null || entry.item_id === void 0 || entry.item_id === 0)) {
+                  if (entry.status) {
+                    dayStatuses.set(dayKey, String(entry.status));
+                  }
                   continue;
                 }
                 const mapped = mapItemIds(entry.item_type_id, entry.item_id);
@@ -25478,6 +25962,10 @@ const Itinerary = () => {
                   duration: entry.duration || "",
                   start_time: times.start_time,
                   end_time: times.end_time,
+                  cost: typeof entry.cost === "number" || typeof entry.cost === "string" ? String(entry.cost) : void 0,
+                  cost_per_person: entry.cost_per_person !== void 0 ? !!entry.cost_per_person : void 0,
+                  included_items: entry.included_items ?? [],
+                  excluded_items: entry.excluded_items ?? [],
                   status: entry.status || "active",
                   created_at: entry.created_at || entry.createdAt || ""
                 };
@@ -25495,7 +25983,8 @@ const Itinerary = () => {
                   trip_title: trip.title || trip.name || "",
                   day: dayNumber,
                   day_title: dayTitle,
-                  day_id: dayId
+                  day_id: dayId,
+                  day_status: dayStatuses.get(dayKey)
                 });
               }
             }
@@ -25514,6 +26003,7 @@ const Itinerary = () => {
               day: dayInfo.day,
               day_title: dayInfo.day_title,
               day_id: dayInfo.day_id,
+              day_status: dayInfo.day_status,
               entries: allEntries.filter((e) => e.trip_id === dayInfo.trip_id && e.day === dayInfo.day)
             });
           }
@@ -25578,7 +26068,7 @@ const Itinerary = () => {
         setExpandedDays(/* @__PURE__ */ new Set([`${firstDay.trip_id}-${firstDay.day}`]));
       }
     }
-  }, [data, expandedDays.size, dayParam, tripIdParam]);
+  }, [data, dayParam, tripIdParam]);
   const bulkDeleteMutation = useMutation({
     mutationFn: async (ids) => {
       const response = await apiClient.delete("/itinerary", {
@@ -25597,7 +26087,6 @@ const Itinerary = () => {
       } else {
         showToast("Failed to delete items. Please try again.", "error");
       }
-      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
       setSelectedEntries(/* @__PURE__ */ new Set());
       queryClient2.invalidateQueries({ queryKey: ["itinerary"] });
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
@@ -25606,7 +26095,6 @@ const Itinerary = () => {
     },
     onError: (error2) => {
       showToast((error2 == null ? void 0 : error2.message) || "Failed to delete items. Please try again.", "error");
-      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
     }
   });
   const deleteMutation = useMutation({
@@ -25822,41 +26310,122 @@ const Itinerary = () => {
     });
   };
   const handleSelectAll = (dayGroup) => {
-    const allEntryIds = dayGroup.entries.map((e) => e.id);
+    const allEntryIds2 = dayGroup.entries.map((e) => e.id);
     setSelectedEntries((prev) => {
       const newSet = new Set(prev);
-      const allSelected = allEntryIds.every((id) => newSet.has(id));
+      const allSelected = allEntryIds2.every((id) => newSet.has(id));
       if (allSelected) {
-        allEntryIds.forEach((id) => newSet.delete(id));
+        allEntryIds2.forEach((id) => newSet.delete(id));
       } else {
-        allEntryIds.forEach((id) => newSet.add(id));
+        allEntryIds2.forEach((id) => newSet.add(id));
       }
       return newSet;
     });
   };
   const handleSelectAllDays = () => {
-    const allEntryIds = dayGroups.flatMap((dg) => dg.entries.map((e) => e.id));
+    const allEntryIds2 = filteredDayGroups.flatMap((dg) => dg.entries.map((e) => e.id));
+    const emptyDayKeys = filteredDayGroups.filter((dg) => dg.entries.length === 0).map((dg) => `${dg.trip_id}-${dg.day}`);
     setSelectedEntries((prev) => {
       const newSet = new Set(prev);
-      const allSelected = allEntryIds.length > 0 && allEntryIds.every((id) => newSet.has(id));
+      const allSelected = allEntryIds2.length > 0 && allEntryIds2.every((id) => newSet.has(id));
       if (allSelected) {
-        allEntryIds.forEach((id) => newSet.delete(id));
+        allEntryIds2.forEach((id) => newSet.delete(id));
       } else {
-        allEntryIds.forEach((id) => newSet.add(id));
+        allEntryIds2.forEach((id) => newSet.add(id));
       }
       return newSet;
     });
+    setSelectedEmptyDays((prev) => {
+      const allSelected = emptyDayKeys.length > 0 && emptyDayKeys.every((key) => prev.has(key));
+      const next = new Set(prev);
+      if (allSelected) {
+        emptyDayKeys.forEach((key) => next.delete(key));
+      } else {
+        emptyDayKeys.forEach((key) => next.add(key));
+      }
+      return next;
+    });
   };
-  const handleBulkDelete = () => {
-    const entryIds = Array.from(selectedEntries);
-    if (entryIds.length === 0) return;
-    setBulkDeleteConfirm({ isOpen: true, entryIds });
-  };
-  const handleBulkDeleteConfirm = () => {
-    bulkDeleteMutation.mutate(bulkDeleteConfirm.entryIds);
-  };
-  const handleBulkDeleteCancel = () => {
-    setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
+  const handleBulkApply = async () => {
+    const ids = Array.from(selectedEntries);
+    const emptyDayKeys = Array.from(selectedEmptyDays);
+    if (!bulkAction || ids.length === 0 && emptyDayKeys.length === 0) {
+      showToast(__("Please select entries or days and a bulk action first.", "Please select entries or days and a bulk action first."), "error");
+      return;
+    }
+    const resolveDayEntryIds = async () => {
+      var _a2, _b2;
+      const dayEntryIds2 = [];
+      for (const key of emptyDayKeys) {
+        const [tripIdStr, dayStr] = key.split("-");
+        const tripIdNum = parseInt(tripIdStr, 10);
+        const dayNum = parseInt(dayStr, 10);
+        if (Number.isNaN(tripIdNum) || Number.isNaN(dayNum)) {
+          continue;
+        }
+        const dg = dayGroups.find(
+          (g) => g.trip_id === tripIdNum && g.day === dayNum
+        );
+        if (!dg || !dg.day_id) {
+          continue;
+        }
+        try {
+          const response = await apiClient.get(
+            `/itinerary/day-entry-by-day-id/${dg.day_id}`
+          );
+          const dayEntryId = ((_a2 = response == null ? void 0 : response.data) == null ? void 0 : _a2.day_entry_id) || (response == null ? void 0 : response.day_entry_id) || ((_b2 = response == null ? void 0 : response.data) == null ? void 0 : _b2.id) || (response == null ? void 0 : response.id) || null;
+          if (dayEntryId) {
+            dayEntryIds2.push(Number(dayEntryId));
+          }
+        } catch (error2) {
+          console.error("Failed to resolve day entry ID for day", key, error2);
+        }
+      }
+      return dayEntryIds2;
+    };
+    const dayEntryIds = await resolveDayEntryIds();
+    const allIdsForAction = [...ids, ...dayEntryIds];
+    if (allIdsForAction.length === 0) {
+      showToast(__("No valid entries or days found to apply this action.", "No valid entries or days found to apply this action."), "error");
+      return;
+    }
+    if (bulkAction === "delete") {
+      bulkDeleteMutation.mutate(allIdsForAction);
+      return;
+    }
+    const targetStatus = (() => {
+      if (bulkAction === "publish") return "published";
+      if (bulkAction === "draft") return "draft";
+      if (bulkAction === "trash") return "trash";
+      if (bulkAction === "restore") return "draft";
+      return "";
+    })();
+    if (!targetStatus) {
+      return;
+    }
+    try {
+      await Promise.all(
+        allIdsForAction.map(async (id) => {
+          var _a2;
+          const current = await apiClient.get(`/itinerary/${id}`);
+          const entryData = ((_a2 = current == null ? void 0 : current.data) == null ? void 0 : _a2.data) || (current == null ? void 0 : current.data) || current;
+          await apiClient.put(`/itinerary/${id}`, {
+            ...entryData,
+            status: targetStatus
+          });
+        })
+      );
+      showToast(__("Bulk action applied successfully.", "Bulk action applied successfully."), "success");
+      setSelectedEntries(/* @__PURE__ */ new Set());
+      setSelectedEmptyDays(/* @__PURE__ */ new Set());
+      setBulkAction("");
+      queryClient2.invalidateQueries({ queryKey: ["itinerary"] });
+      queryClient2.invalidateQueries({ queryKey: ["trips"] });
+      queryClient2.invalidateQueries({ queryKey: ["trips-simple"] });
+      refetch();
+    } catch (error2) {
+      showToast((error2 == null ? void 0 : error2.message) || __("Failed to apply bulk action. Please try again.", "Failed to apply bulk action. Please try again."), "error");
+    }
   };
   const toggleDay = (tripId, day) => {
     const key = `${tripId}-${day}`;
@@ -25877,6 +26446,41 @@ const Itinerary = () => {
     const accommodations = entries.filter((e) => e.item_type === "Accommodation").length;
     return { meals, activities, accommodations, total: entries.length };
   };
+  const getDayStatusBadge = (dayGroup) => {
+    const normalize = (value) => (value || "").toLowerCase();
+    const explicitStatus = normalize(dayGroup.day_status);
+    let label = "";
+    let className = "";
+    if (explicitStatus === "publish" || explicitStatus === "published") {
+      label = __("Published", "Published");
+      className = "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
+    } else if (explicitStatus === "draft") {
+      label = __("Draft", "Draft");
+      className = "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+    } else if (explicitStatus === "trash") {
+      label = __("Trash", "Trash");
+      className = "bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+    } else {
+      const statuses = dayGroup.entries.map((e) => normalize(e.status));
+      const hasPublished = statuses.some((s) => s === "publish" || s === "published");
+      const hasDraft = statuses.some((s) => s === "draft");
+      const hasTrash = statuses.some((s) => s === "trash");
+      if (hasPublished) {
+        label = __("Published", "Published");
+        className = "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
+      } else if (hasDraft) {
+        label = __("Draft", "Draft");
+        className = "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+      } else if (hasTrash) {
+        label = __("Trash", "Trash");
+        className = "bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
+      } else {
+        label = __("No Status", "No Status");
+        className = "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
+      }
+    }
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: `ml-2 text-[11px] px-2 py-0.5 ${className}`, children: label });
+  };
   const formatTime = (time) => {
     const [hours, minutes] = time.split(":");
     const hour = parseInt(hours);
@@ -25885,6 +26489,86 @@ const Itinerary = () => {
     return `${hour12}:${minutes} ${ampm}`;
   };
   const dayGroups = data || [];
+  const matchesStatusValue = (statusValue, filter) => {
+    if (!filter || filter === "all") {
+      return true;
+    }
+    const status = (statusValue || "").toLowerCase();
+    if (filter === "publish" || filter === "published") {
+      return status === "publish" || status === "published";
+    }
+    if (filter === "draft") {
+      return status === "draft";
+    }
+    if (filter === "trash") {
+      return status === "trash";
+    }
+    return true;
+  };
+  const matchesStatusFilter = (entry, filter) => {
+    return matchesStatusValue(entry.status, filter);
+  };
+  const matchesStatusFilterForDay = (dayGroup, filter) => {
+    if (!filter || filter === "all") {
+      return true;
+    }
+    if (matchesStatusValue(dayGroup.day_status, filter)) {
+      return true;
+    }
+    return dayGroup.entries.some((entry) => matchesStatusFilter(entry, filter));
+  };
+  const filteredDayGroups = reactExports.useMemo(
+    () => {
+      const groupsWithFilteredEntries = dayGroups.map((dg) => ({
+        ...dg,
+        entries: dg.entries.filter((entry) => matchesStatusFilter(entry, statusFilter))
+      }));
+      if (!statusFilter || statusFilter === "all") {
+        return groupsWithFilteredEntries;
+      }
+      return groupsWithFilteredEntries.filter((dg) => matchesStatusFilterForDay(dg, statusFilter));
+    },
+    [dayGroups, statusFilter]
+  );
+  const totalEntries = filteredDayGroups.reduce((acc, dg) => acc + dg.entries.length, 0);
+  const totalEmptyDays = filteredDayGroups.filter((dg) => dg.entries.length === 0).length;
+  const totalSelectableItems = totalEntries + totalEmptyDays;
+  const allEntryIds = filteredDayGroups.flatMap((dg) => dg.entries.map((e) => e.id));
+  const statusCounts = dayGroups.reduce(
+    (acc, dg) => {
+      if (matchesStatusFilterForDay(dg, "publish")) {
+        acc.published += 1;
+      }
+      if (matchesStatusFilterForDay(dg, "draft")) {
+        acc.draft += 1;
+      }
+      if (matchesStatusFilterForDay(dg, "trash")) {
+        acc.trash += 1;
+      }
+      return acc;
+    },
+    { published: 0, draft: 0, trash: 0 }
+  );
+  const statusOptions = [
+    { key: "all", label: __("All", "All"), count: dayGroups.length },
+    { key: "publish", label: __("Published", "Published"), count: statusCounts.published },
+    { key: "draft", label: __("Draft", "Draft"), count: statusCounts.draft },
+    { key: "trash", label: __("Trash", "Trash"), count: statusCounts.trash }
+  ];
+  const bulkActionOptions = reactExports.useMemo(() => {
+    if (statusFilter === "trash") {
+      return [
+        { value: "restore", label: __("Restore to Draft", "Restore to Draft") },
+        { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+      ];
+    }
+    return [
+      { value: "publish", label: __("Mark as Published", "Mark as Published") },
+      { value: "draft", label: __("Mark as Draft", "Mark as Draft") },
+      { value: "trash", label: __("Move to Trash", "Move to Trash") },
+      { value: "delete", label: __("Delete Permanently", "Delete Permanently") }
+    ];
+  }, [statusFilter]);
   reactExports.useEffect(() => {
     const handleClickOutside = () => {
       setDayMenuOpen(null);
@@ -25895,35 +26579,7 @@ const Itinerary = () => {
     }
   }, [dayMenuOpen]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4 pb-6", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-8", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Build your complete itinerary with activities, meals, and accommodations", "Build your complete itinerary with activities, meals, and accommodations") }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-        selectedEntries.size > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            onClick: handleBulkDelete,
-            variant: "destructive",
-            className: "flex items-center gap-2",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
-              __("Delete Selected", "Delete Selected"),
-              " (",
-              selectedEntries.size,
-              ")"
-            ]
-          }
-        ) }),
-        tripFilter && (() => {
-          const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
-          const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
-          const buttonLabel = isSingleDay ? __("Add Entry", "Add Entry") : __("Add Day", "Add Day");
-          return /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleAddDay, className: "flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-            buttonLabel
-          ] }) });
-        })()
-      ] })
-    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Build your complete itinerary with activities, meals, and accommodations", "Build your complete itinerary with activities, meals, and accommodations") }) }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6 mb-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-start justify-between gap-4 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
@@ -25977,393 +26633,572 @@ const Itinerary = () => {
         ] }) })
       ] })
     ] }),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "error", title: __("Error Loading Itinerary", "Error Loading Itinerary"), children: __("We couldn't load itinerary entries. Please refresh the page or try again later.", "We couldn't load itinerary entries. Please refresh the page or try again later.") }) : isLoading || isLoadingTrips ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: [1, 2, 3].map((i) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-4 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 flex-1", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse" }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" })
-      ] })
-    ] }) }) }) }, i)) }) : dayGroups.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-gray-400" }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-1", children: (() => {
-          const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
-          const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
-          return isSingleDay ? __("No itinerary entries yet", "No itinerary entries yet") : __("No itinerary days yet", "No itinerary days yet");
-        })() }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-4", children: (() => {
-          const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
-          const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
-          return isSingleDay ? __("Start building your itinerary by adding your first entry.", "Start building your itinerary by adding your first entry.") : __("Start building your itinerary by adding your first day.", "Start building your itinerary by adding your first day.");
-        })() }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleAddDay, className: "flex items-center gap-2 mx-auto", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-          (() => {
+    tripFilter && (() => {
+      const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
+      const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
+      const buttonLabel = isSingleDay ? __("Add Entry", "Add Entry") : __("Add Day", "Add Day");
+      return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex justify-end mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: handleAddDay,
+          className: "flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200",
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+            buttonLabel
+          ]
+        }
+      ) }) });
+    })(),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds: [
+            ...Array.from(selectedEntries),
+            ...Array.from(selectedEmptyDays)
+          ],
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => {
+            setSelectedEntries(/* @__PURE__ */ new Set());
+            setSelectedEmptyDays(/* @__PURE__ */ new Set());
+          },
+          statusFilter,
+          setStatusFilter,
+          statusOptions,
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions: [],
+          onToggleColumn: () => {
+          },
+          bulkMutationPending: bulkDeleteMutation.isPending,
+          totalItems: totalSelectableItems,
+          bulkActionOptions
+        }
+      ),
+      error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "error", title: __("Error Loading Itinerary", "Error Loading Itinerary"), children: __("We couldn't load itinerary entries. Please refresh the page or try again later.", "We couldn't load itinerary entries. Please refresh the page or try again later.") }) : isLoading || isLoadingTrips ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: [1, 2, 3].map((i) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-4 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 flex-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" })
+        ] })
+      ] }) }) }) }, i)) }) : dayGroups.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-gray-400" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-1", children: (() => {
             const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
             const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
-            return isSingleDay ? __("Add Your First Entry", "Add Your First Entry") : __("Add Your First Day", "Add Your First Day");
-          })()
-        ] })
-      ] })
-    ] }) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
-      dayGroups.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 mb-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "input",
-            {
-              type: "checkbox",
-              checked: dayGroups.length > 0 && dayGroups.every((dg) => dg.entries.length > 0 && dg.entries.every((e) => selectedEntries.has(e.id))),
-              onChange: handleSelectAllDays,
-              className: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer", children: __("Select All", "Select All") }),
-          selectedEntries.size > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
-            "(",
-            selectedEntries.size,
-            " ",
-            __("selected", "selected"),
-            ")"
+            return isSingleDay ? __("No itinerary entries yet", "No itinerary entries yet") : __("No itinerary days yet", "No itinerary days yet");
+          })() }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mb-4", children: (() => {
+            const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
+            const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
+            return isSingleDay ? __("Start building your itinerary by adding your first entry.", "Start building your itinerary by adding your first entry.") : __("Start building your itinerary by adding your first day.", "Start building your itinerary by adding your first day.");
+          })() }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleAddDay, className: "flex items-center gap-2 mx-auto", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+            (() => {
+              const selectedTrip = tripsData == null ? void 0 : tripsData.find((t) => t.id.toString() === tripFilter);
+              const isSingleDay = (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day";
+              return isSingleDay ? __("Add Your First Entry", "Add Your First Entry") : __("Add Your First Day", "Add Your First Day");
+            })()
           ] })
-        ] }),
-        selectedEntries.size > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Button,
-          {
-            onClick: handleBulkDelete,
-            variant: "destructive",
-            size: "sm",
-            className: "flex items-center gap-2",
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
-              __("Delete Selected", "Delete Selected")
-            ]
-          }
-        )
-      ] }) }),
-      dayGroups.map((dayGroup) => {
-        const key = `${dayGroup.trip_id}-${dayGroup.day}`;
-        const isExpanded = expandedDays.has(key);
-        const counts = getItemCounts(dayGroup.entries);
-        const sortedEntries = [...dayGroup.entries].sort((a, b) => {
-          const timeA = a.start_time.split(":").map(Number);
-          const timeB = b.start_time.split(":").map(Number);
-          return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
-        });
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-visible", "data-day-key": key, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-0 overflow-visible", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        ] })
+      ] }) }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+        filteredDayGroups.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-visible", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4 rounded-t-lg", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                checked: allEntryIds.length > 0 && allEntryIds.every((id) => selectedEntries.has(id)),
+                onChange: handleSelectAllDays,
+                className: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer", children: __("Select All", "Select All") }),
+            selectedEntries.size > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
+              "(",
+              selectedEntries.size,
+              " ",
+              __("selected", "selected"),
+              ")"
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                className: "hover:text-gray-700 dark:hover:text-gray-200 underline-offset-2 hover:underline",
+                onClick: () => {
+                  const allKeys = filteredDayGroups.map((dg) => `${dg.trip_id}-${dg.day}`);
+                  setExpandedDays(new Set(allKeys));
+                },
+                children: __("Expand all", "Expand all")
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                className: "hover:text-gray-700 dark:hover:text-gray-200 underline-offset-2 hover:underline",
+                onClick: () => {
+                  setExpandedDays(/* @__PURE__ */ new Set());
+                },
+                children: __("Collapse all", "Collapse all")
+              }
+            )
+          ] })
+        ] }) }) }) }),
+        filteredDayGroups.map((dayGroup) => {
+          const key = `${dayGroup.trip_id}-${dayGroup.day}`;
+          const isExpanded = expandedDays.has(key);
+          const counts = getItemCounts(dayGroup.entries);
+          const sortedEntries = [...dayGroup.entries].sort((a, b) => {
+            const timeA = a.start_time.split(":").map(Number);
+            const timeB = b.start_time.split(":").map(Number);
+            return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
+          });
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
-              className: "flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors",
+              "data-day-key": key,
+              className: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 mb-4 overflow-visible",
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
-                  {
-                    type: "checkbox",
-                    checked: dayGroup.entries.length > 0 && dayGroup.entries.every((e) => selectedEntries.has(e.id)),
-                    onChange: (e) => {
-                      e.stopPropagation();
-                      handleSelectAll(dayGroup);
-                    },
-                    onClick: (e) => e.stopPropagation(),
-                    className: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
-                    title: __("Select all entries for this day", "Select all entries for this day")
-                  }
-                ) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
                   "div",
                   {
-                    className: "flex items-center gap-4 flex-1 cursor-pointer",
-                    onClick: () => toggleDay(dayGroup.trip_id, dayGroup.day),
-                    children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium", children: [
-                        __("Day", "Day"),
-                        " ",
-                        dayGroup.day
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: dayGroup.day_title ? `${__("Day", "Day")} ${dayGroup.day}: ${dayGroup.day_title}` : `${__("Day", "Day")} ${dayGroup.day}` }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
-                            counts.total,
-                            " ",
-                            __("items", "items")
-                          ] }),
-                          counts.meals > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(UtensilsCrossed, { className: "w-3.5 h-3.5" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: counts.meals })
-                          ] }),
-                          counts.activities > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: counts.activities })
-                          ] }),
-                          counts.accommodations > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                            /* @__PURE__ */ jsxRuntimeExports.jsx(Hotel, { className: "w-3.5 h-3.5" }),
-                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Stay", "Stay") })
-                          ] })
-                        ] })
-                      ] })
-                    ] })
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 relative", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Button,
-                      {
-                        variant: "ghost",
-                        size: "icon",
-                        className: "h-8 w-8",
-                        onClick: (e) => {
-                          e.stopPropagation();
-                          if (dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day) {
-                            setDayMenuOpen(null);
-                          } else {
-                            setDayMenuOpen({ tripId: dayGroup.trip_id, day: dayGroup.day });
-                          }
-                        },
-                        title: __("Day Options", "Day Options"),
-                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
-                      }
-                    ),
-                    dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      "div",
-                      {
-                        className: "absolute right-0 top-10 z-50 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1",
-                        onClick: (e) => e.stopPropagation(),
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                            "button",
-                            {
-                              onClick: () => handleEditDay(dayGroup.trip_id, dayGroup.day),
-                              className: "w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
-                              children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" }),
-                                __("Edit Day", "Edit Day")
-                              ]
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                            "button",
-                            {
-                              onClick: () => handleDeleteDay(dayGroup.trip_id, dayGroup.day),
-                              className: "w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
-                              children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
-                                __("Delete Day", "Delete Day")
-                              ]
-                            }
-                          ) })
-                        ]
-                      }
-                    )
-                  ] }) }),
-                  isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-5 h-5 text-gray-400" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400" })
-                ] })
-              ]
-            }
-          ),
-          isExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 dark:border-gray-700 overflow-visible", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gray-50 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3", children: __("QUICK ADD", "QUICK ADD") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: quickAddOptions.length > 0 ? quickAddOptions.map((option) => {
-                const isImageIcon = option.typeIconData && typeof option.typeIconData === "object" && option.typeIconData.type === "image";
-                const colorClasses = {
-                  blue: "border-blue-500 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20",
-                  green: "border-green-500 text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20",
-                  red: "border-red-500 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20",
-                  yellow: "border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20",
-                  purple: "border-purple-500 text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20",
-                  orange: "border-orange-500 text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20",
-                  pink: "border-pink-500 text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-900/20",
-                  indigo: "border-indigo-500 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20",
-                  gray: "border-gray-500 text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900/20"
-                };
-                const colorClass = colorClasses[option.typeColor] || colorClasses.blue;
-                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  Button,
-                  {
-                    variant: "outline",
-                    size: "sm",
-                    onClick: () => handleQuickAdd(option.typeId),
-                    className: `flex items-center gap-2 ${colorClass}`,
-                    style: {
-                      borderColor: option.typeColor ? `var(--color-${option.typeColor}-500)` : void 0
-                    },
-                    children: [
-                      isImageIcon && option.typeIconData.value ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        "img",
-                        {
-                          src: option.typeIconData.value,
-                          alt: option.typeName,
-                          className: "w-4 h-4 object-contain"
-                        }
-                      ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        IconSelector,
-                        {
-                          iconName: option.typeIcon,
-                          className: "w-4 h-4"
-                        }
-                      ),
-                      option.typeName
-                    ]
-                  },
-                  option.typeId
-                );
-              }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No item types available", "No item types available") }) })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 space-y-3 overflow-visible", children: [
-              sortedEntries.map((entry) => {
-                var _a2;
-                return /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  "div",
-                  {
-                    className: "flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible",
+                    className: "flex items-center gap-4 px-4 py-3 rounded-t-lg",
                     children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
                         "input",
                         {
                           type: "checkbox",
-                          checked: selectedEntries.has(entry.id),
+                          checked: dayGroup.entries.length === 0 ? selectedEmptyDays.has(key) : dayGroup.entries.every((e) => selectedEntries.has(e.id)),
                           onChange: (e) => {
                             e.stopPropagation();
-                            handleToggleSelect(entry.id);
+                            if (dayGroup.entries.length > 0) {
+                              handleSelectAll(dayGroup);
+                            } else {
+                              setSelectedEmptyDays((prev) => {
+                                const next = new Set(prev);
+                                if (next.has(key)) {
+                                  next.delete(key);
+                                } else {
+                                  next.add(key);
+                                }
+                                return next;
+                              });
+                            }
                           },
                           onClick: (e) => e.stopPropagation(),
-                          className: "mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
-                          title: __("Select this entry", "Select this entry")
+                          className: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
+                          title: __("Select all entries for this day", "Select all entries for this day")
                         }
                       ) }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center min-w-[80px]", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: formatTime(entry.start_time) }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-2 h-2 rounded-full bg-blue-600" }) })
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Badge,
-                            {
-                              className: "text-xs font-medium px-2 py-0.5",
-                              style: {
-                                backgroundColor: entry.item_color === "blue" ? "rgb(219, 234, 254)" : entry.item_color === "green" ? "rgb(220, 252, 231)" : entry.item_color === "orange" ? "rgb(255, 237, 213)" : entry.item_color === "purple" ? "rgb(243, 232, 255)" : entry.item_color === "red" ? "rgb(254, 226, 226)" : entry.item_color === "yellow" ? "rgb(254, 249, 195)" : "rgb(243, 244, 246)",
-                                color: entry.item_color === "blue" ? "rgb(29, 78, 216)" : entry.item_color === "green" ? "rgb(21, 128, 61)" : entry.item_color === "orange" ? "rgb(194, 65, 12)" : entry.item_color === "purple" ? "rgb(126, 34, 206)" : entry.item_color === "red" ? "rgb(185, 28, 28)" : entry.item_color === "yellow" ? "rgb(161, 98, 7)" : "rgb(55, 65, 81)",
-                                borderColor: entry.item_color === "blue" ? "rgb(147, 197, 253)" : entry.item_color === "green" ? "rgb(134, 239, 172)" : entry.item_color === "orange" ? "rgb(254, 215, 170)" : entry.item_color === "purple" ? "rgb(221, 214, 254)" : entry.item_color === "red" ? "rgb(252, 165, 165)" : entry.item_color === "yellow" ? "rgb(253, 230, 138)" : "rgb(209, 213, 219)",
-                                borderWidth: "1px",
-                                borderStyle: "solid"
-                              },
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
-                                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                  IconSelector,
-                                  {
-                                    iconName: entry.item_icon,
-                                    className: "w-3 h-3"
-                                  }
-                                ),
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.item_type })
-                              ] })
-                            }
-                          ) }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: entry.title }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: entry.description }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400", children: [
-                            entry.location && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.location })
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "div",
+                        {
+                          className: "flex items-center gap-4 flex-1 cursor-pointer",
+                          onClick: () => toggleDay(dayGroup.trip_id, dayGroup.day),
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium", children: [
+                              __("Day", "Day"),
+                              " ",
+                              dayGroup.day
                             ] }),
-                            entry.duration && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3.5 h-3.5" }),
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.duration })
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white flex items-center", children: [
+                                dayGroup.day_title ? `${__("Day", "Day")} ${dayGroup.day}: ${dayGroup.day_title}` : `${__("Day", "Day")} ${dayGroup.day}`,
+                                getDayStatusBadge(dayGroup)
+                              ] }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                                  counts.total,
+                                  " ",
+                                  __("items", "items")
+                                ] }),
+                                counts.meals > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx(UtensilsCrossed, { className: "w-3.5 h-3.5" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: counts.meals })
+                                ] }),
+                                counts.activities > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: counts.activities })
+                                ] }),
+                                counts.accommodations > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx(Hotel, { className: "w-3.5 h-3.5" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Stay", "Stay") })
+                                ] })
+                              ] })
                             ] })
                           ] })
-                        ] }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 relative z-10", children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            SearchableSelect,
-                            {
-                              value: ((_a2 = entry.item_id) == null ? void 0 : _a2.toString()) || "",
-                              onChange: (value) => {
-                                if (!value) return;
-                                const selectedItem = itemsData == null ? void 0 : itemsData.find(
-                                  (item) => item.id.toString() === value
-                                );
-                                if (selectedItem && entry.item_type_id) {
-                                  updateItemMutation.mutate({
-                                    entryId: entry.id,
-                                    itemId: selectedItem.id,
-                                    itemTypeId: entry.item_type_id
-                                  });
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "div",
+                        {
+                          className: "flex items-center gap-2 relative cursor-pointer",
+                          onClick: (e) => {
+                            e.stopPropagation();
+                            toggleDay(dayGroup.trip_id, dayGroup.day);
+                          },
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                Button,
+                                {
+                                  variant: "ghost",
+                                  size: "icon",
+                                  className: "h-8 w-8",
+                                  onClick: (e) => {
+                                    e.stopPropagation();
+                                    if (dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day) {
+                                      setDayMenuOpen(null);
+                                    } else {
+                                      setDayMenuOpen({ tripId: dayGroup.trip_id, day: dayGroup.day });
+                                    }
+                                  },
+                                  title: __("Day Options", "Day Options"),
+                                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(MoreVertical, { className: "w-4 h-4" })
                                 }
-                              },
-                              options: (() => {
-                                const itemTypeId = entry.item_type_id;
-                                if (!itemTypeId) return [];
-                                const itemTypeIdNum = typeof itemTypeId === "string" ? parseInt(itemTypeId, 10) : Number(itemTypeId);
-                                if (!itemTypeIdNum || isNaN(itemTypeIdNum)) return [];
-                                return itemsData.filter((item) => {
-                                  const typeId = item.type_id;
-                                  if (!typeId) return false;
-                                  const typeIdNum = typeof typeId === "string" ? parseInt(typeId, 10) : Number(typeId);
-                                  return typeIdNum === itemTypeIdNum;
-                                }).map((item) => ({
-                                  value: item.id.toString(),
-                                  label: item.name
-                                }));
-                              })(),
-                              placeholder: __("Select item...", "Select item..."),
-                              searchPlaceholder: __("Search items...", "Search items..."),
-                              className: "min-w-[140px]",
-                              disabled: updateItemMutation.isPending
-                            }
-                          ),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Button,
-                            {
-                              variant: "ghost",
-                              size: "icon",
-                              onClick: () => handleEdit(entry),
-                              className: "h-8 w-8",
-                              title: __("Edit Activity", "Edit Activity"),
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" })
-                            }
-                          ) }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                            Button,
-                            {
-                              variant: "ghost",
-                              size: "icon",
-                              onClick: () => handleDelete(entry),
-                              className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
-                              title: __("Delete", "Delete"),
-                              children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
-                            }
-                          ) })
-                        ] })
-                      ] }) })
+                              ),
+                              dayMenuOpen && dayMenuOpen.tripId === dayGroup.trip_id && dayMenuOpen.day === dayGroup.day && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                                "div",
+                                {
+                                  className: "absolute right-0 top-10 z-50 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 py-1",
+                                  onClick: (e) => e.stopPropagation(),
+                                  children: [
+                                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                                      "button",
+                                      {
+                                        onClick: () => handleEditDay(dayGroup.trip_id, dayGroup.day),
+                                        className: "w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
+                                        children: [
+                                          /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" }),
+                                          __("Edit Day", "Edit Day")
+                                        ]
+                                      }
+                                    ),
+                                    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                                      "button",
+                                      {
+                                        onClick: () => handleDeleteDay(dayGroup.trip_id, dayGroup.day),
+                                        className: "w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
+                                        children: [
+                                          /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                                          __("Delete Day", "Delete Day")
+                                        ]
+                                      }
+                                    ) })
+                                  ]
+                                }
+                              )
+                            ] }) }),
+                            isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-5 h-5 text-gray-400" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-5 h-5 text-gray-400" })
+                          ]
+                        }
+                      )
                     ]
-                  },
-                  entry.id
-                );
-              }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Button,
-                {
-                  variant: "outline",
-                  className: "w-full flex items-center justify-center gap-2 border-dashed",
-                  onClick: () => {
-                    var _a2;
-                    const tripId = dayGroup.trip_id;
-                    const day = dayGroup.day;
-                    window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=activity`;
-                  },
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-                    __("Add Activity", "Add Activity")
-                  ]
-                }
-              ) })
-            ] })
-          ] })
-        ] }) }, key);
-      })
+                  }
+                ),
+                isExpanded && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 dark:border-gray-700 overflow-visible", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("QUICK ADD", "QUICK ADD") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: quickAddOptions.length > 0 ? quickAddOptions.map((option) => {
+                      const isImageIcon = option.typeIconData && typeof option.typeIconData === "object" && option.typeIconData.type === "image";
+                      const colorClasses = {
+                        blue: "border-blue-500 text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20",
+                        green: "border-green-500 text-green-700 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20",
+                        red: "border-red-500 text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20",
+                        yellow: "border-yellow-500 text-yellow-700 hover:bg-yellow-50 dark:text-yellow-400 dark:hover:bg-yellow-900/20",
+                        purple: "border-purple-500 text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:hover:bg-purple-900/20",
+                        orange: "border-orange-500 text-orange-700 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20",
+                        pink: "border-pink-500 text-pink-700 hover:bg-pink-50 dark:text-pink-400 dark:hover:bg-pink-900/20",
+                        indigo: "border-indigo-500 text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-900/20",
+                        gray: "border-gray-500 text-gray-700 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-gray-900/20"
+                      };
+                      const colorClass = colorClasses[option.typeColor] || colorClasses.blue;
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Button,
+                        {
+                          variant: "outline",
+                          size: "sm",
+                          onClick: () => handleQuickAdd(option.typeId),
+                          className: `flex items-center gap-2 ${colorClass}`,
+                          style: {
+                            borderColor: option.typeColor ? `var(--color-${option.typeColor}-500)` : void 0
+                          },
+                          children: [
+                            isImageIcon && option.typeIconData.value ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "img",
+                              {
+                                src: option.typeIconData.value,
+                                alt: option.typeName,
+                                className: "w-4 h-4 object-contain"
+                              }
+                            ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              IconSelector,
+                              {
+                                iconName: option.typeIcon,
+                                className: "w-4 h-4"
+                              }
+                            ),
+                            option.typeName
+                          ]
+                        },
+                        option.typeId
+                      );
+                    }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("No item types available", "No item types available") }) })
+                  ] }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-4 pb-3 pt-2 space-y-3 overflow-visible rounded-b-lg", children: [
+                    sortedEntries.map((entry) => {
+                      var _a2;
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "div",
+                        {
+                          className: "flex items-center gap-4 p-3 bg-white dark:bg-gray-950 rounded-lg border border-gray-100/60 dark:border-gray-800/80 shadow-sm overflow-visible",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "input",
+                              {
+                                type: "checkbox",
+                                checked: selectedEntries.has(entry.id),
+                                onChange: (e) => {
+                                  e.stopPropagation();
+                                  handleToggleSelect(entry.id);
+                                },
+                                onClick: (e) => e.stopPropagation(),
+                                className: "w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer",
+                                title: __("Select this entry", "Select this entry")
+                              }
+                            ) }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center min-w-[80px]", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: entry.end_time ? `${formatTime(entry.start_time)} - ${formatTime(entry.end_time)}` : formatTime(entry.start_time) }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-1 flex items-center gap-1", children: entry.end_time ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute inline-flex h-5 w-5 rounded-full bg-blue-400/40 animate-ping" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative inline-flex h-3 w-3 rounded-full bg-blue-600" })
+                                ] }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 border-t border-dashed border-gray-300 dark:border-gray-600" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute inline-flex h-5 w-5 rounded-full bg-red-400/40 animate-ping" }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative inline-flex h-3 w-3 rounded-full bg-red-500" })
+                                ] })
+                              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative flex items-center justify-center", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute inline-flex h-5 w-5 rounded-full bg-blue-400/40 animate-ping" }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "relative inline-flex h-3 w-3 rounded-full bg-blue-600" })
+                              ] }) })
+                            ] }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  "a",
+                                  {
+                                    href: entry.item_type_id ? `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${entry.item_type_id}` : "#",
+                                    className: "focus:outline-none text-blue-600 dark:text-blue-400",
+                                    onClick: (e) => {
+                                      if (!entry.item_type_id) e.preventDefault();
+                                    },
+                                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                      Badge,
+                                      {
+                                        className: "text-xs font-medium px-2 py-0.5 hover:underline underline-offset-2",
+                                        style: {
+                                          backgroundColor: entry.item_color === "blue" ? "rgb(219, 234, 254)" : entry.item_color === "green" ? "rgb(220, 252, 231)" : entry.item_color === "orange" ? "rgb(255, 237, 213)" : entry.item_color === "purple" ? "rgb(243, 232, 255)" : entry.item_color === "red" ? "rgb(254, 226, 226)" : entry.item_color === "yellow" ? "rgb(254, 249, 195)" : "rgb(243, 244, 246)",
+                                          color: entry.item_color === "blue" ? "rgb(29, 78, 216)" : entry.item_color === "green" ? "rgb(21, 128, 61)" : entry.item_color === "orange" ? "rgb(194, 65, 12)" : entry.item_color === "purple" ? "rgb(126, 34, 206)" : entry.item_color === "red" ? "rgb(185, 28, 28)" : entry.item_color === "yellow" ? "rgb(161, 98, 7)" : "rgb(55, 65, 81)",
+                                          borderColor: entry.item_color === "blue" ? "rgb(147, 197, 253)" : entry.item_color === "green" ? "rgb(134, 239, 172)" : entry.item_color === "orange" ? "rgb(254, 215, 170)" : entry.item_color === "purple" ? "rgb(221, 214, 254)" : entry.item_color === "red" ? "rgb(252, 165, 165)" : entry.item_color === "yellow" ? "rgb(253, 230, 138)" : "rgb(209, 213, 219)",
+                                          borderWidth: "1px",
+                                          borderStyle: "solid"
+                                        },
+                                        children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1.5", children: [
+                                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                            IconSelector,
+                                            {
+                                              iconName: entry.item_icon,
+                                              className: "w-3 h-3"
+                                            }
+                                          ),
+                                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.item_type })
+                                        ] })
+                                      }
+                                    )
+                                  }
+                                ) }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  "a",
+                                  {
+                                    href: entry.item_id ? `${baseAdminUrl}?page=yatra&subpage=items&action=edit&id=${entry.item_id}` : "#",
+                                    className: "hover:underline underline-offset-2 focus:outline-none text-left text-blue-600 dark:text-blue-400",
+                                    onClick: (e) => {
+                                      if (!entry.item_id) e.preventDefault();
+                                    },
+                                    children: entry.title
+                                  }
+                                ) }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: entry.description }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1 text-xs text-gray-500 dark:text-gray-400", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center flex-wrap gap-4", children: [
+                                    entry.location && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                      /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-3.5 h-3.5" }),
+                                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.location })
+                                    ] }),
+                                    entry.duration && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                      /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-3.5 h-3.5" }),
+                                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: entry.duration })
+                                    ] }),
+                                    entry.cost && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: currencySymbol }),
+                                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                                        entry.cost,
+                                        entry.cost_per_person ? ` / ${__("person", "person")}` : ""
+                                      ] })
+                                    ] })
+                                  ] }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: (() => {
+                                    let included = [];
+                                    let excluded = [];
+                                    if (Array.isArray(entry.included_items)) {
+                                      included = entry.included_items;
+                                    } else if (typeof entry.included_items === "string" && entry.included_items.trim()) {
+                                      try {
+                                        const parsed = JSON.parse(entry.included_items);
+                                        if (Array.isArray(parsed)) included = parsed;
+                                      } catch {
+                                        included = entry.included_items.split(",").map((i) => i.trim()).filter(Boolean);
+                                      }
+                                    }
+                                    if (Array.isArray(entry.excluded_items)) {
+                                      excluded = entry.excluded_items;
+                                    } else if (typeof entry.excluded_items === "string" && entry.excluded_items.trim()) {
+                                      try {
+                                        const parsed = JSON.parse(entry.excluded_items);
+                                        if (Array.isArray(parsed)) excluded = parsed;
+                                      } catch {
+                                        excluded = entry.excluded_items.split(",").map((i) => i.trim()).filter(Boolean);
+                                      }
+                                    }
+                                    if (included.length === 0 && excluded.length === 0) {
+                                      return null;
+                                    }
+                                    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400", children: [
+                                      included.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                                        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-green-600 dark:text-green-400", children: [
+                                          __("Includes", "Includes"),
+                                          ":"
+                                        ] }),
+                                        " ",
+                                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: included.join(", ") })
+                                      ] }),
+                                      included.length > 0 && excluded.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "  ·  " }),
+                                      excluded.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                                        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-red-600 dark:text-red-400", children: [
+                                          __("Excludes", "Excludes"),
+                                          ":"
+                                        ] }),
+                                        " ",
+                                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: excluded.join(", ") })
+                                      ] })
+                                    ] });
+                                  })() })
+                                ] })
+                              ] }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 relative z-10", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  SearchableSelect,
+                                  {
+                                    value: ((_a2 = entry.item_id) == null ? void 0 : _a2.toString()) || "",
+                                    onChange: (value) => {
+                                      if (!value) return;
+                                      const selectedItem = itemsData == null ? void 0 : itemsData.find(
+                                        (item) => item.id.toString() === value
+                                      );
+                                      if (selectedItem && entry.item_type_id) {
+                                        updateItemMutation.mutate({
+                                          entryId: entry.id,
+                                          itemId: selectedItem.id,
+                                          itemTypeId: entry.item_type_id
+                                        });
+                                      }
+                                    },
+                                    options: (() => {
+                                      const itemTypeId = entry.item_type_id;
+                                      if (!itemTypeId) return [];
+                                      const itemTypeIdNum = typeof itemTypeId === "string" ? parseInt(itemTypeId, 10) : Number(itemTypeId);
+                                      if (!itemTypeIdNum || isNaN(itemTypeIdNum)) return [];
+                                      return itemsData.filter((item) => {
+                                        const typeId = item.type_id;
+                                        if (!typeId) return false;
+                                        const typeIdNum = typeof typeId === "string" ? parseInt(typeId, 10) : Number(typeId);
+                                        return typeIdNum === itemTypeIdNum;
+                                      }).map((item) => ({
+                                        value: item.id.toString(),
+                                        label: item.name
+                                      }));
+                                    })(),
+                                    placeholder: __("Select item...", "Select item..."),
+                                    searchPlaceholder: __("Search items...", "Search items..."),
+                                    className: "min-w-[140px]",
+                                    disabled: updateItemMutation.isPending
+                                  }
+                                ),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  Button,
+                                  {
+                                    variant: "ghost",
+                                    size: "icon",
+                                    onClick: () => handleEdit(entry),
+                                    className: "h-8 w-8",
+                                    title: __("Edit Activity", "Edit Activity"),
+                                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" })
+                                  }
+                                ) }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_delete_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                  Button,
+                                  {
+                                    variant: "ghost",
+                                    size: "icon",
+                                    onClick: () => handleDelete(entry),
+                                    className: "h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300",
+                                    title: __("Delete", "Delete"),
+                                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" })
+                                  }
+                                ) })
+                              ] })
+                            ] }) })
+                          ]
+                        },
+                        entry.id
+                      );
+                    }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      Button,
+                      {
+                        variant: "outline",
+                        className: "w-full flex items-center justify-center gap-2 border-2 text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/70 shadow-sm transition-colors",
+                        style: { borderColor: "#3b82f6" },
+                        onClick: () => {
+                          var _a2;
+                          const tripId = dayGroup.trip_id;
+                          const day = dayGroup.day;
+                          window.location.href = `${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=activity`;
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                          __("Add Activity", "Add Activity")
+                        ]
+                      }
+                    ) })
+                  ] })
+                ] })
+              ]
+            },
+            key
+          );
+        })
+      ] })
     ] }) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
@@ -26371,27 +27206,11 @@ const Itinerary = () => {
         isOpen: deleteConfirm.isOpen,
         onClose: handleDeleteCancel,
         onConfirm: handleDeleteConfirm,
-        title: ((_a = deleteConfirm.entry) == null ? void 0 : _a._isDayDeletion) ? __("Delete Day", "Delete Day") : __("Delete Itinerary Entry", "Delete Itinerary Entry"),
-        message: ((_b = deleteConfirm.entry) == null ? void 0 : _b._isDayDeletion) ? __("Are you sure you want to delete this day and all its activities? This action cannot be undone.", "Are you sure you want to delete this day and all its activities? This action cannot be undone.") : __("Are you sure you want to delete this itinerary entry? This action cannot be undone.", "Are you sure you want to delete this itinerary entry? This action cannot be undone."),
+        title: ((_c = deleteConfirm.entry) == null ? void 0 : _c._isDayDeletion) ? __("Delete Day", "Delete Day") : __("Delete Itinerary Entry", "Delete Itinerary Entry"),
+        message: ((_d = deleteConfirm.entry) == null ? void 0 : _d._isDayDeletion) ? __("Are you sure you want to delete this day and all its activities? This action cannot be undone.", "Are you sure you want to delete this day and all its activities? This action cannot be undone.") : __("Are you sure you want to delete this itinerary entry? This action cannot be undone.", "Are you sure you want to delete this itinerary entry? This action cannot be undone."),
         confirmText: __("Delete", "Delete"),
         variant: "danger",
         isLoading: deleteMutation.isPending
-      }
-    ),
-    /* @__PURE__ */ jsxRuntimeExports.jsx(
-      ConfirmationDialog,
-      {
-        isOpen: bulkDeleteConfirm.isOpen,
-        onClose: handleBulkDeleteCancel,
-        onConfirm: handleBulkDeleteConfirm,
-        title: __("Bulk Delete", "Bulk Delete"),
-        message: __(
-          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`,
-          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`
-        ),
-        confirmText: __("Delete All", "Delete All"),
-        variant: "danger",
-        isLoading: bulkDeleteMutation.isPending
       }
     )
   ] });
@@ -28050,6 +28869,7 @@ const ItineraryForm = () => {
   ] });
 };
 const Discounts = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [typeFilter, setTypeFilter] = reactExports.useState("all");
@@ -28085,6 +28905,7 @@ const Discounts = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -28185,19 +29006,16 @@ const Discounts = () => {
     return `$${discount.amount}`;
   };
   const handleEdit = (discount) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
   };
   const handleDelete = (discount) => {
     setDeleteConfirm({ isOpen: true, discount });
   };
   const handleDuplicate = (discount) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts&action=create&duplicate=${discount.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&duplicate=${discount.id}`;
   };
   const handleCreateDiscount = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -28382,7 +29200,14 @@ const Discounts = () => {
       render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-4 h-4 text-gray-400" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white font-mono text-sm", children: discount.code }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`,
+              className: "font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2",
+              children: discount.code
+            }
+          ),
           discount.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
             __("Group", "Group")
@@ -34662,6 +35487,7 @@ const ViewPayment = () => {
   ] });
 };
 const TravelerCategories = () => {
+  var _a;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [sortBy, setSortBy] = reactExports.useState("label");
@@ -34674,6 +35500,7 @@ const TravelerCategories = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const baseAdminUrl = ((_a = window.yatraAdmin) == null ? void 0 : _a.adminUrl) || "";
   const queryParams = reactExports.useMemo(() => {
     const params = {
       page,
@@ -34689,6 +35516,18 @@ const TravelerCategories = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["traveler-categories-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/traveler-categories/stats");
+        return response;
+      } catch (error2) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can("yatra_view_trips")
+  });
   const { data, isLoading, error } = useQuery({
     queryKey: ["traveler-categories", queryParams],
     queryFn: async () => {
@@ -34708,6 +35547,7 @@ const TravelerCategories = () => {
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["traveler-categories"] });
+      queryClient2.invalidateQueries({ queryKey: ["traveler-categories-stats"] });
       showToast(__("Traveler category deleted successfully", "Traveler category deleted successfully"), "success");
       setDeleteConfirm({ isOpen: false, category: null });
     },
@@ -34794,8 +35634,7 @@ const TravelerCategories = () => {
     return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(IconSelector, { iconName: icon.value, className: "w-5 h-5 text-gray-600 dark:text-gray-400" }) });
   };
   const handleEdit = (category) => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`;
   };
   const handleDelete = (category) => {
     setDeleteConfirm({ isOpen: true, category });
@@ -34806,8 +35645,7 @@ const TravelerCategories = () => {
     }
   };
   const handleCreateCategory = () => {
-    var _a;
-    window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=create`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -34849,20 +35687,21 @@ const TravelerCategories = () => {
     }));
   };
   const statusCounts = reactExports.useMemo(() => {
-    const counts = {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return {
       all: 0,
       publish: 0,
       draft: 0,
       trash: 0
     };
-    categories.forEach((cat) => {
-      counts.all++;
-      if (cat.status === "publish") counts.publish++;
-      else if (cat.status === "draft") counts.draft++;
-      else if (cat.status === "trash") counts.trash++;
-    });
-    return counts;
-  }, [categories]);
+  }, [statsData]);
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }) => {
       if (action === "delete") {
@@ -34894,6 +35733,7 @@ const TravelerCategories = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient2.invalidateQueries({ queryKey: ["traveler-categories"] });
+      queryClient2.invalidateQueries({ queryKey: ["traveler-categories-stats"] });
       const msgMap = {
         delete: __("Selected traveler categories deleted successfully", "Selected traveler categories deleted successfully"),
         trash: __("Selected traveler categories moved to trash", "Selected traveler categories moved to trash"),
@@ -34937,7 +35777,14 @@ const TravelerCategories = () => {
       render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
         renderIcon(category.icon),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: category.label }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "a",
+            {
+              href: `${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`,
+              className: "text-blue-600 dark:text-blue-400 hover:underline underline-offset-2",
+              children: category.label
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: category.slug })
         ] })
       ] })
@@ -36352,13 +37199,12 @@ const Availability = () => {
     }
   });
   const { data: availabilityData, isLoading } = useQuery({
-    queryKey: ["availability", selectedTripId, statusFilter, monthFilter, page, searchTerm],
+    queryKey: ["availability", selectedTripId, monthFilter, page, searchTerm],
     queryFn: async () => {
       if (!selectedTripId) return { dates: [], total: 0 };
       const response = await apiClient.get("/availability", {
         params: {
           trip_id: selectedTripId,
-          status: statusFilter !== "all" ? statusFilter : void 0,
           month: monthFilter !== "all" ? monthFilter : void 0,
           search: searchTerm || void 0,
           page,

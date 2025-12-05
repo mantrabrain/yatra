@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Package, MapPin, Calendar, Users, Tag, Mountain, Archive } from 'lucide-react';
+import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, MapPin, Calendar, Users, Tag, Mountain, Archive, ExternalLink } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -15,7 +15,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import { Edit, Trash2 } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
@@ -81,6 +81,28 @@ const Trips: React.FC = () => {
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
 
+  // Fetch global status counts (stable across filters)
+  const { data: statsData } = useQuery({
+    queryKey: ['trips-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/trips/stats');
+        return response;
+      } catch (error) {
+        return {
+          all: 0,
+          published: 0,
+          draft: 0,
+          review: 0,
+          approved: 0,
+          archived: 0,
+          trash: 0,
+        };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
   // Build query params
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
@@ -118,6 +140,7 @@ const Trips: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setIsDeleteDialogOpen(false);
       setTripToDelete(null);
       showToast(__('Trip deleted permanently.', 'Trip deleted permanently.'), 'success');
@@ -143,6 +166,7 @@ const Trips: React.FC = () => {
     onSuccess: (data) => {
       showToast(__('Trip created as draft. Redirecting to builder...', 'Trip created as draft. Redirecting to builder...'), 'success');
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setIsCreateModalOpen(false);
       setNewTripTitle('');
       setNewTripSlug('');
@@ -243,7 +267,7 @@ const Trips: React.FC = () => {
   const formatPrice = (trip: Trip) => {
     // Use sale_price if available, otherwise discounted_price, otherwise original_price
     const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
-    const currencyCode = (trip as any).currency || 'USD';
+    const currencyCode = defaultCurrency;
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = currencyData?.decimalDigits ?? 2;
@@ -348,6 +372,12 @@ const Trips: React.FC = () => {
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // Global/default currency (fallbacks: window.yatraAdmin, settings, then USD)
+  const defaultCurrency =
+    (window as any)?.yatraAdmin?.currency ||
+    (settings as any)?.default_currency ||
+    'USD';
+
   const handleView = (trip: Trip) => {
     const siteUrl = window.yatraAdmin?.siteUrl || '';
     const tripBase = settings?.trip_base || 'trip';
@@ -426,6 +456,9 @@ const Trips: React.FC = () => {
       title: trip.title,
       slug: trip.slug,
     });
+    // After a status change, refresh both list and stats
+    queryClient.invalidateQueries({ queryKey: ['trips'] });
+    queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
   };
 
   // Column visibility state with localStorage persistence
@@ -496,10 +529,22 @@ const Trips: React.FC = () => {
     }
   };
 
-  // Status counts for filter tabs
+  // Status counts for filter tabs (stable, from stats API)
   const statusCounts = useMemo(() => {
-    const counts: Record<string, number> = {
-      all: total,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        published: statsData.published ?? 0,
+        draft: statsData.draft ?? 0,
+        review: statsData.review ?? 0,
+        approved: statsData.approved ?? 0,
+        archived: statsData.archived ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+
+    return {
+      all: 0,
       published: 0,
       draft: 0,
       review: 0,
@@ -507,13 +552,7 @@ const Trips: React.FC = () => {
       archived: 0,
       trash: 0,
     };
-    trips.forEach((trip: Trip) => {
-      if (counts[trip.status] !== undefined) {
-        counts[trip.status] += 1;
-      }
-    });
-    return counts;
-  }, [trips, total]);
+  }, [statsData]);
 
   const statusOptions = [
     { key: 'all', label: __('All', 'All'), count: statusCounts.all },
@@ -574,6 +613,7 @@ const Trips: React.FC = () => {
         showToast(__('Trip status updated successfully', 'Trip status updated successfully'), 'success');
       }
       queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setSelectedIds([]);
       setBulkAction('');
     } catch (error) {
@@ -591,58 +631,84 @@ const Trips: React.FC = () => {
       sortable: true,
       visible: visibleColumns.trip,
       width: 'w-[300px]',
-      render: (trip: Trip) => (
-        <div className="flex items-center gap-2">
-          <div>
-            <div className="font-medium text-gray-900 dark:text-white">
-              {trip.title}
+      render: (trip: Trip) => {
+        const editUrl = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${trip.id}`;
+        return (
+          <div className="flex items-start gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1">
+                <a
+                  href={editUrl}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEdit(trip);
+                  }}
+                  className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-2 hover:underline truncate"
+                >
+                  {trip.title}
+                </a>
+                {can('yatra_view_trips') && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleView(trip);
+                    }}
+                    className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                    title={__('View trip in new tab', 'View trip in new tab')}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                {trip.slug}
+              </div>
+              {(() => {
+                const destinationLabel = summarizeDestinations(trip);
+                const durationLabel = trip.duration_days
+                  ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
+                  : null;
+                const travelerLabel = summarizeTravelers(trip);
+                const categoryLabel = summarizeCategories(trip);
+                const difficultyLabel = formatLabel(trip.difficulty_level);
+                const chips = [
+                  destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
+                  durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
+                  travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
+                  categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
+                  difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
+                ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
+                if (!chips.length) return null;
+                return (
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {chips.map(({ key, label, icon: Icon }) => (
+                      <span
+                        key={`${trip.id}-${key}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]"
+                      >
+                        <Icon className="w-3 h-3" />
+                        {label}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {trip.slug}
-            </div>
-            {(() => {
-              const destinationLabel = summarizeDestinations(trip);
-              const durationLabel = trip.duration_days
-                ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
-                : null;
-              const travelerLabel = summarizeTravelers(trip);
-              const categoryLabel = summarizeCategories(trip);
-              const difficultyLabel = formatLabel(trip.difficulty_level);
-              const chips = [
-                destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
-                durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
-                travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
-                categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
-                difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
-              ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
-              if (!chips.length) return null;
-              return (
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {chips.map(({ key, label, icon: Icon }) => (
-                    <span
-                      key={`${trip.id}-${key}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-2 py-0.5 text-[11px]"
-                    >
-                      <Icon className="w-3 h-3" />
-                      {label}
-                    </span>
-                  ))}
-                </div>
-              );
-            })()}
+            {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
+              <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
+                {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
+                 trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
+                 trip.featured_priority === 'new' ? __('New', 'New') :
+                 trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
+                 trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
+                 trip.featured_priority}
+              </Badge>
+            )}
           </div>
-          {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
-            <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-              {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
-               trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
-               trip.featured_priority === 'new' ? __('New', 'New') :
-               trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
-               trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
-               trip.featured_priority}
-            </Badge>
-          )}
-        </div>
-      ),
+        );
+      },
     });
 
     cols.push({
@@ -744,8 +810,8 @@ const Trips: React.FC = () => {
     if (can('yatra_view_trips')) {
       actions.push({
         key: 'view',
-        label: __('View', 'View'),
-        icon: <Eye className="w-4 h-4" />,
+        label: __('View (frontend)', 'View (frontend)'),
+        icon: <ExternalLink className="w-4 h-4" />,
         onClick: (trip: Trip) => handleView(trip),
       });
     }

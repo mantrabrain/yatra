@@ -73,6 +73,8 @@ interface Booking {
 const ViewCustomer: React.FC = () => {
   const { can, isPro } = usePermissions();
 
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
+
   // Get customer id from URL
   const customerId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -248,15 +250,15 @@ const ViewCustomer: React.FC = () => {
   };
 
   const handleBack = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers`;
   };
 
   const handleEdit = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=edit&id=${customerId}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=customers&action=edit&id=${customerId}`;
   };
 
   const handleViewBooking = (bookingId: number) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
   };
 
   // Skeleton loader
@@ -405,7 +407,7 @@ const ViewCustomer: React.FC = () => {
                   </div>
                   <div className="text-lg font-semibold text-gray-900 dark:text-white">
                     <a
-                      href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=customers&action=view&id=${customer.id}`}
+                      href={`${baseAdminUrl}?page=yatra&subpage=customers&action=view&id=${customer.id}`}
                       className="hover:underline text-primary-600 dark:text-primary-400"
                     >
                       {customer.name || `${customer.first_name} ${customer.last_name}`}

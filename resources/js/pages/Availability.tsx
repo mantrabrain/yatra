@@ -202,14 +202,13 @@ const Availability: React.FC = () => {
 
   // Fetch availability dates for selected trip
   const { data: availabilityData, isLoading } = useQuery({
-    queryKey: ['availability', selectedTripId, statusFilter, monthFilter, page, searchTerm],
+    queryKey: ['availability', selectedTripId, monthFilter, page, searchTerm],
     queryFn: async () => {
       if (!selectedTripId) return { dates: [], total: 0 };
       
       const response = await apiClient.get('/availability', { 
         params: { 
           trip_id: selectedTripId,
-          status: statusFilter !== 'all' ? statusFilter : undefined,
           month: monthFilter !== 'all' ? monthFilter : undefined,
           search: searchTerm || undefined,
           page,

@@ -52,6 +52,8 @@ const TravelerCategories: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
 
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
+
   // Build query params
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
@@ -71,6 +73,20 @@ const TravelerCategories: React.FC = () => {
 
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+
+  // Fetch stable status counts from API (independent of filters)
+  const { data: statsData } = useQuery({
+    queryKey: ['traveler-categories-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/traveler-categories/stats');
+        return response;
+      } catch (error: any) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
 
   // Fetch categories from API
   const { data, isLoading, error } = useQuery({
@@ -94,6 +110,7 @@ const TravelerCategories: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['traveler-categories-stats'] });
       showToast(__('Traveler category deleted successfully', 'Traveler category deleted successfully'), 'success');
       setDeleteConfirm({ isOpen: false, category: null });
     },
@@ -202,7 +219,7 @@ const TravelerCategories: React.FC = () => {
   };
 
   const handleEdit = (category: TravelerCategory) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`;
   };
 
   const handleDelete = (category: TravelerCategory) => {
@@ -216,7 +233,7 @@ const TravelerCategories: React.FC = () => {
   };
 
   const handleCreateCategory = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=create`;
   };
 
   const handleResetFilters = () => {
@@ -267,24 +284,24 @@ const TravelerCategories: React.FC = () => {
     }));
   };
 
-  // Status counts for BulkActionToolbar
+  // Status counts from stats API (stable across filters)
   const statusCounts = useMemo(() => {
-    const counts = {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+
+    return {
       all: 0,
       publish: 0,
       draft: 0,
       trash: 0,
     };
-
-    categories.forEach((cat: TravelerCategory) => {
-      counts.all++;
-      if (cat.status === 'publish') counts.publish++;
-      else if (cat.status === 'draft') counts.draft++;
-      else if (cat.status === 'trash') counts.trash++;
-    });
-
-    return counts;
-  }, [categories]);
+  }, [statsData]);
 
   // Bulk mutation for status changes and deletes
   const bulkMutation = useMutation({
@@ -320,6 +337,7 @@ const TravelerCategories: React.FC = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
+      queryClient.invalidateQueries({ queryKey: ['traveler-categories-stats'] });
       const msgMap: Record<string, string> = {
         delete: __('Selected traveler categories deleted successfully', 'Selected traveler categories deleted successfully'),
         trash: __('Selected traveler categories moved to trash', 'Selected traveler categories moved to trash'),
@@ -370,7 +388,12 @@ const TravelerCategories: React.FC = () => {
           {renderIcon(category.icon)}
           <div>
             <div className="font-medium text-gray-900 dark:text-white">
-              {category.label}
+              <a
+                href={`${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`}
+                className="text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
+              >
+                {category.label}
+              </a>
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {category.slug}

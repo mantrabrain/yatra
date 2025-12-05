@@ -203,6 +203,20 @@ const DifficultyLevels: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
+  // Fetch stable status counts from API (independent of filters)
+  const { data: statsData } = useQuery({
+    queryKey: ['difficulty-levels-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/difficulty-levels/stats');
+        return response;
+      } catch (error: any) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['difficulty-levels', queryParams],
     queryFn: async () => {
@@ -221,6 +235,7 @@ const DifficultyLevels: React.FC = () => {
     mutationFn: async (id: number) => apiClient.delete(`/difficulty-levels/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
+      queryClient.invalidateQueries({ queryKey: ['difficulty-levels-stats'] });
       showToast(__('Difficulty level deleted successfully', 'Difficulty level deleted successfully'), 'success');
     },
     onError: (error: any) => {
@@ -244,6 +259,7 @@ const DifficultyLevels: React.FC = () => {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
+      queryClient.invalidateQueries({ queryKey: ['difficulty-levels-stats'] });
       const msgMap: Record<string, string> = {
         trash: __('Difficulty level moved to trash', 'Difficulty level moved to trash'),
         draft: __('Difficulty level marked as draft', 'Difficulty level marked as draft'),
@@ -267,22 +283,24 @@ const DifficultyLevels: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 20);
 
+  // Status counts from stats API (stable across filters)
   const statusCounts = useMemo(() => {
-    const counts = {
-      all: levels.length,
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+
+    return {
+      all: 0,
       publish: 0,
       draft: 0,
       trash: 0,
     };
-
-    levels.forEach((level: DifficultyLevel) => {
-      if (level.status === 'publish') counts.publish += 1;
-      else if (level.status === 'draft') counts.draft += 1;
-      else if (level.status === 'trash') counts.trash += 1;
-    });
-
-    return counts;
-  }, [levels]);
+  }, [statsData]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -451,6 +469,7 @@ const DifficultyLevels: React.FC = () => {
         }
 
         queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
+        queryClient.invalidateQueries({ queryKey: ['difficulty-levels-stats'] });
         setSelectedIds([]);
         setBulkAction('');
       } catch (error: any) {

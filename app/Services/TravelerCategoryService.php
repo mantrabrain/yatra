@@ -311,5 +311,29 @@ class TravelerCategoryService extends BaseService
 
         return $this->repository->count($args);
     }
+
+    /**
+     * Get status counts for admin list views
+     *
+     * Provides stable counts for All / Published / Draft / Trash that
+     * do not change when filters (status/search) are applied in the UI.
+     */
+    public function getStatusCounts(): array
+    {
+        // All statuses combined (no status filter)
+        $all = $this->count([]);
+
+        // Individual statuses
+        $publish = $this->count(['status' => 'publish']);
+        $draft   = $this->count(['status' => 'draft']);
+        $trash   = $this->count(['status' => 'trash']);
+
+        return [
+            'all'     => (int) $all,
+            'publish' => (int) $publish,
+            'draft'   => (int) $draft,
+            'trash'   => (int) $trash,
+        ];
+    }
 }
 

@@ -20,6 +20,7 @@ import {
   AlertCircle,
   Pencil
 } from 'lucide-react';
+import { getCurrencySymbol } from '../data/currencies';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api';
@@ -32,6 +33,7 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Alert } from '../components/ui/alert';
 import { IconSelector } from '../components/ui/icon-selector';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
 
 interface ItineraryEntry {
   id: number;
@@ -51,6 +53,10 @@ interface ItineraryEntry {
   duration?: string;
   start_time: string;
   end_time: string;
+  cost?: string;
+  cost_per_person?: boolean;
+  included_items?: string[] | string | null;
+  excluded_items?: string[] | string | null;
   status: string;
   created_at: string;
 }
@@ -61,17 +67,28 @@ interface DayGroup {
   day: number;
   day_title?: string;
   day_id?: number;
+  day_status?: string;
   entries: ItineraryEntry[];
 }
 
 const Itinerary: React.FC = () => {
+  // Global currency from settings (same as other admin pages)
+  const globalCurrency = (window as any).yatraAdmin?.currency || 'USD';
+  const currencySymbol = getCurrencySymbol(globalCurrency) || '';
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
   // Get trip_id and day from URL params
   const urlParams = new URLSearchParams(window.location.search);
   const tripIdParam = urlParams.get('trip_id');
   const dayParam = urlParams.get('day');
-  
-  const [tripFilter, setTripFilter] = useState(tripIdParam || '');
+
+  // Restore last selected trip from localStorage if no URL param
+  const storedTripId = !tripIdParam
+    ? window.localStorage.getItem('yatra_itinerary_selected_trip') || ''
+    : '';
+
+  const [tripFilter, setTripFilter] = useState(tripIdParam || storedTripId);
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [selectedEmptyDays, setSelectedEmptyDays] = useState<Set<string>>(new Set());
   const [selectedDay, setSelectedDay] = useState<{ tripId: number; day: number } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; entry: ItineraryEntry | null }>({
     isOpen: false,
@@ -79,10 +96,9 @@ const Itinerary: React.FC = () => {
   });
   const [dayMenuOpen, setDayMenuOpen] = useState<{ tripId: number; day: number } | null>(null);
   const [selectedEntries, setSelectedEntries] = useState<Set<number>>(new Set());
-  const [bulkDeleteConfirm, setBulkDeleteConfirm] = useState<{ isOpen: boolean; entryIds: number[] }>({
-    isOpen: false,
-    entryIds: [],
-  });
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all');
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
@@ -93,6 +109,13 @@ const Itinerary: React.FC = () => {
       setTripFilter(tripIdParam);
     }
   }, [tripIdParam]);
+
+  // Persist selected trip to localStorage so it is restored on next visit
+  useEffect(() => {
+    if (tripFilter) {
+      window.localStorage.setItem('yatra_itinerary_selected_trip', tripFilter);
+    }
+  }, [tripFilter]);
 
   // State for item types and items (populated from trips API meta)
   const [itemTypesData, setItemTypesData] = useState<Array<{ id: number; name: string; icon: string; color: string }>>([]);
@@ -202,7 +225,8 @@ const Itinerary: React.FC = () => {
       try {
         const trips = Array.isArray(tripsData) ? tripsData : [];
         const allEntries: ItineraryEntry[] = [];
-        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number }>();
+        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number; day_status?: string }>();
+        const dayStatuses = new Map<string, string>();
 
         // Fetch itinerary data for the selected trip
         if (!tripFilter) {
@@ -226,6 +250,7 @@ const Itinerary: React.FC = () => {
               const dayNumber = day.day_number || day.day || 1;
               const dayTitle = day.title || day.day_title || '';
               const entries = day.entries || [];
+              const dayKey = `${trip.id}-${dayNumber}`;
 
               // Process each entry (only activities, not day entries)
               for (const entry of entries) {
@@ -238,13 +263,17 @@ const Itinerary: React.FC = () => {
                 // Day entries should not be displayed as activities
                 if ((entry.item_type_id === null || entry.item_type_id === undefined || entry.item_type_id === 0) &&
                     (entry.item_id === null || entry.item_id === undefined || entry.item_id === 0)) {
+                  // Capture day-level status from the day entry so day badges respond to edits
+                  if (entry.status) {
+                    dayStatuses.set(dayKey, String(entry.status));
+                  }
                   continue;
                 }
 
                 const mapped = mapItemIds(entry.item_type_id, entry.item_id);
                 const times = parseTime(entry.time);
 
-                const processedEntry = {
+                const processedEntry: ItineraryEntry = {
                   id: entry.id || 0,
                   trip_id: trip.id,
                   trip_title: trip.title || trip.name || '',
@@ -262,6 +291,10 @@ const Itinerary: React.FC = () => {
                   duration: entry.duration || '',
                   start_time: times.start_time,
                   end_time: times.end_time,
+                  cost: typeof entry.cost === 'number' || typeof entry.cost === 'string' ? String(entry.cost) : undefined,
+                  cost_per_person: entry.cost_per_person !== undefined ? !!entry.cost_per_person : undefined,
+                  included_items: entry.included_items ?? [],
+                  excluded_items: entry.excluded_items ?? [],
                   status: entry.status || 'active',
                   created_at: entry.created_at || entry.createdAt || '',
                 };
@@ -285,6 +318,7 @@ const Itinerary: React.FC = () => {
                   day: dayNumber,
                   day_title: dayTitle,
                   day_id: dayId,
+                  day_status: dayStatuses.get(dayKey),
                 });
               }
             }
@@ -299,7 +333,7 @@ const Itinerary: React.FC = () => {
       const seen = new Set<string>();
 
         // Add all days first (from allDays map)
-        allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number }, key: string) => {
+        allDays.forEach((dayInfo: { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number; day_status?: string }, key: string) => {
           if (!seen.has(key)) {
             seen.add(key);
             grouped.push({
@@ -308,6 +342,7 @@ const Itinerary: React.FC = () => {
               day: dayInfo.day,
               day_title: dayInfo.day_title,
               day_id: dayInfo.day_id,
+              day_status: dayInfo.day_status,
               entries: allEntries.filter(e => e.trip_id === dayInfo.trip_id && e.day === dayInfo.day),
             });
           }
@@ -348,7 +383,7 @@ const Itinerary: React.FC = () => {
     refetchOnReconnect: true, // Refetch when network reconnects
   });
 
-  // Auto-expand day from URL or first day when data loads
+  // Auto-expand day from URL or first day when data loads (only when data/URL change)
   useEffect(() => {
     if (data && data.length > 0 && expandedDays.size === 0) {
       // If day parameter is in URL, expand that specific day
@@ -379,7 +414,7 @@ const Itinerary: React.FC = () => {
         setExpandedDays(new Set([`${firstDay.trip_id}-${firstDay.day}`]));
       }
     }
-  }, [data, expandedDays.size, dayParam, tripIdParam]);
+  }, [data, dayParam, tripIdParam]);
 
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
@@ -404,7 +439,6 @@ const Itinerary: React.FC = () => {
         showToast('Failed to delete items. Please try again.', 'error');
       }
       
-      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
       setSelectedEntries(new Set());
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
       queryClient.invalidateQueries({ queryKey: ['trips'] });
@@ -413,7 +447,6 @@ const Itinerary: React.FC = () => {
     },
     onError: (error: any) => {
       showToast(error?.message || 'Failed to delete items. Please try again.', 'error');
-      setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
     },
   });
 
@@ -692,7 +725,12 @@ const Itinerary: React.FC = () => {
   };
 
   const handleSelectAllDays = () => {
-    const allEntryIds = dayGroups.flatMap(dg => dg.entries.map(e => e.id));
+    // Only operate on entries that are currently visible under the active status tab
+    const allEntryIds = filteredDayGroups.flatMap((dg) => dg.entries.map((e) => e.id));
+    const emptyDayKeys = filteredDayGroups
+      .filter((dg) => dg.entries.length === 0)
+      .map((dg) => `${dg.trip_id}-${dg.day}`);
+
     setSelectedEntries(prev => {
       const newSet = new Set(prev);
       const allSelected = allEntryIds.length > 0 && allEntryIds.every(id => newSet.has(id));
@@ -703,21 +741,128 @@ const Itinerary: React.FC = () => {
       }
       return newSet;
     });
+
+    // Keep empty-day selection in sync with global Select All
+    setSelectedEmptyDays(prev => {
+      const allSelected =
+        emptyDayKeys.length > 0 &&
+        emptyDayKeys.every((key) => prev.has(key));
+      const next = new Set(prev);
+      if (allSelected) {
+        emptyDayKeys.forEach((key) => next.delete(key));
+      } else {
+        emptyDayKeys.forEach((key) => next.add(key));
+      }
+      return next;
+    });
   };
 
-  const handleBulkDelete = () => {
-    const entryIds = Array.from(selectedEntries);
-    if (entryIds.length === 0) return;
-    
-    setBulkDeleteConfirm({ isOpen: true, entryIds });
-  };
+  const handleBulkApply = async () => {
+    const ids = Array.from(selectedEntries);
+    const emptyDayKeys = Array.from(selectedEmptyDays);
 
-  const handleBulkDeleteConfirm = () => {
-    bulkDeleteMutation.mutate(bulkDeleteConfirm.entryIds);
-  };
+    if (!bulkAction || (ids.length === 0 && emptyDayKeys.length === 0)) {
+      showToast(__('Please select entries or days and a bulk action first.', 'Please select entries or days and a bulk action first.'), 'error');
+      return;
+    }
 
-  const handleBulkDeleteCancel = () => {
-    setBulkDeleteConfirm({ isOpen: false, entryIds: [] });
+    // Resolve day_entry IDs for selected empty days
+    const resolveDayEntryIds = async (): Promise<number[]> => {
+      const dayEntryIds: number[] = [];
+
+      for (const key of emptyDayKeys) {
+        const [tripIdStr, dayStr] = key.split('-');
+        const tripIdNum = parseInt(tripIdStr, 10);
+        const dayNum = parseInt(dayStr, 10);
+
+        if (Number.isNaN(tripIdNum) || Number.isNaN(dayNum)) {
+          continue;
+        }
+
+        const dg = dayGroups.find(
+          (g) => g.trip_id === tripIdNum && g.day === dayNum
+        );
+
+        if (!dg || !dg.day_id) {
+          continue;
+        }
+
+        try {
+          const response = await apiClient.get(
+            `/itinerary/day-entry-by-day-id/${dg.day_id}`
+          );
+          const dayEntryId =
+            response?.data?.day_entry_id ||
+            response?.day_entry_id ||
+            response?.data?.id ||
+            response?.id ||
+            null;
+
+          if (dayEntryId) {
+            dayEntryIds.push(Number(dayEntryId));
+          }
+        } catch (error) {
+          // Ignore failures for individual days; bulk handler will still proceed for others
+          console.error('Failed to resolve day entry ID for day', key, error);
+        }
+      }
+
+      return dayEntryIds;
+    };
+
+    const dayEntryIds = await resolveDayEntryIds();
+    const allIdsForAction = [...ids, ...dayEntryIds];
+
+    if (allIdsForAction.length === 0) {
+      showToast(__('No valid entries or days found to apply this action.', 'No valid entries or days found to apply this action.'), 'error');
+      return;
+    }
+
+    // Delete permanently (uses dedicated bulk delete endpoint)
+    if (bulkAction === 'delete') {
+      bulkDeleteMutation.mutate(allIdsForAction);
+      return;
+    }
+
+    // Status changes are applied one-by-one using the REST API
+    const targetStatus = (() => {
+      if (bulkAction === 'publish') return 'published';
+      if (bulkAction === 'draft') return 'draft';
+      if (bulkAction === 'trash') return 'trash';
+      if (bulkAction === 'restore') return 'draft'; // restore from Trash -> Draft
+      return '';
+    })();
+
+    if (!targetStatus) {
+      return;
+    }
+
+    try {
+      await Promise.all(
+        allIdsForAction.map(async (id) => {
+          // Fetch current entry
+          const current = await apiClient.get(`/itinerary/${id}`);
+          const entryData = current?.data?.data || current?.data || current;
+
+          // Apply status change while preserving other fields
+          await apiClient.put(`/itinerary/${id}`, {
+            ...entryData,
+            status: targetStatus,
+          });
+        })
+      );
+
+      showToast(__('Bulk action applied successfully.', 'Bulk action applied successfully.'), 'success');
+      setSelectedEntries(new Set());
+      setSelectedEmptyDays(new Set());
+      setBulkAction('');
+      queryClient.invalidateQueries({ queryKey: ['itinerary'] });
+      queryClient.invalidateQueries({ queryKey: ['trips'] });
+      queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
+      refetch();
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to apply bulk action. Please try again.', 'Failed to apply bulk action. Please try again.'), 'error');
+    }
   };
 
   const toggleDay = (tripId: number, day: number) => {
@@ -741,6 +886,54 @@ const Itinerary: React.FC = () => {
     return { meals, activities, accommodations, total: entries.length };
   };
 
+  const getDayStatusBadge = (dayGroup: DayGroup) => {
+    const normalize = (value?: string | null) => (value || '').toLowerCase();
+
+    // Prefer explicit day_status from the day entry
+    const explicitStatus = normalize(dayGroup.day_status);
+
+    let label = '';
+    let className = '';
+
+    if (explicitStatus === 'publish' || explicitStatus === 'published') {
+      label = __('Published', 'Published');
+      className = 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
+    } else if (explicitStatus === 'draft') {
+      label = __('Draft', 'Draft');
+      className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+    } else if (explicitStatus === 'trash') {
+      label = __('Trash', 'Trash');
+      className = 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+    } else {
+      // Fallback: infer from activity entries when day_status is not set
+      const statuses = dayGroup.entries.map((e) => normalize(e.status));
+
+      const hasPublished = statuses.some((s) => s === 'publish' || s === 'published');
+      const hasDraft = statuses.some((s) => s === 'draft');
+      const hasTrash = statuses.some((s) => s === 'trash');
+
+      if (hasPublished) {
+        label = __('Published', 'Published');
+        className = 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
+      } else if (hasDraft) {
+        label = __('Draft', 'Draft');
+        className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+      } else if (hasTrash) {
+        label = __('Trash', 'Trash');
+        className = 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
+      } else {
+        label = __('No Status', 'No Status');
+        className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
+      }
+    }
+
+    return (
+      <Badge className={`ml-2 text-[11px] px-2 py-0.5 ${className}`}>
+        {label}
+      </Badge>
+    );
+  };
+
 
   const formatTime = (time: string) => {
     // Convert 24h to 12h format
@@ -752,6 +945,113 @@ const Itinerary: React.FC = () => {
   };
 
   const dayGroups: DayGroup[] = (data || []) as DayGroup[];
+
+  const matchesStatusValue = (statusValue: string | undefined | null, filter: string) => {
+    if (!filter || filter === 'all') {
+      return true;
+    }
+
+    const status = (statusValue || '').toLowerCase();
+
+    if (filter === 'publish' || filter === 'published') {
+      return status === 'publish' || status === 'published';
+    }
+
+    if (filter === 'draft') {
+      return status === 'draft';
+    }
+
+    if (filter === 'trash') {
+      return status === 'trash';
+    }
+
+    // Fallback: treat unknown filters as "match all"
+    return true;
+  };
+
+  const matchesStatusFilter = (entry: ItineraryEntry, filter: string) => {
+    return matchesStatusValue(entry.status, filter);
+  };
+
+  const matchesStatusFilterForDay = (dayGroup: DayGroup, filter: string) => {
+    if (!filter || filter === 'all') {
+      return true;
+    }
+
+    // Prefer explicit day_status when available
+    if (matchesStatusValue(dayGroup.day_status, filter)) {
+      return true;
+    }
+
+    // Fallback: infer from any of the day's entries
+    return dayGroup.entries.some((entry) => matchesStatusFilter(entry, filter));
+  };
+
+  const filteredDayGroups: DayGroup[] = useMemo(
+    () => {
+      const groupsWithFilteredEntries = dayGroups.map((dg) => ({
+        ...dg,
+        entries: dg.entries.filter((entry) => matchesStatusFilter(entry, statusFilter)),
+      }));
+
+      if (!statusFilter || statusFilter === 'all') {
+        return groupsWithFilteredEntries;
+      }
+
+      // For specific status tabs, only show days whose own status OR any entry matches the filter
+      return groupsWithFilteredEntries.filter((dg) => matchesStatusFilterForDay(dg, statusFilter));
+    },
+    [dayGroups, statusFilter]
+  );
+
+  const totalEntries = filteredDayGroups.reduce((acc, dg) => acc + dg.entries.length, 0);
+  const totalEmptyDays = filteredDayGroups.filter((dg) => dg.entries.length === 0).length;
+  const totalSelectableItems = totalEntries + totalEmptyDays;
+
+  // Precompute all entry IDs for header "Select All" checkbox (respecting current status filter)
+  const allEntryIds = filteredDayGroups.flatMap((dg) => dg.entries.map((e) => e.id));
+
+  const statusCounts = dayGroups.reduce(
+    (acc, dg) => {
+      if (matchesStatusFilterForDay(dg, 'publish')) {
+        acc.published += 1;
+      }
+      if (matchesStatusFilterForDay(dg, 'draft')) {
+        acc.draft += 1;
+      }
+      if (matchesStatusFilterForDay(dg, 'trash')) {
+        acc.trash += 1;
+      }
+
+      return acc;
+    },
+    { published: 0, draft: 0, trash: 0 }
+  );
+
+  const statusOptions = [
+    { key: 'all', label: __('All', 'All'), count: dayGroups.length },
+    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.published },
+    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+  ];
+
+  const bulkActionOptions = useMemo(() => {
+    // In Trash view: allow restore to Draft and permanent delete only
+    if (statusFilter === 'trash') {
+      return [
+        { value: 'restore', label: __('Restore to Draft', 'Restore to Draft') },
+        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      ];
+    }
+
+    // Other views: normal status changes + move to trash + delete
+    return [
+      { value: 'publish', label: __('Mark as Published', 'Mark as Published') },
+      { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
+      { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
+      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+    ];
+  }, [statusFilter]);
 
   // Close day menu when clicking outside
   useEffect(() => {
@@ -771,34 +1071,6 @@ const Itinerary: React.FC = () => {
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {__('Build your complete itinerary with activities, meals, and accommodations', 'Build your complete itinerary with activities, meals, and accommodations')}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {selectedEntries.size > 0 && (
-            <ConditionalRender capability="yatra_delete_trips">
-              <Button 
-                onClick={handleBulkDelete}
-                variant="destructive"
-                className="flex items-center gap-2"
-              >
-                <Trash2 className="w-4 h-4" />
-                {__('Delete Selected', 'Delete Selected')} ({selectedEntries.size})
-              </Button>
-            </ConditionalRender>
-          )}
-          {tripFilter && (() => {
-            const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
-            const isSingleDay = selectedTrip?.trip_type === 'single_day';
-            const buttonLabel = isSingleDay ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
-            
-            return (
-        <ConditionalRender capability="yatra_edit_trips">
-          <Button onClick={handleAddDay} className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
-            <Plus className="w-4 h-4" />
-                  {buttonLabel}
-          </Button>
-        </ConditionalRender>
-            );
-          })()}
         </div>
       </div>
 
@@ -883,30 +1155,75 @@ const Itinerary: React.FC = () => {
         </div>
       </div>
 
-      <ConditionalRender capability="yatra_view_trips">
-        {error ? (
-          <Alert variant="error" title={__('Error Loading Itinerary', 'Error Loading Itinerary')}>
-            {__('We couldn\'t load itinerary entries. Please refresh the page or try again later.', 'We couldn\'t load itinerary entries. Please refresh the page or try again later.')}
-          </Alert>
-        ) : isLoading || isLoadingTrips ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="overflow-hidden">
-                <CardContent className="p-0">
-                  <div className="flex items-center gap-4 p-4">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
-                      <div className="flex-1">
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
-            </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+      {/* Add Day / Add Entry button below trip selector */}
+      {tripFilter && (() => {
+        const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+        const isSingleDay = selectedTrip?.trip_type === 'single_day';
+        const buttonLabel = isSingleDay ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
+
+        return (
+          <div className="flex justify-end mt-4">
+            <ConditionalRender capability="yatra_edit_trips">
+              <Button
+                onClick={handleAddDay}
+                className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+              >
+                <Plus className="w-4 h-4" />
+                {buttonLabel}
+              </Button>
+            </ConditionalRender>
           </div>
-        ) : dayGroups.length === 0 ? (
+        );
+      })()}
+
+      <ConditionalRender capability="yatra_view_trips">
+        <>
+          <BulkActionToolbar
+            selectedIds={[
+              ...Array.from(selectedEntries),
+              ...Array.from(selectedEmptyDays),
+            ]}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => {
+              setSelectedEntries(new Set());
+              setSelectedEmptyDays(new Set());
+            }}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            statusOptions={statusOptions}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={[]}
+            onToggleColumn={() => {}}
+            bulkMutationPending={bulkDeleteMutation.isPending}
+            totalItems={totalSelectableItems}
+            bulkActionOptions={bulkActionOptions}
+          />
+          {error ? (
+            <Alert variant="error" title={__('Error Loading Itinerary', 'Error Loading Itinerary')}>
+              {__('We couldn\'t load itinerary entries. Please refresh the page or try again later.', 'We couldn\'t load itinerary entries. Please refresh the page or try again later.')}
+            </Alert>
+          ) : isLoading || isLoadingTrips ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <Card key={i} className="overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="flex items-center gap-4 p-4">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-16 h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                        <div className="flex-1">
+                          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse"></div>
+                          <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : dayGroups.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <div className="flex flex-col items-center gap-4">
@@ -945,40 +1262,56 @@ const Itinerary: React.FC = () => {
         ) : (
           <div className="space-y-3">
             {/* Bulk Select All Option */}
-            {dayGroups.length > 0 && (
+            {filteredDayGroups.length > 0 && (
               <ConditionalRender capability="yatra_delete_trips">
-                <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 mb-3">
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={dayGroups.length > 0 && dayGroups.every(dg => dg.entries.length > 0 && dg.entries.every(e => selectedEntries.has(e.id)))}
-                      onChange={handleSelectAllDays}
-                      className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                    />
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                      {__('Select All', 'Select All')}
-                    </label>
-                    {selectedEntries.size > 0 && (
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        ({selectedEntries.size} {__('selected', 'selected')})
-                      </span>
-                    )}
-                  </div>
-                  {selectedEntries.size > 0 && (
-                    <Button 
-                      onClick={handleBulkDelete}
-                      variant="destructive"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      {__('Delete Selected', 'Delete Selected')}
-                    </Button>
-                  )}
-                </div>
+                <Card className="overflow-visible">
+                  <CardContent className="p-0">
+                    <div className="flex items-center justify-between gap-4 rounded-t-lg">
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={allEntryIds.length > 0 && allEntryIds.every((id) => selectedEntries.has(id))}
+                          onChange={handleSelectAllDays}
+                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        />
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+                          {__('Select All', 'Select All')}
+                        </label>
+                        {selectedEntries.size > 0 && (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            ({selectedEntries.size} {__('selected', 'selected')})
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                        <button
+                          type="button"
+                          className="hover:text-gray-700 dark:hover:text-gray-200 underline-offset-2 hover:underline"
+                          onClick={() => {
+                            // Expand all days
+                            const allKeys = filteredDayGroups.map((dg) => `${dg.trip_id}-${dg.day}`);
+                            setExpandedDays(new Set(allKeys));
+                          }}
+                        >
+                          {__('Expand all', 'Expand all')}
+                        </button>
+                        <button
+                          type="button"
+                          className="hover:text-gray-700 dark:hover:text-gray-200 underline-offset-2 hover:underline"
+                          onClick={() => {
+                            // Collapse all days
+                            setExpandedDays(new Set());
+                          }}
+                        >
+                          {__('Collapse all', 'Collapse all')}
+                        </button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </ConditionalRender>
             )}
-            {dayGroups.map((dayGroup) => {
+            {filteredDayGroups.map((dayGroup) => {
               const key = `${dayGroup.trip_id}-${dayGroup.day}`;
               const isExpanded = expandedDays.has(key);
               const counts = getItemCounts(dayGroup.entries);
@@ -989,19 +1322,38 @@ const Itinerary: React.FC = () => {
               });
 
               return (
-              <Card key={key} className="overflow-visible" data-day-key={key}>
-                <CardContent className="p-0 overflow-visible">
+              <div
+                key={key}
+                data-day-key={key}
+                className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 mb-4 overflow-visible"
+              >
                   {/* Day Header */}
                   <div 
-                    className="flex items-center gap-4 p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    className="flex items-center gap-4 px-4 py-3 rounded-t-lg"
                   >
                     <ConditionalRender capability="yatra_delete_trips">
                       <input
                         type="checkbox"
-                        checked={dayGroup.entries.length > 0 && dayGroup.entries.every(e => selectedEntries.has(e.id))}
+                        checked={
+                          dayGroup.entries.length === 0
+                            ? selectedEmptyDays.has(key)
+                            : dayGroup.entries.every((e) => selectedEntries.has(e.id))
+                        }
                         onChange={(e) => {
                           e.stopPropagation();
-                          handleSelectAll(dayGroup);
+                          if (dayGroup.entries.length > 0) {
+                            handleSelectAll(dayGroup);
+                          } else {
+                            setSelectedEmptyDays((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(key)) {
+                                next.delete(key);
+                              } else {
+                                next.add(key);
+                              }
+                              return next;
+                            });
+                          }
                         }}
                         onClick={(e) => e.stopPropagation()}
                         className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
@@ -1017,11 +1369,12 @@ const Itinerary: React.FC = () => {
                           {__('Day', 'Day')} {dayGroup.day}
                         </div>
                         <div>
-                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                          <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
                             {dayGroup.day_title 
                               ? `${__('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
                               : `${__('Day', 'Day')} ${dayGroup.day}`
                             }
+                            {getDayStatusBadge(dayGroup)}
                           </h3>
                           <div className="flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400">
                             <span>{counts.total} {__('items', 'items')}</span>
@@ -1047,7 +1400,13 @@ const Itinerary: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 relative">
+                    <div
+                      className="flex items-center gap-2 relative cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleDay(dayGroup.trip_id, dayGroup.day);
+                      }}
+                    >
                       <ConditionalRender capability="yatra_edit_trips">
                         <div className="relative">
                       <Button
@@ -1103,13 +1462,14 @@ const Itinerary: React.FC = () => {
                   {isExpanded && (
                     <div className="border-t border-gray-200 dark:border-gray-700 overflow-visible">
                       {/* Quick Add Section */}
-                      <div className="p-4 bg-gray-50 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700">
-                        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-                          {__('QUICK ADD', 'QUICK ADD')}
-                        </div>
-                        <div className="flex flex-wrap gap-2">
-                          {quickAddOptions.length > 0 ? (
-                            quickAddOptions.map((option: any) => {
+                      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex flex-wrap items-center gap-3">
+                          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                            {__('QUICK ADD', 'QUICK ADD')}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {quickAddOptions.length > 0 ? (
+                              quickAddOptions.map((option: any) => {
                               // Determine if icon is an image
                               const isImageIcon = option.typeIconData && 
                                 typeof option.typeIconData === 'object' && 
@@ -1129,12 +1489,12 @@ const Itinerary: React.FC = () => {
                               };
                               
                               const colorClass = colorClasses[option.typeColor] || colorClasses.blue;
-                              
+
                               return (
-                          <Button
+                                <Button
                                   key={option.typeId}
-                            variant="outline"
-                            size="sm"
+                                  variant="outline"
+                                  size="sm"
                                   onClick={() => handleQuickAdd(option.typeId)}
                                   className={`flex items-center gap-2 ${colorClass}`}
                                   style={{
@@ -1154,23 +1514,24 @@ const Itinerary: React.FC = () => {
                                     />
                                   )}
                                   {option.typeName}
-                          </Button>
+                                </Button>
                               );
-                            })
-                          ) : (
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {__('No item types available', 'No item types available')}
-                            </div>
-                          )}
+                              })
+                            ) : (
+                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {__('No item types available', 'No item types available')}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {/* Itinerary Items */}
-                      <div className="p-4 space-y-3 overflow-visible">
+                      <div className="px-4 pb-3 pt-2 space-y-3 overflow-visible rounded-b-lg">
                         {sortedEntries.map((entry) => (
                           <div
                             key={entry.id}
-                            className="flex items-start gap-4 p-3 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-visible"
+                            className="flex items-center gap-4 p-3 bg-white dark:bg-gray-950 rounded-lg border border-gray-100/60 dark:border-gray-800/80 shadow-sm overflow-visible"
                           >
                             {/* Checkbox */}
                             <ConditionalRender capability="yatra_delete_trips">
@@ -1182,28 +1543,52 @@ const Itinerary: React.FC = () => {
                                   handleToggleSelect(entry.id);
                                 }}
                                 onClick={(e) => e.stopPropagation()}
-                                className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                                 title={__('Select this entry', 'Select this entry')}
                               />
                             </ConditionalRender>
                             {/* Time */}
                             <div className="flex flex-col items-center min-w-[80px]">
                               <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                {formatTime(entry.start_time)}
+                                {entry.end_time
+                                  ? `${formatTime(entry.start_time)} - ${formatTime(entry.end_time)}`
+                                  : formatTime(entry.start_time)}
                               </div>
-                              <div className="mt-1 w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                              <div className="mt-1 flex items-center gap-1">
+                                {entry.end_time ? (
+                                  <>
+                                    <div className="relative flex items-center justify-center">
+                                      <span className="absolute inline-flex h-5 w-5 rounded-full bg-blue-400/40 animate-ping" />
+                                      <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-600" />
+                                    </div>
+                                    <div className="w-16 border-t border-dashed border-gray-300 dark:border-gray-600" />
+                                    <div className="relative flex items-center justify-center">
+                                      <span className="absolute inline-flex h-5 w-5 rounded-full bg-red-400/40 animate-ping" />
+                                      <span className="relative inline-flex h-3 w-3 rounded-full bg-red-500" />
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div className="relative flex items-center justify-center">
+                                    <span className="absolute inline-flex h-5 w-5 rounded-full bg-blue-400/40 animate-ping" />
+                                    <span className="relative inline-flex h-3 w-3 rounded-full bg-blue-600" />
+                                  </div>
+                                )}
                               </div>
                             </div>
 
                             {/* Content */}
                             <div className="flex-1">
-                              <div className="flex items-start justify-between gap-3">
+                              <div className="flex items-center justify-between gap-3">
                                 <div className="flex-1">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <Badge 
-                                      className="text-xs font-medium px-2 py-0.5"
-                                      style={{
+                                    <a
+                                      href={entry.item_type_id ? `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${entry.item_type_id}` : '#'}
+                                      className="focus:outline-none text-blue-600 dark:text-blue-400"
+                                      onClick={(e) => { if (!entry.item_type_id) e.preventDefault(); }}
+                                    >
+                                      <Badge 
+                                        className="text-xs font-medium px-2 py-0.5 hover:underline underline-offset-2"
+                                        style={{
                                         backgroundColor: entry.item_color === 'blue' ? 'rgb(219, 234, 254)' : 
                                                        entry.item_color === 'green' ? 'rgb(220, 252, 231)' :
                                                        entry.item_color === 'orange' ? 'rgb(255, 237, 213)' :
@@ -1237,26 +1622,111 @@ const Itinerary: React.FC = () => {
                                         <span>{entry.item_type}</span>
                                       </div>
                                     </Badge>
+                                    </a>
                                   </div>
                                   <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                                    {entry.title}
+                                    <a
+                                      href={entry.item_id ? `${baseAdminUrl}?page=yatra&subpage=items&action=edit&id=${entry.item_id}` : '#'}
+                                      className="hover:underline underline-offset-2 focus:outline-none text-left text-blue-600 dark:text-blue-400"
+                                      onClick={(e) => { if (!entry.item_id) e.preventDefault(); }}
+                                    >
+                                      {entry.title}
+                                    </a>
                                   </div>
                                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                     {entry.description}
                                   </div>
-                                  <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                                    {entry.location && (
-                                      <div className="flex items-center gap-1">
-                                        <MapPin className="w-3.5 h-3.5" />
-                                        <span>{entry.location}</span>
-                                      </div>
-                                    )}
-                                    {entry.duration && (
-                                      <div className="flex items-center gap-1">
-                                        <Clock className="w-3.5 h-3.5" />
-                                        <span>{entry.duration}</span>
-                                      </div>
-                                    )}
+                                  <div className="flex flex-col gap-1 text-xs text-gray-500 dark:text-gray-400">
+                                    {/* Top row: location / duration / price */}
+                                    <div className="flex items-center flex-wrap gap-4">
+                                      {entry.location && (
+                                        <div className="flex items-center gap-1">
+                                          <MapPin className="w-3.5 h-3.5" />
+                                          <span>{entry.location}</span>
+                                        </div>
+                                      )}
+                                      {entry.duration && (
+                                        <div className="flex items-center gap-1">
+                                          <Clock className="w-3.5 h-3.5" />
+                                          <span>{entry.duration}</span>
+                                        </div>
+                                      )}
+                                      {entry.cost && (
+                                        <div className="flex items-center gap-1">
+                                          <span>{currencySymbol}</span>
+                                          <span>
+                                            {entry.cost}
+                                            {entry.cost_per_person ? ` / ${__('person', 'person')}` : ''}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Bottom row: Includes / Excludes inline text */}
+                                    <div>
+                                    {(() => {
+                                      // Normalize included/excluded items in case they come as JSON strings
+                                      let included: string[] = [];
+                                      let excluded: string[] = [];
+
+                                      if (Array.isArray(entry.included_items)) {
+                                        included = entry.included_items;
+                                      } else if (typeof entry.included_items === 'string' && entry.included_items.trim()) {
+                                        try {
+                                          const parsed = JSON.parse(entry.included_items as string);
+                                          if (Array.isArray(parsed)) included = parsed;
+                                        } catch {
+                                          // Fallback: split by comma
+                                          included = (entry.included_items as string)
+                                            .split(',')
+                                            .map((i: string) => i.trim())
+                                            .filter(Boolean);
+                                        }
+                                      }
+
+                                      if (Array.isArray(entry.excluded_items)) {
+                                        excluded = entry.excluded_items;
+                                      } else if (typeof entry.excluded_items === 'string' && entry.excluded_items.trim()) {
+                                        try {
+                                          const parsed = JSON.parse(entry.excluded_items as string);
+                                          if (Array.isArray(parsed)) excluded = parsed;
+                                        } catch {
+                                          excluded = (entry.excluded_items as string)
+                                            .split(',')
+                                            .map((i: string) => i.trim())
+                                            .filter(Boolean);
+                                        }
+                                      }
+
+                                      if (included.length === 0 && excluded.length === 0) {
+                                        return null;
+                                      }
+
+                                      return (
+                                        <div className="text-gray-500 dark:text-gray-400">
+                                          {included.length > 0 && (
+                                            <span>
+                                              <span className="font-medium text-green-600 dark:text-green-400">
+                                                {__('Includes', 'Includes')}:
+                                              </span>{' '}
+                                              <span>{included.join(', ')}</span>
+                                            </span>
+                                          )}
+                                          {included.length > 0 && excluded.length > 0 && (
+                                            <span>{'  ·  '}</span>
+                                          )}
+                                          {excluded.length > 0 && (
+                                            <span>
+                                              <span className="font-medium text-red-600 dark:text-red-400">
+                                                {__('Excludes', 'Excludes')}:
+                                              </span>{' '}
+                                              <span>{excluded.join(', ')}</span>
+                                            </span>
+                                          )}
+                                        </div>
+                                      );
+                                    })()}
+                                    </div>
                                   </div>
                                 </div>
 
@@ -1340,7 +1810,8 @@ const Itinerary: React.FC = () => {
                         <ConditionalRender capability="yatra_edit_trips">
                           <Button
                             variant="outline"
-                            className="w-full flex items-center justify-center gap-2 border-dashed"
+                            className="w-full flex items-center justify-center gap-2 border-2 text-blue-700 bg-blue-50 hover:bg-blue-100 dark:text-blue-200 dark:bg-blue-950/40 dark:hover:bg-blue-900/70 shadow-sm transition-colors"
+                            style={{ borderColor: '#3b82f6' }}
                             onClick={() => {
                               const tripId = dayGroup.trip_id;
                               const day = dayGroup.day;
@@ -1354,12 +1825,12 @@ const Itinerary: React.FC = () => {
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
+                </div>
               );
             })}
           </div>
         )}
+        </>
       </ConditionalRender>
 
       {/* Delete Confirmation Dialog */}
@@ -1382,20 +1853,6 @@ const Itinerary: React.FC = () => {
         isLoading={deleteMutation.isPending}
       />
 
-      {/* Bulk Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={bulkDeleteConfirm.isOpen}
-        onClose={handleBulkDeleteCancel}
-        onConfirm={handleBulkDeleteConfirm}
-        title={__('Bulk Delete', 'Bulk Delete')}
-        message={__(
-          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`,
-          `Are you sure you want to delete ${bulkDeleteConfirm.entryIds.length} selected item(s)? This will also delete all activities for any selected days. This action cannot be undone.`
-        )}
-        confirmText={__('Delete All', 'Delete All')}
-        variant="danger"
-        isLoading={bulkDeleteMutation.isPending}
-      />
     </div>
   );
 };

@@ -15,11 +15,13 @@ import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { IconSelector } from '../components/ui/icon-selector';
 import { Badge } from '../components/ui/badge';
+import { Table as SharedTable } from '../components/shared/Table';
+import { Pagination } from '../components/shared/Pagination';
+import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface ItemType {
@@ -45,13 +47,41 @@ const ItemTypes: React.FC = () => {
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [bulkMutationPending, setBulkMutationPending] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; itemType: ItemType | null }>({
     isOpen: false,
     itemType: null,
   });
+  const [statusActionConfirm, setStatusActionConfirm] = useState<{
+    isOpen: boolean;
+    itemType: ItemType | null;
+    action: 'publish' | 'draft' | 'trash' | 'restore' | null;
+  }>({
+    isOpen: false,
+    itemType: null,
+    action: null,
+  });
+
+  const updateItemTypeStatus = async (itemType: ItemType, status: 'draft' | 'publish' | 'trash') => {
+    await apiClient.put(`/item-types/${itemType.id}`, {
+      // Required for validation
+      name: itemType.name,
+      // Preserve current slug and other fields so a status change doesn't mutate core data
+      slug: itemType.slug,
+      description: itemType.description,
+      color: itemType.color,
+      status,
+      preserve_slug: true,
+    });
+  };
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+
+  const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
 
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
@@ -71,6 +101,20 @@ const ItemTypes: React.FC = () => {
 
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
+
+  // Fetch stable status counts from API (independent of filters)
+  const { data: statsData } = useQuery({
+    queryKey: ['item-types-stats'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/item-types/stats');
+        return response;
+      } catch (error: any) {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: can('yatra_view_trips'),
+  });
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['item-types', queryParams],
@@ -92,6 +136,7 @@ const ItemTypes: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['item-types'] });
+      queryClient.invalidateQueries({ queryKey: ['item-types-stats'] });
       showToast(__('Item type deleted successfully', 'Item type deleted successfully'), 'success');
       setDeleteConfirm({ isOpen: false, itemType: null });
     },
@@ -207,11 +252,11 @@ const ItemTypes: React.FC = () => {
   };
 
   const handleCreate = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=create`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=create`;
   };
 
   const handleEdit = (itemType: ItemType) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`;
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`;
   };
 
   const handleDelete = (itemType: ItemType) => {
@@ -252,6 +297,295 @@ const ItemTypes: React.FC = () => {
 
   const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc';
 
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>({
+    type: true,
+    description: true,
+    status: true,
+    items: true,
+    date: true,
+    author: true,
+  });
+
+  const toggleColumn = (columnKey: string) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [columnKey]: !prev[columnKey],
+    }));
+  };
+
+  const columnOptions = [
+    { key: 'type', label: __('Type', 'Type'), visible: visibleColumns.type },
+    { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+    { key: 'items', label: __('Items', 'Items'), visible: visibleColumns.items },
+    { key: 'date', label: __('Date', 'Date'), visible: visibleColumns.date },
+    { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
+  ];
+
+  const isAllSelected = itemTypes.length > 0 && selectedIds.length === itemTypes.length;
+
+  const handleSelectItem = (id: string | number, checked: boolean) => {
+    setSelectedIds(prev =>
+      checked ? [...prev, id] : prev.filter(existingId => existingId !== id)
+    );
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(itemTypes.map((itemType: ItemType) => itemType.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedIds([]);
+  };
+
+  // Status counts from stats API (stable across filters)
+  const statusCounts = useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0,
+      };
+    }
+
+    return {
+      all: 0,
+      publish: 0,
+      draft: 0,
+      trash: 0,
+    };
+  }, [statsData]);
+
+  const statusOptions = [
+    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+    { key: 'publish', label: __('Publish', 'Publish'), count: statusCounts.publish },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+  ];
+
+  const bulkActionOptions = useMemo(() => {
+    if (statusFilter === 'trash') {
+      return [
+        { value: 'restore', label: __('Restore to Draft', 'Restore to Draft') },
+        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      ];
+    }
+
+    return [
+      { value: 'publish', label: __('Mark as Published', 'Mark as Published') },
+      { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
+      { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
+      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+    ];
+  }, [statusFilter]);
+
+  const handleBulkApply = async () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      showToast(__('Please select item types and a bulk action first.', 'Please select item types and a bulk action first.'), 'error');
+      return;
+    }
+
+    try {
+      setBulkMutationPending(true);
+
+      const selectedItemTypes = itemTypes.filter((itemType: ItemType) => selectedIds.includes(itemType.id));
+
+      if (bulkAction === 'delete') {
+        await Promise.all(selectedIds.map(id => apiClient.delete(`/item-types/${id}`)));
+        showToast(__('Item types deleted successfully', 'Item types deleted successfully'), 'success');
+      } else if (bulkAction === 'publish') {
+        await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'publish')));
+        showToast(__('Item types marked as published', 'Item types marked as published'), 'success');
+      } else if (bulkAction === 'draft') {
+        const targetStatus: 'draft' = 'draft';
+        await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, targetStatus)));
+        showToast(
+          statusFilter === 'trash'
+            ? __('Item types restored to draft', 'Item types restored to draft')
+            : __('Item types marked as draft', 'Item types marked as draft'),
+          'success'
+        );
+      } else if (bulkAction === 'trash') {
+        await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'trash')));
+        showToast(__('Item types moved to trash', 'Item types moved to trash'), 'success');
+      } else if (bulkAction === 'restore') {
+        await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'draft')));
+        showToast(__('Item types restored to draft', 'Item types restored to draft'), 'success');
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ['item-types'] });
+      await queryClient.invalidateQueries({ queryKey: ['item-types-stats'] });
+      setSelectedIds([]);
+      setBulkAction('');
+    } catch (error) {
+      showToast(__('Bulk action failed', 'Bulk action failed'), 'error');
+    } finally {
+      setBulkMutationPending(false);
+    }
+  };
+
+  const columns = [
+    {
+      key: 'type',
+      label: __('Type', 'Type'),
+      sortable: true,
+      width: 'w-[200px]',
+      visible: visibleColumns.type,
+      render: (itemType: ItemType) => (
+        <div className="flex items-center gap-3">
+          {renderIcon(itemType.icon)}
+          <div>
+            <div className="font-medium text-gray-900 dark:text-white">
+              <a
+                href={`${baseAdminUrl}?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${itemType.id}`}
+                className="hover:underline underline-offset-2 text-blue-600 dark:text-blue-400"
+              >
+                {itemType.name}
+              </a>
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {itemType.slug}
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'description',
+      label: __('Description', 'Description'),
+      sortable: false,
+      width: 'w-[200px]',
+      render: (itemType: ItemType) => (
+        <span className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
+          {itemType.description || __('No description', 'No description')}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      label: __('Status', 'Status'),
+      sortable: true,
+      width: 'w-[100px]',
+      visible: visibleColumns.status,
+      render: (itemType: ItemType) => getStatusBadge(itemType.status),
+    },
+    {
+      key: 'items',
+      label: __('Items', 'Items'),
+      sortable: false,
+      width: 'w-[100px]',
+      visible: visibleColumns.items,
+      render: (itemType: ItemType) => (
+        <div className="text-center">
+          <Badge variant="outline" className="font-medium">
+            {itemType.items_count ?? 0}
+          </Badge>
+        </div>
+      ),
+    },
+    {
+      key: 'date',
+      label: __('Date', 'Date'),
+      sortable: true,
+      width: 'w-[150px]',
+      visible: visibleColumns.date,
+      render: (itemType: ItemType) => (
+        <div className="text-gray-500 dark:text-gray-400 text-sm">
+          <div>{formatDate(itemType.created_at)}</div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            {__('Updated', 'Updated')}: {formatDate(itemType.updated_at)}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'author',
+      label: __('Author', 'Author'),
+      sortable: false,
+      width: 'w-[150px]',
+      visible: visibleColumns.author,
+      render: (itemType: ItemType) => (
+        <div className="text-gray-600 dark:text-gray-400 text-sm">
+          <div>{formatUser(itemType.created_by, itemType.created_by_name)}</div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+            {__('Updated by', 'Updated by')}: {formatUser(itemType.updated_by, itemType.updated_by_name)}
+          </div>
+        </div>
+      ),
+    },
+  ];
+
+  const tableActions = useMemo(() => {
+    const actions: any[] = [];
+
+    if (can('yatra_edit_trips')) {
+      actions.push({
+        key: 'edit',
+        label: __('Edit', 'Edit'),
+        icon: <Edit className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => handleEdit(itemType),
+      });
+
+      actions.push({
+        key: 'publish',
+        label: __('Mark as Published', 'Mark as Published'),
+        icon: <ArrowUp className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: 'publish' });
+        },
+        condition: (itemType: ItemType) => itemType.status !== 'publish' && itemType.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'draft',
+        label: __('Mark as Draft', 'Mark as Draft'),
+        icon: <ArrowDown className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: 'draft' });
+        },
+        condition: (itemType: ItemType) => itemType.status !== 'draft' && itemType.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'trash',
+        label: __('Move to Trash', 'Move to Trash'),
+        icon: <Trash2 className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: 'trash' });
+        },
+        condition: (itemType: ItemType) => itemType.status !== 'trash',
+      });
+
+      actions.push({
+        key: 'restore',
+        label: __('Restore to Draft', 'Restore to Draft'),
+        icon: <ArrowUp className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => {
+          setStatusActionConfirm({ isOpen: true, itemType, action: 'restore' });
+        },
+        condition: (itemType: ItemType) => itemType.status === 'trash',
+      });
+    }
+
+    if (can('yatra_delete_trips')) {
+      actions.push({
+        key: 'delete',
+        label: __('Delete Permanently', 'Delete Permanently'),
+        icon: <Trash2 className="w-4 h-4" />,
+        onClick: (itemType: ItemType) => handleDelete(itemType),
+        variant: 'destructive' as const,
+        condition: (itemType: ItemType) => itemType.status === 'trash',
+      });
+    }
+
+    return actions;
+  }, [can, queryClient, showToast]);
+
   return (
     <div className="space-y-3">
       <ConfirmationDialog
@@ -267,6 +601,78 @@ const ItemTypes: React.FC = () => {
         cancelText={__('Cancel', 'Cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
+      />
+
+      <ConfirmationDialog
+        isOpen={statusActionConfirm.isOpen}
+        onClose={() => setStatusActionConfirm({ isOpen: false, itemType: null, action: null })}
+        onConfirm={async () => {
+          const { itemType, action } = statusActionConfirm;
+          if (!itemType || !action) {
+            return;
+          }
+
+          const targetStatus = action === 'restore' ? 'draft' : action;
+
+          await updateItemTypeStatus(itemType, targetStatus as 'draft' | 'publish' | 'trash');
+
+          const successMessage =
+            action === 'publish'
+              ? __('Item type marked as published.', 'Item type marked as published.')
+              : action === 'draft' || action === 'restore'
+                ? __('Item type marked as draft.', 'Item type marked as draft.')
+                : __('Item type moved to trash.', 'Item type moved to trash.');
+
+          showToast(successMessage, 'success');
+          queryClient.invalidateQueries({ queryKey: ['item-types'] });
+          queryClient.invalidateQueries({ queryKey: ['item-types-stats'] });
+          setStatusActionConfirm({ isOpen: false, itemType: null, action: null });
+        }}
+        title={(() => {
+          switch (statusActionConfirm.action) {
+            case 'publish':
+              return __('Publish Item Type', 'Publish Item Type');
+            case 'draft':
+              return __('Mark as Draft', 'Mark as Draft');
+            case 'trash':
+              return __('Move to Trash', 'Move to Trash');
+            case 'restore':
+              return __('Restore Item Type', 'Restore Item Type');
+            default:
+              return __('Confirm Action', 'Confirm Action');
+          }
+        })()}
+        message={(() => {
+          const name = statusActionConfirm.itemType?.name || '';
+          switch (statusActionConfirm.action) {
+            case 'publish':
+              return __('Are you sure you want to publish "{name}"?', 'Are you sure you want to publish "{name}"?').replace('{name}', name);
+            case 'draft':
+              return __('Are you sure you want to mark "{name}" as draft?', 'Are you sure you want to mark "{name}" as draft?').replace('{name}', name);
+            case 'trash':
+              return __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', name);
+            case 'restore':
+              return __('Are you sure you want to restore "{name}" to draft?', 'Are you sure you want to restore "{name}" to draft?').replace('{name}', name);
+            default:
+              return __('Are you sure you want to perform this action?', 'Are you sure you want to perform this action?');
+          }
+        })()}
+        confirmText={(() => {
+          switch (statusActionConfirm.action) {
+            case 'publish':
+              return __('Publish', 'Publish');
+            case 'draft':
+            case 'restore':
+              return __('Mark as Draft', 'Mark as Draft');
+            case 'trash':
+              return __('Move to Trash', 'Move to Trash');
+            default:
+              return __('Confirm', 'Confirm');
+          }
+        })()}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="warning"
+        isLoading={false}
       />
 
       <PageHeader
@@ -346,273 +752,67 @@ const ItemTypes: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_trips">
-        {error ? (
+        <>
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={handleClearSelection}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            statusOptions={statusOptions}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={columnOptions}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={bulkMutationPending}
+            totalItems={total}
+            bulkActionOptions={bulkActionOptions}
+          />
+
           <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading item types', 'Error loading item types')}
+            <CardContent className="p-0">
+              <SharedTable
+                data={itemTypes}
+                columns={columns}
+                actions={tableActions}
+                isLoading={isLoading}
+                isError={!!error}
+                errorText={__('Error loading item types', 'Error loading item types')}
+                emptyText={__('No item types found', 'No item types found')}
+                emptyDescription={hasFilters
+                  ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                  : __('Get started by creating your first item type.', 'Get started by creating your first item type.')
+                }
+                onCreateClick={can('yatra_edit_trips') ? handleCreate : undefined}
+                onSort={handleSort}
+                getSortIcon={getSortIcon}
+                selectedItemIds={selectedIds}
+                onSelectItem={handleSelectItem}
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+                getItemId={(itemType: ItemType) => itemType.id}
+                getItemStatus={(itemType: ItemType) => itemType.status}
+                statusFilter={statusFilter}
+                capability="yatra_view_trips"
+              />
             </CardContent>
           </Card>
-        ) : (
-          <>
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">{__('Type', 'Type')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        <TableHead className="w-[100px] text-center">{__('Items', 'Items')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {[...Array(5)].map((_, index) => (
-                        <TableRow key={`skeleton-${index}`}>
-                          <TableCell>
-                            <div className="flex items-center gap-2">
-                              <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <div className="h-4 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mx-auto" />
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                              <div className="h-8 w-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                ) : itemTypes.length === 0 ? (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">{__('Type', 'Type')}</TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">{__('Status', 'Status')}</TableHead>
-                        <TableHead className="w-[100px] text-center">{__('Items', 'Items')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Date', 'Date')}</TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell colSpan={7} className="h-64">
-                          <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-                              <Search className="w-8 h-8 text-gray-400 dark:text-gray-500" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                              {__('No item types found', 'No item types found')}
-                            </h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-sm">
-                              {hasFilters
-                                ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                                : __('Get started by creating your first item type.', 'Get started by creating your first item type.')
-                              }
-                            </p>
-                            {hasFilters ? (
-                              <Button
-                                variant="outline"
-                                onClick={handleResetFilters}
-                                className="flex items-center gap-2"
-                              >
-                                <X className="w-4 h-4" />
-                                {__('Clear Filters', 'Clear Filters')}
-                              </Button>
-                            ) : (
-                              can('yatra_edit_trips') && (
-                                <Button
-                                  onClick={handleCreate}
-                                  className="flex items-center gap-2"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                  {__('Create Item Type', 'Create Item Type')}
-                                </Button>
-                              )
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                ) : (
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[200px]">
-                          <button
-                            onClick={() => handleSort('name')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Type', 'Type')}
-                            {getSortIcon('name')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[200px]">{__('Description', 'Description')}</TableHead>
-                        <TableHead className="w-[100px]">
-                          <button
-                            onClick={() => handleSort('status')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Status', 'Status')}
-                            {getSortIcon('status')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[100px] text-center">{__('Items', 'Items')}</TableHead>
-                        <TableHead className="w-[150px]">
-                          <button
-                            onClick={() => handleSort('created_at')}
-                            className="flex items-center hover:text-gray-900 dark:hover:text-white transition-colors"
-                          >
-                            {__('Date', 'Date')}
-                            {getSortIcon('created_at')}
-                          </button>
-                        </TableHead>
-                        <TableHead className="w-[150px]">{__('Author', 'Author')}</TableHead>
-                        <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {itemTypes.map((itemType: ItemType) => (
-                        <TableRow key={itemType.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              {renderIcon(itemType.icon)}
-                              <div>
-                                <div className="font-medium text-gray-900 dark:text-white">
-                                  {itemType.name}
-                                </div>
-                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                  {itemType.slug}
-                                </div>
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div className="line-clamp-2">
-                              {itemType.description || __('No description', 'No description')}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(itemType.status)}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge variant="outline" className="font-medium">
-                              {itemType.items_count ?? 0}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-gray-500 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatDate(itemType.created_at)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated', 'Updated')}: {formatDate(itemType.updated_at)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-gray-600 dark:text-gray-400 text-sm">
-                            <div>
-                              <div>{formatUser(itemType.created_by, itemType.created_by_name)}</div>
-                              <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                {__('Updated by', 'Updated by')}: {formatUser(itemType.updated_by, itemType.updated_by_name)}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
-                              <ConditionalRender capability="yatra_edit_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleEdit(itemType)}
-                                  className="h-8 w-8"
-                                  aria-label={__('Edit item type', 'Edit item type')}
-                                >
-                                  <Edit className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
 
-                              <ConditionalRender capability="yatra_delete_trips">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => handleDelete(itemType)}
-                                  className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                  aria-label={__('Delete item type', 'Delete item type')}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
-                              </ConditionalRender>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </CardContent>
-            </Card>
-
-            {total > 0 && (
-              <Card>
-                <CardContent className="p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {__('Showing', 'Showing')} <span className="font-medium text-gray-900 dark:text-white">{(page - 1) * 10 + 1}</span> - <span className="font-medium text-gray-900 dark:text-white">{Math.min(page * 10, total)}</span> {__('of', 'of')} <span className="font-medium text-gray-900 dark:text-white">{total}</span> {__('item types', 'item types')}
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                        className="h-8"
-                      >
-                        {__('Previous', 'Previous')}
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                        disabled={page >= totalPages}
-                        className="h-8"
-                      >
-                        {__('Next', 'Next')}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </>
-        )}
+          {total > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={10}
+                onPageChange={setPage}
+                itemName={__('item types', 'item types')}
+              />
+            </div>
+          )}
+        </>
       </ConditionalRender>
     </div>
   );

@@ -33,6 +33,29 @@ class ItemTypeController extends BaseController
     public function register_routes(): void
     {
         $this->registerCrudRoutes($this->getStatusArg());
+
+        // Status statistics for admin views (All / Published / Draft / Trash)
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/stats', [
+            [
+                'methods'  => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getStats'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+    }
+
+    /**
+     * GET /item-types/stats
+     * Return stable status counts for admin list views.
+     */
+    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $stats = $this->service->getStatusCounts();
+            return $this->success_response($stats);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool
