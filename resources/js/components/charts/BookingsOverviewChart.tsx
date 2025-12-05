@@ -89,15 +89,21 @@ const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={safeData}
-          margin={{ top: 8, right: 16, left: 0, bottom: 8 }}
+          margin={{ top: 16, right: 16, left: 24, bottom: 24 }}
         >
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="month" tickLine={false} axisLine={false} />
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+          />
           <YAxis
             yAxisId="left"
             allowDecimals={false}
             tickLine={false}
-            axisLine={false}
+            axisLine={{ stroke: '#e5e7eb' }}
+            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
           />
           <YAxis
             yAxisId="right"
@@ -105,6 +111,7 @@ const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
             tickLine={false}
             axisLine={false}
             tickFormatter={(value: number) => formatAmount(value, { compact: true })}
+            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
           />
           <Tooltip
             cursor={{ fill: 'rgba(148, 163, 184, 0.12)' }}

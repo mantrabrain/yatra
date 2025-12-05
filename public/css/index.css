@@ -702,6 +702,10 @@ video {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
 }
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
 .-mb-24 {
   margin-bottom: -6rem;
 }
@@ -896,6 +900,18 @@ video {
 }
 .h-\[180px\] {
   height: 180px;
+}
+.h-\[250px\] {
+  height: 250px;
+}
+.h-\[300px\] {
+  height: 300px;
+}
+.h-\[220px\] {
+  height: 220px;
+}
+.h-\[260px\] {
+  height: 260px;
 }
 .max-h-48 {
   max-height: 12rem;
@@ -2154,6 +2170,9 @@ video {
 }
 .pb-1 {
   padding-bottom: 0.25rem;
+}
+.pb-5 {
+  padding-bottom: 1.25rem;
 }
 .text-left {
   text-align: left;

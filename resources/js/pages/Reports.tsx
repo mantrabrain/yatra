@@ -16,9 +16,7 @@ import {
   MapPin,
   BarChart3,
   PieChart,
-  Clock,
   XCircle,
-  Globe,
   Plane
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
@@ -30,9 +28,22 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { SimpleLineChart } from '../components/charts/SimpleLineChart';
-import { SimpleBarChart } from '../components/charts/SimpleBarChart';
-import { SimplePieChart } from '../components/charts/SimplePieChart';
+import { apiClient } from '../lib/api';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  BarChart,
+  Bar,
+  Legend,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+} from 'recharts';
 
 const Reports: React.FC = () => {
   const { can, isPro } = usePermissions();
@@ -93,220 +104,51 @@ const Reports: React.FC = () => {
     };
   }, [dateRange, startDate, endDate]);
 
-  // Fetch revenue statistics with comprehensive dummy data
-  const { data: revenueStats } = useQuery({
-    queryKey: ['revenue-stats', dateRangeParams],
-    queryFn: async () => {
-      return {
-        total: 245680,
-        previous: 198500,
-        change: 23.8,
-        average: 5120,
-        bookings: 48,
-        byPaymentMethod: [
-          { label: __('Credit Card', 'Credit Card'), value: 156432, color: '#3b82f6' },
-          { label: __('PayPal', 'PayPal'), value: 52340, color: '#10b981' },
-          { label: __('Bank Transfer', 'Bank Transfer'), value: 28908, color: '#f59e0b' },
-          { label: __('Cash', 'Cash'), value: 8000, color: '#ef4444' },
-        ],
-        byDestination: [
-          { label: __('Nepal', 'Nepal'), value: 125400, color: '#3b82f6' },
-          { label: __('India', 'India'), value: 68000, color: '#10b981' },
-          { label: __('Bhutan', 'Bhutan'), value: 35280, color: '#f59e0b' },
-          { label: __('Tibet', 'Tibet'), value: 17000, color: '#ef4444' },
-        ],
-      };
-    },
+  // Single consolidated reports query
+  const { data: reportData } = useQuery({
+    queryKey: ['reports', dateRangeParams],
     enabled: can('yatra_view_bookings'),
-  });
-
-  // Fetch revenue trend with monthly data
-  const { data: revenueTrend } = useQuery({
-    queryKey: ['revenue-trend', dateRangeParams],
     queryFn: async () => {
-      return [
-        { label: __('Jan', 'Jan'), value: 18500 },
-        { label: __('Feb', 'Feb'), value: 22000 },
-        { label: __('Mar', 'Mar'), value: 28000 },
-        { label: __('Apr', 'Apr'), value: 35000 },
-        { label: __('May', 'May'), value: 42000 },
-        { label: __('Jun', 'Jun'), value: 38000 },
-        { label: __('Jul', 'Jul'), value: 45000 },
-        { label: __('Aug', 'Aug'), value: 41000 },
-        { label: __('Sep', 'Sep'), value: 39000 },
-        { label: __('Oct', 'Oct'), value: 44000 },
-        { label: __('Nov', 'Nov'), value: 36000 },
-        { label: __('Dec', 'Dec'), value: 42000 },
-      ];
+      const { start, end } = dateRangeParams;
+      const resp = await apiClient.get('/reports', {
+        params: {
+          date_from: start,
+          date_to: end,
+        },
+      });
+      return resp?.data?.data || resp?.data || {};
     },
-    enabled: can('yatra_view_bookings'),
   });
 
-  // Fetch booking statistics with comprehensive data
-  const { data: bookingStats } = useQuery({
-    queryKey: ['booking-stats', dateRangeParams],
-    queryFn: async () => {
-      return {
-        total: 156,
-        confirmed: 98,
-        pending: 35,
-        cancelled: 15,
-        completed: 8,
-        cancellationRate: 9.6,
-        conversionRate: 12.5,
-        averageBookingValue: 5120,
-        trend: [
-          { label: __('Jan', 'Jan'), value: 18 },
-          { label: __('Feb', 'Feb'), value: 22 },
-          { label: __('Mar', 'Mar'), value: 28 },
-          { label: __('Apr', 'Apr'), value: 35 },
-          { label: __('May', 'May'), value: 42 },
-          { label: __('Jun', 'Jun'), value: 38 },
-          { label: __('Jul', 'Jul'), value: 45 },
-          { label: __('Aug', 'Aug'), value: 41 },
-          { label: __('Sep', 'Sep'), value: 39 },
-          { label: __('Oct', 'Oct'), value: 44 },
-          { label: __('Nov', 'Nov'), value: 36 },
-          { label: __('Dec', 'Dec'), value: 42 },
-        ],
-        peakPeriods: [
-          { label: __('Spring (Mar-May)', 'Spring (Mar-May)'), value: 105, color: '#10b981' },
-          { label: __('Summer (Jun-Aug)', 'Summer (Jun-Aug)'), value: 124, color: '#f59e0b' },
-          { label: __('Autumn (Sep-Nov)', 'Autumn (Sep-Nov)'), value: 119, color: '#ef4444' },
-          { label: __('Winter (Dec-Feb)', 'Winter (Dec-Feb)'), value: 58, color: '#3b82f6' },
-        ],
-        bookingSources: [
-          { label: __('Website', 'Website'), value: 78, color: '#3b82f6' },
-          { label: __('Social Media', 'Social Media'), value: 35, color: '#10b981' },
-          { label: __('Referral', 'Referral'), value: 22, color: '#f59e0b' },
-          { label: __('Direct Contact', 'Direct Contact'), value: 15, color: '#ef4444' },
-          { label: __('Other', 'Other'), value: 6, color: '#8b5cf6' },
-        ],
-      };
-    },
-    enabled: can('yatra_view_bookings'),
-  });
+  const formatPrice = (price: number) => {
+    const admin = (window as any)?.yatraAdmin || {};
+    const currencyCode: string = admin.currency || 'USD';
+    const position: string = admin.currency_position || 'left';
+    const decimalsRaw = admin.currency_decimals;
 
-  // Fetch trip performance with revenue data
-  const { data: tripPerformance } = useQuery({
-    queryKey: ['trip-performance', dateRangeParams],
-    queryFn: async () => {
-      return [
-        { label: __('Everest Base Camp Trek', 'Everest Base Camp Trek'), value: 45, revenue: 56250, occupancy: 85, color: '#3b82f6' },
-        { label: __('Annapurna Circuit', 'Annapurna Circuit'), value: 32, revenue: 31360, occupancy: 78, color: '#10b981' },
-        { label: __('Golden Triangle Tour', 'Golden Triangle Tour'), value: 28, revenue: 21000, occupancy: 72, color: '#f59e0b' },
-        { label: __('Bhutan Cultural Journey', 'Bhutan Cultural Journey'), value: 22, revenue: 24200, occupancy: 68, color: '#ef4444' },
-        { label: __('Tibet Spiritual Tour', 'Tibet Spiritual Tour'), value: 18, revenue: 15300, occupancy: 65, color: '#8b5cf6' },
-        { label: __('Langtang Valley Trek', 'Langtang Valley Trek'), value: 15, revenue: 13800, occupancy: 60, color: '#06b6d4' },
-      ];
-    },
-    enabled: can('yatra_view_trips'),
-  });
+    const currencyMeta = getCurrency(currencyCode);
+    const defaultDecimals = currencyMeta?.decimalDigits ?? 2;
+    const decimals = Number.isFinite(Number(decimalsRaw))
+      ? Math.max(0, Math.min(4, Number(decimalsRaw)))
+      : defaultDecimals;
 
-  // Fetch customer analytics with comprehensive data
-  const { data: customerAnalytics } = useQuery({
-    queryKey: ['customer-analytics', dateRangeParams],
-    queryFn: async () => {
-      return {
-        newCustomers: 24,
-        returningCustomers: 12,
-        totalCustomers: 89,
-        customerLifetimeValue: 1408,
-        repeatBookingRate: 13.5,
-        customerRetentionRate: 68.5,
-        topCustomers: [
-          { name: __('John Smith', 'John Smith'), bookings: 5, revenue: 12500 },
-          { name: __('Sarah Johnson', 'Sarah Johnson'), bookings: 4, revenue: 9800 },
-          { name: __('Michael Brown', 'Michael Brown'), bookings: 3, revenue: 7500 },
-        ],
-        topCountries: [
-          { label: __('United States', 'United States'), value: 35, color: '#3b82f6' },
-          { label: __('United Kingdom', 'United Kingdom'), value: 22, color: '#10b981' },
-          { label: __('Australia', 'Australia'), value: 18, color: '#f59e0b' },
-          { label: __('Canada', 'Canada'), value: 14, color: '#ef4444' },
-        ],
-        customerSegments: [
-          { label: __('First-time', 'First-time'), value: 65, color: '#3b82f6' },
-          { label: __('Returning (2-3)', 'Returning (2-3)'), value: 20, color: '#10b981' },
-          { label: __('Loyal (4+)', 'Loyal (4+)'), value: 15, color: '#f59e0b' },
-        ],
-      };
-    },
-    enabled: can('yatra_view_customers'),
-  });
-
-  // Fetch payment status breakdown
-  const { data: paymentStatus } = useQuery({
-    queryKey: ['payment-status', dateRangeParams],
-    queryFn: async () => {
-      return [
-        { label: __('Paid', 'Paid'), value: 120, amount: 198500, color: '#10b981' },
-        { label: __('Pending', 'Pending'), value: 25, amount: 35200, color: '#f59e0b' },
-        { label: __('Refunded', 'Refunded'), value: 8, amount: 12000, color: '#ef4444' },
-        { label: __('Partial', 'Partial'), value: 3, amount: 5980, color: '#8b5cf6' },
-      ];
-    },
-    enabled: can('yatra_view_bookings'),
-  });
-
-  // Fetch operational reports
-  const { data: operationalStats } = useQuery({
-    queryKey: ['operational-stats', dateRangeParams],
-    queryFn: async () => {
-      return {
-        upcomingDepartures: 12,
-        totalCapacity: 480,
-        bookedCapacity: 312,
-        occupancyRate: 65.0,
-        averageGroupSize: 4.2,
-        resourceUtilization: [
-          { label: __('Guides', 'Guides'), value: 78, color: '#3b82f6' },
-          { label: __('Vehicles', 'Vehicles'), value: 65, color: '#10b981' },
-          { label: __('Accommodations', 'Accommodations'), value: 82, color: '#f59e0b' },
-        ],
-        upcomingTrips: [
-          { trip: __('Everest Base Camp Trek', 'Everest Base Camp Trek'), date: '2024-07-15', booked: 18, capacity: 20 },
-          { trip: __('Annapurna Circuit', 'Annapurna Circuit'), date: '2024-07-20', booked: 15, capacity: 18 },
-          { trip: __('Bhutan Cultural Journey', 'Bhutan Cultural Journey'), date: '2024-07-25', booked: 12, capacity: 16 },
-        ],
-      };
-    },
-    enabled: can('yatra_view_bookings'),
-  });
-
-  // Fetch seasonal trends
-  const { data: seasonalTrends } = useQuery({
-    queryKey: ['seasonal-trends', dateRangeParams],
-    queryFn: async () => {
-      return {
-        byMonth: [
-          { label: __('Jan', 'Jan'), bookings: 18, revenue: 18500 },
-          { label: __('Feb', 'Feb'), bookings: 22, revenue: 22000 },
-          { label: __('Mar', 'Mar'), bookings: 28, revenue: 28000 },
-          { label: __('Apr', 'Apr'), bookings: 35, revenue: 35000 },
-          { label: __('May', 'May'), bookings: 42, revenue: 42000 },
-          { label: __('Jun', 'Jun'), bookings: 38, revenue: 38000 },
-        ],
-        bySeason: [
-          { label: __('Spring', 'Spring'), bookings: 105, revenue: 105000 },
-          { label: __('Summer', 'Summer'), bookings: 124, revenue: 124000 },
-          { label: __('Autumn', 'Autumn'), bookings: 119, revenue: 119000 },
-          { label: __('Winter', 'Winter'), bookings: 58, revenue: 58000 },
-        ],
-      };
-    },
-    enabled: can('yatra_view_bookings'),
-  });
-
-  const formatPrice = (price: number, currencyCode: string = 'USD') => {
     const symbol = getCurrencySymbol(currencyCode);
-    const currencyData = getCurrency(currencyCode);
-    const decimals = currencyData?.decimalDigits ?? 2;
-    
-    return `${symbol}${new Intl.NumberFormat(undefined, {
+    const core = new Intl.NumberFormat(undefined, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
-    }).format(price)}`;
+    }).format(price ?? 0);
+
+    switch (position) {
+      case 'right':
+        return `${core}${symbol}`;
+      case 'left_space':
+        return `${symbol} ${core}`;
+      case 'right_space':
+        return `${core} ${symbol}`;
+      case 'left':
+      default:
+        return `${symbol}${core}`;
+    }
   };
 
   const handleExport = (format: 'pdf' | 'csv' | 'excel') => {
@@ -315,8 +157,17 @@ const Reports: React.FC = () => {
     alert(__('Export functionality will be implemented soon', 'Export functionality will be implemented soon'));
   };
 
+  const revenueStats = reportData?.revenue_stats;
+  const revenueTrend = reportData?.revenue_trend || [];
+  const bookingStats = reportData?.booking_stats;
+  const bookingTrend = reportData?.booking_trend || [];
+  const tripPerformance = reportData?.trip_performance || [];
+  const paymentStatus = reportData?.payment_status || [];
+  const operationalStats = reportData?.operational_stats;
+  const customerAnalytics = reportData?.customer_analytics;
+
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <PageHeader
         title={__('Reports & Analytics', 'Reports & Analytics')}
         description={__('Comprehensive insights into your travel booking business', 'Comprehensive insights into your travel booking business')}
@@ -390,7 +241,7 @@ const Reports: React.FC = () => {
 
       <ConditionalRender capability="yatra_view_bookings">
         {/* Key Metrics Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between mb-2">
@@ -470,44 +321,76 @@ const Reports: React.FC = () => {
         </div>
 
         {/* Revenue and Booking Trends */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="py-3 px-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <TrendingUp className="w-4 h-4" />
                 {__('Revenue Trend', 'Revenue Trend')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleLineChart
-                data={revenueTrend || []}
-                title=""
-                height={250}
-                color="#10b981"
-              />
+            <CardContent className="px-4 pb-5 pt-1">
+              <div style={{ width: '100%', height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={revenueTrend || []} margin={{ top: 8, right: 16, left: 24, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="label"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={{ stroke: '#e5e7eb' }}
+                      tickFormatter={(value) => formatPrice(Number(value) || 0)}
+                      tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                    />
+                    <Tooltip
+                      formatter={(value: any) => formatPrice(Number(value) || 0)}
+                      labelFormatter={(label: string) => label}
+                    />
+                    <Line type="monotone" dataKey="value" stroke="#10b981" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="py-3 px-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 {__('Booking Trend', 'Booking Trend')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleLineChart
-                data={bookingStats?.trend || []}
-                title=""
-                height={250}
-                color="#3b82f6"
-              />
+            <CardContent className="px-4 pb-5 pt-1">
+              <div style={{ width: '100%', height: 260 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={bookingTrend || []} margin={{ top: 8, right: 16, left: 16, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis
+                      dataKey="label"
+                      tickLine={false}
+                      axisLine={false}
+                      tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={{ stroke: '#e5e7eb' }}
+                      tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                    />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Trip Performance and Payment Status */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-base flex items-center gap-2">
@@ -516,12 +399,21 @@ const Reports: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="pb-2">
-              <SimpleBarChart
-                data={tripPerformance?.map(t => ({ label: t.label, value: t.value, color: t.color })) || []}
-                title=""
-                height={300}
-                showValues={true}
-              />
+              <div className="w-full h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={tripPerformance || []} margin={{ top: 8, right: 16, left: 0, bottom: 32 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="label" tickLine={false} axisLine={false} angle={-20} textAnchor="end" height={50} />
+                    <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                      {(tripPerformance || []).map((t, index) => (
+                        <Cell key={index} fill={t.color} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
               {tripPerformance && tripPerformance.length > 0 && (
                 <div className="mt-4 space-y-2 text-sm">
                   {tripPerformance.slice(0, 3).map((trip, idx) => (
@@ -545,15 +437,30 @@ const Reports: React.FC = () => {
                 {__('Payment Status', 'Payment Status')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="px-4 pb-4">
               <div className="flex items-center justify-center mb-4">
-                <SimplePieChart
-                  data={paymentStatus || []}
-                  title=""
-                  size={250}
-                  showLegend={true}
-                  donut={true}
-                />
+                <div className="w-full h-[250px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={paymentStatus || []}
+                        dataKey="amount"
+                        nameKey="label"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={90}
+                        paddingAngle={2}
+                      >
+                        {(paymentStatus || []).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
               {paymentStatus && paymentStatus.length > 0 && (
                 <div className="space-y-2 text-sm">
@@ -575,59 +482,16 @@ const Reports: React.FC = () => {
           </Card>
         </div>
 
-        {/* Revenue by Payment Method and Destination */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {/* Booking Status Breakdown */}
+        <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                {__('Revenue by Payment Method', 'Revenue by Payment Method')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleBarChart
-                data={revenueStats?.byPaymentMethod?.map(m => ({ label: m.label, value: m.value / 1000, color: m.color })) || []}
-                title=""
-                height={250}
-                showValues={true}
-              />
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-                {__('Values in thousands', 'Values in thousands')}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                {__('Revenue by Destination', 'Revenue by Destination')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleBarChart
-                data={revenueStats?.byDestination?.map(d => ({ label: d.label, value: d.value / 1000, color: d.color })) || []}
-                title=""
-                height={250}
-                showValues={true}
-              />
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-center">
-                {__('Values in thousands', 'Values in thousands')}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Booking Status Breakdown and Peak Periods */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="py-3 px-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <PieChart className="w-4 h-4" />
                 {__('Booking Status Breakdown', 'Booking Status Breakdown')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="px-4 pb-5 pt-1">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
                   <div className="text-2xl font-semibold text-green-600 dark:text-green-400 mb-1">
@@ -665,74 +529,18 @@ const Reports: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                {__('Peak Booking Periods', 'Peak Booking Periods')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleBarChart
-                data={bookingStats?.peakPeriods || []}
-                title=""
-                height={200}
-                showValues={true}
-              />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Booking Sources and Seasonal Trends */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Globe className="w-4 h-4" />
-                {__('Booking Sources', 'Booking Sources')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <div className="flex items-center justify-center mb-4">
-                <SimplePieChart
-                  data={bookingStats?.bookingSources || []}
-                  title=""
-                  size={200}
-                  showLegend={true}
-                  donut={true}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                {__('Seasonal Trends', 'Seasonal Trends')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pb-2">
-              <SimpleBarChart
-                data={seasonalTrends?.bySeason?.map(s => ({ label: s.label, value: s.bookings, color: '#3b82f6' })) || []}
-                title=""
-                height={200}
-                showValues={true}
-              />
-            </CardContent>
-          </Card>
         </div>
 
         {/* Operational Reports */}
         {operationalStats && (
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4">
               <CardTitle className="text-base flex items-center gap-2">
                 <Plane className="w-4 h-4" />
                 {__('Operational Overview', 'Operational Overview')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pb-2">
+            <CardContent className="px-4 pb-5 pt-1">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -768,7 +576,7 @@ const Reports: React.FC = () => {
                 </div>
               </div>
               {operationalStats.upcomingTrips && operationalStats.upcomingTrips.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {__('Upcoming Trips', 'Upcoming Trips')}:
                   </div>
@@ -791,7 +599,7 @@ const Reports: React.FC = () => {
 
         {/* Customer Analytics (Pro Feature) */}
         {isPro && customerAnalytics && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -799,7 +607,7 @@ const Reports: React.FC = () => {
                   {__('Customer Analytics', 'Customer Analytics')}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pb-2">
+              <CardContent className="px-4 pb-4">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
@@ -853,23 +661,7 @@ const Reports: React.FC = () => {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Globe className="w-4 h-4" />
-                  {__('Top Countries', 'Top Countries')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <SimpleBarChart
-                  data={customerAnalytics.topCountries || []}
-                  title=""
-                  height={250}
-                  showValues={true}
-                />
-              </CardContent>
-            </Card>
-          </div>
+            </div>
         )}
 
         {/* Customer Segments (Pro) */}
@@ -883,13 +675,28 @@ const Reports: React.FC = () => {
             </CardHeader>
             <CardContent className="pb-2">
               <div className="flex items-center justify-center mb-4">
-                <SimplePieChart
-                  data={customerAnalytics.customerSegments || []}
-                  title=""
-                  size={200}
-                  showLegend={true}
-                  donut={true}
-                />
+                <div className="w-full h-[220px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RechartsPieChart>
+                      <Pie
+                        data={customerAnalytics.customerSegments || []}
+                        dataKey="value"
+                        nameKey="label"
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        paddingAngle={2}
+                      >
+                        {(customerAnalytics.customerSegments || []).map((entry: any, index: number) => (
+                          <Cell key={`seg-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </RechartsPieChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </CardContent>
           </Card>

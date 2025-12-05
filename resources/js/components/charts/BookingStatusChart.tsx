@@ -80,12 +80,18 @@ const BookingStatusChart: React.FC<BookingStatusChartProps> = ({ data }) => {
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
-          <Tooltip formatter={(value: any, _name: any, props: any) => {
-            const v = Number(value) || 0;
-            const p = props?.payload?.percent ?? 0;
-            return [`${v} (${p.toFixed(1)}%)`, props?.payload?.label];
-          }} />
-          <Legend verticalAlign="middle" align="right" layout="vertical" content={renderLegend} />
+          <Tooltip
+            formatter={(value: any, _: any, item: any) => `${item.payload.percent.toFixed(1)}%`}
+            contentStyle={{ fontFamily: 'inherit', fontSize: 11 }}
+          />
+          <Legend
+            verticalAlign="middle"
+            align="right"
+            layout="vertical"
+            iconType="circle"
+            wrapperStyle={{ fontFamily: 'inherit', fontSize: 11 }}
+            content={renderLegend}
+          />
         </PieChart>
       </ResponsiveContainer>
     </div>
