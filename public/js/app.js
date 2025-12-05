@@ -40698,9 +40698,141 @@ const Reports = () => {
         return `${symbol}${core}`;
     }
   };
-  const handleExport = (format2) => {
-    console.log(`Exporting reports as ${format2}...`);
-    alert(__("Export functionality will be implemented soon", "Export functionality will be implemented soon"));
+  const downloadFile = (content, filename, mime) => {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a2 = document.createElement("a");
+    a2.href = url;
+    a2.download = filename;
+    document.body.appendChild(a2);
+    a2.click();
+    document.body.removeChild(a2);
+    URL.revokeObjectURL(url);
+  };
+  const buildCsvFromReport = (data) => {
+    if (!data) return "";
+    const lines = [];
+    if (data.revenue_stats) {
+      const r2 = data.revenue_stats;
+      lines.push("Section,Metric,Value");
+      lines.push(`Revenue,Total Revenue,${r2.total}`);
+      lines.push(`Revenue,Total Bookings,${r2.bookings}`);
+      lines.push(`Revenue,Average Booking,${r2.average}`);
+      lines.push("");
+    }
+    if (Array.isArray(data.revenue_trend)) {
+      lines.push("Revenue Trend,Date,Amount");
+      data.revenue_trend.forEach((row) => {
+        lines.push(`Revenue Trend,${row.label},${row.value}`);
+      });
+      lines.push("");
+    }
+    if (Array.isArray(data.booking_trend)) {
+      lines.push("Booking Trend,Date,Bookings");
+      data.booking_trend.forEach((row) => {
+        lines.push(`Booking Trend,${row.label},${row.value}`);
+      });
+      lines.push("");
+    }
+    if (data.booking_stats) {
+      const b = data.booking_stats;
+      lines.push("Booking Status,Status,Count");
+      lines.push(`Booking Status,Total,${b.total}`);
+      lines.push(`Booking Status,Confirmed,${b.confirmed}`);
+      lines.push(`Booking Status,Pending,${b.pending}`);
+      lines.push(`Booking Status,Cancelled,${b.cancelled}`);
+      lines.push(`Booking Status,Completed,${b.completed}`);
+      lines.push("");
+    }
+    if (Array.isArray(data.payment_status)) {
+      lines.push("Payment Status,Label,Count,Amount");
+      data.payment_status.forEach((p) => {
+        lines.push(`Payment Status,${p.label},${p.value},${p.amount}`);
+      });
+      lines.push("");
+    }
+    return lines.join("\n");
+  };
+  const openPrintWindowForReport = (data, title2) => {
+    const win = window.open("", "_blank");
+    if (!win) return;
+    const safeTitle = title2 || "Reports";
+    const revenue = data == null ? void 0 : data.revenue_stats;
+    const booking = data == null ? void 0 : data.booking_stats;
+    const html = `<!DOCTYPE html>
+<html>
+  <head>
+    <meta charSet="utf-8" />
+    <title>${safeTitle}</title>
+    <style>
+      body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 24px; color: #111827; }
+      h1 { font-size: 20px; margin-bottom: 4px; }
+      h2 { font-size: 16px; margin-top: 20px; margin-bottom: 8px; }
+      table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+      th, td { border: 1px solid #e5e7eb; padding: 6px 8px; font-size: 12px; text-align: left; }
+      th { background-color: #f9fafb; }
+      .muted { color: #6b7280; font-size: 12px; }
+    </style>
+  </head>
+  <body>
+    <h1>${safeTitle}</h1>
+    <div class="muted">Generated on ${(/* @__PURE__ */ new Date()).toLocaleString()}</div>
+
+    <h2>Revenue Summary</h2>
+    <table>
+      <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Total Revenue</td><td>${revenue ? revenue.total : "-"}</td></tr>
+        <tr><td>Total Bookings</td><td>${revenue ? revenue.bookings : "-"}</td></tr>
+        <tr><td>Average Booking</td><td>${revenue ? revenue.average : "-"}</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Booking Status</h2>
+    <table>
+      <thead><tr><th>Status</th><th>Count</th></tr></thead>
+      <tbody>
+        <tr><td>Total</td><td>${booking ? booking.total : "-"}</td></tr>
+        <tr><td>Confirmed</td><td>${booking ? booking.confirmed : "-"}</td></tr>
+        <tr><td>Pending</td><td>${booking ? booking.pending : "-"}</td></tr>
+        <tr><td>Cancelled</td><td>${booking ? booking.cancelled : "-"}</td></tr>
+        <tr><td>Completed</td><td>${booking ? booking.completed : "-"}</td></tr>
+      </tbody>
+    </table>
+  </body>
+</html>`;
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    win.print();
+  };
+  const handleExport = async (format2) => {
+    var _a;
+    const { start, end } = dateRangeParams;
+    try {
+      const resp = await apiClient.get("/reports", {
+        params: {
+          date_from: start,
+          date_to: end
+        }
+      });
+      const data = ((_a = resp == null ? void 0 : resp.data) == null ? void 0 : _a.data) || (resp == null ? void 0 : resp.data) || {};
+      const rangeLabel = `${start}_to_${end}`;
+      if (format2 === "csv" || format2 === "excel") {
+        const csv = buildCsvFromReport(data);
+        const filename = `reports_${rangeLabel}.${format2 === "excel" ? "csv" : "csv"}`;
+        downloadFile(csv, filename, "text/csv;charset=utf-8;");
+        return;
+      }
+      if (format2 === "pdf") {
+        openPrintWindowForReport(data, `Reports ${rangeLabel}`);
+        return;
+      }
+    } catch (e) {
+      console.error("Failed to export reports", e);
+      alert(__("Failed to export reports. Please try again.", "Failed to export reports. Please try again."));
+    }
   };
   const revenueStats = reportData == null ? void 0 : reportData.revenue_stats;
   const revenueTrend = (reportData == null ? void 0 : reportData.revenue_trend) || [];
