@@ -160,8 +160,14 @@ class DepartureService
         
         // Update departure
         $result = $this->repository->update($id, $data);
+
+        // If status is being explicitly set to 'trash' (admin trash feature),
+        // skip automatic status recalculation so the trashed state is preserved.
+        if (isset($data['status']) && $data['status'] === 'trash') {
+            return $result;
+        }
         
-        // Recalculate status
+        // Recalculate status for all other updates
         $departure = $this->repository->findModel($id);
         if ($departure) {
             $this->repository->update($id, ['status' => $departure->calculateStatus()]);

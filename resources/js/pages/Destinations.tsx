@@ -578,18 +578,16 @@ const Destinations: React.FC = () => {
 
       {/* Pagination */}
       {total > 0 && (
-        <Card>
-          <CardContent className="p-3">
-            <Pagination
-              currentPage={page}
-              totalPages={totalPages}
-              totalItems={total}
-              itemsPerPage={10}
-              onPageChange={setPage}
-              itemName={__('destinations', 'destinations')}
-            />
-          </CardContent>
-        </Card>
+        <div className="mt-4">
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalItems={total}
+            itemsPerPage={10}
+            onPageChange={(newPage) => setPage(newPage)}
+            itemName={__('destinations', 'destinations')}
+          />
+        </div>
       )}
     </div>
   );

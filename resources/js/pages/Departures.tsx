@@ -3,9 +3,9 @@
  * Manage trip departures (manual and recurring-generated)
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, AlertCircle, Edit, Trash2, Columns } from 'lucide-react';
+import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -16,6 +16,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/badge';
 import { DateRangePicker } from '../components/ui/date-range-picker';
 import { DeparturesTableSkeleton } from '../components/ui/table-skeleton';
+import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
+import { Table as SharedTable } from '../components/shared/Table';
+import { Pagination } from '../components/shared/Pagination';
 import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 // Format date helper
@@ -49,7 +52,7 @@ interface Departure {
   max_capacity: number;
   booked_count: number;
   available_capacity: number;
-  status: 'upcoming' | 'full' | 'past' | 'cancelled';
+  status: 'upcoming' | 'full' | 'past' | 'cancelled' | 'trash';
   source: 'manual' | 'booking_created';
   price_override?: number;
   total_revenue?: number;
@@ -97,7 +100,7 @@ const Departures: React.FC = () => {
       return null;
     }
   });
-  const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'full' | 'past' | 'cancelled'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'upcoming' | 'full' | 'past' | 'cancelled' | 'trash'>('all');
   const [sourceFilter, setSourceFilter] = useState<'all' | 'manual' | 'booking_created'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFrom, setDateFrom] = useState<string>('');
@@ -113,9 +116,9 @@ const Departures: React.FC = () => {
     } catch {
       // Ignore errors
     }
-    // Default column visibility (source hidden by default)
+    // Default column visibility (trip and source hidden by default)
     return {
-      trip: true,
+      trip: false,
       date: true,
       time: true,
       capacity: true,
@@ -130,6 +133,8 @@ const Departures: React.FC = () => {
   });
   const columnMenuRef = useRef<HTMLDivElement>(null);
   const [travelerModalDeparture, setTravelerModalDeparture] = useState<Departure | null>(null);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
   const queryClient = useQueryClient();
   const { showToast } = useToast();
 
@@ -163,6 +168,12 @@ const Departures: React.FC = () => {
     setVisibleColumns((prev: typeof visibleColumns) => ({ ...prev, [column]: !prev[column] }));
   };
 
+  const columnOptions = Object.entries(visibleColumns).map(([key, value]) => ({
+    key,
+    label: key.charAt(0).toUpperCase() + key.slice(1),
+    visible: Boolean(value),
+  }));
+
   // Save selected trip to localStorage whenever it changes
   useEffect(() => {
     try {
@@ -187,7 +198,7 @@ const Departures: React.FC = () => {
 
   // Note: We pass filter values directly to the API call instead of building queryParams
 
-  // Fetch departures data
+  // Fetch departures data for the current status tab (filtered list)
   const { data: departuresData, isLoading } = useQuery({
     queryKey: ['departures', selectedTripId, statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page],
     queryFn: async () => {
@@ -228,6 +239,172 @@ const Departures: React.FC = () => {
     enabled: true,
   });
 
+  const departures: Departure[] = departuresData?.data || [];
+
+  const totalItems = departuresData?.meta?.total ?? 0;
+  const itemsPerPage = 20;
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
+
+  // Fetch departures stats without status filter so tab counts stay stable across tabs
+  const { data: departuresStatsData } = useQuery({
+    queryKey: ['departures-stats', selectedTripId, sourceFilter, searchTerm, dateFrom, dateTo],
+    queryFn: async () => {
+      const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : '/departures';
+
+      const response = await apiClient.get(endpoint, {
+        params: {
+          // NOTE: intentionally no status param here
+          source: sourceFilter !== 'all' ? sourceFilter : undefined,
+          search: searchTerm || undefined,
+          date_from: (dateFrom && dateFrom.trim() !== '') ? dateFrom : undefined,
+          date_to: (dateTo && dateTo.trim() !== '') ? dateTo : undefined,
+          include_past: (dateFrom && dateFrom.trim() !== '') || (dateTo && dateTo.trim() !== '') ? 'true' : 'false',
+          page: 1,
+          per_page: 1000,
+        },
+      });
+
+      return response?.data || [];
+    },
+    enabled: true,
+  });
+
+  const statusCounts = useMemo(() => {
+    const allDepartures: Departure[] = Array.isArray(departuresStatsData) ? departuresStatsData : [];
+
+    const counts = {
+      all: allDepartures.length,
+      upcoming: 0,
+      full: 0,
+      past: 0,
+      cancelled: 0,
+      trash: 0,
+    };
+
+    allDepartures.forEach((departure) => {
+      if (departure.status === 'upcoming') counts.upcoming += 1;
+      if (departure.status === 'full') counts.full += 1;
+      if (departure.status === 'past') counts.past += 1;
+      if (departure.status === 'cancelled') counts.cancelled += 1;
+      if (departure.status === 'trash') counts.trash += 1;
+    });
+
+    return counts;
+  }, [departuresStatsData]);
+
+  const statusOptions = [
+    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+    { key: 'upcoming', label: __('Upcoming', 'Upcoming'), count: statusCounts.upcoming },
+    { key: 'full', label: __('Full', 'Full'), count: statusCounts.full },
+    { key: 'past', label: __('Past', 'Past'), count: statusCounts.past },
+    { key: 'cancelled', label: __('Cancelled', 'Cancelled'), count: statusCounts.cancelled },
+    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+  ];
+
+  const bulkActionOptions = useMemo(
+    () => {
+      if (statusFilter === 'trash') {
+        return [
+          { value: 'restore', label: __('Restore', 'Restore') },
+          { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        ];
+      }
+      return [
+        { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
+      ];
+    },
+    [statusFilter]
+  );
+
+  const handleBulkApply = async () => {
+    const ids = selectedIds;
+
+    if (!bulkAction || ids.length === 0) {
+      showToast(
+        __('Please select departures and a bulk action first.', 'Please select departures and a bulk action first.'),
+        'error'
+      );
+      return;
+    }
+
+    if (!selectedTripId) {
+      showToast(__('Please select a trip first', 'Please select a trip first'), 'error');
+      return;
+    }
+
+    try {
+      if (bulkAction === 'trash') {
+        // Move to trash
+        await Promise.all(
+          ids.map((id) =>
+            apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+              status: 'trash',
+            })
+          )
+        );
+        showToast(
+          __('Selected departures moved to trash.', 'Selected departures moved to trash.'),
+          'success'
+        );
+      } else if (bulkAction === 'restore') {
+        // Restore from trash
+        await Promise.all(
+          ids.map((id) =>
+            apiClient.patch(`/trips/${selectedTripId}/departures/${id}`, {
+              status: 'upcoming',
+            })
+          )
+        );
+        showToast(
+          __('Selected departures restored.', 'Selected departures restored.'),
+          'success'
+        );
+      } else if (bulkAction === 'delete') {
+        // Delete permanently (only from trash)
+        const eligibleIds = departures
+          .filter(
+            (d) =>
+              ids.includes(d.id) &&
+              d.status === 'trash' &&
+              d.source === 'booking_created' &&
+              d.booked_count === 0
+          )
+          .map((d) => d.id);
+
+        if (eligibleIds.length === 0) {
+          showToast(
+            __('No selected departures can be deleted (must be in trash, booking-created with zero bookings).',
+              'No selected departures can be deleted (must be in trash, booking-created with zero bookings).'),
+            'error'
+          );
+          return;
+        }
+
+        await Promise.all(
+          eligibleIds.map((id) =>
+            apiClient.delete(`/trips/${selectedTripId}/departures/${id}`)
+          )
+        );
+        showToast(
+          __('Selected departures deleted permanently.', 'Selected departures deleted permanently.'),
+          'success'
+        );
+      }
+
+      setSelectedIds([]);
+      setBulkAction('');
+      queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
+      queryClient.invalidateQueries({ queryKey: ['departures-stats', selectedTripId] });
+    } catch (error: any) {
+      showToast(
+        error?.message ||
+          __('Failed to perform bulk action. Please try again.',
+            'Failed to perform bulk action. Please try again.'),
+        'error'
+      );
+    }
+  };
+
   // Delete departure mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -250,12 +427,29 @@ const Departures: React.FC = () => {
     deleteMutation.mutate(id);
   };
 
+  const isAllSelected = departures.length > 0 && selectedIds.length === departures.length;
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(departures.map((d) => d.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectRow = (id: number, checked: boolean) => {
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((existingId) => existingId !== id)
+    );
+  };
+
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
       upcoming: { label: __('Upcoming', 'Upcoming'), className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
       full: { label: __('Full', 'Full'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
       past: { label: __('Past', 'Past'), className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400' },
       cancelled: { label: __('Cancelled', 'Cancelled'), className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' },
+      trash: { label: __('Trash', 'Trash'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
     };
 
     const statusInfo = statusMap[status] || statusMap.upcoming;
@@ -300,6 +494,223 @@ const Departures: React.FC = () => {
   };
 
   const closeTravelerModal = () => setTravelerModalDeparture(null);
+
+  const departureColumns = React.useMemo(
+    () => [
+      {
+        key: 'trip',
+        label: __('Trip', 'Trip'),
+        visible: visibleColumns.trip,
+        render: (departure: Departure) =>
+          departure.trip?.title ? (
+            <a
+              href={`?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`}
+              className="text-blue-600 hover:text-blue-800 hover:underline"
+              title={__('View trip', 'View trip')}
+            >
+              {departure.trip.title}
+            </a>
+          ) : (
+            <span className="text-gray-400">--</span>
+          ),
+      },
+      {
+        key: 'date',
+        label: __('Date', 'Date'),
+        visible: visibleColumns.date,
+        render: (departure: Departure) =>
+          formatDate(departure.start_date || departure.date),
+      },
+      {
+        key: 'time',
+        label: __('Time', 'Time'),
+        visible: visibleColumns.time,
+        render: (departure: Departure) =>
+          departure.time ? (
+            <span className="font-mono">{departure.time}</span>
+          ) : (
+            <span className="text-gray-400">--</span>
+          ),
+      },
+      {
+        key: 'capacity',
+        label: __('Capacity', 'Capacity'),
+        visible: visibleColumns.capacity,
+        render: (departure: Departure) => (
+          <span title={__('Max Capacity', 'Max Capacity')}>
+            {departure.max_capacity}
+          </span>
+        ),
+      },
+      {
+        key: 'booked',
+        label: __('Booked', 'Booked'),
+        visible: visibleColumns.booked,
+        render: (departure: Departure) => (
+          <span title={__('Booked Count', 'Booked Count')}>
+            {departure.booked_count}
+          </span>
+        ),
+      },
+      {
+        key: 'available',
+        label: __('Available', 'Available'),
+        visible: visibleColumns.available,
+        render: (departure: Departure) => (
+          <span
+            className={departure.available_capacity === 0 ? 'text-red-600 font-semibold' : ''}
+            title={__('Available Capacity', 'Available Capacity')}
+          >
+            {departure.available_capacity}
+          </span>
+        ),
+      },
+      {
+        key: 'revenue',
+        label: __('Revenue', 'Revenue'),
+        visible: visibleColumns.revenue,
+        render: (departure: Departure) =>
+          departure.total_revenue !== undefined && departure.total_revenue > 0 ? (
+            <span className="font-semibold text-green-600">
+              {formatCurrency(departure.total_revenue)}
+            </span>
+          ) : (
+            <span className="text-gray-400">--</span>
+          ),
+      },
+      {
+        key: 'travelers',
+        label: __('Travelers', 'Travelers'),
+        visible: visibleColumns.travelers,
+        render: (departure: Departure) => (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => openTravelerModal(departure)}
+            disabled={!departure.travelers || departure.travelers.length === 0}
+            className="px-3 py-1.5"
+          >
+            {departure.travelers_count || departure.travelers?.length || 0}{' '}
+            {__('Traveler(s)', 'Traveler(s)')}
+          </Button>
+        ),
+      },
+      {
+        key: 'bookings',
+        label: __('Bookings', 'Bookings'),
+        visible: visibleColumns.bookings,
+        render: (departure: Departure) =>
+          departure.booking_ids && departure.booking_ids.length > 0 ? (
+            <div className="flex flex-wrap gap-1">
+              {departure.booking_ids.slice(0, 3).map((bookingId) => (
+                <a
+                  key={bookingId}
+                  href={`?page=yatra&subpage=bookings&action=view&id=${bookingId}`}
+                  className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                  title={__('View booking', 'View booking')}
+                >
+                  #{bookingId}
+                </a>
+              ))}
+              {departure.booking_ids.length > 3 && (
+                <span className="text-gray-500 text-sm">
+                  +{departure.booking_ids.length - 3}
+                </span>
+              )}
+            </div>
+          ) : (
+            <span className="text-gray-400">--</span>
+          ),
+      },
+      {
+        key: 'status',
+        label: __('Status', 'Status'),
+        visible: visibleColumns.status,
+        render: (departure: Departure) => getStatusBadge(departure.status),
+      },
+      {
+        key: 'source',
+        label: __('Source', 'Source'),
+        visible: visibleColumns.source,
+        render: (departure: Departure) => getSourceBadge(departure.source),
+      },
+    ],
+    [visibleColumns, openTravelerModal]
+  );
+
+  const handleMoveToTrash = async (departure: Departure) => {
+    if (!selectedTripId) return;
+    if (!window.confirm(__('Are you sure you want to move this departure to trash?', 'Are you sure you want to move this departure to trash?'))) {
+      return;
+    }
+    try {
+      await apiClient.patch(`/trips/${selectedTripId}/departures/${departure.id}`, {
+        status: 'trash',
+      });
+      showToast(__('Departure moved to trash.', 'Departure moved to trash.'), 'success');
+      queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
+      queryClient.invalidateQueries({ queryKey: ['departures-stats', selectedTripId] });
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to move departure to trash', 'Failed to move departure to trash'), 'error');
+    }
+  };
+
+  const handleRestore = async (departure: Departure) => {
+    if (!selectedTripId) return;
+    if (!window.confirm(__('Are you sure you want to restore this departure?', 'Are you sure you want to restore this departure?'))) {
+      return;
+    }
+    try {
+      await apiClient.patch(`/trips/${selectedTripId}/departures/${departure.id}`, {
+        status: 'upcoming',
+      });
+      showToast(__('Departure restored.', 'Departure restored.'), 'success');
+      queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
+      queryClient.invalidateQueries({ queryKey: ['departures-stats', selectedTripId] });
+    } catch (error: any) {
+      showToast(error?.message || __('Failed to restore departure', 'Failed to restore departure'), 'error');
+    }
+  };
+
+  const tableActions = React.useMemo(
+    () => {
+      const actions = [
+        {
+          key: 'edit',
+          label: __('Edit', 'Edit'),
+          icon: <Edit className="w-4 h-4" />,
+          onClick: (departure: Departure) => navigateToEdit(departure.id),
+          condition: (departure: Departure) => departure.status !== 'trash',
+        },
+      ];
+
+      if (statusFilter === 'trash') {
+        actions.push({
+          key: 'restore',
+          label: __('Restore', 'Restore'),
+          icon: <RotateCcw className="w-4 h-4" />,
+          onClick: (departure: Departure) => handleRestore(departure),
+        } as any);
+        actions.push({
+          key: 'delete',
+          label: __('Delete Permanently', 'Delete Permanently'),
+          icon: <Trash2 className="w-4 h-4" />,
+          onClick: (departure: Departure) => handleDelete(departure.id),
+        } as any);
+      } else {
+        actions.push({
+          key: 'trash',
+          label: __('Move to Trash', 'Move to Trash'),
+          icon: <Trash2 className="w-4 h-4" />,
+          onClick: (departure: Departure) => handleMoveToTrash(departure),
+          variant: 'destructive' as const,
+        } as any);
+      }
+
+      return actions;
+    },
+    [statusFilter, navigateToEdit, handleDelete, handleRestore, handleMoveToTrash]
+  );
 
   return (
     <>
@@ -404,8 +815,6 @@ const Departures: React.FC = () => {
                       <option value="booking_created">{__('Booking Created', 'Booking Created')}</option>
                     </Select>
                   </div>
-                </div>
-                <div className="flex gap-4 items-end flex-wrap border-t pt-4">
                   <div className="w-80">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       {__('Date Range', 'Date Range')}
@@ -425,43 +834,32 @@ const Departures: React.FC = () => {
                       placeholder={__('Select date range...', 'Select date range...')}
                     />
                   </div>
-                  <div className="relative ml-auto" ref={columnMenuRef}>
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowColumnMenu(!showColumnMenu)}
-                      className="h-10"
-                    >
-                      <Columns className="w-4 h-4 mr-2" />
-                      {__('Columns', 'Columns')}
-                    </Button>
-                    {showColumnMenu && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50 py-2">
-                        <div className="px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-700">
-                          {__('Show Columns', 'Show Columns')}
-                        </div>
-                        {Object.entries(visibleColumns).map(([key, value]) => (
-                          <label
-                            key={key}
-                            className="flex items-center px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={Boolean(value)}
-                              onChange={() => toggleColumn(key as keyof typeof visibleColumns)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
-                            />
-                            <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
-                              {__(key.charAt(0).toUpperCase() + key.slice(1), key.charAt(0).toUpperCase() + key.slice(1))}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Bulk actions + status tabs */}
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(filter) => {
+              setStatusFilter(filter as any);
+              setPage(1);
+            }}
+            statusOptions={statusOptions}
+            showColumnsDropdown={showColumnMenu}
+            setShowColumnsDropdown={setShowColumnMenu}
+            columnOptions={columnOptions}
+            onToggleColumn={(key) => toggleColumn(key as keyof typeof visibleColumns)}
+            bulkMutationPending={deleteMutation.isPending}
+            totalItems={departures.length}
+            bulkActionOptions={bulkActionOptions}
+          />
 
           {/* Departures Table */}
           <Card>
@@ -478,161 +876,33 @@ const Departures: React.FC = () => {
                   </Button>
                 </div>
               ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      {visibleColumns.trip && <TableHead>{__('Trip', 'Trip')}</TableHead>}
-                      {visibleColumns.date && <TableHead>{__('Date', 'Date')}</TableHead>}
-                      {visibleColumns.time && <TableHead>{__('Time', 'Time')}</TableHead>}
-                      {visibleColumns.capacity && <TableHead>{__('Capacity', 'Capacity')}</TableHead>}
-                      {visibleColumns.booked && <TableHead>{__('Booked', 'Booked')}</TableHead>}
-                      {visibleColumns.available && <TableHead>{__('Available', 'Available')}</TableHead>}
-                      {visibleColumns.revenue && <TableHead>{__('Revenue', 'Revenue')}</TableHead>}
-                      {visibleColumns.travelers && <TableHead>{__('Travelers', 'Travelers')}</TableHead>}
-                      {visibleColumns.bookings && <TableHead>{__('Bookings', 'Bookings')}</TableHead>}
-                      {visibleColumns.status && <TableHead>{__('Status', 'Status')}</TableHead>}
-                      {visibleColumns.source && <TableHead>{__('Source', 'Source')}</TableHead>}
-                      <TableHead>{__('Actions', 'Actions')}</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {departuresData.data.map((departure: Departure) => (
-                      <TableRow key={departure.id}>
-                        {visibleColumns.trip && (
-                          <TableCell>
-                            {departure.trip?.title ? (
-                              <a
-                                href={`?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`}
-                                className="text-blue-600 hover:text-blue-800 hover:underline"
-                                title={__('View trip', 'View trip')}
-                              >
-                                {departure.trip.title}
-                              </a>
-                            ) : (
-                              <span className="text-gray-400">--</span>
-                            )}
-                          </TableCell>
-                        )}
-                        {visibleColumns.date && (
-                          <TableCell>
-                            {formatDate(departure.start_date || departure.date)}
-                          </TableCell>
-                        )}
-                        {visibleColumns.time && (
-                          <TableCell>
-                            {departure.time ? (
-                              <span className="font-mono">{departure.time}</span>
-                            ) : (
-                              <span className="text-gray-400">--</span>
-                            )}
-                          </TableCell>
-                        )}
-                        {visibleColumns.capacity && (
-                          <TableCell>
-                            <span title={__('Max Capacity', 'Max Capacity')}>
-                              {departure.max_capacity}
-                            </span>
-                          </TableCell>
-                        )}
-                        {visibleColumns.booked && (
-                          <TableCell>
-                            <span title={__('Booked Count', 'Booked Count')}>
-                              {departure.booked_count}
-                            </span>
-                          </TableCell>
-                        )}
-                        {visibleColumns.available && (
-                          <TableCell>
-                            <span 
-                              className={departure.available_capacity === 0 ? 'text-red-600 font-semibold' : ''}
-                              title={__('Available Capacity', 'Available Capacity')}
-                            >
-                              {departure.available_capacity}
-                            </span>
-                          </TableCell>
-                        )}
-                        {visibleColumns.revenue && (
-                          <TableCell>
-                            {departure.total_revenue !== undefined && departure.total_revenue > 0 ? (
-                              <span className="font-semibold text-green-600">
-                                {formatCurrency(departure.total_revenue)}
-                              </span>
-                            ) : (
-                              <span className="text-gray-400">--</span>
-                            )}
-                          </TableCell>
-                        )}
-                        {visibleColumns.travelers && (
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openTravelerModal(departure)}
-                              disabled={!departure.travelers || departure.travelers.length === 0}
-                              className="px-3 py-1.5"
-                            >
-                              {departure.travelers_count || departure.travelers?.length || 0}{' '}
-                              {__('Traveler(s)', 'Traveler(s)')}
-                            </Button>
-                          </TableCell>
-                        )}
-                        {visibleColumns.bookings && (
-                          <TableCell>
-                            {departure.booking_ids && departure.booking_ids.length > 0 ? (
-                              <div className="flex flex-wrap gap-1">
-                                {departure.booking_ids.slice(0, 3).map((bookingId) => (
-                                  <a
-                                    key={bookingId}
-                                    href={`?page=yatra&subpage=bookings&action=view&id=${bookingId}`}
-                                    className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
-                                    title={__('View booking', 'View booking')}
-                                  >
-                                    #{bookingId}
-                                  </a>
-                                ))}
-                                {departure.booking_ids.length > 3 && (
-                                  <span className="text-gray-500 text-sm">
-                                    +{departure.booking_ids.length - 3}
-                                  </span>
-                                )}
-                              </div>
-                            ) : (
-                              <span className="text-gray-400">--</span>
-                            )}
-                          </TableCell>
-                        )}
-                        {visibleColumns.status && <TableCell>{getStatusBadge(departure.status)}</TableCell>}
-                        {visibleColumns.source && <TableCell>{getSourceBadge(departure.source)}</TableCell>}
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => navigateToEdit(departure.id)}
-                              title={__('Edit departure', 'Edit departure')}
-                            >
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            {departure.source === 'booking_created' && departure.booked_count === 0 && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleDelete(departure.id)}
-                                className="text-red-600 hover:text-red-700"
-                                title={__('Delete departure', 'Delete departure')}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <SharedTable
+                  data={departures}
+                  columns={departureColumns}
+                  actions={tableActions}
+                  selectedItemIds={selectedIds}
+                  onSelectItem={(id, checked) => handleSelectRow(id as number, checked)}
+                  onSelectAll={handleSelectAll}
+                  isAllSelected={isAllSelected}
+                  getItemId={(departure: Departure) => departure.id}
+                  getItemStatus={(departure: Departure) => departure.status}
+                />
               )}
             </CardContent>
           </Card>
+
+          {totalItems > 0 && departures.length > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={totalItems}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(newPage) => setPage(newPage)}
+                itemName={__('departures', 'departures')}
+              />
+            </div>
+          )}
     </div>
 
       {travelerModalDeparture && travelerModalDeparture.travelers && (

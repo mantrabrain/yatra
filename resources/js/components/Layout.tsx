@@ -226,7 +226,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ]
     },
     { subpage: 'departures', label: 'Departures', icon: Calendar },
-    { subpage: 'discounts', label: 'Discount', icon: BadgePercent },
+    { subpage: 'discounts', label: 'Discounts', icon: BadgePercent },
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
     { subpage: 'bookings', label: 'Bookings', icon: Calendar },
     { subpage: 'customers', label: 'Customers', icon: UserCircle },

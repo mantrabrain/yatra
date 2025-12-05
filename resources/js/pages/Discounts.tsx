@@ -678,7 +678,7 @@ const Discounts: React.FC = () => {
       />
 
       <PageHeader
-        title={__('Discount Coupons', 'Discount Coupons')}
+        title={__('Discounts', 'Discounts')}
         description={__('Create and manage discount coupons for your trips', 'Create and manage discount coupons for your trips')}
         actionCapability="yatra_edit_bookings"
         actions={
