@@ -39,6 +39,13 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   }
 
   const total = data.reduce((sum, item) => sum + item.value, 0);
+  if (total <= 0) {
+    return (
+      <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+        {__('No data available', 'No data available')}
+      </div>
+    );
+  }
   const center = size / 2;
   const radius = donut ? size / 3 : size / 2 - 10;
   const innerRadius = donut ? size / 4 : 0;

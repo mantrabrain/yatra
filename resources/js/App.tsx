@@ -40,6 +40,7 @@ import AvailabilityForm from './pages/AvailabilityForm';
 import RecurringRuleForm from './pages/RecurringRuleForm';
 import Departures from './pages/Departures';
 import DepartureForm from './pages/DepartureForm';
+import ViewDeparture from './pages/ViewDeparture';
 import Enquiries from './pages/Enquiries';
 import ViewEnquiry from './pages/ViewEnquiry';
 import EnquiryForm from './pages/EnquiryForm';
@@ -200,7 +201,10 @@ const App: React.FC = () => {
             return <ItemTypes />;
         }
       case 'departures':
-        // Check if we're creating or editing a departure
+        // Check if we're viewing, creating, or editing a departure
+        if (action === 'view') {
+          return <ViewDeparture />;
+        }
         if (action === 'create' || action === 'edit') {
           return <DepartureForm />;
         }

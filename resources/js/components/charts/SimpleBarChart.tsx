@@ -47,18 +47,20 @@ export const SimpleBarChart: React.FC<SimpleBarChartProps> = ({
       )}
       <div className="flex items-end justify-between gap-3" style={{ height: `${chartHeight}px` }}>
         {data.map((item, index) => {
-          const barHeight = (item.value / maxValue) * 100;
+          const ratio = item.value / maxValue;
+          // Height in pixels relative to chartHeight, with a strong minimum for non-zero values
+          const barPixelHeight = item.value > 0 ? Math.max(ratio * chartHeight, 24) : 0;
           const color = item.color || defaultColors[index % defaultColors.length];
           
           return (
             <div key={index} className="flex-1 flex flex-col items-center group min-w-0">
               <div className="relative w-full flex items-end justify-center mb-3" style={{ height: '100%' }}>
                 <div
-                  className="w-full rounded-t-md transition-all hover:opacity-90 relative group/bar"
+                  className="w-3/4 max-w-[32px] rounded-t-md transition-all hover:opacity-90 relative group/bar"
                   style={{
-                    height: `${barHeight}%`,
+                    height: `${barPixelHeight}px`,
                     backgroundColor: color,
-                    minHeight: item.value > 0 ? '4px' : '0',
+                    minHeight: item.value > 0 ? '24px' : '4px',
                   }}
                   title={`${item.label}: ${item.value}`}
                 >

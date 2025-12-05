@@ -30,16 +30,16 @@ export const StatCard: React.FC<StatCardProps> = ({
   loading = false,
 }) => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700/50 p-4 hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700/50 p-3 hover:border-gray-200 dark:hover:border-gray-600 transition-colors">
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <p className="text-sm text-gray-500 dark:text-gray-400 mb-1.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
             {title}
           </p>
           {loading ? (
-            <div className="h-8 w-24 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-6 w-20 bg-gray-100 dark:bg-gray-700 rounded animate-pulse" />
           ) : (
-            <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+            <p className="text-xl font-semibold text-gray-900 dark:text-white">
               {value}
             </p>
           )}

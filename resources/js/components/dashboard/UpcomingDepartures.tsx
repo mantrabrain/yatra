@@ -11,6 +11,7 @@ import { Calendar, MapPin, Users } from 'lucide-react';
 
 interface Departure {
   id: number;
+  trip_id?: number;
   trip_title: string;
   departure_date: string;
   available_spots: number;
@@ -75,13 +76,29 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
           <div className="space-y-2">
             {departures.slice(0, 5).map((departure) => {
               const daysUntil = getDaysUntil(departure.departure_date);
-              const occupancy = ((departure.total_spots - departure.available_spots) / departure.total_spots) * 100;
+              const total = Number(departure.total_spots) || 0;
+              let occupancy = 0;
+              if (total > 0) {
+                occupancy = ((total - Number(departure.available_spots || 0)) / total) * 100;
+              }
+              // Clamp to [0, 100] to avoid negative or >100 values
+              occupancy = Math.max(0, Math.min(100, occupancy));
               
               return (
                 <div
                   key={departure.id}
                   className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
-                  onClick={() => onView && onView(departure)}
+                  onClick={() => {
+                    if (onView) {
+                      onView(departure);
+                      return;
+                    }
+                    const admin = (window as any)?.yatraAdmin;
+                    const baseUrl = admin?.siteUrl || '';
+                    const tripId = departure.trip_id || '';
+                    const query = `?page=yatra&subpage=departures&action=view&id=${departure.id}${tripId ? `&trip_id=${tripId}` : ''}`;
+                    window.location.href = `${baseUrl}/wp-admin/admin.php${query}`;
+                  }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">

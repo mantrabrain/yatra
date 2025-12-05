@@ -295,20 +295,116 @@ class TripAvailabilityController extends BaseController
     public function get_departure(WP_REST_Request $request): WP_REST_Response
     {
         $id = (int) $request->get_param('id');
-        
+        $tripId = (int) $request->get_param('trip_id');
+
         $repo = new DepartureRepository();
         $departure = $repo->findModel($id);
-        
+
         if (!$departure) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => 'Departure not found',
             ], 404);
         }
-        
+
+        // Base departure array
+        $departureArray = $departure->toArray();
+
+        // Trip information
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $trip = $tripRepository->find($tripId ?: $departure->trip_id);
+        if ($trip) {
+            $departureArray['trip'] = [
+                'id' => (int) $trip->id,
+                'title' => $trip->title ?? '',
+                'slug' => $trip->slug ?? '',
+                'summary' => $trip->short_description
+                    ?? $trip->excerpt
+                    ?? $trip->summary
+                    ?? '',
+            ];
+        }
+
+        // Related bookings and travelers (mirror get_departures logic)
+        $bookingDepartureRepo = new \Yatra\Repositories\BookingDepartureRepository();
+        $travellerRepo = new \Yatra\Repositories\TravellerRepository();
+        $bookingRepo = new \Yatra\Repositories\BookingRepository();
+
+        $bookingIds = $bookingDepartureRepo->getBookingsForDeparture($departure->id);
+        $departureArray['booking_ids'] = $bookingIds;
+        $departureArray['bookings_count'] = count($bookingIds);
+
+        // Calculate total revenue from bookings (simple sum of total_amount like list endpoint)
+        if (!empty($bookingIds)) {
+            try {
+                $totalRevenue = 0.00;
+                foreach ($bookingIds as $bookingId) {
+                    $booking = $bookingRepo->find($bookingId);
+                    if ($booking && !empty($booking->total_amount)) {
+                        $totalRevenue += (float) $booking->total_amount;
+                    }
+                }
+                $departureArray['total_revenue'] = $totalRevenue;
+            } catch (\Exception $e) {
+                // Leave original value on error
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Error calculating single departure revenue: ' . $e->getMessage());
+                }
+            }
+        }
+
+        // Travelers linked to this departure
+        $allTravelers = [];
+        foreach ($bookingIds as $bookingId) {
+            $travelers = $travellerRepo->getByBookingId($bookingId);
+            $booking = $bookingRepo->find($bookingId);
+            foreach ($travelers as $traveler) {
+                $fields = $traveler['fields'] ?? [];
+
+                $firstName = $fields['first_name']
+                    ?? $traveler['first_name']
+                    ?? ($booking->contact_first_name ?? '');
+                $lastName = $fields['last_name']
+                    ?? $traveler['last_name']
+                    ?? ($booking->contact_last_name ?? '');
+
+                $email = $fields['email']
+                    ?? $fields['contact_email']
+                    ?? $fields['primary_email']
+                    ?? ($booking->contact_email ?? '');
+
+                $phone = $fields['phone']
+                    ?? $fields['contact_phone']
+                    ?? $fields['mobile_phone']
+                    ?? $fields['whatsapp']
+                    ?? ($booking->contact_phone ?? '');
+
+                $allTravelers[] = [
+                    'id' => (int) $traveler['id'],
+                    'booking_id' => $bookingId,
+                    'booking_reference' => $booking ? ($booking->reference ?? '') : '',
+                    'is_lead' => (bool) ($traveler['is_lead'] ?? false),
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                    'email' => $email,
+                    'phone' => $phone,
+                ];
+            }
+        }
+        $departureArray['travelers'] = $allTravelers;
+        $departureArray['travelers_count'] = count($allTravelers);
+
+        // Format time (HH:MM)
+        if (!empty($departureArray['time'])) {
+            $time = $departureArray['time'];
+            if (strlen($time) > 5 && substr_count($time, ':') === 2) {
+                $departureArray['time'] = substr($time, 0, 5);
+            }
+        }
+
         return new WP_REST_Response([
             'success' => true,
-            'data' => $departure->toArray(),
+            'data' => $departureArray,
         ]);
     }
 

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw } from 'lucide-react';
+import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw, Eye } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -481,6 +481,11 @@ const Departures: React.FC = () => {
     window.location.href = `?page=yatra&subpage=departures&action=edit&id=${id}&trip_id=${selectedTripId}`;
   };
 
+  const navigateToView = (id: number) => {
+    if (!selectedTripId) return;
+    window.location.href = `?page=yatra&subpage=departures&action=view&id=${id}&trip_id=${selectedTripId}`;
+  };
+
   const clearDateFilters = () => {
     setDateFrom('');
     setDateTo('');
@@ -675,6 +680,12 @@ const Departures: React.FC = () => {
   const tableActions = React.useMemo(
     () => {
       const actions = [
+        {
+          key: 'view',
+          label: __('View', 'View'),
+          icon: <Eye className="w-4 h-4" />,
+          onClick: (departure: Departure) => navigateToView(departure.id),
+        },
         {
           key: 'edit',
           label: __('Edit', 'Edit'),
