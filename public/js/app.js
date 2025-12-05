@@ -26349,14 +26349,22 @@ const Itinerary = () => {
   const handleBulkApply = async () => {
     const ids = Array.from(selectedEntries);
     const emptyDayKeys = Array.from(selectedEmptyDays);
-    if (!bulkAction || ids.length === 0 && emptyDayKeys.length === 0) {
+    const selectedDayKeysFromEntries = /* @__PURE__ */ new Set();
+    filteredDayGroups.forEach((dg) => {
+      const hasSelectedEntry = dg.entries.some((e) => selectedEntries.has(e.id));
+      if (hasSelectedEntry) {
+        selectedDayKeysFromEntries.add(`${dg.trip_id}-${dg.day}`);
+      }
+    });
+    const combinedDayKeys = /* @__PURE__ */ new Set([...emptyDayKeys, ...selectedDayKeysFromEntries]);
+    if (!bulkAction || ids.length === 0 && combinedDayKeys.size === 0) {
       showToast(__("Please select entries or days and a bulk action first.", "Please select entries or days and a bulk action first."), "error");
       return;
     }
     const resolveDayEntryIds = async () => {
       var _a2, _b2;
       const dayEntryIds2 = [];
-      for (const key of emptyDayKeys) {
+      for (const key of combinedDayKeys) {
         const [tripIdStr, dayStr] = key.split("-");
         const tripIdNum = parseInt(tripIdStr, 10);
         const dayNum = parseInt(dayStr, 10);
@@ -26487,6 +26495,19 @@ const Itinerary = () => {
     const ampm = hour >= 12 ? "PM" : "AM";
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
+  };
+  const getEntryStatusBadge = (status) => {
+    const normalized = (status || "").toLowerCase();
+    if (normalized === "publish" || normalized === "published") {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "ml-2 text-[11px] px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800", children: __("Published", "Published") });
+    }
+    if (normalized === "draft") {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "ml-2 text-[11px] px-2 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600", children: __("Draft", "Draft") });
+    }
+    if (normalized === "trash") {
+      return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "ml-2 text-[11px] px-2 py-0.5 bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-400 dark:border-gray-700", children: __("Trash", "Trash") });
+    }
+    return null;
   };
   const dayGroups = data || [];
   const matchesStatusValue = (statusValue, filter) => {
@@ -27027,17 +27048,20 @@ const Itinerary = () => {
                                     )
                                   }
                                 ) }),
-                                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white mb-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                                  "a",
-                                  {
-                                    href: entry.item_id ? `${baseAdminUrl}?page=yatra&subpage=items&action=edit&id=${entry.item_id}` : "#",
-                                    className: "hover:underline underline-offset-2 focus:outline-none text-left text-blue-600 dark:text-blue-400",
-                                    onClick: (e) => {
-                                      if (!entry.item_id) e.preventDefault();
-                                    },
-                                    children: entry.title
-                                  }
-                                ) }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                    "a",
+                                    {
+                                      href: entry.item_id ? `${baseAdminUrl}?page=yatra&subpage=items&action=edit&id=${entry.item_id}` : "#",
+                                      className: "text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline underline-offset-2 focus:outline-none text-left",
+                                      onClick: (e) => {
+                                        if (!entry.item_id) e.preventDefault();
+                                      },
+                                      children: entry.title
+                                    }
+                                  ),
+                                  getEntryStatusBadge(entry.status)
+                                ] }),
                                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-2", children: entry.description }),
                                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1 text-xs text-gray-500 dark:text-gray-400", children: [
                                   /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center flex-wrap gap-4", children: [

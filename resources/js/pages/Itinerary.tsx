@@ -761,7 +761,18 @@ const Itinerary: React.FC = () => {
     const ids = Array.from(selectedEntries);
     const emptyDayKeys = Array.from(selectedEmptyDays);
 
-    if (!bulkAction || (ids.length === 0 && emptyDayKeys.length === 0)) {
+    // Also treat days that have at least one selected entry as selected days
+    const selectedDayKeysFromEntries = new Set<string>();
+    filteredDayGroups.forEach((dg) => {
+      const hasSelectedEntry = dg.entries.some((e) => selectedEntries.has(e.id));
+      if (hasSelectedEntry) {
+        selectedDayKeysFromEntries.add(`${dg.trip_id}-${dg.day}`);
+      }
+    });
+
+    const combinedDayKeys = new Set<string>([...emptyDayKeys, ...selectedDayKeysFromEntries]);
+
+    if (!bulkAction || (ids.length === 0 && combinedDayKeys.size === 0)) {
       showToast(__('Please select entries or days and a bulk action first.', 'Please select entries or days and a bulk action first.'), 'error');
       return;
     }
@@ -770,7 +781,7 @@ const Itinerary: React.FC = () => {
     const resolveDayEntryIds = async (): Promise<number[]> => {
       const dayEntryIds: number[] = [];
 
-      for (const key of emptyDayKeys) {
+      for (const key of combinedDayKeys) {
         const [tripIdStr, dayStr] = key.split('-');
         const tripIdNum = parseInt(tripIdStr, 10);
         const dayNum = parseInt(dayStr, 10);
@@ -942,6 +953,36 @@ const Itinerary: React.FC = () => {
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
+  };
+
+  const getEntryStatusBadge = (status: string) => {
+    const normalized = (status || '').toLowerCase();
+
+    if (normalized === 'publish' || normalized === 'published') {
+      return (
+        <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800">
+          {__('Published', 'Published')}
+        </Badge>
+      );
+    }
+
+    if (normalized === 'draft') {
+      return (
+        <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">
+          {__('Draft', 'Draft')}
+        </Badge>
+      );
+    }
+
+    if (normalized === 'trash') {
+      return (
+        <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-400 dark:border-gray-700">
+          {__('Trash', 'Trash')}
+        </Badge>
+      );
+    }
+
+    return null;
   };
 
   const dayGroups: DayGroup[] = (data || []) as DayGroup[];
@@ -1624,14 +1665,15 @@ const Itinerary: React.FC = () => {
                                     </Badge>
                                     </a>
                                   </div>
-                                  <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                                  <div className="flex items-center gap-2 mb-1">
                                     <a
                                       href={entry.item_id ? `${baseAdminUrl}?page=yatra&subpage=items&action=edit&id=${entry.item_id}` : '#'}
-                                      className="hover:underline underline-offset-2 focus:outline-none text-left text-blue-600 dark:text-blue-400"
+                                      className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline underline-offset-2 focus:outline-none text-left"
                                       onClick={(e) => { if (!entry.item_id) e.preventDefault(); }}
                                     >
                                       {entry.title}
                                     </a>
+                                    {getEntryStatusBadge(entry.status)}
                                   </div>
                                   <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                     {entry.description}
