@@ -1152,7 +1152,7 @@ const Itinerary: React.FC = () => {
 
           {tripFilter && (() => {
             const tripsList = Array.isArray(tripsData) ? tripsData : [];
-            const selectedTrip = tripsList.find((t: any) => t.id === parseInt(tripFilter));
+            const selectedTrip = tripsList.find((t: any) => t.id.toString() === tripFilter);
             return selectedTrip ? (
               <div className="flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700">
                 <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
@@ -1264,7 +1264,7 @@ const Itinerary: React.FC = () => {
                 </Card>
               ))}
             </div>
-          ) : dayGroups.length === 0 ? (
+          ) : filteredDayGroups.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
               <div className="flex flex-col items-center gap-4">
@@ -1362,6 +1362,10 @@ const Itinerary: React.FC = () => {
                 return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
               });
 
+              const tripsList = Array.isArray(tripsData) ? tripsData : [];
+              const selectedTripForLayout = tripsList.find((t: any) => t.id.toString() === tripFilter);
+              const isSingleDayTrip = selectedTripForLayout?.trip_type === 'single_day';
+
               return (
               <div
                 key={key}
@@ -1407,13 +1411,13 @@ const Itinerary: React.FC = () => {
                   >
                       <div className="flex items-center gap-3">
                         <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium">
-                          {__('Day', 'Day')} {dayGroup.day}
+                          {isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} {dayGroup.day}
                         </div>
                         <div>
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
                             {dayGroup.day_title 
-                              ? `${__('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
-                              : `${__('Day', 'Day')} ${dayGroup.day}`
+                              ? `${isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
+                              : `${isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} ${dayGroup.day}`
                             }
                             {getDayStatusBadge(dayGroup)}
                           </h3>
@@ -1476,7 +1480,7 @@ const Itinerary: React.FC = () => {
                                 className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                               >
                                 <Pencil className="w-4 h-4" />
-                                {__('Edit Day', 'Edit Day')}
+                                {isSingleDayTrip ? __('Edit Entry', 'Edit Entry') : __('Edit Day', 'Edit Day')}
                               </button>
                               <ConditionalRender capability="yatra_delete_trips">
                                 <button
@@ -1484,7 +1488,7 @@ const Itinerary: React.FC = () => {
                                   className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                 >
                                   <Trash2 className="w-4 h-4" />
-                                  {__('Delete Day', 'Delete Day')}
+                                  {isSingleDayTrip ? __('Delete Entry', 'Delete Entry') : __('Delete Day', 'Delete Day')}
                                 </button>
                               </ConditionalRender>
                             </div>

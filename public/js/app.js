@@ -26634,7 +26634,7 @@ const Itinerary = () => {
         ] }),
         tripFilter && (() => {
           const tripsList = Array.isArray(tripsData) ? tripsData : [];
-          const selectedTrip = tripsList.find((t) => t.id === parseInt(tripFilter));
+          const selectedTrip = tripsList.find((t) => t.id.toString() === tripFilter);
           return selectedTrip ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }),
@@ -26704,7 +26704,7 @@ const Itinerary = () => {
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-2 animate-pulse" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" })
         ] })
-      ] }) }) }) }, i)) }) : dayGroups.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
+      ] }) }) }) }, i)) }) : filteredDayGroups.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-gray-400" }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white mb-1", children: (() => {
@@ -26782,6 +26782,9 @@ const Itinerary = () => {
             const timeB = b.start_time.split(":").map(Number);
             return timeA[0] * 60 + timeA[1] - (timeB[0] * 60 + timeB[1]);
           });
+          const tripsList = Array.isArray(tripsData) ? tripsData : [];
+          const selectedTripForLayout = tripsList.find((t) => t.id.toString() === tripFilter);
+          const isSingleDayTrip = (selectedTripForLayout == null ? void 0 : selectedTripForLayout.trip_type) === "single_day";
           return /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
             {
@@ -26826,13 +26829,13 @@ const Itinerary = () => {
                           onClick: () => toggleDay(dayGroup.trip_id, dayGroup.day),
                           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
                             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium", children: [
-                              __("Day", "Day"),
+                              isSingleDayTrip ? __("Entry", "Entry") : __("Day", "Day"),
                               " ",
                               dayGroup.day
                             ] }),
                             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                               /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white flex items-center", children: [
-                                dayGroup.day_title ? `${__("Day", "Day")} ${dayGroup.day}: ${dayGroup.day_title}` : `${__("Day", "Day")} ${dayGroup.day}`,
+                                dayGroup.day_title ? `${isSingleDayTrip ? __("Entry", "Entry") : __("Day", "Day")} ${dayGroup.day}: ${dayGroup.day_title}` : `${isSingleDayTrip ? __("Entry", "Entry") : __("Day", "Day")} ${dayGroup.day}`,
                                 getDayStatusBadge(dayGroup)
                               ] }),
                               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400", children: [
@@ -26899,7 +26902,7 @@ const Itinerary = () => {
                                         className: "w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                                         children: [
                                           /* @__PURE__ */ jsxRuntimeExports.jsx(Pencil, { className: "w-4 h-4" }),
-                                          __("Edit Day", "Edit Day")
+                                          isSingleDayTrip ? __("Edit Entry", "Edit Entry") : __("Edit Day", "Edit Day")
                                         ]
                                       }
                                     ),
@@ -26910,7 +26913,7 @@ const Itinerary = () => {
                                         className: "w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2",
                                         children: [
                                           /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
-                                          __("Delete Day", "Delete Day")
+                                          isSingleDayTrip ? __("Delete Entry", "Delete Entry") : __("Delete Day", "Delete Day")
                                         ]
                                       }
                                     ) })
