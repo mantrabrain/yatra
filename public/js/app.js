@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, d as MapPin, e as CircleUser, f as Tag, R as Route, g as FileText, h as Calendar$1, B as BadgePercent, i as CreditCard, P as Plane, k as MessageSquare, S as Star, l as BarChart3, m as Puzzle, n as Settings$1, o as ChevronDown, p as ChevronRight, q as RefreshCw, s as Loader2, t as Sun, v as Moon, w as Bell, U as User, x as commonjsGlobal, y as getDefaultExportFromCjs, z as reactIsExports, D as React, E as Animate, G as Users, H as Clock, I as DollarSign, J as ArrowRight, K as Info, N as HelpCircle, O as MoreVertical, Q as AlertTriangle, X, V as Columns, W as ExternalLink, Y as Mountain, Z as PenSquare, _ as ArrowUp, $ as ArrowDown, a0 as Archive, a1 as Trash2, a2 as Plus, a3 as Search, a4 as ArrowUpDown, a5 as AlertCircle, a6 as XCircle, a7 as CheckCircle, a8 as Flame, a9 as Zap, aa as Heart, ab as ShoppingBag, ac as BookOpen, ad as Gamepad2, ae as Music, af as Image, ag as Eye, ah as Footprints, ai as Bed, aj as Coffee, ak as Hotel, al as Car, am as Palette, an as Waves, ao as Camera, ap as Target, aq as Package, ar as Bus, as as Building2, at as UtensilsCrossed, au as CheckCircle2, av as GripVertical, aw as Pencil, ax as Copy, ay as Check, az as Mail, aA as Lightbulb, aB as Database, aC as History, aD as Save, aE as Sparkles, aF as ChevronLeft, aG as Box, aH as ChevronUp, aI as Upload, aJ as RotateCcw, aK as ArrowLeft, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as TrendingDown, aR as PieChart$1, aS as ClipboardList, aT as Receipt, aU as Plug, aV as Shield, aW as Lock, aX as EyeOff, aY as Ban, aZ as Send, a_ as Crown, a$ as reactDomExports, b0 as Filter, b1 as QueryClient, b2 as client, b3 as QueryClientProvider } from "./react-vendor-CBYsGUci.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-Cnl2mpbz.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as HelpCircle, Q as MoreVertical, V as AlertTriangle, X, W as Columns, Y as ExternalLink, Z as Mountain, _ as PenSquare, $ as ArrowUp, a0 as ArrowDown, a1 as Archive, a2 as Trash2, a3 as Plus, a4 as Search, a5 as ArrowUpDown, a6 as AlertCircle, a7 as XCircle, a8 as CheckCircle, a9 as Flame, aa as Zap, ab as Heart, ac as ShoppingBag, ad as BookOpen, ae as Gamepad2, af as Music, ag as Image, ah as Eye, ai as Footprints, aj as Bed, ak as Coffee, al as Hotel, am as Car, an as Palette, ao as Waves, ap as Camera, aq as Target, ar as Package, as as Bus, at as Building2, au as UtensilsCrossed, av as CheckCircle2, aw as GripVertical, ax as Pencil, ay as Copy, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as TrendingDown, aR as PieChart$1, aS as ClipboardList, aT as Receipt, aU as Plug, aV as Shield, aW as Lock, aX as EyeOff, aY as Ban, aZ as Send, a_ as Crown, a$ as reactDomExports, b0 as Filter, b1 as QueryClient, b2 as client, b3 as QueryClientProvider } from "./react-vendor-_U5MdN6Y.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-XMgb0gs9.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -444,9 +444,22 @@ const Layout = ({ children }) => {
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `min-h-screen ${darkMode ? "dark bg-gray-900" : "bg-gray-50"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex h-screen overflow-hidden", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("aside", { className: "w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-16 px-6 flex items-center border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-bold text-lg", children: "Y" }) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl font-bold text-gray-900 dark:text-white", children: "Yatra" })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-16 px-6 flex items-center border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col w-full gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-bold text-lg", children: "Y" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl font-bold text-gray-900 dark:text-white", children: "Yatra" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "a",
+          {
+            href: ((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+            className: "inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Back to WordPress" })
+            ]
+          }
+        )
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex-1 p-4 space-y-1 overflow-y-auto", children: menuItems.map((item) => {
         const Icon = item.icon;
@@ -495,15 +508,7 @@ const Layout = ({ children }) => {
             ]
           }
         ) }, item.subpage);
-      }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        "a",
-        {
-          href: ((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
-          className: "flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors",
-          children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "← Back to WordPress" })
-        }
-      ) })
+      }) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex-1 flex flex-col ${isTripFormPage ? "overflow-hidden" : "overflow-y-auto"}`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between w-full", children: [
@@ -40609,6 +40614,9 @@ const Reports = () => {
   const [dateRange, setDateRange] = reactExports.useState("last_30_days");
   const [startDate, setStartDate] = reactExports.useState("");
   const [endDate, setEndDate] = reactExports.useState("");
+  const [revenueTripFilter, setRevenueTripFilter] = reactExports.useState("");
+  const [bookingTripFilter, setBookingTripFilter] = reactExports.useState("");
+  const [bookingStatusFilter, setBookingStatusFilter] = reactExports.useState("");
   const dateRangeParams = reactExports.useMemo(() => {
     const today = /* @__PURE__ */ new Date();
     let start;
@@ -40842,6 +40850,43 @@ const Reports = () => {
   const paymentStatus = (reportData == null ? void 0 : reportData.payment_status) || [];
   const operationalStats = reportData == null ? void 0 : reportData.operational_stats;
   const customerAnalytics = reportData == null ? void 0 : reportData.customer_analytics;
+  const revenueByTrip = (reportData == null ? void 0 : reportData.revenue_by_trip) || [];
+  const bookingsTable = (reportData == null ? void 0 : reportData.bookings_table) || [];
+  const travelerSegments = reportData == null ? void 0 : reportData.traveler_segments;
+  const departuresTable = (reportData == null ? void 0 : reportData.departures_table) || [];
+  const occupancyTrend = (reportData == null ? void 0 : reportData.occupancy_trend) || [];
+  const seatUtilization = (reportData == null ? void 0 : reportData.seat_utilization) || [];
+  const cancellationsSummary = reportData == null ? void 0 : reportData.cancellations;
+  reportData == null ? void 0 : reportData.profitability;
+  const revenueTripOptions = reactExports.useMemo(() => {
+    const names = /* @__PURE__ */ new Set();
+    revenueByTrip.forEach((row) => {
+      if (row.trip) {
+        names.add(String(row.trip));
+      }
+    });
+    return Array.from(names).sort();
+  }, [revenueByTrip]);
+  const bookingTripOptions = reactExports.useMemo(() => {
+    const names = /* @__PURE__ */ new Set();
+    bookingsTable.forEach((row) => {
+      if (row.trip) {
+        names.add(String(row.trip));
+      }
+    });
+    return Array.from(names).sort();
+  }, [bookingsTable]);
+  const filteredRevenueByTrip = reactExports.useMemo(() => {
+    if (!revenueTripFilter) return revenueByTrip;
+    return revenueByTrip.filter((row) => row.trip === revenueTripFilter);
+  }, [revenueByTrip, revenueTripFilter]);
+  const filteredBookingsTable = reactExports.useMemo(() => {
+    return bookingsTable.filter((row) => {
+      if (bookingTripFilter && row.trip !== bookingTripFilter) return false;
+      if (bookingStatusFilter && row.status !== bookingStatusFilter) return false;
+      return true;
+    });
+  }, [bookingsTable, bookingTripFilter, bookingStatusFilter]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
@@ -41193,6 +41238,397 @@ const Reports = () => {
               ] })
             ] }, idx))
           ] })
+        ] })
+      ] }),
+      travelerSegments && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "py-3 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
+          __("Traveler Reports", "Traveler Reports")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-4 pb-5 pt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2", children: __("Traveler Categories", "Traveler Categories") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-[220px]", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(PieChart, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Pie,
+                {
+                  data: travelerSegments.segments || [],
+                  dataKey: "value",
+                  nameKey: "label",
+                  cx: "50%",
+                  cy: "50%",
+                  innerRadius: 50,
+                  outerRadius: 80,
+                  paddingAngle: 2,
+                  children: (travelerSegments.segments || []).map((seg, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Cell, { fill: ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"][index % 4] }, `trav-${index}`))
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, {}),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Legend, {})
+            ] }) }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "col-span-1 lg:col-span-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2", children: __("Travelers Over Time", "Travelers Over Time") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { style: { width: "100%", height: 220 }, children: /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(LineChart, { data: travelerSegments.trend || [], margin: { top: 8, right: 16, left: 16, bottom: 8 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", vertical: false }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                XAxis,
+                {
+                  dataKey: "label",
+                  tickLine: false,
+                  axisLine: false,
+                  tick: { fontFamily: "inherit", fontSize: 11, fill: "#6b7280" }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                YAxis,
+                {
+                  tickLine: false,
+                  axisLine: { stroke: "#e5e7eb" },
+                  tick: { fontFamily: "inherit", fontSize: 11, fill: "#6b7280" }
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, {}),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Line, { type: "monotone", dataKey: "value", stroke: "#6366f1", strokeWidth: 2, dot: false })
+            ] }) }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Total Travelers", "Total Travelers") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: travelerSegments.totalTravelers || 0 })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Avg Travelers / Booking", "Avg Travelers / Booking") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: (travelerSegments.avgTravelersPerBooking || 0).toFixed(1) })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Top Category", "Top Category") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-semibold text-gray-900 dark:text-white capitalize", children: travelerSegments.topCategory || "-" })
+              ] })
+            ] })
+          ] })
+        ] }) })
+      ] }),
+      departuresTable && departuresTable.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "py-3 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plane, { className: "w-4 h-4" }),
+          __("Departure Reports", "Departure Reports")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 pb-5 pt-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { width: "100%", height: 220 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Occupancy Rate Over Time", "Occupancy Rate Over Time") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(LineChart, { data: occupancyTrend || [], margin: { top: 8, right: 16, left: 16, bottom: 8 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", vertical: false }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "label", tickLine: false, axisLine: false, tick: { fontSize: 11, fill: "#6b7280" } }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { tickLine: false, axisLine: { stroke: "#e5e7eb" }, tick: { fontSize: 11, fill: "#6b7280" } }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Line, { type: "monotone", dataKey: "value", stroke: "#0ea5e9", strokeWidth: 2, dot: false })
+              ] }) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { style: { width: "100%", height: 220 }, children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Seat Utilization by Trip", "Seat Utilization by Trip") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: "100%", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(BarChart, { data: seatUtilization || [], margin: { top: 8, right: 16, left: 0, bottom: 32 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", vertical: false }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "trip", tickLine: false, axisLine: false, angle: -20, textAnchor: "end", height: 50 }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { tickLine: false, axisLine: { stroke: "#e5e7eb" } }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, {}),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Bar, { dataKey: "utilization", fill: "#22c55e", radius: [4, 4, 0, 0] })
+              ] }) })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-full text-sm border-collapse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Departure Date", "Departure Date") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Trip", "Trip") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Max Seats", "Max Seats") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Booked", "Booked") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Left", "Left") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Status", "Status") })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: departuresTable.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-100 dark:border-gray-800", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.date || "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.trip }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: row.maxSeats ?? "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: row.bookedSeats ?? "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: row.leftSeats ?? "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "td",
+                {
+                  className: `px-4 py-2 whitespace-nowrap text-xs font-medium capitalize rounded-full
+                            ${row.status === "upcoming" ? "text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-blue-900/30" : row.status === "completed" || row.status === "past" ? "text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/30" : row.status === "expired" || row.status === "cancelled" ? "text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30" : "text-gray-700 bg-gray-50 dark:text-gray-300 dark:bg-gray-900/40"}`,
+                  children: row.status || "-"
+                }
+              )
+            ] }, idx)) })
+          ] }) })
+        ] })
+      ] }),
+      cancellationsSummary && bookingsTable && bookingsTable.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "py-3 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+          __("Cancellations Report", "Cancellations Report")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 pb-5 pt-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 text-xs text-gray-500 dark:text-gray-400", children: [
+            __("Total cancellations", "Total cancellations"),
+            ": ",
+            cancellationsSummary.totalCancellations || 0,
+            " ",
+            "• ",
+            __("Cancellation rate", "Cancellation rate"),
+            ": ",
+            (cancellationsSummary.cancellationRate || 0).toFixed(1),
+            "%",
+            " ",
+            "• ",
+            __("Revenue lost", "Revenue lost"),
+            ": ",
+            formatPrice(cancellationsSummary.revenueLost || 0)
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-full text-sm border-collapse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Booking ID", "Booking ID") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Trip", "Trip") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Departure Date", "Departure Date") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Reason", "Reason") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Refund Amount", "Refund Amount") })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("tbody", { children: bookingsTable.filter((row) => row.status === "cancelled").map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-100 dark:border-gray-800", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.bookingNumber || row.id }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.trip }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200", children: row.departureDate || "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-gray-700 dark:text-gray-200", children: row.cancellationReason || "-" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.refundAmount || 0) })
+            ] }, idx)) })
+          ] }) })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "py-3 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(BarChart3, { className: "w-4 h-4" }),
+          __("Profitability", "Profitability")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 pb-5 pt-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Total Revenue", "Total Revenue") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: formatPrice((revenueStats == null ? void 0 : revenueStats.total) || 0) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Estimated Cost", "Estimated Cost") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: formatPrice(0) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Estimated Profit", "Estimated Profit") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: formatPrice((revenueStats == null ? void 0 : revenueStats.total) || 0) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Profit Margin", "Profit Margin") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: revenueStats && revenueStats.total > 0 ? "100%" : "0%" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Profit per Trip", "Profit per Trip") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ResponsiveContainer, { width: "100%", height: 120, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(BarChart, { data: revenueByTrip || [], margin: { top: 4, right: 12, left: 0, bottom: 24 }, children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CartesianGrid, { strokeDasharray: "3 3", vertical: false }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XAxis, { dataKey: "trip", tickLine: false, axisLine: false, angle: -20, textAnchor: "end", height: 50 }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(YAxis, { tickLine: false, axisLine: { stroke: "#e5e7eb" }, domain: [0, (dataMax) => dataMax * 1.2] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Tooltip, { formatter: (value) => formatPrice(Number(value)) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Bar, { dataKey: "totalRevenue", name: __("Profit", "Profit"), fill: "#22c55e", radius: [4, 4, 0, 0] })
+              ] }) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "w-full overflow-x-auto", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Trip Profitability", "Trip Profitability") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-full text-sm border-collapse", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Trip", "Trip") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Revenue", "Revenue") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Estimated Cost", "Estimated Cost") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Estimated Profit", "Estimated Profit") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Margin %", "Margin %") })
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
+                  (revenueByTrip || []).map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-100 dark:border-gray-800", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.trip }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.totalRevenue || 0) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(0) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.totalRevenue || 0) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: row.totalRevenue > 0 ? "100%" : "0%" })
+                  ] }, idx)),
+                  (!revenueByTrip || revenueByTrip.length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 5, className: "px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400", children: __("No profitability data available for this period.", "No profitability data available for this period.") }) })
+                ] })
+              ] })
+            ] })
+          ] })
+        ] })
+      ] }),
+      revenueByTrip && revenueByTrip.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(DollarSign, { className: "w-4 h-4" }),
+            __("Revenue Reports", "Revenue Reports")
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("Trip", "Trip") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                value: revenueTripFilter,
+                onChange: (e) => setRevenueTripFilter(e.target.value),
+                className: "h-8 min-w-[140px]",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("All Trips", "All Trips") }),
+                  revenueTripOptions.map((name) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: name, children: name }, name))
+                ]
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "px-4 pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-full text-sm border-collapse", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Trip", "Trip") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Total Revenue", "Total Revenue") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Avg / Booking", "Avg / Booking") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Paid", "Paid") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Pending", "Pending") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Refunded", "Refunded") })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
+            filteredRevenueByTrip.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-100 dark:border-gray-800", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-gray-800 dark:text-gray-100 whitespace-nowrap", children: row.trip }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.totalRevenue || 0) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.avgRevenuePerBooking || 0) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right text-green-600 dark:text-green-400", children: formatPrice(row.paidTotal || 0) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right text-yellow-600 dark:text-yellow-400", children: formatPrice(row.pendingTotal || 0) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right text-red-600 dark:text-red-400", children: formatPrice(row.refundedTotal || 0) })
+            ] }, idx)),
+            filteredRevenueByTrip.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 6, className: "px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400", children: __("No revenue data found for this filter.", "No revenue data found for this filter.") }) })
+          ] })
+        ] }) }) })
+      ] }),
+      bookingsTable && bookingsTable.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "mt-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "py-3 px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-3 md:flex-row md:items-center md:justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4" }),
+            __("Booking Reports", "Booking Reports")
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-2 items-center", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                __("Trip", "Trip"),
+                ":"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: bookingTripFilter,
+                  onChange: (e) => setBookingTripFilter(e.target.value),
+                  className: "h-8 min-w-[140px]",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("All Trips", "All Trips") }),
+                    bookingTripOptions.map((name) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: name, children: name }, name))
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                __("Status", "Status"),
+                ":"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: bookingStatusFilter,
+                  onChange: (e) => setBookingStatusFilter(e.target.value),
+                  className: "h-8 min-w-[120px]",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("All", "All") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "confirmed", children: __("Confirmed", "Confirmed") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pending", children: __("Pending", "Pending") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "cancelled", children: __("Cancelled", "Cancelled") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "completed", children: __("Completed", "Completed") })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: () => {
+                  const header = ["Booking ID", "Trip", "Departure Date", "Travelers", "Price", "Payment Method", "Status"];
+                  const rows = filteredBookingsTable.map((row) => [
+                    row.bookingNumber || row.id || "",
+                    row.trip || "",
+                    row.departureDate || "",
+                    row.travelerCount ?? "",
+                    row.price ?? "",
+                    row.paymentMethod || "",
+                    row.status || ""
+                  ]);
+                  const csv = [header.join(","), ...rows.map((r2) => r2.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(","))].join("\n");
+                  const filename = `booking_reports_${dateRangeParams.start}_to_${dateRangeParams.end}.csv`;
+                  downloadFile(csv, filename, "text/csv;charset=utf-8;");
+                },
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-3 h-3 mr-1" }),
+                  __("Export CSV", "Export CSV")
+                ]
+              }
+            )
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "px-4 pb-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3 text-xs text-gray-500 dark:text-gray-400", children: [
+            __("Total bookings", "Total bookings"),
+            ": ",
+            filteredBookingsTable.length,
+            bookingStats && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              " ",
+              "• ",
+              __("Confirmed", "Confirmed"),
+              ": ",
+              bookingStats.confirmed || 0,
+              " ",
+              "• ",
+              __("Cancelled", "Cancelled"),
+              ": ",
+              bookingStats.cancelled || 0
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("table", { className: "w-full min-w-full text-sm border-collapse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("thead", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Booking ID", "Booking ID") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Trip", "Trip") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Departure Date", "Departure Date") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Travelers", "Travelers") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Price", "Price") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Payment Method", "Payment Method") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("th", { className: "text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200", children: __("Status", "Status") })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("tbody", { children: [
+              filteredBookingsTable.map((row, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("tr", { className: "border-b border-gray-100 dark:border-gray-800", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.bookingNumber || row.id }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100", children: row.trip }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200", children: row.departureDate || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: row.travelerCount ?? "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 text-right", children: formatPrice(row.price || 0) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("td", { className: "px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200", children: row.paymentMethod || "-" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "td",
+                  {
+                    className: `px-4 py-2 whitespace-nowrap text-xs font-medium capitalize rounded-full
+                            ${row.status === "confirmed" || row.status === "completed" ? "text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/30" : row.status === "pending" ? "text-yellow-700 bg-yellow-50 dark:text-yellow-300 dark:bg-yellow-900/30" : row.status === "cancelled" ? "text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30" : "text-gray-700 bg-gray-50 dark:text-gray-300 dark:bg-gray-900/40"}`,
+                    children: row.status || "-"
+                  }
+                )
+              ] }, idx)),
+              filteredBookingsTable.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("tr", { children: /* @__PURE__ */ jsxRuntimeExports.jsx("td", { colSpan: 7, className: "px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400", children: __("No bookings found for this filter.", "No bookings found for this filter.") }) })
+            ] })
+          ] }) })
         ] })
       ] }),
       isPro && customerAnalytics && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [

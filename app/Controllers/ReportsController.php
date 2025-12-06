@@ -385,6 +385,240 @@ class ReportsController extends BaseController
             'customerSegments'      => $customerSegments,
         ];
 
+        // --------------------------------------------------------------
+        // Extended datasets for detailed reports UI
+        // --------------------------------------------------------------
+
+        // Revenue broken down by trip
+        $revenueByTrip = [];
+        foreach ($bookings as $b) {
+            $tripTitle = $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'Untitled Trip'));
+            $amount = isset($b['total_amount']) ? (float) $b['total_amount'] : 0.0;
+            $status = strtolower((string) ($b['payment_status'] ?? $b['status'] ?? 'pending'));
+
+            if (!isset($revenueByTrip[$tripTitle])) {
+                $revenueByTrip[$tripTitle] = [
+                    'trip'          => $tripTitle,
+                    'totalRevenue'  => 0.0,
+                    'bookings'      => 0,
+                    'paidTotal'     => 0.0,
+                    'pendingTotal'  => 0.0,
+                    'refundedTotal' => 0.0,
+                ];
+            }
+
+            $revenueByTrip[$tripTitle]['totalRevenue'] += $amount;
+            $revenueByTrip[$tripTitle]['bookings']++;
+
+            if ($status === 'paid' || $status === 'completed') {
+                $revenueByTrip[$tripTitle]['paidTotal'] += $amount;
+            } elseif ($status === 'pending') {
+                $revenueByTrip[$tripTitle]['pendingTotal'] += $amount;
+            } elseif ($status === 'refunded' || $status === 'cancelled') {
+                $revenueByTrip[$tripTitle]['refundedTotal'] += $amount;
+            }
+        }
+
+        foreach ($revenueByTrip as &$tripRow) {
+            $count = $tripRow['bookings'] > 0 ? $tripRow['bookings'] : 1;
+            $tripRow['avgRevenuePerBooking'] = $tripRow['totalRevenue'] / $count;
+        }
+        unset($tripRow);
+        $revenueByTripRows = array_values($revenueByTrip);
+
+        // Flat bookings table used by detailed booking and cancellation views
+        $bookingsTable = [];
+        foreach ($bookings as $b) {
+            $travelerCount = 0;
+            $travelerCount += isset($b['adult_count']) ? (int) $b['adult_count'] : 0;
+            $travelerCount += isset($b['child_count']) ? (int) $b['child_count'] : 0;
+            $travelerCount += isset($b['senior_count']) ? (int) $b['senior_count'] : 0;
+            $travelerCount += isset($b['student_count']) ? (int) $b['student_count'] : 0;
+
+            if ($travelerCount === 0 && isset($b['travelers_count'])) {
+                $travelerCount = (int) $b['travelers_count'];
+            }
+
+            $bookingsTable[] = [
+                'id'                 => $b['id'] ?? null,
+                'bookingNumber'      => $b['booking_number'] ?? ($b['id'] ?? null),
+                'trip'               => $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'Untitled Trip')),
+                'departureDate'      => $b['travel_date'] ?? null,
+                'travelerCount'      => $travelerCount,
+                'price'              => isset($b['total_amount']) ? (float) $b['total_amount'] : 0.0,
+                'paymentMethod'      => $b['payment_method'] ?? ($b['gateway'] ?? null),
+                'status'             => strtolower((string) ($b['status'] ?? 'pending')),
+                'cancellationReason' => $b['cancellation_reason'] ?? null,
+                'refundAmount'       => isset($b['refund_amount']) ? (float) $b['refund_amount'] : 0.0,
+            ];
+        }
+
+        // Traveler segments (adult / child / senior / student) and trend
+        $travelerBuckets = [
+            'adult'   => 0,
+            'child'   => 0,
+            'senior'  => 0,
+            'student' => 0,
+        ];
+        $byDayTravelers = [];
+
+        foreach ($bookings as $b) {
+            $adult   = isset($b['adult_count']) ? (int) $b['adult_count'] : 0;
+            $child   = isset($b['child_count']) ? (int) $b['child_count'] : 0;
+            $senior  = isset($b['senior_count']) ? (int) $b['senior_count'] : 0;
+            $student = isset($b['student_count']) ? (int) $b['student_count'] : 0;
+
+            $travelerBuckets['adult']   += $adult;
+            $travelerBuckets['child']   += $child;
+            $travelerBuckets['senior']  += $senior;
+            $travelerBuckets['student'] += $student;
+
+            $createdAt = $b['created_at'] ?? ($b['travel_date'] ?? null);
+            if (!$createdAt) {
+                continue;
+            }
+            $ts = strtotime((string) $createdAt);
+            if ($ts === false) {
+                continue;
+            }
+            $dayKey = gmdate('Y-m-d', $ts);
+            $totalTravelers = $adult + $child + $senior + $student;
+            if (!isset($byDayTravelers[$dayKey])) {
+                $byDayTravelers[$dayKey] = 0;
+            }
+            $byDayTravelers[$dayKey] += $totalTravelers;
+        }
+
+        $travelersTrend = [];
+        if ($fromTs !== null && $toTs !== null && $fromTs <= $toTs) {
+            $day = $fromTs;
+            while ($day <= $toTs) {
+                $key = gmdate('Y-m-d', $day);
+                $count = $byDayTravelers[$key] ?? 0;
+                $dt = \DateTimeImmutable::createFromFormat('Y-m-d', $key);
+                if ($dt) {
+                    $travelersTrend[] = [
+                        'label' => $dt->format('j M'),
+                        'value' => $count,
+                    ];
+                }
+                $day = strtotime('+1 day', $day);
+            }
+        }
+
+        $totalTravelersAll = array_sum($travelerBuckets);
+        $avgTravelersPerBooking = $totalBookings > 0 ? $totalTravelersAll / $totalBookings : 0.0;
+        $topTravelerCategory = null;
+        if ($totalTravelersAll > 0) {
+            $maxVal = -1;
+            foreach ($travelerBuckets as $key => $val) {
+                if ($val > $maxVal) {
+                    $maxVal = $val;
+                    $topTravelerCategory = $key;
+                }
+            }
+        }
+
+        $travelerSegments = [
+            'segments' => [
+                ['label' => __('Adult', 'Adult'),   'key' => 'adult',   'value' => $travelerBuckets['adult']],
+                ['label' => __('Child', 'Child'),   'key' => 'child',   'value' => $travelerBuckets['child']],
+                ['label' => __('Senior', 'Senior'), 'key' => 'senior',  'value' => $travelerBuckets['senior']],
+                ['label' => __('Student', 'Student'), 'key' => 'student', 'value' => $travelerBuckets['student']],
+            ],
+            'totalTravelers'         => $totalTravelersAll,
+            'avgTravelersPerBooking' => $avgTravelersPerBooking,
+            'topCategory'            => $topTravelerCategory,
+            'trend'                  => $travelersTrend,
+        ];
+
+        // Departures table and occupancy datasets
+        $departuresTable = [];
+        $occupancyByDay = [];
+        $capacityByDay = [];
+        $seatUtilizationByTrip = [];
+
+        foreach ($departures as $d) {
+            $dateStr = $d['start_date'] ?? ($d['date'] ?? null);
+            $tripTitle = $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'Unknown Trip'));
+            $capacity = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
+            $booked   = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
+            $left     = $capacity > 0 ? max(0, $capacity - $booked) : 0;
+            $status   = strtolower((string) ($d['status'] ?? 'upcoming'));
+
+            $departuresTable[] = [
+                'date'        => $dateStr,
+                'trip'        => $tripTitle,
+                'maxSeats'    => $capacity,
+                'bookedSeats' => $booked,
+                'leftSeats'   => $left,
+                'status'      => $status,
+            ];
+
+            if ($dateStr) {
+                $dayKey = substr((string) $dateStr, 0, 10);
+                if (!isset($occupancyByDay[$dayKey])) {
+                    $occupancyByDay[$dayKey] = 0;
+                    $capacityByDay[$dayKey] = 0;
+                }
+                $occupancyByDay[$dayKey] += $booked;
+                $capacityByDay[$dayKey]  += $capacity;
+            }
+
+            if (!isset($seatUtilizationByTrip[$tripTitle])) {
+                $seatUtilizationByTrip[$tripTitle] = ['trip' => $tripTitle, 'booked' => 0, 'capacity' => 0];
+            }
+            $seatUtilizationByTrip[$tripTitle]['booked'] += $booked;
+            $seatUtilizationByTrip[$tripTitle]['capacity'] += $capacity;
+        }
+
+        $occupancyTrend = [];
+        foreach ($occupancyByDay as $dayKey => $bookedSum) {
+            $capSum = $capacityByDay[$dayKey] ?? 0;
+            if ($capSum <= 0) {
+                continue;
+            }
+            $dt = \DateTimeImmutable::createFromFormat('Y-m-d', $dayKey);
+            if ($dt) {
+                $occupancyTrend[] = [
+                    'label' => $dt->format('j M'),
+                    'value' => round(($bookedSum / $capSum) * 100.0, 1),
+                ];
+            }
+        }
+
+        $seatUtilization = [];
+        foreach ($seatUtilizationByTrip as $row) {
+            $cap = $row['capacity'] > 0 ? $row['capacity'] : 1;
+            $seatUtilization[] = [
+                'trip'        => $row['trip'],
+                'utilization' => round(($row['booked'] / $cap) * 100.0, 1),
+            ];
+        }
+
+        // Cancellations summary
+        $totalCancellations = 0;
+        $revenueLost = 0.0;
+        foreach ($bookingsTable as $row) {
+            if ($row['status'] === 'cancelled') {
+                $totalCancellations++;
+                $revenueLost += $row['refundAmount'] > 0 ? $row['refundAmount'] : $row['price'];
+            }
+        }
+
+        $cancellationRatePercent = $totalCount > 0 ? ($totalCancellations / $totalCount) * 100.0 : 0.0;
+        $cancellationsSummary = [
+            'totalCancellations'     => $totalCancellations,
+            'cancellationRate'       => $cancellationRatePercent,
+            'revenueLost'            => $revenueLost,
+        ];
+
+        // Profitability placeholders (phase 2)
+        $profitabilityPlaceholders = [
+            'profitPerTrip'   => [],
+            'costVsRevenue'   => [],
+        ];
+
         return new WP_REST_Response([
             'success' => true,
             'data'    => [
@@ -396,6 +630,15 @@ class ReportsController extends BaseController
                 'payment_status'     => $paymentStatus,
                 'operational_stats'  => $operationalStats,
                 'customer_analytics' => $customerAnalytics,
+                // Extended datasets
+                'revenue_by_trip'    => $revenueByTripRows,
+                'bookings_table'     => $bookingsTable,
+                'traveler_segments'  => $travelerSegments,
+                'departures_table'   => $departuresTable,
+                'occupancy_trend'    => $occupancyTrend,
+                'seat_utilization'   => $seatUtilization,
+                'cancellations'      => $cancellationsSummary,
+                'profitability'      => $profitabilityPlaceholders,
             ],
         ]);
     }

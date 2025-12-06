@@ -51,6 +51,11 @@ const Reports: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // Local filters for detailed reports sections
+  const [revenueTripFilter, setRevenueTripFilter] = useState('');
+  const [bookingTripFilter, setBookingTripFilter] = useState('');
+  const [bookingStatusFilter, setBookingStatusFilter] = useState('');
+
   // Calculate date range based on selection
   const dateRangeParams = useMemo(() => {
     const today = new Date();
@@ -317,6 +322,47 @@ const Reports: React.FC = () => {
   const paymentStatus = reportData?.payment_status || [];
   const operationalStats = reportData?.operational_stats;
   const customerAnalytics = reportData?.customer_analytics;
+  const revenueByTrip: any[] = reportData?.revenue_by_trip || [];
+  const bookingsTable: any[] = reportData?.bookings_table || [];
+  const travelerSegments = reportData?.traveler_segments;
+  const departuresTable: any[] = reportData?.departures_table || [];
+  const occupancyTrend: any[] = reportData?.occupancy_trend || [];
+  const seatUtilization: any[] = reportData?.seat_utilization || [];
+  const cancellationsSummary = reportData?.cancellations;
+  const profitability = reportData?.profitability;
+
+  const revenueTripOptions = useMemo(() => {
+    const names = new Set<string>();
+    revenueByTrip.forEach((row: any) => {
+      if (row.trip) {
+        names.add(String(row.trip));
+      }
+    });
+    return Array.from(names).sort();
+  }, [revenueByTrip]);
+
+  const bookingTripOptions = useMemo(() => {
+    const names = new Set<string>();
+    bookingsTable.forEach((row: any) => {
+      if (row.trip) {
+        names.add(String(row.trip));
+      }
+    });
+    return Array.from(names).sort();
+  }, [bookingsTable]);
+
+  const filteredRevenueByTrip = useMemo(() => {
+    if (!revenueTripFilter) return revenueByTrip;
+    return revenueByTrip.filter((row: any) => row.trip === revenueTripFilter);
+  }, [revenueByTrip, revenueTripFilter]);
+
+  const filteredBookingsTable = useMemo(() => {
+    return bookingsTable.filter((row: any) => {
+      if (bookingTripFilter && row.trip !== bookingTripFilter) return false;
+      if (bookingStatusFilter && row.status !== bookingStatusFilter) return false;
+      return true;
+    });
+  }, [bookingsTable, bookingTripFilter, bookingStatusFilter]);
 
   return (
     <div className="space-y-4">
@@ -560,7 +606,7 @@ const Reports: React.FC = () => {
                     <Tooltip />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                       {(tripPerformance || []).map((t, index) => (
-                        <Cell key={index} fill={t.color} />
+                        <Cell key={index} fill={(t as any).color} />
                       ))}
                     </Bar>
                   </BarChart>
@@ -568,7 +614,7 @@ const Reports: React.FC = () => {
               </div>
               {tripPerformance && tripPerformance.length > 0 && (
                 <div className="mt-4 space-y-2 text-sm">
-                  {tripPerformance.slice(0, 3).map((trip, idx) => (
+                  {tripPerformance.slice(0, 3).map((trip: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
                       <span className="text-gray-700 dark:text-gray-300">{trip.label}</span>
                       <div className="flex items-center gap-4">
@@ -616,7 +662,7 @@ const Reports: React.FC = () => {
               </div>
               {paymentStatus && paymentStatus.length > 0 && (
                 <div className="space-y-2 text-sm">
-                  {paymentStatus.map((status, idx) => (
+                  {paymentStatus.map((status: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: status.color }}></div>
@@ -745,6 +791,519 @@ const Reports: React.FC = () => {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Traveler Reports */}
+        {travelerSegments && (
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Users className="w-4 h-4" />
+                {__('Traveler Reports', 'Traveler Reports')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-5 pt-1">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="col-span-1">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                    {__('Traveler Categories', 'Traveler Categories')}
+                  </div>
+                  <div className="w-full h-[220px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RechartsPieChart>
+                        <Pie
+                          data={travelerSegments.segments || []}
+                          dataKey="value"
+                          nameKey="label"
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={50}
+                          outerRadius={80}
+                          paddingAngle={2}
+                        >
+                          {(travelerSegments.segments || []).map((seg: any, index: number) => (
+                            <Cell key={`trav-${index}`} fill={['#3b82f6','#10b981','#f59e0b','#8b5cf6'][index % 4]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </RechartsPieChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="col-span-1 lg:col-span-2">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                    {__('Travelers Over Time', 'Travelers Over Time')}
+                  </div>
+                  <div style={{ width: '100%', height: 220 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={travelerSegments.trend || []} margin={{ top: 8, right: 16, left: 16, bottom: 8 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis
+                          dataKey="label"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={{ stroke: '#e5e7eb' }}
+                          tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+                        />
+                        <Tooltip />
+                        <Line type="monotone" dataKey="value" stroke="#6366f1" strokeWidth={2} dot={false} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                        {__('Total Travelers', 'Total Travelers')}
+                      </div>
+                      <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                        {travelerSegments.totalTravelers || 0}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                        {__('Avg Travelers / Booking', 'Avg Travelers / Booking')}
+                      </div>
+                      <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                        {(travelerSegments.avgTravelersPerBooking || 0).toFixed(1)}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                        {__('Top Category', 'Top Category')}
+                      </div>
+                      <div className="text-sm font-semibold text-gray-900 dark:text-white capitalize">
+                        {travelerSegments.topCategory || '-'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Departure Reports */}
+        {departuresTable && departuresTable.length > 0 && (
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <Plane className="w-4 h-4" />
+                {__('Departure Reports', 'Departure Reports')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-5 pt-1">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                <div style={{ width: '100%', height: 220 }}>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__('Occupancy Rate Over Time', 'Occupancy Rate Over Time')}
+                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={occupancyTrend || []} margin={{ top: 8, right: 16, left: 16, bottom: 8 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="label" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                      <YAxis tickLine={false} axisLine={{ stroke: '#e5e7eb' }} tick={{ fontSize: 11, fill: '#6b7280' }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="value" stroke="#0ea5e9" strokeWidth={2} dot={false} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                <div style={{ width: '100%', height: 220 }}>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                    {__('Seat Utilization by Trip', 'Seat Utilization by Trip')}
+                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={seatUtilization || []} margin={{ top: 8, right: 16, left: 0, bottom: 32 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="trip" tickLine={false} axisLine={false} angle={-20} textAnchor="end" height={50} />
+                      <YAxis tickLine={false} axisLine={{ stroke: '#e5e7eb' }} />
+                      <Tooltip />
+                      <Bar dataKey="utilization" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Departure Date', 'Departure Date')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Trip', 'Trip')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Max Seats', 'Max Seats')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Booked', 'Booked')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Left', 'Left')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Status', 'Status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {departuresTable.map((row: any, idx: number) => (
+                      <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.date || '-'}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.trip}</td>
+                        <td className="px-4 py-2 text-right">{row.maxSeats ?? '-'}</td>
+                        <td className="px-4 py-2 text-right">{row.bookedSeats ?? '-'}</td>
+                        <td className="px-4 py-2 text-right">{row.leftSeats ?? '-'}</td>
+                        <td
+                          className={`px-4 py-2 whitespace-nowrap text-xs font-medium capitalize rounded-full
+                            ${row.status === 'upcoming'
+                              ? 'text-blue-700 bg-blue-50 dark:text-blue-300 dark:bg-blue-900/30'
+                              : row.status === 'completed' || row.status === 'past'
+                              ? 'text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/30'
+                              : row.status === 'expired' || row.status === 'cancelled'
+                              ? 'text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30'
+                              : 'text-gray-700 bg-gray-50 dark:text-gray-300 dark:bg-gray-900/40'
+                            }`
+                          }
+                        >
+                          {row.status || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Cancellations Report */}
+        {cancellationsSummary && bookingsTable && bookingsTable.length > 0 && (
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-base flex items-center gap-2">
+                <XCircle className="w-4 h-4" />
+                {__('Cancellations Report', 'Cancellations Report')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-4 pb-5 pt-1">
+              <div className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                {__('Total cancellations', 'Total cancellations')}: {cancellationsSummary.totalCancellations || 0}
+                {' '}
+                &bull; {__('Cancellation rate', 'Cancellation rate')}: {(cancellationsSummary.cancellationRate || 0).toFixed(1)}%
+                {' '}
+                &bull; {__('Revenue lost', 'Revenue lost')}: {formatPrice(cancellationsSummary.revenueLost || 0)}
+              </div>
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Booking ID', 'Booking ID')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Trip', 'Trip')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Departure Date', 'Departure Date')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Reason', 'Reason')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Refund Amount', 'Refund Amount')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookingsTable
+                      .filter((row: any) => row.status === 'cancelled')
+                      .map((row: any, idx: number) => (
+                        <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                          <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.bookingNumber || row.id}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.trip}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{row.departureDate || '-'}</td>
+                          <td className="px-4 py-2 text-gray-700 dark:text-gray-200">{row.cancellationReason || '-'}</td>
+                          <td className="px-4 py-2 text-right">{formatPrice(row.refundAmount || 0)}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Profitability */}
+        <Card className="mt-4">
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="text-base flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" />
+              {__('Profitability', 'Profitability')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="px-4 pb-5 pt-1">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Total Revenue', 'Total Revenue')}
+                </div>
+                <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {formatPrice(revenueStats?.total || 0)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Estimated Cost', 'Estimated Cost')}
+                </div>
+                <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {formatPrice(0)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Estimated Profit', 'Estimated Profit')}
+                </div>
+                <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {formatPrice(revenueStats?.total || 0)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Profit Margin', 'Profit Margin')}
+                </div>
+                <div className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {revenueStats && revenueStats.total > 0 ? '100%' : '0%'}
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="w-full">
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Profit per Trip', 'Profit per Trip')}
+                </div>
+                {/* Compact height so the bar area feels lightweight in the card */}
+                <ResponsiveContainer width="100%" height={120}>
+                  <BarChart data={revenueByTrip || []} margin={{ top: 4, right: 12, left: 0, bottom: 24 }}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="trip" tickLine={false} axisLine={false} angle={-20} textAnchor="end" height={50} />
+                    {/* Add some headroom so the tallest bar doesn't touch the top of the chart */}
+                    <YAxis tickLine={false} axisLine={{ stroke: '#e5e7eb' }} domain={[0, (dataMax: number) => dataMax * 1.2]} />
+                    <Tooltip formatter={(value) => formatPrice(Number(value))} />
+                    <Bar dataKey="totalRevenue" name={__('Profit', 'Profit')} fill="#22c55e" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="w-full overflow-x-auto">
+                <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                  {__('Trip Profitability', 'Trip Profitability')}
+                </div>
+                <table className="w-full min-w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Trip', 'Trip')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Revenue', 'Revenue')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Estimated Cost', 'Estimated Cost')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Estimated Profit', 'Estimated Profit')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Margin %', 'Margin %')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(revenueByTrip || []).map((row: any, idx: number) => (
+                      <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.trip}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(row.totalRevenue || 0)}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(0)}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(row.totalRevenue || 0)}</td>
+                        <td className="px-4 py-2 text-right">{row.totalRevenue > 0 ? '100%' : '0%'}</td>
+                      </tr>
+                    ))}
+                    {(!revenueByTrip || revenueByTrip.length === 0) && (
+                      <tr>
+                        <td colSpan={5} className="px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                          {__('No profitability data available for this period.', 'No profitability data available for this period.')}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Revenue Reports */}
+        {revenueByTrip && revenueByTrip.length > 0 && (
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4 flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <CardTitle className="text-base flex items-center gap-2">
+                <DollarSign className="w-4 h-4" />
+                {__('Revenue Reports', 'Revenue Reports')}
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {__('Trip', 'Trip')}
+                </span>
+                <Select
+                  value={revenueTripFilter}
+                  onChange={(e) => setRevenueTripFilter(e.target.value)}
+                  className="h-8 min-w-[140px]"
+                >
+                  <option value="">{__('All Trips', 'All Trips')}</option>
+                  {revenueTripOptions.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </Select>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Trip', 'Trip')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Total Revenue', 'Total Revenue')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Avg / Booking', 'Avg / Booking')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Paid', 'Paid')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Pending', 'Pending')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Refunded', 'Refunded')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredRevenueByTrip.map((row: any, idx: number) => (
+                      <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                        <td className="px-4 py-2 text-gray-800 dark:text-gray-100 whitespace-nowrap">{row.trip}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(row.totalRevenue || 0)}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(row.avgRevenuePerBooking || 0)}</td>
+                        <td className="px-4 py-2 text-right text-green-600 dark:text-green-400">{formatPrice(row.paidTotal || 0)}</td>
+                        <td className="px-4 py-2 text-right text-yellow-600 dark:text-yellow-400">{formatPrice(row.pendingTotal || 0)}</td>
+                        <td className="px-4 py-2 text-right text-red-600 dark:text-red-400">{formatPrice(row.refundedTotal || 0)}</td>
+                      </tr>
+                    ))}
+                    {filteredRevenueByTrip.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                          {__('No revenue data found for this filter.', 'No revenue data found for this filter.')}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Booking Reports */}
+        {bookingsTable && bookingsTable.length > 0 && (
+          <Card className="mt-4">
+            <CardHeader className="py-3 px-4">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  {__('Booking Reports', 'Booking Reports')}
+                </CardTitle>
+                <div className="flex flex-wrap gap-2 items-center">
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <span>{__('Trip', 'Trip')}:</span>
+                    <Select
+                      value={bookingTripFilter}
+                      onChange={(e) => setBookingTripFilter(e.target.value)}
+                      className="h-8 min-w-[140px]"
+                    >
+                      <option value="">{__('All Trips', 'All Trips')}</option>
+                      {bookingTripOptions.map((name) => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </Select>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                    <span>{__('Status', 'Status')}:</span>
+                    <Select
+                      value={bookingStatusFilter}
+                      onChange={(e) => setBookingStatusFilter(e.target.value)}
+                      className="h-8 min-w-[120px]"
+                    >
+                      <option value="">{__('All', 'All')}</option>
+                      <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
+                      <option value="pending">{__('Pending', 'Pending')}</option>
+                      <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
+                      <option value="completed">{__('Completed', 'Completed')}</option>
+                    </Select>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Simple CSV export for the currently filtered bookings table
+                      const header = ['Booking ID','Trip','Departure Date','Travelers','Price','Payment Method','Status'];
+                      const rows = filteredBookingsTable.map((row: any) => [
+                        row.bookingNumber || row.id || '',
+                        row.trip || '',
+                        row.departureDate || '',
+                        row.travelerCount ?? '',
+                        row.price ?? '',
+                        row.paymentMethod || '',
+                        row.status || '',
+                      ]);
+                      const csv = [header.join(','), ...rows.map(r => r.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))].join('\n');
+                      const filename = `booking_reports_${dateRangeParams.start}_to_${dateRangeParams.end}.csv`;
+                      downloadFile(csv, filename, 'text/csv;charset=utf-8;');
+                    }}
+                  >
+                    <Download className="w-3 h-3 mr-1" />
+                    {__('Export CSV', 'Export CSV')}
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="px-4 pb-4">
+              <div className="mb-3 text-xs text-gray-500 dark:text-gray-400">
+                {__('Total bookings', 'Total bookings')}: {filteredBookingsTable.length}
+                {bookingStats && (
+                  <>
+                    {' '}
+                    &bull; {__('Confirmed', 'Confirmed')}: {bookingStats.confirmed || 0}
+                    {' '}
+                    &bull; {__('Cancelled', 'Cancelled')}: {bookingStats.cancelled || 0}
+                  </>
+                )}
+              </div>
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/40">
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Booking ID', 'Booking ID')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Trip', 'Trip')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Departure Date', 'Departure Date')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Travelers', 'Travelers')}</th>
+                      <th className="text-right px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Price', 'Price')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Payment Method', 'Payment Method')}</th>
+                      <th className="text-left px-4 py-2 font-medium text-gray-700 dark:text-gray-200">{__('Status', 'Status')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredBookingsTable.map((row: any, idx: number) => (
+                      <tr key={idx} className="border-b border-gray-100 dark:border-gray-800">
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.bookingNumber || row.id}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-800 dark:text-gray-100">{row.trip}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{row.departureDate || '-'}</td>
+                        <td className="px-4 py-2 text-right">{row.travelerCount ?? '-'}</td>
+                        <td className="px-4 py-2 text-right">{formatPrice(row.price || 0)}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-gray-700 dark:text-gray-200">{row.paymentMethod || '-'}</td>
+                        <td
+                          className={`px-4 py-2 whitespace-nowrap text-xs font-medium capitalize rounded-full
+                            ${row.status === 'confirmed' || row.status === 'completed'
+                              ? 'text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/30'
+                              : row.status === 'pending'
+                              ? 'text-yellow-700 bg-yellow-50 dark:text-yellow-300 dark:bg-yellow-900/30'
+                              : row.status === 'cancelled'
+                              ? 'text-red-700 bg-red-50 dark:text-red-300 dark:bg-red-900/30'
+                              : 'text-gray-700 bg-gray-50 dark:text-gray-300 dark:bg-gray-900/40'
+                            }`
+                          }
+                        >
+                          {row.status || '-'}
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredBookingsTable.length === 0 && (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-6 text-center text-xs text-gray-500 dark:text-gray-400">
+                          {__('No bookings found for this filter.', 'No bookings found for this filter.')}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </CardContent>
           </Card>
         )}

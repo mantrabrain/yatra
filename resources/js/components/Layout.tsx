@@ -28,7 +28,8 @@ import {
   RefreshCw,
   Puzzle,
   Loader2,
-  Plane
+  Plane,
+  ArrowLeft
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -284,11 +285,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Logo */}
           <div className="h-16 px-6 flex items-center border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Y</span>
+            <div className="flex flex-col w-full gap-1">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">Y</span>
+                </div>
+                <span className="text-xl font-bold text-gray-900 dark:text-white">Yatra</span>
               </div>
-              <span className="text-xl font-bold text-gray-900 dark:text-white">Yatra</span>
+              <a
+                href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'}
+                className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                <span>Back to WordPress</span>
+              </a>
             </div>
           </div>
 
@@ -362,16 +372,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
           </nav>
-
-          {/* Back to WordPress Link */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-            <a 
-              href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'} 
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <span>← Back to WordPress</span>
-            </a>
-          </div>
         </aside>
 
         {/* Main Content */}

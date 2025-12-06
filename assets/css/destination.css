@@ -1,0 +1,43 @@
+.yatra-destination-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.yatra-destination-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.yatra-destination-icon-wrapper,
+.yatra-destination-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yatra-destination-icon-wrapper {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.yatra-destination-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.yatra-destination-placeholder {
+  background-color: #f3f4f6;
+}
+
+.yatra-destination-placeholder-text {
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}

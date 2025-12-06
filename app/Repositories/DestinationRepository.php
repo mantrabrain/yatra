@@ -54,6 +54,43 @@ class DestinationRepository extends BaseRepository
     }
 
     /**
+     * Get published destinations with attached trip counts.
+     *
+     * This uses the yatra_trip_destinations relation table to count how many
+     * trips are linked to each destination. It returns each destination row
+     * plus a numeric trips_count property.
+     */
+    public function getPublishedWithTripCounts(): array
+    {
+        global $wpdb;
+
+        $destTable    = esc_sql($this->table);
+        $relTable     = esc_sql($wpdb->prefix . 'yatra_trip_destinations');
+        $tripsTable   = esc_sql($wpdb->prefix . 'yatra_trips');
+        $reviewsTable = esc_sql($wpdb->prefix . 'yatra_reviews');
+
+        // COUNT(DISTINCT td.trip_id) gives real number of trips per destination.
+        // avg_rating is computed from approved reviews across all those trips.
+        // starting_price is the minimum non-zero price across related trips,
+        // using sale/discounted/original price in that priority.
+        $sql = "SELECT d.*, 
+                       COUNT(DISTINCT td.trip_id) AS trips_count,
+                       COALESCE(AVG(r.rating), 0) AS avg_rating,
+                       MIN(NULLIF(COALESCE(t.sale_price, t.discounted_price, t.original_price), 0)) AS starting_price
+                FROM `{$destTable}` d
+                LEFT JOIN `{$relTable}` td
+                  ON td.destination_id = d.id
+                LEFT JOIN `{$tripsTable}` t
+                  ON t.id = td.trip_id
+                LEFT JOIN `{$reviewsTable}` r
+                  ON r.trip_id = t.id AND r.status = 'approved'
+                WHERE d.status = 'publish'
+                GROUP BY d.id";
+
+        return $this->wpdb->get_results($sql) ?: [];
+    }
+
+    /**
      * Search destinations
      */
     public function search(string $search, array $args = []): array
