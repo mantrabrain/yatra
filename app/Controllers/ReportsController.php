@@ -298,8 +298,8 @@ class ReportsController extends BaseController
             $bookedCapacity += $booked;
         }
 
-        $occupancyRate = $totalCapacity > 0 ? ($bookedCapacity / $totalCapacity) * 100.0 : 0.0;
-        $averageGroupSize = $upcomingDepartures > 0 ? $bookedCapacity / $upcomingDepartures : 0.0;
+        $occupancyRate = $totalCapacity > 0 ? round(($bookedCapacity / $totalCapacity) * 100.0, 1) : 0.0;
+        $averageGroupSize = $upcomingDepartures > 0 ? round($bookedCapacity / $upcomingDepartures, 1) : 0.0;
 
         $operationalStats = [
             'upcomingDepartures' => $upcomingDepartures,
