@@ -94,6 +94,31 @@ class DestinationController extends BaseController
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
+            // Attach trip counts for each destination
+            if (!empty($items)) {
+                global $wpdb;
+                $tripTable = $wpdb->prefix . 'yatra_trips';
+                $joinTable = $wpdb->prefix . 'yatra_trip_destinations';
+
+                foreach ($items as $item) {
+                    $destinationId = isset($item->id) ? (int) $item->id : 0;
+                    if ($destinationId <= 0) {
+                        continue;
+                    }
+
+                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(DISTINCT t.id)
+                         FROM `{$tripTable}` t
+                         INNER JOIN `{$joinTable}` td ON td.trip_id = t.id
+                         WHERE td.destination_id = %d
+                           AND t.status != 'trash'",
+                        $destinationId
+                    ));
+
+                    $item->trip_count = $tripCount;
+                }
+            }
+
             $prepared = array_map([$this, 'prepareItem'], $items);
 
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
@@ -109,6 +134,23 @@ class DestinationController extends BaseController
 
             if (!$item) {
                 return $this->not_found(__('Destination not found', 'yatra'));
+            }
+
+            // Attach trip count for single destination
+            global $wpdb;
+            $tripTable = $wpdb->prefix . 'yatra_trips';
+            $joinTable = $wpdb->prefix . 'yatra_trip_destinations';
+            $destinationId = isset($item->id) ? (int) $item->id : 0;
+            if ($destinationId > 0) {
+                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(DISTINCT t.id)
+                     FROM `{$tripTable}` t
+                     INNER JOIN `{$joinTable}` td ON td.trip_id = t.id
+                     WHERE td.destination_id = %d
+                       AND t.status != 'trash'",
+                    $destinationId
+                ));
+                $item->trip_count = $tripCount;
             }
 
             return $this->success_response($this->prepareItem($item));

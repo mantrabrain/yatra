@@ -89,6 +89,9 @@ interface TravelerCategory {
   age_min?: number;
   age_max?: number;
   status: 'active' | 'inactive' | 'publish' | 'draft';
+  pricing_mode?: 'per_person' | 'per_group';
+  min_pax?: number | null;
+  max_pax?: number | null;
 }
 
 interface PriceType {
@@ -243,11 +246,6 @@ interface TripFormData {
   deposit_amount: string;
   deposit_percentage: string;
   payment_terms: string;
-  group_pricing_enabled: boolean;
-  group_size_min: string;
-  group_discount_percentage: string;
-  
-  // Booking
   max_travelers: string;
   min_travelers: string;
   booking_deadline: string;
@@ -459,9 +457,6 @@ const TripForm: React.FC = () => {
       deposit_amount: '300',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 30 days before departure',
-      group_pricing_enabled: true,
-      group_size_min: '4',
-      group_discount_percentage: '10',
       max_travelers: '12',
       min_travelers: '2',
       booking_deadline: '',
@@ -563,9 +558,6 @@ const TripForm: React.FC = () => {
       deposit_amount: '500',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 60 days before departure',
-      group_pricing_enabled: true,
-      group_size_min: '4',
-      group_discount_percentage: '15',
       max_travelers: '12',
       min_travelers: '2',
       booking_deadline: '',
@@ -669,9 +661,6 @@ const TripForm: React.FC = () => {
       deposit_amount: '600',
       deposit_percentage: '',
       payment_terms: '40% deposit required at booking, remaining 60% due 45 days before departure',
-      group_pricing_enabled: true,
-      group_size_min: '6',
-      group_discount_percentage: '12',
       max_travelers: '20',
       min_travelers: '4',
       booking_deadline: '',
@@ -776,9 +765,6 @@ const TripForm: React.FC = () => {
     deposit_amount: '',
     deposit_percentage: '',
     payment_terms: '',
-    group_pricing_enabled: false,
-    group_size_min: '',
-    group_discount_percentage: '',
     max_travelers: '',
     min_travelers: '',
     booking_deadline: '',
@@ -1198,9 +1184,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         deposit_amount: tripData.deposit_amount?.toString() || '',
         deposit_percentage: tripData.deposit_percentage?.toString() || '',
         payment_terms: tripData.payment_terms || '',
-        group_pricing_enabled: tripData.group_pricing_enabled || false,
-        group_size_min: tripData.group_size_min?.toString() || '',
-        group_discount_percentage: tripData.group_discount_percentage?.toString() || '',
         max_travelers: tripData.max_travelers?.toString() || '',
         min_travelers: tripData.min_travelers?.toString() || '',
         booking_deadline: tripData.booking_deadline || '',
@@ -1882,9 +1865,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
         deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
         payment_terms: data.payment_terms.trim(),
-        group_pricing_enabled: data.group_pricing_enabled || false,
-        group_size_min: data.group_size_min ? parseInt(data.group_size_min) : null,
-        group_discount_percentage: data.group_discount_percentage ? parseFloat(data.group_discount_percentage) : null,
         max_travelers: data.max_travelers ? parseInt(data.max_travelers) : null,
         min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
         booking_deadline: data.booking_deadline || null,
@@ -3681,6 +3661,25 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                           : ''
                                         : null;
 
+                                      const pricingMode = category.pricing_mode || 'per_person';
+                                      const hasMin = category.min_pax !== null && category.min_pax !== undefined;
+                                      const hasMax = category.max_pax !== null && category.max_pax !== undefined;
+
+                                      let pricingLabel = '';
+                                      if (pricingMode === 'per_group') {
+                                        if (hasMin && hasMax) {
+                                          pricingLabel = `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+                                        } else if (hasMin) {
+                                          pricingLabel = `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+                                        } else if (hasMax) {
+                                          pricingLabel = `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+                                        } else {
+                                          pricingLabel = __('Per group', 'Per group');
+                                        }
+                                      } else {
+                                        pricingLabel = __('Per person', 'Per person');
+                                      }
+
                                       return (
                                         <button
                                           key={category.id}
@@ -3701,6 +3700,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                           </div>
                                           <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                             {category.description}
+                                            {pricingLabel && (
+                                              <span className="ml-1 text-[11px] font-medium text-gray-600 dark:text-gray-300">
+                                                • {pricingLabel}
+                                              </span>
+                                            )}
                                           </div>
                                         </button>
                                       );
@@ -3744,6 +3748,30 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                       )
                                     </span>
                                   )}
+
+                                  {/* Pricing mode & group size */}
+                                  <span className="ml-2 inline-flex items-center gap-1 text-[11px] font-medium text-gray-600 dark:text-gray-300">
+                                    {(() => {
+                                      const pricingMode = category.pricing_mode || 'per_person';
+                                      const hasMin = category.min_pax !== null && category.min_pax !== undefined;
+                                      const hasMax = category.max_pax !== null && category.max_pax !== undefined;
+
+                                      if (pricingMode === 'per_group') {
+                                        if (hasMin && hasMax) {
+                                          return `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+                                        }
+                                        if (hasMin) {
+                                          return `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+                                        }
+                                        if (hasMax) {
+                                          return `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+                                        }
+                                        return __('Per group', 'Per group');
+                                      }
+
+                                      return __('Per person', 'Per person');
+                                    })()}
+                                  </span>
                                 </h4>
                               </div>
                               <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -3916,57 +3944,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               </div>
 
               {/* Group Pricing */}
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <div className="mb-3">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.group_pricing_enabled}
-                      onChange={(e) => handleFieldChange('group_pricing_enabled', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {__('Enable Group Pricing', 'Enable Group Pricing')}
-                    </span>
-                  </label>
-                </div>
-                {formData.group_pricing_enabled && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label htmlFor="group_size_min" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Minimum Group Size', 'Minimum Group Size')}
-                      </label>
-                      <Input
-                        id="group_size_min"
-                        type="number"
-                        min="2"
-                        value={formData.group_size_min}
-                        onChange={(e) => handleFieldChange('group_size_min', e.target.value)}
-                        placeholder="5"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="group_discount_percentage" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Group Discount (%)', 'Group Discount (%)')}
-                      </label>
-                      <div className="relative">
-                        <Input
-                          id="group_discount_percentage"
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          max="100"
-                          value={formData.group_discount_percentage}
-                          onChange={(e) => handleFieldChange('group_discount_percentage', e.target.value)}
-                          placeholder="10"
-                          className="pr-7"
-                        />
-                        <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* Removed */}
 
             </div>
           </div>

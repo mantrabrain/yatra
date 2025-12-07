@@ -113,6 +113,31 @@ class ActivityController extends BaseController
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
+            // Attach trip counts for each activity
+            if (!empty($items)) {
+                global $wpdb;
+                $tripTable = $wpdb->prefix . 'yatra_trips';
+                $joinTable = $wpdb->prefix . 'yatra_trip_activities';
+
+                foreach ($items as $item) {
+                    $activityId = isset($item->id) ? (int) $item->id : 0;
+                    if ($activityId <= 0) {
+                        continue;
+                    }
+
+                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(DISTINCT t.id)
+                         FROM `{$tripTable}` t
+                         INNER JOIN `{$joinTable}` ta ON ta.trip_id = t.id
+                         WHERE ta.activity_id = %d
+                           AND t.status != 'trash'",
+                        $activityId
+                    ));
+
+                    $item->trip_count = $tripCount;
+                }
+            }
+
             $prepared = array_map([$this, 'prepareActivity'], $items);
 
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
@@ -131,6 +156,23 @@ class ActivityController extends BaseController
 
             if (!$item) {
                 return $this->not_found(__('Activity not found', 'yatra'));
+            }
+
+            // Attach trip count for single activity
+            global $wpdb;
+            $tripTable = $wpdb->prefix . 'yatra_trips';
+            $joinTable = $wpdb->prefix . 'yatra_trip_activities';
+            $activityId = isset($item->id) ? (int) $item->id : 0;
+            if ($activityId > 0) {
+                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(DISTINCT t.id)
+                     FROM `{$tripTable}` t
+                     INNER JOIN `{$joinTable}` ta ON ta.trip_id = t.id
+                     WHERE ta.activity_id = %d
+                       AND t.status != 'trash'",
+                    $activityId
+                ));
+                $item->trip_count = $tripCount;
             }
 
             return $this->success_response($this->prepareActivity($item));

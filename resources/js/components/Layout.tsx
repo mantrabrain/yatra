@@ -302,7 +302,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation + Bottom Actions */}
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {menuItems.map((item) => {
               const Icon = item.icon;
@@ -372,6 +372,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
           </nav>
+
+          {/* Sticky bottom back link */}
+          <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+            <a
+              href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'}
+              className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            >
+              <span className="inline-flex items-center gap-2">
+                <ArrowLeft className="w-3 h-3" />
+                <span>{__('Back to WordPress', 'Back to WordPress')}</span>
+              </span>
+            </a>
+          </div>
         </aside>
 
         {/* Main Content */}

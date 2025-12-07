@@ -498,20 +498,20 @@ class AppServiceProvider extends ServiceProvider
             $entity = $taxonomy_data['entity'];
             $type = $taxonomy_data['type'];
             
-            // Map type to subpage and label
+            // Map type to admin tab (React-based UI under subpage=trips)
             $type_config = [
                 'destination' => [
-                    'subpage' => 'destinations',
+                    'tab' => 'destinations',
                     'label' => __('Edit Destination', 'yatra'),
                     'icon_id' => 'yatra-edit-destination',
                 ],
                 'activity' => [
-                    'subpage' => 'activities',
+                    'tab' => 'activities',
                     'label' => __('Edit Activity', 'yatra'),
                     'icon_id' => 'yatra-edit-activity',
                 ],
                 'category' => [
-                    'subpage' => 'trip-categories',
+                    'tab' => 'categories',
                     'label' => __('Edit Category', 'yatra'),
                     'icon_id' => 'yatra-edit-category',
                 ],
@@ -519,7 +519,8 @@ class AppServiceProvider extends ServiceProvider
             
             if (isset($type_config[$type])) {
                 $config = $type_config[$type];
-                $edit_url = admin_url('admin.php?page=yatra&subpage=' . $config['subpage'] . '&action=edit&id=' . (int) $entity->id);
+                // Use the unified Trips React admin with appropriate tab
+                $edit_url = admin_url('admin.php?page=yatra&subpage=trips&tab=' . $config['tab'] . '&action=edit&id=' . (int) $entity->id);
                 
                 $admin_bar->add_node([
                     'id'    => $config['icon_id'],
@@ -1384,6 +1385,53 @@ class AppServiceProvider extends ServiceProvider
                 "SELECT COUNT(*) FROM {$reviews_table} WHERE trip_id = %d AND status = 'approved'",
                 $trip->id
             )) ?: 0;
+
+            // Traveler-based pricing: compute effective min/max price from price types when flat prices are empty
+            $has_flat_price = (
+                (!empty($trip->sale_price) && (float) $trip->sale_price > 0) ||
+                (!empty($trip->discounted_price) && (float) $trip->discounted_price > 0) ||
+                (!empty($trip->original_price) && (float) $trip->original_price > 0) ||
+                (!empty($trip->regular_price) && (float) $trip->regular_price > 0)
+            );
+
+            if (
+                !$has_flat_price &&
+                !empty($trip->pricing_type) &&
+                $trip->pricing_type === 'traveler_based'
+            ) {
+                $priceTypeTable = $wpdb->prefix . 'yatra_trip_price_types';
+
+                $row = $wpdb->get_row($wpdb->prepare(
+                    "SELECT
+                        MIN(CASE
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
+                            ELSE original_price
+                        END) AS min_price,
+                        MAX(CASE
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
+                            ELSE original_price
+                        END) AS max_price
+                     FROM `{$priceTypeTable}`
+                     WHERE trip_id = %d
+                       AND (
+                            (discounted_price IS NOT NULL AND discounted_price > 0)
+                         OR (original_price IS NOT NULL AND original_price > 0)
+                       )",
+                    (int) $trip->id
+                ));
+
+                if ($row && ($row->min_price !== null || $row->max_price !== null)) {
+                    $minPrice = $row->min_price !== null ? (float) $row->min_price : 0.0;
+                    $maxPrice = $row->max_price !== null ? (float) $row->max_price : 0.0;
+
+                    if ($minPrice > 0) {
+                        $trip->effective_price_min = $minPrice;
+                    }
+                    if ($maxPrice > 0) {
+                        $trip->effective_price_max = $maxPrice;
+                    }
+                }
+            }
         }
 
         // Prevent 404 handling

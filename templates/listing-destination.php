@@ -300,49 +300,6 @@ get_header();
     </div>
   </div>
 
-<script>
-  (function() {
-    var gridEl   = document.getElementById('destination-grid');
-    if (!gridEl) return;
-
-    var storageKey = 'yatra_destination_view';
-    var buttons    = document.querySelectorAll('.yatra-view-btn');
-
-    function applyView(view) {
-      buttons.forEach(function(btn) {
-        btn.classList.toggle('active', btn.getAttribute('data-view') === view);
-      });
-      if (view === 'list') {
-        gridEl.classList.add('list-view');
-      } else {
-        gridEl.classList.remove('list-view');
-      }
-    }
-
-    // Load saved preference, default to grid
-    try {
-      var saved = window.localStorage.getItem(storageKey);
-      if (saved === 'list' || saved === 'grid') {
-        applyView(saved);
-      } else {
-        applyView('grid');
-      }
-    } catch (e) {
-      applyView('grid');
-    }
-
-    buttons.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var view = this.getAttribute('data-view') || 'grid';
-        applyView(view);
-        try {
-          window.localStorage.setItem(storageKey, view);
-        } catch (e) {}
-      });
-    });
-  })();
-</script>
-
 <?php
 get_footer();
 ?>

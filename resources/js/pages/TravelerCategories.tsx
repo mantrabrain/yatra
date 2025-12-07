@@ -30,6 +30,9 @@ interface TravelerCategory {
   age_max?: number | null;
   icon?: IconPickerValue | null;
   status: 'draft' | 'publish' | 'trash';
+  pricing_mode?: 'per_person' | 'per_group';
+  min_pax?: number | null;
+  max_pax?: number | null;
   created_at: string;
   updated_at: string;
   created_by: number; // user_id
@@ -185,6 +188,31 @@ const TravelerCategories: React.FC = () => {
     return __('No age restriction', 'No age restriction');
   };
 
+  const formatPricing = (category: TravelerCategory) => {
+    const mode = category.pricing_mode || 'per_person';
+
+    if (mode === 'per_group') {
+      const hasMin = category.min_pax !== null && category.min_pax !== undefined;
+      const hasMax = category.max_pax !== null && category.max_pax !== undefined;
+
+      if (hasMin && hasMax) {
+        return `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+      }
+
+      if (hasMin) {
+        return `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+      }
+
+      if (hasMax) {
+        return `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+      }
+
+      return __('Per group', 'Per group');
+    }
+
+    return __('Per person', 'Per person');
+  };
+
   const renderIcon = (icon: IconPickerValue | null | undefined) => {
     if (!icon) {
       return (
@@ -272,6 +300,7 @@ const TravelerCategories: React.FC = () => {
     category: true,
     description: true,
     age_range: true,
+    pricing: true,
     status: true,
     dates: true,
     author: true,
@@ -326,6 +355,9 @@ const TravelerCategories: React.FC = () => {
                 age_min: category.age_min,
                 age_max: category.age_max,
                 icon: category.icon,
+                pricing_mode: category.pricing_mode || 'per_person',
+                min_pax: category.min_pax ?? null,
+                max_pax: category.max_pax ?? null,
                 status: action,
               });
             } catch {
@@ -419,6 +451,16 @@ const TravelerCategories: React.FC = () => {
       render: (category: TravelerCategory) => (
         <span className="text-gray-600 dark:text-gray-400 text-sm">
           {formatAgeRange(category.age_min, category.age_max)}
+        </span>
+      ),
+    },
+    {
+      key: 'pricing',
+      label: __('Pricing', 'Pricing'),
+      visible: visibleColumns.pricing,
+      render: (category: TravelerCategory) => (
+        <span className="text-gray-600 dark:text-gray-400 text-sm">
+          {formatPricing(category)}
         </span>
       ),
     },
@@ -596,6 +638,7 @@ const TravelerCategories: React.FC = () => {
             { key: 'category', label: __('Category', 'Category'), visible: visibleColumns.category },
             { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
             { key: 'age_range', label: __('Age Range', 'Age Range'), visible: visibleColumns.age_range },
+            { key: 'pricing', label: __('Pricing', 'Pricing'), visible: visibleColumns.pricing },
             { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
             { key: 'dates', label: __('Date', 'Date'), visible: visibleColumns.dates },
             { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },

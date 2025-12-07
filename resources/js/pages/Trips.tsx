@@ -5,7 +5,22 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, MapPin, Calendar, Users, Tag, Mountain, Archive, ExternalLink } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Archive,
+  Copy,
+  ExternalLink,
+  MapPin,
+  Calendar,
+  Users,
+  Tag,
+  Mountain,
+  Plus,
+  Search,
+  X,
+  ArrowUpDown,
+} from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -33,6 +48,7 @@ interface Trip {
   original_price?: number;
   discounted_price?: number;
   sale_price?: number;
+  pricing_type?: 'regular' | 'traveler_based' | string;
   status: string;
   created_at: string;
   bookings_count?: number;
@@ -52,6 +68,13 @@ interface Trip {
     is_primary?: boolean;
     order?: number;
   }>;
+  activity_types?: Array<{
+    id: number;
+    name: string;
+    slug?: string;
+    is_primary?: boolean;
+    order?: number;
+  }>;
   difficulty_level?: string;
   destinations?: Array<{
     id: number;
@@ -59,13 +82,27 @@ interface Trip {
     slug?: string;
     is_primary?: boolean;
   }>;
+  price_types?: Array<{
+    id?: number;
+    category_id: number;
+    category_label?: string;
+    category_slug?: string;
+    original_price: number;
+    discounted_price?: number | null;
+    sale_price?: number | null;
+    is_default?: boolean;
+    min_quantity?: number;
+    max_quantity?: number | null;
+  }>;
+  traveler_min_price?: number | null;
+  traveler_max_price?: number | null;
 }
 
 const Trips: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('title');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newTripTitle, setNewTripTitle] = useState('');
@@ -206,6 +243,14 @@ const Trips: React.FC = () => {
     return remaining > 0 ? `${summary} +${remaining}` : summary;
   };
 
+  const summarizeActivities = (trip: Trip) => {
+    const names = (trip.activity_types || []).map(act => act.name).filter(Boolean);
+    if (!names.length) return null;
+    const summary = names.slice(0, 2).join(', ');
+    const remaining = names.length - 2;
+    return remaining > 0 ? `${summary} +${remaining}` : summary;
+  };
+
   const summarizeCategories = (trip: Trip) => {
     const names = (trip.trip_category || []).map(cat => cat.name).filter(Boolean);
     if (!names.length) return null;
@@ -265,17 +310,57 @@ const Trips: React.FC = () => {
   };
 
   const formatPrice = (trip: Trip) => {
-    // Use sale_price if available, otherwise discounted_price, otherwise original_price
-    const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
     const currencyCode = defaultCurrency;
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = currencyData?.decimalDigits ?? 2;
-    
-    return `${symbol}${new Intl.NumberFormat(undefined, {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-    }).format(price)}`;
+
+    const formatNumber = (value: number) =>
+      new Intl.NumberFormat(undefined, {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      }).format(value);
+
+    // Traveler-based pricing: show min - max range
+    if (trip.pricing_type === 'traveler_based') {
+      let minPrice: number | null = null;
+      let maxPrice: number | null = null;
+
+      if (Array.isArray(trip.price_types) && trip.price_types.length > 0) {
+        const pricesFromTypes = trip.price_types
+          .map((pt) => pt.sale_price || pt.discounted_price || pt.original_price || 0)
+          .filter((val) => typeof val === 'number' && val > 0);
+
+        if (pricesFromTypes.length > 0) {
+          minPrice = Math.min(...pricesFromTypes);
+          maxPrice = Math.max(...pricesFromTypes);
+        }
+      } else {
+        // List endpoint does not hydrate price_types; use backend-computed fields
+        if (typeof trip.traveler_min_price === 'number' && trip.traveler_min_price > 0) {
+          minPrice = trip.traveler_min_price;
+        }
+        if (typeof trip.traveler_max_price === 'number' && trip.traveler_max_price > 0) {
+          maxPrice = trip.traveler_max_price;
+        }
+      }
+
+      if (minPrice !== null && maxPrice !== null) {
+        if (minPrice === maxPrice) {
+          return `${symbol}${formatNumber(minPrice)} \n`;
+        }
+        return `${symbol}${formatNumber(minPrice)} - ${symbol}${formatNumber(maxPrice)}`;
+      }
+    }
+
+    // Fallback / regular pricing: use sale_price, then discounted_price, then original_price
+    const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
+
+    if (!price) {
+      return '-';
+    }
+
+    return `${symbol}${formatNumber(price)}`;
   };
 
   const getStatusBadge = (status: string) => {
@@ -424,8 +509,8 @@ const Trips: React.FC = () => {
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
-    setSortBy('title');
-    setSortOrder('asc');
+    setSortBy('id');
+    setSortOrder('desc');
     setPage(1);
   };
 
@@ -447,7 +532,7 @@ const Trips: React.FC = () => {
       : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'title' || sortOrder !== 'asc';
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
 
   // Helper: update trip status, including required fields for backend validation
   const updateTripStatus = async (trip: Trip, status: string) => {
@@ -471,6 +556,10 @@ const Trips: React.FC = () => {
       duration: false,
       countries: false,
       difficulty: false,
+      // Control chips inside Trip column
+      destinations: true,
+      activities: true,
+      categories: true,
       bookings: true,
       created: true,
     };
@@ -508,6 +597,10 @@ const Trips: React.FC = () => {
     { key: 'duration', label: __('Duration', 'Duration'), visible: visibleColumns.duration },
     { key: 'countries', label: __('Countries', 'Countries'), visible: visibleColumns.countries },
     { key: 'difficulty', label: __('Difficulty', 'Difficulty'), visible: visibleColumns.difficulty },
+    // These control which chips are shown inside the Trip column
+    { key: 'destinations', label: __('Destinations (chips)', 'Destinations (chips)'), visible: visibleColumns.destinations },
+    { key: 'activities', label: __('Activities (chips)', 'Activities (chips)'), visible: visibleColumns.activities },
+    { key: 'categories', label: __('Categories (chips)', 'Categories (chips)'), visible: visibleColumns.categories },
     ...(isPro ? [{ key: 'bookings', label: __('Bookings', 'Bookings'), visible: visibleColumns.bookings }] : []),
     { key: 'created', label: __('Created', 'Created'), visible: visibleColumns.created },
   ];
@@ -663,7 +756,8 @@ const Trips: React.FC = () => {
                 )}
               </div>
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
-                {trip.slug}
+                {trip.slug} 
+                <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">(ID: {trip.id})</span>
               </div>
               {(() => {
                 const destinationLabel = summarizeDestinations(trip);
@@ -672,12 +766,14 @@ const Trips: React.FC = () => {
                   : null;
                 const travelerLabel = summarizeTravelers(trip);
                 const categoryLabel = summarizeCategories(trip);
+                const activityLabel = summarizeActivities(trip);
                 const difficultyLabel = formatLabel(trip.difficulty_level);
                 const chips = [
-                  destinationLabel && { key: 'dest', label: destinationLabel, icon: MapPin },
+                  destinationLabel && visibleColumns.destinations && { key: 'dest', label: destinationLabel, icon: MapPin },
                   durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
                   travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
-                  categoryLabel && { key: 'category', label: categoryLabel, icon: Tag },
+                  activityLabel && visibleColumns.activities && { key: 'activity', label: activityLabel, icon: Tag },
+                  categoryLabel && visibleColumns.categories && { key: 'category', label: categoryLabel, icon: Tag },
                   difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
                 ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
                 if (!chips.length) return null;
@@ -823,6 +919,29 @@ const Trips: React.FC = () => {
         label: __('Edit', 'Edit'),
         icon: <Edit className="w-4 h-4" />,
         onClick: (trip: Trip) => handleEdit(trip),
+      });
+
+      // Duplicate trip as draft
+      actions.push({
+        key: 'duplicate',
+        label: __('Duplicate', 'Duplicate'),
+        icon: <Copy className="w-4 h-4" />,
+        onClick: async (trip: Trip) => {
+          try {
+            await apiClient.post(`/trips/${trip.id}/duplicate`);
+            showToast(
+              __('Trip duplicated as draft.', 'Trip duplicated as draft.'),
+              'success'
+            );
+            queryClient.invalidateQueries({ queryKey: ['trips'] });
+          } catch (error) {
+            console.error('Failed to duplicate trip', error);
+            showToast(
+              __('Failed to duplicate trip.', 'Failed to duplicate trip.'),
+              'error'
+            );
+          }
+        },
       });
 
       // Status-based actions

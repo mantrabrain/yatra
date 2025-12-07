@@ -29,6 +29,7 @@ interface DifficultyLevel {
   icon?: IconPickerValue | null;
   level_order: number;
   status: string;
+  trip_count?: number;
   created_at: string;
   updated_at: string;
   created_by: number;
@@ -55,6 +56,7 @@ const DifficultyLevels: React.FC = () => {
           name: true,
           slug: true,
           description: true,
+          trips: true,
           status: true,
           created_at: false,
         };
@@ -119,6 +121,16 @@ const DifficultyLevels: React.FC = () => {
         <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
           {level.description || '—'}
         </div>
+      ),
+    },
+    {
+      key: 'trips',
+      label: __('Trips', 'Trips'),
+      visible: visibleColumns.trips,
+      render: (level: DifficultyLevel) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          {typeof level.trip_count === 'number' ? level.trip_count : 0}
+        </span>
       ),
     },
     {

@@ -31,6 +31,9 @@ interface TravelerCategoryFormData {
     value: string;
   } | null;
   status: 'draft' | 'publish' | 'trash';
+  pricing_mode: 'per_person' | 'per_group';
+  min_pax: string;
+  max_pax: string;
 }
 
 const TravelerCategoryForm: React.FC = () => {
@@ -45,6 +48,9 @@ const TravelerCategoryForm: React.FC = () => {
     age_max: '',
     icon: null,
     status: 'draft',
+    pricing_mode: 'per_person',
+    min_pax: '',
+    max_pax: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -90,6 +96,9 @@ const TravelerCategoryForm: React.FC = () => {
         age_max: categoryData.age_max?.toString() || '',
         icon: (categoryData.icon as IconPickerValue) || null,
         status: categoryData.status || 'draft',
+        pricing_mode: (categoryData.pricing_mode as 'per_person' | 'per_group') || 'per_person',
+        min_pax: categoryData.min_pax !== undefined && categoryData.min_pax !== null ? categoryData.min_pax.toString() : '',
+        max_pax: categoryData.max_pax !== undefined && categoryData.max_pax !== null ? categoryData.max_pax.toString() : '',
       });
     }
   }, [categoryData, isEditMode]);
@@ -168,6 +177,25 @@ const TravelerCategoryForm: React.FC = () => {
       newErrors.age_max = __('Maximum age must be greater than minimum age', 'Maximum age must be greater than minimum age');
     }
 
+    // Validate group size when pricing_mode is per_group
+    if (formData.pricing_mode === 'per_group') {
+      if (formData.min_pax && isNaN(parseInt(formData.min_pax))) {
+        newErrors.min_pax = __('Minimum group size must be a valid number', 'Minimum group size must be a valid number');
+      }
+      if (formData.max_pax && isNaN(parseInt(formData.max_pax))) {
+        newErrors.max_pax = __('Maximum group size must be a valid number', 'Maximum group size must be a valid number');
+      }
+      if (
+        formData.min_pax &&
+        formData.max_pax &&
+        !isNaN(parseInt(formData.min_pax)) &&
+        !isNaN(parseInt(formData.max_pax)) &&
+        parseInt(formData.min_pax) > parseInt(formData.max_pax)
+      ) {
+        newErrors.max_pax = __('Maximum group size should be greater than or equal to minimum group size', 'Maximum group size should be greater than or equal to minimum group size');
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -195,6 +223,26 @@ const TravelerCategoryForm: React.FC = () => {
         payload.age_max = parseInt(data.age_max);
       } else {
         payload.age_max = null;
+      }
+
+      // Pricing mode and group size
+      payload.pricing_mode = data.pricing_mode || 'per_person';
+
+      if (data.pricing_mode === 'per_group') {
+        if (data.min_pax && data.min_pax.trim() !== '') {
+          payload.min_pax = parseInt(data.min_pax);
+        } else {
+          payload.min_pax = null;
+        }
+
+        if (data.max_pax && data.max_pax.trim() !== '') {
+          payload.max_pax = parseInt(data.max_pax);
+        } else {
+          payload.max_pax = null;
+        }
+      } else {
+        payload.min_pax = null;
+        payload.max_pax = null;
       }
 
       // If slug was manually edited, add flag to preserve it
@@ -431,6 +479,76 @@ const TravelerCategoryForm: React.FC = () => {
                         <AlertCircle className="w-4 h-4" />
                         {__('Minimum age should be less than maximum age', 'Minimum age should be less than maximum age')}
                       </p>
+                    )}
+                  </div>
+
+                  {/* Pricing Mode & Group Size */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Pricing Mode', 'Pricing Mode')}
+                    </label>
+                    <HelpText
+                      text={__('Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking.', 'Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking.')}
+                      className="mb-2"
+                    />
+                    <Select
+                      id="pricing_mode"
+                      value={formData.pricing_mode}
+                      onChange={(e) => handleFieldChange('pricing_mode', e.target.value as 'per_person' | 'per_group')}
+                    >
+                      <option value="per_person">{__('Per person', 'Per person')}</option>
+                      <option value="per_group">{__('Per group', 'Per group')}</option>
+                    </Select>
+
+                    {formData.pricing_mode === 'per_group' && (
+                      <div className="mt-3 space-y-2">
+                        <HelpText
+                          text={__('Optional group size limits for this category. These are used to validate bookings when this category is priced per group.', 'Optional group size limits for this category. These are used to validate bookings when this category is priced per group.')}
+                          className="mb-1"
+                        />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label htmlFor="min_pax" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                              {__('Minimum Group Size', 'Minimum Group Size')}
+                            </label>
+                            <Input
+                              id="min_pax"
+                              type="number"
+                              min="1"
+                              value={formData.min_pax}
+                              onChange={(e) => handleFieldChange('min_pax', e.target.value)}
+                              placeholder={__('e.g., 2', 'e.g., 2')}
+                              className={errors.min_pax ? 'border-red-500' : ''}
+                            />
+                            {errors.min_pax && (
+                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" />
+                                {errors.min_pax}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label htmlFor="max_pax" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
+                              {__('Maximum Group Size', 'Maximum Group Size')}
+                            </label>
+                            <Input
+                              id="max_pax"
+                              type="number"
+                              min="1"
+                              value={formData.max_pax}
+                              onChange={(e) => handleFieldChange('max_pax', e.target.value)}
+                              placeholder={__('e.g., 6 (optional)', 'e.g., 6 (optional)')}
+                              className={errors.max_pax ? 'border-red-500' : ''}
+                            />
+                            {errors.max_pax && (
+                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                <AlertCircle className="w-4 h-4" />
+                                {errors.max_pax}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
 

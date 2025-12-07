@@ -59,6 +59,15 @@ class TripController extends BaseController
             ],
         ]);
 
+        // Duplicate trip: POST /trips/{id}/duplicate
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/duplicate', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'duplicate_item'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
         register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)', [
             [
                 'methods' => \WP_REST_Server::READABLE,
@@ -142,6 +151,33 @@ class TripController extends BaseController
     }
 
     /**
+     * Duplicate trip
+     *
+     * Endpoint: POST /trips/{id}/duplicate
+     */
+    public function duplicate_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $id = (int) $request->get_param('id');
+
+            if ($id <= 0) {
+                return $this->error_response(__('Invalid trip ID', 'yatra'), 400);
+            }
+
+            $newId = $this->service->duplicate($id);
+
+            return $this->success_response([
+                'message' => __('Trip duplicated as draft', 'yatra'),
+                'id'      => $newId,
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return $this->error_response($e->getMessage(), 400);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Get items
      */
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
@@ -168,6 +204,166 @@ class TripController extends BaseController
             } else {
                 $items = $this->service->getAll($args);
                 $total = $this->service->count($args);
+            }
+
+            // Ensure traveler-based pricing trips have a usable base price in list view
+            if (!empty($items)) {
+                global $wpdb;
+                $priceTypeTable = $wpdb->prefix . 'yatra_trip_price_types';
+
+                foreach ($items as $item) {
+                    // Skip if we already have a flat price set
+                    $flatSale   = isset($item->sale_price) ? (float) $item->sale_price : 0.0;
+                    $flatDisc   = isset($item->discounted_price) ? (float) $item->discounted_price : 0.0;
+                    $flatOrig   = isset($item->original_price) ? (float) $item->original_price : 0.0;
+                    $hasFlatAny = ($flatSale > 0) || ($flatDisc > 0) || ($flatOrig > 0);
+
+                    if ($hasFlatAny) {
+                        continue;
+                    }
+
+                    // Only compute for traveler-based pricing trips
+                    $pricingType = $item->pricing_type ?? '';
+                    if ($pricingType !== 'traveler_based') {
+                        continue;
+                    }
+
+                    // Find the lowest and highest non-zero price across discount/original in price types
+                    $row = $wpdb->get_row($wpdb->prepare(
+                        "SELECT
+                            MIN(CASE
+                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
+                                ELSE original_price
+                            END) AS min_price,
+                            MAX(CASE
+                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
+                                ELSE original_price
+                            END) AS max_price
+                        FROM `{$priceTypeTable}`
+                        WHERE trip_id = %d
+                          AND (
+                               (discounted_price IS NOT NULL AND discounted_price > 0)
+                            OR (original_price IS NOT NULL AND original_price > 0)
+                          )",
+                        (int) $item->id
+                    ));
+
+                    if ($row && ($row->min_price !== null || $row->max_price !== null)) {
+                        $minPrice = $row->min_price !== null ? (float) $row->min_price : 0.0;
+                        $maxPrice = $row->max_price !== null ? (float) $row->max_price : 0.0;
+
+                        if ($minPrice > 0) {
+                            // Use min price as effective sale_price for list display
+                            $item->sale_price = $minPrice;
+                            $item->traveler_min_price = $minPrice;
+                        }
+                        if ($maxPrice > 0) {
+                            $item->traveler_max_price = $maxPrice;
+                        }
+                    }
+                }
+
+                // Hydrate lightweight relationships for list view (destinations, activities, categories)
+                $tripIds = array_map(static function ($item) {
+                    return isset($item->id) ? (int) $item->id : 0;
+                }, $items);
+                $tripIds = array_values(array_filter($tripIds));
+
+                if (!empty($tripIds)) {
+                    $inPlaceholders = implode(',', array_fill(0, count($tripIds), '%d'));
+
+                    // Destinations
+                    $destTable = $wpdb->prefix . 'yatra_trip_destinations';
+                    $destTaxTable = $wpdb->prefix . 'yatra_destinations';
+                    $destRows = $wpdb->get_results($wpdb->prepare(
+                        "SELECT td.trip_id, d.id, d.name, d.slug
+                         FROM `{$destTable}` td
+                         INNER JOIN `{$destTaxTable}` d ON td.destination_id = d.id
+                         WHERE td.trip_id IN ($inPlaceholders)
+                         ORDER BY td.`order` ASC, d.name ASC",
+                        ...$tripIds
+                    ));
+
+                    $destByTrip = [];
+                    foreach ($destRows as $row) {
+                        $tId = (int) $row->trip_id;
+                        if (!isset($destByTrip[$tId])) {
+                            $destByTrip[$tId] = [];
+                        }
+                        $destByTrip[$tId][] = (object) [
+                            'destination_id' => (int) $row->id,
+                            'destination_name' => $row->name,
+                            'destination_slug' => $row->slug,
+                        ];
+                    }
+
+                    // Activities
+                    $actTable = $wpdb->prefix . 'yatra_trip_activities';
+                    $actTaxTable = $wpdb->prefix . 'yatra_activities';
+                    $actRows = $wpdb->get_results($wpdb->prepare(
+                        "SELECT ta.trip_id, a.id, a.name, a.slug
+                         FROM `{$actTable}` ta
+                         INNER JOIN `{$actTaxTable}` a ON ta.activity_id = a.id
+                         WHERE ta.trip_id IN ($inPlaceholders)
+                         ORDER BY ta.`order` ASC, a.name ASC",
+                        ...$tripIds
+                    ));
+
+                    $actByTrip = [];
+                    foreach ($actRows as $row) {
+                        $tId = (int) $row->trip_id;
+                        if (!isset($actByTrip[$tId])) {
+                            $actByTrip[$tId] = [];
+                        }
+                        $actByTrip[$tId][] = (object) [
+                            'activity_id' => (int) $row->id,
+                            'activity_name' => $row->name,
+                            'activity_slug' => $row->slug,
+                        ];
+                    }
+
+                    // Trip categories
+                    $catRelTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+                    $catTaxTable = $wpdb->prefix . 'yatra_trip_categories';
+                    $catRows = $wpdb->get_results($wpdb->prepare(
+                        "SELECT ttc.trip_id, tc.id, tc.name, tc.slug
+                         FROM `{$catRelTable}` ttc
+                         INNER JOIN `{$catTaxTable}` tc ON ttc.category_id = tc.id
+                         WHERE ttc.trip_id IN ($inPlaceholders)
+                         ORDER BY ttc.`order` ASC, tc.name ASC",
+                        ...$tripIds
+                    ));
+
+                    $catByTrip = [];
+                    foreach ($catRows as $row) {
+                        $tId = (int) $row->trip_id;
+                        if (!isset($catByTrip[$tId])) {
+                            $catByTrip[$tId] = [];
+                        }
+                        $catByTrip[$tId][] = (object) [
+                            'category_id' => (int) $row->id,
+                            'category_name' => $row->name,
+                            'category_slug' => $row->slug,
+                        ];
+                    }
+
+                    // Attach grouped relations back to items so prepare_item_for_response can format them
+                    foreach ($items as $item) {
+                        $id = isset($item->id) ? (int) $item->id : 0;
+                        if ($id <= 0) {
+                            continue;
+                        }
+                        if (isset($destByTrip[$id])) {
+                            $item->destinations = $destByTrip[$id];
+                        }
+                        if (isset($actByTrip[$id])) {
+                            $item->activities = $actByTrip[$id];
+                        }
+                        if (isset($catByTrip[$id])) {
+                            $item->trip_category = $catByTrip[$id];
+                        }
+                    }
+                }
             }
 
             // Check if itinerary meta is requested (for Itinerary page)
@@ -646,6 +842,8 @@ class TripController extends BaseController
             'original_price',
             'discounted_price',
             'sale_price',
+            'traveler_min_price',
+            'traveler_max_price',
             'deposit_amount',
             'deposit_percentage',
             'tax_rate',

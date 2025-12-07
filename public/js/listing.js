@@ -118,10 +118,10 @@
         });
     }
 
-    // View toggle (grid/list)
+    // View toggle (grid/list) with localStorage persistence
     function initViewToggle() {
         const viewButtons = document.querySelectorAll('.yatra-view-btn[data-view]');
-        
+
         // Find all grids that support view toggle
         const grids = [
             document.getElementById('trip-grid'),
@@ -130,29 +130,57 @@
             document.getElementById('activity-grid')
         ].filter(grid => grid !== null);
 
-        if (grids.length === 0) return;
+        if (viewButtons.length === 0 || grids.length === 0) return;
 
+        const storageKey = 'yatra_listing_view';
+
+        function applyView(view) {
+            if (view !== 'list') {
+                view = 'grid';
+            }
+
+            // Update active state for all toggle groups
+            document.querySelectorAll('.yatra-results-controls').forEach(container => {
+                const buttons = container.querySelectorAll('.yatra-view-btn[data-view]');
+                buttons.forEach(btn => {
+                    const btnView = btn.getAttribute('data-view');
+                    btn.classList.toggle('active', btnView === view);
+                });
+            });
+
+            // Toggle grid/list view for all grids on the page
+            grids.forEach(grid => {
+                if (view === 'list') {
+                    grid.classList.add('list-view');
+                } else {
+                    grid.classList.remove('list-view');
+                }
+            });
+        }
+
+        // Initial view from localStorage (shared across listing pages)
+        let initialView = 'grid';
+        try {
+            const saved = window.localStorage.getItem(storageKey);
+            if (saved === 'list' || saved === 'grid') {
+                initialView = saved;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        applyView(initialView);
+
+        // Handle clicks
         viewButtons.forEach(button => {
             button.addEventListener('click', function() {
-                const view = this.getAttribute('data-view');
-                
-                // Update active state for all buttons in the same container
-                const container = this.closest('.yatra-results-controls');
-                if (container) {
-                    container.querySelectorAll('.yatra-view-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
+                const view = this.getAttribute('data-view') || 'grid';
+                applyView(view);
+                try {
+                    window.localStorage.setItem(storageKey, view);
+                } catch (e) {
+                    // ignore
                 }
-                this.classList.add('active');
-
-                // Toggle grid/list view for all grids on the page
-                grids.forEach(grid => {
-                    if (view === 'list') {
-                        grid.classList.add('list-view');
-                    } else {
-                        grid.classList.remove('list-view');
-                    }
-                });
             });
         });
     }

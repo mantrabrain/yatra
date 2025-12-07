@@ -664,7 +664,8 @@
     grid-template-columns: 1fr;
 }
 
-.yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-card {
+.yatra-listing-content-full .yatra-trip-grid.list-view .yatra-trip-card,
+.yatra-trip-grid.yatra-list-view .yatra-trip-card {
     flex-direction: row;
     max-height: 280px;
 }
@@ -931,7 +932,8 @@
     margin-bottom: 32px;
 }
 
-.yatra-trip-grid.list-view {
+.yatra-trip-grid.list-view,
+.yatra-trip-grid.yatra-list-view {
     grid-template-columns: 1fr;
 }
 
@@ -1002,7 +1004,8 @@
     flex-shrink: 0;
 }
 
-.yatra-trip-grid.list-view .yatra-trip-image {
+.yatra-trip-grid.list-view .yatra-trip-image,
+.yatra-trip-grid.yatra-list-view .yatra-trip-image {
     width: 320px;
     height: 100%;
 }
@@ -1096,7 +1099,8 @@
     flex: 1;
 }
 
-.yatra-trip-grid.list-view .yatra-trip-content {
+.yatra-trip-grid.list-view .yatra-trip-content,
+.yatra-trip-grid.yatra-list-view .yatra-trip-content {
     padding: 24px;
 }
 
@@ -1292,25 +1296,29 @@ a.yatra-highlight-link:hover {
     pointer-events: none;
 }
 
-/* Destination listing: make active grid/list view button very clear */
-.yatra-destination-listing .yatra-results-controls .yatra-view-toggle {
+/* Destination and single taxonomy listing: make active grid/list view button very clear */
+.yatra-destination-listing .yatra-results-controls .yatra-view-toggle,
+.yatra-taxonomy-page .yatra-results-controls .yatra-view-toggle {
     border-radius: 10px;
     overflow: hidden;
     margin-left: 8px;
 }
 
-.yatra-destination-listing .yatra-results-controls .yatra-view-btn {
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn,
+.yatra-taxonomy-page .yatra-results-controls .yatra-view-btn {
     background: transparent !important;
     color: #2563eb !important; /* blue icon */
     padding: 6px 10px;
 }
 
-.yatra-destination-listing .yatra-results-controls .yatra-view-btn.active {
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn.active,
+.yatra-taxonomy-page .yatra-results-controls .yatra-view-btn.active {
     background: #2563eb !important; /* solid blue pill */
     color: #ffffff !important;      /* white icon */
 }
 
-.yatra-destination-listing .yatra-results-controls .yatra-view-btn:not(.active) {
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn:not(.active),
+.yatra-taxonomy-page .yatra-results-controls .yatra-view-btn:not(.active) {
     opacity: 0.75;
 }
 
@@ -2011,7 +2019,10 @@ a.yatra-highlight-link:hover {
     position: relative;
     height: 350px;
     background-size: cover;
-    background-position: center;
+    /* Ensure background scrolls with page and is nicely centered */
+    background-attachment: scroll;
+    background-position: center center;
+    border-radius: 0;
     display: flex;
     align-items: center;
     justify-content: center;

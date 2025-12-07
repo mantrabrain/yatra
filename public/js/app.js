@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as HelpCircle, Q as MoreVertical, V as AlertTriangle, X, W as Columns, Y as ExternalLink, Z as Mountain, _ as PenSquare, $ as ArrowUp, a0 as ArrowDown, a1 as Archive, a2 as Trash2, a3 as Plus, a4 as Search, a5 as ArrowUpDown, a6 as AlertCircle, a7 as XCircle, a8 as CheckCircle, a9 as Flame, aa as Zap, ab as Heart, ac as ShoppingBag, ad as BookOpen, ae as Gamepad2, af as Music, ag as Image, ah as Eye, ai as Footprints, aj as Bed, ak as Coffee, al as Hotel, am as Car, an as Palette, ao as Waves, ap as Camera, aq as Target, ar as Package, as as Bus, at as Building2, au as UtensilsCrossed, av as CheckCircle2, aw as GripVertical, ax as Pencil, ay as Copy, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as TrendingDown, aR as PieChart$1, aS as ClipboardList, aT as Receipt, aU as Plug, aV as Shield, aW as Lock, aX as EyeOff, aY as Ban, aZ as Send, a_ as Crown, a$ as reactDomExports, b0 as Filter, b1 as QueryClient, b2 as client, b3 as QueryClientProvider } from "./react-vendor-_U5MdN6Y.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-XMgb0gs9.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as HelpCircle, Q as MoreVertical, V as AlertTriangle, X, W as Columns, Y as ExternalLink, Z as Mountain, _ as PenSquare, $ as Copy, a0 as ArrowUp, a1 as ArrowDown, a2 as Archive, a3 as Trash2, a4 as Plus, a5 as Search, a6 as ArrowUpDown, a7 as AlertCircle, a8 as XCircle, a9 as CheckCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as TrendingDown, aR as PieChart$1, aS as ClipboardList, aT as Receipt, aU as Plug, aV as Shield, aW as Lock, aX as EyeOff, aY as Ban, aZ as Send, a_ as Crown, a$ as reactDomExports, b0 as Filter, b1 as QueryClient, b2 as client, b3 as QueryClientProvider } from "./react-vendor-D2uRinXH.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BYQk2eL3.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -259,7 +259,7 @@ const useBulkToggleModules = () => {
   });
 };
 const Layout = ({ children }) => {
-  var _a, _b;
+  var _a, _b, _c;
   const [darkMode, setDarkMode] = reactExports.useState(() => {
     const saved = localStorage.getItem("yatra-dark-mode");
     return saved === "true";
@@ -508,7 +508,18 @@ const Layout = ({ children }) => {
             ]
           }
         ) }, item.subpage);
-      }) })
+      }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "a",
+        {
+          href: ((_b = window.yatraAdmin) == null ? void 0 : _b.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+          className: "flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Back to WordPress", "Back to WordPress") })
+          ] })
+        }
+      ) })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: `flex-1 flex flex-col ${isTripFormPage ? "overflow-hidden" : "overflow-y-auto"}`, children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("header", { className: "h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between w-full", children: [
@@ -644,7 +655,7 @@ const Layout = ({ children }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-5 h-5 text-white" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_b = window.yatraAdmin) == null ? void 0 : _b.currentUser) || "Admin" }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_c = window.yatraAdmin) == null ? void 0 : _c.currentUser) || "Admin" }) })
           ] })
         ] })
       ] }) }),
@@ -23926,8 +23937,8 @@ const Trips = () => {
   var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
-  const [sortBy2, setSortBy] = reactExports.useState("title");
-  const [sortOrder, setSortOrder] = reactExports.useState("asc");
+  const [sortBy2, setSortBy] = reactExports.useState("id");
+  const [sortOrder, setSortOrder] = reactExports.useState("desc");
   const [page, setPage] = reactExports.useState(1);
   const [isCreateModalOpen, setIsCreateModalOpen] = reactExports.useState(false);
   const [newTripTitle, setNewTripTitle] = reactExports.useState("");
@@ -24050,6 +24061,13 @@ const Trips = () => {
     const remaining = names.length - 2;
     return remaining > 0 ? `${summary} +${remaining}` : summary;
   };
+  const summarizeActivities = (trip) => {
+    const names = (trip.activity_types || []).map((act) => act.name).filter(Boolean);
+    if (!names.length) return null;
+    const summary = names.slice(0, 2).join(", ");
+    const remaining = names.length - 2;
+    return remaining > 0 ? `${summary} +${remaining}` : summary;
+  };
   const summarizeCategories = (trip) => {
     const names = (trip.trip_category || []).map((cat) => cat.name).filter(Boolean);
     if (!names.length) return null;
@@ -24099,15 +24117,44 @@ const Trips = () => {
     });
   };
   const formatPrice = (trip) => {
-    const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
     const currencyCode = defaultCurrency;
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = (currencyData == null ? void 0 : currencyData.decimalDigits) ?? 2;
-    return `${symbol}${new Intl.NumberFormat(void 0, {
+    const formatNumber = (value) => new Intl.NumberFormat(void 0, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals
-    }).format(price)}`;
+    }).format(value);
+    if (trip.pricing_type === "traveler_based") {
+      let minPrice = null;
+      let maxPrice = null;
+      if (Array.isArray(trip.price_types) && trip.price_types.length > 0) {
+        const pricesFromTypes = trip.price_types.map((pt) => pt.sale_price || pt.discounted_price || pt.original_price || 0).filter((val) => typeof val === "number" && val > 0);
+        if (pricesFromTypes.length > 0) {
+          minPrice = Math.min(...pricesFromTypes);
+          maxPrice = Math.max(...pricesFromTypes);
+        }
+      } else {
+        if (typeof trip.traveler_min_price === "number" && trip.traveler_min_price > 0) {
+          minPrice = trip.traveler_min_price;
+        }
+        if (typeof trip.traveler_max_price === "number" && trip.traveler_max_price > 0) {
+          maxPrice = trip.traveler_max_price;
+        }
+      }
+      if (minPrice !== null && maxPrice !== null) {
+        if (minPrice === maxPrice) {
+          return `${symbol}${formatNumber(minPrice)} 
+`;
+        }
+        return `${symbol}${formatNumber(minPrice)} - ${symbol}${formatNumber(maxPrice)}`;
+      }
+    }
+    const price = trip.sale_price || trip.discounted_price || trip.original_price || 0;
+    if (!price) {
+      return "-";
+    }
+    return `${symbol}${formatNumber(price)}`;
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -24228,8 +24275,8 @@ const Trips = () => {
   const handleResetFilters = () => {
     setSearchTerm("");
     setStatusFilter("all");
-    setSortBy("title");
-    setSortOrder("asc");
+    setSortBy("id");
+    setSortOrder("desc");
     setPage(1);
   };
   const handleSort = (field) => {
@@ -24246,7 +24293,7 @@ const Trips = () => {
     }
     return sortOrder === "asc" ? /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowUp, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowDown, { className: "w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" });
   };
-  const hasFilters = searchTerm || statusFilter !== "all" || sortBy2 !== "title" || sortOrder !== "asc";
+  const hasFilters = searchTerm || statusFilter !== "all" || sortBy2 !== "id" || sortOrder !== "desc";
   const updateTripStatus = async (trip, status) => {
     await apiClient.put(`/trips/${trip.id}`, {
       status,
@@ -24265,6 +24312,10 @@ const Trips = () => {
       duration: false,
       countries: false,
       difficulty: false,
+      // Control chips inside Trip column
+      destinations: true,
+      activities: true,
+      categories: true,
       bookings: true,
       created: true
     };
@@ -24297,6 +24348,10 @@ const Trips = () => {
     { key: "duration", label: __("Duration", "Duration"), visible: visibleColumns.duration },
     { key: "countries", label: __("Countries", "Countries"), visible: visibleColumns.countries },
     { key: "difficulty", label: __("Difficulty", "Difficulty"), visible: visibleColumns.difficulty },
+    // These control which chips are shown inside the Trip column
+    { key: "destinations", label: __("Destinations (chips)", "Destinations (chips)"), visible: visibleColumns.destinations },
+    { key: "activities", label: __("Activities (chips)", "Activities (chips)"), visible: visibleColumns.activities },
+    { key: "categories", label: __("Categories (chips)", "Categories (chips)"), visible: visibleColumns.categories },
     ...isPro ? [{ key: "bookings", label: __("Bookings", "Bookings"), visible: visibleColumns.bookings }] : [],
     { key: "created", label: __("Created", "Created"), visible: visibleColumns.created }
   ];
@@ -24429,18 +24484,27 @@ const Trips = () => {
                 }
               )
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate", children: trip.slug }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate", children: [
+              trip.slug,
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-1 text-[11px] text-gray-400 dark:text-gray-500", children: [
+                "(ID: ",
+                trip.id,
+                ")"
+              ] })
+            ] }),
             (() => {
               const destinationLabel = summarizeDestinations(trip);
               const durationLabel = trip.duration_days ? `${trip.duration_days}${__("d", "d")}${trip.duration_nights ? ` / ${trip.duration_nights}${__("n", "n")}` : ""}` : null;
               const travelerLabel = summarizeTravelers(trip);
               const categoryLabel = summarizeCategories(trip);
+              const activityLabel = summarizeActivities(trip);
               const difficultyLabel = formatLabel(trip.difficulty_level);
               const chips = [
-                destinationLabel && { key: "dest", label: destinationLabel, icon: MapPin },
+                destinationLabel && visibleColumns.destinations && { key: "dest", label: destinationLabel, icon: MapPin },
                 durationLabel && { key: "duration", label: durationLabel, icon: Calendar$1 },
                 travelerLabel && { key: "traveler", label: travelerLabel, icon: Users },
-                categoryLabel && { key: "category", label: categoryLabel, icon: Tag },
+                activityLabel && visibleColumns.activities && { key: "activity", label: activityLabel, icon: Tag },
+                categoryLabel && visibleColumns.categories && { key: "category", label: categoryLabel, icon: Tag },
                 difficultyLabel && { key: "difficulty", label: difficultyLabel, icon: Mountain }
               ].filter(Boolean);
               if (!chips.length) return null;
@@ -24550,6 +24614,27 @@ const Trips = () => {
         label: __("Edit", "Edit"),
         icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
         onClick: (trip) => handleEdit(trip)
+      });
+      actions.push({
+        key: "duplicate",
+        label: __("Duplicate", "Duplicate"),
+        icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-4 h-4" }),
+        onClick: async (trip) => {
+          try {
+            await apiClient.post(`/trips/${trip.id}/duplicate`);
+            showToast(
+              __("Trip duplicated as draft.", "Trip duplicated as draft."),
+              "success"
+            );
+            queryClient2.invalidateQueries({ queryKey: ["trips"] });
+          } catch (error2) {
+            console.error("Failed to duplicate trip", error2);
+            showToast(
+              __("Failed to duplicate trip.", "Failed to duplicate trip."),
+              "error"
+            );
+          }
+        }
       });
       actions.push({
         key: "publish",
@@ -26934,9 +27019,6 @@ const TripForm = () => {
       deposit_amount: "300",
       deposit_percentage: "",
       payment_terms: "50% deposit required at booking, remaining 50% due 30 days before departure",
-      group_pricing_enabled: true,
-      group_size_min: "4",
-      group_discount_percentage: "10",
       max_travelers: "12",
       min_travelers: "2",
       booking_deadline: "",
@@ -27039,9 +27121,6 @@ const TripForm = () => {
       deposit_amount: "500",
       deposit_percentage: "",
       payment_terms: "50% deposit required at booking, remaining 50% due 60 days before departure",
-      group_pricing_enabled: true,
-      group_size_min: "4",
-      group_discount_percentage: "15",
       max_travelers: "12",
       min_travelers: "2",
       booking_deadline: "",
@@ -27145,9 +27224,6 @@ const TripForm = () => {
       deposit_amount: "600",
       deposit_percentage: "",
       payment_terms: "40% deposit required at booking, remaining 60% due 45 days before departure",
-      group_pricing_enabled: true,
-      group_size_min: "6",
-      group_discount_percentage: "12",
       max_travelers: "20",
       min_travelers: "4",
       booking_deadline: "",
@@ -27253,9 +27329,6 @@ const TripForm = () => {
     deposit_amount: "",
     deposit_percentage: "",
     payment_terms: "",
-    group_pricing_enabled: false,
-    group_size_min: "",
-    group_discount_percentage: "",
     max_travelers: "",
     min_travelers: "",
     booking_deadline: "",
@@ -27474,7 +27547,7 @@ const TripForm = () => {
     enabled: isEditMode && can("yatra_view_trips")
   });
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
+    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
     if (tripData && isEditMode) {
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
@@ -27643,15 +27716,12 @@ const TripForm = () => {
         deposit_amount: ((_j = tripData.deposit_amount) == null ? void 0 : _j.toString()) || "",
         deposit_percentage: ((_k = tripData.deposit_percentage) == null ? void 0 : _k.toString()) || "",
         payment_terms: tripData.payment_terms || "",
-        group_pricing_enabled: tripData.group_pricing_enabled || false,
-        group_size_min: ((_l = tripData.group_size_min) == null ? void 0 : _l.toString()) || "",
-        group_discount_percentage: ((_m = tripData.group_discount_percentage) == null ? void 0 : _m.toString()) || "",
-        max_travelers: ((_n = tripData.max_travelers) == null ? void 0 : _n.toString()) || "",
-        min_travelers: ((_o = tripData.min_travelers) == null ? void 0 : _o.toString()) || "",
+        max_travelers: ((_l = tripData.max_travelers) == null ? void 0 : _l.toString()) || "",
+        min_travelers: ((_m = tripData.min_travelers) == null ? void 0 : _m.toString()) || "",
         booking_deadline: tripData.booking_deadline || "",
         cancellation_policy: tripData.cancellation_policy || "",
-        age_min: ((_p = tripData.age_min) == null ? void 0 : _p.toString()) || "",
-        age_max: ((_q = tripData.age_max) == null ? void 0 : _q.toString()) || "",
+        age_min: ((_n = tripData.age_min) == null ? void 0 : _n.toString()) || "",
+        age_max: ((_o = tripData.age_max) == null ? void 0 : _o.toString()) || "",
         physical_requirements: tripData.physical_requirements || "",
         visa_requirements: tripData.visa_requirements || "",
         vaccination_requirements: tripData.vaccination_requirements || "",
@@ -28223,9 +28293,6 @@ const TripForm = () => {
         deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
         deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
         payment_terms: data.payment_terms.trim(),
-        group_pricing_enabled: data.group_pricing_enabled || false,
-        group_size_min: data.group_size_min ? parseInt(data.group_size_min) : null,
-        group_discount_percentage: data.group_discount_percentage ? parseFloat(data.group_discount_percentage) : null,
         max_travelers: data.max_travelers ? parseInt(data.max_travelers) : null,
         min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
         booking_deadline: data.booking_deadline || null,
@@ -29679,6 +29746,23 @@ const TripForm = () => {
                       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1", children: __("Select a category to add pricing", "Select a category to add pricing") }),
                       activeCategories.filter((cat) => !formData.price_types.some((pt) => Number(pt.category_id) === Number(cat.id))).length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center", children: __("All categories have pricing added", "All categories have pricing added") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: activeCategories.filter((cat) => !formData.price_types.some((pt) => Number(pt.category_id) === Number(cat.id))).map((category) => {
                         const ageRange = category.age_min !== void 0 || category.age_max !== void 0 ? category.age_min !== void 0 && category.age_max !== void 0 ? `${category.age_min}-${category.age_max} ${__("years", "years")}` : category.age_min !== void 0 ? `${category.age_min}+ ${__("years", "years")}` : category.age_max !== void 0 ? `${__("Under", "Under")} ${category.age_max} ${__("years", "years")}` : "" : null;
+                        const pricingMode = category.pricing_mode || "per_person";
+                        const hasMin = category.min_pax !== null && category.min_pax !== void 0;
+                        const hasMax = category.max_pax !== null && category.max_pax !== void 0;
+                        let pricingLabel = "";
+                        if (pricingMode === "per_group") {
+                          if (hasMin && hasMax) {
+                            pricingLabel = `${__("Per group", "Per group")} (${category.min_pax}-${category.max_pax})`;
+                          } else if (hasMin) {
+                            pricingLabel = `${__("Per group", "Per group")} (${__("From", "From")} ${category.min_pax})`;
+                          } else if (hasMax) {
+                            pricingLabel = `${__("Per group", "Per group")} (${__("Up to", "Up to")} ${category.max_pax})`;
+                          } else {
+                            pricingLabel = __("Per group", "Per group");
+                          }
+                        } else {
+                          pricingLabel = __("Per person", "Per person");
+                        }
                         return /* @__PURE__ */ jsxRuntimeExports.jsxs(
                           "button",
                           {
@@ -29697,7 +29781,13 @@ const TripForm = () => {
                                   ")"
                                 ] })
                               ] }),
-                              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: category.description })
+                              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: [
+                                category.description,
+                                pricingLabel && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "ml-1 text-[11px] font-medium text-gray-600 dark:text-gray-300", children: [
+                                  "• ",
+                                  pricingLabel
+                                ] })
+                              ] })
                             ]
                           },
                           category.id
@@ -29721,7 +29811,25 @@ const TripForm = () => {
                             "(",
                             category.age_min !== void 0 && category.age_max !== void 0 ? `${category.age_min}-${category.age_max} ${__("years", "years")}` : category.age_min !== void 0 ? `${category.age_min}+ ${__("years", "years")}` : category.age_max !== void 0 ? `${__("Under", "Under")} ${category.age_max} ${__("years", "years")}` : "",
                             ")"
-                          ] })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-2 inline-flex items-center gap-1 text-[11px] font-medium text-gray-600 dark:text-gray-300", children: (() => {
+                            const pricingMode = category.pricing_mode || "per_person";
+                            const hasMin = category.min_pax !== null && category.min_pax !== void 0;
+                            const hasMax = category.max_pax !== null && category.max_pax !== void 0;
+                            if (pricingMode === "per_group") {
+                              if (hasMin && hasMax) {
+                                return `${__("Per group", "Per group")} (${category.min_pax}-${category.max_pax})`;
+                              }
+                              if (hasMin) {
+                                return `${__("Per group", "Per group")} (${__("From", "From")} ${category.min_pax})`;
+                              }
+                              if (hasMax) {
+                                return `${__("Per group", "Per group")} (${__("Up to", "Up to")} ${category.max_pax})`;
+                              }
+                              return __("Per group", "Per group");
+                            }
+                            return __("Per person", "Per person");
+                          })() })
                         ] }) }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-600 dark:text-gray-400", children: category.description })
                       ] }),
@@ -29874,56 +29982,6 @@ const TripForm = () => {
                     className: "flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                   }
                 )
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 cursor-pointer", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  "input",
-                  {
-                    type: "checkbox",
-                    checked: formData.group_pricing_enabled,
-                    onChange: (e) => handleFieldChange("group_pricing_enabled", e.target.checked),
-                    className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-700 dark:text-gray-300", children: __("Enable Group Pricing", "Enable Group Pricing") })
-              ] }) }),
-              formData.group_pricing_enabled && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "group_size_min", className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: __("Minimum Group Size", "Minimum Group Size") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
-                    {
-                      id: "group_size_min",
-                      type: "number",
-                      min: "2",
-                      value: formData.group_size_min,
-                      onChange: (e) => handleFieldChange("group_size_min", e.target.value),
-                      placeholder: "5"
-                    }
-                  )
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "group_discount_percentage", className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: __("Group Discount (%)", "Group Discount (%)") }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(
-                      Input,
-                      {
-                        id: "group_discount_percentage",
-                        type: "number",
-                        step: "0.01",
-                        min: "0",
-                        max: "100",
-                        value: formData.group_discount_percentage,
-                        onChange: (e) => handleFieldChange("group_discount_percentage", e.target.value),
-                        placeholder: "10",
-                        className: "pr-7"
-                      }
-                    ),
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500", children: "%" })
-                  ] })
-                ] })
               ] })
             ] })
           ] })
@@ -31097,6 +31155,7 @@ const Activities = () => {
     return saved ? JSON.parse(saved) : {
       name: true,
       description: true,
+      trips: true,
       status: true,
       created_at: false,
       updated_at: false,
@@ -31369,6 +31428,7 @@ const Activities = () => {
           columnOptions: [
             { key: "name", label: __("Activity", "Activity"), visible: visibleColumns.name },
             { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+            { key: "trips", label: __("Trips", "Trips"), visible: visibleColumns.trips },
             { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
             { key: "created_at", label: __("Created Date", "Created Date"), visible: visibleColumns.created_at },
             { key: "updated_at", label: __("Updated Date", "Updated Date"), visible: visibleColumns.updated_at },
@@ -31421,6 +31481,13 @@ const Activities = () => {
                   ] })
                 ] });
               }
+            },
+            {
+              key: "trips",
+              label: __("Trips", "Trips"),
+              sortable: false,
+              visible: visibleColumns.trips,
+              render: (activity) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: typeof activity.trip_count === "number" ? activity.trip_count : 0 })
             },
             {
               key: "description",
@@ -32355,6 +32422,7 @@ const Destinations = () => {
     return saved ? JSON.parse(saved) : {
       name: true,
       description: true,
+      trips: true,
       status: true,
       created_at: false,
       updated_at: false,
@@ -32611,6 +32679,7 @@ const Destinations = () => {
         columnOptions: [
           { key: "name", label: __("Destination", "Destination"), visible: visibleColumns.name },
           { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+          { key: "trips", label: __("Trips", "Trips"), visible: visibleColumns.trips },
           { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
           { key: "created_at", label: __("Created Date", "Created Date"), visible: visibleColumns.created_at },
           { key: "updated_at", label: __("Updated Date", "Updated Date"), visible: visibleColumns.updated_at },
@@ -32663,6 +32732,13 @@ const Destinations = () => {
                 ] })
               ] });
             }
+          },
+          {
+            key: "trips",
+            label: __("Trips", "Trips"),
+            sortable: false,
+            visible: visibleColumns.trips,
+            render: (destination) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: typeof destination.trip_count === "number" ? destination.trip_count : 0 })
           },
           {
             key: "description",
@@ -33157,6 +33233,7 @@ const Categories = () => {
       name: true,
       slug: true,
       description: true,
+      trips: true,
       status: true,
       created_at: true
     };
@@ -33479,6 +33556,12 @@ const Categories = () => {
       visible: visibleColumns.name
     },
     {
+      key: "trips",
+      label: __("Trips", "Trips"),
+      visible: visibleColumns.trips,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: typeof category.trip_count === "number" ? category.trip_count : 0 })
+    },
+    {
       key: "slug",
       label: __("Slug", "Slug"),
       visible: visibleColumns.slug
@@ -33598,6 +33681,8 @@ const Categories = () => {
           ] })
         ] })
       ] }),
+      // Trips column
+      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: typeof category.trip_count === "number" ? category.trip_count : 0 }),
       // Slug column
       /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs text-gray-600 dark:text-gray-400", children: category.slug }),
       // Description column
@@ -33711,9 +33796,10 @@ const Categories = () => {
         showColumnsDropdown,
         setShowColumnsDropdown,
         columnOptions: [
-          { key: "name", label: __("Name", "Name"), visible: visibleColumns.name },
+          { key: "name", label: __("Category", "Category"), visible: visibleColumns.name },
           { key: "slug", label: __("Slug", "Slug"), visible: visibleColumns.slug },
           { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
+          { key: "trips", label: __("Trips", "Trips"), visible: visibleColumns.trips },
           { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
           { key: "created_at", label: __("Created", "Created"), visible: visibleColumns.created_at }
         ],
@@ -34171,6 +34257,7 @@ const DifficultyLevels = () => {
       name: true,
       slug: true,
       description: true,
+      trips: true,
       status: true,
       created_at: false
     };
@@ -34224,6 +34311,12 @@ const DifficultyLevels = () => {
       label: __("Description", "Description"),
       visible: visibleColumns.description,
       render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-xs truncate text-sm text-gray-600 dark:text-gray-400", children: level.description || "—" })
+    },
+    {
+      key: "trips",
+      label: __("Trips", "Trips"),
+      visible: visibleColumns.trips,
+      render: (level) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: typeof level.trip_count === "number" ? level.trip_count : 0 })
     },
     {
       key: "status",
@@ -57509,6 +57602,24 @@ const TravelerCategories = () => {
     }
     return __("No age restriction", "No age restriction");
   };
+  const formatPricing = (category) => {
+    const mode = category.pricing_mode || "per_person";
+    if (mode === "per_group") {
+      const hasMin = category.min_pax !== null && category.min_pax !== void 0;
+      const hasMax = category.max_pax !== null && category.max_pax !== void 0;
+      if (hasMin && hasMax) {
+        return `${__("Per group", "Per group")} (${category.min_pax}-${category.max_pax})`;
+      }
+      if (hasMin) {
+        return `${__("Per group", "Per group")} (${__("From", "From")} ${category.min_pax})`;
+      }
+      if (hasMax) {
+        return `${__("Per group", "Per group")} (${__("Up to", "Up to")} ${category.max_pax})`;
+      }
+      return __("Per group", "Per group");
+    }
+    return __("Per person", "Per person");
+  };
   const renderIcon = (icon) => {
     if (!icon) {
       return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 rounded bg-gray-100 dark:bg-gray-800 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-400 dark:text-gray-500", children: "—" }) });
@@ -57575,6 +57686,7 @@ const TravelerCategories = () => {
     category: true,
     description: true,
     age_range: true,
+    pricing: true,
     status: true,
     dates: true,
     author: true
@@ -57621,6 +57733,9 @@ const TravelerCategories = () => {
                 age_min: category.age_min,
                 age_max: category.age_max,
                 icon: category.icon,
+                pricing_mode: category.pricing_mode || "per_person",
+                min_pax: category.min_pax ?? null,
+                max_pax: category.max_pax ?? null,
                 status: action
               });
             } catch {
@@ -57699,6 +57814,12 @@ const TravelerCategories = () => {
       label: __("Age Range", "Age Range"),
       visible: visibleColumns.age_range,
       render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm", children: formatAgeRange(category.age_min, category.age_max) })
+    },
+    {
+      key: "pricing",
+      label: __("Pricing", "Pricing"),
+      visible: visibleColumns.pricing,
+      render: (category) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 text-sm", children: formatPricing(category) })
     },
     {
       key: "status",
@@ -57867,6 +57988,7 @@ const TravelerCategories = () => {
             { key: "category", label: __("Category", "Category"), visible: visibleColumns.category },
             { key: "description", label: __("Description", "Description"), visible: visibleColumns.description },
             { key: "age_range", label: __("Age Range", "Age Range"), visible: visibleColumns.age_range },
+            { key: "pricing", label: __("Pricing", "Pricing"), visible: visibleColumns.pricing },
             { key: "status", label: __("Status", "Status"), visible: visibleColumns.status },
             { key: "dates", label: __("Date", "Date"), visible: visibleColumns.dates },
             { key: "author", label: __("Author", "Author"), visible: visibleColumns.author }
@@ -57938,7 +58060,10 @@ const TravelerCategoryForm = () => {
     age_min: "",
     age_max: "",
     icon: null,
-    status: "draft"
+    status: "draft",
+    pricing_mode: "per_person",
+    min_pax: "",
+    max_pax: ""
   });
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
@@ -57976,7 +58101,10 @@ const TravelerCategoryForm = () => {
         age_min: ((_a = categoryData.age_min) == null ? void 0 : _a.toString()) || "",
         age_max: ((_b = categoryData.age_max) == null ? void 0 : _b.toString()) || "",
         icon: categoryData.icon || null,
-        status: categoryData.status || "draft"
+        status: categoryData.status || "draft",
+        pricing_mode: categoryData.pricing_mode || "per_person",
+        min_pax: categoryData.min_pax !== void 0 && categoryData.min_pax !== null ? categoryData.min_pax.toString() : "",
+        max_pax: categoryData.max_pax !== void 0 && categoryData.max_pax !== null ? categoryData.max_pax.toString() : ""
       });
     }
   }, [categoryData, isEditMode]);
@@ -58041,6 +58169,17 @@ const TravelerCategoryForm = () => {
     if (formData.age_min && formData.age_max && parseInt(formData.age_min) >= parseInt(formData.age_max)) {
       newErrors.age_max = __("Maximum age must be greater than minimum age", "Maximum age must be greater than minimum age");
     }
+    if (formData.pricing_mode === "per_group") {
+      if (formData.min_pax && isNaN(parseInt(formData.min_pax))) {
+        newErrors.min_pax = __("Minimum group size must be a valid number", "Minimum group size must be a valid number");
+      }
+      if (formData.max_pax && isNaN(parseInt(formData.max_pax))) {
+        newErrors.max_pax = __("Maximum group size must be a valid number", "Maximum group size must be a valid number");
+      }
+      if (formData.min_pax && formData.max_pax && !isNaN(parseInt(formData.min_pax)) && !isNaN(parseInt(formData.max_pax)) && parseInt(formData.min_pax) > parseInt(formData.max_pax)) {
+        newErrors.max_pax = __("Maximum group size should be greater than or equal to minimum group size", "Maximum group size should be greater than or equal to minimum group size");
+      }
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -58062,6 +58201,22 @@ const TravelerCategoryForm = () => {
         payload.age_max = parseInt(data.age_max);
       } else {
         payload.age_max = null;
+      }
+      payload.pricing_mode = data.pricing_mode || "per_person";
+      if (data.pricing_mode === "per_group") {
+        if (data.min_pax && data.min_pax.trim() !== "") {
+          payload.min_pax = parseInt(data.min_pax);
+        } else {
+          payload.min_pax = null;
+        }
+        if (data.max_pax && data.max_pax.trim() !== "") {
+          payload.max_pax = parseInt(data.max_pax);
+        } else {
+          payload.max_pax = null;
+        }
+      } else {
+        payload.min_pax = null;
+        payload.max_pax = null;
       }
       if (isEditMode && isSlugEditable) {
         payload.preserve_slug = true;
@@ -58280,6 +58435,77 @@ const TravelerCategoryForm = () => {
             formData.age_min && formData.age_max && parseInt(formData.age_min) >= parseInt(formData.age_max) && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-yellow-600 dark:text-yellow-400 flex items-center gap-1", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
               __("Minimum age should be less than maximum age", "Minimum age should be less than maximum age")
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Pricing Mode", "Pricing Mode") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              HelpText,
+              {
+                text: __("Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking.", "Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking."),
+                className: "mb-2"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                id: "pricing_mode",
+                value: formData.pricing_mode,
+                onChange: (e) => handleFieldChange("pricing_mode", e.target.value),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "per_person", children: __("Per person", "Per person") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "per_group", children: __("Per group", "Per group") })
+                ]
+              }
+            ),
+            formData.pricing_mode === "per_group" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                HelpText,
+                {
+                  text: __("Optional group size limits for this category. These are used to validate bookings when this category is priced per group.", "Optional group size limits for this category. These are used to validate bookings when this category is priced per group."),
+                  className: "mb-1"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "min_pax", className: "block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5", children: __("Minimum Group Size", "Minimum Group Size") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "min_pax",
+                      type: "number",
+                      min: "1",
+                      value: formData.min_pax,
+                      onChange: (e) => handleFieldChange("min_pax", e.target.value),
+                      placeholder: __("e.g., 2", "e.g., 2"),
+                      className: errors.min_pax ? "border-red-500" : ""
+                    }
+                  ),
+                  errors.min_pax && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
+                    errors.min_pax
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "max_pax", className: "block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5", children: __("Maximum Group Size", "Maximum Group Size") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      id: "max_pax",
+                      type: "number",
+                      min: "1",
+                      value: formData.max_pax,
+                      onChange: (e) => handleFieldChange("max_pax", e.target.value),
+                      placeholder: __("e.g., 6 (optional)", "e.g., 6 (optional)"),
+                      className: errors.max_pax ? "border-red-500" : ""
+                    }
+                  ),
+                  errors.max_pax && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
+                    errors.max_pax
+                  ] })
+                ] })
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(

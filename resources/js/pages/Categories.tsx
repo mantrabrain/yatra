@@ -24,8 +24,9 @@ interface Category {
   id: number;
   name: string;
   slug: string;
-  description: string;
+  description?: string;
   icon?: IconPickerValue | null;
+  trip_count?: number;
   parent_id?: number | null;
   parent_name?: string | null;
   status: string;
@@ -61,6 +62,7 @@ const Categories: React.FC = () => {
       name: true,
       slug: true,
       description: true,
+      trips: true,
       status: true,
       created_at: true,
     };
@@ -462,6 +464,16 @@ const Categories: React.FC = () => {
       visible: visibleColumns.name,
     },
     {
+      key: 'trips',
+      label: __('Trips', 'Trips'),
+      visible: visibleColumns.trips,
+      render: (category: Category) => (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+          {typeof category.trip_count === 'number' ? category.trip_count : 0}
+        </span>
+      ),
+    },
+    {
       key: 'slug',
       label: __('Slug', 'Slug'),
       visible: visibleColumns.slug,
@@ -588,6 +600,10 @@ const Categories: React.FC = () => {
           )}
         </div>
       </div>,
+      // Trips column
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+        {typeof category.trip_count === 'number' ? category.trip_count : 0}
+      </span>,
       // Slug column
       <code className="text-xs text-gray-600 dark:text-gray-400">{category.slug}</code>,
       // Description column
@@ -713,9 +729,10 @@ const Categories: React.FC = () => {
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
         columnOptions={[
-          { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
+          { key: 'name', label: __('Category', 'Category'), visible: visibleColumns.name },
           { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
           { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+          { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
           { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
           { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
         ]}

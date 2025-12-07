@@ -43,22 +43,67 @@ $type_labels = [
 
 $labels = $type_labels[$type] ?? $type_labels['category'];
 
-// Get entity image
+// Basic pagination for trips on taxonomy pages (10 trips per page)
+$per_page     = 10;
+$current_page = isset($_GET['yatra_page']) ? max(1, (int) $_GET['yatra_page']) : 1;
+$total_trips  = is_array($trips) ? count($trips) : 0;
+$total_pages  = $total_trips > 0 ? (int) ceil($total_trips / $per_page) : 1;
+$current_page = min($current_page, $total_pages);
+
+$offset      = ($current_page - 1) * $per_page;
+$paged_trips = $total_trips > 0 ? array_slice($trips, $offset, $per_page) : [];
+
+// Get entity image (no external hardcoded external URL)
 $entity_image = '';
+
+// Prefer explicit featured_image or image when present
 if (!empty($entity->featured_image)) {
     $entity_image = wp_get_attachment_url($entity->featured_image);
 } elseif (!empty($entity->image)) {
     $entity_image = $entity->image;
 }
 
-// Fallback image
+// If still empty, try resolving from icon configuration (same logic as listing-destination.php)
+if (empty($entity_image) && !empty($entity->icon)) {
+    $icon = maybe_unserialize($entity->icon);
+
+    if (is_array($icon)) {
+        $type  = $icon['type']  ?? '';
+        $value = $icon['value'] ?? '';
+
+        if ($type === 'image' && !empty($value)) {
+            if (is_numeric($value)) {
+                $maybe_url = wp_get_attachment_image_url((int) $value, 'large');
+                if (!empty($maybe_url)) {
+                    $entity_image = $maybe_url;
+                }
+            } elseif (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+                $entity_image = $value;
+            }
+        } elseif (!empty($icon['url']) && filter_var($icon['url'], FILTER_VALIDATE_URL)) {
+            // Legacy format: ['url' => 'https://...']
+            $entity_image = $icon['url'];
+        } elseif (!empty($icon['id'])) {
+            // Legacy format: ['id' => attachment_id]
+            $maybe_url = wp_get_attachment_image_url((int) $icon['id'], 'large');
+            if (!empty($maybe_url)) {
+                $entity_image = $maybe_url;
+            }
+        }
+    } elseif (is_numeric($icon)) {
+        $maybe_url = wp_get_attachment_image_url((int) $icon, 'large');
+        if (!empty($maybe_url)) {
+            $entity_image = $maybe_url;
+        }
+    } elseif (is_string($icon) && filter_var($icon, FILTER_VALIDATE_URL)) {
+        $entity_image = $icon;
+    }
+}
+
+// Final internal placeholder fallback (no external Unsplash)
 if (empty($entity_image)) {
-    $fallback_images = [
-        'destination' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=400&fit=crop',
-        'activity' => 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=1600&h=400&fit=crop',
-        'category' => 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&h=400&fit=crop',
-    ];
-    $entity_image = $fallback_images[$type] ?? $fallback_images['category'];
+    $placeholder_src = plugins_url('assets/images/placeholder.png', dirname(__FILE__));
+    $entity_image = $placeholder_src;
 }
 
 get_header();
@@ -67,33 +112,9 @@ get_header();
 <div class="yatra-listing-page yatra-taxonomy-page yatra-<?php echo esc_attr($type); ?>-page">
     
     <!-- Hero Section -->
-    <div class="yatra-taxonomy-hero" style="background-image: url('<?php echo esc_url($entity_image); ?>');">
+    <div class="yatra-taxonomy-hero"<?php echo $entity_image ? ' style="background-image: url(' . esc_url($entity_image) . ');"' : ''; ?>>
         <div class="yatra-taxonomy-hero-overlay"></div>
         <div class="yatra-taxonomy-hero-content">
-            <nav class="yatra-breadcrumb">
-                <a href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html__('Home', 'yatra'); ?></a>
-                <span class="yatra-breadcrumb-sep">›</span>
-                <?php 
-                $base_url = '';
-                switch ($type) {
-                    case 'destination':
-                        $base_url = yatra_get_destination_permalink((object)['slug' => '']);
-                        $base_url = str_replace('//', '/', dirname($base_url));
-                        break;
-                    case 'activity':
-                        $base_url = yatra_get_activity_permalink((object)['slug' => '']);
-                        $base_url = str_replace('//', '/', dirname($base_url));
-                        break;
-                    case 'category':
-                        $base_url = yatra_get_category_permalink((object)['slug' => '']);
-                        $base_url = str_replace('//', '/', dirname($base_url));
-                        break;
-                }
-                ?>
-                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getString($type . '_base', $type) . '/')); ?>"><?php echo esc_html($labels['plural']); ?></a>
-                <span class="yatra-breadcrumb-sep">›</span>
-                <span class="yatra-breadcrumb-current"><?php echo esc_html($entity->name); ?></span>
-            </nav>
             <h1 class="yatra-taxonomy-title"><?php echo esc_html($entity->name); ?></h1>
             <?php if (!empty($entity->description)): ?>
             <p class="yatra-taxonomy-description"><?php echo wp_kses_post($entity->description); ?></p>
@@ -118,8 +139,9 @@ get_header();
                     <h2><?php echo sprintf(esc_html($labels['trips_title']), esc_html($entity->name)); ?></h2>
                     <p class="yatra-results-count">
                         <?php echo sprintf(
-                            __('Showing <strong>%d</strong> trips', 'yatra'),
-                            count($trips)
+                            __('Showing <strong>%d</strong> of %d trips', 'yatra'),
+                            count($paged_trips),
+                            $total_trips
                         ); ?>
                     </p>
                 </div>
@@ -151,11 +173,26 @@ get_header();
             </div>
 
             <!-- Trip Grid -->
-            <?php if (!empty($trips)): ?>
+            <?php if (!empty($paged_trips)): ?>
             <div class="yatra-trip-grid" id="trip-grid">
-                <?php foreach ($trips as $trip): 
+                <?php foreach ($paged_trips as $trip): 
                     $original_price = (float) ($trip->original_price ?? $trip->regular_price ?? 0);
-                    $sale_price = (float) ($trip->sale_price ?? $trip->discounted_price ?? 0);
+                    $sale_price     = (float) ($trip->sale_price ?? $trip->discounted_price ?? 0);
+
+                    $has_flat_price = ($original_price > 0) || ($sale_price > 0);
+
+                    // Traveler-based pricing fallback: use effective min price computed in handleSingleTaxonomyPage
+                    if (!$has_flat_price && !empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+                        $effective_min = isset($trip->effective_price_min) ? (float) $trip->effective_price_min : 0.0;
+                        $effective_max = isset($trip->effective_price_max) ? (float) $trip->effective_price_max : 0.0;
+
+                        if ($effective_min > 0) {
+                            // Treat effective_min as the primary display price
+                            $original_price = $effective_min;
+                            $sale_price     = $effective_min; // no discount badge for now
+                        }
+                    }
+
                     $has_discount = !empty($sale_price) && $sale_price > 0 && $sale_price < $original_price;
                     $discount_percent = ($has_discount && $original_price > 0) ? round((($original_price - $sale_price) / $original_price) * 100) : 0;
                     $display_price = $has_discount ? $sale_price : $original_price;
@@ -164,7 +201,7 @@ get_header();
                      data-price="<?php echo esc_attr($display_price); ?>"
                      data-rating="<?php echo esc_attr($trip->average_rating); ?>"
                      data-duration="<?php echo esc_attr($trip->duration_days ?? 0); ?>">
-                    <div class="yatra-trip-image">
+                    <div class="yatra-trip-image" data-permalink="<?php echo esc_url($trip->permalink); ?>">
                         <?php if (!empty($trip->featured_image_url)): ?>
                         <img src="<?php echo esc_url($trip->featured_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>">
                         <?php else: ?>
@@ -177,7 +214,7 @@ get_header();
                         </div>
                         <?php endif; ?>
                         
-                        <button class="yatra-favorite-btn" title="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>">
+                        <button class="yatra-favorite-btn" title="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>" type="button">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                             </svg>
@@ -205,7 +242,11 @@ get_header();
                             <?php endif; ?>
                         </div>
                         
-                        <h3 class="yatra-trip-title"><?php echo esc_html($trip->title); ?></h3>
+                        <h3 class="yatra-trip-title">
+                            <a href="<?php echo esc_url($trip->permalink); ?>">
+                                <?php echo esc_html($trip->title); ?>
+                            </a>
+                        </h3>
                         
                         <?php 
                         // Get highlights from trip features, categories, activities, and included items
@@ -273,11 +314,36 @@ get_header();
                         
                         <div class="yatra-trip-footer">
                             <div class="yatra-trip-price">
-                                <?php if ($has_discount): ?>
-                                <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($original_price)); ?></div>
+                                <?php
+                                $is_traveler_based = !empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based';
+                                $effective_min = isset($trip->effective_price_min) ? (float) $trip->effective_price_min : 0.0;
+                                $effective_max = isset($trip->effective_price_max) ? (float) $trip->effective_price_max : 0.0;
+
+                                if ($is_traveler_based && $effective_min > 0) :
+                                    // Traveler-based: show min-max or From single price
+                                    if ($effective_max > 0 && $effective_max > $effective_min) :
+                                        $range_label = sprintf(
+                                            '%s - %s',
+                                            yatra_format_price($effective_min),
+                                            yatra_format_price($effective_max)
+                                        );
+                                    else :
+                                        $range_label = sprintf(
+                                            /* translators: %s: formatted price */
+                                            __('From %s', 'yatra'),
+                                            yatra_format_price($effective_min)
+                                        );
+                                    endif;
+                                ?>
+                                    <div class="yatra-current-price"><?php echo esc_html($range_label); ?></div>
+                                    <div class="yatra-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
+                                <?php else : ?>
+                                    <?php if ($has_discount): ?>
+                                    <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($original_price)); ?></div>
+                                    <?php endif; ?>
+                                    <div class="yatra-current-price"><?php echo esc_html(yatra_format_price($display_price)); ?></div>
+                                    <div class="yatra-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
                                 <?php endif; ?>
-                                <div class="yatra-current-price"><?php echo esc_html(yatra_format_price($display_price)); ?></div>
-                                <div class="yatra-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
                             </div>
                             <a href="<?php echo esc_url($trip->permalink); ?>" class="yatra-card-view-btn"><?php echo esc_html__('View Details', 'yatra'); ?></a>
                         </div>
@@ -298,6 +364,42 @@ get_header();
                     <?php echo esc_html__('Browse All Trips', 'yatra'); ?>
                 </a>
             </div>
+            <?php endif; ?>
+
+            <?php if ($total_pages > 1): ?>
+                <div class="yatra-listing-pagination">
+                    <?php
+                    $base_url_no_page = remove_query_arg('yatra_page');
+                    $prev_page        = max(1, $current_page - 1);
+                    $next_page        = min($total_pages, $current_page + 1);
+                    ?>
+
+                    <?php if ($current_page <= 1): ?>
+                        <span class="yatra-pagination-btn disabled" aria-disabled="true">
+                            <?php echo esc_html__('Previous', 'yatra'); ?>
+                        </span>
+                    <?php else: ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $prev_page], $base_url_no_page)); ?>">
+                            <?php echo esc_html__('Previous', 'yatra'); ?>
+                        </a>
+                    <?php endif; ?>
+
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a class="yatra-pagination-btn<?php echo $i === $current_page ? ' active' : ''; ?>" href="<?php echo esc_url(add_query_arg(['yatra_page' => $i], $base_url_no_page)); ?>">
+                            <?php echo (int) $i; ?>
+                        </a>
+                    <?php endfor; ?>
+
+                    <?php if ($current_page >= $total_pages): ?>
+                        <span class="yatra-pagination-btn disabled" aria-disabled="true">
+                            <?php echo esc_html__('Next', 'yatra'); ?>
+                        </span>
+                    <?php else: ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $next_page], $base_url_no_page)); ?>">
+                            <?php echo esc_html__('Next', 'yatra'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
             <?php endif; ?>
 
         </div>
@@ -351,6 +453,23 @@ document.addEventListener('DOMContentLoaded', function() {
             cards.forEach(card => tripGrid.appendChild(card));
         });
     }
+
+    // Make trip image area clickable via JS (preserve markup/design)
+    const imageWrappers = document.querySelectorAll('.yatra-trip-card .yatra-trip-image[data-permalink]');
+    imageWrappers.forEach(function(wrapper) {
+        wrapper.addEventListener('click', function (event) {
+            // Do not navigate when clicking the favorite button inside the image area
+            var target = event.target;
+            if (target instanceof Element && target.closest('.yatra-favorite-btn')) {
+                return;
+            }
+
+            var url = wrapper.getAttribute('data-permalink');
+            if (url) {
+                window.location.href = url;
+            }
+        });
+    });
 });
 </script>
 

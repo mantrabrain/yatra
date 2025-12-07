@@ -27,6 +27,7 @@ interface Destination {
   description: string;
   icon?: IconPickerValue | null;
   status: string;
+  trip_count?: number;
   created_at: string;
   updated_at: string;
   created_by: string;
@@ -49,6 +50,7 @@ const Destinations: React.FC = () => {
     return saved ? JSON.parse(saved) : {
       name: true,
       description: true,
+      trips: true,
       status: true,
       created_at: false,
       updated_at: false,
@@ -344,6 +346,7 @@ const Destinations: React.FC = () => {
         columnOptions={[
           { key: 'name', label: __('Destination', 'Destination'), visible: visibleColumns.name },
           { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+          { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
           { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
           { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
           { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
@@ -412,6 +415,17 @@ const Destinations: React.FC = () => {
                             </div>
                           </div>
                         </div>
+                      )
+                    },
+                    {
+                      key: 'trips',
+                      label: __('Trips', 'Trips'),
+                      sortable: false,
+                      visible: visibleColumns.trips,
+                      render: (destination: Destination) => (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                          {typeof destination.trip_count === 'number' ? destination.trip_count : 0}
+                        </span>
                       )
                     },
                     {

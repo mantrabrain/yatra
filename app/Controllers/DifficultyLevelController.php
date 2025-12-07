@@ -107,6 +107,29 @@ class DifficultyLevelController extends BaseController
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
+            // Attach trip counts for each difficulty level
+            if (!empty($items)) {
+                global $wpdb;
+                $tripTable = $wpdb->prefix . 'yatra_trips';
+
+                foreach ($items as $item) {
+                    $levelId = isset($item->id) ? (int) $item->id : 0;
+                    if ($levelId <= 0) {
+                        continue;
+                    }
+
+                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                        "SELECT COUNT(*)
+                         FROM `{$tripTable}` t
+                         WHERE t.difficulty_level = %d
+                           AND t.status != 'trash'",
+                        $levelId
+                    ));
+
+                    $item->trip_count = $tripCount;
+                }
+            }
+
             $prepared = array_map([$this, 'prepareItem'], $items);
 
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
@@ -122,6 +145,21 @@ class DifficultyLevelController extends BaseController
 
             if (!$item) {
                 return $this->not_found(__('Difficulty level not found', 'yatra'));
+            }
+
+            // Attach trip count for single level
+            global $wpdb;
+            $tripTable = $wpdb->prefix . 'yatra_trips';
+            $levelId = isset($item->id) ? (int) $item->id : 0;
+            if ($levelId > 0) {
+                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(*)
+                     FROM `{$tripTable}` t
+                     WHERE t.difficulty_level = %d
+                       AND t.status != 'trash'",
+                    $levelId
+                ));
+                $item->trip_count = $tripCount;
             }
 
             return $this->success_response($this->prepareItem($item));

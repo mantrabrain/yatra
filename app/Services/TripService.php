@@ -465,6 +465,209 @@ class TripService extends BaseService
     }
 
     /**
+     * Duplicate a trip with all relationships
+     *
+     * Creates a new draft trip based on an existing one, copying
+     * core fields and relationships (destinations, activities,
+     * categories, pricing, highlights, gallery, FAQs, itinerary,
+     * availability dates). Slug will be regenerated to ensure
+     * uniqueness and status is always set to draft.
+     *
+     * @param int $id Existing trip ID
+     * @return int New trip ID
+     * @throws \Exception If source trip not found
+     */
+    public function duplicate(int $id): int
+    {
+        $source = $this->getWithRelations($id);
+        if (!$source) {
+            throw new \Exception(__('Trip not found', 'yatra'));
+        }
+
+        $data = (array) $source;
+
+        // Adjust core fields
+        $data['title'] = ($data['title'] ?? '') . ' (Copy)';
+
+        // Generate new unique slug based on existing slug with numeric suffix (-1, -2, ...)
+        $baseSlug = !empty($source->slug) ? sanitize_title((string) $source->slug) : $this->generateSlug($data['title'] ?? 'trip-copy');
+        $suffix = 1;
+        $newSlug = $baseSlug . '-' . $suffix;
+        while ($this->repository->findBySlug($newSlug)) {
+            $suffix++;
+            $newSlug = $baseSlug . '-' . $suffix;
+        }
+        $data['slug'] = $newSlug;
+
+        // Always create as draft copy
+        $data['status'] = 'draft';
+
+        // Ensure created_by is current user; clear technical fields
+        $data['created_by'] = get_current_user_id();
+        unset(
+            $data['id'],
+            $data['created_at'],
+            $data['updated_at'],
+            $data['version'],
+            $data['published_at']
+        );
+
+        // Extract relationships from the hydrated source object in the shapes
+        // expected by TripRepository::createWithRelations (scalar IDs / simple arrays)
+        $relationships = [];
+
+        // Destinations: array of destination IDs
+        $destinations = [];
+        if (!empty($source->destinations) && is_array($source->destinations)) {
+            foreach ($source->destinations as $dest) {
+                $id = (int) ($dest->destination_id ?? $dest->id ?? 0);
+                if ($id > 0 && !in_array($id, $destinations, true)) {
+                    $destinations[] = $id;
+                }
+            }
+        }
+        $relationships['destinations'] = $destinations;
+
+        // Activities: array of activity IDs
+        $activities = [];
+        if (!empty($source->activities) && is_array($source->activities)) {
+            foreach ($source->activities as $act) {
+                $id = (int) ($act->activity_id ?? $act->id ?? 0);
+                if ($id > 0 && !in_array($id, $activities, true)) {
+                    $activities[] = $id;
+                }
+            }
+        }
+        $relationships['activities'] = $activities;
+
+        // Trip categories: array of category IDs
+        $categories = [];
+        if (!empty($source->trip_category) && is_array($source->trip_category)) {
+            foreach ($source->trip_category as $cat) {
+                $id = (int) ($cat->category_id ?? $cat->id ?? 0);
+                if ($id > 0 && !in_array($id, $categories, true)) {
+                    $categories[] = $id;
+                }
+            }
+        }
+        $relationships['trip_category'] = $categories;
+
+        // Price types: normalize to simple associative arrays
+        $priceTypes = [];
+        if (!empty($source->price_types) && is_array($source->price_types)) {
+            foreach ($source->price_types as $pt) {
+                $categoryId = (int) ($pt->category_id ?? 0);
+                if ($categoryId <= 0) {
+                    continue;
+                }
+                $item = [
+                    'category_id' => $categoryId,
+                    'original_price' => (float) ($pt->original_price ?? 0),
+                ];
+                if (isset($pt->discounted_price)) {
+                    $item['discounted_price'] = (float) $pt->discounted_price;
+                }
+                $priceTypes[] = $item;
+            }
+        }
+        $relationships['price_types'] = $priceTypes;
+
+        // Highlights: normalize stdClass rows from DB into arrays/strings expected by saveHighlights
+        $highlights = [];
+        $rawHighlights = $data['highlights'] ?? ($source->highlights ?? []);
+        if (!empty($rawHighlights) && is_array($rawHighlights)) {
+            foreach ($rawHighlights as $highlight) {
+                // Already a simple string
+                if (is_string($highlight)) {
+                    $highlights[] = $highlight;
+                    continue;
+                }
+
+                // Already an array in the expected shape
+                if (is_array($highlight)) {
+                    $highlights[] = $highlight;
+                    continue;
+                }
+
+                // Convert stdClass from yatra_trip_highlights table into array
+                if (is_object($highlight)) {
+                    $text = $highlight->text ?? $highlight->highlight_text ?? '';
+                    if ($text === '') {
+                        continue;
+                    }
+
+                    $highlights[] = [
+                        'text'        => $text,
+                        'icon'        => $highlight->icon ?? $highlight->highlight_icon ?? null,
+                        'image_id'    => isset($highlight->image_id)
+                            ? (int) $highlight->image_id
+                            : (isset($highlight->highlight_image_id) ? (int) $highlight->highlight_image_id : 0),
+                        'is_featured' => isset($highlight->is_featured) ? (int) $highlight->is_featured : 0,
+                    ];
+                }
+            }
+        }
+        $relationships['highlights'] = $highlights;
+
+        // Gallery images: normalize stdClass rows from DB into arrays/strings expected by saveGalleryImages
+        $galleryImages = [];
+        $rawGalleryImages = $data['gallery_images'] ?? ($source->gallery_images ?? []);
+        if (!empty($rawGalleryImages) && is_array($rawGalleryImages)) {
+            foreach ($rawGalleryImages as $image) {
+                // Already a simple URL string
+                if (is_string($image)) {
+                    $galleryImages[] = $image;
+                    continue;
+                }
+
+                // Already an array in the expected shape
+                if (is_array($image)) {
+                    $galleryImages[] = $image;
+                    continue;
+                }
+
+                // Convert stdClass from yatra_trip_gallery_images into array
+                if (is_object($image)) {
+                    $url = $image->url ?? $image->image_url ?? '';
+                    if ($url === '') {
+                        continue;
+                    }
+
+                    $galleryImages[] = [
+                        'url'           => $url,
+                        'id'            => isset($image->image_id) ? (int) $image->image_id : 0,
+                        'thumbnail_url' => $image->thumbnail_url ?? null,
+                        'alt_text'      => $image->alt_text ?? null,
+                        'caption'       => $image->caption ?? null,
+                        'is_featured'   => isset($image->is_featured) ? (int) $image->is_featured : 0,
+                    ];
+                }
+            }
+        }
+        $relationships['gallery_images'] = $galleryImages;
+
+        // Other relationships can be copied as-is; repository helpers can handle them
+        $relationships['faqs']               = $data['faqs'] ?? ($source->faqs ?? []);
+        $relationships['itinerary_days']     = $data['itinerary_days'] ?? ($source->itinerary_days ?? []);
+        $relationships['availability_dates'] = $data['availability_dates'] ?? ($source->availability_dates ?? []);
+
+        // Remove relationship keys from main data to avoid column issues
+        unset(
+            $data['destinations'],
+            $data['activities'],
+            $data['trip_category'],
+            $data['price_types'],
+            $data['highlights'],
+            $data['gallery_images'],
+            $data['faqs'],
+            $data['itinerary_days'],
+            $data['availability_dates']
+        );
+
+        return $this->createWithRelations($data, $relationships);
+    }
+
+    /**
      * Soft delete trip
      */
     public function softDelete(int $id): bool

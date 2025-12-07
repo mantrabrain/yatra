@@ -115,6 +115,41 @@ class TripCategoryController extends BaseController
 
             $total = $this->service->count($args);
 
+            // Attach trip counts for each category (including nested subcategories)
+            if (!empty($items)) {
+                global $wpdb;
+                $tripTable = $wpdb->prefix . 'yatra_trips';
+                $joinTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+
+                $attachCounts = function (&$categories) use (&$attachCounts, $wpdb, $tripTable, $joinTable) {
+                    if (empty($categories) || !is_array($categories)) {
+                        return;
+                    }
+
+                    foreach ($categories as &$cat) {
+                        $categoryId = isset($cat->id) ? (int) $cat->id : 0;
+                        if ($categoryId > 0) {
+                            $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                                "SELECT COUNT(DISTINCT t.id)
+                                 FROM `{$tripTable}` t
+                                 INNER JOIN `{$joinTable}` tc ON tc.trip_id = t.id
+                                 WHERE tc.category_id = %d
+                                   AND t.status != 'trash'",
+                                $categoryId
+                            ));
+
+                            $cat->trip_count = $tripCount;
+                        }
+
+                        if (isset($cat->subcategories) && is_array($cat->subcategories)) {
+                            $attachCounts($cat->subcategories);
+                        }
+                    }
+                };
+
+                $attachCounts($items);
+            }
+
             $prepared = array_map([$this, 'prepareItem'], $items);
 
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
@@ -130,6 +165,23 @@ class TripCategoryController extends BaseController
 
             if (!$item) {
                 return $this->not_found(__('Category not found', 'yatra'));
+            }
+
+            // Attach trip count for single category
+            global $wpdb;
+            $tripTable = $wpdb->prefix . 'yatra_trips';
+            $joinTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+            $categoryId = isset($item->id) ? (int) $item->id : 0;
+            if ($categoryId > 0) {
+                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
+                    "SELECT COUNT(DISTINCT t.id)
+                     FROM `{$tripTable}` t
+                     INNER JOIN `{$joinTable}` tc ON tc.trip_id = t.id
+                     WHERE tc.category_id = %d
+                       AND t.status != 'trash'",
+                    $categoryId
+                ));
+                $item->trip_count = $tripCount;
             }
 
             return $this->success_response($this->prepareItem($item));

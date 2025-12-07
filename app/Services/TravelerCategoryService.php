@@ -77,6 +77,43 @@ class TravelerCategoryService extends BaseService
                 throw new \InvalidArgumentException('Maximum age must be greater than minimum age');
             }
         }
+
+        // Validate pricing mode
+        if (isset($data['pricing_mode']) && $data['pricing_mode'] !== '') {
+            $allowed_pricing_modes = ['per_person', 'per_group'];
+            if (!in_array($data['pricing_mode'], $allowed_pricing_modes, true)) {
+                throw new \InvalidArgumentException('Invalid pricing mode. Must be per_person or per_group');
+            }
+        }
+
+        // Validate group size when pricing per group
+        if (($data['pricing_mode'] ?? 'per_person') === 'per_group') {
+            if (isset($data['min_pax']) && $data['min_pax'] !== '' && $data['min_pax'] !== null) {
+                $min_pax = (int) $data['min_pax'];
+                if ($min_pax <= 0) {
+                    throw new \InvalidArgumentException('Minimum group size must be greater than zero');
+                }
+            }
+
+            if (isset($data['max_pax']) && $data['max_pax'] !== '' && $data['max_pax'] !== null) {
+                $max_pax = (int) $data['max_pax'];
+                if ($max_pax <= 0) {
+                    throw new \InvalidArgumentException('Maximum group size must be greater than zero');
+                }
+            }
+
+            if (
+                isset($data['min_pax'], $data['max_pax']) &&
+                $data['min_pax'] !== '' && $data['max_pax'] !== '' &&
+                $data['min_pax'] !== null && $data['max_pax'] !== null
+            ) {
+                $min_pax = (int) $data['min_pax'];
+                $max_pax = (int) $data['max_pax'];
+                if ($min_pax > $max_pax) {
+                    throw new \InvalidArgumentException('Maximum group size must be greater than or equal to minimum group size');
+                }
+            }
+        }
     }
 
     /**
@@ -116,6 +153,14 @@ class TravelerCategoryService extends BaseService
             $data['status'] = 'draft';
         }
 
+        // Sanitize pricing mode
+        $allowed_pricing_modes = ['per_person', 'per_group'];
+        if (isset($data['pricing_mode']) && in_array($data['pricing_mode'], $allowed_pricing_modes, true)) {
+            $data['pricing_mode'] = $data['pricing_mode'];
+        } else {
+            $data['pricing_mode'] = 'per_person';
+        }
+
         // Handle age_min
         if (isset($data['age_min'])) {
             if ($data['age_min'] === '' || $data['age_min'] === null) {
@@ -131,6 +176,23 @@ class TravelerCategoryService extends BaseService
                 $data['age_max'] = null;
             } else {
                 $data['age_max'] = absint($data['age_max']);
+            }
+        }
+
+        // Handle group size (min_pax, max_pax)
+        if (isset($data['min_pax'])) {
+            if ($data['min_pax'] === '' || $data['min_pax'] === null) {
+                $data['min_pax'] = null;
+            } else {
+                $data['min_pax'] = absint($data['min_pax']);
+            }
+        }
+
+        if (isset($data['max_pax'])) {
+            if ($data['max_pax'] === '' || $data['max_pax'] === null) {
+                $data['max_pax'] = null;
+            } else {
+                $data['max_pax'] = absint($data['max_pax']);
             }
         }
 
@@ -207,6 +269,17 @@ class TravelerCategoryService extends BaseService
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
                 : 'draft';
+        }
+
+        // Sanitize pricing mode (if provided)
+        if (isset($data['pricing_mode'])) {
+            $allowed_pricing_modes = ['per_person', 'per_group'];
+            if (in_array($data['pricing_mode'], $allowed_pricing_modes, true)) {
+                $data['pricing_mode'] = $data['pricing_mode'];
+            } else {
+                // If invalid, default to per_person to avoid bad data
+                $data['pricing_mode'] = 'per_person';
+            }
         }
 
         // Handle age_min

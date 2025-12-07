@@ -13,7 +13,10 @@ export interface TravelerCategory {
   description: string;
   age_min?: number;
   age_max?: number;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'publish' | 'draft';
+  pricing_mode?: 'per_person' | 'per_group';
+  min_pax?: number | null;
+  max_pax?: number | null;
 }
 
 export interface PriceType {
@@ -146,9 +149,6 @@ export interface TripFormData {
   deposit_amount: string;
   deposit_percentage: string;
   payment_terms: string;
-  group_pricing_enabled: boolean;
-  group_size_min: string;
-  group_discount_percentage: string;
   
   // Booking
   max_travelers: string;

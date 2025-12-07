@@ -41,6 +41,21 @@ class TravelerCategory
     public ?int $age_max;
 
     /**
+     * @var string Pricing mode (per_person or per_group)
+     */
+    public string $pricing_mode;
+
+    /**
+     * @var int|null Minimum group size when pricing per group
+     */
+    public ?int $min_pax;
+
+    /**
+     * @var int|null Maximum group size when pricing per group
+     */
+    public ?int $max_pax;
+
+    /**
      * @var array|null Icon data (type and value)
      */
     public ?array $icon;
@@ -83,6 +98,11 @@ class TravelerCategory
         $category->description = $data['description'] ?? '';
         $category->age_min = isset($data['age_min']) && $data['age_min'] !== '' ? (int) $data['age_min'] : null;
         $category->age_max = isset($data['age_max']) && $data['age_max'] !== '' ? (int) $data['age_max'] : null;
+        $category->pricing_mode = isset($data['pricing_mode']) && in_array($data['pricing_mode'], ['per_person', 'per_group'], true)
+            ? $data['pricing_mode']
+            : 'per_person';
+        $category->min_pax = isset($data['min_pax']) && $data['min_pax'] !== '' ? (int) $data['min_pax'] : null;
+        $category->max_pax = isset($data['max_pax']) && $data['max_pax'] !== '' ? (int) $data['max_pax'] : null;
         $category->icon = isset($data['icon']) ? (is_array($data['icon']) ? $data['icon'] : maybe_unserialize($data['icon'])) : null;
         $category->status = $data['status'] ?? 'draft';
         $category->created_at = $data['created_at'] ?? '';
@@ -105,6 +125,9 @@ class TravelerCategory
             'description' => $this->description,
             'age_min' => $this->age_min,
             'age_max' => $this->age_max,
+            'pricing_mode' => $this->pricing_mode,
+            'min_pax' => $this->min_pax,
+            'max_pax' => $this->max_pax,
             'icon' => $this->icon,
             'status' => $this->status,
             'created_at' => $this->created_at,
