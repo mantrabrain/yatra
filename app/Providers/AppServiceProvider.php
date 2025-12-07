@@ -792,6 +792,22 @@ class AppServiceProvider extends ServiceProvider
                 $css_version
             );
         }
+
+        // Destination listing specific styles (icons, placeholders, etc.)
+        $listing_page = get_query_var('yatra_listing_page');
+        if ($listing_page === 'destination') {
+            $dest_css_file = YATRA_PLUGIN_PATH . 'assets/css/destination.css';
+            if (file_exists($dest_css_file)) {
+                $dest_css_url     = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $dest_css_file);
+                $dest_css_version = YATRA_VERSION . '.' . filemtime($dest_css_file);
+                wp_enqueue_style(
+                    'yatra-destination',
+                    $dest_css_url,
+                    ['yatra-listing'],
+                    $dest_css_version
+                );
+            }
+        }
         
         // Check for CSS file (could be app.css or index.css)
         $css_files = [

@@ -71,12 +71,12 @@ class DestinationRepository extends BaseRepository
 
         // COUNT(DISTINCT td.trip_id) gives real number of trips per destination.
         // avg_rating is computed from approved reviews across all those trips.
-        // starting_price is the minimum non-zero price across related trips,
-        // using sale/discounted/original price in that priority.
+        // starting_price is computed in PHP using both regular trip prices and
+        // traveler-based pricing from recurring availability rules.
         $sql = "SELECT d.*, 
                        COUNT(DISTINCT td.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
-                       MIN(NULLIF(COALESCE(t.sale_price, t.discounted_price, t.original_price), 0)) AS starting_price
+                       GROUP_CONCAT(DISTINCT td.trip_id) AS trip_ids
                 FROM `{$destTable}` d
                 LEFT JOIN `{$relTable}` td
                   ON td.destination_id = d.id
@@ -87,7 +87,129 @@ class DestinationRepository extends BaseRepository
                 WHERE d.status = 'publish'
                 GROUP BY d.id";
 
-        return $this->wpdb->get_results($sql) ?: [];
+        $rows = $this->wpdb->get_results($sql) ?: [];
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        foreach ($rows as $row) {
+            $row->starting_price = $this->computeStartingPriceForTripIds($row->trip_ids ?? '');
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Compute the minimum effective starting price across a set of trip IDs.
+     *
+     * This looks at both regular trip pricing (sale/discounted/original) and
+     * traveler-based pricing defined in recurring availability rules.
+     */
+    private function computeStartingPriceForTripIds(string $tripIdsCsv): float
+    {
+        if (trim($tripIdsCsv) === '') {
+            return 0.0;
+        }
+
+        $tripIds = array_filter(array_map('intval', explode(',', $tripIdsCsv)));
+        if (empty($tripIds)) {
+            return 0.0;
+        }
+
+        $minPrice = null;
+        foreach ($tripIds as $tripId) {
+            $price = $this->getEffectiveTripBasePrice($tripId);
+            if ($price > 0 && ($minPrice === null || $price < $minPrice)) {
+                $minPrice = $price;
+            }
+        }
+
+        return $minPrice ?? 0.0;
+    }
+
+    /**
+     * Get an effective base price for a single trip.
+     *
+     * Priority:
+     * 1) Trip-level sale/discounted/original price (if any > 0)
+     * 2) Traveler-based pricing from active recurring availability rules
+     *    (minimum effective traveler price or rule-level sale/original).
+     */
+    private function getEffectiveTripBasePrice(int $tripId): float
+    {
+        global $wpdb;
+
+        if ($tripId <= 0) {
+            return 0.0;
+        }
+
+        $tripsTable = esc_sql($wpdb->prefix . 'yatra_trips');
+
+        $trip = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT id, sale_price, discounted_price, original_price FROM `{$tripsTable}` WHERE id = %d",
+                $tripId
+            )
+        );
+
+        if (!$trip) {
+            return 0.0;
+        }
+
+        $candidates = [];
+        foreach (['sale_price', 'discounted_price', 'original_price'] as $field) {
+            if (isset($trip->{$field}) && (float) $trip->{$field} > 0) {
+                $candidates[] = (float) $trip->{$field};
+            }
+        }
+
+        if (!empty($candidates)) {
+            return (float) min($candidates);
+        }
+
+        // Fallback 1: look at traveler-based pricing from recurring availability rules
+        $rulesRepo = new RecurringAvailabilityRepository();
+        $rules     = $rulesRepo->findByTripId($tripId, ['status' => 'active']);
+
+        foreach ($rules as $rule) {
+            // Rule-level sale/original
+            if (!empty($rule->sale_price) && (float) $rule->sale_price > 0) {
+                $candidates[] = (float) $rule->sale_price;
+            }
+            if (!empty($rule->original_price) && (float) $rule->original_price > 0) {
+                $candidates[] = (float) $rule->original_price;
+            }
+
+            // Traveler pricing on the rule itself
+            if (!empty($rule->traveler_pricing) && is_array($rule->traveler_pricing)) {
+                foreach ($rule->traveler_pricing as $pricing) {
+                    if (!empty($pricing['effective_price']) && (float) $pricing['effective_price'] > 0) {
+                        $candidates[] = (float) $pricing['effective_price'];
+                    }
+                }
+            }
+
+            // Traveler pricing nested in time_slots
+            if (!empty($rule->time_slots) && is_array($rule->time_slots)) {
+                foreach ($rule->time_slots as $slot) {
+                    if (empty($slot['traveler_pricing']) || !is_array($slot['traveler_pricing'])) {
+                        continue;
+                    }
+                    foreach ($slot['traveler_pricing'] as $pricing) {
+                        if (!empty($pricing['effective_price']) && (float) $pricing['effective_price'] > 0) {
+                            $candidates[] = (float) $pricing['effective_price'];
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($candidates)) {
+            return 0.0;
+        }
+
+        return (float) min($candidates);
     }
 
     /**

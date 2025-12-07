@@ -315,7 +315,9 @@ if (!function_exists('yatra_get_currency_symbol')) {
             'EGP' => 'E£',
             'NGN' => '₦',
             'KES' => 'KSh',
-            'GHS' => 'GH₵',
+            // Ghanaian cedi – use plain symbol without the GH prefix
+            'GHS' => '₵',
+            'GHC' => '₵',
             'ARS' => 'AR$',
             'CLP' => 'CL$',
             'COP' => 'CO$',

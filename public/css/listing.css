@@ -951,6 +951,43 @@
     max-height: 280px;
 }
 
+/* Destination grid/list layout (mirror trip grid behavior) */
+.yatra-destination-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.yatra-destination-grid.list-view {
+    grid-template-columns: 1fr;
+}
+
+.yatra-destination-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-card {
+    flex-direction: row;
+    max-height: 260px;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-image {
+    width: 320px;
+    height: 100%;
+}
+
+.yatra-destination-grid.list-view .yatra-destination-content {
+    padding: 20px;
+}
+
 .yatra-trip-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -1247,6 +1284,34 @@ a.yatra-highlight-link:hover {
 .yatra-pagination-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.yatra-pagination-btn.disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
+/* Destination listing: make active grid/list view button very clear */
+.yatra-destination-listing .yatra-results-controls .yatra-view-toggle {
+    border-radius: 10px;
+    overflow: hidden;
+    margin-left: 8px;
+}
+
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn {
+    background: transparent !important;
+    color: #2563eb !important; /* blue icon */
+    padding: 6px 10px;
+}
+
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn.active {
+    background: #2563eb !important; /* solid blue pill */
+    color: #ffffff !important;      /* white icon */
+}
+
+.yatra-destination-listing .yatra-results-controls .yatra-view-btn:not(.active) {
+    opacity: 0.75;
 }
 
 /* Responsive Styles */

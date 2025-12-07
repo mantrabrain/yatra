@@ -25,18 +25,49 @@ if (!class_exists('Yatra\\Services\\DestinationService')) {
 
 $destination_service = new \Yatra\Services\DestinationService();
 
-// Enqueue destination-specific styles so icons and placeholders render correctly.
-if (defined('YATRA_PLUGIN_URL')) {
-    $css_path = YATRA_PLUGIN_PATH . 'assets/css/destination.css';
-    if (file_exists($css_path)) {
-        $css_url     = YATRA_PLUGIN_URL . 'assets/css/destination.css';
-        $css_version = defined('YATRA_VERSION') ? YATRA_VERSION . '.' . filemtime($css_path) : null;
-        wp_enqueue_style('yatra-destination', $css_url, [], $css_version);
-    }
+// Fetch published destinations with stats (including trips_count, avg_rating, starting_price)
+$destinations = $destination_service->getPublishedWithStats();
+
+// Apply simple server-side sorting and pagination for UX.
+$sort = isset($_GET['yatra_sort']) ? sanitize_text_field(wp_unslash($_GET['yatra_sort'])) : 'popular';
+
+if (!empty($destinations) && is_array($destinations)) {
+    usort($destinations, function ($a, $b) use ($sort) {
+        $nameA = isset($a->name) ? strtolower($a->name) : '';
+        $nameB = isset($b->name) ? strtolower($b->name) : '';
+        $tripsA = isset($a->trips_count) ? (int) $a->trips_count : 0;
+        $tripsB = isset($b->trips_count) ? (int) $b->trips_count : 0;
+        $ratingA = isset($a->avg_rating) ? (float) $a->avg_rating : 0.0;
+        $ratingB = isset($b->avg_rating) ? (float) $b->avg_rating : 0.0;
+
+        switch ($sort) {
+            case 'trips_desc': // Most Trips
+                return $tripsB <=> $tripsA;
+            case 'trips_asc':
+                return $tripsA <=> $tripsB;
+            case 'name_asc': // Name: A-Z
+                return $nameA <=> $nameB;
+            case 'name_desc': // Name: Z-A
+                return $nameB <=> $nameA;
+            case 'rating_desc': // Most Popular (by rating then trips)
+            default:
+                $cmp = $ratingB <=> $ratingA;
+                if (0 === $cmp) {
+                    return $tripsB <=> $tripsA;
+                }
+                return $cmp;
+        }
+    });
 }
 
-// Fetch published destinations with stats (including trips_count), ordered by name
-$destinations = $destination_service->getPublishedWithStats();
+$per_page     = 6;
+$current_page = isset($_GET['yatra_page']) ? max(1, (int) $_GET['yatra_page']) : 1;
+$total_items  = is_array($destinations) ? count($destinations) : 0;
+$total_pages  = $total_items > 0 ? (int) ceil($total_items / $per_page) : 1;
+$current_page = min($current_page, $total_pages);
+
+$offset             = ($current_page - 1) * $per_page;
+$paged_destinations = $total_items > 0 ? array_slice($destinations, $offset, $per_page) : [];
 
 get_header();
 ?>
@@ -53,21 +84,31 @@ get_header();
                 </div>
                 <div class="yatra-results-controls">
                     <div class="yatra-sort-control">
-                        <label>Sort by:</label>
-                        <select>
-                            <option>Most Popular</option>
-                            <option>Most Trips</option>
-                            <option>Name: A-Z</option>
-                            <option>Name: Z-A</option>
+                        <label><?php esc_html_e('Sort by:', 'yatra'); ?></label>
+                        <select onchange="if (this.value) window.location.href=this.value;">
+                            <?php
+                            $base_url = remove_query_arg(['yatra_page', 'yatra_sort']);
+                            $options  = [
+                                'rating_desc' => __('Most Popular', 'yatra'),
+                                'trips_desc'  => __('Most Trips', 'yatra'),
+                                'name_asc'    => __('Name: A-Z', 'yatra'),
+                                'name_desc'   => __('Name: Z-A', 'yatra'),
+                            ];
+                            foreach ($options as $value => $label) {
+                                $url      = esc_url(add_query_arg(['yatra_sort' => $value], $base_url));
+                                $selected = $sort === $value ? 'selected' : '';
+                                echo '<option value="' . $url . '" ' . $selected . '>' . esc_html($label) . '</option>';
+                            }
+                            ?>
                         </select>
                     </div>
                     <div class="yatra-view-toggle">
-                        <button class="yatra-view-btn active" data-view="grid" title="Grid View">
+                        <button class="yatra-view-btn active" data-view="grid" type="button" title="<?php esc_attr_e('Grid View', 'yatra'); ?>">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                             </svg>
                         </button>
-                        <button class="yatra-view-btn" data-view="list" title="List View">
+                        <button class="yatra-view-btn" data-view="list" type="button" title="<?php esc_attr_e('List View', 'yatra'); ?>">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
@@ -78,11 +119,11 @@ get_header();
 
             <!-- Destination Grid -->
             <div class="yatra-destination-grid" id="destination-grid">
-                <?php if (!empty($destinations)) : ?>
+                <?php if (!empty($paged_destinations)) : ?>
                     <?php
                     ?>
 
-                    <?php foreach ($destinations as $destination) : ?>
+                    <?php foreach ($paged_destinations as $destination) : ?>
                         <?php
                         // Destination is a stdClass from repository
                         $name        = isset($destination->name) ? $destination->name : '';
@@ -223,16 +264,84 @@ get_header();
             </div>
 
             <!-- Pagination -->
-            <div class="yatra-listing-pagination">
-                <button class="yatra-pagination-btn" disabled>Previous</button>
-                <button class="yatra-pagination-btn active">1</button>
-                <button class="yatra-pagination-btn">2</button>
-                <button class="yatra-pagination-btn">3</button>
-                <button class="yatra-pagination-btn">Next</button>
-            </div>
+            <?php if ($total_pages > 1) : ?>
+                <div class="yatra-listing-pagination">
+                    <?php
+                    $base_url_no_page = remove_query_arg('yatra_page');
+                    $prev_page        = max(1, $current_page - 1);
+                    $next_page        = min($total_pages, $current_page + 1);
+                    ?>
+                    <?php if ($current_page <= 1) : ?>
+                        <span class="yatra-pagination-btn disabled" aria-disabled="true">
+                            <?php esc_html_e('Previous', 'yatra'); ?>
+                        </span>
+                    <?php else : ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $prev_page], $base_url_no_page)); ?>">
+                            <?php esc_html_e('Previous', 'yatra'); ?>
+                        </a>
+                    <?php endif; ?>
+                    <?php for ($i = 1; $i <= $total_pages; $i++) : ?>
+                        <a class="yatra-pagination-btn<?php echo $i === $current_page ? ' active' : ''; ?>" href="<?php echo esc_url(add_query_arg(['yatra_page' => $i], $base_url_no_page)); ?>">
+                            <?php echo esc_html($i); ?>
+                        </a>
+                    <?php endfor; ?>
+                    <?php if ($current_page >= $total_pages) : ?>
+                        <span class="yatra-pagination-btn disabled" aria-disabled="true">
+                            <?php esc_html_e('Next', 'yatra'); ?>
+                        </span>
+                    <?php else : ?>
+                        <a class="yatra-pagination-btn" href="<?php echo esc_url(add_query_arg(['yatra_page' => $next_page], $base_url_no_page)); ?>">
+                            <?php esc_html_e('Next', 'yatra'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
-</div>
+  </div>
+
+<script>
+  (function() {
+    var gridEl   = document.getElementById('destination-grid');
+    if (!gridEl) return;
+
+    var storageKey = 'yatra_destination_view';
+    var buttons    = document.querySelectorAll('.yatra-view-btn');
+
+    function applyView(view) {
+      buttons.forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-view') === view);
+      });
+      if (view === 'list') {
+        gridEl.classList.add('list-view');
+      } else {
+        gridEl.classList.remove('list-view');
+      }
+    }
+
+    // Load saved preference, default to grid
+    try {
+      var saved = window.localStorage.getItem(storageKey);
+      if (saved === 'list' || saved === 'grid') {
+        applyView(saved);
+      } else {
+        applyView('grid');
+      }
+    } catch (e) {
+      applyView('grid');
+    }
+
+    buttons.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var view = this.getAttribute('data-view') || 'grid';
+        applyView(view);
+        try {
+          window.localStorage.setItem(storageKey, view);
+        } catch (e) {}
+      });
+    });
+  })();
+</script>
 
 <?php
 get_footer();
