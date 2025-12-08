@@ -15,6 +15,7 @@ use Yatra\Providers\AdminServiceProvider;
  */
 class Bootstrap
 {
+    
     /**
      * @var Container
      */
