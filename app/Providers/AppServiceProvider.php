@@ -2667,6 +2667,28 @@ HTML;
                 true
             );
         }
+
+        // Enqueue wishlist JS
+        $wishlist_js_file = YATRA_PLUGIN_PATH . 'public/js/listing-wishlist.js';
+        if (file_exists($wishlist_js_file)) {
+            $wishlist_js_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $wishlist_js_file);
+            $wishlist_js_version = YATRA_VERSION . '.' . filemtime($wishlist_js_file);
+            wp_enqueue_script(
+                'yatra-listing-wishlist',
+                $wishlist_js_url,
+                ['yatra-listing'],
+                $wishlist_js_version,
+                true
+            );
+            
+            // Localize script with required data
+            wp_localize_script('yatra-listing-wishlist', 'yatraAdmin', [
+                'rest_url' => rest_url(),
+                'nonce' => wp_create_nonce('wp_rest'),
+                'is_logged_in' => is_user_logged_in(),
+                'login_url' => wp_login_url()
+            ]);
+        }
     }
 
     /**
