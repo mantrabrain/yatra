@@ -447,6 +447,10 @@ class TripController extends BaseController
         try {
             $data = $request->get_json_params();
             
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra TripController create_item: difficulty_level=" . ($data['difficulty_level'] ?? 'NOT SET'));
+            }
+            
             // Extract relationships (fields stored in separate tables)
             $relationships = [
                 'destinations' => $data['destinations'] ?? [],
@@ -498,6 +502,7 @@ class TripController extends BaseController
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log("Yatra TripController update_item: pricing_type=" . ($data['pricing_type'] ?? 'NOT SET'));
                 error_log("Yatra TripController update_item: price_types=" . json_encode($data['price_types'] ?? 'NOT SET'));
+                error_log("Yatra TripController update_item: difficulty_level=" . ($data['difficulty_level'] ?? 'NOT SET'));
             }
 
             // Extract relationships (fields stored in separate tables)

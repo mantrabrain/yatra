@@ -170,6 +170,11 @@ class TripService extends BaseService
 
         // Process JSON fields
         $data = $this->processJsonFields($data);
+        
+        // Ensure difficulty_level is stored as integer ID
+        if (isset($data['difficulty_level'])) {
+            $data['difficulty_level'] = is_numeric($data['difficulty_level']) ? (int) $data['difficulty_level'] : null;
+        }
 
         return $data;
     }
@@ -226,6 +231,11 @@ class TripService extends BaseService
 
         // Process JSON fields
         $data = $this->processJsonFields($data);
+        
+        // Ensure difficulty_level is stored as integer ID
+        if (isset($data['difficulty_level'])) {
+            $data['difficulty_level'] = is_numeric($data['difficulty_level']) ? (int) $data['difficulty_level'] : null;
+        }
 
         return $data;
     }

@@ -13,16 +13,6 @@
       "css/index.css"
     ]
   },
-  "_index-Xx9Mz2YU.js": {
-    "file": "js/index-Xx9Mz2YU.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-D_FxdjGQ.js"
-    ],
-    "css": [
-      "css/index.css"
-    ]
-  },
   "_react-vendor-D_FxdjGQ.js": {
     "file": "js/react-vendor-D_FxdjGQ.js",
     "name": "react-vendor"

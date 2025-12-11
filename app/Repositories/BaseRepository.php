@@ -83,7 +83,23 @@ abstract class BaseRepository
 
         $query = "SELECT * FROM `{$table}` {$where} {$order} {$limit}";
 
-        return $this->wpdb->get_results($query) ?: [];
+        // DEBUG: Log query execution for TripRepository
+        if (defined('WP_DEBUG') && WP_DEBUG && strpos($table, 'yatra_trips') !== false) {
+            error_log('YATRA TRIP QUERY DEBUG - Table: ' . $table);
+            error_log('YATRA TRIP QUERY DEBUG - Final SQL: ' . $query);
+        }
+
+        $results = $this->wpdb->get_results($query) ?: [];
+        
+        // DEBUG: Log results for TripRepository
+        if (defined('WP_DEBUG') && WP_DEBUG && strpos($table, 'yatra_trips') !== false) {
+            error_log('YATRA TRIP QUERY DEBUG - Query returned ' . count($results) . ' results');
+            if ($this->wpdb->last_error) {
+                error_log('YATRA TRIP QUERY DEBUG - SQL Error: ' . $this->wpdb->last_error);
+            }
+        }
+
+        return $results;
     }
 
     /**

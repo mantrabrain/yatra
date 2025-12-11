@@ -50,6 +50,336 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Find trips with comprehensive filtering, pagination, and relationships
+     *
+     * @param array $filters Filter criteria
+     * @param int $page Current page
+     * @param int $perPage Items per page
+     * @return array
+     */
+    public function findWithFilters(array $filters = [], int $page = 1, int $perPage = 10): array
+    {
+        global $wpdb;
+        
+        // Table references
+        $trip_table = $this->getTableName();
+        $reviews_table = $wpdb->prefix . 'yatra_reviews';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $dest_table = $wpdb->prefix . 'yatra_destinations';
+        $act_table = $wpdb->prefix . 'yatra_activities';
+        
+        // Build WHERE conditions and parameters
+        $wheres = ["t.status IN ('publish', 'published')"];
+        $params = [];
+        $joins = [];
+        $having_clauses = [];
+        $rating_params = [];
+        
+        // Destination filter
+        if (!empty($filters['destination'])) {
+            $dest_mapping_table = $wpdb->prefix . 'yatra_trip_destination_mapping';
+            $joins[] = "LEFT JOIN {$dest_mapping_table} tdm ON tdm.trip_id = t.id";
+            $joins[] = "LEFT JOIN {$dest_table} dest ON dest.id = tdm.destination_id";
+            $wheres[] = "dest.slug = %s";
+            $params[] = $filters['destination'];
+        }
+        
+        // Activity filter
+        if (!empty($filters['activity'])) {
+            $act_mapping_table = $wpdb->prefix . 'yatra_trip_activity_mapping';
+            $joins[] = "LEFT JOIN {$act_mapping_table} tam ON tam.trip_id = t.id";
+            $joins[] = "LEFT JOIN {$act_table} act ON act.id = tam.activity_id";
+            $wheres[] = "act.slug = %s";
+            $params[] = $filters['activity'];
+        }
+        
+        // Price range filter
+        if (!empty($filters['price_min']) && $filters['price_min'] > 0) {
+            $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) >= %f";
+            $params[] = $filters['price_min'];
+        }
+        
+        if (!empty($filters['price_max']) && $filters['price_max'] > 0) {
+            $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) <= %f";
+            $params[] = $filters['price_max'];
+        }
+        
+        // Duration filter
+        if (!empty($filters['duration_min']) && $filters['duration_min'] > 0) {
+            $wheres[] = "CAST(t.duration_days AS UNSIGNED) >= %d";
+            $params[] = $filters['duration_min'];
+        }
+        
+        if (!empty($filters['duration_max']) && $filters['duration_max'] > 0) {
+            $wheres[] = "CAST(t.duration_days AS UNSIGNED) <= %d";
+            $params[] = $filters['duration_max'];
+        }
+        
+        // Rating filter
+        if (!empty($filters['rating_min']) && $filters['rating_min'] > 0) {
+            $having_clauses[] = "AVG(r.rating) >= %f";
+            $rating_params[] = $filters['rating_min'];
+        }
+        
+        // Difficulty filter
+        if (!empty($filters['difficulty']) && is_array($filters['difficulty'])) {
+            $difficulty_table = $wpdb->prefix . 'yatra_difficulty_levels';
+            $joins[] = "LEFT JOIN {$difficulty_table} dl ON (t.difficulty_level = dl.id OR t.difficulty_level = dl.slug)";
+            $difficulty_placeholders = implode(',', array_fill(0, count($filters['difficulty']), '%d'));
+            $wheres[] = "dl.id IN ({$difficulty_placeholders})";
+            $params = array_merge($params, $filters['difficulty']);
+        }
+        
+        // Build SQL components
+        $join_sql = !empty($joins) ? implode(' ', $joins) : '';
+        $where_sql = 'WHERE ' . implode(' AND ', $wheres);
+        $having_sql = !empty($having_clauses) ? ('HAVING ' . implode(' AND ', $having_clauses)) : '';
+        
+        // Calculate pagination
+        $offset = ($page - 1) * $perPage;
+        
+        // Count total results
+        $count_params = array_merge($params, $rating_params);
+        if (!empty($having_clauses)) {
+            $count_sql = "SELECT COUNT(*) FROM (
+                          SELECT t.id
+                          FROM {$trip_table} t
+                          {$join_sql}
+                          LEFT JOIN {$reviews_table} r ON r.trip_id = t.id AND r.status = 'approved'
+                          {$where_sql}
+                          GROUP BY t.id
+                          {$having_sql}
+                          ) as filtered_trips";
+        } else {
+            $count_sql = "SELECT COUNT(DISTINCT t.id)
+                          FROM {$trip_table} t
+                          {$join_sql}
+                          {$where_sql}";
+            $count_params = $params;
+        }
+        
+        $prepared_count_query = empty($count_params) ? $count_sql : 
+            $wpdb->prepare($count_sql, ...$count_params);
+        
+        $total = (int) $wpdb->get_var($prepared_count_query);
+        $total_pages = $total > 0 ? (int) ceil($total / $perPage) : 1;
+        
+        // Build ORDER BY clause
+        $order_clause = $this->buildTripOrderClause($filters['sort'] ?? '');
+        
+        // Check for difficulty table and build difficulty JOIN
+        $difficulty_join = $this->buildDifficultyJoin();
+        $difficulty_select = $difficulty_join ? ', diff.name AS difficulty_name, diff.icon AS difficulty_icon' : '';
+        
+        
+        // Main query
+        $query_sql = "SELECT t.*,
+                             AVG(r.rating) AS average_rating,
+                             COUNT(DISTINCT r.id) AS review_count,
+                             COUNT(DISTINCT b.id) AS booking_count{$difficulty_select}
+                      FROM {$trip_table} t
+                      {$join_sql}
+                      LEFT JOIN {$reviews_table} r ON r.trip_id = t.id AND r.status = 'approved'
+                      LEFT JOIN {$bookings_table} b ON b.trip_id = t.id AND b.status IN ('confirmed', 'completed', 'paid')
+                      {$difficulty_join}
+                      {$where_sql}
+                      GROUP BY t.id
+                      {$having_sql}
+                      {$order_clause}
+                      LIMIT {$perPage} OFFSET {$offset}";
+        
+        $main_query_params = array_merge($params, $rating_params);
+        $prepared_query = empty($main_query_params) ? $query_sql : 
+            $wpdb->prepare($query_sql, ...$main_query_params);
+        
+        $trips = $wpdb->get_results($prepared_query) ?: [];
+        
+        // Process each trip for additional data
+        foreach ($trips as $trip) {
+            $this->enrichTripData($trip);
+            $this->loadTripRelationships($trip);
+        }
+        
+        return [
+            'trips' => $trips,
+            'total' => $total,
+            'pages' => $total_pages,
+            'page' => $page,
+            'per_page' => $perPage
+        ];
+    }
+    
+    /**
+     * Build ORDER BY clause for trip-specific sorting
+     */
+    protected function buildTripOrderClause(string $sort): string
+    {
+        switch ($sort) {
+            case 'most_popular':
+                return "ORDER BY booking_count DESC, t.created_at DESC";
+            case 'price_low':
+                return "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) ASC";
+            case 'price_high':
+                return "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) DESC";
+            case 'rating_high':
+                return "ORDER BY average_rating DESC";
+            case 'duration_short':
+                return "ORDER BY CAST(t.duration_days AS UNSIGNED) ASC, CAST(t.duration_nights AS UNSIGNED) ASC";
+            case 'duration_long':
+                return "ORDER BY CAST(t.duration_days AS UNSIGNED) DESC, CAST(t.duration_nights AS UNSIGNED) DESC";
+            default:
+                return "ORDER BY t.created_at DESC";
+        }
+    }
+    
+    /**
+     * Build difficulty JOIN clause using actual database schema
+     */
+    protected function buildDifficultyJoin(): string
+    {
+        global $wpdb;
+        
+        // Use the actual difficulty table from Database.php schema
+        $difficulty_table = $wpdb->prefix . 'yatra_difficulty_levels';
+        
+        // Check if the table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
+        
+        if ($table_exists) {
+            // Map yatra_trips.difficulty_level (bigint ID) to yatra_difficulty_levels table
+            // The difficulty_level field now contains the ID, so match on ID first
+            return "LEFT JOIN {$difficulty_table} diff ON diff.id = t.difficulty_level";
+        }
+        return '';
+    }
+    
+    /**
+     * Enrich trip data with additional computed fields
+     */
+    protected function enrichTripData(\stdClass $trip): void
+    {
+        global $wpdb;
+        
+        // Compute effective pricing based on pricing type
+        $trip->effective_price_min = 0;
+        
+        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+            $all_price_types = $wpdb->get_results($wpdb->prepare(
+                "SELECT original_price, discounted_price,
+                        CASE 
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
+                            ELSE original_price 
+                        END as effective_price,
+                        CASE 
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
+                            THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                            ELSE 0
+                        END as discount_percentage
+                 FROM {$price_types_table} 
+                 WHERE trip_id = %d AND (
+                     (discounted_price IS NOT NULL AND discounted_price > 0) OR 
+                     (original_price IS NOT NULL AND original_price > 0)
+                 )
+                 ORDER BY effective_price ASC",
+                $trip->id
+            ));
+            
+            if ($all_price_types && count($all_price_types) > 0) {
+                $min_price_row = $all_price_types[0];
+                $trip->effective_price_min = (float)$min_price_row->effective_price;
+                $trip->min_category_original_price = (float)$min_price_row->original_price;
+                
+                $max_discount = 0;
+                foreach ($all_price_types as $price_type) {
+                    if ($price_type->discount_percentage > $max_discount) {
+                        $max_discount = $price_type->discount_percentage;
+                    }
+                }
+                $trip->max_discount_percentage = $max_discount;
+            }
+        } else {
+            // Regular pricing logic
+            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                $trip->effective_price_min = (float)$trip->discounted_price;
+            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                $trip->effective_price_min = (float)$trip->sale_price;
+            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                $trip->effective_price_min = (float)$trip->original_price;
+            }
+        }
+    }
+
+    /**
+     * Load trip relationships (destinations, activities, categories)
+     */
+    protected function loadTripRelationships(\stdClass $trip): void
+    {
+        global $wpdb;
+        
+        // Check and load destinations using existing table structure
+        $dest_rel_table = $wpdb->prefix . 'yatra_trip_destinations';
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'")) {
+            $destinations = $wpdb->get_results($wpdb->prepare(
+                "SELECT d.* FROM {$wpdb->prefix}yatra_destinations d
+                 INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
+                 WHERE td.trip_id = %d AND d.status = 'publish'
+                 ORDER BY d.name ASC",
+                $trip->id
+            ));
+            $trip->destinations = $destinations ?: [];
+        } else {
+            $trip->destinations = [];
+        }
+        
+        // Check and load activities using existing table structure
+        $act_rel_table = $wpdb->prefix . 'yatra_trip_activities';
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'")) {
+            $activities = $wpdb->get_results($wpdb->prepare(
+                "SELECT a.* FROM {$wpdb->prefix}yatra_activities a
+                 INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id
+                 WHERE ta.trip_id = %d AND a.status = 'publish'
+                 ORDER BY a.name ASC",
+                $trip->id
+            ));
+            $trip->activities = $activities ?: [];
+        } else {
+            $trip->activities = [];
+        }
+        
+        // Check and load categories using existing table structure
+        $cat_rel_table = $wpdb->prefix . 'yatra_trip_trip_categories';
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$cat_rel_table}'")) {
+            $categories = $wpdb->get_results($wpdb->prepare(
+                "SELECT c.* FROM {$wpdb->prefix}yatra_trip_categories c
+                 INNER JOIN {$cat_rel_table} ttc ON c.id = ttc.category_id
+                 WHERE ttc.trip_id = %d AND c.status = 'publish'
+                 ORDER BY c.name ASC",
+                $trip->id
+            ));
+            $trip->categories = $categories ?: [];
+        } else {
+            $trip->categories = [];
+        }
+        
+        // Load price types for traveler-based pricing
+        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+            if ($wpdb->get_var("SHOW TABLES LIKE '{$price_types_table}'")) {
+                $price_types = $wpdb->get_results($wpdb->prepare(
+                    "SELECT * FROM {$price_types_table}
+                     WHERE trip_id = %d
+                     ORDER BY original_price ASC",
+                    $trip->id
+                ));
+                $trip->price_types = $price_types ?: [];
+            } else {
+                $trip->price_types = [];
+            }
+        }
+    }
+
+    /**
      * Find by slug
      */
     public function findBySlug(string $slug): ?\stdClass
@@ -924,13 +1254,165 @@ class TripRepository extends BaseRepository
     }
 
     /**
-     * Get active trips (not deleted, published)
+     * Get active trips (not deleted, with specified statuses)
+     * 
+     * @param array $args Query arguments
+     * @param array $statuses Array of statuses to filter by. Defaults to ['published']
+     * @return array
      */
-    public function getActive(array $args = []): array
+    public function getActive(array $args = [], array $statuses = ['published']): array
     {
         $args['where']['deleted_at'] = null;
-        $args['where']['status'] = 'published';
+        
+        // If status is already set in where clause, respect it
+        if (!isset($args['where']['status'])) {
+            $args['where']['status'] = $statuses;
+        }
+        
         return $this->all($args);
+    }
+    
+    /**
+     * Find trips within a price range, considering all pricing types
+     * 
+     * @param float $min_price Minimum price
+     * @param float $max_price Maximum price
+     * @param array $args Additional query arguments
+     * @return array Array of trips
+     */
+    public function findByPriceRange(float $min_price = 0, float $max_price = 0, array $args = []): array
+    {
+        global $wpdb;
+        
+        // DEBUG: Log method entry
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA PRICE RANGE DEBUG - Method called with min_price=' . $min_price . ', max_price=' . $max_price);
+            error_log('YATRA PRICE RANGE DEBUG - Args: ' . print_r($args, true));
+        }
+        
+        // Base query to get all active trips
+        $args['where']['deleted_at'] = null;
+        if (!isset($args['where']['status'])) {
+            $args['where']['status'] = ['publish', 'published', 'active'];
+        }
+        
+        // DEBUG: Log query args
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA PRICE RANGE DEBUG - Query args: ' . print_r($args, true));
+        }
+        
+        // Get all active trips first
+        $all_trips = $this->all($args);
+        
+        // DEBUG: Log trips found
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA PRICE RANGE DEBUG - Found ' . count($all_trips) . ' active trips');
+            if (!empty($all_trips)) {
+                error_log('YATRA PRICE RANGE DEBUG - First trip sample: ' . print_r($all_trips[0], true));
+            }
+        }
+        
+        if (empty($all_trips)) {
+            return [];
+        }
+        
+        // Get trip IDs
+        $trip_ids = array_map(function($trip) {
+            return $trip->id;
+        }, $all_trips);
+        
+        // Get minimum prices for each trip from all pricing sources
+        $prices_table = $wpdb->prefix . 'yatra_trip_price_types';
+        $availability_table = $wpdb->prefix . 'yatra_recurring_availability';
+        
+        // Get minimum prices from price types
+        $price_types_sql = "
+            SELECT trip_id, MIN(LEAST(
+                NULLIF(sale_price, 0), 
+                NULLIF(discounted_price, 0), 
+                NULLIF(original_price, 0)
+            )) as min_price
+            FROM {$prices_table}
+            WHERE trip_id IN (" . implode(',', array_fill(0, count($trip_ids), '%d')) . ")
+            GROUP BY trip_id
+        ";
+        
+        // Get minimum prices from availability rules
+        $availability_sql = "
+            SELECT 
+                trip_id, 
+                MIN(LEAST(
+                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].sale_price'), 'null'),
+                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].discounted_price'), 'null'),
+                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].original_price'), 'null'),
+                    NULLIF(sale_price, 0),
+                    NULLIF(original_price, 0)
+                )) as min_price
+            FROM {$availability_table}
+            WHERE trip_id IN (" . implode(',', array_fill(0, count($trip_ids), '%d')) . ")
+                AND status = 'active'
+            GROUP BY trip_id
+        ";
+        
+        // Execute queries with trip IDs
+        $price_type_prices = $wpdb->get_results(
+            $wpdb->prepare(
+                $price_types_sql,
+                $trip_ids // Only pass trip_ids once, not twice
+            ),
+            OBJECT_K
+        );
+        
+        // Get trip prices and filter by range
+        $filtered_trips = [];
+        
+        // DEBUG: Log price filtering process
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA PRICE RANGE DEBUG - Starting price filtering for ' . count($all_trips) . ' trips');
+            error_log('YATRA PRICE RANGE DEBUG - Filter range: $' . $min_price . ' - $' . $max_price);
+        }
+        
+        foreach ($all_trips as $trip) {
+            $trip_id = $trip->id;
+            $trip_min_price = PHP_FLOAT_MAX;
+            
+            // Check trip's own price first
+            if (!empty($trip->sale_price) && $trip->sale_price > 0) {
+                $trip_min_price = min($trip_min_price, (float)$trip->sale_price);
+            }
+            if (!empty($trip->discounted_price) && $trip->discounted_price > 0) {
+                $trip_min_price = min($trip_min_price, (float)$trip->discounted_price);
+            }
+            if (!empty($trip->original_price) && $trip->original_price > 0) {
+                $trip_min_price = min($trip_min_price, (float)$trip->original_price);
+            }
+            
+            // Check price types
+            if (isset($price_type_prices[$trip_id]) && $price_type_prices[$trip_id]->min_price > 0) {
+                $trip_min_price = min($trip_min_price, (float)$price_type_prices[$trip_id]->min_price);
+            }
+            
+            // If no valid price found, skip
+            if ($trip_min_price === PHP_FLOAT_MAX) {
+                continue;
+            }
+            
+            // Apply price range filter
+            $passes_filter = ($min_price === 0 || $trip_min_price >= $min_price) && 
+                           ($max_price === 0 || $trip_min_price <= $max_price);
+            
+            // DEBUG: Log individual trip filtering
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('YATRA PRICE RANGE DEBUG - Trip ID ' . $trip_id . ': trip_min_price=$' . $trip_min_price . ', passes_filter=' . ($passes_filter ? 'YES' : 'NO'));
+            }
+            
+            if ($passes_filter) {
+                $trip->min_price = $trip_min_price;
+                $filtered_trips[] = $trip;
+            }
+        }
+        
+        return $filtered_trips;
     }
 
     /**

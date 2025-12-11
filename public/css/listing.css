@@ -32,6 +32,85 @@
 }
 
 /* ============================================
+   FILTER SIDEBAR STYLES
+   ============================================ */
+
+/* This old sidebar definition is removed - using the updated one below */
+
+/* Star Rating Filter Styles */
+.yatra-rating-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-rating-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-rating-option:hover {
+    background: rgba(59, 130, 246, 0.05);
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.yatra-rating-option input[type="checkbox"] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: #3b82f6;
+}
+
+.yatra-stars-display {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.yatra-star {
+    width: 14px;
+    height: 14px;
+    transition: all 0.1s ease;
+}
+
+.yatra-star.filled {
+    fill: #fbbf24;
+}
+
+.yatra-star.empty {
+    fill: #e5e7eb;
+}
+
+.yatra-rating-label {
+    font-size: 13px;
+    color: #374151;
+    margin-left: 4px;
+    font-weight: 400;
+}
+
+.yatra-rating-option:hover .yatra-rating-label {
+    color: #1f2937;
+}
+
+/* Responsive adjustments for rating filter */
+@media (max-width: 768px) {
+    .yatra-star {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .yatra-rating-label {
+        font-size: 12px;
+    }
+}
+
+/* ============================================
    HORIZONTAL SEARCH BAR
    ============================================ */
 .yatra-horizontal-search {
@@ -1139,10 +1218,18 @@
 
 /* Listing Layout */
 .yatra-listing-layout {
-    display: grid;
-    grid-template-columns: 300px 1fr;
+    display: flex;
     gap: 28px;
-    align-items: start;
+    align-items: flex-start;
+}
+
+.yatra-filter-sidebar {
+    flex-shrink: 0;
+}
+
+.yatra-listing-content {
+    flex: 1;
+    min-width: 0;
 }
 
 /* Full Width Content (no sidebar) */
@@ -1174,13 +1261,16 @@
 
 /* Filter Sidebar */
 .yatra-filter-sidebar {
+    width: 100%;
+    max-width: 320px;
     background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    height: fit-content;
+    border-radius: 12px;
+    padding: 24px;
+    height: auto;
     border: 1px solid #e5e7eb;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     overflow: visible;
+    box-sizing: border-box;
 }
 
 .yatra-filter-header {
@@ -1219,7 +1309,9 @@
     margin-bottom: 24px;
     border-bottom: 1px solid #f3f4f6;
     padding-bottom: 20px;
-    overflow: visible;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yatra-filter-section:last-child {
@@ -1233,13 +1325,66 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: #111827;
-    margin-bottom: 14px;
+    margin-bottom: 16px;
     user-select: none;
-    padding: 2px 0;
+    padding: 4px 0;
     transition: color 0.2s;
+}
+
+.yatra-filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.yatra-clear-section {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    width: 22px;
+    height: 22px;
+}
+
+.yatra-clear-section:hover {
+    color: #dc2626;
+    background-color: #fef2f2;
+}
+
+.yatra-clear-section:active {
+    transform: scale(0.95);
+}
+
+.yatra-clear-section svg {
+    width: 14px;
+    height: 14px;
+    stroke-width: 2;
+}
+
+.yatra-filter-title-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.yatra-filter-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: #6b7280;
+    transition: color 0.2s;
+}
+
+.yatra-filter-title:hover .yatra-filter-icon {
+    color: #3b82f6;
 }
 
 .yatra-filter-title:hover {
@@ -1259,37 +1404,107 @@
 
 .yatra-filter-content {
     display: block;
-    overflow: visible;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yatra-filter-section:not(.open) .yatra-filter-content {
     display: none;
 }
 
-/* Price Range */
+/* Filter Toggle Animation */
+.yatra-filter-content {
+    transition: all 0.3s ease;
+}
+
+.yatra-filter-section.open .yatra-filter-content {
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+    }
+}
+
+/* Loading State */
+.yatra-filters-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.yatra-filters-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Clear Filters Button */
+.yatra-clear-filters {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-clear-filters:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+/* Price Range - Clean Minimal Design */
 .yatra-price-range {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 24px;
     overflow: visible;
 }
 
 .yatra-price-inputs {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
+    padding: 0;
+}
+
+.yatra-price-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-price-input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6b7280;
+    margin-bottom: 4px;
 }
 
 .yatra-price-inputs input {
-    width: 80px;
-    min-width: 80px;
-    max-width: 100px;
-    padding: 9px 12px;
-    border: 1.5px solid #e5e7eb;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
     border-radius: 6px;
-    font-size: 13px;
-    transition: all 0.2s;
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
     background: #fff;
+    transition: all 0.2s ease;
+    text-align: left;
 }
 
 .yatra-price-inputs input:focus {
@@ -1298,9 +1513,17 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.yatra-price-inputs span {
+.yatra-price-inputs input::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+.yatra-price-separator {
     color: #9ca3af;
     font-weight: 500;
+    font-size: 13px;
+    margin-top: 24px;
+    flex-shrink: 0;
 }
 
 .yatra-price-slider {
@@ -1308,7 +1531,7 @@
     height: 6px;
     background: #e5e7eb;
     border-radius: 3px;
-    margin: 16px 0;
+    margin: 16px 0 8px 0;
     overflow: visible;
 }
 
@@ -1320,6 +1543,7 @@
     -webkit-appearance: none;
     appearance: none;
     pointer-events: none;
+    top: 0;
 }
 
 .yatra-price-slider input[type="range"]::-webkit-slider-thumb {
@@ -1328,61 +1552,72 @@
     width: 18px;
     height: 18px;
     background: #3b82f6;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
     pointer-events: all;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    margin-top: -6px;
 }
 
 .yatra-price-slider input[type="range"]::-webkit-slider-thumb:hover {
     background: #2563eb;
     transform: scale(1.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .yatra-price-slider input[type="range"]::-moz-range-thumb {
     width: 18px;
     height: 18px;
     background: #3b82f6;
+    border: 2px solid #fff;
     border-radius: 50%;
     cursor: pointer;
     pointer-events: all;
-    border: none;
-    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    margin-top: 0;
 }
 
 .yatra-price-display {
     font-size: 13px;
-    font-weight: 600;
-    color: #374151;
+    font-weight: 500;
+    color: #6b7280;
     text-align: center;
-    padding: 6px 12px;
-    background: #f9fafb;
-    border-radius: 6px;
+    padding: 8px 0;
+    margin-top: 8px;
 }
 
 /* Checkbox Group */
 .yatra-checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .yatra-checkbox-label {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     cursor: pointer;
     font-size: 14px;
     color: #374151;
-    user-select: none;
-    padding: 6px 0;
-    transition: color 0.2s;
-    border-radius: 4px;
+    transition: all 0.2s ease;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: -4px -12px;
+    width: calc(100% + 24px);
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .yatra-checkbox-label:hover {
-    color: #111827;
+    background: rgba(59, 130, 246, 0.05);
+    color: #1e293b;
 }
 
 .yatra-checkbox-label input[type="checkbox"] {
@@ -1435,7 +1670,7 @@
 }
 
 .yatra-trip-card {
-    background: #fff;
+    background: white;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -1443,6 +1678,12 @@
     cursor: pointer;
     display: flex;
     flex-direction: column;
+    height: 100%;
+}
+
+.yatra-trip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .yatra-trip-grid.list-view .yatra-trip-card {
@@ -1476,15 +1717,22 @@
 .yatra-destination-grid.list-view .yatra-destination-card {
     flex-direction: row;
     max-height: 260px;
+    width: 100%;
 }
 
 .yatra-destination-grid.list-view .yatra-destination-image {
     width: 320px;
+    min-width: 320px;
     height: 100%;
+    flex-shrink: 0;
 }
 
 .yatra-destination-grid.list-view .yatra-destination-content {
     padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .yatra-trip-card:hover {

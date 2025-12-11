@@ -434,7 +434,7 @@ const TripForm: React.FC = () => {
       peak_season: 'July to August',
       off_season: 'November to March',
       activity_types: [], // Will be populated based on available activities
-      difficulty_level: 'beginner',
+      difficulty_level: '',
       trip_category: [],
       tags: ['family-friendly', 'beach', 'relaxation', 'cultural', 'spa'],
       featured_priority: 'featured',
@@ -540,7 +540,7 @@ const TripForm: React.FC = () => {
       peak_season: 'October to November',
       off_season: 'December to February, June to August',
       activity_types: [],
-      difficulty_level: 'challenging',
+      difficulty_level: '',
       trip_category: [],
       tags: ['trekking', 'mountains', 'adventure', 'challenging', 'everest'],
       featured_priority: 'popular',
@@ -643,7 +643,7 @@ const TripForm: React.FC = () => {
       peak_season: 'June to August',
       off_season: 'November to March',
       activity_types: [],
-      difficulty_level: 'easy',
+      difficulty_level: '',
       trip_category: [],
       tags: ['cultural', 'city-tour', 'history', 'art', 'food'],
       featured_priority: 'popular',
@@ -1161,7 +1161,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         peak_season: tripData.peak_season || '',
         off_season: tripData.off_season || '',
         activity_types: extractIds(tripData.activity_types || []),
-        difficulty_level: tripData.difficulty_level || '',
+        difficulty_level: tripData.difficulty_level?.toString() || '',
         trip_category: extractIds(tripData.trip_category || []),
         tags: Array.isArray(tripData.tags) ? tripData.tags : [],
         featured_priority: tripData.featured_priority || 'none',
@@ -1842,7 +1842,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         peak_season: data.peak_season.trim(),
         off_season: data.off_season.trim(),
         activity_types: data.activity_types || [], // Array of activity IDs
-        difficulty_level: data.difficulty_level || '',
+        difficulty_level: parseInt(data.difficulty_level) || null,
         trip_category: data.trip_category || [],
         tags: data.tags || [],
         featured_priority: data.featured_priority,
@@ -3114,7 +3114,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     difficultyLevels.map((level) => (
                       <option
                         key={`difficulty-${level.id}`}
-                        value={level.slug || level.name || level.id?.toString() || ''}
+                        value={level.id?.toString() || ''}
                       >
                         {level.name}
                       </option>

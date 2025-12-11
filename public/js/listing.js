@@ -242,29 +242,8 @@
         updatePriceDisplay();
     }
 
-    // Clear filters
-    const clearFiltersBtn = document.querySelector('.yatra-clear-filters');
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', function() {
-            // Clear all checkboxes
-            document.querySelectorAll('.yatra-checkbox-label input[type="checkbox"]').forEach(cb => {
-                cb.checked = false;
-            });
-
-            // Reset price range
-            const minRange = document.getElementById('priceRangeMin');
-            const maxRange = document.getElementById('priceRangeMax');
-            const minInput = document.getElementById('priceMin');
-            const maxInput = document.getElementById('priceMax');
-            const priceDisplay = document.querySelector('.yatra-price-display');
-            
-            if (minRange) minRange.value = 0;
-            if (maxRange) maxRange.value = 10000;
-            if (minInput) minInput.value = 0;
-            if (maxInput) maxInput.value = 10000;
-            if (priceDisplay) priceDisplay.textContent = '$0 - $10,000';
-        });
-    }
+    // Clear filters functionality is handled by listing-filters.js
+    // Removed conflicting event listener to prevent interference
 
     // Horizontal Search Dropdowns
     function initHorizontalSearchDropdowns() {

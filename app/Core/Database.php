@@ -95,7 +95,7 @@ class Database
             `trip_category` varchar(100) DEFAULT NULL,
             `trip_category_parent` varchar(100) DEFAULT NULL,
             `trip_category_sub` varchar(100) DEFAULT NULL,
-            `difficulty_level` varchar(100) DEFAULT NULL,
+            `difficulty_level` bigint(20) UNSIGNED DEFAULT NULL,
             `activity_intensity` enum('relaxing','light','moderate','active','strenuous') DEFAULT NULL,
             `featured_priority` enum('none','featured','popular','new','limited','bestseller') DEFAULT 'none',
             `trip_style` varchar(50) DEFAULT NULL,
@@ -1239,8 +1239,8 @@ class Database
             if ($currentType && strpos(strtolower($currentType), 'enum') !== false) {
                 $after = $getAfterColumn('off_season');
                 $sql = $after
-                    ? "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` varchar(100) DEFAULT NULL AFTER `{$after}`"
-                    : "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` varchar(100) DEFAULT NULL";
+                    ? "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` bigint(20) UNSIGNED DEFAULT NULL AFTER `{$after}`"
+                    : "ALTER TABLE `{$table_trips}` MODIFY COLUMN `difficulty_level` bigint(20) UNSIGNED DEFAULT NULL";
                 $wpdb->query($sql);
                 
                 if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -1278,7 +1278,7 @@ class Database
             ['name' => 'off_season', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'peak_season'],
             
             // Categorization
-            ['name' => 'difficulty_level', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'off_season'],
+            ['name' => 'difficulty_level', 'def' => "bigint(20) UNSIGNED DEFAULT NULL", 'after' => 'off_season'],
             ['name' => 'trip_category', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'difficulty_level'],
             ['name' => 'trip_category_parent', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'trip_category'],
             ['name' => 'trip_category_sub', 'def' => "varchar(100) DEFAULT NULL", 'after' => 'trip_category_parent'],

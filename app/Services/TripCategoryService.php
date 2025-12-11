@@ -286,6 +286,14 @@ class TripCategoryService extends BaseService
     }
 
     /**
+     * Get published categories with trip counts, ratings, and pricing stats
+     */
+    public function getPublishedWithStats(): array
+    {
+        return $this->repository->getPublishedWithTripCounts();
+    }
+
+    /**
      * Count items
      */
     public function count(array $args = []): int

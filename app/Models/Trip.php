@@ -64,6 +64,8 @@ class Trip
     public ?string $trip_category_parent = null;
     public ?string $trip_category_sub = null;
     public ?string $difficulty_level = null;
+    public ?string $difficulty_name = null;
+    public ?string $difficulty_icon = null;
     public ?string $activity_intensity = null;
     public string $featured_priority = 'none';
     public ?string $trip_style = null;
@@ -74,6 +76,9 @@ class Trip
     public float $original_price = 0.00;
     public ?float $discounted_price = null;
     public ?float $sale_price = null;
+    public ?float $effective_price_min = null;
+    public ?float $min_category_original_price = null;
+    public ?int $max_discount_percentage = null;
     public string $currency = 'USD';
     public bool $price_per_person = true;
     public bool $deposit_required = false;
@@ -164,6 +169,7 @@ class Trip
     // SEO
     public ?string $meta_title = null;
     public ?string $meta_description = null;
+    public ?string $permalink = null;
     public ?string $meta_keywords = null;
     public ?string $og_title = null;
     public ?string $og_description = null;
@@ -209,9 +215,19 @@ class Trip
     public array $pricing_rules = [];
     public array $booking_rules = [];
 
-    // Relationships (loaded separately)
+    // Relationships & Linked Data
     public array $destinations = [];
     public array $activities = [];
+    public array $categories = [];
+    public array $included_services = [];
+    public array $excluded_services = [];
+    public array $equipment_list = [];
+    public array $packing_list = [];
+    public array $itinerary = [];
+    public array $reviews = [];
+    public array $departures = [];
+    public array $bookings = [];
+
 
     // Timestamps
     public string $created_at = '';
@@ -228,6 +244,7 @@ class Trip
     {
         $trip = new self();
         
+    
         // Basic fields
         $trip->id = (int) ($data['id'] ?? 0);
         $trip->title = $data['title'] ?? '';
@@ -636,5 +653,522 @@ class Trip
         }
 
         return maybe_serialize($value);
+    }
+
+    // ========================================
+    // GETTER METHODS FOR TRIP CARD COMPONENT
+    // ========================================
+
+    /**
+     * Get formatted trip title
+     */
+    public function getTitle(): string
+    {
+        return !empty($this->title) ? $this->title : __('Untitled Trip', 'yatra');
+    }
+
+    /**
+     * Get discount information
+     */
+    public function getDiscount(): array
+    {
+        // Check pricing type for traveler-based pricing
+        $is_traveler_based = (!empty($this->pricing_type) && $this->pricing_type === 'traveler_based');
+        
+        $has_discount = false;
+        $discount_percent = 0;
+        $discount_text = '';
+        
+        if ($is_traveler_based) {
+            // For traveler-based pricing, calculate highest discount from all categories
+            $max_discount = 0;
+            
+            // Check multiple possible data structures for price categories
+            $price_categories = [];
+            
+            // Try different property names for price categories
+            if (!empty($this->price_types) && is_array($this->price_types)) {
+                $price_categories = $this->price_types;
+            } elseif (!empty($this->pricing_categories) && is_array($this->pricing_categories)) {
+                $price_categories = $this->pricing_categories;
+            } elseif (!empty($this->traveler_categories) && is_array($this->traveler_categories)) {
+                $price_categories = $this->traveler_categories;
+            }
+            
+            if (!empty($price_categories)) {
+                foreach ($price_categories as $category) {
+                    // Handle both object and array formats
+                    if (is_object($category)) {
+                        $regular_price = (float) ($category->regular_price ?? $category->original_price ?? $category->price ?? 0);
+                        $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
+                    } elseif (is_array($category)) {
+                        $regular_price = (float) ($category['regular_price'] ?? $category['original_price'] ?? $category['price'] ?? 0);
+                        $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
+                    } else {
+                        continue;
+                    }
+                    
+                    if ($regular_price > 0 && $discounted_price > 0 && $discounted_price < $regular_price) {
+                        $category_discount = round((($regular_price - $discounted_price) / $regular_price) * 100);
+                        if ($category_discount > $max_discount) {
+                            $max_discount = $category_discount;
+                        }
+                    }
+                }
+            }
+            
+            // Fallback to pre-calculated discount data
+            if ($max_discount === 0) {
+                if (!empty($this->max_discount_percentage)) {
+                    $max_discount = (int) $this->max_discount_percentage;
+                } elseif (!empty($this->discount_percentage)) {
+                    $max_discount = (int) $this->discount_percentage;
+                } elseif (!empty($this->highest_discount)) {
+                    $max_discount = (int) $this->highest_discount;
+                }
+            }
+            
+            if ($max_discount > 0) {
+                $discount_percent = $max_discount;
+                $discount_text = 'Up to ' . $discount_percent . '%';
+                $has_discount = true;
+            }
+        } else {
+            // Regular pricing - calculate discount from original vs sale price
+            $original_price = 0;
+            $sale_price = 0;
+            
+            // Check for original price
+            if (!empty($this->original_price)) {
+                $original_price = (float) $this->original_price;
+            } elseif (!empty($this->regular_price)) {
+                $original_price = (float) $this->regular_price;
+            } elseif (!empty($this->base_price)) {
+                $original_price = (float) $this->base_price;
+            }
+            
+            // Check for sale/discounted price
+            if (!empty($this->sale_price)) {
+                $sale_price = (float) $this->sale_price;
+            } elseif (!empty($this->discounted_price)) {
+                $sale_price = (float) $this->discounted_price;
+            }
+            
+            $has_discount = $sale_price > 0 && $sale_price < $original_price;
+            
+            if ($has_discount && $original_price > 0) {
+                $discount_percent = round((($original_price - $sale_price) / $original_price) * 100);
+                $discount_text = $discount_percent . '%';
+            }
+        }
+        
+        return [
+            'has_discount' => $has_discount,
+            'discount_percent' => $discount_percent,
+            'discount_text' => $discount_text,
+            'is_traveler_based' => $is_traveler_based
+        ];
+    }
+
+    /**
+     * Get trip destinations
+     */
+    public function getDestinations(): array
+    {
+        // This will be populated by the repository when loading trip data
+        return $this->destinations ?? [];
+    }
+
+    /**
+     * Get trip categories
+     */
+    public function getCategories(): array
+    {
+        
+        // This will be populated by the repository when loading trip data
+        return $this->categories ?? [];
+    }
+
+    /**
+     * Get trip rating information
+     */
+    public function getRating(): array
+    {
+        $average_rating = (float) ($this->average_rating ?? 0);
+        $review_count = (int) ($this->review_count ?? 0);
+        
+        return [
+            'average_rating' => $average_rating,
+            'review_count' => $review_count,
+            'formatted_rating' => number_format($average_rating, 1)
+        ];
+    }
+
+    /**
+     * Get pricing information
+     */
+    public function getPricing(): array
+    {
+        // Check pricing type for traveler-based pricing
+        $is_traveler_based = (!empty($this->pricing_type) && $this->pricing_type === 'traveler_based');
+        
+        $current_price = '';
+        $original_price = '';
+        $price_prefix = '';
+        $has_discount = false;
+        $current_price_raw = 0;
+        $original_price_raw = 0;
+        
+        if ($is_traveler_based) {
+            // For traveler-based pricing, find minimum price from all categories
+            $min_price = PHP_FLOAT_MAX;
+            $min_original_price = 0;
+            
+            // Check multiple possible data structures for price categories
+            $price_categories = [];
+            
+            // Try different property names for price categories
+            if (!empty($this->price_types) && is_array($this->price_types)) {
+                $price_categories = $this->price_types;
+            } elseif (!empty($this->pricing_categories) && is_array($this->pricing_categories)) {
+                $price_categories = $this->pricing_categories;
+            } elseif (!empty($this->traveler_categories) && is_array($this->traveler_categories)) {
+                $price_categories = $this->traveler_categories;
+            }
+            
+            if (!empty($price_categories)) {
+                foreach ($price_categories as $category) {
+                    // Handle both object and array formats
+                    if (is_object($category)) {
+                        $regular_price = (float) ($category->regular_price ?? $category->original_price ?? $category->price ?? 0);
+                        $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
+                    } elseif (is_array($category)) {
+                        $regular_price = (float) ($category['regular_price'] ?? $category['original_price'] ?? $category['price'] ?? 0);
+                        $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
+                    } else {
+                        continue;
+                    }
+                    
+                    // Use discounted price if available, otherwise regular price
+                    $category_price = ($discounted_price > 0 && $discounted_price < $regular_price) ? $discounted_price : $regular_price;
+                    
+                    if ($category_price > 0 && $category_price < $min_price) {
+                        $min_price = $category_price;
+                        // Store original price from the same category for strikethrough
+                        if ($discounted_price > 0 && $discounted_price < $regular_price) {
+                            $min_original_price = $regular_price;
+                            $has_discount = true;
+                        }
+                    }
+                }
+            }
+            
+            // Fallback to effective_price_min if no price_types
+            if ($min_price === PHP_FLOAT_MAX) {
+                if (!empty($this->effective_price_min)) {
+                    $min_price = (float) $this->effective_price_min;
+                    if (!empty($this->min_category_original_price)) {
+                        $min_original_price = (float) $this->min_category_original_price;
+                        $has_discount = $min_original_price > $min_price;
+                    }
+                } elseif (!empty($this->min_price)) {
+                    $min_price = (float) $this->min_price;
+                } elseif (!empty($this->starting_price)) {
+                    $min_price = (float) $this->starting_price;
+                }
+            }
+            
+            if ($min_price !== PHP_FLOAT_MAX && $min_price > 0) {
+                $current_price_raw = $min_price;
+                $current_price = yatra_format_price($current_price_raw);
+                $price_prefix = __('From ', 'yatra'); // Always show "From" for traveler-based
+                
+                if ($has_discount && $min_original_price > 0) {
+                    $original_price_raw = $min_original_price;
+                    $original_price = yatra_format_price($original_price_raw);
+                }
+            }
+        } else {
+            // Regular pricing - NO "From" text
+            if (!empty($this->original_price)) {
+                $original_price_raw = (float) $this->original_price;
+            } elseif (!empty($this->regular_price)) {
+                $original_price_raw = (float) $this->regular_price;
+            } elseif (!empty($this->base_price)) {
+                $original_price_raw = (float) $this->base_price;
+            }
+            
+            $sale_price_raw = 0;
+            if (!empty($this->sale_price)) {
+                $sale_price_raw = (float) $this->sale_price;
+            } elseif (!empty($this->discounted_price)) {
+                $sale_price_raw = (float) $this->discounted_price;
+            }
+            
+            $has_discount = $sale_price_raw > 0 && $sale_price_raw < $original_price_raw;
+            $current_price_raw = $has_discount ? $sale_price_raw : $original_price_raw;
+            
+            if ($current_price_raw > 0) {
+                $current_price = yatra_format_price($current_price_raw);
+                $price_prefix = ''; // NO "From" text for regular pricing
+                
+                if ($has_discount && $original_price_raw > 0) {
+                    $original_price = yatra_format_price($original_price_raw);
+                }
+            }
+        }
+        
+        return [
+            'has_price' => $current_price_raw > 0,
+            'current_price' => $current_price,
+            'original_price' => $original_price,
+            'price_prefix' => $price_prefix,
+            'has_discount' => $has_discount,
+            'raw_current_price' => $current_price_raw,
+            'raw_original_price' => $original_price_raw,
+            'is_traveler_based' => $is_traveler_based
+        ];
+    }
+
+    /**
+     * Get difficulty information
+     */
+    public function getDifficulty(): array
+    {
+        
+        
+        $difficulty = '';
+        $difficulty_icon = '';
+        
+        // First priority: Use pre-populated difficulty_name from main query (AppServiceProvider)
+        if (!empty($this->difficulty_name)) {
+            $difficulty = $this->difficulty_name;
+        }
+        
+        // First priority: Use pre-populated difficulty_icon from main query (AppServiceProvider)
+        if (!empty($this->difficulty_icon)) {
+            $icon_data = maybe_unserialize($this->difficulty_icon);
+            if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                $difficulty_icon = $icon_data['value'];
+            } elseif (is_string($this->difficulty_icon)) {
+                $difficulty_icon = $this->difficulty_icon;
+            }
+        }
+        
+        // Fallback: Handle difficulty_level as ID - fetch from difficulty table
+        if (empty($difficulty) && !empty($this->difficulty_level)) {
+            global $wpdb;
+            
+            // The difficulty_level field now contains the ID, so fetch by ID
+            if (is_numeric($this->difficulty_level)) {
+                $difficulty_data = $wpdb->get_row($wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}yatra_difficulty_levels WHERE id = %d",
+                    (int) $this->difficulty_level
+                ));
+                
+                if ($difficulty_data) {
+                    $difficulty = $difficulty_data->name;
+                    if (empty($difficulty_icon) && !empty($difficulty_data->icon)) {
+                        $icon_data = maybe_unserialize($difficulty_data->icon);
+                        if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                            $difficulty_icon = $icon_data['value'];
+                        } elseif (is_string($difficulty_data->icon)) {
+                            $difficulty_icon = $difficulty_data->icon;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Fallback icon from direct property
+        if (empty($difficulty_icon) && !empty($this->difficulty_icon)) {
+            $icon_data = maybe_unserialize($this->difficulty_icon);
+            if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                $difficulty_icon = $icon_data['value'];
+            }
+        }
+        
+        // If we have difficulty but no icon, provide a default icon
+        if (!empty($difficulty) && empty($difficulty_icon)) {
+            $difficulty_icon = 'mountain';
+        }
+        
+        return [
+            'level' => $difficulty,
+            'icon' => $difficulty_icon,
+            'has_difficulty' => !empty($difficulty)
+        ];
+    }
+
+    /**
+     * Get trip duration information
+     */
+    public function getDuration(): array
+    {
+        $duration = '';
+        if (!empty($this->duration_days)) {
+            $duration = yatra_format_duration($this->duration_days, $this->duration_nights ?? null);
+        }
+        
+        return [
+            'formatted' => $duration,
+            'days' => $this->duration_days ?? 0,
+            'nights' => $this->duration_nights ?? 0,
+            'has_duration' => !empty($duration)
+        ];
+    }
+
+    /**
+     * Get trip activities
+     */
+    public function getActivities(): array
+    {
+        // This will be populated by the repository when loading trip data
+        return $this->activities ?? [];
+    }
+
+    /**
+     * Get trip image information
+     */
+    public function getImage(): array
+    {
+        $image_url = '';
+        $has_image = false;
+        
+        // Match the exact logic from the working listing-trip.php template
+        if (!empty($this->featured_image_url)) {
+            $image_url = $this->featured_image_url;
+            $has_image = true;
+        } else {
+            // Use the same fallback as the original template
+            $image_url = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+            $has_image = false;
+        }
+        
+        return [
+            'url' => $image_url,
+            'alt' => $this->getTitle(),
+            'has_image' => $has_image
+        ];
+    }
+
+    /**
+     * Get trip permalink
+     */
+    public function getPermalink(): string
+    {
+        // If permalink is already set, use it
+        if (!empty($this->permalink)) {
+            return $this->permalink;
+        }
+        
+        // Generate permalink from trip ID and slug/title
+        if (!empty($this->id)) {
+            // Try to use WordPress get_permalink if available
+            if (function_exists('get_permalink')) {
+                $permalink = get_permalink($this->id);
+                if ($permalink && $permalink !== false) {
+                    return $permalink;
+                }
+            }
+            
+            // Fallback: generate basic permalink structure
+            $slug = !empty($this->slug) ? $this->slug : sanitize_title($this->title);
+            return home_url("/trip/{$slug}/");
+        }
+        
+        return '';
+    }
+
+    /**
+     * Create Trip model instance from stdClass object
+     */
+    public static function fromStdClass($stdObject): self
+    {
+        $trip = new self();
+        
+        // Map all properties from stdClass to Trip model with proper type casting
+        foreach (get_object_vars($stdObject) as $key => $value) {
+            if (property_exists($trip, $key)) {
+                // Cast values to proper types based on property declarations
+                $trip->$key = self::castPropertyValue($key, $value);
+            }
+        }
+        
+        return $trip;
+    }
+
+    /**
+     * Cast property values to correct types based on actual Trip model property definitions
+     */
+    private static function castPropertyValue(string $property, $value)
+    {
+        // Handle null/empty values - return null for nullable properties, defaults for non-nullable
+        if ($value === null || $value === '') {
+            // Check property type from actual model definition
+            $reflection = new \ReflectionClass(self::class);
+            if ($reflection->hasProperty($property)) {
+                $propertyReflection = $reflection->getProperty($property);
+                $type = $propertyReflection->getType();
+                
+                if ($type && $type->allowsNull()) {
+                    return null; // Nullable property
+                }
+                
+                // Non-nullable property - return appropriate default
+                if ($type instanceof \ReflectionNamedType) {
+                    switch ($type->getName()) {
+                        case 'int':
+                            return 0;
+                        case 'float':
+                            return 0.0;
+                        case 'bool':
+                            return false;
+                        case 'string':
+                            return '';
+                        case 'array':
+                            return [];
+                        default:
+                            return null;
+                    }
+                }
+            }
+            return null; // Default for unknown properties
+        }
+
+        // Cast non-null values to appropriate types
+        $reflection = new \ReflectionClass(self::class);
+        if ($reflection->hasProperty($property)) {
+            $propertyReflection = $reflection->getProperty($property);
+            $type = $propertyReflection->getType();
+            
+            if ($type instanceof \ReflectionNamedType) {
+                switch ($type->getName()) {
+                    case 'int':
+                        return (int) $value;
+                    case 'float':
+                        return (float) $value;
+                    case 'bool':
+                        return (bool) $value;
+                    case 'string':
+                        return (string) $value;
+                    case 'array':
+                        if (is_string($value)) {
+                            $decoded = maybe_unserialize($value);
+                            if (is_array($decoded)) {
+                                return $decoded;
+                            }
+                            $json = json_decode($value, true);
+                            return is_array($json) ? $json : [];
+                        }
+                        return is_array($value) ? $value : [];
+                    default:
+                        return $value;
+                }
+            }
+        }
+        
+        // Default string casting for unknown properties
+        return (string) $value;
     }
 }

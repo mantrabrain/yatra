@@ -140,6 +140,67 @@ class TripCategoryRepository extends BaseRepository
     }
 
     /**
+     * Get published categories with trip counts, ratings, and pricing stats
+     */
+    public function getPublishedWithTripCounts(): array
+    {
+        $table = esc_sql($this->table);
+        $trip_table = esc_sql($this->wpdb->prefix . 'yatra_trips');
+        $trip_cat_table = esc_sql($this->wpdb->prefix . 'yatra_trip_trip_categories');
+        $reviews_table = esc_sql($this->wpdb->prefix . 'yatra_reviews');
+
+        $query = "
+            SELECT c.*, 
+                   COUNT(DISTINCT tc.trip_id) AS trips_count,
+                   COALESCE(AVG(r.rating), 0) AS avg_rating,
+                   GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
+            FROM `{$table}` c
+            LEFT JOIN `{$trip_cat_table}` tc ON tc.category_id = c.id
+            LEFT JOIN `{$trip_table}` t ON t.id = tc.trip_id AND t.status = 'published'
+            LEFT JOIN `{$reviews_table}` r ON r.trip_id = t.id AND r.status = 'approved'
+            WHERE c.status = 'publish'
+            GROUP BY c.id
+            ORDER BY c.name ASC
+        ";
+
+        $categories = $this->wpdb->get_results($query) ?: [];
+
+        // Calculate starting prices for each category
+        foreach ($categories as $category) {
+            $category->starting_price = 0;
+            if (!empty($category->trip_ids)) {
+                $trip_ids = explode(',', $category->trip_ids);
+                $category->starting_price = $this->computeStartingPriceForTripIds($trip_ids);
+            }
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Compute starting price for given trip IDs
+     */
+    private function computeStartingPriceForTripIds(array $trip_ids): float
+    {
+        if (empty($trip_ids)) {
+            return 0;
+        }
+
+        $trip_table = esc_sql($this->wpdb->prefix . 'yatra_trips');
+        $placeholders = implode(',', array_fill(0, count($trip_ids), '%d'));
+        
+        $query = "SELECT MIN(CAST(original_price AS DECIMAL(10,2))) as min_price 
+                  FROM `{$trip_table}` 
+                  WHERE id IN ({$placeholders}) AND original_price > 0";
+        
+        $min_price = $this->wpdb->get_var(
+            $this->wpdb->prepare($query, ...$trip_ids)
+        );
+
+        return $min_price ? (float) $min_price : 0;
+    }
+
+    /**
      * Search categories
      */
     public function search(string $search, array $args = []): array

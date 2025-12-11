@@ -26529,7 +26529,7 @@ const TripForm = () => {
       off_season: "November to March",
       activity_types: [],
       // Will be populated based on available activities
-      difficulty_level: "beginner",
+      difficulty_level: "",
       trip_category: [],
       tags: ["family-friendly", "beach", "relaxation", "cultural", "spa"],
       featured_priority: "featured",
@@ -26636,7 +26636,7 @@ const TripForm = () => {
       peak_season: "October to November",
       off_season: "December to February, June to August",
       activity_types: [],
-      difficulty_level: "challenging",
+      difficulty_level: "",
       trip_category: [],
       tags: ["trekking", "mountains", "adventure", "challenging", "everest"],
       featured_priority: "popular",
@@ -26739,7 +26739,7 @@ const TripForm = () => {
       peak_season: "June to August",
       off_season: "November to March",
       activity_types: [],
-      difficulty_level: "easy",
+      difficulty_level: "",
       trip_category: [],
       tags: ["cultural", "city-tour", "history", "art", "food"],
       featured_priority: "popular",
@@ -27080,7 +27080,7 @@ const TripForm = () => {
     enabled: isEditMode && can("yatra_view_trips")
   });
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
+    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     if (tripData && isEditMode) {
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
@@ -27223,7 +27223,7 @@ const TripForm = () => {
         peak_season: tripData.peak_season || "",
         off_season: tripData.off_season || "",
         activity_types: extractIds(tripData.activity_types || []),
-        difficulty_level: tripData.difficulty_level || "",
+        difficulty_level: ((_g = tripData.difficulty_level) == null ? void 0 : _g.toString()) || "",
         trip_category: extractIds(tripData.trip_category || []),
         tags: Array.isArray(tripData.tags) ? tripData.tags : [],
         featured_priority: tripData.featured_priority || "none",
@@ -27235,8 +27235,8 @@ const TripForm = () => {
         dropoff_location: tripData.dropoff_location || "",
         transportation_details: tripData.transportation_details || "",
         pricing_type: tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? "traveler_based" : "regular"),
-        original_price: ((_g = tripData.original_price) == null ? void 0 : _g.toString()) || "",
-        discounted_price: ((_h = tripData.discounted_price) == null ? void 0 : _h.toString()) || "",
+        original_price: ((_h = tripData.original_price) == null ? void 0 : _h.toString()) || "",
+        discounted_price: ((_i = tripData.discounted_price) == null ? void 0 : _i.toString()) || "",
         price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
           var _a3, _b3;
           return {
@@ -27245,16 +27245,16 @@ const TripForm = () => {
             discounted_price: ((_b3 = pt.discounted_price) == null ? void 0 : _b3.toString()) || ""
           };
         }) : [],
-        sale_price: ((_i = tripData.sale_price) == null ? void 0 : _i.toString()) || "",
-        deposit_amount: ((_j = tripData.deposit_amount) == null ? void 0 : _j.toString()) || "",
-        deposit_percentage: ((_k = tripData.deposit_percentage) == null ? void 0 : _k.toString()) || "",
+        sale_price: ((_j = tripData.sale_price) == null ? void 0 : _j.toString()) || "",
+        deposit_amount: ((_k = tripData.deposit_amount) == null ? void 0 : _k.toString()) || "",
+        deposit_percentage: ((_l = tripData.deposit_percentage) == null ? void 0 : _l.toString()) || "",
         payment_terms: tripData.payment_terms || "",
-        max_travelers: ((_l = tripData.max_travelers) == null ? void 0 : _l.toString()) || "",
-        min_travelers: ((_m = tripData.min_travelers) == null ? void 0 : _m.toString()) || "",
+        max_travelers: ((_m = tripData.max_travelers) == null ? void 0 : _m.toString()) || "",
+        min_travelers: ((_n = tripData.min_travelers) == null ? void 0 : _n.toString()) || "",
         booking_deadline: tripData.booking_deadline || "",
         cancellation_policy: tripData.cancellation_policy || "",
-        age_min: ((_n = tripData.age_min) == null ? void 0 : _n.toString()) || "",
-        age_max: ((_o = tripData.age_max) == null ? void 0 : _o.toString()) || "",
+        age_min: ((_o = tripData.age_min) == null ? void 0 : _o.toString()) || "",
+        age_max: ((_p = tripData.age_max) == null ? void 0 : _p.toString()) || "",
         physical_requirements: tripData.physical_requirements || "",
         visa_requirements: tripData.visa_requirements || "",
         vaccination_requirements: tripData.vaccination_requirements || "",
@@ -27803,7 +27803,7 @@ const TripForm = () => {
         off_season: data.off_season.trim(),
         activity_types: data.activity_types || [],
         // Array of activity IDs
-        difficulty_level: data.difficulty_level || "",
+        difficulty_level: parseInt(data.difficulty_level) || null,
         trip_category: data.trip_category || [],
         tags: data.tags || [],
         featured_priority: data.featured_priority,
@@ -28843,7 +28843,7 @@ const TripForm = () => {
                       return /* @__PURE__ */ jsxRuntimeExports.jsx(
                         "option",
                         {
-                          value: level.slug || level.name || ((_a3 = level.id) == null ? void 0 : _a3.toString()) || "",
+                          value: ((_a3 = level.id) == null ? void 0 : _a3.toString()) || "",
                           children: level.name
                         },
                         `difficulty-${level.id}`
