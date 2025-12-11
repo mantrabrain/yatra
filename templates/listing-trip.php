@@ -886,22 +886,22 @@ get_header();
                                             </div>
                                         <?php endif; ?>
                                     </div>
-                                    <!-- Destination section outside image -->
-                                    <?php if (!empty($trip->destinations)) : ?>
-                                        <div class="yatra-trip-destinations">
-                                            <svg class="location-icon" width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
-                                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
-                                            </svg>
-                                            <?php 
-                                            $destination_links = [];
-                                            foreach ($trip->destinations as $destination) {
-                                                $destination_links[] = '<a href="' . esc_url(yatra_get_destination_permalink($destination)) . '" class="destination-link">' . esc_html($destination->name) . '</a>';
-                                            }
-                                            echo implode(', ', $destination_links);
-                                            ?>
-                                        </div>
-                                    <?php endif; ?>
                                     <div class="yatra-trip-content">
+                                        <!-- Destination section now inside content for proper positioning -->
+                                        <?php if (!empty($trip->destinations)) : ?>
+                                            <div class="yatra-trip-destinations">
+                                                <svg class="location-icon" width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                                </svg>
+                                                <?php 
+                                                $destination_links = [];
+                                                foreach ($trip->destinations as $destination) {
+                                                    $destination_links[] = '<a href="' . esc_url(yatra_get_destination_permalink($destination)) . '" class="destination-link">' . esc_html($destination->name) . '</a>';
+                                                }
+                                                echo implode(', ', $destination_links);
+                                                ?>
+                                            </div>
+                                        <?php endif; ?>
                                         <h3 class="yatra-trip-title">
                                             <?php if (!empty($permalink)): ?>
                                                 <a href="<?php echo esc_url($permalink); ?>" class="yatra-trip-title-link"><?php echo esc_html($title); ?></a>

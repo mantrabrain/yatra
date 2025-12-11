@@ -23,6 +23,7 @@
         initTravelersSelect();
         initHorizontalSearchDropdowns();
         initDurationSlider();
+        initListGridToggle();
     }
 
     // Advanced search toggle
@@ -388,6 +389,43 @@
 
         // Initial display
         updateDurationDisplay();
+    }
+
+    // List/Grid view toggle
+    function initListGridToggle() {
+        const viewButtons = document.querySelectorAll('.yatra-view-btn');
+        const grid = document.querySelector('.yatra-trip-grid, .yatra-destination-grid, .yatra-activity-grid');
+        
+        if (!viewButtons.length || !grid) return;
+        
+        viewButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const view = this.getAttribute('data-view');
+                
+                // Update active button
+                viewButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update grid layout
+                if (view === 'list') {
+                    grid.classList.add('list-view');
+                    grid.classList.remove('grid-view');
+                } else {
+                    grid.classList.add('grid-view');
+                    grid.classList.remove('list-view');
+                }
+                
+                // Store preference in localStorage
+                localStorage.setItem('yatra-view-preference', view);
+            });
+        });
+        
+        // Load saved preference
+        const savedView = localStorage.getItem('yatra-view-preference') || 'grid';
+        const savedButton = document.querySelector(`[data-view="${savedView}"]`);
+        if (savedButton) {
+            savedButton.click();
+        }
     }
 
 })();
