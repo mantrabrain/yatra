@@ -1057,6 +1057,14 @@ class Trip
      */
     public function getPermalink(): string
     {
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA DEBUG - Trip::getPermalink() called for trip ID: ' . ($this->id ?? 'unknown'));
+            error_log('YATRA DEBUG - Trip permalink property: ' . ($this->permalink ?? 'empty'));
+            error_log('YATRA DEBUG - Trip slug: ' . ($this->slug ?? 'empty'));
+            error_log('YATRA DEBUG - Trip title: ' . ($this->title ?? 'empty'));
+        }
+        
         // If permalink is already set, use it
         if (!empty($this->permalink)) {
             return $this->permalink;
@@ -1064,19 +1072,19 @@ class Trip
         
         // Generate permalink from trip ID and slug/title
         if (!empty($this->id)) {
-            // Try to use WordPress get_permalink if available
-            if (function_exists('get_permalink')) {
-                $permalink = get_permalink($this->id);
-                if ($permalink && $permalink !== false) {
-                    return $permalink;
-                }
+            // For trips from custom table (TripRepository), always use custom permalink structure
+            // WordPress get_permalink() won't work with custom table IDs
+            $slug = !empty($this->slug) ? $this->slug : sanitize_title($this->title ?? '');
+            $fallback_url = home_url("/trip/{$slug}/");
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('YATRA DEBUG - Generated custom permalink: ' . $fallback_url . ' for trip ID: ' . $this->id);
             }
-            
-            // Fallback: generate basic permalink structure
-            $slug = !empty($this->slug) ? $this->slug : sanitize_title($this->title);
-            return home_url("/trip/{$slug}/");
+            return $fallback_url;
         }
         
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('YATRA DEBUG - No trip ID available, returning empty permalink');
+        }
         return '';
     }
 
