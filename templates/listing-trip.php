@@ -788,19 +788,41 @@ get_header();
                                     }
                                 }
                                 
-                                // Check for discount display
-                                if (!empty($current_price) && !empty($trip->original_price) && (float)$trip->original_price > 0) {
-                                    $current_field_value = 0;
-                                    foreach ($price_fields as $field) {
-                                        if (isset($trip->$field) && !empty($trip->$field) && (float)$trip->$field > 0) {
-                                            $current_field_value = (float)$trip->$field;
-                                            break;
+                                // Check for discount display - handle both regular and traveler-based pricing
+                                $discount_text = '';
+                                $current_field_value = 0;
+                                
+                                // Get the actual price value used for current_price
+                                foreach ($price_fields as $field) {
+                                    if (isset($trip->$field) && !empty($trip->$field) && (float)$trip->$field > 0) {
+                                        $current_field_value = (float)$trip->$field;
+                                        break;
+                                    }
+                                }
+                                
+                                // For traveler-based pricing, use pre-calculated discount data
+                                if ($is_traveler_based && $current_field_value > 0) {
+                                    // Use the highest discount percentage among all categories
+                                    if (!empty($trip->max_discount_percentage) && $trip->max_discount_percentage > 0) {
+                                        // Use original price from same category as minimum price for strikethrough
+                                        if (!empty($trip->min_category_original_price) && (float)$trip->min_category_original_price > 0) {
+                                            $original_price = yatra_format_price((float)$trip->min_category_original_price);
+                                            $has_discount = true;
+                                            $discount_text = 'Up to ' . $trip->max_discount_percentage . '%';
                                         }
                                     }
-                                    
-                                    if ($current_field_value > 0 && (float)$trip->original_price > $current_field_value) {
-                                        $original_price = yatra_format_price((float)$trip->original_price);
-                                        $has_discount = true;
+                                } else {
+                                    // Regular pricing - compare with original_price
+                                    if (!empty($current_price) && !empty($trip->original_price) && (float)$trip->original_price > 0 && $current_field_value > 0) {
+                                        if ((float)$trip->original_price > $current_field_value) {
+                                            $discount_percentage = round((((float)$trip->original_price - $current_field_value) / (float)$trip->original_price) * 100);
+                                            
+                                            if ($discount_percentage >= 1) {
+                                                $original_price = yatra_format_price((float)$trip->original_price);
+                                                $has_discount = true;
+                                                $discount_text = $discount_percentage . '%';
+                                            }
+                                        }
                                     }
                                 }
                                 
@@ -810,19 +832,14 @@ get_header();
                                     echo '<!-- PRICING DEBUG -->';
                                     echo '<!-- pricing_type: "' . ($trip->pricing_type ?? 'EMPTY') . '" -->';
                                     echo '<!-- original_price: "' . ($trip->original_price ?? 'EMPTY') . '" -->';
-                                    echo '<!-- sale_price: "' . ($trip->sale_price ?? 'EMPTY') . '" -->';
-                                    echo '<!-- discounted_price: "' . ($trip->discounted_price ?? 'EMPTY') . '" -->';
                                     echo '<!-- effective_price_min: "' . ($trip->effective_price_min ?? 'EMPTY') . '" -->';
-                                    echo '<!-- regular_price: "' . ($trip->regular_price ?? 'EMPTY') . '" -->';
+                                    echo '<!-- effective_price_max: "' . ($trip->effective_price_max ?? 'EMPTY') . '" -->';
                                     echo '<!-- Final current_price: "' . $current_price . '" -->';
-                                    echo '<!-- Categories count: ' . (isset($trip->categories) ? count($trip->categories) : 'not set') . ' -->';
+                                    echo '<!-- has_discount: ' . ($has_discount ? 'YES' : 'NO') . ' -->';
+                                    echo '<!-- discount_text: "' . $discount_text . '" -->';
                                 }
 
-                                // Discount badge text (optional)
-                                $discount_text = '';
-                                if ($has_discount && !empty($trip->discount_percentage)) {
-                                    $discount_text = intval($trip->discount_percentage) . '%';
-                                }
+                                // Discount badge text is already calculated above if discount exists
 
                                 // Highlights: use first few activities/destinations as badges
                                 $highlights = [];
@@ -885,7 +902,13 @@ get_header();
                                         </div>
                                     <?php endif; ?>
                                     <div class="yatra-trip-content">
-                                        <h3 class="yatra-trip-title"><?php echo esc_html($title); ?></h3>
+                                        <h3 class="yatra-trip-title">
+                                            <?php if (!empty($permalink)): ?>
+                                                <a href="<?php echo esc_url($permalink); ?>" class="yatra-trip-title-link"><?php echo esc_html($title); ?></a>
+                                            <?php else: ?>
+                                                <?php echo esc_html($title); ?>
+                                            <?php endif; ?>
+                                        </h3>
                                         
                                         <!-- Trip Info Row (Duration only) -->
                                         <?php if (!empty($duration)): ?>
@@ -1123,12 +1146,11 @@ document.addEventListener('DOMContentLoaded', function () {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: white;
     padding: 4px 8px;
-    border-radius: 6px;
+    border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 2;
 }
 
 /* Favorite Button */
@@ -1190,15 +1212,26 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 
 .yatra-trip-title {
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 600;
     color: #1f2937;
-    margin: 0 0 16px 0;
+    margin-bottom: 12px;
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+.yatra-trip-title-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.yatra-trip-title-link:hover {
+    color: #2563eb;
+    text-decoration: none;
 }
 
 /* Trip Info Row */
@@ -1388,6 +1421,24 @@ document.addEventListener('DOMContentLoaded', function () {
     font-size: 1.125rem;
     font-weight: 700;
     color: #2563eb;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.yatra-original-price {
+    text-decoration: line-through;
+    text-decoration-thickness: 2px;
+    text-decoration-color: #ef4444;
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 500;
+    background: rgba(239, 68, 68, 0.08);
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid rgba(239, 68, 68, 0.15);
+    line-height: 1;
 }
 
 .yatra-card-view-btn {

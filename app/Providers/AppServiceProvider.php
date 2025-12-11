@@ -1442,14 +1442,60 @@ class AppServiceProvider extends ServiceProvider
                     // Removed fallback that was creating difficulty names from slugs
                 }
 
-                // Price fields: compute effective min price if sale/discount exists
+                // Price fields: compute effective min price based on pricing type
                 $trip->effective_price_min = 0;
-                if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-                    $trip->effective_price_min = (float)$trip->discounted_price;
-                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-                    $trip->effective_price_min = (float)$trip->sale_price;
-                } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-                    $trip->effective_price_min = (float)$trip->original_price;
+                
+                // Check if this is traveler-based pricing
+                if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+                    // Query price types table for minimum and maximum prices
+                    $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+                    // Get all price type data for discount calculation
+                    $all_price_types = $wpdb->get_results($wpdb->prepare(
+                        "SELECT 
+                            original_price,
+                            discounted_price,
+                            CASE 
+                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
+                                ELSE original_price 
+                            END as effective_price,
+                            CASE 
+                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
+                                THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                                ELSE 0
+                            END as discount_percentage
+                        FROM {$price_types_table} 
+                        WHERE trip_id = %d AND (
+                            (discounted_price IS NOT NULL AND discounted_price > 0) OR 
+                            (original_price IS NOT NULL AND original_price > 0)
+                        )
+                        ORDER BY effective_price ASC",
+                        $trip->id
+                    ));
+                    
+                    if ($all_price_types && count($all_price_types) > 0) {
+                        // Find minimum effective price and its corresponding original price
+                        $min_price_row = $all_price_types[0]; // First row has minimum effective price
+                        $trip->effective_price_min = (float)$min_price_row->effective_price;
+                        $trip->min_category_original_price = (float)$min_price_row->original_price;
+                        
+                        // Find highest discount percentage among all categories
+                        $max_discount = 0;
+                        foreach ($all_price_types as $price_type) {
+                            if ($price_type->discount_percentage > $max_discount) {
+                                $max_discount = $price_type->discount_percentage;
+                            }
+                        }
+                        $trip->max_discount_percentage = $max_discount;
+                    }
+                } else {
+                    // Regular pricing logic
+                    if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                        $trip->effective_price_min = (float)$trip->discounted_price;
+                    } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                        $trip->effective_price_min = (float)$trip->sale_price;
+                    } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                        $trip->effective_price_min = (float)$trip->original_price;
+                    }
                 }
             }
 
@@ -1686,7 +1732,63 @@ class AppServiceProvider extends ServiceProvider
                 $trip->id
             )) ?: 0;
 
-            // Traveler-based pricing: compute effective min/max price from price types when flat prices are empty
+            // Compute effective min price based on pricing type
+            $trip->effective_price_min = 0;
+            
+            // Check if this is traveler-based pricing
+            if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+                // Query price types table for minimum and maximum prices
+                $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+                // Get all price type data for discount calculation
+                $all_price_types = $wpdb->get_results($wpdb->prepare(
+                    "SELECT 
+                        original_price,
+                        discounted_price,
+                        CASE 
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
+                            ELSE original_price 
+                        END as effective_price,
+                        CASE 
+                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
+                            THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                            ELSE 0
+                        END as discount_percentage
+                    FROM {$price_types_table} 
+                    WHERE trip_id = %d AND (
+                        (discounted_price IS NOT NULL AND discounted_price > 0) OR 
+                        (original_price IS NOT NULL AND original_price > 0)
+                    )
+                    ORDER BY effective_price ASC",
+                    $trip->id
+                ));
+                
+                if ($all_price_types && count($all_price_types) > 0) {
+                    // Find minimum effective price and its corresponding original price
+                    $min_price_row = $all_price_types[0]; // First row has minimum effective price
+                    $trip->effective_price_min = (float)$min_price_row->effective_price;
+                    $trip->min_category_original_price = (float)$min_price_row->original_price;
+                    
+                    // Find highest discount percentage among all categories
+                    $max_discount = 0;
+                    foreach ($all_price_types as $price_type) {
+                        if ($price_type->discount_percentage > $max_discount) {
+                            $max_discount = $price_type->discount_percentage;
+                        }
+                    }
+                    $trip->max_discount_percentage = $max_discount;
+                }
+            } else {
+                // Regular pricing logic
+                if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                    $trip->effective_price_min = (float)$trip->discounted_price;
+                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                    $trip->effective_price_min = (float)$trip->sale_price;
+                } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                    $trip->effective_price_min = (float)$trip->original_price;
+                }
+            }
+
+            // Traveler-based pricing: compute effective max price from price types when flat prices are empty
             $has_flat_price = (
                 (!empty($trip->sale_price) && (float) $trip->sale_price > 0) ||
                 (!empty($trip->discounted_price) && (float) $trip->discounted_price > 0) ||
@@ -1703,10 +1805,6 @@ class AppServiceProvider extends ServiceProvider
 
                 $row = $wpdb->get_row($wpdb->prepare(
                     "SELECT
-                        MIN(CASE
-                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
-                            ELSE original_price
-                        END) AS min_price,
                         MAX(CASE
                             WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
                             ELSE original_price
@@ -1720,13 +1818,9 @@ class AppServiceProvider extends ServiceProvider
                     (int) $trip->id
                 ));
 
-                if ($row && ($row->min_price !== null || $row->max_price !== null)) {
-                    $minPrice = $row->min_price !== null ? (float) $row->min_price : 0.0;
-                    $maxPrice = $row->max_price !== null ? (float) $row->max_price : 0.0;
+                if ($row && $row->max_price !== null) {
+                    $maxPrice = (float) $row->max_price;
 
-                    if ($minPrice > 0) {
-                        $trip->effective_price_min = $minPrice;
-                    }
                     if ($maxPrice > 0) {
                         $trip->effective_price_max = $maxPrice;
                     }
