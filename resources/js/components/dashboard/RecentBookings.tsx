@@ -8,6 +8,7 @@ import { __ } from '../../lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { Calendar, User, ArrowRight } from 'lucide-react';
+import { getCurrencySymbol } from '../../data/currencies';
 
 interface Booking {
   id: number;
@@ -41,11 +42,36 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
     });
   };
 
+  // Get global currency settings
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
+  const currencyPosition = (window as any)?.yatraAdmin?.currencyPosition || (window as any)?.yatraAdmin?.currency_position || 'before';
+  const decimalPlaces = Number((window as any)?.yatraAdmin?.decimalPlaces || (window as any)?.yatraAdmin?.currency_decimals || 2);
+  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(amount);
+    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + '0';
+    
+    const numPrice = Number(amount) || 0;
+    
+    // Format the number with proper separators
+    const formattedAmount = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: decimalPlaces,
+    }).format(numPrice)
+      .replace(/,/g, 'TEMP_THOUSAND')
+      .replace(/\./g, decimalSeparator)
+      .replace(/TEMP_THOUSAND/g, thousandSeparator);
+    
+    // Get currency symbol
+    const currencySymbol = getCurrencySymbol(globalCurrency);
+    
+    // Apply currency position
+    if (currencyPosition === 'after' || currencyPosition === 'right') {
+      return `${formattedAmount} ${currencySymbol}`;
+    } else {
+      return `${currencySymbol}${formattedAmount}`;
+    }
   };
 
   const getStatusColor = (status: string) => {

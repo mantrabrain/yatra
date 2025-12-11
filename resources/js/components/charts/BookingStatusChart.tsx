@@ -81,7 +81,7 @@ const BookingStatusChart: React.FC<BookingStatusChartProps> = ({ data }) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(value: any, _: any, item: any) => `${item.payload.percent.toFixed(1)}%`}
+            formatter={(value: any, _name: any, props: any) => `${props.payload.percent.toFixed(1)}%`}
             contentStyle={{ fontFamily: 'inherit', fontSize: 11 }}
           />
           <Legend

@@ -1550,7 +1550,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const handlePriceTypeRemove = (categoryId: number) => {
     setFormData(prev => ({
       ...prev,
-      price_types: prev.price_types.filter(pt => pt.category_id !== categoryId),
+      price_types: prev.price_types.filter(pt => Number(pt.category_id) !== Number(categoryId)),
     }));
   };
 
@@ -1558,7 +1558,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     setFormData(prev => ({
       ...prev,
       price_types: prev.price_types.map(pt => 
-        pt.category_id === categoryId ? { ...pt, [field]: value } : pt
+        Number(pt.category_id) === Number(categoryId) ? { ...pt, [field]: value } : pt
       ),
     }));
   };
@@ -2154,7 +2154,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Grid Fields Skeleton */}
                   <div className="grid grid-cols-2 gap-4">
                     {[...Array(4)].map((_, i) => (
-                      <div key={`grid-${i}`} className="space-y-2">
+                      <div key={`grid-${i}`} className="space-y-3">
                         <div className="h-3.5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                         <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                       </div>
@@ -2588,6 +2588,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               value="single_day"
                               checked={formData.trip_type === 'single_day'}
                               onChange={(e) => {
+                                console.log('📝 TRIP TYPE CHANGE HANDLER CALLED:', {
+                                  newValue: e.target.value,
+                                  timestamp: new Date().toISOString()
+                                });
                                 handleFieldChange('trip_type', e.target.value);
                                 if (e.target.value === 'single_day') {
                                   setFormData(prev => ({
@@ -3724,7 +3728,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           // Use Number() to ensure consistent comparison (handles string/number mismatch)
                           const category = activeCategories.find(cat => Number(cat.id) === Number(priceType.category_id));
                           if (!category) {
-                            console.log('Category not found for priceType:', priceType, 'activeCategories:', activeCategories);
                             return null;
                           }
 

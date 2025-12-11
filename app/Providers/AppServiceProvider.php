@@ -1210,6 +1210,279 @@ class AppServiceProvider extends ServiceProvider
         // Enqueue listing page assets
         $this->enqueueListingPageAssets();
 
+        // If this is the /trip listing, prepare real trips with filters + pagination
+        if ($listing_page === 'trip') {
+            global $wpdb;
+
+            $trip_table         = $wpdb->prefix . 'yatra_trips';
+            $dest_rel_table     = $wpdb->prefix . 'yatra_trip_destinations';
+            $dest_table         = $wpdb->prefix . 'yatra_destinations';
+            $act_rel_table      = $wpdb->prefix . 'yatra_trip_activities';
+            $act_table          = $wpdb->prefix . 'yatra_activities';
+            $cat_table          = $wpdb->prefix . 'yatra_trip_categories';
+            $cat_rel_table      = $wpdb->prefix . 'yatra_trip_trip_categories';
+            $reviews_table      = $wpdb->prefix . 'yatra_reviews';
+
+            // Pagination
+            $page     = isset($_GET['page']) ? max(1, absint($_GET['page'])) : 1;
+            $per_page = 9;
+            $offset   = ($page - 1) * $per_page;
+
+            // Filters
+            $filter_destination = isset($_GET['destination']) ? sanitize_title(wp_unslash($_GET['destination'])) : '';
+            $filter_activity    = isset($_GET['activity']) ? sanitize_title(wp_unslash($_GET['activity'])) : '';
+            $price_min          = isset($_GET['price_min']) ? floatval($_GET['price_min']) : 0;
+            $price_max          = isset($_GET['price_max']) ? floatval($_GET['price_max']) : 0;
+            $duration_min       = isset($_GET['duration_min']) ? intval($_GET['duration_min']) : 0;
+            $duration_max       = isset($_GET['duration_max']) ? intval($_GET['duration_max']) : 0;
+            $rating_min         = isset($_GET['rating_min']) ? floatval($_GET['rating_min']) : 0;
+            $sort_param         = isset($_GET['sort']) ? sanitize_text_field(wp_unslash($_GET['sort'])) : '';
+
+            $joins = [];
+            $wheres = ["t.status IN ('publish','published')"];
+            $params = [];
+
+            // Destination filter
+            if (!empty($filter_destination)) {
+                $joins[]  = "INNER JOIN {$dest_rel_table} td ON t.id = td.trip_id";
+                $joins[]  = "INNER JOIN {$dest_table} d ON d.id = td.destination_id";
+                $wheres[] = "d.slug = %s";
+                $params[] = $filter_destination;
+            }
+
+            // Activity filter
+            if (!empty($filter_activity)) {
+                $joins[]  = "INNER JOIN {$act_rel_table} ta ON t.id = ta.trip_id";
+                $joins[]  = "INNER JOIN {$act_table} a ON a.id = ta.activity_id";
+                $wheres[] = "a.slug = %s";
+                $params[] = $filter_activity;
+            }
+
+            // Price filter (original_price numeric)
+            if ($price_min > 0) {
+                $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) >= %f";
+                $params[] = $price_min;
+            }
+            if ($price_max > 0) {
+                $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) <= %f";
+                $params[] = $price_max;
+            }
+
+            // Duration filter
+            if ($duration_min > 0) {
+                $wheres[] = "CAST(t.duration AS UNSIGNED) >= %d";
+                $params[] = $duration_min;
+            }
+            if ($duration_max > 0) {
+                $wheres[] = "CAST(t.duration AS UNSIGNED) <= %d";
+                $params[] = $duration_max;
+            }
+
+            $join_sql  = !empty($joins) ? implode(' ', $joins) : '';
+            $where_sql = !empty($wheres) ? ('WHERE ' . implode(' AND ', $wheres)) : '';
+
+            // Count total
+            $count_sql = "SELECT COUNT(DISTINCT t.id)
+                          FROM {$trip_table} t
+                          {$join_sql}
+                          {$where_sql}";
+            if (empty($params)) {
+                $prepared_count_query = $count_sql;
+            } else {
+                $prepared_count_query = call_user_func_array([$wpdb, 'prepare'], array_merge([$count_sql], $params));
+            }
+            $total = $wpdb->get_var($prepared_count_query);
+            $total = $total ? (int) $total : 0;
+            $total_pages = $total > 0 ? (int) ceil($total / $per_page) : 1;
+
+            // Sorting
+            $order_clause = "ORDER BY t.created_at DESC";
+            if (!empty($sort_param)) {
+                switch ($sort_param) {
+                    case 'price_low':
+                        $order_clause = "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) ASC";
+                        break;
+                    case 'price_high':
+                        $order_clause = "ORDER BY CAST(t.original_price AS DECIMAL(10,2)) DESC";
+                        break;
+                    case 'rating_high':
+                        $order_clause = "ORDER BY average_rating DESC";
+                        break;
+                    case 'duration_short':
+                        $order_clause = "ORDER BY CAST(t.duration AS UNSIGNED) ASC";
+                        break;
+                    case 'duration_long':
+                        $order_clause = "ORDER BY CAST(t.duration AS UNSIGNED) DESC";
+                        break;
+                    default:
+                        $order_clause = "ORDER BY t.created_at DESC";
+                        break;
+                }
+            }
+
+            // Main query with rating aggregates
+            $query_sql = "SELECT t.*,
+                                 AVG(r.rating) AS average_rating,
+                                 COUNT(r.id) AS review_count
+                          FROM {$trip_table} t
+                          {$join_sql}
+                          LEFT JOIN {$reviews_table} r
+                            ON r.trip_id = t.id AND r.status = 'approved'
+                          {$where_sql}
+                          GROUP BY t.id
+                          {$order_clause}
+                          LIMIT {$per_page} OFFSET {$offset}";
+            if (empty($params)) {
+                $prepared_query = $query_sql;
+            } else {
+                $prepared_query = call_user_func_array([$wpdb, 'prepare'], array_merge([$query_sql], $params));
+            }
+            $rows = $wpdb->get_results($prepared_query) ?: [];
+
+            // Post-process trips
+            foreach ($rows as $trip) {
+                // Permalink
+                $trip->permalink = yatra_get_trip_permalink($trip);
+
+                // Featured image
+                if (!empty($trip->featured_image)) {
+                    $trip->featured_image_url = wp_get_attachment_url($trip->featured_image);
+                } else {
+                    $gallery_table = $wpdb->prefix . 'yatra_trip_gallery_images';
+                    $first_image = $wpdb->get_row($wpdb->prepare(
+                        "SELECT image_url FROM {$gallery_table} WHERE trip_id = %d ORDER BY `order` ASC LIMIT 1",
+                        $trip->id
+                    ));
+                    $trip->featured_image_url = $first_image ? $first_image->image_url : '';
+                }
+
+                // Destinations
+                $trip->destinations = $wpdb->get_results($wpdb->prepare(
+                    "SELECT d.name, d.slug FROM {$dest_table} d
+                     INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
+                     WHERE td.trip_id = %d",
+                    $trip->id
+                ));
+
+                // Activities
+                $trip->activities = $wpdb->get_results($wpdb->prepare(
+                    "SELECT a.name, a.slug FROM {$act_table} a
+                     INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id
+                     WHERE ta.trip_id = %d",
+                    $trip->id
+                ));
+
+                // Categories - get all categories including parent/child with icons
+                $cat_table = $wpdb->prefix . 'yatra_trip_categories';
+                $cat_rel_table = $wpdb->prefix . 'yatra_trip_trip_categories';
+                $trip->categories = $wpdb->get_results($wpdb->prepare(
+                    "SELECT DISTINCT c.id, c.name, c.slug, c.parent_id, c.icon FROM {$cat_table} c
+                     INNER JOIN {$cat_rel_table} tc ON c.id = tc.category_id
+                     WHERE tc.trip_id = %d AND c.status IN ('publish', 'published')
+                     ORDER BY c.parent_id ASC, c.name ASC",
+                    $trip->id
+                ));
+                
+                // Debug: Check all trip fields to find difficulty
+                if (current_user_can('manage_options')) {
+                    error_log('TRIP DEBUG - All fields for trip ID ' . $trip->id . ': ' . print_r($trip, true));
+                }
+                
+                // Check multiple possible difficulty field names - but validate they're meaningful
+                $difficulty_fields = ['difficulty', 'difficulty_level', 'trip_difficulty', 'difficulty_id', 'level'];
+                foreach ($difficulty_fields as $field) {
+                    if (isset($trip->$field) && !empty($trip->$field)) {
+                        $field_value = trim((string)$trip->$field);
+                        // Only set if it's a meaningful value (not empty, not placeholder)
+                        if (!empty($field_value) && 
+                            $field_value !== 'EMPTY' && 
+                            $field_value !== 'none' && 
+                            $field_value !== 'null' && 
+                            $field_value !== '0' &&
+                            strlen($field_value) > 1) {
+                            $trip->difficulty = $field_value;
+                            break;
+                        }
+                    }
+                }
+                
+                // If no valid difficulty found, ensure it's completely empty
+                if (empty($trip->difficulty) || 
+                    trim((string)$trip->difficulty) === '' || 
+                    trim((string)$trip->difficulty) === 'EMPTY') {
+                    $trip->difficulty = null;
+                    $trip->difficulty_name = null;
+                    $trip->difficulty_icon = null;
+                }
+                
+                // Get difficulty name and icon - try multiple possible table names
+                if (!empty($trip->difficulty)) {
+                    $possible_tables = [
+                        $wpdb->prefix . 'yatra_trip_difficulties',
+                        $wpdb->prefix . 'yatra_difficulties',
+                        $wpdb->prefix . 'yatra_difficulty_levels'
+                    ];
+                    
+                    foreach ($possible_tables as $difficulty_table) {
+                        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
+                        if ($table_exists) {
+                            $difficulty_data = $wpdb->get_row($wpdb->prepare(
+                                "SELECT name, icon FROM {$difficulty_table} WHERE id = %s OR slug = %s LIMIT 1",
+                                $trip->difficulty, $trip->difficulty
+                            ));
+                            if ($difficulty_data) {
+                                $trip->difficulty_name = $difficulty_data->name;
+                                $trip->difficulty_icon = $difficulty_data->icon;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Don't create fake difficulty names - only use real database values
+                    // Removed fallback that was creating difficulty names from slugs
+                }
+
+                // Price fields: compute effective min price if sale/discount exists
+                $trip->effective_price_min = 0;
+                if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                    $trip->effective_price_min = (float)$trip->discounted_price;
+                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                    $trip->effective_price_min = (float)$trip->sale_price;
+                } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                    $trip->effective_price_min = (float)$trip->original_price;
+                }
+            }
+
+            // Destination/Activity options for filters
+            $destinations = $wpdb->get_results(
+                "SELECT name, slug FROM {$dest_table} WHERE status = 'publish' ORDER BY name ASC"
+            ) ?: [];
+            $activities = $wpdb->get_results(
+                "SELECT name, slug FROM {$act_table} WHERE status = 'publish' ORDER BY name ASC"
+            ) ?: [];
+
+            // Share with template
+            $GLOBALS['yatra_trip_list'] = [
+                'trips'        => $rows,
+                'total'        => $total,
+                'pages'        => $total_pages,
+                'page'         => $page,
+                'per_page'     => $per_page,
+                'filters'      => [
+                    'destination'  => $filter_destination,
+                    'activity'     => $filter_activity,
+                    'price_min'    => $price_min,
+                    'price_max'    => $price_max,
+                    'duration_min' => $duration_min,
+                    'duration_max' => $duration_max,
+                    'rating_min'   => $rating_min,
+                    'sort'         => $sort_param,
+                ],
+                'destinations' => $destinations,
+                'activities'   => $activities,
+            ];
+        }
+
         // Load the appropriate listing page template
         $template_path = YATRA_PLUGIN_PATH . 'templates/listing-' . $listing_page . '.php';
         
@@ -1365,15 +1638,42 @@ class AppServiceProvider extends ServiceProvider
                 $trip->id
             ));
             
-            // Get categories for this trip
+            // Get categories for this trip - including parent/child
             $cat_table = $wpdb->prefix . 'yatra_trip_categories';
             $trip_cat_table = $wpdb->prefix . 'yatra_trip_trip_categories';
-            $trip->trip_categories = $wpdb->get_results($wpdb->prepare(
-                "SELECT c.name, c.slug FROM {$cat_table} c
+            $trip->categories = $wpdb->get_results($wpdb->prepare(
+                "SELECT DISTINCT c.id, c.name, c.slug, c.parent_id FROM {$cat_table} c
                  INNER JOIN {$trip_cat_table} tc ON c.id = tc.category_id
-                 WHERE tc.trip_id = %d",
+                 WHERE tc.trip_id = %d AND c.status IN ('publish', 'published')
+                 ORDER BY c.parent_id ASC, c.name ASC",
                 $trip->id
             ));
+            
+            // Get difficulty name - try multiple possible table names
+            if (!empty($trip->difficulty)) {
+                $possible_tables = [
+                    $wpdb->prefix . 'yatra_trip_difficulties',
+                    $wpdb->prefix . 'yatra_difficulties',
+                    $wpdb->prefix . 'yatra_difficulty_levels'
+                ];
+                
+                foreach ($possible_tables as $difficulty_table) {
+                    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
+                    if ($table_exists) {
+                        $difficulty_name = $wpdb->get_var($wpdb->prepare(
+                            "SELECT name FROM {$difficulty_table} WHERE id = %s OR slug = %s LIMIT 1",
+                            $trip->difficulty, $trip->difficulty
+                        ));
+                        if ($difficulty_name) {
+                            $trip->difficulty_name = $difficulty_name;
+                            break;
+                        }
+                    }
+                }
+                
+                // Don't create fake difficulty names - only use real database values
+                // Removed fallback that was creating difficulty names from slugs
+            }
             
             // Calculate average rating
             $reviews_table = $wpdb->prefix . 'yatra_reviews';
@@ -1448,16 +1748,44 @@ class AppServiceProvider extends ServiceProvider
         // Enqueue listing page assets
         $this->enqueueListingPageAssets();
 
-        // Load the template
-        $template_path = YATRA_PLUGIN_PATH . 'templates/single-taxonomy.php';
-        
+        // Load the appropriate template based on type
+        $template_path = '';
+
+        switch ($type) {
+            case 'destination':
+                // Re-use the trip listing template so design + sidebar match /trip exactly
+                $template_path = YATRA_PLUGIN_PATH . 'templates/listing-trip.php';
+                // Context for listing-trip: which destination and its trips
+                $GLOBALS['yatra_taxonomy_context'] = [
+                    'type'  => 'destination',
+                    'entity'=> $entity,
+                    'trips' => $trips,
+                ];
+                break;
+
+            case 'activity':
+                // Re-use the trip listing template so design + sidebar match /trip exactly
+                $template_path = YATRA_PLUGIN_PATH . 'templates/listing-trip.php';
+                // Context for listing-trip: which activity and its trips
+                $GLOBALS['yatra_taxonomy_context'] = [
+                    'type'  => 'activity',
+                    'entity'=> $entity,
+                    'trips' => $trips,
+                ];
+                break;
+
+            case 'category':
+                $template_path = YATRA_PLUGIN_PATH . 'templates/single-taxonomy.php';
+                // Make data available to template
+                $GLOBALS['yatra_taxonomy_data'] = $taxonomy_data;
+                break;
+        }
+
         if (file_exists($template_path)) {
-            // Make data available to template
-            $GLOBALS['yatra_taxonomy_data'] = $taxonomy_data;
             include $template_path;
             exit;
         } else {
-            wp_die(sprintf('Single taxonomy template not found'));
+            wp_die(sprintf('Single %s template not found: %s', $type, $template_path));
         }
     }
 
@@ -1753,8 +2081,13 @@ HTML;
         
         if (empty($request_path)) {
             $request_uri = $_SERVER['REQUEST_URI'] ?? '';
-            $path = trim(wp_parse_url($request_uri, PHP_URL_PATH) ?? '', '/');
-            $home_path = trim(wp_parse_url(home_url('/'), PHP_URL_PATH) ?? '', '/');
+            $parsed_uri = wp_parse_url($request_uri);
+            $path = $parsed_uri['path'] ?? '';
+            $path = trim($path, '/');
+
+            // Remove site subdirectory (if WordPress is installed in subdir)
+            $home_path = wp_parse_url(home_url('/'), PHP_URL_PATH);
+            $home_path = $home_path ? trim($home_path, '/') : '';
             if ($home_path && str_starts_with($path, $home_path)) {
                 $path = trim(substr($path, strlen($home_path)), '/');
             }
@@ -1983,7 +2316,7 @@ HTML;
                 
                 // Debug logging for each gateway
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Yatra Gateway Debug - {$gateway_id}: enabled=" . var_export($enabled_value, true) . ", is_enabled=" . var_export($is_enabled, true));
+                    error_log("[Yatra] Gateway {$gateway_id}: enabled=" . var_export($enabled_value, true) . ", is_enabled=" . var_export($is_enabled, true));
                 }
                 
                 if ($is_enabled) {
@@ -2562,4 +2895,3 @@ HTML;
         return $tag;
     }
 }
-

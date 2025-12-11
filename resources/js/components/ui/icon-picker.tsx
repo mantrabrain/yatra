@@ -6,36 +6,6 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import {
-  Activity,
-  UtensilsCrossed,
-  Building2,
-  Bus,
-  Moon,
-  Package,
-  Target,
-  Camera,
-  Mountain,
-  Waves,
-  Palette,
-  Plane,
-  Car,
-  Hotel,
-  Coffee,
-  Bed,
-  MapPin,
-  Footprints,
-  Eye,
-  Clock,
-  Calendar,
-  Image as ImageIcon,
-  Music,
-  Gamepad2,
-  BookOpen,
-  ShoppingBag,
-  Heart,
-  Star,
-  Zap,
-  Flame,
   Upload,
   X,
   Search,
@@ -43,6 +13,7 @@ import {
   Sparkles,
   Check,
 } from 'lucide-react';
+import { getIconOptions, type IconName } from '../../lib/icons';
 import { __ } from '../../lib/i18n';
 import { Button } from './button';
 import { Input } from './input';
@@ -50,77 +21,8 @@ import { Card, CardContent } from './card';
 import { Badge } from './badge';
 import { useWordPressMedia } from '../../hooks/useWordPressMedia';
 
-export type IconName = 
-  | 'activity'
-  | 'utensils'
-  | 'building'
-  | 'bus'
-  | 'moon'
-  | 'package'
-  | 'target'
-  | 'camera'
-  | 'mountain'
-  | 'waves'
-  | 'palette'
-  | 'plane'
-  | 'car'
-  | 'hotel'
-  | 'coffee'
-  | 'bed'
-  | 'map-pin'
-  | 'footprints'
-  | 'eye'
-  | 'clock'
-  | 'calendar'
-  | 'image'
-  | 'music'
-  | 'gamepad'
-  | 'book'
-  | 'shopping'
-  | 'heart'
-  | 'star'
-  | 'zap'
-  | 'flame';
-
-interface IconOption {
-  name: IconName;
-  label: string;
-  component: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  category: 'activity' | 'travel' | 'food' | 'accommodation' | 'transport' | 'general';
-}
-
-const iconOptions: IconOption[] = [
-  { name: 'activity', label: 'Activity', component: Activity, category: 'activity' },
-  { name: 'footprints', label: 'Hiking', component: Footprints, category: 'activity' },
-  { name: 'mountain', label: 'Mountain', component: Mountain, category: 'activity' },
-  { name: 'waves', label: 'Water Sports', component: Waves, category: 'activity' },
-  { name: 'camera', label: 'Photography', component: Camera, category: 'activity' },
-  { name: 'eye', label: 'Sightseeing', component: Eye, category: 'activity' },
-  { name: 'target', label: 'Target', component: Target, category: 'activity' },
-  { name: 'zap', label: 'Energy', component: Zap, category: 'activity' },
-  { name: 'flame', label: 'Adventure', component: Flame, category: 'activity' },
-  { name: 'utensils', label: 'Meal', component: UtensilsCrossed, category: 'food' },
-  { name: 'coffee', label: 'Coffee', component: Coffee, category: 'food' },
-  { name: 'hotel', label: 'Hotel', component: Hotel, category: 'accommodation' },
-  { name: 'bed', label: 'Bed', component: Bed, category: 'accommodation' },
-  { name: 'building', label: 'Building', component: Building2, category: 'accommodation' },
-  { name: 'bus', label: 'Bus', component: Bus, category: 'transport' },
-  { name: 'plane', label: 'Plane', component: Plane, category: 'transport' },
-  { name: 'car', label: 'Car', component: Car, category: 'transport' },
-  { name: 'map-pin', label: 'Location', component: MapPin, category: 'travel' },
-  { name: 'calendar', label: 'Calendar', component: Calendar, category: 'travel' },
-  { name: 'clock', label: 'Time', component: Clock, category: 'travel' },
-  { name: 'moon', label: 'Rest', component: Moon, category: 'general' },
-  { name: 'package', label: 'Package', component: Package, category: 'general' },
-  { name: 'palette', label: 'Palette', component: Palette, category: 'general' },
-  { name: 'image', label: 'Image', component: ImageIcon, category: 'general' },
-  { name: 'music', label: 'Music', component: Music, category: 'general' },
-  { name: 'gamepad', label: 'Entertainment', component: Gamepad2, category: 'general' },
-  { name: 'book', label: 'Education', component: BookOpen, category: 'general' },
-  { name: 'shopping', label: 'Shopping', component: ShoppingBag, category: 'general' },
-  { name: 'heart', label: 'Wellness', component: Heart, category: 'general' },
-  { name: 'star', label: 'Featured', component: Star, category: 'general' },
-];
+// Use centralized icon system
+const iconOptions = getIconOptions();
 
 const categoryLabels: Record<string, string> = {
   activity: 'Activities',

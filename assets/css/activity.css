@@ -1,0 +1,144 @@
+.yatra-activity-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.yatra-activity-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.yatra-activity-icon-wrapper,
+.yatra-activity-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.yatra-activity-icon-wrapper {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  color: #4b5563;
+}
+
+.yatra-activity-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.yatra-activity-placeholder {
+  background-color: #f3f4f6;
+}
+
+.yatra-activity-placeholder-text {
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: 0.08em;
+}
+
+/* View toggle buttons (grid / list) */
+.yatra-activity-listing .yatra-view-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 9999px;
+  overflow: hidden;
+  background-color: #e5e7eb !important; /* gray-200 */
+}
+
+.yatra-activity-listing .yatra-view-btn {
+  border: none;
+  background: transparent !important;
+  padding: 0.35rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb !important; /* blue-600 */
+  cursor: pointer;
+}
+
+.yatra-activity-listing .yatra-view-btn svg {
+  display: block;
+}
+
+.yatra-activity-listing .yatra-view-btn.active {
+  background-color: #2563eb !important; /* blue-600 */
+  color: #ffffff !important;
+}
+
+.yatra-activity-listing .yatra-view-btn:not(.active):hover {
+  background-color: #d1d5db !important; /* gray-300 */
+}
+
+/* Grid/List toggle */
+.yatra-activity-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Default card layout in grid mode: vertical card */
+.yatra-activity-grid .yatra-activity-card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* List view: cards become horizontal rows */
+.yatra-activity-grid.list-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.yatra-activity-grid.list-view .yatra-activity-card {
+  flex-direction: row;
+}
+
+.yatra-activity-grid.list-view .yatra-activity-image {
+  flex: 0 0 260px;
+}
+
+.yatra-activity-grid.list-view .yatra-activity-content {
+  flex: 1 1 auto;
+}
+
+/* Pagination buttons */
+.yatra-listing-pagination .yatra-pagination-btn.disabled {
+  opacity: 0.5;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* View Trips button */
+.yatra-activity-listing a.yatra-activity-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  background-color: #10b981; /* emerald-500 */
+  color: #ffffff !important;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none !important;
+  border: none;
+  cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.yatra-activity-listing a.yatra-activity-btn:hover,
+.yatra-activity-listing a.yatra-activity-btn:focus {
+  background-color: #059669; /* emerald-600 */
+  color: #ffffff !important; /* keep white, avoid blue link color */
+  text-decoration: none !important;
+}
+
+.yatra-activity-listing a.yatra-activity-btn:active {
+  transform: translateY(1px);
+}

@@ -12,12 +12,17 @@ import {
   Users, 
   Plane,
   TrendingUp,
-  Info
+  Info,
+  Activity,
+  Clock,
+  CheckCircle,
+  AlertCircle
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { StatCard } from '../components/common/StatCard';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Button } from '../components/ui/button';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { SimpleBarChart } from '../components/charts/SimpleBarChart';
 import BookingsOverviewChart from '../components/charts/BookingsOverviewChart';
@@ -26,6 +31,7 @@ import { UpcomingDepartures } from '../components/dashboard/UpcomingDepartures';
 import { PendingPayments } from '../components/dashboard/PendingPayments';
 import { RecentBookings } from '../components/dashboard/RecentBookings';
 import { apiClient } from '../lib/api';
+import { getCurrencySymbol } from '../data/currencies';
 
 const Dashboard: React.FC = () => {
   const { can } = usePermissions();
@@ -46,6 +52,36 @@ const Dashboard: React.FC = () => {
   const currencyDecimals = Number.isFinite(Number(currencyDecimalsRaw))
     ? Number(currencyDecimalsRaw)
     : 2;
+
+  // Get additional currency settings
+  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+
+  // Comprehensive currency formatting function
+  const formatCurrencyAmount = (amount: number) => {
+    if (!amount || amount === 0) return getCurrencySymbol(defaultCurrency) + '0';
+    
+    const numPrice = Number(amount) || 0;
+    
+    // Format the number with proper separators
+    const formattedAmount = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: currencyDecimals,
+      maximumFractionDigits: currencyDecimals,
+    }).format(numPrice)
+      .replace(/,/g, 'TEMP_THOUSAND')
+      .replace(/\./g, decimalSeparator)
+      .replace(/TEMP_THOUSAND/g, thousandSeparator);
+    
+    // Get currency symbol
+    const currencySymbol = getCurrencySymbol(defaultCurrency);
+    
+    // Apply currency position
+    if (currencyPosition === 'after' || currencyPosition === 'right') {
+      return `${formattedAmount} ${currencySymbol}`;
+    } else {
+      return `${currencySymbol}${formattedAmount}`;
+    }
+  };
 
   // Fetch booking statistics (totals, revenue, status breakdown, upcoming)
   const { data: bookingStats, isLoading } = useQuery({
@@ -269,18 +305,24 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-3">
-      {/* Welcome Message */}
+      {/* Enhanced Welcome Message */}
       <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">
-          <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                {__('Welcome to Yatra Dashboard', 'Welcome to Yatra Dashboard')}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-300">
-                {__('Here\'s an overview of your travel booking business. Use the cards below to see key metrics, upcoming trips, and recent activity.', 'Here\'s an overview of your travel booking business. Use the cards below to see key metrics, upcoming trips, and recent activity.')}
-              </p>
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-3">
+              <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
+                  {__('Welcome to Yatra Dashboard', 'Welcome to Yatra Dashboard')}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {__('Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.', 'Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.')}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <Activity className="w-4 h-4" />
+              <span>{__('Live Data', 'Live Data')}</span>
             </div>
           </div>
         </CardContent>
@@ -311,7 +353,7 @@ const Dashboard: React.FC = () => {
         <div className="flex-1 min-w-0">
           <StatCard
             title={__('Booked Revenue', 'Booked Revenue')}
-            value={`$${(bookingStats?.total_revenue || 0).toLocaleString?.() || '0'}`}
+            value={formatCurrencyAmount(bookingStats?.total_revenue || 0)}
             icon={DollarSign}
             color="purple"
             loading={isLoading}
@@ -321,7 +363,7 @@ const Dashboard: React.FC = () => {
         <div className="flex-1 min-w-0">
           <StatCard
             title={__('Collected Revenue', 'Collected Revenue')}
-            value={`$${(bookingStats?.total_collected || 0).toLocaleString?.() || '0'}`}
+            value={formatCurrencyAmount(bookingStats?.total_collected || 0)}
             icon={DollarSign}
             color="green"
             loading={isLoading}
@@ -333,6 +375,26 @@ const Dashboard: React.FC = () => {
             title={__('Total Customers', 'Total Customers')}
             value={customersSummary?.total || 0}
             icon={Users}
+            color="orange"
+            loading={isLoading}
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <StatCard
+            title={__('Confirmed Bookings', 'Confirmed Bookings')}
+            value={(bookingStats as any)?.by_status?.confirmed?.count || 0}
+            icon={CheckCircle}
+            color="green"
+            loading={isLoading}
+          />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <StatCard
+            title={__('Pending Bookings', 'Pending Bookings')}
+            value={(bookingStats as any)?.by_status?.pending?.count || 0}
+            icon={Clock}
             color="orange"
             loading={isLoading}
           />
@@ -425,6 +487,71 @@ const Dashboard: React.FC = () => {
               }}
             />
           </ConditionalRender>
+
+          {/* Quick Actions */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                {__('Quick Actions', 'Quick Actions')}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <Button
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {
+                    const admin = (window as any)?.yatraAdmin;
+                    const baseUrl = admin?.siteUrl || '';
+                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=trips&action=add`;
+                  }}
+                >
+                  <MapPin className="w-5 h-5" />
+                  <span className="text-xs">{__('Add Trip', 'Add Trip')}</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {
+                    const admin = (window as any)?.yatraAdmin;
+                    const baseUrl = admin?.siteUrl || '';
+                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=bookings`;
+                  }}
+                >
+                  <Calendar className="w-5 h-5" />
+                  <span className="text-xs">{__('View Bookings', 'View Bookings')}</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {
+                    const admin = (window as any)?.yatraAdmin;
+                    const baseUrl = admin?.siteUrl || '';
+                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=customers`;
+                  }}
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="text-xs">{__('Customers', 'Customers')}</span>
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-center gap-2"
+                  onClick={() => {
+                    const admin = (window as any)?.yatraAdmin;
+                    const baseUrl = admin?.siteUrl || '';
+                    window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=reports`;
+                  }}
+                >
+                  <Activity className="w-5 h-5" />
+                  <span className="text-xs">{__('Reports', 'Reports')}</span>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column - Widgets (5 columns) */}

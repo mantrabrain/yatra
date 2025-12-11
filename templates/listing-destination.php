@@ -72,6 +72,17 @@ $paged_destinations = $total_items > 0 ? array_slice($destinations, $offset, $pe
 get_header();
 ?>
 
+<style>
+.yatra-destination-icon-wrapper svg {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 100%;
+    min-height: 100%;
+}
+</style>
+
 <div class="yatra-listing-page yatra-destination-listing">
     <div class="yatra-listing-wrapper">
         <div class="yatra-listing-container">
@@ -136,9 +147,10 @@ get_header();
                             $icon = maybe_unserialize($destination->icon);
 
                             if (is_array($icon)) {
-                                // Newer format: ['type' => 'image'|'icon', 'value' => attachment id, URL, or icon name]
-                                $type  = $icon['type']  ?? '';
-                                $value = $icon['value'] ?? '';
+                                // Handle both newer format ['type' => 'icon', 'value' => 'footprint'] 
+                                // and older format [0 => 'icon', 1 => 'footprint']
+                                $type  = $icon['type'] ?? $icon[0] ?? '';
+                                $value = $icon['value'] ?? $icon[1] ?? '';
 
                                 if ($type === 'image' && !empty($value)) {
                                     if (is_numeric($value)) {
@@ -151,7 +163,7 @@ get_header();
                                     }
                                 } elseif ($type === 'icon' && !empty($value) && is_string($value)) {
                                     // Store icon name so yatra_svg_icon() can render the same SVG
-                                    // icon as used in the React admin (e.g. 'camera').
+                                    // icon as used in the React admin (e.g. 'footprint').
                                     $icon_class = $value;
                                 } elseif (!empty($icon['url']) && filter_var($icon['url'], FILTER_VALIDATE_URL)) {
                                     // Legacy format: ['url' => 'https://...']
@@ -200,7 +212,7 @@ get_header();
                                 <?php if (!empty($image_url)) : ?>
                                     <img src="<?php echo esc_url($image_url); ?>" alt="<?php echo esc_attr($name); ?>">
                                 <?php elseif (!empty($icon_class)) : ?>
-                                    <div class="yatra-destination-icon-wrapper" aria-hidden="true">
+                                    <div class="yatra-destination-icon-wrapper" aria-hidden="true" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%); color: #4b5563;">
                                         <?php echo yatra_svg_icon($icon_class, 'yatra-destination-icon'); ?>
                                     </div>
                                 <?php else : ?>

@@ -215,6 +215,17 @@ class ActivityService extends BaseService
     }
 
     /**
+     * Get published activities along with aggregated stats such as
+     * trips_count derived from related trip records.
+     */
+    public function getPublishedWithStats(): array
+    {
+        // For now this simply delegates to a repository method that attaches
+        // trips_count using the yatra_trip_activities relation table.
+        return $this->repository->getPublishedWithTripCounts();
+    }
+
+    /**
      * Count items
      */
     public function count(array $args = []): int

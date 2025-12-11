@@ -115,6 +115,82 @@ class ActivityRepository extends BaseRepository
     }
 
     /**
+     * Get published activities with trip counts and stats
+     * Similar to destinations, this joins with trip_activities relation table
+     * to count how many trips are linked to each activity.
+     */
+    public function getPublishedWithTripCounts(): array
+    {
+        global $wpdb;
+
+        $actTable     = esc_sql($this->table);
+        $relTable     = esc_sql($wpdb->prefix . 'yatra_trip_activities');
+        $tripsTable   = esc_sql($wpdb->prefix . 'yatra_trips');
+        $reviewsTable = esc_sql($wpdb->prefix . 'yatra_reviews');
+
+        // COUNT(DISTINCT ta.trip_id) gives real number of trips per activity.
+        // avg_rating is computed from approved reviews across all those trips.
+        // starting_price is computed in PHP using both regular trip prices and
+        // traveler-based pricing from recurring availability rules.
+        $sql = "SELECT a.*, 
+                       COUNT(DISTINCT ta.trip_id) AS trips_count,
+                       COALESCE(AVG(r.rating), 0) AS avg_rating,
+                       GROUP_CONCAT(DISTINCT ta.trip_id) AS trip_ids
+                FROM `{$actTable}` a
+                LEFT JOIN `{$relTable}` ta
+                  ON ta.activity_id = a.id
+                LEFT JOIN `{$tripsTable}` t
+                  ON t.id = ta.trip_id
+                LEFT JOIN `{$reviewsTable}` r
+                  ON r.trip_id = t.id AND r.status = 'approved'
+                WHERE a.status = 'publish'
+                GROUP BY a.id";
+
+        $rows = $this->wpdb->get_results($sql) ?: [];
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        foreach ($rows as $row) {
+            $row->starting_price = $this->computeStartingPriceForTripIds($row->trip_ids ?? '');
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Compute starting price for given trip IDs
+     * This method calculates the lowest price from all trips associated with an activity
+     */
+    private function computeStartingPriceForTripIds(string $tripIds): float
+    {
+        if (empty($tripIds)) {
+            return 0.0;
+        }
+
+        global $wpdb;
+        $tripIdsArray = array_filter(array_map('intval', explode(',', $tripIds)));
+        
+        if (empty($tripIdsArray)) {
+            return 0.0;
+        }
+
+        $placeholders = implode(',', array_fill(0, count($tripIdsArray), '%d'));
+        $tripsTable = esc_sql($wpdb->prefix . 'yatra_trips');
+        
+        // Get the minimum original price from trips
+        $sql = "SELECT MIN(CAST(original_price AS DECIMAL(10,2))) as min_price 
+                FROM `{$tripsTable}` 
+                WHERE id IN ({$placeholders}) AND original_price > 0";
+        
+        $prepared = $this->wpdb->prepare($sql, $tripIdsArray);
+        $result = $this->wpdb->get_var($prepared);
+        
+        return $result ? (float) $result : 0.0;
+    }
+
+    /**
      * Get counts per status for admin views
      */
     public function getStatusCounts(): array
