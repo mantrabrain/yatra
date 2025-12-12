@@ -253,17 +253,13 @@ const Trips: React.FC = () => {
   const formatLabel = (value?: string | null) => {
     if (!value) return '';
     
-    // If it's a difficulty level ID, look it up in the difficulty levels data
+    // Only show difficulty if it's a numeric ID that exists in the difficulty levels data
     if (value && /^\d+$/.test(value) && difficultyLevels[value]) {
       return difficultyLevels[value];
     }
     
-    // Otherwise, just format the string
-    return value
-      .replace(/[-_]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
+    // Don't show anything for non-numeric or invalid values
+    return '';
   };
 
   const summarizeDestinations = (trip: Trip) => {
@@ -899,8 +895,12 @@ const Trips: React.FC = () => {
       sortable: false,
       visible: visibleColumns.difficulty,
       render: (trip: Trip) => {
-        if (!trip.difficulty_level) return null;
-        return <span className="text-sm text-gray-700 dark:text-gray-300">{formatLabel(trip.difficulty_level)}</span>;
+        // Only show difficulty if it's set and is a valid positive number
+        const difficultyValue = trip.difficulty_level;
+        if (!difficultyValue || difficultyValue === '0' || Number(difficultyValue) === 0) return null;
+        const difficultyText = formatLabel(String(difficultyValue));
+        if (!difficultyText) return null;
+        return <span className="text-sm text-gray-700 dark:text-gray-300">{difficultyText}</span>;
       },
     });
 

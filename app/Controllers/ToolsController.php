@@ -613,96 +613,126 @@ class ToolsController extends BaseController
      */
     private function getLogsByType(string $type, int $page, int $per_page): array
     {
-        // This is a simplified implementation
-        // In a real implementation, you would read from actual log files or database
+        $upload_dir = wp_upload_dir();
+        $log_dir = $upload_dir['basedir'] . '/yatra-logs';
         
-        $logs = [];
-        $total = 0;
-
-        switch ($type) {
-            case 'error':
-                $logs = $this->getErrorLogs($page, $per_page);
-                break;
-            case 'payment':
-                $logs = $this->getPaymentLogs($page, $per_page);
-                break;
-            case 'booking':
-                $logs = $this->getBookingLogs($page, $per_page);
-                break;
-            case 'system':
-                $logs = $this->getSystemLogs($page, $per_page);
-                break;
+        if (!is_dir($log_dir)) {
+            return ['logs' => [], 'total' => 0];
         }
-
+        
+        // Get all log files (sorted by date, newest first)
+        $log_files = glob($log_dir . '/yatra-*.log');
+        if (empty($log_files)) {
+            return ['logs' => [], 'total' => 0];
+        }
+        
+        // Sort by modification time, newest first
+        usort($log_files, function($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+        
+        // Read and parse log entries from all files
+        $all_logs = [];
+        foreach ($log_files as $log_file) {
+            $file_logs = $this->parseLogFile($log_file, $type);
+            $all_logs = array_merge($all_logs, $file_logs);
+        }
+        
+        // Sort by timestamp, newest first
+        usort($all_logs, function($a, $b) {
+            return strtotime($b['timestamp']) - strtotime($a['timestamp']);
+        });
+        
+        $total = count($all_logs);
+        
+        // Paginate
+        $offset = ($page - 1) * $per_page;
+        $logs = array_slice($all_logs, $offset, $per_page);
+        
         return [
             'logs' => $logs,
-            'total' => count($logs) // Simplified - in real implementation, get actual total
+            'total' => $total
         ];
     }
 
     /**
-     * Get error logs
+     * Parse log file and extract entries
      */
-    private function getErrorLogs(int $page, int $per_page): array
+    private function parseLogFile(string $file_path, string $type_filter = 'all'): array
     {
-        // Simplified implementation - read from WordPress error log or custom log
-        return [
-            [
-                'id' => 1,
-                'timestamp' => current_time('mysql'),
-                'level' => 'error',
-                'message' => 'Sample error log entry',
-                'context' => ['file' => 'example.php', 'line' => 123]
-            ]
-        ];
-    }
-
-    /**
-     * Get payment logs
-     */
-    private function getPaymentLogs(int $page, int $per_page): array
-    {
-        return [
-            [
-                'id' => 1,
-                'timestamp' => current_time('mysql'),
-                'level' => 'info',
-                'message' => 'Payment processed successfully',
-                'context' => ['booking_id' => 123, 'amount' => 500.00]
-            ]
-        ];
-    }
-
-    /**
-     * Get booking logs
-     */
-    private function getBookingLogs(int $page, int $per_page): array
-    {
-        return [
-            [
-                'id' => 1,
-                'timestamp' => current_time('mysql'),
-                'level' => 'info',
-                'message' => 'Booking created successfully',
-                'context' => ['booking_id' => 123, 'trip_id' => 456]
-            ]
-        ];
-    }
-
-    /**
-     * Get system logs
-     */
-    private function getSystemLogs(int $page, int $per_page): array
-    {
-        return [
-            [
-                'id' => 1,
-                'timestamp' => current_time('mysql'),
-                'level' => 'info',
-                'message' => 'System status check completed',
-                'context' => ['memory_usage' => '64MB']
-            ]
-        ];
+        if (!file_exists($file_path)) {
+            return [];
+        }
+        
+        $content = file_get_contents($file_path);
+        if (empty($content)) {
+            return [];
+        }
+        
+        $lines = explode(PHP_EOL, $content);
+        $logs = [];
+        $id = 0;
+        
+        foreach ($lines as $line) {
+            if (empty(trim($line))) {
+                continue;
+            }
+            
+            // Parse log entry: [timestamp] [level] message | Context: {...}
+            if (preg_match('/^\[(.*?)\]\s*\[(.*?)\]\s*(.*)$/', $line, $matches)) {
+                $timestamp = $matches[1];
+                $level = strtolower($matches[2]);
+                $rest = $matches[3];
+                
+                // Extract message and context
+                $message = $rest;
+                $context = [];
+                
+                if (strpos($rest, ' | Context: ') !== false) {
+                    list($message, $context_json) = explode(' | Context: ', $rest, 2);
+                    $context = json_decode($context_json, true) ?: [];
+                }
+                
+                // Filter by type
+                if ($type_filter !== 'all') {
+                    $should_include = false;
+                    
+                    switch ($type_filter) {
+                        case 'error':
+                            $should_include = in_array($level, ['error', 'critical', 'alert', 'emergency']);
+                            break;
+                        case 'payment':
+                            $should_include = stripos($message, 'payment') !== false || 
+                                            stripos($message, 'transaction') !== false ||
+                                            (isset($context['payment_id']) || isset($context['transaction_id']));
+                            break;
+                        case 'booking':
+                            $should_include = stripos($message, 'booking') !== false ||
+                                            isset($context['booking_id']);
+                            break;
+                        case 'system':
+                            $should_include = in_array($level, ['info', 'notice', 'debug']) &&
+                                            stripos($message, 'payment') === false &&
+                                            stripos($message, 'booking') === false;
+                            break;
+                    }
+                    
+                    if (!$should_include) {
+                        continue;
+                    }
+                }
+                
+                $logs[] = [
+                    'id' => ++$id,
+                    'timestamp' => $timestamp,
+                    'level' => $level,
+                    'message' => trim($message),
+                    'context' => $context
+                ];
+            }
+        }
+        
+        return $logs;
     }
 
     /**
@@ -710,8 +740,66 @@ class ToolsController extends BaseController
      */
     private function clearLogsByType(string $type): int
     {
-        // Simplified implementation - in real implementation, clear actual log files/database
-        return 0; // Return number of cleared entries
+        $upload_dir = wp_upload_dir();
+        $log_dir = $upload_dir['basedir'] . '/yatra-logs';
+        
+        if (!is_dir($log_dir)) {
+            return 0;
+        }
+        
+        $log_files = glob($log_dir . '/yatra-*.log');
+        if (empty($log_files)) {
+            return 0;
+        }
+        
+        $cleared_count = 0;
+        
+        if ($type === 'all') {
+            // Clear all log files
+            foreach ($log_files as $file) {
+                if (file_exists($file)) {
+                    $cleared_count += count(file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES));
+                    unlink($file);
+                }
+            }
+        } else {
+            // For specific types, we need to read, filter, and rewrite
+            foreach ($log_files as $file) {
+                if (!file_exists($file)) {
+                    continue;
+                }
+                
+                $all_logs = $this->parseLogFile($file, 'all');
+                $filtered_logs = $this->parseLogFile($file, $type);
+                
+                $cleared_count += count($filtered_logs);
+                
+                // Keep only logs that don't match the type
+                $remaining_logs = array_filter($all_logs, function($log) use ($filtered_logs) {
+                    foreach ($filtered_logs as $filtered) {
+                        if ($log['timestamp'] === $filtered['timestamp'] && 
+                            $log['message'] === $filtered['message']) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+                
+                // Rewrite the file with remaining logs
+                if (empty($remaining_logs)) {
+                    unlink($file);
+                } else {
+                    $content = '';
+                    foreach ($remaining_logs as $log) {
+                        $context_str = !empty($log['context']) ? ' | Context: ' . json_encode($log['context'], JSON_UNESCAPED_SLASHES) : '';
+                        $content .= "[{$log['timestamp']}] [{$log['level']}] {$log['message']}{$context_str}" . PHP_EOL;
+                    }
+                    file_put_contents($file, $content);
+                }
+            }
+        }
+        
+        return $cleared_count;
     }
 
     /**

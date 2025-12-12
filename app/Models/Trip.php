@@ -947,25 +947,23 @@ class Trip
         $difficulty_icon = '';
         
         // Always prioritize fetching from difficulty_levels table if we have a difficulty_level ID
-        if (!empty($this->difficulty_level)) {
+        // Check if difficulty_level is set and is a valid positive integer (not 0, null, or empty)
+        if (!empty($this->difficulty_level) && is_numeric($this->difficulty_level) && (int) $this->difficulty_level > 0) {
             global $wpdb;
             
-            // Check if it's a numeric ID
-            if (is_numeric($this->difficulty_level)) {
-                $difficulty_data = $wpdb->get_row($wpdb->prepare(
-                    "SELECT * FROM {$wpdb->prefix}yatra_difficulty_levels WHERE id = %d",
-                    (int) $this->difficulty_level
-                ));
-                
-                if ($difficulty_data) {
-                    $difficulty = $difficulty_data->name;
-                    if (!empty($difficulty_data->icon)) {
-                        $icon_data = maybe_unserialize($difficulty_data->icon);
-                        if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
-                            $difficulty_icon = $icon_data['value'];
-                        } elseif (is_string($difficulty_data->icon)) {
-                            $difficulty_icon = $difficulty_data->icon;
-                        }
+            $difficulty_data = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM {$wpdb->prefix}yatra_difficulty_levels WHERE id = %d",
+                (int) $this->difficulty_level
+            ));
+            
+            if ($difficulty_data) {
+                $difficulty = $difficulty_data->name;
+                if (!empty($difficulty_data->icon)) {
+                    $icon_data = maybe_unserialize($difficulty_data->icon);
+                    if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                        $difficulty_icon = $icon_data['value'];
+                    } elseif (is_string($difficulty_data->icon)) {
+                        $difficulty_icon = $difficulty_data->icon;
                     }
                 }
             }

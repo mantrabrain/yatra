@@ -345,64 +345,91 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 )}
 
                 {activeTab === 'upload' && allowImageUpload && (
-                  <div className="space-y-4">
-                    {/* WordPress Media Library Upload */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Upload Image', 'Upload Image')}
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={handleWordPressMediaSelect}
-                          className="w-full flex flex-col items-center gap-2 py-6"
-                        >
-                          <Upload className="w-8 h-8 text-gray-400" />
-                          <span className="text-sm text-gray-600 dark:text-gray-400">
-                            {__('Click to open WordPress Media Library', 'Click to open WordPress Media Library')}
-                          </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-500">
-                            {__('Select from library or upload new image', 'Select from library or upload new image')}
-                          </span>
-                        </Button>
+                  <div className="space-y-6 p-2">
+                    {/* Image Preview or Upload Area */}
+                    {imagePreview ? (
+                      <div className="space-y-4">
+                        <div className="relative group">
+                          <div className="relative overflow-hidden rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                            <img
+                              src={imagePreview}
+                              alt="Preview"
+                              className="w-full h-64 object-contain"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={handleWordPressMediaSelect}
+                                className="bg-white/90 hover:bg-white text-gray-900 border-white"
+                              >
+                                <Upload className="w-4 h-4 mr-2" />
+                                {__('Change Image', 'Change Image')}
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleRemoveImage}
+                                className="bg-red-500/90 hover:bg-red-600"
+                              >
+                                <X className="w-4 h-4 mr-2" />
+                                {__('Remove', 'Remove')}
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {/* WordPress Media Library Upload */}
+                        <div
+                          onClick={handleWordPressMediaSelect}
+                          className="group cursor-pointer border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-500 rounded-xl p-12 text-center transition-all duration-200 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
+                        >
+                          <div className="flex flex-col items-center gap-4">
+                            <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Upload className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div className="space-y-2">
+                              <p className="text-base font-semibold text-gray-900 dark:text-white">
+                                {__('Upload Image', 'Upload Image')}
+                              </p>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {__('Click to open WordPress Media Library', 'Click to open WordPress Media Library')}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-500">
+                                {__('Select from library or upload new image', 'Select from library or upload new image')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
 
-                    {/* Image URL Input (Fallback) */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Or Enter Image URL', 'Or Enter Image URL')}
-                      </label>
-                      <Input
-                        type="url"
-                        placeholder={__('https://example.com/image.png', 'https://example.com/image.png')}
-                        value={value?.type === 'image' ? value.value : ''}
-                        onChange={(e) => handleImageUrlChange(e.target.value)}
-                      />
-                    </div>
+                        {/* Divider */}
+                        <div className="relative">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                          </div>
+                          <div className="relative flex justify-center text-xs uppercase">
+                            <span className="bg-white dark:bg-gray-900 px-3 text-gray-500 dark:text-gray-400">
+                              {__('Or', 'Or')}
+                            </span>
+                          </div>
+                        </div>
 
-                    {/* Image Preview */}
-                    {imagePreview && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('Preview', 'Preview')}
-                        </label>
-                        <div className="relative inline-block">
-                          <img
-                            src={imagePreview}
-                            alt="Preview"
-                            className="max-w-full max-h-48 rounded-lg border border-gray-300 dark:border-gray-600"
+                        {/* Image URL Input */}
+                        <div className="space-y-3">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {__('Enter Image URL', 'Enter Image URL')}
+                          </label>
+                          <Input
+                            type="url"
+                            placeholder={__('https://example.com/image.png', 'https://example.com/image.png')}
+                            value={value?.type === 'image' ? value.value : ''}
+                            onChange={(e) => handleImageUrlChange(e.target.value)}
+                            className="h-11"
                           />
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            onClick={handleRemoveImage}
-                            className="absolute top-2 right-2 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
                         </div>
                       </div>
                     )}
