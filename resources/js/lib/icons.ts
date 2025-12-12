@@ -97,7 +97,7 @@ let iconsCache: Record<string, IconData> | null = null;
  * Load icons from the centralized JSON file
  */
 export async function loadIcons(): Promise<Record<string, IconData>> {
-  if (iconsCache) {
+  if (iconsCache !== null) {
     return iconsCache;
   }
 
@@ -110,7 +110,7 @@ export async function loadIcons(): Promise<Record<string, IconData>> {
     
     const loadedIcons = await response.json();
     iconsCache = loadedIcons || {};
-    return iconsCache;
+    return iconsCache as Record<string, IconData>;
   } catch (error) {
     console.warn('Failed to load centralized icons, using fallback:', error);
     iconsCache = {};

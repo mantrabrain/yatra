@@ -12,6 +12,9 @@ use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Repositories\ItemTypeRepository;
 use Yatra\Repositories\ItemRepository;
 use Yatra\Models\Trip;
+use Yatra\Validators\TripValidator;
+use Yatra\Exceptions\TripNotFoundException;
+use Yatra\Exceptions\ValidationException;
 
 /**
  * Trip REST API Controller
@@ -427,15 +430,20 @@ class TripController extends BaseController
     {
         try {
             $id = (int) $request->get_param('id');
+            
+            if ($id <= 0) {
+                throw new ValidationException('Invalid trip ID', ['id' => ['Trip ID must be a positive integer']]);
+            }
+            
             $item = $this->service->getWithRelations($id);
 
             if (!$item) {
-                return $this->error_response('Trip not found', 404);
+                throw new TripNotFoundException($id);
             }
 
             return $this->success_response($this->prepare_item_for_response($item, $request));
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return $this->handle_exception($e);
         }
     }
 
@@ -447,9 +455,9 @@ class TripController extends BaseController
         try {
             $data = $request->get_json_params();
             
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra TripController create_item: difficulty_level=" . ($data['difficulty_level'] ?? 'NOT SET'));
-            }
+            // Validate and sanitize input data
+            TripValidator::validateCreate($data);
+            $data = TripValidator::sanitize($data);
             
             // Extract relationships (fields stored in separate tables)
             $relationships = [
@@ -483,10 +491,8 @@ class TripController extends BaseController
                 'id' => $id,
                 'message' => __('Trip created successfully', 'yatra'),
             ], 201);
-        } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return $this->handle_exception($e);
         }
     }
 

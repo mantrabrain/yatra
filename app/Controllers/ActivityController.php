@@ -8,6 +8,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\ActivityService;
+use Yatra\Validators\ActivityValidator;
+use Yatra\Exceptions\ValidationException;
+use Yatra\Utils\Logger;
 
 /**
  * Activity REST API Controller
@@ -93,6 +96,8 @@ class ActivityController extends BaseController
     {
         try {
             $params = $this->getPaginationParams($request);
+            
+            Logger::apiRequest('/activities', 'GET', $params);
 
             $args = [
                 'limit' => $params['per_page'],
@@ -140,9 +145,12 @@ class ActivityController extends BaseController
 
             $prepared = array_map([$this, 'prepareActivity'], $items);
 
+            Logger::info("Activities retrieved successfully", ['count' => count($prepared), 'total' => $total]);
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
+            
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            Logger::error("Failed to get activities", ['error' => $e->getMessage(), 'params' => $params ?? []]);
+            return $this->handle_exception($e);
         }
     }
 
@@ -152,9 +160,18 @@ class ActivityController extends BaseController
     public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $item = $this->service->getById($this->getId($request));
+            $id = $this->getId($request);
+            
+            if ($id <= 0) {
+                throw new ValidationException('Invalid activity ID', ['id' => ['Activity ID must be a positive integer']]);
+            }
+
+            Logger::apiRequest("/activities/{$id}", 'GET');
+            
+            $item = $this->service->getById($id);
 
             if (!$item) {
+                Logger::warning("Activity not found", ['activity_id' => $id]);
                 return $this->not_found(__('Activity not found', 'yatra'));
             }
 
@@ -175,9 +192,12 @@ class ActivityController extends BaseController
                 $item->trip_count = $tripCount;
             }
 
+            Logger::info("Activity retrieved successfully", ['activity_id' => $id]);
             return $this->success_response($this->prepareActivity($item));
+            
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            Logger::error("Failed to get activity", ['activity_id' => $id ?? 0, 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
     }
 
@@ -187,16 +207,25 @@ class ActivityController extends BaseController
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = $this->service->create($this->getBody($request));
+            $data = $this->getBody($request);
+            
+            // Validate and sanitize input data
+            ActivityValidator::validateCreate($data);
+            $data = ActivityValidator::sanitize($data);
+            
+            Logger::apiRequest('/activities', 'POST', $data);
+            
+            $id = $this->service->create($data);
 
+            Logger::info("Activity created successfully", ['activity_id' => $id]);
             return $this->success_response([
                 'id' => $id,
                 'message' => __('Activity created successfully', 'yatra'),
             ], 201);
-        } catch (\InvalidArgumentException $e) {
-            return $this->validation_error($e->getMessage());
+            
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            Logger::error("Failed to create activity", ['data' => $data ?? [], 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
     }
 

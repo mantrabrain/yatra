@@ -50,6 +50,9 @@ class AppServiceProvider extends ServiceProvider
         
         // Register scheduled payment processing
         \Yatra\Services\ScheduledPaymentService::register();
+        
+        // Register export/import background job handlers
+        \Yatra\Services\ExportImportService::register();
 
         // Register departure status update cron job
         add_action('init', function() {

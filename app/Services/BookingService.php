@@ -11,6 +11,9 @@ use Yatra\Repositories\CustomerRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
+use Yatra\Validators\BookingValidator;
+use Yatra\Utils\Logger;
+use Yatra\Services\CacheService;
 
 /**
  * Booking Service
@@ -98,105 +101,228 @@ class BookingService
     }
 
     /**
-     * Create a new booking
+     * Validate booking business rules
+     */
+    private function validateBookingBusinessRules(array $data): array
+    {
+        // Check minimum travelers count
+        $travelersCount = (int) ($data['travelers_count'] ?? 0);
+        if ($travelersCount <= 0) {
+            return [
+                'success' => false,
+                'message' => __('At least one traveler is required for booking.', 'yatra')
+            ];
+        }
+
+        // Check trip capacity if specified
+        if (!empty($data['trip_id'])) {
+            $trip = $this->tripRepository->find((int) $data['trip_id']);
+            if ($trip && !empty($trip->max_travelers)) {
+                $maxCapacity = (int) $trip->max_travelers;
+                if ($travelersCount > $maxCapacity) {
+                    return [
+                        'success' => false,
+                        'message' => sprintf(
+                            __('Maximum %d travelers allowed for this trip.', 'yatra'),
+                            $maxCapacity
+                        )
+                    ];
+                }
+            }
+        }
+
+        // Check booking date is in the future
+        if (!empty($data['start_date'])) {
+            $startDate = strtotime($data['start_date']);
+            $today = strtotime('today');
+            
+            if ($startDate < $today) {
+                return [
+                    'success' => false,
+                    'message' => __('Booking date must be in the future.', 'yatra')
+                ];
+            }
+        }
+
+        // Check total amount is positive
+        $totalAmount = (float) ($data['total_amount'] ?? 0);
+        if ($totalAmount <= 0) {
+            return [
+                'success' => false,
+                'message' => __('Total amount must be greater than zero.', 'yatra')
+            ];
+        }
+
+        // Check payment amount doesn't exceed total
+        $amountPaid = (float) ($data['amount_paid'] ?? 0);
+        if ($amountPaid > $totalAmount) {
+            return [
+                'success' => false,
+                'message' => __('Payment amount cannot exceed total booking amount.', 'yatra')
+            ];
+        }
+
+        return ['success' => true];
+    }
+
+    /**
+     * Create a new booking with comprehensive validation and business rules
      * 
      * @param array $data Booking data
      * @return array {success: bool, booking_id?: int, reference?: string, message?: string}
      */
     public function createBooking(array $data): array
     {
-        // Validate trip exists and is available
-        $trip = $this->tripRepository->find((int) $data['trip_id']);
-        if (!$trip) {
-            return ['success' => false, 'message' => __('Trip not found.', 'yatra')];
-        }
-
-        if ($trip->status !== 'published') {
-            return ['success' => false, 'message' => __('Trip is not available for booking.', 'yatra')];
-        }
-
-        // Calculate start_date and end_date if travel_date is provided
-        if (!empty($data['travel_date']) && empty($data['start_date'])) {
-            $data['start_date'] = $data['travel_date'];
-        }
+        $startTime = microtime(true);
         
-        if (!empty($data['start_date']) && empty($data['end_date'])) {
-            $data['end_date'] = $this->calculateEndDate($data['start_date'], (int) $data['trip_id']);
-        }
-
-        // Generate unique reference
-        $data['reference'] = $this->bookingRepository->generateReference();
-
-        // Find or create customer
-        if (!empty($data['contact_email'])) {
-            $customerId = $this->customerRepository->findOrCreate([
-                'email' => $data['contact_email'],
-                'first_name' => $data['contact_first_name'] ?? '',
-                'last_name' => $data['contact_last_name'] ?? '',
-                'phone' => $data['contact_phone'] ?? '',
-                'country' => $data['contact_country'] ?? '',
-                'user_id' => $data['user_id'] ?? null,
+        try {
+            Logger::info("Booking creation started", [
+                'data_keys' => array_keys($data),
+                'trip_id' => $data['trip_id'] ?? null
             ]);
-            $data['customer_id'] = $customerId;
-        }
-
-        // Calculate amounts
-        $data['amount_due'] = (float) ($data['total_amount'] ?? 0) - (float) ($data['amount_paid'] ?? 0);
-
-        // Create booking
-        $bookingId = $this->bookingRepository->create($data);
-
-        if (!$bookingId) {
-            return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
-        }
-
-        // Link booking to departure if start_date is provided
-        if (!empty($data['start_date']) && !empty($data['end_date'])) {
-            try {
-                $trip = $this->tripRepository->find((int) $data['trip_id']);
-                // Get max capacity from trip's max_travelers, or use default
-                $maxCapacity = null;
-                if ($trip && !empty($trip->max_travelers)) {
-                    $maxCapacity = (int) $trip->max_travelers;
-                }
-                $travelersCount = (int) ($data['travelers_count'] ?? 0);
-
-                // Find or create departure
-                $departure = $this->departureService->findOrCreateForBooking(
-                    (int) $data['trip_id'],
-                    $data['start_date'],
-                    $data['end_date'],
-                    $travelersCount,
-                    $maxCapacity
-                );
-
-                // Link booking to departure
-                $this->departureService->linkBookingToDeparture($bookingId, $departure->id);
-
-                // Increment booked count
-                $this->departureService->incrementBookedCount($departure->id, $travelersCount);
-
-                error_log("Yatra: Linked booking {$bookingId} to departure {$departure->id}");
-            } catch (\Exception $e) {
-                // Log error but don't fail the booking
-                error_log('Yatra: Failed to link booking to departure: ' . $e->getMessage());
+            
+            // Comprehensive validation using BookingValidator
+            BookingValidator::validateCreate($data);
+            $data = BookingValidator::sanitize($data);
+            
+            // Business rule validations
+            $validationResult = $this->validateBookingBusinessRules($data);
+            if (!$validationResult['success']) {
+                Logger::warning("Booking business rule validation failed", [
+                    'trip_id' => $data['trip_id'],
+                    'reason' => $validationResult['message']
+                ]);
+                return $validationResult;
             }
+            
+            // Validate trip exists and is available
+            $trip = $this->tripRepository->find((int) $data['trip_id']);
+            if (!$trip) {
+                Logger::error("Trip not found for booking", ['trip_id' => $data['trip_id']]);
+                return ['success' => false, 'message' => __('Trip not found.', 'yatra')];
+            }
+
+            if ($trip->status !== 'published') {
+                Logger::warning("Trip not available for booking", [
+                    'trip_id' => $data['trip_id'],
+                    'status' => $trip->status
+                ]);
+                return ['success' => false, 'message' => __('Trip is not available for booking.', 'yatra')];
+            }
+
+            // Calculate start_date and end_date if travel_date is provided
+            if (!empty($data['travel_date']) && empty($data['start_date'])) {
+                $data['start_date'] = $data['travel_date'];
+            }
+            
+            if (!empty($data['start_date']) && empty($data['end_date'])) {
+                $data['end_date'] = $this->calculateEndDate($data['start_date'], (int) $data['trip_id']);
+            }
+
+            // Generate unique reference
+            $data['reference'] = $this->bookingRepository->generateReference();
+
+            // Find or create customer
+            if (!empty($data['contact_email'])) {
+                $customerId = $this->customerRepository->findOrCreate([
+                    'email' => $data['contact_email'],
+                    'first_name' => $data['contact_first_name'] ?? '',
+                    'last_name' => $data['contact_last_name'] ?? '',
+                    'phone' => $data['contact_phone'] ?? '',
+                    'country' => $data['contact_country'] ?? '',
+                    'user_id' => $data['user_id'] ?? null,
+                ]);
+                $data['customer_id'] = $customerId;
+            }
+
+            // Calculate amounts
+            $data['amount_due'] = (float) ($data['total_amount'] ?? 0) - (float) ($data['amount_paid'] ?? 0);
+
+            // Create booking
+            $bookingId = $this->bookingRepository->create($data);
+
+            if (!$bookingId) {
+                Logger::error("Failed to create booking in database", ['data' => $data]);
+                return ['success' => false, 'message' => __('Failed to create booking.', 'yatra')];
+            }
+
+            // Link booking to departure if start_date is provided
+            if (!empty($data['start_date']) && !empty($data['end_date'])) {
+                try {
+                    $trip = $this->tripRepository->find((int) $data['trip_id']);
+                    // Get max capacity from trip's max_travelers, or use default
+                    $maxCapacity = null;
+                    if ($trip && !empty($trip->max_travelers)) {
+                        $maxCapacity = (int) $trip->max_travelers;
+                    }
+                    $travelersCount = (int) ($data['travelers_count'] ?? 0);
+
+                    // Find or create departure
+                    $departure = $this->departureService->findOrCreateForBooking(
+                        (int) $data['trip_id'],
+                        $data['start_date'],
+                        $data['end_date'],
+                        $travelersCount,
+                        $maxCapacity
+                    );
+
+                    // Link booking to departure
+                    $this->departureService->linkBookingToDeparture($bookingId, $departure->id);
+
+                    // Increment booked count
+                    $this->departureService->incrementBookedCount($departure->id, $travelersCount);
+
+                    Logger::info("Booking linked to departure", [
+                        'booking_id' => $bookingId,
+                        'departure_id' => $departure->id
+                    ]);
+                } catch (\Exception $e) {
+                    // Log error but don't fail the booking
+                    Logger::warning("Failed to link booking to departure", [
+                        'booking_id' => $bookingId,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+
+            // Save travelers
+            if (!empty($data['travelers']) && is_array($data['travelers'])) {
+                $this->saveTravelers($bookingId, $data['travelers']);
+            }
+
+            // Send confirmation email if needed
+            $this->sendBookingConfirmationEmail($bookingId);
+            
+            // Clear related caches
+            CacheService::invalidateEntity('booking', $bookingId);
+            
+            $executionTime = microtime(true) - $startTime;
+            Logger::info("Booking created successfully", [
+                'booking_id' => $bookingId,
+                'reference' => $data['reference'],
+                'execution_time' => $executionTime
+            ]);
+
+            return [
+                'success' => true,
+                'booking_id' => $bookingId,
+                'reference' => $data['reference'],
+                'message' => __('Booking created successfully.', 'yatra'),
+            ];
+            
+        } catch (\Exception $e) {
+            $executionTime = microtime(true) - $startTime;
+            Logger::error("Booking creation failed", [
+                'trip_id' => $data['trip_id'] ?? null,
+                'execution_time' => $executionTime,
+                'error' => $e->getMessage()
+            ]);
+            
+            return [
+                'success' => false,
+                'message' => $e->getMessage()
+            ];
         }
-
-        // Save travelers
-        if (!empty($data['travelers']) && is_array($data['travelers'])) {
-            $this->saveTravelers($bookingId, $data['travelers']);
-        }
-
-        // Send confirmation email if needed
-        $this->sendBookingConfirmationEmail($bookingId);
-
-        return [
-            'success' => true,
-            'booking_id' => $bookingId,
-            'reference' => $data['reference'],
-            'message' => __('Booking created successfully.', 'yatra'),
-        ];
     }
 
     /**

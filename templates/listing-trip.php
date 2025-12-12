@@ -77,8 +77,8 @@ function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field'
     return [];
 }
 
-// DEBUG: Check raw $_GET data
-if (current_user_can('manage_options')) {
+// DEBUG: Check raw $_GET data (only in debug mode)
+if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
     error_log('YATRA DEBUG - Raw $_GET data: ' . print_r($_GET, true));
     error_log('YATRA DEBUG - Raw difficulty param: ' . print_r($_GET['difficulty'] ?? 'NOT SET', true));
 }
@@ -103,8 +103,8 @@ $active_filters = [
     'age_suitability'    => yatra_get_filter_array('age_suitability', 'sanitize_text_field'),
 ];
 
-// DEBUG: Check processed active filters
-if (current_user_can('manage_options')) {
+// DEBUG: Check processed active filters (only in debug mode)
+if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
     error_log('YATRA DEBUG - Processed active_filters difficulty: ' . print_r($active_filters['difficulty'], true));
 }
 
@@ -117,14 +117,17 @@ wp_enqueue_script(
     true
 );
 
-// Add currency formatting function to JavaScript
-wp_add_inline_script('yatra-listing-filters', '
+// Add currency formatting function to JavaScript with proper escaping
+$contact_for_pricing = esc_js(__('Contact for pricing', 'yatra'));
+wp_add_inline_script('yatra-listing-filters', "
     window.yatra_format_price = function(amount) {
-        if (!amount || amount == 0) return "' . __('Contact for pricing', 'yatra') . '";
-        // Simple formatting - you can enhance this based on your currency settings
-        return "$" + amount.toLocaleString();
+        if (!amount || amount == 0) return '{$contact_for_pricing}';
+        // Use global currency settings if available
+        const currency = window.yatraSettings?.currency || 'USD';
+        const symbol = window.yatraSettings?.currencySymbol || '$';
+        return symbol + amount.toLocaleString();
     };
-');
+");
 
 if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
     $trips_source      = $yatra_trip_list['trips'];

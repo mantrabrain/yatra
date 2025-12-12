@@ -9,8 +9,9 @@ import { useQuery } from '@tanstack/react-query';
 import { __ } from '../lib/i18n';
 import { apiClient } from '../lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
+// Button and Badge available for future use
+// import { Button } from '../components/ui/button';
+// import { Badge } from '../components/ui/badge';
 import BookingsOverviewChart from '../components/charts/BookingsOverviewChart';
 import BookingStatusChart from '../components/charts/BookingStatusChart';
 import { getCurrencySymbol } from '../data/currencies';
@@ -352,9 +353,11 @@ const DetailedBreakdownTable: React.FC<{
     // Base values from API data - NO FALLBACKS, use real data only
     const baseBookings = reportData?.booking_stats?.totalBookings || 0;
     const baseRevenue = reportData?.revenue_stats?.totalRevenue || 0;
-    const baseConfirmed = reportData?.booking_stats?.confirmedBookings || 0;
-    const basePending = reportData?.booking_stats?.pendingBookings || 0;
-    const baseCancelled = reportData?.booking_stats?.cancelledBookings || 0;
+    // These are available for more granular breakdown if needed
+    const _baseConfirmed = reportData?.booking_stats?.confirmedBookings || 0;
+    const _basePending = reportData?.booking_stats?.pendingBookings || 0;
+    const _baseCancelled = reportData?.booking_stats?.cancelledBookings || 0;
+    void _baseConfirmed; void _basePending; void _baseCancelled; // Suppress unused warnings
     const baseDepartures = reportData?.departure_stats?.totalDepartures || 0;
     const baseCapacity = reportData?.departure_stats?.totalCapacity || 0;
     const baseOccupancy = reportData?.operational_stats?.occupancyRate || 0;
@@ -879,7 +882,7 @@ const DetailedBreakdownTable: React.FC<{
           <div>
             <p className="text-sm text-gray-600 dark:text-gray-400">{__('Avg Occupancy', 'Avg Occupancy')}</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
-              {(breakdownData.reduce((sum, row) => sum + row.occupancy, 0) / breakdownData.length).toFixed(1)}%
+              {(breakdownData.reduce((sum, row) => sum + row.occupancyRate, 0) / breakdownData.length).toFixed(1)}%
             </p>
           </div>
         </div>

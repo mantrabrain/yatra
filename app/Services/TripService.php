@@ -7,6 +7,9 @@ namespace Yatra\Services;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Models\Trip;
+use Yatra\Services\CacheService;
+use Yatra\Utils\Cache;
+use Yatra\Utils\Logger;
 
 /**
  * Trip Service
@@ -46,6 +49,116 @@ class TripService extends BaseService
     protected function getRepository(): TripRepository
     {
         return $this->repository;
+    }
+
+    /**
+     * Get trip by ID with caching
+     */
+    public function getById(int $id): ?\stdClass
+    {
+        // Try cache first
+        $cached = CacheService::getCachedTrip($id);
+        if ($cached !== null) {
+            Logger::debug("Trip loaded from cache", ['trip_id' => $id]);
+            return $cached;
+        }
+
+        // Load from database
+        $trip = $this->repository->find($id);
+        
+        if ($trip) {
+            // Cache the result
+            CacheService::cacheTrip($id, $trip);
+            Logger::debug("Trip loaded from database and cached", ['trip_id' => $id]);
+        }
+
+        return $trip;
+    }
+
+    /**
+     * Get trip with relationships and caching (enhanced version)
+     */
+    public function getWithRelationsCached(int $id): ?\stdClass
+    {
+        $cacheKey = "trip_with_relations_{$id}";
+        
+        return Cache::remember($cacheKey, function() use ($id) {
+            $trip = $this->repository->find($id);
+            
+            if ($trip) {
+                // Load relationships
+                $this->repository->loadTripRelationships($trip);
+                Logger::debug("Trip with relationships loaded", ['trip_id' => $id]);
+            }
+            
+            return $trip;
+        }, Cache::DURATION_TRIP_DATA);
+    }
+
+    /**
+     * Create trip with caching
+     */
+    public function create(array $data): int
+    {
+        // Validate data
+        $this->validate($data);
+        $this->validatePricing($data);
+        $this->validateDuration($data);
+
+        // Process data
+        $processedData = $this->processBeforeCreate($data);
+
+        // Create trip
+        $id = $this->repository->create($processedData);
+
+        // Clear related caches
+        Cache::clearByPrefix(Cache::PREFIX_QUERY_RESULT);
+        Cache::clearByPrefix(Cache::PREFIX_STATS);
+
+        Logger::info("Trip created", ['trip_id' => $id]);
+        return $id;
+    }
+
+    /**
+     * Update trip with cache invalidation
+     */
+    public function update(int $id, array $data): bool
+    {
+        // Validate data
+        $this->validate($data, $id);
+        if (isset($data['pricing_type']) || isset($data['original_price']) || isset($data['price_types'])) {
+            $this->validatePricing($data);
+        }
+        if (isset($data['trip_type']) || isset($data['duration_days']) || isset($data['duration_nights'])) {
+            $this->validateDuration($data);
+        }
+
+        // Update trip
+        $result = $this->repository->update($id, $data);
+
+        if ($result) {
+            // Invalidate caches
+            CacheService::invalidateEntity('trip', $id);
+            Logger::info("Trip updated and cache invalidated", ['trip_id' => $id]);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Delete trip with cache invalidation
+     */
+    public function delete(int $id): bool
+    {
+        $result = $this->repository->delete($id);
+
+        if ($result) {
+            // Invalidate caches
+            CacheService::invalidateEntity('trip', $id);
+            Logger::info("Trip deleted and cache invalidated", ['trip_id' => $id]);
+        }
+
+        return $result;
     }
 
     /**

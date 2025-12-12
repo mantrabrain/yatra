@@ -7,6 +7,8 @@ namespace Yatra\Services;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\DestinationRepository;
 use Yatra\Repositories\ActivityRepository;
+use Yatra\Utils\Cache;
+use Yatra\Utils\Logger;
 
 /**
  * Trip Listing Service
@@ -32,13 +34,15 @@ class TripListingService
     }
 
     /**
-     * Get filtered and paginated trip listings with metadata
+     * Get filtered and paginated trip listings with metadata and caching
      *
      * @param array $requestParams Raw request parameters
      * @return array Formatted trip listing data
      */
     public function getFilteredTrips(array $requestParams = []): array
     {
+        $startTime = microtime(true);
+        
         // Sanitize and validate input parameters
         $filters = $this->sanitizeFilters($requestParams);
         
@@ -46,22 +50,44 @@ class TripListingService
         $page = max(1, (int) ($requestParams['page'] ?? 1));
         $perPage = max(1, min(50, (int) ($requestParams['per_page'] ?? 9))); // Cap at 50 for performance
         
-        // Get filtered trips from repository
-        $result = $this->tripRepository->findWithFilters($filters, $page, $perPage);
+        // Create cache key for this specific request
+        $cacheKey = $this->generateCacheKey($filters, $page, $perPage);
         
-        // Get filter options for UI
-        $filterOptions = $this->getFilterOptions();
-        
-        return [
-            'trips' => $result['trips'],
-            'total' => $result['total'],
-            'pages' => $result['pages'],
-            'page' => $result['page'],
-            'per_page' => $result['per_page'],
+        Logger::debug("Trip listing request started", [
             'filters' => $filters,
-            'destinations' => $filterOptions['destinations'],
-            'activities' => $filterOptions['activities']
-        ];
+            'page' => $page,
+            'per_page' => $perPage,
+            'cache_key' => substr($cacheKey, 0, 50) . '...'
+        ]);
+        
+        // Try to get cached result
+        $result = Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
+            // Get filtered trips from repository
+            $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
+            
+            // Get filter options for UI (cached separately)
+            $filterOptions = $this->getFilterOptions();
+            
+            return [
+                'trips' => $tripResult['trips'],
+                'total' => $tripResult['total'],
+                'pages' => $tripResult['pages'],
+                'page' => $tripResult['page'],
+                'per_page' => $tripResult['per_page'],
+                'filters' => $filters,
+                'destinations' => $filterOptions['destinations'],
+                'activities' => $filterOptions['activities']
+            ];
+        }, Cache::DURATION_QUERY_RESULT);
+        
+        $executionTime = microtime(true) - $startTime;
+        Logger::debug("Trip listing request completed", [
+            'execution_time' => $executionTime,
+            'total_trips' => $result['total'],
+            'returned_trips' => count($result['trips'])
+        ]);
+        
+        return $result;
     }
 
     /**
@@ -131,28 +157,67 @@ class TripListingService
     }
 
     /**
-     * Get available filter options for UI dropdowns
+     * Generate cache key for trip listing request
+     */
+    private function generateCacheKey(array $filters, int $page, int $perPage): string
+    {
+        $keyData = [
+            'filters' => $filters,
+            'page' => $page,
+            'per_page' => $perPage
+        ];
+        
+        return 'trip_listing_' . md5(serialize($keyData));
+    }
+
+    /**
+     * Get available filter options for the UI with caching
      *
      * @return array Filter options
      */
     private function getFilterOptions(): array
     {
-        global $wpdb;
+        return Cache::remember('trip_listing_filter_options', function() {
+            return [
+                'destinations' => $this->destinationRepository->getPublished(),
+                'activities' => $this->activityRepository->getPublished()
+            ];
+        }, Cache::DURATION_DESTINATION_DATA); // Cache for 1 hour since destinations/activities don't change often
+    }
 
-        // Get published destinations
-        $destinations = $wpdb->get_results(
-            "SELECT name, slug FROM {$wpdb->prefix}yatra_destinations WHERE status = 'publish' ORDER BY name ASC"
-        ) ?: [];
+    /**
+     * Get trip statistics for analytics
+     */
+    public function getTripStatistics(): array
+    {
+        return Cache::remember('trip_listing_statistics', function() {
+            $startTime = microtime(true);
+            
+            $stats = [
+                'total_published_trips' => $this->tripRepository->count(['status' => 'publish']),
+                'total_destinations' => $this->destinationRepository->count(['status' => 'publish']),
+                'total_activities' => $this->activityRepository->count(['status' => 'publish']),
+                'price_range' => $this->tripRepository->getPriceRange(),
+                'duration_range' => $this->tripRepository->getDurationRange()
+            ];
+            
+            $executionTime = microtime(true) - $startTime;
+            Logger::debug("Trip statistics calculated", [
+                'execution_time' => $executionTime,
+                'stats' => $stats
+            ]);
+            
+            return $stats;
+        }, Cache::DURATION_STATS);
+    }
 
-        // Get published activities
-        $activities = $wpdb->get_results(
-            "SELECT name, slug FROM {$wpdb->prefix}yatra_activities WHERE status = 'publish' ORDER BY name ASC"
-        ) ?: [];
-
-        return [
-            'destinations' => $destinations,
-            'activities' => $activities
-        ];
+    /**
+     * Clear trip listing caches
+     */
+    public function clearCache(): void
+    {
+        Cache::clearByPrefix('trip_listing_');
+        Logger::info("Trip listing caches cleared");
     }
 
     /**

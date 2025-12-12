@@ -421,6 +421,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </Button>
                 </ConditionalRender>
                 <ConditionalRender capability="yatra_edit_trips">
+                  <Button
+                    variant={currentSubpage === 'tools' ? 'default' : 'outline'}
+                    onClick={() => {
+                      const admin = (window as any)?.yatraAdmin;
+                      const baseUrl = admin?.adminUrl || '';
+                      window.location.href = `${baseUrl}?page=yatra&subpage=tools`;
+                    }}
+                    className={`flex items-center gap-2 ${
+                      currentSubpage === 'tools' 
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
+                        : ''
+                    }`}
+                  >
+                    <Settings className="w-4 h-4" />
+                    {__('Tools', 'Tools')}
+                  </Button>
+                </ConditionalRender>
+                <ConditionalRender capability="yatra_edit_trips">
                   <div className="relative">
                     <button
                       onClick={() => setIsModulesPanelOpen(prev => !prev)}
@@ -562,7 +580,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
           {/* Page Content */}
           <main className={`flex-1 ${isTripFormPage ? 'p-0 h-full min-h-0' : 'p-6 overflow-y-auto'}`}>
-            {children}
+            <div className={currentSubpage === 'tools' ? '' : 'space-y-6'}>
+              {children}
+            </div>
           </main>
         </div>
       </div>

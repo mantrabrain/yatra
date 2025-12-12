@@ -8,6 +8,9 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\CustomerService;
+use Yatra\Validators\CustomerValidator;
+use Yatra\Exceptions\ValidationException;
+use Yatra\Utils\Logger;
 
 /**
  * Customer REST API Controller
@@ -196,27 +199,41 @@ class CustomerController extends BaseController
     /**
      * PUT /customers/me - Update current customer profile
      */
-    public function updateMe(WP_REST_Request $request): WP_REST_Response
+    public function updateMe(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $userId = get_current_user_id();
-        $data = $request->get_json_params();
+        try {
+            $userId = get_current_user_id();
+            $data = $request->get_json_params();
 
-        $customer = $this->customerService->getCustomerByUserId($userId);
+            Logger::apiRequest('/customers/me', 'PUT', $data);
 
-        if (!$customer) {
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => __('Customer profile not found.', 'yatra'),
-            ], 404);
+            $customer = $this->customerService->getCustomerByUserId($userId);
+
+            if (!$customer) {
+                Logger::warning("Customer profile not found for user", ['user_id' => $userId]);
+                return $this->not_found(__('Customer profile not found', 'yatra'));
+            }
+
+            $customerId = (int) $customer['id'];
+            
+            // Validate and sanitize input data
+            CustomerValidator::validateUpdate($data, $customerId);
+            $data = CustomerValidator::sanitize($data);
+
+            $result = $this->customerService->updateCustomer($customerId, $data);
+
+            if (!$result['success']) {
+                Logger::warning("Customer profile update failed", ['customer_id' => $customerId, 'user_id' => $userId, 'result' => $result]);
+                return $this->error_response($result['message'] ?? 'Failed to update customer profile', 400);
+            }
+
+            Logger::info("Customer profile updated successfully", ['customer_id' => $customerId, 'user_id' => $userId]);
+            return $this->success_response($result['data']);
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to update customer profile", ['user_id' => $userId ?? 0, 'data' => $data ?? [], 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
-
-        $result = $this->customerService->updateCustomer((int) $customer['id'], $data);
-
-        if (!$result['success']) {
-            return new WP_REST_Response($result, 400);
-        }
-
-        return new WP_REST_Response($result);
     }
 
     /**

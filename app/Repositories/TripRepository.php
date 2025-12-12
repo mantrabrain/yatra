@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Models\Trip;
+use Yatra\Utils\Cache;
 
 /**
  * Trip Repository
@@ -18,6 +19,11 @@ use Yatra\Models\Trip;
  */
 class TripRepository extends BaseRepository
 {
+    /**
+     * Cache for table existence checks to avoid repeated SHOW TABLES queries
+     */
+    private static array $tableExistsCache = [];
+
     /**
      * Get table name
      */
@@ -194,10 +200,9 @@ class TripRepository extends BaseRepository
         
         $trips = $wpdb->get_results($prepared_query) ?: [];
         
-        // Process each trip for additional data
-        foreach ($trips as $trip) {
-            $this->enrichTripData($trip);
-            $this->loadTripRelationships($trip);
+        // Process trips in batch for better performance (eliminates N+1 queries)
+        if (!empty($trips)) {
+            $this->batchEnrichTrips($trips);
         }
         
         return [
@@ -233,7 +238,7 @@ class TripRepository extends BaseRepository
     }
     
     /**
-     * Build difficulty JOIN clause using actual database schema
+     * Build difficulty JOIN clause if table exists
      */
     protected function buildDifficultyJoin(): string
     {
@@ -242,19 +247,170 @@ class TripRepository extends BaseRepository
         // Use the actual difficulty table from Database.php schema
         $difficulty_table = $wpdb->prefix . 'yatra_difficulty_levels';
         
-        // Check if the table exists
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
+        // Use advanced caching system instead of simple array cache
+        $tableExists = Cache::tableExists($difficulty_table, function() use ($wpdb, $difficulty_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
+        });
         
-        if ($table_exists) {
+        if ($tableExists) {
             // Map yatra_trips.difficulty_level (bigint ID) to yatra_difficulty_levels table
             // The difficulty_level field now contains the ID, so match on ID first
             return "LEFT JOIN {$difficulty_table} diff ON diff.id = t.difficulty_level";
         }
         return '';
     }
+
+    /**
+     * Batch enrich multiple trips to eliminate N+1 queries
+     * 
+     * @param array $trips Array of trip objects
+     */
+    protected function batchEnrichTrips(array $trips): void
+    {
+        if (empty($trips)) {
+            return;
+        }
+
+        global $wpdb;
+        $trip_ids = array_column($trips, 'id');
+        $trip_ids_placeholder = implode(',', array_fill(0, count($trip_ids), '%d'));
+
+        // Batch load pricing data for traveler-based trips
+        $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+        $pricing_data = $wpdb->get_results($wpdb->prepare(
+            "SELECT trip_id, original_price, discounted_price,
+                    CASE 
+                        WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
+                        ELSE original_price 
+                    END as effective_price,
+                    CASE 
+                        WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
+                        THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                        ELSE 0
+                    END as discount_percentage
+             FROM {$price_types_table} 
+             WHERE trip_id IN ({$trip_ids_placeholder}) AND (
+                 (discounted_price IS NOT NULL AND discounted_price > 0) OR 
+                 (original_price IS NOT NULL AND original_price > 0)
+             )
+             ORDER BY trip_id, effective_price ASC",
+            ...$trip_ids
+        ));
+
+        // Group pricing data by trip_id
+        $pricing_by_trip = [];
+        foreach ($pricing_data as $price) {
+            $pricing_by_trip[$price->trip_id][] = $price;
+        }
+
+        // Batch load destinations
+        $dest_rel_table = $wpdb->prefix . 'yatra_trip_destinations';
+        $destinations_data = [];
+        $destTableExists = Cache::tableExists($dest_rel_table, function() use ($wpdb, $dest_rel_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'");
+        });
+        
+        if ($destTableExists) {
+            $destinations_raw = $wpdb->get_results($wpdb->prepare(
+                "SELECT td.trip_id, d.* FROM {$wpdb->prefix}yatra_destinations d
+                 INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
+                 WHERE td.trip_id IN ({$trip_ids_placeholder}) AND d.status = 'publish'
+                 ORDER BY td.trip_id, d.name ASC",
+                ...$trip_ids
+            ));
+            
+            foreach ($destinations_raw as $dest) {
+                $trip_id = $dest->trip_id;
+                unset($dest->trip_id);
+                $destinations_data[$trip_id][] = $dest;
+            }
+        }
+
+        // Batch load activities
+        $act_rel_table = $wpdb->prefix . 'yatra_trip_activities';
+        $activities_data = [];
+        $actTableExists = Cache::tableExists($act_rel_table, function() use ($wpdb, $act_rel_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'");
+        });
+        
+        if ($actTableExists) {
+            $activities_raw = $wpdb->get_results($wpdb->prepare(
+                "SELECT ta.trip_id, a.* FROM {$wpdb->prefix}yatra_activities a
+                 INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id
+                 WHERE ta.trip_id IN ({$trip_ids_placeholder}) AND a.status = 'publish'
+                 ORDER BY ta.trip_id, a.name ASC",
+                ...$trip_ids
+            ));
+            
+            foreach ($activities_raw as $act) {
+                $trip_id = $act->trip_id;
+                unset($act->trip_id);
+                $activities_data[$trip_id][] = $act;
+            }
+        }
+
+        // Batch load categories
+        $cat_rel_table = $wpdb->prefix . 'yatra_trip_trip_categories';
+        $categories_data = [];
+        $catTableExists = Cache::tableExists($cat_rel_table, function() use ($wpdb, $cat_rel_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$cat_rel_table}'");
+        });
+        
+        if ($catTableExists) {
+            $categories_raw = $wpdb->get_results($wpdb->prepare(
+                "SELECT tc.trip_id, c.* FROM {$wpdb->prefix}yatra_trip_categories c
+                 INNER JOIN {$cat_rel_table} tc ON c.id = tc.category_id
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.status = 'publish'
+                 ORDER BY tc.trip_id, c.name ASC",
+                ...$trip_ids
+            ));
+            
+            foreach ($categories_raw as $cat) {
+                $trip_id = $cat->trip_id;
+                unset($cat->trip_id);
+                $categories_data[$trip_id][] = $cat;
+            }
+        }
+
+        // Apply enriched data to each trip
+        foreach ($trips as $trip) {
+            // Set pricing data
+            $trip->effective_price_min = 0;
+            
+            if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
+                if (isset($pricing_by_trip[$trip->id]) && !empty($pricing_by_trip[$trip->id])) {
+                    $min_price_row = $pricing_by_trip[$trip->id][0];
+                    $trip->effective_price_min = (float)$min_price_row->effective_price;
+                    $trip->min_category_original_price = (float)$min_price_row->original_price;
+                    
+                    $max_discount = 0;
+                    foreach ($pricing_by_trip[$trip->id] as $price_type) {
+                        if ($price_type->discount_percentage > $max_discount) {
+                            $max_discount = $price_type->discount_percentage;
+                        }
+                    }
+                    $trip->max_discount_percentage = $max_discount;
+                }
+            } else {
+                // Regular pricing logic
+                if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                    $trip->effective_price_min = (float)$trip->discounted_price;
+                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                    $trip->effective_price_min = (float)$trip->sale_price;
+                } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                    $trip->effective_price_min = (float)$trip->original_price;
+                }
+            }
+
+            // Set relationships
+            $trip->destinations = $destinations_data[$trip->id] ?? [];
+            $trip->activities = $activities_data[$trip->id] ?? [];
+            $trip->categories = $categories_data[$trip->id] ?? [];
+        }
+    }
     
     /**
-     * Enrich trip data with additional computed fields
+     * Enrich trip data with additional computed fields (legacy single-trip method)
      */
     protected function enrichTripData(\stdClass $trip): void
     {
@@ -317,9 +473,13 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Check and load destinations using existing table structure
+        // Use advanced caching system for table existence checks
         $dest_rel_table = $wpdb->prefix . 'yatra_trip_destinations';
-        if ($wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'")) {
+        $destTableExists = Cache::tableExists($dest_rel_table, function() use ($wpdb, $dest_rel_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'");
+        });
+        
+        if ($destTableExists) {
             $destinations = $wpdb->get_results($wpdb->prepare(
                 "SELECT d.* FROM {$wpdb->prefix}yatra_destinations d
                  INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
@@ -332,9 +492,13 @@ class TripRepository extends BaseRepository
             $trip->destinations = [];
         }
         
-        // Check and load activities using existing table structure
+        // Use advanced caching system for activities table existence check
         $act_rel_table = $wpdb->prefix . 'yatra_trip_activities';
-        if ($wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'")) {
+        $actTableExists = Cache::tableExists($act_rel_table, function() use ($wpdb, $act_rel_table) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'");
+        });
+        
+        if ($actTableExists) {
             $activities = $wpdb->get_results($wpdb->prepare(
                 "SELECT a.* FROM {$wpdb->prefix}yatra_activities a
                  INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id

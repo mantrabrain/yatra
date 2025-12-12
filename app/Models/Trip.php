@@ -784,9 +784,17 @@ class Trip
      */
     public function getCategories(): array
     {
+        // Handle both property names for backward compatibility
+        // AppServiceProvider uses 'categories', TripRepository uses 'trip_category'
+        if (!empty($this->categories)) {
+            return $this->categories;
+        }
         
-        // This will be populated by the repository when loading trip data
-        return $this->categories ?? [];
+        if (!empty($this->trip_category)) {
+            return $this->trip_category;
+        }
+        
+        return [];
     }
 
     /**
@@ -1057,35 +1065,260 @@ class Trip
      */
     public function getPermalink(): string
     {
-        // Debug logging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA DEBUG - Trip::getPermalink() called for trip ID: ' . ($this->id ?? 'unknown'));
-            error_log('YATRA DEBUG - Trip permalink property: ' . ($this->permalink ?? 'empty'));
-            error_log('YATRA DEBUG - Trip slug: ' . ($this->slug ?? 'empty'));
-            error_log('YATRA DEBUG - Trip title: ' . ($this->title ?? 'empty'));
-        }
-        
         // If permalink is already set, use it
         if (!empty($this->permalink)) {
             return $this->permalink;
         }
         
-        // Generate permalink from trip ID and slug/title
+        // Use the proper helper function that handles trip base settings
         if (!empty($this->id)) {
-            // For trips from custom table (TripRepository), always use custom permalink structure
-            // WordPress get_permalink() won't work with custom table IDs
-            $slug = !empty($this->slug) ? $this->slug : sanitize_title($this->title ?? '');
-            $fallback_url = home_url("/trip/{$slug}/");
+            $permalink = yatra_get_trip_permalink($this);
+            
+            // Debug logging for development
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('YATRA DEBUG - Generated custom permalink: ' . $fallback_url . ' for trip ID: ' . $this->id);
+                error_log("Trip {$this->id} permalink generated: {$permalink}");
+                error_log("Trip slug: " . ($this->slug ?? 'empty'));
             }
-            return $fallback_url;
+            
+            return $permalink;
         }
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA DEBUG - No trip ID available, returning empty permalink');
-        }
         return '';
+    }
+
+    /**
+     * Check if trip is available for booking
+     */
+    public function isAvailableForBooking(): bool
+    {
+        // Check if trip is published
+        if ($this->status !== 'publish') {
+            return false;
+        }
+
+        // Check if within available date range
+        if (!empty($this->available_from) && strtotime($this->available_from) > time()) {
+            return false;
+        }
+
+        if (!empty($this->available_to) && strtotime($this->available_to) < time()) {
+            return false;
+        }
+
+        // Check capacity if specified
+        if (!empty($this->max_travelers) && $this->max_travelers <= 0) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Calculate effective price considering discounts
+     */
+    public function getEffectivePrice(): float
+    {
+        if ($this->pricing_type === 'traveler_based') {
+            return $this->min_category_original_price ?? 0.0;
+        }
+
+        // Use discounted price if available and valid
+        if (!empty($this->discounted_price) && $this->discounted_price < $this->original_price) {
+            return $this->discounted_price;
+        }
+
+        // Use sale price if available and valid
+        if (!empty($this->sale_price) && $this->sale_price < $this->original_price) {
+            return $this->sale_price;
+        }
+
+        return $this->original_price;
+    }
+
+    /**
+     * Check if trip has active discount
+     */
+    public function hasDiscount(): bool
+    {
+        if ($this->pricing_type === 'traveler_based') {
+            return false; // Traveler-based pricing doesn't have simple discounts
+        }
+
+        $effectivePrice = $this->getEffectivePrice();
+        return $effectivePrice < $this->original_price;
+    }
+
+    /**
+     * Calculate discount percentage
+     */
+    public function getDiscountPercentage(): int
+    {
+        if (!$this->hasDiscount()) {
+            return 0;
+        }
+
+        $effectivePrice = $this->getEffectivePrice();
+        $discount = (($this->original_price - $effectivePrice) / $this->original_price) * 100;
+        
+        return (int) round($discount);
+    }
+
+    /**
+     * Check if deposit is required
+     */
+    public function requiresDeposit(): bool
+    {
+        return $this->deposit_required && ($this->deposit_amount > 0 || $this->deposit_percentage > 0);
+    }
+
+    /**
+     * Calculate deposit amount
+     */
+    public function getDepositAmount(): float
+    {
+        if (!$this->requiresDeposit()) {
+            return 0.0;
+        }
+
+        if ($this->deposit_amount > 0) {
+            return $this->deposit_amount;
+        }
+
+        if ($this->deposit_percentage > 0) {
+            $effectivePrice = $this->getEffectivePrice();
+            return ($effectivePrice * $this->deposit_percentage) / 100;
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Check if trip is featured
+     */
+    public function isFeatured(): bool
+    {
+        return $this->featured_priority !== 'none' && !empty($this->featured_priority);
+    }
+
+    /**
+     * Get trip difficulty information
+     */
+    public function getDifficultyInfo(): array
+    {
+        return [
+            'level' => $this->difficulty_level ?? 'moderate',
+            'name' => $this->difficulty_name ?? ucfirst($this->difficulty_level ?? 'Moderate'),
+            'icon' => $this->difficulty_icon ?? '',
+            'has_difficulty' => !empty($this->difficulty_level)
+        ];
+    }
+
+    /**
+     * Check if trip supports group bookings
+     */
+    public function supportsGroupBookings(): bool
+    {
+        return $this->group_pricing_enabled && 
+               !empty($this->group_size_min) && 
+               $this->group_size_min > 1;
+    }
+
+    /**
+     * Calculate group discount for given size
+     */
+    public function getGroupDiscount(int $groupSize): float
+    {
+        if (!$this->supportsGroupBookings() || $groupSize < $this->group_size_min) {
+            return 0.0;
+        }
+
+        if (!empty($this->group_size_max) && $groupSize > $this->group_size_max) {
+            $groupSize = $this->group_size_max; // Cap at maximum
+        }
+
+        if ($this->group_discount_type === 'percentage' && !empty($this->group_discount_percentage)) {
+            return $this->group_discount_percentage;
+        }
+
+        if ($this->group_discount_type === 'amount' && !empty($this->group_discount_amount)) {
+            $effectivePrice = $this->getEffectivePrice();
+            return ($this->group_discount_amount / $effectivePrice) * 100;
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Validate trip data integrity
+     */
+    public function validate(): array
+    {
+        $errors = [];
+
+        // Required fields
+        if (empty($this->title)) {
+            $errors['title'] = 'Trip title is required';
+        }
+
+        if (empty($this->slug)) {
+            $errors['slug'] = 'Trip slug is required';
+        }
+
+        // Pricing validation
+        if ($this->original_price <= 0) {
+            $errors['original_price'] = 'Original price must be greater than zero';
+        }
+
+        if (!empty($this->discounted_price) && $this->discounted_price >= $this->original_price) {
+            $errors['discounted_price'] = 'Discounted price must be less than original price';
+        }
+
+        // Duration validation
+        if ($this->trip_type === 'single_day' && $this->duration_days !== 1) {
+            $errors['duration_days'] = 'Single day trips must have duration of 1 day';
+        }
+
+        if ($this->trip_type === 'multi_day' && (!empty($this->duration_days) && $this->duration_days < 2)) {
+            $errors['duration_days'] = 'Multi-day trips must have duration of at least 2 days';
+        }
+
+        // Capacity validation
+        if (!empty($this->max_travelers) && $this->max_travelers <= 0) {
+            $errors['max_travelers'] = 'Maximum travelers must be greater than zero';
+        }
+
+        // Group pricing validation
+        if ($this->group_pricing_enabled) {
+            if (empty($this->group_size_min) || $this->group_size_min <= 1) {
+                $errors['group_size_min'] = 'Group minimum size must be greater than 1';
+            }
+
+            if (!empty($this->group_size_max) && $this->group_size_max < $this->group_size_min) {
+                $errors['group_size_max'] = 'Group maximum size must be greater than minimum size';
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Get trip status information
+     */
+    public function getStatusInfo(): array
+    {
+        $statusLabels = [
+            'draft' => 'Draft',
+            'publish' => 'Published',
+            'private' => 'Private',
+            'trash' => 'Trashed'
+        ];
+
+        return [
+            'status' => $this->status,
+            'label' => $statusLabels[$this->status] ?? 'Unknown',
+            'is_published' => $this->status === 'publish',
+            'is_draft' => $this->status === 'draft'
+        ];
     }
 
     /**

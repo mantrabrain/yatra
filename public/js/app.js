@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as CheckCircle, Q as HelpCircle, V as MoreVertical, W as AlertTriangle, X, Y as Columns, Z as ExternalLink, _ as Mountain, $ as PenSquare, a0 as Copy, a1 as ArrowUp, a2 as ArrowDown, a3 as Archive, a4 as Trash2, a5 as Plus, a6 as Search, a7 as ArrowUpDown, a8 as AlertCircle, a9 as XCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as ClipboardList, aQ as Receipt, aR as Plug, aS as Shield, aT as Lock, aU as EyeOff, aV as Ban, aW as Send, aX as Crown, aY as reactDomExports, aZ as Filter, a_ as QueryClient, a$ as client, b0 as QueryClientProvider } from "./react-vendor-D_FxdjGQ.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-D_K97-2e.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as CheckCircle, Q as HelpCircle, V as MoreVertical, W as AlertTriangle, X, Y as Columns, Z as ExternalLink, _ as Mountain, $ as PenSquare, a0 as Copy, a1 as ArrowUp, a2 as ArrowDown, a3 as Archive, a4 as Trash2, a5 as Plus, a6 as Search, a7 as ArrowUpDown, a8 as AlertCircle, a9 as XCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as Server, aR as Folder, aS as UserCheck, aT as ClipboardList, aU as Receipt, aV as Plug, aW as Shield, aX as Lock, aY as EyeOff, aZ as Ban, a_ as Send, a$ as Crown, b0 as reactDomExports, b1 as Filter, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-C_nDbNrJ.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-DXDUp5pC.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -548,6 +548,22 @@ const Layout = ({ children }) => {
               ]
             }
           ) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              variant: currentSubpage === "tools" ? "default" : "outline",
+              onClick: () => {
+                const admin = window == null ? void 0 : window.yatraAdmin;
+                const baseUrl2 = (admin == null ? void 0 : admin.adminUrl) || "";
+                window.location.href = `${baseUrl2}?page=yatra&subpage=tools`;
+              },
+              className: `flex items-center gap-2 ${currentSubpage === "tools" ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600" : ""}`,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Settings$1, { className: "w-4 h-4" }),
+                __("Tools", "Tools")
+              ]
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_edit_trips", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
@@ -659,7 +675,7 @@ const Layout = ({ children }) => {
           ] })
         ] })
       ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: `flex-1 ${isTripFormPage ? "p-0 h-full min-h-0" : "p-6 overflow-y-auto"}`, children })
+      /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: `flex-1 ${isTripFormPage ? "p-0 h-full min-h-0" : "p-6 overflow-y-auto"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: currentSubpage === "tools" ? "" : "space-y-6", children }) })
     ] })
   ] }) });
 };
@@ -21792,7 +21808,7 @@ const BookingStatusChart = ({ data }) => {
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       Tooltip,
       {
-        formatter: (value, _name, props) => `${props.payload.percent.toFixed(1)}%`,
+        formatter: (_value, _name, props) => `${props.payload.percent.toFixed(1)}%`,
         contentStyle: { fontFamily: "inherit", fontSize: 11 }
       }
     ),
@@ -40833,7 +40849,7 @@ const DetailedBreakdownTable = ({ viewType, dateRange, selectedCategory, reportD
       /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Avg Occupancy", "Avg Occupancy") }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-lg font-bold text-orange-600 dark:text-orange-400", children: [
-          (breakdownData.reduce((sum, row) => sum + row.occupancy, 0) / breakdownData.length).toFixed(1),
+          (breakdownData.reduce((sum, row) => sum + row.occupancyRate, 0) / breakdownData.length).toFixed(1),
           "%"
         ] })
       ] })
@@ -41208,6 +41224,1199 @@ const TravelBookingReports = () => {
             reportData
           }
         ) })
+      ] }) })
+    ] })
+  ] });
+};
+const Tools = () => {
+  var _a, _b;
+  const [activeTab, setActiveTab] = reactExports.useState("export-import");
+  const [isExporting, setIsExporting] = reactExports.useState(false);
+  const [isImporting, setIsImporting] = reactExports.useState(false);
+  const [selectedExportData, setSelectedExportData] = reactExports.useState([
+    "trips",
+    "destinations",
+    "activities",
+    "bookings",
+    "customers"
+  ]);
+  const [selectedImportData, setSelectedImportData] = reactExports.useState([]);
+  const [isDragOver, setIsDragOver] = reactExports.useState(false);
+  const [showExportModal, setShowExportModal] = reactExports.useState(false);
+  const [showImportModal, setShowImportModal] = reactExports.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = reactExports.useState(false);
+  const [pendingImportFile, setPendingImportFile] = reactExports.useState(null);
+  const [systemStatus, setSystemStatus] = reactExports.useState(null);
+  const [logs, setLogs] = reactExports.useState({});
+  const [selectedLogType, setSelectedLogType] = reactExports.useState("error");
+  const [isLoadingStatus, setIsLoadingStatus] = reactExports.useState(false);
+  const [isLoadingLogs, setIsLoadingLogs] = reactExports.useState(false);
+  const [isLoadingJobs, setIsLoadingJobs] = reactExports.useState(false);
+  const [allJobs, setAllJobs] = reactExports.useState([]);
+  const [exportJob, setExportJob] = reactExports.useState(null);
+  const [importJob, setImportJob] = reactExports.useState(null);
+  const pollingIntervalRef = reactExports.useRef(null);
+  const logTypes = [
+    { key: "error", label: "Error Logs", icon: XCircle },
+    { key: "payment", label: "Payment Logs", icon: CheckCircle },
+    { key: "booking", label: "Booking Logs", icon: FileText },
+    { key: "system", label: "System Logs", icon: Server }
+  ];
+  const dataTypes = [
+    { key: "trips", label: "Trips", description: "All trip packages, itineraries, and details", icon: MapPin },
+    { key: "destinations", label: "Destinations", description: "Travel destinations and locations", icon: Globe },
+    { key: "activities", label: "Activities", description: "Trip activities and experiences", icon: Activity },
+    { key: "categories", label: "Trip Categories", description: "Trip categorization and taxonomy", icon: Folder },
+    { key: "difficulty_levels", label: "Difficulty Levels", description: "Trip difficulty classifications", icon: Mountain },
+    { key: "bookings", label: "Bookings", description: "Customer bookings and reservations", icon: Calendar$1 },
+    { key: "customers", label: "Customers", description: "Customer profiles and CRM data", icon: Users },
+    { key: "travelers", label: "Travelers", description: "Individual traveler information", icon: UserCheck },
+    { key: "payments", label: "Payments", description: "Payment transactions and history", icon: CreditCard },
+    { key: "reviews", label: "Reviews", description: "Trip reviews and ratings", icon: Star },
+    { key: "enquiries", label: "Enquiries", description: "Customer enquiries and leads", icon: MessageSquare },
+    { key: "discounts", label: "Discounts", description: "Discount codes and promotions", icon: Tag },
+    { key: "availability", label: "Availability", description: "Trip availability and schedules", icon: BarChart3 },
+    { key: "itinerary", label: "Itinerary Items", description: "Itinerary items and types", icon: List },
+    { key: "settings", label: "Settings", description: "Plugin configuration and settings", icon: Settings$1 }
+  ];
+  const loadSystemStatus = async () => {
+    setIsLoadingStatus(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/system-status`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      setSystemStatus(data);
+    } catch (error) {
+      console.error("Failed to load system status:", error);
+    } finally {
+      setIsLoadingStatus(false);
+    }
+  };
+  const loadActiveJobs = async () => {
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/active-jobs`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (response.ok) {
+        const jobs = await response.json();
+        if (Array.isArray(jobs) && jobs.length > 0) {
+          const exportJobData = jobs.find((j) => j.type === "export");
+          const importJobData = jobs.find((j) => j.type === "import");
+          if (exportJobData) {
+            setExportJob(exportJobData);
+            if (exportJobData.status === "pending" || exportJobData.status === "running") {
+              setIsExporting(true);
+              pollJobStatus(exportJobData.id, "export");
+            }
+          }
+          if (importJobData) {
+            setImportJob(importJobData);
+            if (importJobData.status === "pending" || importJobData.status === "running") {
+              setIsImporting(true);
+              pollJobStatus(importJobData.id, "import");
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load active jobs:", error);
+    }
+  };
+  reactExports.useEffect(() => {
+    loadActiveJobs();
+    if (activeTab === "system-status") {
+      loadSystemStatus();
+    }
+  }, [activeTab]);
+  const loadLogs = async (type, page = 1) => {
+    setIsLoadingLogs(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/logs/${type}?page=${page}`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setLogs((prev) => ({ ...prev, [type]: data.data }));
+      }
+    } catch (error) {
+      console.error("Failed to load logs:", error);
+    } finally {
+      setIsLoadingLogs(false);
+    }
+  };
+  const handleExportDataToggle = (dataType) => {
+    setSelectedExportData(
+      (prev) => prev.includes(dataType) ? prev.filter((type) => type !== dataType) : [...prev, dataType]
+    );
+  };
+  const handleExportSelectAll = () => {
+    if (selectedExportData.length === dataTypes.length) {
+      setSelectedExportData([]);
+    } else {
+      setSelectedExportData(dataTypes.map((dt) => dt.key));
+    }
+  };
+  const handleImportDataToggle = (dataType) => {
+    setSelectedImportData(
+      (prev) => prev.includes(dataType) ? prev.filter((type) => type !== dataType) : [...prev, dataType]
+    );
+  };
+  const handleExportClick = () => {
+    setShowExportModal(true);
+  };
+  const handleExport = async () => {
+    if (selectedExportData.length === 0) {
+      alert("Please select at least one data type to export.");
+      return;
+    }
+    setIsExporting(true);
+    setShowExportModal(false);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/export-job`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        },
+        body: JSON.stringify({
+          data_types: selectedExportData
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create export job");
+      }
+      const jobId = data.job_id;
+      pollJobStatus(jobId, "export");
+    } catch (error) {
+      console.error("Export error:", error);
+      alert("Export failed. Please try again.");
+      setIsExporting(false);
+    }
+  };
+  const stopPolling = () => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+  };
+  const pollJobStatus = (jobId, type) => {
+    const endpoint = type === "export" ? "export-job" : "import-job";
+    const poll = async () => {
+      try {
+        const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/${endpoint}/${jobId}`, {
+          headers: {
+            "X-WP-Nonce": window.yatraAdmin.nonce
+          }
+        });
+        const data = await response.json();
+        if (response.ok && data) {
+          const jobData = data;
+          if (type === "export") {
+            setExportJob(jobData);
+          } else {
+            setImportJob(jobData);
+          }
+          if (jobData.status === "completed" || jobData.status === "failed") {
+            stopPolling();
+            if (type === "export") {
+              setIsExporting(false);
+            } else {
+              setIsImporting(false);
+            }
+            if (jobData.status === "failed") {
+              alert(`${type === "export" ? "Export" : "Import"} failed: ${jobData.error || "Unknown error"}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to poll job status:", error);
+      }
+    };
+    stopPolling();
+    poll();
+    pollingIntervalRef.current = setInterval(poll, 2e3);
+  };
+  const handleDownloadExport = async () => {
+    if (!exportJob || exportJob.status !== "completed") return;
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}/download`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a2 = document.createElement("a");
+      a2.style.display = "none";
+      a2.href = url;
+      a2.download = `yatra-export-${(/* @__PURE__ */ new Date()).toISOString().split("T")[0]}.json`;
+      document.body.appendChild(a2);
+      a2.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a2);
+      const deleteResponse = await fetch(`${window.yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (deleteResponse.ok) {
+        setExportJob(null);
+      }
+    } catch (error) {
+      console.error("Download error:", error);
+      alert("Download failed. Please try again.");
+    }
+  };
+  const handleDeleteClick = () => {
+    if (!exportJob) return;
+    setShowDeleteModal(true);
+  };
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+  const handleConfirmDelete = async () => {
+    if (!exportJob) return;
+    setShowDeleteModal(false);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (response.ok) {
+        setExportJob(null);
+      } else {
+        alert("Failed to delete export file.");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Failed to delete export file.");
+    }
+  };
+  reactExports.useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, []);
+  const processFile = async (file) => {
+    if (selectedImportData.length === 0) {
+      alert("Please select at least one data type to import.");
+      return;
+    }
+    setIsImporting(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("data_types", JSON.stringify(selectedImportData));
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/import-job`, {
+        method: "POST",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        },
+        body: formData
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create import job");
+      }
+      const jobId = data.job_id;
+      pollJobStatus(jobId, "import");
+      setSelectedImportData([]);
+    } catch (error) {
+      console.error("Import error:", error);
+      alert("Import failed. Please check the file format and try again.");
+      setIsImporting(false);
+    }
+  };
+  const handleImport = async (event) => {
+    var _a2;
+    const file = (_a2 = event.target.files) == null ? void 0 : _a2[0];
+    if (!file) return;
+    setPendingImportFile(file);
+    setShowImportModal(true);
+    event.target.value = "";
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    const jsonFile = files.find((file) => file.type === "application/json" || file.name.endsWith(".json"));
+    if (!jsonFile) {
+      alert("Please drop a valid JSON file.");
+      return;
+    }
+    setPendingImportFile(jsonFile);
+    setShowImportModal(true);
+  };
+  const handleImportConfirm = async () => {
+    if (!pendingImportFile) return;
+    setShowImportModal(false);
+    await processFile(pendingImportFile);
+    setPendingImportFile(null);
+    setSelectedImportData([]);
+  };
+  const handleClearLogs = async (type) => {
+    if (!confirm(`Are you sure you want to clear all ${type} logs?`)) return;
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/logs/${type}/clear`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        loadLogs(type);
+      }
+    } catch (error) {
+      console.error("Failed to clear logs:", error);
+    }
+  };
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case "pass":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "success", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-3 h-3 mr-1" }),
+          "Pass"
+        ] });
+      case "warning":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "warning", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-3 h-3 mr-1" }),
+          "Warning"
+        ] });
+      case "fail":
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-3 h-3 mr-1" }),
+          "Fail"
+        ] });
+      default:
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: "Unknown" });
+    }
+  };
+  const getLogLevelBadge = (level) => {
+    switch (level.toLowerCase()) {
+      case "error":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "error", children: "Error" });
+      case "warning":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", children: "Warning" });
+      case "info":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "info", children: "Info" });
+      default:
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: level });
+    }
+  };
+  const loadAllJobs = async () => {
+    setIsLoadingJobs(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/all-jobs`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setAllJobs(data.data || []);
+      }
+    } catch (error) {
+      console.error("Failed to load jobs:", error);
+    } finally {
+      setIsLoadingJobs(false);
+    }
+  };
+  reactExports.useEffect(() => {
+    if (activeTab === "system-status") {
+      loadSystemStatus();
+    } else if (activeTab === "logs") {
+      loadLogs(selectedLogType);
+    } else if (activeTab === "jobs") {
+      loadAllJobs();
+    }
+  }, [activeTab, selectedLogType]);
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: "Tools" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Export/Import data, check system status, and view logs" })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex space-x-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("export-import"),
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "export-import" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Export/Import" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("jobs"),
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "jobs" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Jobs" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("system-status"),
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "system-status" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Server, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "System Status" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("logs"),
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "logs" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Logs" })
+            ]
+          }
+        )
+      ] }) }),
+      activeTab === "export-import" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-8", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-8", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 mb-6", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-6 h-6 text-blue-600 dark:text-blue-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Export Data" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Download your data" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed", children: "Export your Yatra data for backup or migration purposes. Click the button below to select which data types to export." }),
+            exportJob && (exportJob.status === "pending" || exportJob.status === "running") && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-blue-700 dark:text-blue-400", children: exportJob.status === "pending" ? "Queued..." : "Exporting..." }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-blue-600 dark:text-blue-400", children: [
+                  exportJob.progress,
+                  "%"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: "bg-blue-600 dark:bg-blue-400 h-2 rounded-full transition-all duration-300",
+                  style: { width: `${exportJob.progress}%` }
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-blue-600 dark:text-blue-400 mt-2", children: [
+                exportJob.processed_records,
+                " / ",
+                exportJob.total_records,
+                " records processed"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Processing in background. You can close this page and come back later." })
+            ] }),
+            exportJob && exportJob.status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-700 dark:text-green-400", children: "Export completed successfully!" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Button,
+                  {
+                    onClick: handleDownloadExport,
+                    className: "flex-1",
+                    variant: "outline",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4 mr-2" }),
+                      "Download"
+                    ]
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    onClick: handleDeleteClick,
+                    variant: "outline",
+                    className: "text-red-600 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" })
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                onClick: handleExportClick,
+                disabled: isExporting || !!(exportJob && (exportJob.status === "pending" || exportJob.status === "running")),
+                className: "w-full py-3",
+                size: "lg",
+                children: isExporting ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-5 h-5 mr-3 animate-spin" }),
+                  "Starting export..."
+                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-5 h-5 mr-3" }),
+                  "Select Data Types to Export"
+                ] })
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-8", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 mb-6", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-green-50 dark:bg-green-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-6 h-6 text-green-600 dark:text-green-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Import Data" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Restore from backup" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-6 leading-relaxed", children: "Import Yatra data from a previously exported JSON file. Drop your file below or click to browse." }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "div",
+              {
+                onDragOver: handleDragOver,
+                onDragLeave: handleDragLeave,
+                onDrop: handleDrop,
+                className: `relative border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 ${isDragOver ? "border-green-400 bg-green-50 dark:bg-green-900/20" : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 hover:border-green-400 hover:bg-green-50 dark:hover:bg-green-900/20"} ${isImporting ? "pointer-events-none opacity-50" : ""}`,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "file",
+                      accept: ".json",
+                      onChange: handleImport,
+                      disabled: isImporting,
+                      className: "absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-4 rounded-full ${isDragOver ? "bg-green-100 dark:bg-green-900/30" : "bg-gray-100 dark:bg-gray-700"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: `w-8 h-8 ${isDragOver ? "text-green-600 dark:text-green-400" : "text-gray-400 dark:text-gray-500"}` }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: isDragOver ? "Drop your JSON file here" : "Drop JSON file or click to browse" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Supports JSON files exported from Yatra" })
+                    ] })
+                  ] })
+                ]
+              }
+            ),
+            importJob && (importJob.status === "pending" || importJob.status === "running") && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-700 dark:text-green-400", children: importJob.status === "pending" ? "Queued..." : "Importing..." }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-green-600 dark:text-green-400", children: [
+                  importJob.progress,
+                  "%"
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-green-200 dark:bg-green-800 rounded-full h-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: "bg-green-600 dark:bg-green-400 h-2 rounded-full transition-all duration-300",
+                  style: { width: `${importJob.progress}%` }
+                }
+              ) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-green-600 dark:text-green-400 mt-2", children: [
+                importJob.processed_records,
+                " / ",
+                importJob.total_records,
+                " records processed"
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: "Processing in background. You can close this page and come back later." })
+            ] }),
+            importJob && importJob.status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-700 dark:text-green-400", children: "Import completed successfully!" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "button",
+                  {
+                    onClick: async () => {
+                      if (!importJob) return;
+                      try {
+                        const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/import-job/${importJob.id}`, {
+                          method: "DELETE",
+                          headers: {
+                            "X-WP-Nonce": window.yatraAdmin.nonce
+                          }
+                        });
+                        if (response.ok) {
+                          console.log("Import job deleted successfully");
+                        } else {
+                          console.error("Failed to delete import job");
+                        }
+                      } catch (e) {
+                        console.error("Error deleting import job:", e);
+                      }
+                      setImportJob(null);
+                    },
+                    className: "ml-auto text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300",
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" })
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-green-700 dark:text-green-400 mb-2", children: [
+                "Total: ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: importJob.processed_records }),
+                " records imported"
+              ] }),
+              importJob.import_stats && Object.keys(importJob.import_stats).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 border-t border-green-200 dark:border-green-800 pt-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs font-medium text-green-700 dark:text-green-400 mb-2", children: "Import Details:" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 gap-1", children: Object.entries(importJob.import_stats).map(([dataType, stats]) => {
+                  const dataTypeObj = dataTypes.find((dt) => dt.key === dataType);
+                  const Icon = (dataTypeObj == null ? void 0 : dataTypeObj.icon) || FileText;
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-xs", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-3 h-3 text-green-600 dark:text-green-400" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "capitalize", children: [
+                        dataType.replace("_", " "),
+                        ":"
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-green-700 dark:text-green-400", children: stats.imported }),
+                      stats.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400 ml-1", children: [
+                        "(",
+                        stats.failed,
+                        " failed)"
+                      ] })
+                    ] })
+                  ] }, dataType);
+                }) })
+              ] })
+            ] }),
+            importJob && importJob.status === "failed" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 p-4 bg-red-50 dark:bg-red-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-5 h-5 text-red-600 dark:text-red-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm font-medium text-red-700 dark:text-red-400", children: [
+                "Import failed: ",
+                importJob.error || "Unknown error"
+              ] })
+            ] }) }),
+            isImporting && !importJob && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center gap-3 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg mt-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-5 h-5 animate-spin" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Starting import..." })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-6 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-5 h-5 text-yellow-600 dark:text-yellow-400" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-semibold text-yellow-800 dark:text-yellow-200 mb-2", children: "Important Notice" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-yellow-700 dark:text-yellow-300 leading-relaxed", children: "Importing data will create new records. Existing data will not be overwritten. Always backup your database before importing data to prevent any potential data loss." })
+          ] })
+        ] }) })
+      ] }),
+      activeTab === "system-status" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: isLoadingStatus ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", children: [...Array(4)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-32" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: [...Array(4)].map((_2, i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-center", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-24" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-16" })
+        ] }, i)) })
+      ] }) }, index)) }) : systemStatus ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold mb-4 flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Server, { className: "w-5 h-5" }),
+            "PHP Information"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Version:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.php.version })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Memory Limit:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.php.memory_limit })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Max Execution Time:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium", children: [
+                systemStatus.php.max_execution_time,
+                "s"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Upload Max Size:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.php.upload_max_filesize })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold mb-4", children: "WordPress Information" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Version:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.wordpress.version })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Multisite:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.wordpress.multisite ? "Yes" : "No" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Debug Mode:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: systemStatus.wordpress.debug_mode ? "Enabled" : "Disabled" })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold mb-4", children: "Requirements Check" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: Object.entries(systemStatus.requirements).map(([key, req]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium capitalize", children: key.replace("_", " ") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+                "Required: ",
+                req.required,
+                " | Current: ",
+                req.current
+              ] })
+            ] }),
+            getStatusBadge(req.status)
+          ] }, key)) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold mb-4", children: "PHP Extensions" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 gap-3", children: Object.entries(systemStatus.extensions).map(([ext, loaded]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: ext }),
+            loaded ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "success", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-3 h-3 mr-1" }),
+              "Loaded"
+            ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-3 h-3 mr-1" }),
+              "Missing"
+            ] })
+          ] }, ext)) })
+        ] })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-12 h-12 text-red-500 mx-auto mb-4" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "Failed to load system status" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: loadSystemStatus, className: "mt-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2" }),
+          "Retry"
+        ] })
+      ] }) }) }),
+      activeTab === "jobs" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: "All Jobs" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              onClick: loadAllJobs,
+              disabled: isLoadingJobs,
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isLoadingJobs ? "animate-spin" : ""}` }),
+                "Refresh"
+              ]
+            }
+          )
+        ] }),
+        isLoadingJobs ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-20 h-6 bg-gray-200 dark:bg-gray-700 rounded" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-32 h-5 bg-gray-200 dark:bg-gray-700 rounded" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-5 bg-gray-200 dark:bg-gray-700 rounded" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-2 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3/4 h-4 bg-gray-200 dark:bg-gray-700 rounded" })
+        ] }, index)) }) : allJobs.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: allJobs.map((job) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: job.type === "export" ? "default" : "info", children: [
+                job.type === "export" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-3 h-3 mr-1" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-3 h-3 mr-1" }),
+                job.type.toUpperCase()
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-gray-900 dark:text-white", children: [
+                "Job ID: ",
+                job.id
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              job.status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "success", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-3 h-3 mr-1" }),
+                "Completed"
+              ] }),
+              job.status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3 mr-1 animate-spin" }),
+                "Running"
+              ] }),
+              job.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "warning", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-3 h-3 mr-1" }),
+                "Pending"
+              ] }),
+              job.status === "failed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-3 h-3 mr-1" }),
+                "Failed"
+              ] })
+            ] })
+          ] }),
+          (job.status === "running" || job.status === "completed") && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm mb-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Progress" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-gray-900 dark:text-white", children: [
+                job.progress,
+                "%"
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "div",
+              {
+                className: `h-2 rounded-full transition-all ${job.status === "completed" ? "bg-green-500" : "bg-blue-500"}`,
+                style: { width: `${job.progress}%` }
+              }
+            ) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4 text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Created:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.created_at).toLocaleString() })
+            ] }),
+            job.started_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Started:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.started_at).toLocaleString() })
+            ] }),
+            job.completed_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Completed:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.completed_at).toLocaleString() })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Records:" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-medium text-gray-900 dark:text-white", children: [
+                job.processed_records || 0,
+                " / ",
+                job.total_records || 0
+              ] })
+            ] })
+          ] }),
+          job.type === "import" && job.import_stats && Object.keys(job.import_stats).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("details", { className: "text-sm", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer text-gray-600 dark:text-gray-400 font-medium mb-2", children: "Import Details" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-2 mt-2", children: Object.entries(job.import_stats).map(([dataType, stats]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-900 rounded p-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 dark:text-gray-400 capitalize mb-1", children: dataType.replace("_", " ") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-600 dark:text-green-400", children: stats.imported }),
+                stats.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-red-600 dark:text-red-400", children: [
+                  "(",
+                  stats.failed,
+                  " failed)"
+                ] })
+              ] })
+            ] }, dataType)) })
+          ] }) }),
+          job.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-red-800 dark:text-red-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Error:" }),
+            " ",
+            job.error
+          ] }) }),
+          job.type === "export" && job.status === "completed" && job.file_url && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: job.file_url,
+              download: true,
+              className: "inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
+                "Download Export File"
+              ]
+            }
+          ) })
+        ] }, job.id)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-16 h-16 text-gray-400 mx-auto mb-4" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 text-lg font-medium mb-2", children: "No jobs found" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-500 text-sm", children: "Export or import data to see job history here" })
+        ] })
+      ] }) }),
+      activeTab === "logs" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: logTypes.map((type) => {
+          const Icon = type.icon;
+          return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              variant: selectedLogType === type.key ? "default" : "outline",
+              onClick: () => setSelectedLogType(type.key),
+              className: "flex items-center gap-2",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-4 h-4" }),
+                type.label
+              ]
+            },
+            type.key
+          );
+        }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold capitalize", children: [
+              selectedLogType,
+              " Logs"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "outline",
+                  size: "sm",
+                  onClick: () => loadLogs(selectedLogType),
+                  disabled: isLoadingLogs,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isLoadingLogs ? "animate-spin" : ""}` }),
+                    "Refresh"
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "destructive",
+                  size: "sm",
+                  onClick: () => handleClearLogs(selectedLogType),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4 mr-2" }),
+                    "Clear Logs"
+                  ]
+                }
+              )
+            ] })
+          ] }),
+          isLoadingLogs ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [...Array(3)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-start justify-between mb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-5 bg-gray-200 dark:bg-gray-700 rounded" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded" })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3/4 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-1/2 h-3 bg-gray-200 dark:bg-gray-700 rounded" })
+          ] }, index)) }) : ((_b = (_a = logs[selectedLogType]) == null ? void 0 : _a.logs) == null ? void 0 : _b.length) > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: logs[selectedLogType].logs.map((log2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-start justify-between mb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              getLogLevelBadge(log2.level),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: new Date(log2.timestamp).toLocaleString() })
+            ] }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-2", children: log2.message }),
+            log2.context && Object.keys(log2.context).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("details", { className: "text-xs", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer text-gray-600 dark:text-gray-400", children: "View Context" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-x-auto", children: JSON.stringify(log2.context, null, 2) })
+            ] })
+          ] }, log2.id)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-12 h-12 text-gray-400 mx-auto mb-4" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-gray-600 dark:text-gray-400", children: [
+              "No ",
+              selectedLogType,
+              " logs found"
+            ] })
+          ] })
+        ] })
+      ] }),
+      showExportModal && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50", style: { margin: 0, padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-2xl max-h-[85vh] overflow-hidden mx-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Select Data Types to Export" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setShowExportModal(false),
+              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-5 h-5" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 overflow-y-auto max-h-[60vh]", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mb-4 pb-3 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-3 p-3 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg cursor-pointer transition-colors", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                checked: selectedExportData.length === dataTypes.length,
+                onChange: handleExportSelectAll,
+                className: "rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-semibold text-blue-700 dark:text-blue-400", children: selectedExportData.length === dataTypes.length ? "Deselect All" : "Select All" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                "(",
+                dataTypes.length,
+                " data types)"
+              ] })
+            ] })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 gap-1", children: dataTypes.map((dataType) => /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "input",
+              {
+                type: "checkbox",
+                checked: selectedExportData.includes(dataType.key),
+                onChange: () => handleExportDataToggle(dataType.key),
+                className: "mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(dataType.icon, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: dataType.label })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: dataType.description })
+            ] })
+          ] }, dataType.key)) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+            selectedExportData.length,
+            " data types selected"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                onClick: () => setShowExportModal(false),
+                children: "Cancel"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                onClick: handleExport,
+                disabled: selectedExportData.length === 0,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4 mr-2" }),
+                  "Export Selected Data"
+                ]
+              }
+            )
+          ] })
+        ] })
+      ] }) }),
+      showDeleteModal && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50", style: { margin: 0, padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-md overflow-hidden mx-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Confirm Deletion" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: handleCancelDelete,
+              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-5 h-5" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 mb-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-red-100 dark:bg-red-900/30 rounded-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6 text-red-600 dark:text-red-400" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-lg font-medium text-gray-900 dark:text-white mb-1", children: "Delete Export File?" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: "This action cannot be undone. The export file will be permanently deleted from the server." })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: handleCancelDelete,
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: handleConfirmDelete,
+              className: "bg-red-600 hover:bg-red-700 text-white",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4 mr-2" }),
+                "Delete File"
+              ]
+            }
+          )
+        ] }) })
+      ] }) }),
+      showImportModal && pendingImportFile && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50", style: { margin: 0, padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-2xl max-h-[85vh] overflow-hidden mx-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Select Data Types to Import" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: [
+              "File: ",
+              pendingImportFile.name
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => {
+                setShowImportModal(false);
+                setPendingImportFile(null);
+              },
+              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-5 h-5" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 overflow-y-auto max-h-[60vh]", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 gap-1", children: dataTypes.map((dataType) => /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-start gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg cursor-pointer transition-colors", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "input",
+            {
+              type: "checkbox",
+              checked: selectedImportData.includes(dataType.key),
+              onChange: () => handleImportDataToggle(dataType.key),
+              className: "mt-1 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-0", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(dataType.icon, { className: "w-4 h-4 text-green-600 dark:text-green-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-gray-900 dark:text-white", children: dataType.label })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: dataType.description })
+          ] })
+        ] }, dataType.key)) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+            selectedImportData.length,
+            " data types selected"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                onClick: () => {
+                  setShowImportModal(false);
+                  setPendingImportFile(null);
+                },
+                children: "Cancel"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                onClick: handleImportConfirm,
+                disabled: selectedImportData.length === 0,
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-4 h-4 mr-2" }),
+                  "Import Selected Data"
+                ]
+              }
+            )
+          ] })
+        ] })
       ] }) })
     ] })
   ] });
@@ -63813,7 +65022,7 @@ const ViewDeparture = () => {
               __("bookings", "bookings")
             ] })
           ] }),
-          departure.booking_ids && departure.booking_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4", children: departure.booking_ids.map((bookingId, index) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-start", children: [
+          departure.booking_ids && departure.booking_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-4", children: departure.booking_ids.map((bookingId) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex justify-between items-start", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-medium text-gray-900 dark:text-white", children: [
                 __("Booking", "Booking"),
@@ -66777,6 +67986,8 @@ const App = () => {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(TravelerCategories, {});
       case "reports":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(TravelBookingReports, {});
+      case "tools":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Tools, {});
       case "settings":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Settings, {});
       case "modules":

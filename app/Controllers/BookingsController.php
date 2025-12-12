@@ -9,6 +9,9 @@ use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\BookingService;
 use Yatra\Services\PaymentService;
+use Yatra\Validators\BookingValidator;
+use Yatra\Exceptions\ValidationException;
+use Yatra\Utils\Logger;
 
 /**
  * Bookings REST API Controller
@@ -275,56 +278,92 @@ class BookingsController extends BaseController
     /**
      * GET /bookings/{id} - Get single booking
      */
-    public function getBooking(WP_REST_Request $request): WP_REST_Response
+    public function getBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $id = (int) $request->get_param('id');
+        try {
+            $id = (int) $request->get_param('id');
+            
+            if ($id <= 0) {
+                throw new ValidationException('Invalid booking ID', ['id' => ['Booking ID must be a positive integer']]);
+            }
 
-        $booking = $this->bookingService->getBooking($id);
+            Logger::apiRequest("/bookings/{$id}", 'GET');
+            
+            $booking = $this->bookingService->getBooking($id);
 
-        if (!$booking) {
-            return new WP_REST_Response([
-                'success' => false,
-                'message' => __('Booking not found.', 'yatra'),
-            ], 404);
+            if (!$booking) {
+                Logger::warning("Booking not found", ['booking_id' => $id]);
+                return $this->not_found(__('Booking not found', 'yatra'));
+            }
+
+            Logger::info("Booking retrieved successfully", ['booking_id' => $id]);
+            return $this->success_response($booking);
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to get booking", ['booking_id' => $id ?? 0, 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
-
-        return new WP_REST_Response([
-            'success' => true,
-            'data' => $booking,
-        ]);
     }
 
     /**
      * POST /bookings - Create booking
      */
-    public function createBooking(WP_REST_Request $request): WP_REST_Response
+    public function createBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $data = $request->get_json_params();
+        try {
+            $data = $request->get_json_params();
+            
+            // Validate and sanitize input data
+            BookingValidator::validateCreate($data);
+            $data = BookingValidator::sanitize($data);
+            
+            Logger::apiRequest('/bookings', 'POST', $data);
+            
+            $result = $this->bookingService->createBooking($data);
 
-        $result = $this->bookingService->createBooking($data);
+            if (!$result['success']) {
+                Logger::warning("Booking creation failed", ['data' => $data, 'result' => $result]);
+                return $this->error_response($result['message'] ?? 'Failed to create booking', 400);
+            }
 
-        if (!$result['success']) {
-            return new WP_REST_Response($result, 400);
+            Logger::info("Booking created successfully", ['booking_id' => $result['data']['id'] ?? null]);
+            return $this->success_response($result['data'], 201);
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to create booking", ['data' => $data ?? [], 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
-
-        return new WP_REST_Response($result, 201);
     }
 
     /**
      * PUT /bookings/{id} - Update booking
      */
-    public function updateBooking(WP_REST_Request $request): WP_REST_Response
+    public function updateBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $id = (int) $request->get_param('id');
-        $data = $request->get_json_params();
+        try {
+            $id = (int) $request->get_param('id');
+            $data = $request->get_json_params();
+            
+            // Validate and sanitize input data
+            BookingValidator::validateUpdate($data, $id);
+            $data = BookingValidator::sanitize($data);
+            
+            Logger::apiRequest("/bookings/{$id}", 'PUT', $data);
+            
+            $result = $this->bookingService->updateBooking($id, $data);
 
-        $result = $this->bookingService->updateBooking($id, $data);
+            if (!$result['success']) {
+                Logger::warning("Booking update failed", ['booking_id' => $id, 'data' => $data, 'result' => $result]);
+                return $this->error_response($result['message'] ?? 'Failed to update booking', 400);
+            }
 
-        if (!$result['success']) {
-            return new WP_REST_Response($result, 400);
+            Logger::info("Booking updated successfully", ['booking_id' => $id]);
+            return $this->success_response($result['data']);
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to update booking", ['booking_id' => $id ?? 0, 'data' => $data ?? [], 'error' => $e->getMessage()]);
+            return $this->handle_exception($e);
         }
-
-        return new WP_REST_Response($result);
     }
 
     /**

@@ -76,7 +76,12 @@ $activities = $trip->getActivities();
                 <?php 
                 $destination_links = [];
                 foreach ($destinations as $destination) {
-                    $destination_links[] = '<a href="' . esc_url(yatra_get_destination_permalink($destination)) . '" class="destination-link">' . esc_html($destination->name) . '</a>';
+                    if (isset($destination->name)) {
+                        $destination_permalink = function_exists('yatra_get_destination_permalink') 
+                            ? yatra_get_destination_permalink($destination) 
+                            : '#';
+                        $destination_links[] = '<a href="' . esc_url($destination_permalink) . '" class="destination-link">' . esc_html($destination->name) . '</a>';
+                    }
                 }
                 echo implode(', ', $destination_links);
                 ?>
@@ -91,17 +96,27 @@ $activities = $trip->getActivities();
             <?php endif; ?>
         </h3>
         
-        <!-- Trip Info Row (Duration only) -->
-        <?php if ($duration['has_duration']): ?>
-            <div class="yatra-trip-info-row">
+        <!-- Trip Info Row (Duration and Rating on same line) -->
+        <div class="yatra-trip-info-row">
+            <?php if ($duration['has_duration']): ?>
                 <span class="yatra-info-badge duration">
                     <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6z" clip-rule="evenodd" />
                     </svg>
                     <?php echo esc_html($duration['formatted']); ?>
                 </span>
+            <?php endif; ?>
+            
+            <div class="yatra-trip-rating">
+                <div class="yatra-rating-stars">
+                    <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <span class="yatra-rating-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
+                </div>
+                <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> reviews)</span>
             </div>
-        <?php endif; ?>
+        </div>
 
         <!-- Activities Only -->
         <?php if (!empty($activities)) : ?>
@@ -113,16 +128,6 @@ $activities = $trip->getActivities();
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
-
-        <div class="yatra-trip-rating">
-            <div class="yatra-rating-stars">
-                <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                <span class="yatra-rating-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
-            </div>
-            <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> reviews)</span>
-        </div>
 
         <!-- Categories below reviews -->
         <?php if (!empty($categories)) : ?>

@@ -43,14 +43,37 @@ class Bootstrap
             return;
         }
 
-        // Register service providers
-        $this->registerServiceProviders();
+        try {
+            // Register service providers first
+            $this->registerServiceProviders();
+            
+            // Initialize cache hooks
+            if (class_exists('\Yatra\Hooks\CacheHooks')) {
+                \Yatra\Hooks\CacheHooks::init();
+            }
+            
+            // Initialize core components
+            $this->initializeCore();
+            
+            // Set up WordPress hooks
+            $this->setupWordPressHooks();
 
-        // Initialize core components
-        $this->initializeCore();
-
-        // Set up WordPress hooks
-        $this->setupWordPressHooks();
+        } catch (\Exception $e) {
+            // Log the error
+            if (function_exists('error_log')) {
+                error_log('Yatra plugin initialization error: ' . $e->getMessage());
+            }
+            
+            // Show admin notice if in admin area
+            if (is_admin()) {
+                add_action('admin_notices', function() use ($e) {
+                    echo '<div class="notice notice-error"><p>Yatra plugin failed to initialize: ' . 
+                         esc_html($e->getMessage()) . '</p></div>';
+                });
+            }
+            
+            return;
+        }
 
         $this->initialized = true;
     }
@@ -58,26 +81,49 @@ class Bootstrap
     /**
      * Register service providers
      */
+    /**
+     * Register and boot service providers
+     */
     private function registerServiceProviders(): void
     {
-        $providers = [
-            AppServiceProvider::class,
-            RouteServiceProvider::class,
-            AdminServiceProvider::class,
-        ];
+        $providers = [];
+        
+        // Core providers
+        if (class_exists('Yatra\Providers\AppServiceProvider')) {
+            $providers[] = 'Yatra\Providers\AppServiceProvider';
+        }
+        
+        if (class_exists('Yatra\Providers\RouteServiceProvider')) {
+            $providers[] = 'Yatra\Providers\RouteServiceProvider';
+        }
+        
+        if (is_admin() && class_exists('Yatra\Providers\AdminServiceProvider')) {
+            $providers[] = 'Yatra\Providers\AdminServiceProvider';
+        }
 
+        // Register each provider
         foreach ($providers as $provider) {
-            if (class_exists($provider)) {
-                $serviceProvider = new $provider($this->container);
-                $serviceProvider->register();
+            try {
+                $providerInstance = new $provider($this->container);
+                if (method_exists($providerInstance, 'register')) {
+                    $providerInstance->register();
+                }
+            } catch (\Exception $e) {
+                error_log("Failed to register provider {$provider}: " . $e->getMessage());
+                continue;
             }
         }
         
-        // Boot all service providers after registration
+        // Boot each provider
         foreach ($providers as $provider) {
-            if (class_exists($provider)) {
-                $serviceProvider = new $provider($this->container);
-                $serviceProvider->boot();
+            try {
+                $providerInstance = $this->container->get($provider);
+                if (method_exists($providerInstance, 'boot')) {
+                    $providerInstance->boot();
+                }
+            } catch (\Exception $e) {
+                error_log("Failed to boot provider {$provider}: " . $e->getMessage());
+                continue;
             }
         }
     }

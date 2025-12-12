@@ -15,13 +15,13 @@ import {
   Info,
   Activity,
   Clock,
-  CheckCircle,
-  AlertCircle
+  CheckCircle
+  // AlertCircle available for future use
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { StatCard } from '../components/common/StatCard';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { SimpleBarChart } from '../components/charts/SimpleBarChart';

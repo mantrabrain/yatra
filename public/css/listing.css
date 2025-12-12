@@ -901,7 +901,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 3px;
 }
 
 .yatra-rating-stars {
@@ -1895,12 +1895,6 @@ a.yatra-highlight-link:hover {
     text-decoration: none;
 }
 
-.yatra-trip-rating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-}
 
 .yatra-rating-stars {
     display: flex;
@@ -2208,13 +2202,7 @@ a.yatra-highlight-link:hover {
     height: 14px;
 }
 
-/* Rating Section */
-.yatra-trip-rating {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
+/* Rating Section - consolidated with main rule above */
 
 .yatra-rating-stars {
     display: flex;

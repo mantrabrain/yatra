@@ -7,6 +7,8 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Exceptions\YatraException;
+use Yatra\Exceptions\ValidationException;
 
 /**
  * Base REST API Controller
@@ -316,6 +318,39 @@ abstract class BaseController
     protected function error_response(string $message, int $status = 400, array $data = []): WP_Error
     {
         return new WP_Error('yatra_error', $message, array_merge(['status' => $status], $data));
+    }
+
+    /**
+     * Handle Yatra exceptions and convert to appropriate WP_Error
+     */
+    protected function handle_exception(\Exception $e): WP_Error
+    {
+        if ($e instanceof ValidationException) {
+            return new WP_Error(
+                $e->getErrorCode(),
+                $e->getMessage(),
+                [
+                    'status' => $e->getCode(),
+                    'validation_errors' => $e->getErrors(),
+                    'context' => $e->getContext()
+                ]
+            );
+        }
+
+        if ($e instanceof YatraException) {
+            return new WP_Error(
+                $e->getErrorCode(),
+                $e->getMessage(),
+                [
+                    'status' => $e->getCode(),
+                    'context' => $e->getContext()
+                ]
+            );
+        }
+
+        // Generic exception handling
+        $status = method_exists($e, 'getCode') && $e->getCode() > 0 ? $e->getCode() : 500;
+        return new WP_Error('server_error', $e->getMessage(), ['status' => $status]);
     }
 
     /**

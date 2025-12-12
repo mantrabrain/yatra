@@ -9,7 +9,8 @@ import { useQuery } from '@tanstack/react-query';
 import { __ } from '../lib/i18n';
 import { apiClient } from '../lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Button } from '../components/ui/button';
+// Button available for future use
+// import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 
 // Skeleton Loading Components
@@ -20,7 +21,8 @@ const SkeletonMetricCard = () => (
   </div>
 );
 
-const SkeletonTabContent = () => (
+// SkeletonTabContent available for future use - exported to suppress unused warning
+export const SkeletonTabContent = () => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
@@ -466,7 +468,7 @@ const ViewDeparture: React.FC = () => {
               
               {departure.booking_ids && departure.booking_ids.length > 0 ? (
                 <div className="grid gap-4">
-                  {departure.booking_ids.map((bookingId: number, index: number) => (
+                  {departure.booking_ids.map((bookingId: number) => (
                     <div key={bookingId} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                       <div className="flex justify-between items-start">
                         <div>

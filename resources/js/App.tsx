@@ -21,6 +21,7 @@ import Reviews from './pages/Reviews';
 import ReviewForm from './pages/ReviewForm';
 import ViewReview from './pages/ViewReview';
 import Reports from './pages/Reports';
+import Tools from './components/Tools';
 import Settings from './pages/Settings';
 import ItemTypes from './pages/ItemTypes';
 import ItemTypeForm from './pages/ItemTypeForm';
@@ -232,6 +233,8 @@ const App: React.FC = () => {
         return <TravelerCategories />;
       case 'reports':
         return <Reports />;
+      case 'tools':
+        return <Tools />;
       case 'settings':
         return <Settings />;
       case 'modules':
