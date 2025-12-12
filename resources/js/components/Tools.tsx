@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useToast } from '../components/ui/toast';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -119,6 +120,8 @@ const Tools: React.FC = () => {
   const [isLoadingLogs, setIsLoadingLogs] = useState(false);
   const [isLoadingJobs, setIsLoadingJobs] = useState(false);
   const [allJobs, setAllJobs] = useState<JobStatus[]>([]);
+  const [isClearingCache, setIsClearingCache] = useState(false);
+  const { showToast } = useToast();
   
   // Background job states
   const [exportJob, setExportJob] = useState<JobStatus | null>(null);
@@ -623,6 +626,54 @@ const Tools: React.FC = () => {
     }
   };
 
+  // Clear all caches
+  const clearAllCache = async () => {
+    setIsClearingCache(true);
+    try {
+      // Log the request
+      console.log('Clearing cache - sending request');
+      
+      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/clear-cache`, {
+        method: 'DELETE',
+        headers: {
+          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+        },
+      });
+      
+      // Log the raw response
+      console.log('Cache clearing response status:', response.status);
+      
+      const data = await response.json();
+      console.log('Cache clearing response data:', data);
+      
+      // Clear React Query cache if available
+      if ((window as any).yatraQueryClient && typeof (window as any).yatraQueryClient.invalidateQueries === 'function') {
+        (window as any).yatraQueryClient.invalidateQueries();
+      }
+      
+      // Fixed handling of response
+      if (response.ok && data.success) {
+        // Only show success message if both response.ok and data.success are true
+        showToast('All caches cleared successfully! Please refresh the page to see the changes.', 'success');
+      } else {
+        // Create a clean error message without concatenation issues
+        let errorMessage = 'Failed to clear caches';
+        
+        // Only append additional details if they don't create a contradictory message
+        if (data.message && !data.message.includes('success')) {
+          errorMessage += ': ' + data.message;
+        }
+        
+        showToast(errorMessage, 'error');
+      }
+    } catch (error) {
+      console.error('Failed to clear caches:', error);
+      showToast('Failed to clear caches. Please try again.', 'error');
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'system-status') {
       loadSystemStatus();
@@ -641,6 +692,17 @@ const Tools: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400">
             Export/Import data, check system status, and view logs
           </p>
+        </div>
+        <div>
+          <Button 
+            onClick={clearAllCache} 
+            variant="outline"
+            className="flex items-center gap-2"
+            disabled={isClearingCache}
+          >
+            <RefreshCw className={`w-4 h-4 ${isClearingCache ? 'animate-spin' : ''}`} />
+            {isClearingCache ? 'Clearing...' : 'Clear Cache'}
+          </Button>
         </div>
       </div>
 

@@ -155,6 +155,15 @@ class ToolsController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+
+        // Clear all cache
+        register_rest_route($namespace, '/' . $base . '/clear-cache', [
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'clearAllCache'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -1016,18 +1025,13 @@ class ToolsController extends BaseController
                 $jobData = maybe_unserialize($option->option_value);
                 
                 if (!is_array($jobData)) {
-                    Logger::warning("Job data is not an array for option: {$option->option_name}");
                     continue;
                 }
                 
-                // Don't filter by user - show all jobs for admin users
-                // This allows admins to see all jobs
-                if (!current_user_can('manage_options')) {
-                    // For non-admin users, filter by user ID
-                    if (($jobData['user_id'] ?? 0) !== $userId) {
-                        $filteredCount++;
-                        continue;
-                    }
+                // Filter by user
+                if (($jobData['user_id'] ?? 0) !== $userId) {
+                    $filteredCount++;
+                    continue;
                 }
                 
                 $jobs[] = $jobData;
@@ -1044,6 +1048,47 @@ class ToolsController extends BaseController
             
         } catch (\Exception $e) {
             Logger::error('Failed to get all jobs: ' . $e->getMessage());
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Clear all Yatra caches
+     */
+    public function clearAllCache(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            global $wpdb;
+            
+            // Clear transients
+            $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_yatra_%'");
+            $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_timeout_yatra_%'");
+            
+            // Clear object cache if available
+            if (function_exists('wp_cache_flush')) {
+                wp_cache_flush();
+            }
+            
+            // Clear any cached queries
+            if (class_exists('\\Yatra\\Utils\\QueryCache')) {
+                \Yatra\Utils\QueryCache::invalidateAll();
+            }
+            
+            // Clear React query cache
+            // This is done on the frontend when the API call succeeds
+            
+            // Clear any other specific caches
+            do_action('yatra_clear_cache');
+            
+            Logger::info('All Yatra caches cleared successfully');
+            
+            return $this->success_response([
+                'success' => true,
+                'message' => __('All caches cleared successfully', 'yatra')
+            ]);
+            
+        } catch (\Exception $e) {
+            Logger::error('Failed to clear caches: ' . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }

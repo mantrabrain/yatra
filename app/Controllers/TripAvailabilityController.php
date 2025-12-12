@@ -314,6 +314,35 @@ class TripAvailabilityController extends BaseController
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $trip = $tripRepository->find($tripId ?: $departure->trip_id);
         if ($trip) {
+            // Log trip data for debugging
+            \Yatra\Utils\Logger::info("Trip data for departure {$departure->id}: " . json_encode([
+                'duration' => $trip->duration ?? 'NULL',
+                'group_type' => $trip->group_type ?? 'NULL',
+                'difficulty_level' => $trip->difficulty_level ?? 'NULL',
+                'min_travelers' => $trip->min_travelers ?? 'NULL',
+                'max_travelers' => $trip->max_travelers ?? 'NULL',
+            ]));
+            
+            // Fetch difficulty level name from difficulty_levels table
+            $difficultyLevelName = '';
+            if (!empty($trip->difficulty_level) && is_numeric($trip->difficulty_level)) {
+                $difficultyRepo = new \Yatra\Repositories\DifficultyLevelRepository();
+                $difficultyLevel = $difficultyRepo->find((int) $trip->difficulty_level);
+                if ($difficultyLevel) {
+                    $difficultyLevelName = $difficultyLevel->name ?? '';
+                }
+            }
+            
+            // Fetch group type name from traveler_categories table
+            $groupTypeName = '';
+            if (!empty($trip->group_type) && is_numeric($trip->group_type)) {
+                $travelerCategoryRepo = new \Yatra\Repositories\TravelerCategoryRepository();
+                $travelerCategory = $travelerCategoryRepo->find((int) $trip->group_type);
+                if ($travelerCategory) {
+                    $groupTypeName = $travelerCategory->name ?? '';
+                }
+            }
+            
             $departureArray['trip'] = [
                 'id' => (int) $trip->id,
                 'title' => $trip->title ?? '',
@@ -322,6 +351,15 @@ class TripAvailabilityController extends BaseController
                     ?? $trip->excerpt
                     ?? $trip->summary
                     ?? '',
+                'starting_location' => $trip->starting_location ?? '',
+                'ending_location' => $trip->ending_location ?? '',
+                'difficulty_level' => $difficultyLevelName,
+                'group_type' => $groupTypeName,
+                'min_travelers' => $trip->min_travelers ?? null,
+                'max_travelers' => $trip->max_travelers ?? null,
+                'duration' => $trip->duration ?? null,
+                'price' => $trip->price ?? null,
+                'created_at' => $trip->created_at ?? '',
             ];
         }
 

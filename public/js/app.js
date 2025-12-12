@@ -23599,8 +23599,33 @@ const Trips = () => {
   const trips = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
+  const { data: difficultyLevelsData } = useQuery({
+    queryKey: ["difficulty-levels-lookup"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/difficulty-levels", { params: { per_page: 100 } });
+        return response.data || [];
+      } catch (error2) {
+        console.error("Failed to load difficulty levels", error2);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1e3
+    // 5 minutes
+  });
+  const difficultyLevels = reactExports.useMemo(() => {
+    return (difficultyLevelsData || []).reduce((acc, level) => {
+      if (level && level.id && level.name) {
+        acc[level.id.toString()] = level.name;
+      }
+      return acc;
+    }, {});
+  }, [difficultyLevelsData]);
   const formatLabel = (value) => {
     if (!value) return "";
+    if (value && /^\d+$/.test(value) && difficultyLevels[value]) {
+      return difficultyLevels[value];
+    }
     return value.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim().replace(/\b\w/g, (char) => char.toUpperCase());
   };
   const summarizeDestinations = (trip) => {
@@ -41253,6 +41278,8 @@ const Tools = () => {
   const [isLoadingLogs, setIsLoadingLogs] = reactExports.useState(false);
   const [isLoadingJobs, setIsLoadingJobs] = reactExports.useState(false);
   const [allJobs, setAllJobs] = reactExports.useState([]);
+  const [isClearingCache, setIsClearingCache] = reactExports.useState(false);
+  const { showToast } = useToast();
   const [exportJob, setExportJob] = reactExports.useState(null);
   const [importJob, setImportJob] = reactExports.useState(null);
   const pollingIntervalRef = reactExports.useRef(null);
@@ -41644,6 +41671,38 @@ const Tools = () => {
       setIsLoadingJobs(false);
     }
   };
+  const clearAllCache = async () => {
+    setIsClearingCache(true);
+    try {
+      console.log("Clearing cache - sending request");
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/clear-cache`, {
+        method: "DELETE",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      console.log("Cache clearing response status:", response.status);
+      const data = await response.json();
+      console.log("Cache clearing response data:", data);
+      if (window.yatraQueryClient && typeof window.yatraQueryClient.invalidateQueries === "function") {
+        window.yatraQueryClient.invalidateQueries();
+      }
+      if (response.ok && data.success) {
+        showToast("All caches cleared successfully! Please refresh the page to see the changes.", "success");
+      } else {
+        let errorMessage = "Failed to clear caches";
+        if (data.message && !data.message.includes("success")) {
+          errorMessage += ": " + data.message;
+        }
+        showToast(errorMessage, "error");
+      }
+    } catch (error) {
+      console.error("Failed to clear caches:", error);
+      showToast("Failed to clear caches. Please try again.", "error");
+    } finally {
+      setIsClearingCache(false);
+    }
+  };
   reactExports.useEffect(() => {
     if (activeTab === "system-status") {
       loadSystemStatus();
@@ -41654,10 +41713,25 @@ const Tools = () => {
     }
   }, [activeTab, selectedLogType]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: "Tools" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Export/Import data, check system status, and view logs" })
-    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: "Tools" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Export/Import data, check system status, and view logs" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        Button,
+        {
+          onClick: clearAllCache,
+          variant: "outline",
+          className: "flex items-center gap-2",
+          disabled: isClearingCache,
+          children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isClearingCache ? "animate-spin" : ""}` }),
+            isClearingCache ? "Clearing..." : "Clear Cache"
+          ]
+        }
+      ) })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex space-x-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(

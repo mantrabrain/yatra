@@ -943,31 +943,14 @@ class Trip
      */
     public function getDifficulty(): array
     {
-        
-        
         $difficulty = '';
         $difficulty_icon = '';
         
-        // First priority: Use pre-populated difficulty_name from main query (AppServiceProvider)
-        if (!empty($this->difficulty_name)) {
-            $difficulty = $this->difficulty_name;
-        }
-        
-        // First priority: Use pre-populated difficulty_icon from main query (AppServiceProvider)
-        if (!empty($this->difficulty_icon)) {
-            $icon_data = maybe_unserialize($this->difficulty_icon);
-            if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
-                $difficulty_icon = $icon_data['value'];
-            } elseif (is_string($this->difficulty_icon)) {
-                $difficulty_icon = $this->difficulty_icon;
-            }
-        }
-        
-        // Fallback: Handle difficulty_level as ID - fetch from difficulty table
-        if (empty($difficulty) && !empty($this->difficulty_level)) {
+        // Always prioritize fetching from difficulty_levels table if we have a difficulty_level ID
+        if (!empty($this->difficulty_level)) {
             global $wpdb;
             
-            // The difficulty_level field now contains the ID, so fetch by ID
+            // Check if it's a numeric ID
             if (is_numeric($this->difficulty_level)) {
                 $difficulty_data = $wpdb->get_row($wpdb->prepare(
                     "SELECT * FROM {$wpdb->prefix}yatra_difficulty_levels WHERE id = %d",
@@ -976,7 +959,7 @@ class Trip
                 
                 if ($difficulty_data) {
                     $difficulty = $difficulty_data->name;
-                    if (empty($difficulty_icon) && !empty($difficulty_data->icon)) {
+                    if (!empty($difficulty_data->icon)) {
                         $icon_data = maybe_unserialize($difficulty_data->icon);
                         if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
                             $difficulty_icon = $icon_data['value'];
@@ -988,11 +971,18 @@ class Trip
             }
         }
         
-        // Fallback icon from direct property
+        // Fallback: Use pre-populated difficulty_name from main query (AppServiceProvider)
+        if (empty($difficulty) && !empty($this->difficulty_name)) {
+            $difficulty = $this->difficulty_name;
+        }
+        
+        // Fallback: Use pre-populated difficulty_icon from main query (AppServiceProvider)
         if (empty($difficulty_icon) && !empty($this->difficulty_icon)) {
             $icon_data = maybe_unserialize($this->difficulty_icon);
             if (is_array($icon_data) && isset($icon_data['type']) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
                 $difficulty_icon = $icon_data['value'];
+            } elseif (is_string($this->difficulty_icon)) {
+                $difficulty_icon = $this->difficulty_icon;
             }
         }
         

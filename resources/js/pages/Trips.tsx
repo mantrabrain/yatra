@@ -226,8 +226,39 @@ const Trips: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
+  // Get difficulty level data for lookup
+  const { data: difficultyLevelsData } = useQuery({
+    queryKey: ['difficulty-levels-lookup'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/difficulty-levels', { params: { per_page: 100 } });
+        return response.data || [];
+      } catch (error) {
+        console.error('Failed to load difficulty levels', error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  const difficultyLevels = useMemo(() => {
+    return (difficultyLevelsData || []).reduce((acc: Record<string, string>, level: any) => {
+      if (level && level.id && level.name) {
+        acc[level.id.toString()] = level.name;
+      }
+      return acc;
+    }, {});
+  }, [difficultyLevelsData]);
+
   const formatLabel = (value?: string | null) => {
     if (!value) return '';
+    
+    // If it's a difficulty level ID, look it up in the difficulty levels data
+    if (value && /^\d+$/.test(value) && difficultyLevels[value]) {
+      return difficultyLevels[value];
+    }
+    
+    // Otherwise, just format the string
     return value
       .replace(/[-_]+/g, ' ')
       .replace(/\s+/g, ' ')
