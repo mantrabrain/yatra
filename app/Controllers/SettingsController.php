@@ -16,8 +16,17 @@ class SettingsController extends BaseController
 {
     /**
      * All settings fields with their default values
+     * Pro plugin can add additional settings via filter
      */
-    private array $default_settings = [
+    private array $default_settings;
+    
+    /**
+     * Constructor - initialize default settings with filter
+     */
+    public function __construct()
+    {
+        // Define base settings
+        $base_settings = [
         // General Settings
         'company_name' => '',
         'company_email' => '',
@@ -167,7 +176,11 @@ class SettingsController extends BaseController
         
         // Booking Form Builder
         'booking_form_config' => [],
-    ];
+        ];
+        
+        // Allow Pro plugins to add their settings via filter
+        $this->default_settings = apply_filters('yatra_settings_default_fields', $base_settings);
+    }
 
     public function register_routes(): void
     {
@@ -283,7 +296,6 @@ class SettingsController extends BaseController
 
             $updated = [];
             $errors = [];
-
             // Process each setting
             foreach ($data as $key => $value) {
                 // Validate that the key exists in default settings
@@ -350,11 +362,18 @@ class SettingsController extends BaseController
 
     /**
      * Sanitize and validate setting value
+     * Pro plugins can handle sanitization of their own settings via filter
      */
     private function sanitize_setting(string $key, mixed $value): mixed
     {
         $default = $this->default_settings[$key] ?? null;
         $default_type = gettype($default);
+        
+        // Allow Pro plugins to handle sanitization of their own settings
+        $filtered_value = apply_filters('yatra_sanitize_setting', null, $key, $value, $default);
+        if ($filtered_value !== null) {
+            return $filtered_value;
+        }
 
         // Handle null values - use default
         if ($value === null) {

@@ -47,6 +47,7 @@ import ViewEnquiry from './pages/ViewEnquiry';
 import EnquiryForm from './pages/EnquiryForm';
 import Modules from './pages/Modules';
 import Travelers from './pages/Travelers';
+import GoogleCalendar from './pages/GoogleCalendar';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -239,6 +240,8 @@ const App: React.FC = () => {
         return <Settings />;
       case 'modules':
         return <Modules />;
+      case 'yatra-google-calendar':
+        return <GoogleCalendar />;
       case 'dashboard':
       default:
         return <Dashboard />;

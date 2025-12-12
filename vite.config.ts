@@ -11,6 +11,7 @@ export default defineConfig({
       },
     }),
   ],
+  base: './', // Use relative paths for assets
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './resources/js'),

@@ -6,6 +6,7 @@ namespace Yatra\Providers;
 
 use Yatra\Core\ServiceProvider;
 use Yatra\Core\Container;
+use Yatra\Core\Modules\ModuleManager;
 
 /**
  * Admin Service Provider
@@ -294,7 +295,7 @@ class AdminServiceProvider extends ServiceProvider
             ];
             
         // Localize script with API data, permissions, and translations
-        wp_localize_script('yatra-admin', 'yatraAdmin', [
+        wp_localize_script('yatra-admin', 'yatraAdmin', apply_filters('yatra_admin_localized_data', [
             'apiUrl' => rest_url('yatra/v1'),
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
@@ -304,10 +305,14 @@ class AdminServiceProvider extends ServiceProvider
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,
             'isPro' => defined('YATRA_PRO_VERSION'),
+            'showGoogleCalendarSettingsUI' => apply_filters(
+                'yatra_show_google_calendar_settings_ui',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('google_calendar') : false
+            ),
             'translations' => $translations,
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
-        ]);
+        ]));
     }
 
 

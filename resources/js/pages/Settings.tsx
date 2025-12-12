@@ -34,7 +34,11 @@ import {
   Eye,
   EyeOff,
   Edit2,
-  Lock
+  Lock,
+  CheckCircle,
+  XCircle,
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -62,7 +66,7 @@ const FormField = React.memo(({
 }: { 
   id: string; 
   label: string; 
-  description?: string; 
+  description?: React.ReactNode; 
   required?: boolean;
   children: React.ReactNode;
 }) => (
@@ -72,15 +76,327 @@ const FormField = React.memo(({
       {required && <span className="text-red-500">*</span>}
     </Label>
     {description && (
-      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1">
+      <p className="text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5">
         <Info className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
-        {description}
+        <span className="min-w-0 leading-relaxed">{description}</span>
       </p>
     )}
     {children}
   </div>
 ));
 FormField.displayName = 'FormField';
+
+// Google Calendar Integration Section - inline component to avoid lazy loading issues
+const GoogleCalendarIntegrationSection: React.FC<{
+  formData: SettingsData;
+  setFormData: React.Dispatch<React.SetStateAction<SettingsData | null>>;
+}> = ({ formData, setFormData }) => {
+  const yatraAdmin = (window as any).yatraAdmin || {};
+  const gcSettings = yatraAdmin.googleCalendar || {};
+  const siteUrl = yatraAdmin.siteUrl || '';
+  
+  // Use state from parent formData if available, otherwise use from yatraAdmin
+  const [clientId, setClientId] = useState(formData.google_calendar_client_id || gcSettings.client_id || '');
+  const [clientSecret, setClientSecret] = useState(formData.google_calendar_client_secret || gcSettings.client_secret || '');
+  const [calendarId, setCalendarId] = useState(formData.google_calendar_calendar_id || gcSettings.calendar_id || '');
+  const [calendarName, setCalendarName] = useState(formData.google_calendar_calendar_name || gcSettings.calendar_name || '');
+  const [connected, setConnected] = useState(formData.google_calendar_connected || gcSettings.connected || false);
+  const [connecting, setConnecting] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  
+  const redirectUri = yatraAdmin.googleCalendarRedirectUri || gcSettings.redirect_uri || `${siteUrl}/wp-json/yatra/v1/google-calendar/callback`;
+  const lastSync = formData.google_calendar_last_sync || gcSettings.last_sync || null;
+  
+  // Dynamic mapping of settings to formData
+  const syncSettingsToFormData = () => {
+    // Get all available settings from the backend
+    const allSettings = {
+      google_calendar_client_id: clientId,
+      google_calendar_client_secret: clientSecret,
+      google_calendar_calendar_id: calendarId,
+      google_calendar_calendar_name: calendarName,
+      google_calendar_connected: connected,
+      google_calendar_last_sync: lastSync,
+      google_calendar_enabled: true, // Enable by default when settings are provided
+    };
+    
+    // Update formData with all settings
+    setFormData(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ...allSettings
+      };
+    });
+  };
+  
+  // Update formData when any setting changes
+  useEffect(() => {
+    syncSettingsToFormData();
+  }, [clientId, clientSecret, calendarId, calendarName, connected, lastSync]);
+
+  const handleConnect = async () => {
+    setConnecting(true);
+    try {
+      const response = await apiClient.post('/google-calendar/connect');
+      if (response.data?.auth_url) {
+        window.open(response.data.auth_url, '_blank');
+      }
+    } catch (error) {
+      console.error('Failed to connect:', error);
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    if (!confirm(__('Are you sure you want to disconnect from Google Calendar?', 'Are you sure you want to disconnect from Google Calendar?'))) {
+      return;
+    }
+    try {
+      await apiClient.post('/google-calendar/disconnect');
+      
+      // Update settings state
+      setConnected(false);
+      setCalendarId('');
+      setCalendarName('');
+    } catch (error) {
+      console.error('Failed to disconnect:', error);
+    }
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      await apiClient.post('/google-calendar/sync-all');
+      // No need to update lastSync state directly as it's derived from formData
+      // The API response will be handled by the backend and reflected in the next load
+    } catch (error) {
+      console.error('Failed to sync:', error);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Settings Card */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-blue-500" />
+            {__('Google Calendar Settings', 'Google Calendar Settings')}
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {connected ? (
+              <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                <CheckCircle className="w-4 h-4" />
+                {__('Connected', 'Connected')}
+              </div>
+            ) : (
+              <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                <XCircle className="w-4 h-4" />
+                {__('Not Connected', 'Not Connected')}
+              </div>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {__('Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.', 'Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.')}
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField 
+              id="gc_client_id" 
+              label={__('Client ID', 'Client ID')} 
+              description={(
+                <>
+                  {__('Create an OAuth client in', 'Create an OAuth client in')}{' '}
+                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
+                  {__(', then paste the OAuth 2.0 Client ID here.', ', then paste the OAuth 2.0 Client ID here.')}{' '}
+                  {__('Example:', 'Example:')}{' '}
+                  <code className="font-mono">123...apps.googleusercontent.com</code>
+                </>
+              )}
+            >
+              <Input
+                id="gc_client_id"
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+                placeholder="123456789-xxxxx.apps.googleusercontent.com"
+              />
+            </FormField>
+            <FormField 
+              id="gc_client_secret" 
+              label={__('Client Secret', 'Client Secret')}
+              description={(
+                <>
+                  {__('Copy the Client Secret from the same OAuth client in', 'Copy the Client Secret from the same OAuth client in')}{' '}
+                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
+                  {__('.', '.')}{' '}
+                  {__('Keep this private.', 'Keep this private.')}
+                </>
+              )}
+            >
+              <Input
+                id="gc_client_secret"
+                type="password"
+                value={clientSecret}
+                onChange={(e) => setClientSecret(e.target.value)}
+                placeholder="GOCSPX-xxxxxxxxxxxxxxxxxx"
+              />
+            </FormField>
+          </div>
+
+          <FormField 
+            id="gc_redirect_uri" 
+            label={__('Redirect URI (OAuth Callback URL)', 'Redirect URI (OAuth Callback URL)')} 
+            description={(
+              <>
+                {__('Add this to your OAuth client under "Authorized redirect URIs" in', 'Add this to your OAuth client under "Authorized redirect URIs" in')}{' '}
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
+                {__('.', '.')}{' '}
+                {__('Make sure the', 'Make sure the')}{' '}
+                <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Calendar API', 'Google Calendar API')}</a>
+                {' '}{__('is enabled.', 'is enabled.')}
+              </>
+            )}
+          >
+            <div className="flex items-center gap-2">
+              <Input
+                id="gc_redirect_uri"
+                value={redirectUri}
+                readOnly
+                className="bg-gray-50 dark:bg-gray-900 font-mono text-sm"
+              />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigator.clipboard.writeText(redirectUri)}
+              >
+                {__('Copy', 'Copy')}
+              </Button>
+            </div>
+          </FormField>
+
+          <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+            <p className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+              <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
+              <span className="min-w-0 leading-relaxed">
+                {__('OAuth scopes required (add these on the Google OAuth consent screen):', 'OAuth scopes required (add these on the Google OAuth consent screen):')}{' '}
+                <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer" className="text-amber-900 dark:text-amber-200 underline">{__('OAuth Consent Screen', 'OAuth Consent Screen')}</a>
+              </span>
+            </p>
+            <div className="mt-2 space-y-1">
+              <div className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <code className="text-[11px] bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">https://www.googleapis.com/auth/calendar</code>
+              </div>
+              <div className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
+                <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <code className="text-[11px] bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded">https://www.googleapis.com/auth/calendar.events</code>
+              </div>
+            </div>
+          </div>
+
+          {connected && (
+            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md space-y-4">
+              <h4 className="font-medium text-sm text-green-800 dark:text-green-400 flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                {__('Connected Calendar', 'Connected Calendar')}
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField 
+                  id="gc_calendar_id" 
+                  label={__('Calendar ID', 'Calendar ID')}
+                  description={__('The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.', 'The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.')}
+                >
+                  <Input
+                    id="gc_calendar_id"
+                    value={calendarId}
+                    onChange={(e) => setCalendarId(e.target.value)}
+                    placeholder="primary"
+                  />
+                </FormField>
+                <FormField 
+                  id="gc_calendar_name" 
+                  label={__('Calendar Name', 'Calendar Name')}
+                  description={__('A friendly name for this calendar connection (for your reference only).', 'A friendly name for this calendar connection (for your reference only).')}
+                >
+                  <Input
+                    id="gc_calendar_name"
+                    value={calendarName}
+                    onChange={(e) => setCalendarName(e.target.value)}
+                    placeholder={__('My Booking Calendar', 'My Booking Calendar')}
+                  />
+                </FormField>
+              </div>
+              
+              <div className="flex items-center justify-between pt-2 border-t border-green-200 dark:border-green-800">
+                <p className="text-xs text-green-700 dark:text-green-400">
+                  {lastSync ? (
+                    <>{__('Last sync:', 'Last sync:')} {new Date(lastSync).toLocaleString()}</>
+                  ) : (
+                    __('Never synced', 'Never synced')
+                  )}
+                </p>
+                <Button variant="outline" size="sm" onClick={handleSync} disabled={syncing} className="flex items-center gap-2">
+                  <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                  {__('Sync Now', 'Sync Now')}
+                </Button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex flex-wrap justify-between items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-wrap gap-3">
+              <a
+                href="https://console.cloud.google.com/apis/credentials"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
+              >
+                <ExternalLink className="w-3 h-3" />
+                {__('Credentials', 'Credentials')}
+              </a>
+              <a
+                href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
+              >
+                <ExternalLink className="w-3 h-3" />
+                {__('Calendar API', 'Calendar API')}
+              </a>
+              <a
+                href="https://console.cloud.google.com/apis/credentials/consent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
+              >
+                <ExternalLink className="w-3 h-3" />
+                {__('OAuth Consent', 'OAuth Consent')}
+              </a>
+            </div>
+            
+            {connected ? (
+              <Button variant="destructive" onClick={handleDisconnect} className="flex items-center gap-2">
+                <XCircle className="w-4 h-4" />
+                {__('Disconnect', 'Disconnect')}
+              </Button>
+            ) : (
+              <Button onClick={handleConnect} disabled={connecting || !clientId || !clientSecret} className="flex items-center gap-2">
+                {connecting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
+                {__('Connect to Google Calendar', 'Connect to Google Calendar')}
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
 
 type SettingsSection = 
   | 'general'
@@ -182,6 +498,15 @@ interface SettingsData {
   date_format: string;
   time_format: string;
   language: string;
+  
+  // Google Calendar Settings
+  google_calendar_client_id?: string;
+  google_calendar_client_secret?: string;
+  google_calendar_calendar_id?: string;
+  google_calendar_calendar_name?: string;
+  google_calendar_connected?: boolean;
+  google_calendar_last_sync?: string | null;
+  google_calendar_enabled?: boolean;
   
   // Booking Settings
   booking_confirmation: boolean;
@@ -3534,6 +3859,16 @@ onChange={handleFieldChange}
       case 'integration':
         return (
           <div className="space-y-6">
+            {/* Google Calendar Integration - Only show if Pro is active */}
+            {window.yatraAdmin && (window as any).yatraAdmin.showGoogleCalendarSettingsUI && (
+              <>
+                <SectionDivider title={__('Google Calendar Integration', 'Google Calendar Integration')} />
+                <GoogleCalendarIntegrationSection formData={formData} setFormData={setFormData} />
+              </>
+            )}
+            
+            <SectionDivider title={__('Analytics & Tracking', 'Analytics & Tracking')} />
+            
             <div className="space-y-4">
               <FormField
                 id="google_analytics"

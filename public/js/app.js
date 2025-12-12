@@ -42665,13 +42665,319 @@ const FormField = React.memo(({
     label,
     required && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
   ] }),
-  description && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1", children: [
+  description && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 flex items-start gap-1.5", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-3.5 h-3.5 mt-0.5 flex-shrink-0" }),
-    description
+    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "min-w-0 leading-relaxed", children: description })
   ] }),
   children
 ] }));
 FormField.displayName = "FormField";
+const GoogleCalendarIntegrationSection = ({ formData, setFormData }) => {
+  const yatraAdmin = window.yatraAdmin || {};
+  const gcSettings = yatraAdmin.googleCalendar || {};
+  const siteUrl = yatraAdmin.siteUrl || "";
+  const [clientId, setClientId] = reactExports.useState(formData.google_calendar_client_id || gcSettings.client_id || "");
+  const [clientSecret, setClientSecret] = reactExports.useState(formData.google_calendar_client_secret || gcSettings.client_secret || "");
+  const [calendarId, setCalendarId] = reactExports.useState(formData.google_calendar_calendar_id || gcSettings.calendar_id || "");
+  const [calendarName, setCalendarName] = reactExports.useState(formData.google_calendar_calendar_name || gcSettings.calendar_name || "");
+  const [connected, setConnected] = reactExports.useState(formData.google_calendar_connected || gcSettings.connected || false);
+  const [connecting, setConnecting] = reactExports.useState(false);
+  const [syncing, setSyncing] = reactExports.useState(false);
+  const redirectUri = yatraAdmin.googleCalendarRedirectUri || gcSettings.redirect_uri || `${siteUrl}/wp-json/yatra/v1/google-calendar/callback`;
+  const lastSync = formData.google_calendar_last_sync || gcSettings.last_sync || null;
+  const syncSettingsToFormData = () => {
+    const allSettings = {
+      google_calendar_client_id: clientId,
+      google_calendar_client_secret: clientSecret,
+      google_calendar_calendar_id: calendarId,
+      google_calendar_calendar_name: calendarName,
+      google_calendar_connected: connected,
+      google_calendar_last_sync: lastSync,
+      google_calendar_enabled: true
+      // Enable by default when settings are provided
+    };
+    setFormData((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        ...allSettings
+      };
+    });
+  };
+  reactExports.useEffect(() => {
+    syncSettingsToFormData();
+  }, [clientId, clientSecret, calendarId, calendarName, connected, lastSync]);
+  const handleConnect = async () => {
+    var _a;
+    setConnecting(true);
+    try {
+      const response = await apiClient.post("/google-calendar/connect");
+      if ((_a = response.data) == null ? void 0 : _a.auth_url) {
+        window.open(response.data.auth_url, "_blank");
+      }
+    } catch (error) {
+      console.error("Failed to connect:", error);
+    } finally {
+      setConnecting(false);
+    }
+  };
+  const handleDisconnect = async () => {
+    if (!confirm(__("Are you sure you want to disconnect from Google Calendar?", "Are you sure you want to disconnect from Google Calendar?"))) {
+      return;
+    }
+    try {
+      await apiClient.post("/google-calendar/disconnect");
+      setConnected(false);
+      setCalendarId("");
+      setCalendarName("");
+    } catch (error) {
+      console.error("Failed to disconnect:", error);
+    }
+  };
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      await apiClient.post("/google-calendar/sync-all");
+    } catch (error) {
+      console.error("Failed to sync:", error);
+    } finally {
+      setSyncing(false);
+    }
+  };
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "flex flex-row items-center justify-between pb-2", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-5 h-5 text-blue-500" }),
+        __("Google Calendar Settings", "Google Calendar Settings")
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: connected ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-green-600 dark:text-green-400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+        __("Connected", "Connected")
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+        __("Not Connected", "Not Connected")
+      ] }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-300", children: __("Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.", "Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          FormField,
+          {
+            id: "gc_client_id",
+            label: __("Client ID", "Client ID"),
+            description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              __("Create an OAuth client in", "Create an OAuth client in"),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://console.cloud.google.com/apis/credentials", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Google Cloud Credentials", "Google Cloud Credentials") }),
+              __(", then paste the OAuth 2.0 Client ID here.", ", then paste the OAuth 2.0 Client ID here."),
+              " ",
+              __("Example:", "Example:"),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "font-mono", children: "123...apps.googleusercontent.com" })
+            ] }),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "gc_client_id",
+                value: clientId,
+                onChange: (e) => setClientId(e.target.value),
+                placeholder: "123456789-xxxxx.apps.googleusercontent.com"
+              }
+            )
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          FormField,
+          {
+            id: "gc_client_secret",
+            label: __("Client Secret", "Client Secret"),
+            description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+              __("Copy the Client Secret from the same OAuth client in", "Copy the Client Secret from the same OAuth client in"),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://console.cloud.google.com/apis/credentials", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Google Cloud Credentials", "Google Cloud Credentials") }),
+              __(".", "."),
+              " ",
+              __("Keep this private.", "Keep this private.")
+            ] }),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "gc_client_secret",
+                type: "password",
+                value: clientSecret,
+                onChange: (e) => setClientSecret(e.target.value),
+                placeholder: "GOCSPX-xxxxxxxxxxxxxxxxxx"
+              }
+            )
+          }
+        )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        FormField,
+        {
+          id: "gc_redirect_uri",
+          label: __("Redirect URI (OAuth Callback URL)", "Redirect URI (OAuth Callback URL)"),
+          description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            __('Add this to your OAuth client under "Authorized redirect URIs" in', 'Add this to your OAuth client under "Authorized redirect URIs" in'),
+            " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://console.cloud.google.com/apis/credentials", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Google Cloud Credentials", "Google Cloud Credentials") }),
+            __(".", "."),
+            " ",
+            __("Make sure the", "Make sure the"),
+            " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://console.cloud.google.com/apis/library/calendar-json.googleapis.com", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Google Calendar API", "Google Calendar API") }),
+            " ",
+            __("is enabled.", "is enabled.")
+          ] }),
+          children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Input,
+              {
+                id: "gc_redirect_uri",
+                value: redirectUri,
+                readOnly: true,
+                className: "bg-gray-50 dark:bg-gray-900 font-mono text-sm"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: () => navigator.clipboard.writeText(redirectUri),
+                children: __("Copy", "Copy")
+              }
+            )
+          ] })
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Shield, { className: "w-4 h-4 mt-0.5 flex-shrink-0" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "min-w-0 leading-relaxed", children: [
+            __("OAuth scopes required (add these on the Google OAuth consent screen):", "OAuth scopes required (add these on the Google OAuth consent screen):"),
+            " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://console.cloud.google.com/apis/credentials/consent", target: "_blank", rel: "noopener noreferrer", className: "text-amber-900 dark:text-amber-200 underline", children: __("OAuth Consent Screen", "OAuth Consent Screen") })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-2 space-y-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 mt-0.5 flex-shrink-0" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-[11px] bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded", children: "https://www.googleapis.com/auth/calendar" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 mt-0.5 flex-shrink-0" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-[11px] bg-amber-100 dark:bg-amber-900/40 px-1 py-0.5 rounded", children: "https://www.googleapis.com/auth/calendar.events" })
+          ] })
+        ] })
+      ] }),
+      connected && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "font-medium text-sm text-green-800 dark:text-green-400 flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+          __("Connected Calendar", "Connected Calendar")
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            FormField,
+            {
+              id: "gc_calendar_id",
+              label: __("Calendar ID", "Calendar ID"),
+              description: __('The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.', 'The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.'),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "gc_calendar_id",
+                  value: calendarId,
+                  onChange: (e) => setCalendarId(e.target.value),
+                  placeholder: "primary"
+                }
+              )
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            FormField,
+            {
+              id: "gc_calendar_name",
+              label: __("Calendar Name", "Calendar Name"),
+              description: __("A friendly name for this calendar connection (for your reference only).", "A friendly name for this calendar connection (for your reference only)."),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "gc_calendar_name",
+                  value: calendarName,
+                  onChange: (e) => setCalendarName(e.target.value),
+                  placeholder: __("My Booking Calendar", "My Booking Calendar")
+                }
+              )
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between pt-2 border-t border-green-200 dark:border-green-800", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-green-700 dark:text-green-400", children: lastSync ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            __("Last sync:", "Last sync:"),
+            " ",
+            new Date(lastSync).toLocaleString()
+          ] }) : __("Never synced", "Never synced") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", size: "sm", onClick: handleSync, disabled: syncing, className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${syncing ? "animate-spin" : ""}` }),
+            __("Sync Now", "Sync Now")
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap justify-between items-center gap-3 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: "https://console.cloud.google.com/apis/credentials",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
+                __("Credentials", "Credentials")
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: "https://console.cloud.google.com/apis/library/calendar-json.googleapis.com",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
+                __("Calendar API", "Calendar API")
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: "https://console.cloud.google.com/apis/credentials/consent",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" }),
+                __("OAuth Consent", "OAuth Consent")
+              ]
+            }
+          )
+        ] }),
+        connected ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "destructive", onClick: handleDisconnect, className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+          __("Disconnect", "Disconnect")
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleConnect, disabled: connecting || !clientId || !clientSecret, className: "flex items-center gap-2", children: [
+          connecting ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4" }),
+          __("Connect to Google Calendar", "Connect to Google Calendar")
+        ] })
+      ] })
+    ] })
+  ] }) });
+};
 const getInitialFormSubTab = () => {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("yatra_settings_booking_form_subtab");
@@ -45762,6 +46068,11 @@ const Settings = () => {
         ] });
       case "integration":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          window.yatraAdmin && window.yatraAdmin.showGoogleCalendarSettingsUI && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Google Calendar Integration", "Google Calendar Integration") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(GoogleCalendarIntegrationSection, { formData, setFormData })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Analytics & Tracking", "Analytics & Tracking") }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               FormField,
@@ -67929,6 +68240,301 @@ const Travelers = () => {
     )
   ] });
 };
+const Switch = ({ checked, onCheckedChange, disabled = false, className = "" }) => {
+  return /* @__PURE__ */ jsxRuntimeExports.jsx(
+    "button",
+    {
+      type: "button",
+      role: "switch",
+      "aria-checked": checked,
+      disabled,
+      onClick: () => !disabled && onCheckedChange(!checked),
+      className: `relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${checked ? "bg-blue-600 dark:bg-blue-500" : "bg-gray-200 dark:bg-gray-700"} ${className}`,
+      children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "span",
+        {
+          className: `inline-block h-5 w-5 transform rounded-full bg-white shadow-lg transition-transform ${checked ? "translate-x-5" : "translate-x-0.5"}`
+        }
+      )
+    }
+  );
+};
+const GoogleCalendar = () => {
+  const [settings, setSettings] = reactExports.useState(null);
+  const [loading, setLoading] = reactExports.useState(true);
+  const [connecting, setConnecting] = reactExports.useState(false);
+  const [syncing, setSyncing] = reactExports.useState(false);
+  const { showToast } = useToast();
+  const __2 = (text) => text;
+  reactExports.useEffect(() => {
+    fetchSettings();
+  }, []);
+  const fetchSettings = async () => {
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/google-calendar/settings`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSettings(data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch settings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleConnect = async () => {
+    setConnecting(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/google-calendar/connect`, {
+        method: "POST",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success && data.data.auth_url) {
+        window.location.href = data.data.auth_url;
+      } else {
+        showToast(data.message || __2("Failed to connect"), "error");
+      }
+    } catch (error) {
+      showToast(__2("Failed to connect to Google Calendar"), "error");
+    } finally {
+      setConnecting(false);
+    }
+  };
+  const handleDisconnect = async () => {
+    if (!confirm(__2("Are you sure you want to disconnect Google Calendar?"))) {
+      return;
+    }
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/google-calendar/disconnect`, {
+        method: "POST",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      if (response.ok) {
+        showToast(__2("Disconnected successfully"), "success");
+        fetchSettings();
+      }
+    } catch (error) {
+      showToast(__2("Failed to disconnect"), "error");
+    }
+  };
+  const handleSyncAll = async () => {
+    setSyncing(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/google-calendar/sync-all`, {
+        method: "POST",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast(__2("Sync completed successfully"), "success");
+        fetchSettings();
+      } else {
+        showToast(data.message || __2("Sync failed"), "error");
+      }
+    } catch (error) {
+      showToast(__2("Failed to sync bookings"), "error");
+    } finally {
+      setSyncing(false);
+    }
+  };
+  const handleSettingChange = async (key, value) => {
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/google-calendar/settings`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        },
+        body: JSON.stringify({ [key]: value })
+      });
+      if (response.ok) {
+        setSettings((prev) => prev ? { ...prev, [key]: value } : null);
+        showToast(__2("Settings updated"), "success");
+      }
+    } catch (error) {
+      showToast(__2("Failed to update settings"), "error");
+    }
+  };
+  if (loading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center h-64", children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-8 h-8 animate-spin text-blue-600" }) });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6 p-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-between", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-8 h-8 text-blue-600" }),
+        __2("Google Calendar Integration")
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mt-2", children: __2("Automatically sync your bookings and departures to Google Calendar") })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __2("Connection Status") }),
+          (settings == null ? void 0 : settings.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 mr-1" }),
+            __2("Connected")
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 mr-1" }),
+            __2("Not Connected")
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: (settings == null ? void 0 : settings.connected) ? __2("Your Google Calendar is connected and ready to sync") : __2("Connect your Google account to start syncing bookings") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: (settings == null ? void 0 : settings.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: settings.calendar_name || __2("Primary Calendar") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: [
+              __2("Calendar ID"),
+              ": ",
+              settings.calendar_id
+            ] }),
+            settings.last_sync && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-500 mt-2", children: [
+              __2("Last synced"),
+              ": ",
+              new Date(settings.last_sync).toLocaleString()
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              onClick: handleSyncAll,
+              disabled: syncing,
+              className: "flex-1",
+              children: syncing ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2 animate-spin" }),
+                __2("Syncing...")
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 mr-2" }),
+                __2("Sync All Bookings")
+              ] })
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: handleDisconnect,
+              className: "text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10",
+              children: __2("Disconnect")
+            }
+          )
+        ] })
+      ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          onClick: handleConnect,
+          disabled: connecting,
+          className: "w-full",
+          size: "lg",
+          children: connecting ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-5 h-5 mr-2 animate-spin" }),
+            __2("Connecting...")
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-5 h-5 mr-2" }),
+            __2("Connect Google Calendar")
+          ] })
+        }
+      ) })
+    ] }),
+    (settings == null ? void 0 : settings.connected) && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Settings$1, { className: "w-5 h-5" }),
+          __2("Sync Settings")
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __2("Configure what gets synced to your Google Calendar") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Auto Sync") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Automatically sync new bookings and changes") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings.auto_sync,
+              onCheckedChange: (checked) => handleSettingChange("auto_sync", checked)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Sync Bookings") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Create calendar events for new bookings") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings.sync_bookings,
+              onCheckedChange: (checked) => handleSettingChange("sync_bookings", checked)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Sync Departures") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Create calendar events for departures") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings.sync_departures,
+              onCheckedChange: (checked) => handleSettingChange("sync_departures", checked)
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "font-medium text-gray-900 dark:text-white", children: __2("Send Invitations") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __2("Send calendar invitations to customers") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Switch,
+            {
+              checked: settings.send_invitations,
+              onCheckedChange: (checked) => handleSettingChange("send_invitations", checked)
+            }
+          )
+        ] })
+      ] }) })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __2("Documentation") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __2("Learn more about Google Calendar integration") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+        "a",
+        {
+          href: "https://docs.yatra.com/modules/google-calendar",
+          target: "_blank",
+          rel: "noopener noreferrer",
+          className: "inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300",
+          children: [
+            __2("View Documentation"),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
+          ]
+        }
+      ) })
+    ] })
+  ] });
+};
 const App = () => {
   const [urlKey, setUrlKey] = reactExports.useState(0);
   reactExports.useEffect(() => {
@@ -68087,6 +68693,8 @@ const App = () => {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Settings, {});
       case "modules":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Modules, {});
+      case "yatra-google-calendar":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(GoogleCalendar, {});
       case "dashboard":
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Dashboard, {});

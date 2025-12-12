@@ -38,7 +38,7 @@ class ModuleManager
      */
     public static function getDefaultModules(): array
     {
-        return [
+        $modules = [
             [
                 'slug' => 'partial_payments',
                 'name' => __('Partial Payments', 'yatra'),
@@ -243,7 +243,24 @@ class ModuleManager
                 'tags' => ['bookings', 'self-service'],
                 'video_url' => self::DEFAULT_VIDEO_URL,
             ],
+            [
+                'slug' => 'google_calendar',
+                'name' => __('Google Calendar Integration', 'yatra'),
+                'description' => __('Automatically sync bookings and departures to Google Calendar with reminders and invitations.', 'yatra'),
+                'category' => __('Integrations', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/google-calendar',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=google-calendar',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['integrations', 'calendar', 'automation'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'settings_page' => 'yatra-google-calendar',
+            ],
         ];
+        
+        return apply_filters('yatra_default_modules', $modules);
     }
 
     /**
@@ -297,10 +314,58 @@ class ModuleManager
      */
     public static function isModuleEnabled(string $slug): bool
     {
+        // Allow direct override for specific modules
+        $override = apply_filters('yatra_module_enabled_status', null, $slug);
+        if ($override !== null) {
+            return (bool) $override;
+        }
+        
         $modules = self::getModules();
         foreach ($modules as $module) {
             if ($module['slug'] === $slug) {
+                // Check if module requires Pro and if Pro is active
+                if (!empty($module['requires_pro'])) {
+                    $pro_active = apply_filters('yatra_is_pro_active', false);
+                    if (!$pro_active) {
+                        return false;
+                    }
+                }
+                
                 return (bool) $module['enabled'];
+            }
+        }
+
+        return false;
+    }
+    
+    /**
+     * Check if module is available (can be enabled)
+     */
+    public static function isModuleAvailable(string $slug): bool
+    {
+        // Allow direct override for specific modules
+        $override = apply_filters('yatra_module_is_available_' . $slug, null);
+        if ($override !== null) {
+            return (bool) $override;
+        }
+        
+        $modules = self::getModules();
+        foreach ($modules as $module) {
+            if ($module['slug'] === $slug) {
+                // If module requires Pro, check if Pro is active
+                if (!empty($module['requires_pro'])) {
+                    // Check if Pro is active
+                    $pro_active = apply_filters('yatra_is_pro_active', false);
+                    if (!$pro_active) {
+                        return false;
+                    }
+                    
+                    // Check if this module is available in Pro
+                    $available_modules = apply_filters('yatra_pro_available_modules', []);
+                    return in_array($slug, $available_modules, true);
+                }
+                
+                return true;
             }
         }
 
@@ -359,5 +424,3 @@ class ModuleManager
         return self::getModules();
     }
 }
-
-

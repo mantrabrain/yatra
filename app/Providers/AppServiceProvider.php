@@ -38,7 +38,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Load text domain
-        add_action('plugins_loaded', [$this, 'loadTextDomain']);
+        add_action('init', [$this, 'loadTextDomain'], 1);
 
         // Start session early for booking management (both frontend and REST API)
         add_action('init', [$this, 'startSession'], 1);
