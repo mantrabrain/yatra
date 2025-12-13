@@ -71,6 +71,21 @@ class CustomerController extends BaseController
             ],
         ]);
 
+        register_rest_route($namespace, '/' . $base . '/my-bookings/(?P<id>\d+)', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getMyBooking'],
+                'permission_callback' => [$this, 'checkCustomerPermission'],
+                'args' => [
+                    'id' => [
+                        'required' => true,
+                        'type' => 'integer',
+                        'sanitize_callback' => 'absint',
+                    ],
+                ],
+            ],
+        ]);
+
         // Current customer's payments
         register_rest_route($namespace, '/' . $base . '/my-payments', [
             [
@@ -252,6 +267,26 @@ class CustomerController extends BaseController
         ]);
     }
 
+    public function getMyBooking(WP_REST_Request $request): WP_REST_Response
+    {
+        $userId = get_current_user_id();
+        $bookingId = (int) $request->get_param('id');
+
+        $booking = $this->customerService->getBookingDetailsForUser($userId, $bookingId);
+
+        if (!$booking) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Booking not found.', 'yatra'),
+            ], 404);
+        }
+
+        return new WP_REST_Response([
+            'success' => true,
+            'data' => $booking,
+        ]);
+    }
+
     /**
      * GET /customers/my-payments - Get current customer's payments
      */
@@ -283,9 +318,12 @@ class CustomerController extends BaseController
         $customer = $this->customerService->getCustomerByUserId($userId);
 
         if (!$customer) {
+            $bookings = $this->customerService->getBookingsByUserId($userId, 1000);
+            $documents = $this->customerService->getDocumentsForBookings($bookings, 0);
+
             return new WP_REST_Response([
                 'success' => true,
-                'data' => [],
+                'data' => is_array($documents) ? $documents : [],
             ]);
         }
 

@@ -12,6 +12,8 @@ use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\PaymentRepository;
 use Yatra\Repositories\ScheduledPaymentRepository;
 use Yatra\Repositories\TripRepository;
+use Yatra\Helpers\FormatHelper;
+use Yatra\Services\PdfService;
 use Yatra\Services\SettingsService;
 
 /**
@@ -134,6 +136,15 @@ class PaymentGatewayController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'download_invoice'],
+                'permission_callback' => '__return_true', // Auth checked inside callback
+            ],
+        ]);
+
+        // Download travel voucher for a payment
+        register_rest_route($namespace, '/' . $base . '/(?P<payment_id>[\d]+)/voucher', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'download_voucher'],
                 'permission_callback' => '__return_true', // Auth checked inside callback
             ],
         ]);
@@ -691,6 +702,8 @@ class PaymentGatewayController extends BaseController
     public function download_invoice(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         $paymentId = (int) $request->get_param('payment_id');
+        $isPreview = $request->get_param('preview') === '1';
+        $isDownload = $request->get_param('download') === '1';
 
         if ($paymentId <= 0) {
             return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
@@ -729,175 +742,302 @@ class PaymentGatewayController extends BaseController
         $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
         $companyPhone = SettingsService::get('company_phone', '');
         $currency = SettingsService::getCurrency();
-        $currencySymbol = SettingsService::getCurrencySymbol();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
 
         // Format dates
         $paymentDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
         $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
 
-        // Build invoice HTML
-        $invoiceHtml = $this->generateInvoiceHtml([
-            'payment' => $payment,
-            'trip' => $trip,
+
+        $bookingRef = (string) ($payment->booking_reference ?? $payment->booking_number ?? $payment->reference ?? (string) $paymentId);
+        $filename = 'Invoice #' . $bookingRef . '.pdf';
+
+
+        $pdfService = new PdfService();
+        if (!$pdfService->isAvailable()) {
+            return new WP_Error(
+                'pdf_engine_missing',
+                __('Invoice PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
+                ['status' => 500]
+            );
+        }
+
+        $templateData = [
             'company_name' => $companyName,
             'company_address' => $companyAddress,
             'company_email' => $companyEmail,
             'company_phone' => $companyPhone,
-            'currency' => $currency,
-            'currency_symbol' => $currencySymbol,
+            'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
+            'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
+            'payment_ref' => $payment->reference ?? '',
             'payment_date' => $paymentDate,
+            'payment_status' => ucfirst($payment->status ?? 'paid'),
+            'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['paid', 'completed', 'success'], true) ? 'paid' : 'pending',
+            'trip_title' => $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra'),
+            'payment_method' => ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online'),
+            'booking_ref' => $payment->booking_reference ?? $payment->booking_number ?? '',
             'travel_date' => $travelDate,
+            'currency_symbol' => $currencySymbol,
+            'amount' => number_format((float) ($payment->amount ?? 0), 2),
+            'booking_total' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
+            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
+            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+        ];
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/invoice.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
         ]);
 
-        // Set headers for HTML download (can be printed to PDF by browser)
-        $filename = 'invoice-' . ($payment->reference ?? $paymentId) . '.html';
-        
-        header('Content-Type: text/html; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: no-cache, no-store, must-revalidate');
-        header('Pragma: no-cache');
-        header('Expires: 0');
-
-        echo $invoiceHtml;
-        exit;
+        if ($isPreview) {
+            // For preview, return PDF as inline display
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        } else {
+            // For download, output PDF as download
+            $pdfService->outputPdfDownload($pdfBinary, $filename);
+            exit;
+        }
     }
 
     /**
-     * Generate invoice HTML
+     * Download travel voucher PDF for a booking
      */
-    private function generateInvoiceHtml(array $data): string
+    public function download_voucher(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $payment = $data['payment'];
-        $trip = $data['trip'];
-        $currencySymbol = $data['currency_symbol'];
+        $paymentId = (int) $request->get_param('payment_id');
+        $isPreview = $request->get_param('preview') === '1';
+        $isDownload = $request->get_param('download') === '1';
 
-        $amount = number_format((float) ($payment->amount ?? 0), 2);
-        $bookingTotal = number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2);
-        $amountPaid = number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2);
-        $amountDue = number_format((float) ($payment->booking_amount_due ?? 0), 2);
-
-        $customerName = trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? ''));
-        if (empty($customerName)) {
-            $customerName = $payment->customer_name ?? __('Customer', 'yatra');
+        if ($paymentId <= 0) {
+            return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
         }
-        $customerEmail = $payment->contact_email ?? $payment->customer_email ?? '';
 
-        $tripTitle = $trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra');
-        $bookingRef = $payment->booking_reference ?? $payment->booking_number ?? '';
-        $paymentRef = $payment->reference ?? '';
-        $paymentMethod = ucfirst($payment->gateway ?? $payment->payment_method ?? 'Online');
-        $paymentStatus = ucfirst($payment->status ?? 'paid');
+        // Get payment with booking details
+        $payment = $this->paymentRepository->findWithBooking($paymentId);
 
-        return <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice - {$paymentRef}</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; line-height: 1.6; color: #333; background: #f5f5f5; padding: 20px; }
-        .invoice { max-width: 800px; margin: 0 auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }
-        .invoice-header { background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: #fff; padding: 30px 40px; }
-        .invoice-header h1 { font-size: 28px; font-weight: 700; margin-bottom: 5px; }
-        .invoice-header p { opacity: 0.9; font-size: 14px; }
-        .invoice-body { padding: 40px; }
-        .invoice-meta { display: flex; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
-        .invoice-meta-block h3 { font-size: 12px; text-transform: uppercase; color: #6b7280; margin-bottom: 8px; letter-spacing: 0.5px; }
-        .invoice-meta-block p { font-size: 14px; color: #111; margin-bottom: 4px; }
-        .invoice-meta-block strong { font-weight: 600; }
-        .invoice-table { width: 100%; border-collapse: collapse; margin: 30px 0; }
-        .invoice-table th { background: #f9fafb; padding: 12px 16px; text-align: left; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 2px solid #e5e7eb; }
-        .invoice-table td { padding: 16px; border-bottom: 1px solid #e5e7eb; }
-        .invoice-table .amount { text-align: right; font-weight: 600; }
-        .invoice-totals { margin-top: 20px; border-top: 2px solid #e5e7eb; padding-top: 20px; }
-        .invoice-total-row { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; }
-        .invoice-total-row.grand-total { font-size: 18px; font-weight: 700; color: #1e40af; border-top: 2px solid #1e40af; margin-top: 10px; padding-top: 15px; }
-        .invoice-footer { background: #f9fafb; padding: 20px 40px; text-align: center; font-size: 12px; color: #6b7280; }
-        .status-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
-        .status-paid { background: #d1fae5; color: #065f46; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        @media print { body { background: #fff; padding: 0; } .invoice { box-shadow: none; } }
-    </style>
-</head>
-<body>
-    <div class="invoice">
-        <div class="invoice-header">
-            <h1>{$data['company_name']}</h1>
-            <p>Payment Invoice</p>
-        </div>
-        <div class="invoice-body">
-            <div class="invoice-meta">
-                <div class="invoice-meta-block">
-                    <h3>Invoice To</h3>
-                    <p><strong>{$customerName}</strong></p>
-                    <p>{$customerEmail}</p>
-                </div>
-                <div class="invoice-meta-block">
-                    <h3>Invoice Details</h3>
-                    <p><strong>Invoice #:</strong> {$paymentRef}</p>
-                    <p><strong>Date:</strong> {$data['payment_date']}</p>
-                    <p><strong>Status:</strong> <span class="status-badge status-{$payment->status}">{$paymentStatus}</span></p>
-                </div>
-                <div class="invoice-meta-block">
-                    <h3>Company</h3>
-                    <p>{$data['company_name']}</p>
-                    <p>{$data['company_address']}</p>
-                    <p>{$data['company_email']}</p>
-                    <p>{$data['company_phone']}</p>
-                </div>
-            </div>
+        if (!$payment) {
+            return new WP_Error('payment_not_found', __('Payment not found.', 'yatra'), ['status' => 404]);
+        }
 
-            <table class="invoice-table">
-                <thead>
-                    <tr>
-                        <th>Description</th>
-                        <th>Booking Ref</th>
-                        <th>Travel Date</th>
-                        <th class="amount">Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            <strong>{$tripTitle}</strong><br>
-                            <small style="color: #6b7280;">Payment via {$paymentMethod}</small>
-                        </td>
-                        <td>{$bookingRef}</td>
-                        <td>{$data['travel_date']}</td>
-                        <td class="amount">{$currencySymbol}{$amount}</td>
-                    </tr>
-                </tbody>
-            </table>
+        // Verify user is logged in and owns this payment (or is admin)
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
+        
+        // Must be logged in
+        if (!$currentUserId) {
+            return new WP_Error('unauthorized', __('You must be logged in to download vouchers.', 'yatra'), ['status' => 401]);
+        }
+        
+        // Must own the booking or be admin
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            return new WP_Error('forbidden', __('You do not have permission to access this voucher.', 'yatra'), ['status' => 403]);
+        }
 
-            <div class="invoice-totals">
-                <div class="invoice-total-row">
-                    <span>Booking Total</span>
-                    <span>{$currencySymbol}{$bookingTotal}</span>
-                </div>
-                <div class="invoice-total-row">
-                    <span>Total Paid</span>
-                    <span style="color: #059669;">{$currencySymbol}{$amountPaid}</span>
-                </div>
-                <div class="invoice-total-row">
-                    <span>Balance Due</span>
-                    <span>{$currencySymbol}{$amountDue}</span>
-                </div>
-                <div class="invoice-total-row grand-total">
-                    <span>This Payment</span>
-                    <span>{$currencySymbol}{$amount}</span>
-                </div>
-            </div>
-        </div>
-        <div class="invoice-footer">
-            <p>Thank you for your booking! If you have any questions, please contact us at {$data['company_email']}</p>
-            <p style="margin-top: 10px;">This invoice was generated on {$data['payment_date']}</p>
-        </div>
-    </div>
-    <script>window.onload = function() { window.print(); }</script>
-</body>
-</html>
-HTML;
+        // Get trip details if available
+        $trip = null;
+        if (!empty($payment->trip_id)) {
+            $trip = $this->tripRepository->find((int) $payment->trip_id);
+        }
+
+        // Get company settings
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
+
+        // Format dates
+        $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
+        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+        
+        // Calculate return date if duration is available
+        $returnDate = '';
+        if (!empty($payment->travel_date) && !empty($trip->duration ?? 0)) {
+            $returnTimestamp = strtotime($payment->travel_date . ' +' . (int) ($trip->duration ?? 0) . ' days');
+            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+        }
+
+        $bookingRef = (string) ($payment->booking_reference ?? $payment->booking_number ?? $payment->reference ?? (string) $paymentId);
+        $filename = 'Travel Voucher #' . $bookingRef . '.pdf';
+
+        $pdfService = new PdfService();
+        if (!$pdfService->isAvailable()) {
+            return new WP_Error(
+                'pdf_engine_missing',
+                __('Voucher PDF generator is not installed. Please run composer install to install dompdf/dompdf.', 'yatra'),
+                ['status' => 500]
+            );
+        }
+
+        $templateData = [
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
+            'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
+            'booking_ref' => $bookingRef,
+            'booking_date' => $bookingDate,
+            'booking_status' => ucfirst($payment->status ?? 'confirmed'),
+            'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['confirmed', 'completed', 'success'], true) ? 'confirmed' : 
+                           (in_array(strtolower((string) ($payment->status ?? '')), ['cancelled'], true) ? 'cancelled' : 'pending'),
+            'trip_title' => $trip ? ($trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra')) : ($payment->trip_title ?? __('Trip Booking', 'yatra')),
+            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
+            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
+            'destination' => $trip ? ($trip->destination ?? $payment->destination ?? '') : ($payment->destination ?? ''),
+            'travel_date' => $travelDate,
+            'return_date' => $returnDate,
+            'currency_symbol' => $currencySymbol,
+            'total_amount' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
+            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
+            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+            'traveler_count' => (int) ($payment->traveler_count ?? 1),
+        ];
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/voucher.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        if ($isPreview) {
+            // For preview, return PDF as inline display
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        } else {
+            // For download, output PDF as download
+            $pdfService->outputPdfDownload($pdfBinary, $filename);
+            exit;
+        }
+    }
+
+    /**
+     * GET /payments/{payment_id}/itinerary - Download travel itinerary for a payment
+     */
+    public function download_itinerary(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        $paymentId = (int) $request->get_param('payment_id');
+        $isPreview = $request->get_param('preview') === '1';
+        $isDownload = $request->get_param('download') === '1';
+
+        if ($paymentId <= 0) {
+            return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Get payment with booking details
+        $payment = $this->paymentRepository->findWithBooking($paymentId);
+
+        if (!$payment) {
+            return new WP_Error('payment_not_found', __('Payment not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Verify user is logged in and owns this payment (or is admin)
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($payment->booking_user_id ?? $payment->user_id ?? 0);
+        
+        // Must be logged in
+        if (!$currentUserId) {
+            return new WP_Error('unauthorized', __('You must be logged in to download itineraries.', 'yatra'), ['status' => 401]);
+        }
+        
+        // Must own the booking or be admin
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            return new WP_Error('forbidden', __('You do not have permission to access this itinerary.', 'yatra'), ['status' => 403]);
+        }
+
+        // Get trip details if available
+        $trip = null;
+        if (!empty($payment->trip_id)) {
+            $trip = $this->tripRepository->find((int) $payment->trip_id);
+        }
+
+        // Get company settings
+        $companyName = SettingsService::get('company_name', get_bloginfo('name'));
+        $companyAddress = SettingsService::get('company_address', '');
+        $companyEmail = SettingsService::get('company_email', get_option('admin_email'));
+        $companyPhone = SettingsService::get('company_phone', '');
+        $currency = SettingsService::getCurrency();
+        $currencySymbol = FormatHelper::getCurrencySymbol($currency);
+
+        // Format dates
+        $bookingDate = !empty($payment->created_at) ? date_i18n(get_option('date_format'), strtotime($payment->created_at)) : '';
+        $travelDate = !empty($payment->travel_date) ? date_i18n(get_option('date_format'), strtotime($payment->travel_date)) : '';
+        
+        // Calculate return date if duration is available
+        $returnDate = '';
+        if (!empty($payment->travel_date) && !empty($trip->duration ?? 0)) {
+            $returnTimestamp = strtotime($payment->travel_date . ' +' . (int) ($trip->duration ?? 0) . ' days');
+            $returnDate = date_i18n(get_option('date_format'), $returnTimestamp);
+        }
+
+        // Generate booking reference
+        $bookingRef = '';
+        if (!empty($payment->booking_id)) {
+            $bookingRef = 'YTR-' . strtoupper(str_pad((string) $payment->booking_id, 8, '0', STR_PAD_LEFT));
+        }
+
+        // Generate PDF using PDF service
+        $pdfService = new PdfService();
+        $filename = 'Travel-Itinerary-' . $bookingRef . '.pdf';
+
+        // Prepare template data with null-safe access
+        $templateData = [
+            'company_name' => $companyName,
+            'company_address' => $companyAddress,
+            'company_email' => $companyEmail,
+            'company_phone' => $companyPhone,
+            'customer_name' => trim(($payment->contact_first_name ?? '') . ' ' . ($payment->contact_last_name ?? '')) ?: ($payment->customer_name ?? __('Customer', 'yatra')),
+            'customer_email' => $payment->contact_email ?? $payment->customer_email ?? '',
+            'booking_ref' => $bookingRef,
+            'booking_date' => $bookingDate,
+            'booking_status' => ucfirst($payment->status ?? 'confirmed'),
+            'status_class' => in_array(strtolower((string) ($payment->status ?? '')), ['confirmed', 'completed', 'success'], true) ? 'confirmed' : 
+                           (in_array(strtolower((string) ($payment->status ?? '')), ['cancelled'], true) ? 'cancelled' : 'pending'),
+            'trip_title' => $trip ? ($trip->title ?? $payment->trip_title ?? __('Trip Booking', 'yatra')) : ($payment->trip_title ?? __('Trip Booking', 'yatra')),
+            'trip_description' => $trip ? ($trip->description ?? $trip->content ?? '') : '',
+            'trip_duration' => $trip && $trip->duration ? sprintf(__('%d days', 'yatra'), (int) $trip->duration) : '',
+            'trip_difficulty' => $trip ? ($trip->difficulty_name ?? '') : '',
+            'trip_highlights' => $trip ? ($trip->highlights ?? $trip->trip_highlights ?? '') : '',
+            'trip_includes' => $trip ? ($trip->includes ?? $trip->trip_includes ?? '') : '',
+            'trip_excludes' => $trip ? ($trip->excludes ?? $trip->trip_excludes ?? '') : '',
+            'departure_location' => $trip ? ($trip->departure_location ?? '') : '',
+            'destination' => $trip ? ($trip->destination ?? $payment->destination ?? '') : ($payment->destination ?? ''),
+            'travel_date' => $travelDate,
+            'return_date' => $returnDate,
+            'currency_symbol' => $currencySymbol,
+            'total_amount' => number_format((float) ($payment->booking_total_amount ?? $payment->amount ?? 0), 2),
+            'amount_paid' => number_format((float) ($payment->booking_amount_paid ?? $payment->amount ?? 0), 2),
+            'amount_due' => number_format((float) ($payment->booking_amount_due ?? 0), 2),
+            'traveler_count' => (int) ($payment->traveler_count ?? 1),
+        ];
+
+        $pdfBinary = $pdfService->renderTemplateToPdfSafely('pdf/itinerary.php', $templateData, [
+            'paper' => 'A4',
+            'orientation' => 'portrait',
+            'default_font' => 'DejaVu Sans',
+        ]);
+
+        if ($isPreview) {
+            // For preview, return PDF as inline display
+            return new WP_REST_Response([
+                'success' => true,
+                'pdf_data' => base64_encode($pdfBinary),
+                'filename' => $filename,
+            ]);
+        } else {
+            // For download, output PDF as download
+            $pdfService->outputPdfDownload($pdfBinary, $filename);
+            exit;
+        }
     }
 }

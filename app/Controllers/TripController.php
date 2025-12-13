@@ -453,37 +453,40 @@ class TripController extends BaseController
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $data = $request->get_json_params();
+            $rawData = $request->get_json_params();
+            $rawData = apply_filters('yatra_trip_create_raw_data', $rawData, $request);
             
             // Validate and sanitize input data
-            TripValidator::validateCreate($data);
-            $data = TripValidator::sanitize($data);
+            TripValidator::validateCreate($rawData);
+            $data = TripValidator::sanitize($rawData);
+            $data = apply_filters('yatra_trip_create_sanitized_data', $data, $rawData, $request);
             
             // Extract relationships (fields stored in separate tables)
             $relationships = [
-                'destinations' => $data['destinations'] ?? [],
-                'activities' => $data['activity_types'] ?? [],
-                'trip_category' => $data['trip_category'] ?? [],
-                'price_types' => $data['price_types'] ?? [],
-                'highlights' => $data['highlights'] ?? [],
-                'gallery_images' => $data['gallery_images'] ?? [],
-                'faqs' => $data['faqs'] ?? [],
-                'itinerary_days' => $data['itinerary_days'] ?? [],
-                'availability_dates' => $data['availability_dates'] ?? [],
+                'destinations' => $rawData['destinations'] ?? [],
+                'activities' => $rawData['activity_types'] ?? [],
+                'trip_category' => $rawData['trip_category'] ?? [],
+                'price_types' => $rawData['price_types'] ?? [],
+                'highlights' => $rawData['highlights'] ?? [],
+                'gallery_images' => $rawData['gallery_images'] ?? [],
+                'faqs' => $rawData['faqs'] ?? [],
+                'itinerary_days' => $rawData['itinerary_days'] ?? [],
+                'availability_dates' => $rawData['availability_dates'] ?? [],
             ];
 
-            // Remove relationships from main data (these should not be in the main table)
-            unset(
-                $data['destinations'], 
-                $data['activity_types'], 
-                $data['trip_category'],
-                $data['price_types'],
-                $data['highlights'],
-                $data['gallery_images'],
-                $data['faqs'],
-                $data['itinerary_days'],
-                $data['availability_dates']
-            );
+            $relationships = apply_filters('yatra_trip_create_relationships', $relationships, $rawData, $request);
+
+            $extraUnsetKeys = apply_filters('yatra_trip_create_unset_keys', [], $rawData, $relationships, $request);
+            if (is_array($extraUnsetKeys) && !empty($extraUnsetKeys)) {
+                foreach ($extraUnsetKeys as $key) {
+                    if (is_string($key) && isset($rawData[$key])) {
+                        unset($rawData[$key]);
+                    }
+                    if (is_string($key) && isset($data[$key])) {
+                        unset($data[$key]);
+                    }
+                }
+            }
 
             $id = $this->service->createWithRelations($data, $relationships);
 
@@ -504,6 +507,7 @@ class TripController extends BaseController
         try {
             $id = (int) $request->get_param('id');
             $data = $request->get_json_params();
+            $data = apply_filters('yatra_trip_update_raw_data', $data, $id, $request);
 
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log("Yatra TripController update_item: pricing_type=" . ($data['pricing_type'] ?? 'NOT SET'));
@@ -543,6 +547,19 @@ class TripController extends BaseController
             if (isset($data['availability_dates'])) {
                 $relationships['availability_dates'] = $data['availability_dates'];
             }
+
+            $relationships = apply_filters('yatra_trip_update_relationships', $relationships, $data, $request);
+
+            $extraUnsetKeys = apply_filters('yatra_trip_update_unset_keys', [], $data, $relationships, $request);
+            if (is_array($extraUnsetKeys) && !empty($extraUnsetKeys)) {
+                foreach ($extraUnsetKeys as $key) {
+                    if (is_string($key) && isset($data[$key])) {
+                        unset($data[$key]);
+                    }
+                }
+            }
+
+            $data = apply_filters('yatra_trip_update_sanitized_data', $data, $id, $relationships, $request);
 
             // Remove relationships from main data (these should not be in the main table)
             unset(
@@ -973,20 +990,7 @@ class TripController extends BaseController
             }, $item->gallery_images);
         }
 
-        // Handle FAQs relationship
-        if (isset($item->faqs)) {
-            $data['faqs'] = array_map(function ($faq) {
-                return [
-                    'question' => $faq->question ?? '',
-                    'answer' => $faq->answer ?? '',
-                ];
-            }, $item->faqs);
-        }
-
-        // Handle itinerary days relationship
         if (isset($item->itinerary_days)) {
-            // Itinerary days are complex nested structures, return as-is for now
-            // The frontend will handle the structure
             $data['itinerary_days'] = array_map(function ($day) {
                 $dayData = [
                     'id' => isset($day->id) ? (int) $day->id : null,
@@ -1090,7 +1094,7 @@ class TripController extends BaseController
             $data['updated_by_name'] = $user ? $user->display_name : __('Unknown', 'yatra');
         }
 
-        return $data;
+        return apply_filters('yatra_trip_prepare_item_for_response', $data, $item, $request);
     }
 
     /**

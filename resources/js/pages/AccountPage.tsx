@@ -109,6 +109,38 @@ const AccountPage: React.FC = () => {
   
   // State moved to individual components
 
+  const unwrapArrayResponse = (response: any): any[] => {
+    if (!response) return [];
+
+    // Common WP pattern: { success: true, data: [...] }
+    if (typeof response === 'object' && response.success === true && Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    // Nested wrapper pattern: { data: { success: true, data: [...] } }
+    if (typeof response === 'object' && response.data && typeof response.data === 'object') {
+      const inner = response.data;
+      if (inner.success === true && Array.isArray(inner.data)) {
+        return inner.data;
+      }
+      if (Array.isArray(inner)) {
+        return inner;
+      }
+    }
+
+    // Direct array
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    // Some endpoints may return {data: [...]} without success
+    if (typeof response === 'object' && Array.isArray(response.data)) {
+      return response.data;
+    }
+
+    return [];
+  };
+
   const { data: profile, isLoading: isLoadingProfile } = useQuery<CustomerProfile | null>({
     queryKey: ['account-profile'],
     queryFn: async () => {
@@ -129,6 +161,7 @@ const AccountPage: React.FC = () => {
         return null;
       }
     },
+    refetchOnMount: 'always',
   });
 
   const displayProfile = profile;
@@ -139,16 +172,13 @@ const AccountPage: React.FC = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/customers/my-bookings');
-        const data = (response && typeof response === 'object' && 'data' in response) ? response.data : response;
-        if (Array.isArray(data)) {
-          return data;
-        }
-        return [];
+        return unwrapArrayResponse(response) as Booking[];
       } catch (error) {
         console.error('Error fetching bookings:', error);
         return [];
       }
     },
+    refetchOnMount: 'always',
   });
 
   // Fetch payments
@@ -157,16 +187,13 @@ const AccountPage: React.FC = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/customers/my-payments');
-        const data = (response && typeof response === 'object' && 'data' in response) ? response.data : response;
-        if (Array.isArray(data)) {
-          return data;
-        }
-        return [];
+        return unwrapArrayResponse(response) as Payment[];
       } catch (error) {
         console.error('Error fetching payments:', error);
         return [];
       }
     },
+    refetchOnMount: 'always',
   });
 
   // Fetch documents
@@ -175,16 +202,13 @@ const AccountPage: React.FC = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/customers/my-documents');
-        const data = (response && typeof response === 'object' && 'data' in response) ? response.data : response;
-        if (Array.isArray(data)) {
-          return data;
-        }
-        return [];
+        return unwrapArrayResponse(response) as TravelDocument[];
       } catch (error) {
         console.error('Error fetching documents:', error);
         return [];
       }
     },
+    refetchOnMount: 'always',
   });
 
   // Fetch support tickets
@@ -193,16 +217,13 @@ const AccountPage: React.FC = () => {
     queryFn: async () => {
       try {
         const response = await apiClient.get('/customers/my-support-tickets');
-        const data = (response && typeof response === 'object' && 'data' in response) ? response.data : response;
-        if (Array.isArray(data)) {
-          return data;
-        }
-        return [];
+        return unwrapArrayResponse(response) as SupportTicket[];
       } catch (error) {
         console.error('Error fetching support tickets:', error);
         return [];
       }
     },
+    refetchOnMount: 'always',
   });
 
   // Notifications (empty for now)
@@ -284,7 +305,7 @@ const AccountPage: React.FC = () => {
         label: __('Total Bookings', 'Total Bookings'),
         value: displayProfile?.total_bookings ?? totalBookings,
         icon: Package,
-        badge: displayProfile?.loyalty_tier || 'Gold Member',
+        badge: displayProfile?.loyalty_tier || '',
       },
       {
         label: __('Upcoming Trips', 'Upcoming Trips'),

@@ -168,10 +168,14 @@ class PaymentRepository extends BaseRepository
         $query = $this->wpdb->prepare(
             "SELECT p.*, 
                     b.reference as booking_reference,
+                    b.user_id as booking_user_id,
                     b.contact_email,
                     b.contact_first_name,
                     b.contact_last_name,
-                    b.total_amount as booking_total,
+                    b.total_amount as booking_total_amount,
+                    b.amount_paid as booking_amount_paid,
+                    b.amount_due as booking_amount_due,
+                    b.travel_date as travel_date,
                     t.title as trip_title
              FROM {$table} p
              LEFT JOIN {$bookings_table} b ON p.booking_id = b.id

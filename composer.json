@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=8.0",
+        "dompdf/dompdf": "^2.0",
         "woocommerce/action-scheduler": "^3.9"
     },
     "autoload": {

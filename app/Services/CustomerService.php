@@ -301,6 +301,84 @@ class CustomerService
         return $allBookings;
     }
 
+    public function getBookingDetailsForUser(int $userId, int $bookingId): ?array
+    {
+        if ($userId <= 0 || $bookingId <= 0) {
+            return null;
+        }
+
+        $booking = $this->bookingRepository->findWithTrip($bookingId);
+        if (!$booking) {
+            return null;
+        }
+
+        $user = get_userdata($userId);
+        $userEmail = ($user && !empty($user->user_email)) ? (string) $user->user_email : '';
+
+        $customer = $this->getCustomerByUserId($userId);
+        $customerId = $customer ? (int) ($customer['id'] ?? 0) : 0;
+
+        $bookingUserId = isset($booking->user_id) ? (int) $booking->user_id : 0;
+        $bookingCustomerId = isset($booking->customer_id) ? (int) $booking->customer_id : 0;
+        $bookingEmail = isset($booking->contact_email) ? (string) $booking->contact_email : '';
+
+        $allowed = false;
+        if ($bookingUserId > 0 && $bookingUserId === $userId) {
+            $allowed = true;
+        }
+        if (!$allowed && $customerId > 0 && $bookingCustomerId > 0 && $bookingCustomerId === $customerId) {
+            $allowed = true;
+        }
+        if (!$allowed && $userEmail !== '' && $bookingEmail !== '' && strtolower($userEmail) === strtolower($bookingEmail)) {
+            $allowed = true;
+        }
+
+        if (!$allowed) {
+            return null;
+        }
+
+        $emergencyContact = isset($booking->emergency_contact) ? maybe_unserialize($booking->emergency_contact) : null;
+        if (is_string($emergencyContact)) {
+            $decoded = json_decode($emergencyContact, true);
+            if (is_array($decoded)) {
+                $emergencyContact = $decoded;
+            }
+        }
+
+        $details = [
+            'id' => (int) ($booking->id ?? 0),
+            'reference' => $booking->reference ?? null,
+            'trip_id' => (int) ($booking->trip_id ?? 0),
+            'trip_title' => $booking->trip_title ?? null,
+            'trip_slug' => $booking->trip_slug ?? null,
+            'trip_url' => function_exists('yatra_get_trip_permalink') ? yatra_get_trip_permalink((int) ($booking->trip_id ?? 0)) : '',
+            'featured_image' => $booking->featured_image ?? null,
+            'created_at' => $booking->created_at ?? null,
+            'updated_at' => $booking->updated_at ?? null,
+            'travel_date' => $booking->travel_date ?? null,
+            'travelers_count' => (int) ($booking->travelers_count ?? 0),
+            'total_amount' => (float) ($booking->total_amount ?? 0),
+            'amount_paid' => (float) ($booking->amount_paid ?? 0),
+            'amount_due' => (float) ($booking->amount_due ?? 0),
+            'currency' => $booking->currency ?? null,
+            'payment_status' => $booking->payment_status ?? null,
+            'status' => $booking->status ?? null,
+            'payment_gateway' => $booking->payment_gateway ?? null,
+            'contact_first_name' => $booking->contact_first_name ?? null,
+            'contact_last_name' => $booking->contact_last_name ?? null,
+            'contact_email' => $booking->contact_email ?? null,
+            'contact_phone' => $booking->contact_phone ?? null,
+            'contact_country' => $booking->contact_country ?? null,
+            'special_requests' => $booking->special_requests ?? null,
+            'emergency_contact' => $emergencyContact,
+            'contact_data' => isset($booking->contact_data) ? maybe_unserialize($booking->contact_data) : null,
+            'travelers' => isset($booking->travelers) ? maybe_unserialize($booking->travelers) : null,
+            'payments' => [],
+        ];
+
+        return apply_filters('yatra_customer_booking_details', $details, $booking, $userId);
+    }
+
     /**
      * Get customer's payments
      * 
@@ -432,6 +510,110 @@ class CustomerService
         }, $payments);
     }
 
+    public function getDocumentsForBookings(array $bookings, int $customerId = 0): array
+    {
+        $documents = [];
+
+        // Process each booking individually for vouchers and itineraries
+        // but group by trip for downloads
+        $tripsWithBookings = [];
+        
+        foreach ($bookings as $booking) {
+            $bookingId = is_object($booking) ? (int) ($booking->id ?? 0) : (int) ($booking['id'] ?? $booking['booking_id'] ?? 0);
+            $tripId = is_object($booking) ? (int) ($booking->trip_id ?? 0) : (int) ($booking['trip_id'] ?? 0);
+            $tripTitle = is_object($booking) ? (string) ($booking->trip_title ?? '') : (string) ($booking['trip_title'] ?? '');
+            $reference = is_object($booking) ? ($booking->reference ?? null) : ($booking['reference'] ?? null);
+            $status = is_object($booking) ? (string) ($booking->status ?? '') : (string) ($booking['status'] ?? '');
+            $createdAt = is_object($booking) ? (string) ($booking->created_at ?? '') : (string) ($booking['created_at'] ?? '');
+
+            if ($bookingId <= 0) {
+                continue;
+            }
+
+            // Store trip info for downloads (grouped by trip)
+            if ($tripId > 0 && !isset($tripsWithBookings[$tripId])) {
+                $tripsWithBookings[$tripId] = [
+                    'booking_id' => $bookingId,
+                    'trip_title' => $tripTitle,
+                    'reference' => $reference,
+                    'status' => $status,
+                    'created_at' => $createdAt,
+                ];
+            }
+
+            // Get payments for this booking (invoices per payment)
+            $payments = $this->paymentRepository->findByBookingId($bookingId);
+            foreach ($payments as $payment) {
+                $paymentId = (int) ($payment->id ?? 0);
+                if ($paymentId <= 0) {
+                    continue;
+                }
+
+                $paymentStatus = (string) ($payment->status ?? '');
+                if (!in_array($paymentStatus, ['paid', 'completed', 'success'], true)) {
+                    continue;
+                }
+
+                $docRef = $reference ?: $bookingId;
+
+                // Invoice per payment
+                $invoiceUrl = rest_url('yatra/v1/payment/' . $paymentId . '/invoice');
+                $invoiceUrl = add_query_arg('_wpnonce', wp_create_nonce('wp_rest'), $invoiceUrl);
+
+                $documents[] = [
+                    'id' => 'invoice-payment-' . $paymentId,
+                    'name' => sprintf(__('Invoice #%s.pdf', 'yatra'), $docRef),
+                    'trip_title' => $tripTitle,
+                    'category' => 'invoice',
+                    'updated_at' => $payment->created_at ?? $createdAt ?: date('Y-m-d H:i:s'),
+                    'url' => $invoiceUrl,
+                ];
+            }
+
+            // Voucher per booking
+            if ($status === 'confirmed') {
+                $docRef = $reference ?: $bookingId;
+
+                $voucherUrl = rest_url('yatra/v1/bookings/' . $bookingId . '/voucher');
+                $voucherUrl = add_query_arg('_wpnonce', wp_create_nonce('wp_rest'), $voucherUrl);
+
+                $documents[] = [
+                    'id' => 'voucher-' . $bookingId, // Booking-based ID
+                    'name' => sprintf(__('Travel Voucher #%s.pdf', 'yatra'), $docRef),
+                    'trip_title' => $tripTitle,
+                    'category' => 'voucher',
+                    'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
+                    'url' => $voucherUrl,
+                ];
+
+                // Itinerary per booking
+                $itineraryUrl = rest_url('yatra/v1/bookings/' . $bookingId . '/itinerary');
+                $itineraryUrl = add_query_arg('_wpnonce', wp_create_nonce('wp_rest'), $itineraryUrl);
+
+                $documents[] = [
+                    'id' => 'itinerary-' . $bookingId, // Booking-based ID
+                    'name' => sprintf(__('Travel Itinerary #%s.pdf', 'yatra'), $docRef),
+                    'trip_title' => $tripTitle,
+                    'category' => 'itinerary',
+                    'updated_at' => $createdAt ?: date('Y-m-d H:i:s'),
+                    'url' => $itineraryUrl,
+                ];
+            }
+        }
+
+        usort($documents, function ($a, $b) {
+            return strtotime($b['updated_at']) - strtotime($a['updated_at']);
+        });
+
+        // Apply downloads filter (which groups by trip)
+        $documents = apply_filters('yatra_customer_documents', $documents, $bookings, $customerId);
+        
+        // Debug: Log the documents being returned
+        error_log('CustomerService Debug: Final documents array: ' . print_r($documents, true));
+
+        return is_array($documents) ? $documents : [];
+    }
+
     /**
      * Get customer's documents (invoices, vouchers, itineraries)
      * 
@@ -442,44 +624,33 @@ class CustomerService
     {
         // Get customer's bookings
         $bookings = $this->customerRepository->getCustomerBookings($customerId, 1000);
-        
-        $documents = [];
-        
-        foreach ($bookings as $booking) {
-            $bookingId = (int) $booking['id'];
-            $tripTitle = $booking['trip_title'] ?? 'N/A';
-            
-            // Generate invoice document
-            if (!empty($booking['total_amount'])) {
-                $documents[] = [
-                    'id' => 'invoice-' . $bookingId,
-                    'name' => sprintf(__('Invoice #%s.pdf', 'yatra'), $booking['reference'] ?? $bookingId),
-                    'trip_title' => $tripTitle,
-                    'category' => 'invoice',
-                    'updated_at' => $booking['created_at'] ?? date('Y-m-d H:i:s'),
-                    'url' => rest_url('yatra/v1/bookings/' . $bookingId . '/invoice'),
-                ];
+
+        // Also include bookings linked via user_id/email (older bookings may not have customer_id)
+        $customer = $this->customerRepository->find($customerId);
+        if ($customer) {
+            if (!empty($customer->user_id)) {
+                $userBookings = $this->bookingRepository->findByUserId((int) $customer->user_id, 1000);
+                $bookings = array_merge($bookings, $userBookings);
             }
-            
-            // Generate voucher document if booking is confirmed
-            if (($booking['status'] ?? '') === 'confirmed') {
-                $documents[] = [
-                    'id' => 'voucher-' . $bookingId,
-                    'name' => sprintf(__('Travel Voucher #%s.pdf', 'yatra'), $booking['reference'] ?? $bookingId),
-                    'trip_title' => $tripTitle,
-                    'category' => 'voucher',
-                    'updated_at' => $booking['created_at'] ?? date('Y-m-d H:i:s'),
-                    'url' => rest_url('yatra/v1/bookings/' . $bookingId . '/voucher'),
-                ];
+
+            if (!empty($customer->email)) {
+                $emailBookings = $this->bookingRepository->findByContactEmail((string) $customer->email, 1000);
+                $bookings = array_merge($bookings, $emailBookings);
             }
         }
-        
-        // Sort by updated_at descending
-        usort($documents, function($a, $b) {
-            return strtotime($b['updated_at']) - strtotime($a['updated_at']);
-        });
-        
-        return $documents;
+
+        // Deduplicate by booking id
+        $seen = [];
+        $unique = [];
+        foreach ($bookings as $b) {
+            $id = is_object($b) ? ($b->id ?? null) : ($b['id'] ?? $b['booking_id'] ?? null);
+            if ($id && !isset($seen[$id])) {
+                $seen[$id] = true;
+                $unique[] = $b;
+            }
+        }
+
+        return $this->getDocumentsForBookings($unique, $customerId);
     }
 
     /**

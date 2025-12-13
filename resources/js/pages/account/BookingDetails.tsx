@@ -9,6 +9,8 @@ import {
   FileText as FileTextIcon,
   AlertCircle,
   ArrowRight,
+  ExternalLink,
+  Download,
 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatDate, getBadge, formatPriceForBooking } from './utils';
@@ -73,6 +75,7 @@ interface BookingDetailsData {
   customer_country?: string;
   trip_id: number;
   trip_title: string;
+  trip_url?: string;
   trip_image?: string;
   trip_price: number;
   booking_date: string;
@@ -91,6 +94,15 @@ interface BookingDetailsData {
   emergency_contact?: any;
   contact_data?: any;
   payments?: any[];
+  downloads?: Array<{
+    id: string;
+    title: string;
+    url: string;
+    visibility?: string;
+    access_label?: string;
+    locked?: boolean;
+    locked_reason?: string;
+  }>;
   created_at: string;
   updated_at?: string;
 }
@@ -145,6 +157,25 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
     );
   }
 
+  const normalizeRecord = (value: any): Record<string, any> | null => {
+    if (!value) return null;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed as Record<string, any>;
+      } catch {
+        return null;
+      }
+      return null;
+    }
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      return value as Record<string, any>;
+    }
+    return null;
+  };
+
+  const emergencyContact = normalizeRecord((booking as any).emergency_contact);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -193,6 +224,15 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {booking.trip_title}
                 </div>
+                {booking.trip_url ? (
+                  <a
+                    href={booking.trip_url}
+                    className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    {__('View Trip', 'View Trip')}
+                  </a>
+                ) : null}
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
@@ -346,14 +386,14 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           )}
 
           {/* Emergency Contact */}
-          {booking.emergency_contact && Object.values(booking.emergency_contact).some((v: any) => v && String(v).trim() !== '') && (
+          {emergencyContact && Object.values(emergencyContact).some((v: any) => v && String(v).trim() !== '') && (
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
                 {__('Emergency Contact', 'Emergency Contact')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {Object.entries(booking.emergency_contact)
+                {Object.entries(emergencyContact)
                   .filter(([_, value]) => value && String(value).trim() !== '')
                   .map(([fieldId, fieldValue]) => {
                     const label = fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -380,6 +420,47 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {booking.notes}
               </p>
+            </div>
+          )}
+
+          {/* Downloads */}
+          {Array.isArray((booking as any).downloads) && (booking as any).downloads.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Download className="w-5 h-5" />
+                {__('Downloads', 'Downloads')}
+              </h3>
+              <div className="space-y-3">
+                {(booking as any).downloads.map((d: any) => (
+                  <div key={d.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{d.title}</div>
+                      {d.access_label ? (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{d.access_label}</div>
+                      ) : null}
+                      {d.locked && d.locked_reason ? (
+                        <div className="text-xs text-amber-700 dark:text-amber-300 mt-1">{d.locked_reason}</div>
+                      ) : null}
+                    </div>
+                    {d.locked || !d.url ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium cursor-not-allowed">
+                        <Download className="w-4 h-4" />
+                        {__('Not Available', 'Not Available')}
+                      </div>
+                    ) : (
+                      <a
+                        href={d.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                      >
+                        <Download className="w-4 h-4" />
+                        {__('Download', 'Download')}
+                      </a>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

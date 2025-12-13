@@ -30,7 +30,7 @@ export interface FrontendTab {
   label: string;
   enabled: boolean;
   order: number;
-  content_type: 'general' | 'pricing' | 'itinerary' | 'included_excluded' | 'gallery' | 'faqs' | 'reviews' | 'custom';
+  content_type: 'general' | 'pricing' | 'itinerary' | 'included_excluded' | 'gallery' | 'faqs' | 'reviews' | 'downloads' | 'custom';
   custom_content?: string;
 }
 

@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as CheckCircle, Q as HelpCircle, V as MoreVertical, W as AlertTriangle, X, Y as Columns, Z as ExternalLink, _ as Mountain, $ as PenSquare, a0 as Copy, a1 as ArrowUp, a2 as ArrowDown, a3 as Archive, a4 as Trash2, a5 as Plus, a6 as Search, a7 as ArrowUpDown, a8 as AlertCircle, a9 as XCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Lightbulb, aC as Database, aD as History, aE as Save, aF as Sparkles, aG as ChevronLeft, aH as Box, aI as ChevronUp, aJ as Upload, aK as RotateCcw, aL as Pen, aM as Phone, aN as Globe, aO as Award, aP as Download, aQ as Server, aR as Folder, aS as UserCheck, aT as ClipboardList, aU as Receipt, aV as Plug, aW as Shield, aX as Lock, aY as EyeOff, aZ as Ban, a_ as Send, a$ as Crown, b0 as reactDomExports, b1 as Filter, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-C_nDbNrJ.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-DXDUp5pC.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as CheckCircle, Q as HelpCircle, V as MoreVertical, W as AlertTriangle, X, Y as Columns, Z as ExternalLink, _ as Mountain, $ as PenSquare, a0 as Copy, a1 as ArrowUp, a2 as ArrowDown, a3 as Archive, a4 as Trash2, a5 as Plus, a6 as Search, a7 as ArrowUpDown, a8 as AlertCircle, a9 as XCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Download, aC as Lightbulb, aD as Database, aE as History, aF as Save, aG as Sparkles, aH as ChevronLeft, aI as Box, aJ as ChevronUp, aK as Upload, aL as RotateCcw, aM as Pen, aN as Phone, aO as Globe, aP as Award, aQ as Server, aR as Folder, aS as UserCheck, aT as ClipboardList, aU as Receipt, aV as Plug, aW as Shield, aX as Lock, aY as EyeOff, aZ as Ban, a_ as Send, a$ as Crown, b0 as reactDomExports, b1 as Filter, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-MMNwjThF.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-ZAc9H3xe.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -26501,14 +26501,15 @@ const normalizeAmenityItems = (items) => {
   return [];
 };
 const TripForm = () => {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const showDownloadsUI = !!((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.showDownloadsUI);
   const getInitialSection = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sectionFromUrl = urlParams.get("section");
-    const validSections = ["basic", "location", "duration", "pricing", "booking", "itinerary", "included", "media", "categorization", "faqs", "seo", "advanced"];
+    const validSections = ["basic", "location", "duration", "pricing", "booking", "itinerary", "included", "media", "downloads", "categorization", "faqs", "seo", "advanced"];
     if (sectionFromUrl && validSections.includes(sectionFromUrl)) {
       return sectionFromUrl;
     }
@@ -26622,6 +26623,7 @@ const TripForm = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: "",
+      downloadable_items: [],
       faqs: [
         { question: "What is the best time to visit Bali?", answer: "The best time to visit Bali is during the dry season from April to October, when you can expect sunny days and minimal rainfall." },
         { question: "Do I need a visa?", answer: "Most nationalities can get a visa on arrival at the airport. A valid passport with at least 6 months validity is required." },
@@ -26725,6 +26727,7 @@ const TripForm = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: "",
+      downloadable_items: [],
       faqs: [
         { question: "How difficult is the trek?", answer: "This is a challenging trek requiring excellent physical fitness. You'll be walking 6-8 hours daily at high altitude. Previous trekking experience is recommended." },
         { question: "What is the altitude at Base Camp?", answer: "Everest Base Camp is located at 5,364 meters (17,598 feet) above sea level." },
@@ -26827,6 +26830,7 @@ const TripForm = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: "",
+      downloadable_items: [],
       faqs: [
         { question: "Do I need a visa?", answer: "Most non-EU nationals need a Schengen visa. Apply at the embassy of your first entry country (France) well in advance." },
         { question: "What languages are spoken?", answer: "English-speaking guides provided. Local languages are French, Italian, and Spanish, but English is widely spoken in tourist areas." },
@@ -26920,6 +26924,7 @@ const TripForm = () => {
     itinerary_days: [],
     gallery_images: [],
     featured_image: "",
+    downloadable_items: [],
     faqs: [],
     frontend_tabs: [
       { id: "general", label: "General", enabled: true, order: 1, content_type: "general" },
@@ -27124,7 +27129,7 @@ const TripForm = () => {
     enabled: isEditMode && can("yatra_view_trips")
   });
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a2, _b2, _c2, _d2, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     if (tripData && isEditMode) {
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
@@ -27157,6 +27162,32 @@ const TripForm = () => {
           }
         }
         return [];
+      };
+      const normalizeDownloadableItems = (items) => {
+        if (!items) return [];
+        if (!Array.isArray(items)) return [];
+        return items.filter((row) => row && typeof row === "object").map((row, idx) => {
+          const rawVisibility = row.visibility ?? "booked_only";
+          const mappedVisibility = rawVisibility === "paid_only" ? "booked_only" : rawVisibility;
+          const safeVisibility = ["public", "logged_in", "booked_only"].includes(mappedVisibility) ? mappedVisibility : "booked_only";
+          const title2 = (row.title ?? row.download_title ?? row.downlaod_title ?? "").toString();
+          const description = (row.description ?? row.download_description ?? row.downlaod_description ?? "").toString();
+          const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
+          const attachmentUrl = (row.attachment_url ?? "").toString();
+          const attachmentTitle = (row.attachment_title ?? "").toString();
+          const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
+          return {
+            id: row.id != null ? Number(row.id) : null,
+            title: title2,
+            description,
+            attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
+            attachment_url: attachmentUrl,
+            attachment_title: attachmentTitle,
+            visibility: safeVisibility,
+            enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
+            sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1
+          };
+        });
       };
       const normalizeGalleryImages = (images) => {
         if (!images) return [];
@@ -27257,7 +27288,7 @@ const TripForm = () => {
         longitude: ((_b2 = tripData.longitude) == null ? void 0 : _b2.toString()) || "",
         landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
         trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_c2 = tripData.duration_days) == null ? void 0 : _c2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
-        duration_days: ((_d = tripData.duration_days) == null ? void 0 : _d.toString()) || "",
+        duration_days: ((_d2 = tripData.duration_days) == null ? void 0 : _d2.toString()) || "",
         duration_nights: ((_e = tripData.duration_nights) == null ? void 0 : _e.toString()) || "",
         available_from: tripData.available_from || "",
         available_to: tripData.available_to || "",
@@ -27307,6 +27338,7 @@ const TripForm = () => {
         itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
         gallery_images: normalizeGalleryImages(tripData.gallery_images),
         featured_image: tripData.featured_image || tripData.featured_image_url || "",
+        downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
         faqs: normalizeFaqs(tripData.faqs),
         frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
           { id: "general", label: "General", enabled: true, order: 1, content_type: "general" },
@@ -27343,6 +27375,7 @@ const TripForm = () => {
       "included": ["included_items", "excluded_items"],
       "media": ["gallery_images", "video_url", "virtual_tour_url"],
       // Removed featured_image - it's in basic section
+      "downloads": ["downloadable_items"],
       "categorization": ["trip_category", "activity_types"],
       "faqs": ["faqs"],
       "seo": ["meta_title", "meta_description"],
@@ -27363,7 +27396,7 @@ const TripForm = () => {
       label: __("Basic Information", "Basic Information"),
       icon: FileText,
       required: true,
-      completed: !!(((_a = formData.title) == null ? void 0 : _a.trim()) && ((_b = formData.slug) == null ? void 0 : _b.trim())),
+      completed: !!(((_b = formData.title) == null ? void 0 : _b.trim()) && ((_c = formData.slug) == null ? void 0 : _c.trim())),
       hasErrors: getSectionErrors("basic").length > 0
     },
     // Step 2: Location & Geography
@@ -27421,6 +27454,16 @@ const TripForm = () => {
       completed: formData.gallery_images.length > 0 || !!formData.video_url,
       hasErrors: getSectionErrors("media").length > 0
     },
+    ...showDownloadsUI ? [
+      {
+        id: "downloads",
+        label: __("Downloads", "Downloads"),
+        icon: Download,
+        required: false,
+        completed: (formData.downloadable_items || []).length > 0,
+        hasErrors: getSectionErrors("downloads").length > 0
+      }
+    ] : [],
     {
       id: "categorization",
       label: __("Categorization", "Categorization"),
@@ -27549,13 +27592,13 @@ const TripForm = () => {
         const selection = mediaUploader.state().get("selection");
         const newImages = [];
         selection.each((attachment) => {
-          var _a2, _b2, _c2, _d;
+          var _a2, _b2, _c2, _d2;
           const image = attachment.toJSON();
           if (image.url) {
             newImages.push({
               id: image.id || 0,
               url: image.url,
-              thumbnail_url: ((_b2 = (_a2 = image.sizes) == null ? void 0 : _a2.thumbnail) == null ? void 0 : _b2.url) || ((_d = (_c2 = image.sizes) == null ? void 0 : _c2.medium) == null ? void 0 : _d.url) || image.url,
+              thumbnail_url: ((_b2 = (_a2 = image.sizes) == null ? void 0 : _a2.thumbnail) == null ? void 0 : _b2.url) || ((_d2 = (_c2 = image.sizes) == null ? void 0 : _c2.medium) == null ? void 0 : _d2.url) || image.url,
               alt_text: image.alt || "",
               caption: image.caption || ""
             });
@@ -27586,6 +27629,76 @@ const TripForm = () => {
       newImages.splice(toIndex, 0, movedImage);
       return { ...prev, gallery_images: newImages };
     });
+  };
+  const handleDownloadableItemAdd = () => {
+    setFormData((prev) => {
+      var _a2;
+      const nextOrder = (((_a2 = prev.downloadable_items) == null ? void 0 : _a2.length) || 0) + 1;
+      return {
+        ...prev,
+        downloadable_items: [
+          ...prev.downloadable_items || [],
+          {
+            id: null,
+            title: "",
+            description: "",
+            attachment_id: null,
+            attachment_url: "",
+            attachment_title: "",
+            visibility: "booked_only",
+            enabled: true,
+            sort_order: nextOrder
+          }
+        ]
+      };
+    });
+  };
+  const handleDownloadableItemRemove = (index) => {
+    setFormData((prev) => ({
+      ...prev,
+      downloadable_items: (prev.downloadable_items || []).filter((_, i) => i !== index)
+    }));
+  };
+  const handleDownloadableItemMove = (fromIndex, toIndex) => {
+    setFormData((prev) => {
+      const items = [...prev.downloadable_items || []];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+      const normalized = items.map((item, idx) => ({
+        ...item,
+        sort_order: idx + 1
+      }));
+      return { ...prev, downloadable_items: normalized };
+    });
+  };
+  const handleDownloadableItemChange = (index, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      downloadable_items: (prev.downloadable_items || []).map(
+        (item, i) => i === index ? { ...item, [field]: value } : item
+      )
+    }));
+  };
+  const handleDownloadableItemSelectFile = (index) => {
+    if (window.wp && window.wp.media) {
+      const mediaUploader = window.wp.media({
+        title: __("Select File", "Select File"),
+        button: { text: __("Use this file", "Use this file") },
+        multiple: false
+      });
+      mediaUploader.on("select", () => {
+        const selection = mediaUploader.state().get("selection");
+        const attachment = selection.first();
+        if (!attachment) return;
+        const file = attachment.toJSON();
+        handleDownloadableItemChange(index, "attachment_id", file.id || null);
+        handleDownloadableItemChange(index, "attachment_url", file.url || "");
+        handleDownloadableItemChange(index, "attachment_title", file.title || file.filename || "");
+      });
+      mediaUploader.open();
+    } else {
+      showToast(__("Media library not available. Please ensure you are logged in as admin.", "Media library not available. Please ensure you are logged in as admin."), "error");
+    }
   };
   const handlePriceTypeAdd = (categoryId) => {
     if (formData.price_types.some((pt) => Number(pt.category_id) === Number(categoryId))) {
@@ -27641,7 +27754,8 @@ const TripForm = () => {
       regions: dummyData.regions || [],
       landmarks: dummyData.landmarks || [],
       availability_dates: dummyData.availability_dates || [],
-      frontend_tabs: dummyData.frontend_tabs || []
+      frontend_tabs: dummyData.frontend_tabs || [],
+      downloadable_items: dummyData.downloadable_items || []
     });
     showToast(
       __("Dummy data filled", "Dummy data filled") + ` (${nextIndex + 1}/${dummyTripsData.length})`,
@@ -27928,6 +28042,25 @@ const TripForm = () => {
         meta_description: data.meta_description || "",
         meta_keywords: data.meta_keywords || ""
       };
+      if (showDownloadsUI) {
+        payload.downloadable_items = (data.downloadable_items || []).map((item, idx) => ({
+          id: item.id ?? null,
+          title: (item.title || "").trim(),
+          description: item.description || "",
+          attachment_id: item.attachment_id ?? null,
+          visibility: item.visibility || "booked_only",
+          enabled: item.enabled !== false,
+          sort_order: item.sort_order != null ? item.sort_order : idx + 1,
+          attachment_url: item.attachment_url || "",
+          attachment_title: item.attachment_title || "",
+          // Prefixed keys (requested)
+          download_title: (item.title || "").trim(),
+          download_description: item.description || "",
+          download_visibility: item.visibility || "booked_only",
+          download_enabled: item.enabled !== false,
+          download_file: item.attachment_id ?? null
+        })).filter((item) => item.title);
+      }
       if (isEditMode && tripId) {
         const response = await apiClient.put(`/trips/${tripId}`, payload);
         return response.data || response;
@@ -29183,6 +29316,126 @@ const TripForm = () => {
             ] })
           ] })
         ] });
+      case "downloads":
+        if (!showDownloadsUI) {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "info", children: __("Downloads module is not enabled.", "Downloads module is not enabled.") }) });
+        }
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mb-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-5 h-5 text-gray-500" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Downloads", "Downloads") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-6", children: __("Attach files to this trip and control who can access them.", "Attach files to this trip and control who can access them.") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Downloads", "Downloads") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: __("Attach files to this trip and control who can access them.", "Attach files to this trip and control who can access them.") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              (formData.downloadable_items || []).length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: (formData.downloadable_items || []).map((item, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: __("Title", "Title") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        value: item.title,
+                        onChange: (e) => handleDownloadableItemChange(index, "title", e.target.value),
+                        placeholder: __("E.g. Packing list, itinerary PDF, waiver form...", "E.g. Packing list, itinerary PDF, waiver form...")
+                      }
+                    )
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-1 pt-7", children: [
+                    index > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "ghost", size: "sm", onClick: () => handleDownloadableItemMove(index, index - 1), title: __("Move up", "Move up"), children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronUp, { className: "w-4 h-4" }) }),
+                    index < (formData.downloadable_items || []).length - 1 && /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "ghost", size: "sm", onClick: () => handleDownloadableItemMove(index, index + 1), title: __("Move down", "Move down"), children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { type: "button", variant: "ghost", size: "sm", onClick: () => handleDownloadableItemRemove(index), className: "text-red-600 hover:text-red-700", title: __("Remove", "Remove"), children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" }) })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: [
+                    __("Description", "Description"),
+                    " (",
+                    __("Optional", "Optional"),
+                    ")"
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "textarea",
+                    {
+                      value: item.description,
+                      onChange: (e) => handleDownloadableItemChange(index, "description", e.target.value),
+                      rows: 3,
+                      className: "flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
+                    }
+                  )
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: __("Visibility", "Visibility") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Select, { value: item.visibility, onChange: (e) => handleDownloadableItemChange(index, "visibility", e.target.value), children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "public", children: __("Public", "Public") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "logged_in", children: __("Private (My Account only)", "Private (My Account only)") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booked_only", children: __("Private (Booking confirmation only)", "Private (Booking confirmation only)") })
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: __("File", "File") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                      item.attachment_url ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "a",
+                        {
+                          href: item.attachment_url,
+                          target: "_blank",
+                          rel: "noreferrer",
+                          className: "flex-shrink-0",
+                          title: __("View file", "View file"),
+                          children: /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(item.attachment_url) ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "img",
+                            {
+                              src: item.attachment_url,
+                              alt: item.attachment_title || __("Selected file", "Selected file"),
+                              className: "w-9 h-9 rounded border border-gray-200 dark:border-gray-700 object-cover bg-white dark:bg-gray-900"
+                            }
+                          ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded border border-gray-200 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900", children: /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4 text-gray-500 dark:text-gray-400" }) })
+                        }
+                      ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-9 h-9 rounded border border-gray-200 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900 flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4 text-gray-400 dark:text-gray-600" }) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-w-0 flex-1", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 min-w-0", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", variant: "outline", onClick: () => handleDownloadableItemSelectFile(index), className: "flex items-center gap-2 flex-shrink-0", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-4 h-4" }),
+                          item.attachment_id ? __("Change File", "Change File") : __("Select File", "Select File")
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-600 dark:text-gray-400 truncate min-w-0", children: item.attachment_title || (item.attachment_id ? `#${item.attachment_id}` : __("No file selected", "No file selected")) }),
+                        item.attachment_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "a",
+                          {
+                            href: item.attachment_url,
+                            target: "_blank",
+                            rel: "noreferrer",
+                            className: "text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 flex-shrink-0",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-3 h-3" }),
+                              __("View", "View")
+                            ]
+                          }
+                        )
+                      ] }) })
+                    ] })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("input", { type: "checkbox", checked: item.enabled, onChange: (e) => handleDownloadableItemChange(index, "enabled", e.target.checked), className: "h-4 w-4" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: __("Enabled", "Enabled") })
+                ] })
+              ] }, index)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: __("No downloads added yet", "No downloads added yet") })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", variant: "outline", onClick: handleDownloadableItemAdd, className: "w-full", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+                __("Add Download", "Add Download")
+              ] })
+            ] })
+          ] })
+        ] });
       case "pricing":
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mb-2", children: [
@@ -30083,6 +30336,7 @@ const TripForm = () => {
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "itinerary", children: __("Itinerary", "Itinerary") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "included_excluded", children: __("Included/Excluded", "Included/Excluded") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gallery", children: __("Gallery", "Gallery") }),
+                            showDownloadsUI && /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "downloads", children: __("Downloads", "Downloads") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "faqs", children: __("FAQs", "FAQs") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "reviews", children: __("Reviews", "Reviews") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "custom", children: __("Custom Content", "Custom Content") })
@@ -30394,7 +30648,7 @@ const TripForm = () => {
             style: { width: `${completionPercentage}%` }
           }
         ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center", children: ((_c = allSections[currentStepIndex]) == null ? void 0 : _c.label) || __("Overview", "Overview") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center", children: ((_d = allSections[currentStepIndex]) == null ? void 0 : _d.label) || __("Overview", "Overview") })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Button,

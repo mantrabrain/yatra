@@ -235,6 +235,6 @@ class TripValidator
             $sanitized['excludes'] = is_array($data['excludes']) ? json_encode($data['excludes']) : $data['excludes'];
         }
 
-        return $sanitized;
+        return apply_filters('yatra_trip_sanitize_data', $sanitized, $data);
     }
 }

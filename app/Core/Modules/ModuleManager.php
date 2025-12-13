@@ -258,6 +258,21 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'yatra-google-calendar',
             ],
+            [
+                'slug' => 'downloads',
+                'name' => __('Downloads', 'yatra'),
+                'description' => __('Attach secure downloadable files to trips and control access for travelers.', 'yatra'),
+                'category' => __('Bookings', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/downloads',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=downloads',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['downloads', 'documents', 'traveler-portal'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'settings_page' => 'yatra-downloads',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

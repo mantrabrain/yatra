@@ -121,6 +121,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Authentication (login, register, email verification)
         add_action('rest_api_init', [\Yatra\Controllers\AuthController::class, 'registerRoutes']);
+        add_action('rest_api_init', function() {
+            $bookingsController = new \Yatra\Controllers\BookingsController();
+            $bookingsController->register_routes();
+        });
         add_filter('authenticate', [\Yatra\Controllers\AuthController::class, 'blockUnverifiedUserLogin'], 30, 3);
         add_action('init', [\Yatra\Controllers\AuthController::class, 'registerCustomerRole'], 5);
         add_action('init', [\Yatra\Controllers\AuthController::class, 'handleWpLoginResendVerification'], 1);

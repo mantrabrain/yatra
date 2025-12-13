@@ -36,7 +36,8 @@ import {
   Copy,
   BookOpen,
   Mail,
-  Database
+  Database,
+  Download
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -45,8 +46,8 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { Alert } from '../components/ui/alert';
-import { Badge } from '../components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { Badge } from '../components/ui/badge';
 import { HelpText } from '../components/ui/help-text';
 import { getCurrencySymbol } from '../data/currencies';
 import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
@@ -63,6 +64,7 @@ type SectionId =
   | 'itinerary'         // 6. Itinerary Builder (includes Included/Excluded)
   | 'included'          // 7. What's Included/Excluded (deprecated - merged into itinerary)
   | 'media'             // 8. Media & Content (gallery, video, story, testimonials)
+  | 'downloads'         // 8b. Downloads (Pro module)
   | 'categorization'    // 9. Categorization & Tags (category, activities, difficulty, tags)
   | 'faqs'              // 10. FAQs
   | 'seo'               // 11. SEO Settings
@@ -122,6 +124,18 @@ interface DifficultyLevelOption {
 interface TripAmenityItem {
   title: string;
   description: string;
+}
+
+interface DownloadableItem {
+  id?: number | null;
+  title: string;
+  description: string;
+  attachment_id: number | null;
+  attachment_url?: string;
+  attachment_title?: string;
+  visibility: 'public' | 'logged_in' | 'booked_only';
+  enabled: boolean;
+  sort_order?: number;
 }
 
 const buildCategoryOptionNodes = (
@@ -266,6 +280,9 @@ interface TripFormData {
   // Gallery
   gallery_images: Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }>;
   featured_image: string;
+
+  // Downloads
+  downloadable_items: DownloadableItem[];
   
   // FAQs
   faqs: FAQ[];
@@ -296,7 +313,7 @@ interface FrontendTab {
   label: string;
   enabled: boolean;
   order: number;
-  content_type: 'general' | 'pricing' | 'itinerary' | 'included_excluded' | 'gallery' | 'faqs' | 'reviews' | 'custom';
+  content_type: 'general' | 'pricing' | 'itinerary' | 'included_excluded' | 'gallery' | 'faqs' | 'reviews' | 'downloads' | 'custom';
   custom_content?: string;
 }
 
@@ -353,12 +370,13 @@ const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const showDownloadsUI = !!(window as any)?.yatraAdmin?.showDownloadsUI;
   
   // Get section from URL on initial load
   const getInitialSection = (): SectionId => {
     const urlParams = new URLSearchParams(window.location.search);
     const sectionFromUrl = urlParams.get('section') as SectionId | null;
-    const validSections: SectionId[] = ['basic', 'location', 'duration', 'pricing', 'booking', 'itinerary', 'included', 'media', 'categorization', 'faqs', 'seo', 'advanced'];
+    const validSections: SectionId[] = ['basic', 'location', 'duration', 'pricing', 'booking', 'itinerary', 'included', 'media', 'downloads', 'categorization', 'faqs', 'seo', 'advanced'];
     if (sectionFromUrl && validSections.includes(sectionFromUrl)) {
       return sectionFromUrl;
     }
@@ -483,6 +501,7 @@ const TripForm: React.FC = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: '',
+      downloadable_items: [],
       faqs: [
         { question: 'What is the best time to visit Bali?', answer: 'The best time to visit Bali is during the dry season from April to October, when you can expect sunny days and minimal rainfall.' },
         { question: 'Do I need a visa?', answer: 'Most nationalities can get a visa on arrival at the airport. A valid passport with at least 6 months validity is required.' },
@@ -585,6 +604,7 @@ const TripForm: React.FC = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: '',
+      downloadable_items: [],
       faqs: [
         { question: 'How difficult is the trek?', answer: 'This is a challenging trek requiring excellent physical fitness. You\'ll be walking 6-8 hours daily at high altitude. Previous trekking experience is recommended.' },
         { question: 'What is the altitude at Base Camp?', answer: 'Everest Base Camp is located at 5,364 meters (17,598 feet) above sea level.' },
@@ -687,6 +707,7 @@ const TripForm: React.FC = () => {
       itinerary_days: [],
       gallery_images: [],
       featured_image: '',
+      downloadable_items: [],
       faqs: [
         { question: 'Do I need a visa?', answer: 'Most non-EU nationals need a Schengen visa. Apply at the embassy of your first entry country (France) well in advance.' },
         { question: 'What languages are spoken?', answer: 'English-speaking guides provided. Local languages are French, Italian, and Spanish, but English is widely spoken in tourist areas.' },
@@ -779,6 +800,7 @@ const TripForm: React.FC = () => {
     itinerary_days: [],
     gallery_images: [],
     featured_image: '',
+    downloadable_items: [],
     faqs: [],
     frontend_tabs: [
       { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
@@ -1044,6 +1066,40 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       };
 
+      const normalizeDownloadableItems = (items: any): DownloadableItem[] => {
+        if (!items) return [];
+        if (!Array.isArray(items)) return [];
+
+        return items
+          .filter((row: any) => row && typeof row === 'object')
+          .map((row: any, idx: number) => {
+            const rawVisibility = (row.visibility ?? 'booked_only') as any;
+            const mappedVisibility = rawVisibility === 'paid_only' ? 'booked_only' : rawVisibility;
+            const safeVisibility: DownloadableItem['visibility'] = ['public', 'logged_in', 'booked_only'].includes(mappedVisibility)
+              ? mappedVisibility
+              : 'booked_only';
+
+            const title = (row.title ?? row.download_title ?? row.downlaod_title ?? '').toString();
+            const description = (row.description ?? row.download_description ?? row.downlaod_description ?? '').toString();
+            const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
+            const attachmentUrl = (row.attachment_url ?? '').toString();
+            const attachmentTitle = (row.attachment_title ?? '').toString();
+            const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
+
+            return {
+              id: row.id != null ? Number(row.id) : null,
+              title,
+              description,
+              attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
+              attachment_url: attachmentUrl,
+              attachment_title: attachmentTitle,
+              visibility: safeVisibility,
+              enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
+              sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1,
+            };
+          });
+      };
+
       // Helper to normalize gallery images
       const normalizeGalleryImages = (images: any): Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }> => {
         if (!images) return [];
@@ -1198,6 +1254,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
         gallery_images: normalizeGalleryImages(tripData.gallery_images),
         featured_image: tripData.featured_image || tripData.featured_image_url || '',
+        downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
         faqs: normalizeFaqs(tripData.faqs),
         frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
           { id: 'general', label: 'General', enabled: true, order: 1, content_type: 'general' },
@@ -1235,6 +1292,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       'itinerary': ['itinerary_days'],
       'included': ['included_items', 'excluded_items'],
       'media': ['gallery_images', 'video_url', 'virtual_tour_url'], // Removed featured_image - it's in basic section
+      'downloads': ['downloadable_items'],
       'categorization': ['trip_category', 'activity_types'],
       'faqs': ['faqs'],
       'seo': ['meta_title', 'meta_description'],
@@ -1325,6 +1383,16 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       completed: formData.gallery_images.length > 0 || !!formData.video_url,
       hasErrors: getSectionErrors('media').length > 0,
     },
+    ...(showDownloadsUI ? ([
+      {
+        id: 'downloads',
+        label: __('Downloads', 'Downloads'),
+        icon: Download,
+        required: false,
+        completed: (formData.downloadable_items || []).length > 0,
+        hasErrors: getSectionErrors('downloads').length > 0,
+      },
+    ] as Section[]) : []),
     { 
       id: 'categorization', 
       label: __('Categorization', 'Categorization'), 
@@ -1535,6 +1603,86 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     });
   };
 
+  const handleDownloadableItemAdd = () => {
+    setFormData(prev => {
+      const nextOrder = (prev.downloadable_items?.length || 0) + 1;
+      return {
+        ...prev,
+        downloadable_items: [
+          ...(prev.downloadable_items || []),
+          {
+            id: null,
+            title: '',
+            description: '',
+            attachment_id: null,
+            attachment_url: '',
+            attachment_title: '',
+            visibility: 'booked_only',
+            enabled: true,
+            sort_order: nextOrder,
+          },
+        ],
+      };
+    });
+  };
+
+  const handleDownloadableItemRemove = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      downloadable_items: (prev.downloadable_items || []).filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleDownloadableItemMove = (fromIndex: number, toIndex: number) => {
+    setFormData(prev => {
+      const items = [...(prev.downloadable_items || [])];
+      const [moved] = items.splice(fromIndex, 1);
+      items.splice(toIndex, 0, moved);
+
+      const normalized = items.map((item, idx) => ({
+        ...item,
+        sort_order: idx + 1,
+      }));
+
+      return { ...prev, downloadable_items: normalized };
+    });
+  };
+
+  const handleDownloadableItemChange = (index: number, field: keyof DownloadableItem, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      downloadable_items: (prev.downloadable_items || []).map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
+  };
+
+  const handleDownloadableItemSelectFile = (index: number) => {
+    if (window.wp && window.wp.media) {
+      const mediaUploader = window.wp.media({
+        title: __('Select File', 'Select File'),
+        button: { text: __('Use this file', 'Use this file') },
+        multiple: false,
+      });
+
+      mediaUploader.on('select', () => {
+        const selection = mediaUploader.state().get('selection');
+        const attachment = selection.first();
+        if (!attachment) return;
+        const file = attachment.toJSON();
+
+        handleDownloadableItemChange(index, 'attachment_id', file.id || null);
+        handleDownloadableItemChange(index, 'attachment_url', file.url || '');
+        handleDownloadableItemChange(index, 'attachment_title', file.title || file.filename || '');
+      });
+
+      mediaUploader.open();
+    } else {
+      // Fallback for when wp.media is not available
+      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'Media library not available. Please ensure you are logged in as admin.'), 'error');
+    }
+  };
+
   const handlePriceTypeAdd = (categoryId: number) => {
     // Check if category already exists (compare as numbers to handle string/number mismatch)
     if (formData.price_types.some(pt => Number(pt.category_id) === Number(categoryId))) {
@@ -1601,6 +1749,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       landmarks: dummyData.landmarks || [],
       availability_dates: dummyData.availability_dates || [],
       frontend_tabs: dummyData.frontend_tabs || [],
+      downloadable_items: dummyData.downloadable_items || [],
     });
     
     // Show toast notification
@@ -1921,6 +2070,29 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_description: data.meta_description || '',
         meta_keywords: data.meta_keywords || '',
       };
+
+      if (showDownloadsUI) {
+        (payload as any).downloadable_items = (data.downloadable_items || [])
+          .map((item, idx) => ({
+            id: item.id ?? null,
+            title: (item.title || '').trim(),
+            description: item.description || '',
+            attachment_id: item.attachment_id ?? null,
+            visibility: item.visibility || 'booked_only',
+            enabled: item.enabled !== false,
+            sort_order: item.sort_order != null ? item.sort_order : idx + 1,
+            attachment_url: item.attachment_url || '',
+            attachment_title: item.attachment_title || '',
+
+            // Prefixed keys (requested)
+            download_title: (item.title || '').trim(),
+            download_description: item.description || '',
+            download_visibility: item.visibility || 'booked_only',
+            download_enabled: item.enabled !== false,
+            download_file: item.attachment_id ?? null,
+          }))
+          .filter((item) => item.title);
+      }
 
       if (isEditMode && tripId) {
         const response = await apiClient.put(`/trips/${tripId}`, payload);
@@ -3273,7 +3445,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   )}
                 </CardContent>
               </Card>
-
               {/* Video & Virtual Tour */}
               <Card>
                 <CardHeader>
@@ -3429,6 +3600,167 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 </CardContent>
               </Card>
             </div>
+          </div>
+        );
+
+      case 'downloads':
+        if (!showDownloadsUI) {
+          return (
+            <div className="space-y-6">
+              <Alert variant="info">
+                {__('Downloads module is not enabled.', 'Downloads module is not enabled.')}
+              </Alert>
+            </div>
+          );
+        }
+
+        return (
+          <div className="space-y-6">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <Download className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Downloads', 'Downloads')}</h2>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+              {__('Attach files to this trip and control who can access them.', 'Attach files to this trip and control who can access them.')}
+            </p>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('Downloads', 'Downloads')}</CardTitle>
+                <CardDescription>
+                  {__('Attach files to this trip and control who can access them.', 'Attach files to this trip and control who can access them.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {(formData.downloadable_items || []).length > 0 ? (
+                  <div className="space-y-3">
+                    {(formData.downloadable_items || []).map((item, index) => (
+                      <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                              {__('Title', 'Title')}
+                            </label>
+                            <Input
+                              value={item.title}
+                              onChange={(e) => handleDownloadableItemChange(index, 'title', e.target.value)}
+                              placeholder={__('E.g. Packing list, itinerary PDF, waiver form...', 'E.g. Packing list, itinerary PDF, waiver form...')}
+                            />
+                          </div>
+
+                          <div className="flex gap-1 pt-7">
+                            {index > 0 && (
+                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index - 1)} title={__('Move up', 'Move up')}>
+                                <ChevronUp className="w-4 h-4" />
+                              </Button>
+                            )}
+                            {index < (formData.downloadable_items || []).length - 1 && (
+                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index + 1)} title={__('Move down', 'Move down')}>
+                                <ChevronDown className="w-4 h-4" />
+                              </Button>
+                            )}
+                            <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemRemove(index)} className="text-red-600 hover:text-red-700" title={__('Remove', 'Remove')}>
+                              <X className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                            {__('Description', 'Description')} ({__('Optional', 'Optional')})
+                          </label>
+                          <textarea
+                            value={item.description}
+                            onChange={(e) => handleDownloadableItemChange(index, 'description', e.target.value)}
+                            rows={3}
+                            className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('Visibility', 'Visibility')}</label>
+                            <Select value={item.visibility} onChange={(e) => handleDownloadableItemChange(index, 'visibility', e.target.value)}>
+                              <option value="public">{__('Public', 'Public')}</option>
+                              <option value="logged_in">{__('Private (My Account only)', 'Private (My Account only)')}</option>
+                              <option value="booked_only">{__('Private (Booking confirmation only)', 'Private (Booking confirmation only)')}</option>
+                            </Select>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('File', 'File')}</label>
+                            <div className="flex items-center gap-2">
+                              {item.attachment_url ? (
+                                <a
+                                  href={item.attachment_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="flex-shrink-0"
+                                  title={__('View file', 'View file')}
+                                >
+                                  {/\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(item.attachment_url) ? (
+                                    <img
+                                      src={item.attachment_url}
+                                      alt={item.attachment_title || __('Selected file', 'Selected file')}
+                                      className="w-9 h-9 rounded border border-gray-200 dark:border-gray-700 object-cover bg-white dark:bg-gray-900"
+                                    />
+                                  ) : (
+                                    <div className="w-9 h-9 rounded border border-gray-200 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+                                      <FileText className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                    </div>
+                                  )}
+                                </a>
+                              ) : (
+                                <div className="w-9 h-9 rounded border border-gray-200 dark:border-gray-700 flex items-center justify-center bg-gray-50 dark:bg-gray-900 flex-shrink-0">
+                                  <FileText className="w-4 h-4 text-gray-400 dark:text-gray-600" />
+                                </div>
+                              )}
+
+                              <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <Button type="button" variant="outline" onClick={() => handleDownloadableItemSelectFile(index)} className="flex items-center gap-2 flex-shrink-0">
+                                    <Upload className="w-4 h-4" />
+                                    {item.attachment_id ? __('Change File', 'Change File') : __('Select File', 'Select File')}
+                                  </Button>
+                                  <span className="text-xs text-gray-600 dark:text-gray-400 truncate min-w-0">
+                                    {item.attachment_title || (item.attachment_id ? `#${item.attachment_id}` : __('No file selected', 'No file selected'))}
+                                  </span>
+                                  {item.attachment_url && (
+                                    <a
+                                      href={item.attachment_url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 flex-shrink-0"
+                                    >
+                                      <Eye className="w-3 h-3" />
+                                      {__('View', 'View')}
+                                    </a>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input type="checkbox" checked={item.enabled} onChange={(e) => handleDownloadableItemChange(index, 'enabled', e.target.checked)} className="h-4 w-4" />
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{__('Enabled', 'Enabled')}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
+                    <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{__('No downloads added yet', 'No downloads added yet')}</p>
+                  </div>
+                )}
+
+                <Button type="button" variant="outline" onClick={handleDownloadableItemAdd} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  {__('Add Download', 'Add Download')}
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         );
 
@@ -4152,9 +4484,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       case 'itinerary':
         return (
           <ItinerarySection
-            formData={formData}
-            errors={errors}
-            handleFieldChange={handleFieldChange}
+            formData={formData as any}
+            errors={errors as any}
+            handleFieldChange={handleFieldChange as any}
             handleItineraryDayAdd={handleItineraryDayAdd}
             handleItineraryDayRemove={handleItineraryDayRemove}
             handleItineraryDayTitleChange={handleItineraryDayTitleChange}
@@ -4508,6 +4840,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                   <option value="itinerary">{__('Itinerary', 'Itinerary')}</option>
                                   <option value="included_excluded">{__('Included/Excluded', 'Included/Excluded')}</option>
                                   <option value="gallery">{__('Gallery', 'Gallery')}</option>
+                                  {showDownloadsUI && (
+                                    <option value="downloads">{__('Downloads', 'Downloads')}</option>
+                                  )}
                                   <option value="faqs">{__('FAQs', 'FAQs')}</option>
                                   <option value="reviews">{__('Reviews', 'Reviews')}</option>
                                   <option value="custom">{__('Custom Content', 'Custom Content')}</option>

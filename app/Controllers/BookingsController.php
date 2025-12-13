@@ -229,6 +229,20 @@ class BookingsController extends BaseController
             'callback' => [$this, 'getBookingScheduledPayments'],
             'permission_callback' => [$this, 'checkAdminPermission'],
         ]);
+
+        // Download travel voucher for a booking
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/voucher', [
+            'methods' => 'GET',
+            'callback' => [$this, 'downloadVoucher'],
+            'permission_callback' => '__return_true', // Auth checked inside callback
+        ]);
+
+        // Download travel itinerary for a booking
+        register_rest_route($this->namespace, '/bookings/(?P<id>\d+)/itinerary', [
+            'methods' => 'GET',
+            'callback' => [$this, 'downloadItinerary'],
+            'permission_callback' => '__return_true', // Auth checked inside callback
+        ]);
     }
 
     /**
@@ -728,5 +742,127 @@ class BookingsController extends BaseController
             'success' => true,
             'data' => $payments,
         ]);
+    }
+
+    /**
+     * GET /bookings/{id}/voucher - Download travel voucher for a booking
+     */
+    public function downloadVoucher(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        $bookingId = (int) $request->get_param('id');
+        $isPreview = $request->get_param('preview') === '1';
+        $isDownload = $request->get_param('download') === '1';
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Get booking details
+        $booking = $this->bookingService->getBooking($bookingId);
+
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Verify user is logged in and owns this booking (or is admin)
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($booking['user_id'] ?? 0);
+        
+        // Must be logged in
+        if (!$currentUserId) {
+            return new WP_Error('unauthorized', __('You must be logged in to download vouchers.', 'yatra'), ['status' => 401]);
+        }
+        
+        // Must own the booking or be admin
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            return new WP_Error('forbidden', __('You do not have permission to access this voucher.', 'yatra'), ['status' => 403]);
+        }
+
+        // Get payment for this booking
+        $payments = $this->paymentService->getBookingPayments($bookingId);
+        
+        if (empty($payments)) {
+            return new WP_Error('no_payment', __('No payment found for this booking.', 'yatra'), ['status' => 404]);
+        }
+
+        // Use the first payment (or you could use the latest payment)
+        $payment = $payments[0];
+        $paymentId = (int) ($payment['id'] ?? 0);
+
+        if ($paymentId <= 0) {
+            return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Delegate to PaymentGatewayController's download_voucher method
+        $paymentGatewayController = new \Yatra\Controllers\PaymentGatewayController();
+        
+        // Create a new request with the payment ID
+        $paymentRequest = new WP_REST_Request('GET', "/payments/{$paymentId}/voucher");
+        $paymentRequest->set_param('payment_id', $paymentId);
+        $paymentRequest->set_param('preview', $isPreview ? '1' : '');
+        $paymentRequest->set_param('download', $isDownload ? '1' : '');
+
+        return $paymentGatewayController->download_voucher($paymentRequest);
+    }
+
+    /**
+     * GET /bookings/{id}/itinerary - Download travel itinerary for a booking
+     */
+    public function downloadItinerary(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        $bookingId = (int) $request->get_param('id');
+        $isPreview = $request->get_param('preview') === '1';
+        $isDownload = $request->get_param('download') === '1';
+
+        if ($bookingId <= 0) {
+            return new WP_Error('invalid_booking', __('Invalid booking ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Get booking details
+        $booking = $this->bookingService->getBooking($bookingId);
+
+        if (!$booking) {
+            return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Verify user is logged in and owns this booking (or is admin)
+        $currentUserId = get_current_user_id();
+        $bookingUserId = (int) ($booking['user_id'] ?? 0);
+        
+        // Must be logged in
+        if (!$currentUserId) {
+            return new WP_Error('unauthorized', __('You must be logged in to download itineraries.', 'yatra'), ['status' => 401]);
+        }
+        
+        // Must own the booking or be admin
+        if ($bookingUserId && $currentUserId !== $bookingUserId && !current_user_can('manage_options')) {
+            return new WP_Error('forbidden', __('You do not have permission to access this itinerary.', 'yatra'), ['status' => 403]);
+        }
+
+        // Get payment for this booking
+        $payments = $this->paymentService->getBookingPayments($bookingId);
+        
+        if (empty($payments)) {
+            return new WP_Error('no_payment', __('No payment found for this booking.', 'yatra'), ['status' => 404]);
+        }
+
+        // Use the first payment (or you could use the latest payment)
+        $payment = $payments[0];
+        $paymentId = (int) ($payment['id'] ?? 0);
+
+        if ($paymentId <= 0) {
+            return new WP_Error('invalid_payment', __('Invalid payment ID.', 'yatra'), ['status' => 400]);
+        }
+
+        // Delegate to PaymentGatewayController's download_itinerary method
+        $paymentGatewayController = new \Yatra\Controllers\PaymentGatewayController();
+        
+        // Create a new request with the payment ID
+        $paymentRequest = new WP_REST_Request('GET', "/payments/{$paymentId}/itinerary");
+        $paymentRequest->set_param('payment_id', $paymentId);
+        $paymentRequest->set_param('preview', $isPreview ? '1' : '');
+        $paymentRequest->set_param('download', $isDownload ? '1' : '');
+
+        return $paymentGatewayController->download_itinerary($paymentRequest);
     }
 }

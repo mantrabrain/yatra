@@ -600,6 +600,8 @@ class TripRepository extends BaseRepository
         // Load itinerary days with entries
         $trip->itinerary_days = $this->getItineraryDays($id);
 
+        do_action('yatra_trip_loaded_with_relations', $trip);
+
         return $trip;
     }
 
@@ -1319,6 +1321,8 @@ class TripRepository extends BaseRepository
         if (!empty($availabilityDates)) {
             $this->saveAvailabilityDates($tripId, $availabilityDates);
         }
+
+        do_action('yatra_trip_created_with_relations', $tripId, $relationships, $data);
         
         return $tripId;
     }
@@ -1391,6 +1395,8 @@ class TripRepository extends BaseRepository
         if ($availabilityDates !== null) {
             $this->saveAvailabilityDates($id, $availabilityDates);
         }
+
+        do_action('yatra_trip_updated_with_relations', $id, $relationships, $data);
         
         return $result;
     }

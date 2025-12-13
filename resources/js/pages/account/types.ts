@@ -33,12 +33,20 @@ export interface Payment {
 }
 
 export interface TravelDocument {
-  id: number;
+  id: string | number;
   name: string;
   trip_title: string;
-  category: 'itinerary' | 'voucher' | 'invoice';
+  category: 'itinerary' | 'voucher' | 'invoice' | 'downloads';
   updated_at: string;
   url: string;
+
+  // Optional metadata for Pro downloads
+  trip_id?: number;
+  booking_id?: number;
+  access?: 'public' | 'logged_in' | 'booked_only' | 'paid_only';
+  access_label?: string;
+  locked?: boolean;
+  locked_reason?: string;
 }
 
 export interface SupportTicket {
