@@ -1425,6 +1425,23 @@ const Payments = ({ payments, onSectionChange }) => {
 const Documents = ({ documents }) => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [selectedCategory, setSelectedCategory] = reactExports.useState("all");
+  const handleDownload = async (url, name) => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      window.open(url, "_blank");
+    }
+  };
   const handlePreview = async (url) => {
     try {
       const response = await fetch(url);
@@ -1549,10 +1566,9 @@ const Documents = ({ documents }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-document-actions flex flex-wrap gap-3 mt-4", children: [
             doc.locked || !doc.url ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors text-sm font-medium cursor-not-allowed", title: doc.locked_reason || __("Not available", "Not available"), children: __("Not Available", "Not Available") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "a",
+              "button",
               {
-                href: doc.url,
-                download: doc.name || `${doc.category}-document.pdf`,
+                onClick: () => handleDownload(doc.url, doc.name || `${doc.category}-document.pdf`),
                 className: "yatra-document-action yatra-document-action-download inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
                 children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),

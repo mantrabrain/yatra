@@ -12,6 +12,33 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'itinerary' | 'voucher' | 'invoice' | 'downloads'>('all');
   
+  // Handle download with blob
+  const handleDownload = async (url: string, name: string) => {
+    try {
+      // Fetch the document as a blob
+      const response = await fetch(url);
+      const blob = await response.blob();
+      
+      // Create a blob URL
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Create a temporary link to download the file
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the blob URL
+      URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error('Error downloading document:', error);
+      // Fallback to direct link
+      window.open(url, '_blank');
+    }
+  };
+
   // Handle preview with blob URL
   const handlePreview = async (url: string) => {
     try {
@@ -192,9 +219,8 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                           {__('Not Available', 'Not Available')}
                         </div>
                       ) : (
-                        <a
-                          href={doc.url}
-                          download={doc.name || `${doc.category}-document.pdf`}
+                        <button
+                          onClick={() => handleDownload(doc.url, doc.name || `${doc.category}-document.pdf`)}
                           className="yatra-document-action yatra-document-action-download inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
                         >
                           <Download className="w-4 h-4" />
@@ -202,7 +228,7 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                            doc.category === 'voucher' ? __('Download Voucher', 'Download Voucher') : 
                            doc.category === 'itinerary' ? __('Download Itinerary', 'Download Itinerary') : 
                            __('Download', 'Download')}
-                        </a>
+                        </button>
                       )}
 
                       {doc.url ? (
