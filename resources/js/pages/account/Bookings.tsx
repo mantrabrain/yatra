@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Package, CheckCircle, Calendar, Clock, DollarSign, MapPin } from 'lucide-react';
+import { Package, CheckCircle, Calendar, Clock, DollarSign, MapPin, Eye, CreditCard, HelpCircle } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatDate, getBadge, currency } from './utils';
 import type { Booking } from './types';
@@ -49,32 +49,6 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
   const handleBackToList = () => {
     setSelectedBookingId(null);
     setBookingDetails(null);
-  };
-
-  // Handle download click
-  const handleDownloadClick = async (bookingId: number) => {
-    try {
-      // Fetch documents for this booking
-      const response = await apiClient.get(`/customer/bookings/${bookingId}/documents`);
-      const documents = response.data;
-      
-      // Find the voucher document
-      const voucherDoc = documents.find((doc: any) => doc.category === 'voucher');
-      
-      if (voucherDoc && voucherDoc.url) {
-        // Create a temporary link to download the file
-        const link = document.createElement('a');
-        link.href = voucherDoc.url;
-        link.download = voucherDoc.name || `voucher-${bookingId}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        console.error('No voucher document found');
-      }
-    } catch (error) {
-      console.error('Error downloading voucher:', error);
-    }
   };
 
   // Handle remaining payment
@@ -353,24 +327,18 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       role="button" 
                       tabIndex={0} 
                       onClick={() => handleBookingSelect(bookingId)} 
-                      className="yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
+                      className="yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
                     >
+                      <Eye className="w-4 h-4" />
                       {__('View Details', 'View Details')}
                     </div>
                     <div 
                       role="button" 
                       tabIndex={0} 
-                      onClick={() => handleDownloadClick(bookingId)} 
-                      className="yatra-booking-action yatra-booking-action-download inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      {__('Download Voucher', 'Download Voucher')}
-                    </div>
-                    <div 
-                      role="button" 
-                      tabIndex={0} 
                       onClick={() => onSectionChange('payments')} 
-                      className="yatra-booking-action yatra-booking-action-payment inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
+                      className="yatra-booking-action yatra-booking-action-payment inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                     >
+                      <CreditCard className="w-4 h-4" />
                       {__('Payment', 'Payment')}
                     </div>
                     {canPayRemaining && (
@@ -378,14 +346,16 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                         type="button"
                         onClick={() => bookingId && startRemainingPaymentSession(bookingId)}
                         disabled={payLoading === bookingId}
-                        className="yatra-booking-action inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
+                        className="yatra-booking-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50"
                       >
                         {payLoading === bookingId ? (
                           <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
                             <path d="M4 12a8 8 0 0 1 8-8" />
                           </svg>
-                        ) : null}
+                        ) : (
+                          <CreditCard className="w-4 h-4" />
+                        )}
                         {__('Pay Remaining Balance', 'Pay Remaining Balance')}
                       </button>
                     )}
@@ -393,8 +363,9 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       role="button" 
                       tabIndex={0} 
                       onClick={() => onSectionChange('support')} 
-                      className="yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
+                      className="yatra-booking-action yatra-booking-action-support inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                     >
+                      <HelpCircle className="w-4 h-4" />
                       {__('Support', 'Support')}
                     </div>
                   </div>

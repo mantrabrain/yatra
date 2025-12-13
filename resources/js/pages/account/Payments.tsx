@@ -5,9 +5,7 @@ import {
   Clock as ClockIcon,
   DollarSign as DollarSignIcon,
   Calendar as CalendarIcon,
-  FileText as FileTextIcon,
   Eye,
-  Download,
 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatDate, getBadge, currency } from './utils';
@@ -160,7 +158,6 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
             const dueRaw = bookingDue ?? (bookingTotal !== null ? bookingTotal - paid : total - paid);
             const due = Math.max(0, dueRaw || 0);
             const canPayRemaining = typeof payment.booking_id === 'number' && due > 0.01;
-            const isPaid = payment.status === 'paid' || payment.status === 'completed';
             const isPending = payment.status === 'pending';
 
             return (
@@ -233,31 +230,6 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
 
                   {/* Action Buttons */}
                   <div className="yatra-payment-actions flex flex-wrap gap-3">
-                    {/* Download Invoice - show for paid/completed payments */}
-                    {isPaid && (
-                      <a
-                        href={`${(window as any).yatraAdmin?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAdmin?.nonce || ''}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
-                        style={{ backgroundColor: '#059669', color: '#ffffff' }}
-                      >
-                        <Download className="w-4 h-4" />
-                        {__('Download Invoice', 'Download Invoice')}
-                      </a>
-                    )}
-                    {isPaid && (
-                      <a
-                        href={`${(window as any).yatraAdmin?.siteUrl || ''}/?yatra_invoice=${payment.id}&_wpnonce=${(window as any).yatraAdmin?.nonce || ''}&view=1`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium"
-                        style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
-                      >
-                        <FileTextIcon className="w-4 h-4" />
-                        {__('View Receipt', 'View Receipt')}
-                      </a>
-                    )}
                     {isPending && !canPayRemaining && (
                       <button type="button" className="yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">
                         <ClockIcon className="w-4 h-4" />
@@ -267,7 +239,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                     <button
                       type="button"
                       onClick={() => onSectionChange('bookings')}
-                      className="yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
+                      className="yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
                     >
                       <Eye className="w-4 h-4" />
                       {__('View Booking', 'View Booking')}
