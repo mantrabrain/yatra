@@ -1628,6 +1628,9 @@
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     
+                    // Store reference to this for use in callbacks
+                    const self = this;
+                    
                     // Get booking details
                     const tripId = btn.getAttribute('data-trip-id') || window.yatraTripData?.tripId;
                     const date = btn.getAttribute('data-date');
@@ -1730,36 +1733,29 @@
                         sessionPayload.traveler_counts = travelerCounts;
                     }
                     
-                    // Set booking session via REST API
-                    // credentials: 'same-origin' is required to send cookies for session
-                    fetch(window.yatraTripData.apiUrl + '/booking/session', {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-WP-Nonce': window.yatraTripData.nonce
-                        },
-                        body: JSON.stringify(sessionPayload)
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success && data.redirect_url) {
-                            // Success - redirect to booking page
-                            window.location.href = data.redirect_url;
-                        } else {
-                            // Error - show message and reset button
-                            console.error('Booking session error:', data);
-                            btn.innerHTML = originalText;
-                            btn.disabled = false;
-                            this.showBookingError(btn, data.message || 'Unable to process booking. Please try again.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error setting booking session:', error);
-                        btn.innerHTML = originalText;
-                        btn.disabled = false;
-                        this.showBookingError(btn, 'Unable to process booking. Please try again.');
-                    });
+                    // Hook: Allow Pro plugins to intercept booking flow (e.g., show additional services popup)
+                    // If handler returns true (or Promise resolving to true), Pro handled the flow
+                    if (typeof window.yatraBeforeBooking === 'function') {
+                        const self = this;
+                        Promise.resolve(window.yatraBeforeBooking({
+                            btn: btn,
+                            originalText: originalText,
+                            sessionPayload: sessionPayload,
+                            proceedToBooking: () => self.proceedToBooking(btn, originalText, sessionPayload)
+                        })).then(handled => {
+                            if (!handled) {
+                                // Pro plugin didn't handle it, proceed normally
+                                self.proceedToBooking(btn, originalText, sessionPayload);
+                            }
+                        }).catch(error => {
+                            console.error('Error in yatraBeforeBooking hook:', error);
+                            self.proceedToBooking(btn, originalText, sessionPayload);
+                        });
+                        return; // Wait for promise to resolve
+                    }
+                    
+                    // Proceed with normal booking flow
+                    this.proceedToBooking(btn, originalText, sessionPayload);
                 });
             });
 
@@ -1770,6 +1766,42 @@
                     this.handleLoadMore();
                 });
             }
+        }
+        
+        /**
+         * Proceed to booking - creates session and redirects
+         */
+        proceedToBooking(btn, originalText, sessionPayload) {
+            // Set booking session via REST API
+            // credentials: 'same-origin' is required to send cookies for session
+            fetch(window.yatraTripData.apiUrl + '/booking/session', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': window.yatraTripData.nonce
+                },
+                body: JSON.stringify(sessionPayload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.redirect_url) {
+                    // Success - redirect to booking page
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Error - show message and reset button
+                    console.error('Booking session error:', data);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    this.showBookingError(btn, data.message || 'Unable to process booking. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error setting booking session:', error);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                this.showBookingError(btn, 'Unable to process booking. Please try again.');
+            });
         }
 
         initTravelerSelectors() {
@@ -2037,20 +2069,149 @@
                 }
             }
 
+            // Apply group discount if applicable
+            const groupDiscountResult = this.calculateGroupDiscount(totalPrice, totalTravelers);
+            const finalPrice = groupDiscountResult.finalPrice;
+            const groupDiscountApplied = groupDiscountResult.discountApplied;
+            const groupDiscountAmount = groupDiscountResult.discountAmount;
+
             // Format price using the existing format from the element
             const existingText = totalAmountElement.textContent.trim();
             const currencySymbol = existingText.match(/^[^\d]+/)?.[0] || '£ ';
-            totalAmountElement.textContent = currencySymbol + totalPrice.toFixed(2);
+            totalAmountElement.textContent = currencySymbol + finalPrice.toFixed(2);
 
             // Update the note text
             const noteElement = this.section.querySelector(
                 `.yatra-card-total-note[data-item="${itemIndex}"]`
             );
             if (noteElement) {
-                const travelerText = totalTravelers === 1
+                let travelerText = totalTravelers === 1
                     ? 'for 1 traveler'
                     : `for ${totalTravelers} travelers`;
+                
+                // Add group discount info if applied
+                if (groupDiscountApplied && groupDiscountAmount > 0) {
+                    travelerText += ` (Group discount: -${currencySymbol}${groupDiscountAmount.toFixed(2)})`;
+                }
                 noteElement.textContent = travelerText;
+            }
+
+            // Show/hide group discount applied badge
+            this.updateGroupDiscountBadge(itemIndex, groupDiscountApplied, groupDiscountResult);
+        }
+
+        /**
+         * Calculate group discount based on total travelers
+         */
+        calculateGroupDiscount(totalPrice, totalTravelers) {
+            const result = {
+                finalPrice: totalPrice,
+                discountApplied: false,
+                discountAmount: 0,
+                discountPercentage: 0,
+                discountType: null
+            };
+
+            // Get group discounts from the booking card data attribute
+            const bookingCard = document.querySelector('.yatra-booking-card');
+            if (!bookingCard) return result;
+
+            const groupDiscountsData = bookingCard.getAttribute('data-group-discounts');
+            if (!groupDiscountsData) return result;
+
+            let groupDiscounts;
+            try {
+                groupDiscounts = JSON.parse(groupDiscountsData);
+            } catch (e) {
+                console.error('Failed to parse group discounts:', e);
+                return result;
+            }
+
+            if (!Array.isArray(groupDiscounts) || groupDiscounts.length === 0) return result;
+
+            // Find the applicable discount based on total travelers
+            let applicableDiscount = null;
+
+            for (const discount of groupDiscounts) {
+                // Check if discount has ranges (new format)
+                if (discount.group_discount_ranges && discount.group_discount_ranges.length > 0) {
+                    for (const range of discount.group_discount_ranges) {
+                        const minSize = parseInt(range.min_group_size) || 0;
+                        const maxSize = range.max_group_size ? parseInt(range.max_group_size) : Infinity;
+                        
+                        if (totalTravelers >= minSize && totalTravelers <= maxSize) {
+                            applicableDiscount = {
+                                type: range.discount_type || 'percentage',
+                                amount: parseFloat(range.discount_amount) || 0
+                            };
+                            break;
+                        }
+                    }
+                } else {
+                    // Legacy format: single min_group_size
+                    const minSize = parseInt(discount.min_group_size) || 0;
+                    const maxSize = discount.max_group_size ? parseInt(discount.max_group_size) : Infinity;
+                    
+                    if (totalTravelers >= minSize && totalTravelers <= maxSize) {
+                        applicableDiscount = {
+                            type: discount.discount_type || 'percentage',
+                            amount: parseFloat(discount.discount_amount) || 0
+                        };
+                    }
+                }
+
+                if (applicableDiscount) break;
+            }
+
+            // Apply the discount if found
+            if (applicableDiscount && applicableDiscount.amount > 0) {
+                result.discountApplied = true;
+                result.discountType = applicableDiscount.type;
+
+                if (applicableDiscount.type === 'percentage') {
+                    result.discountPercentage = applicableDiscount.amount;
+                    result.discountAmount = totalPrice * (applicableDiscount.amount / 100);
+                } else {
+                    // Fixed amount discount
+                    result.discountAmount = applicableDiscount.amount;
+                }
+
+                result.finalPrice = Math.max(0, totalPrice - result.discountAmount);
+            }
+
+            return result;
+        }
+
+        /**
+         * Update group discount badge visibility
+         */
+        updateGroupDiscountBadge(itemIndex, discountApplied, discountResult) {
+            // Find or create the group discount applied badge for this item
+            const availabilityItem = this.section.querySelector(`.yatra-availability-item[data-item="${itemIndex}"]`);
+            if (!availabilityItem) return;
+
+            let badge = availabilityItem.querySelector('.yatra-group-discount-applied');
+            
+            if (discountApplied && discountResult.discountAmount > 0) {
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.className = 'yatra-group-discount-applied';
+                    badge.style.cssText = 'background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; margin-top: 8px; display: inline-flex; align-items: center; gap: 4px;';
+                    
+                    // Insert after the total amount
+                    const totalSection = availabilityItem.querySelector('.yatra-card-total');
+                    if (totalSection) {
+                        totalSection.appendChild(badge);
+                    }
+                }
+                
+                // Update badge content
+                const discountText = discountResult.discountType === 'percentage' 
+                    ? `${discountResult.discountPercentage}% group discount applied!`
+                    : `Group discount applied!`;
+                badge.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg> ${discountText}`;
+            } else if (badge) {
+                badge.remove();
             }
         }
 

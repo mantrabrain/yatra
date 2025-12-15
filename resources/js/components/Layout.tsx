@@ -29,7 +29,8 @@ import {
   Puzzle,
   Loader2,
   Plane,
-  ArrowLeft
+  ArrowLeft,
+  Package
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -213,6 +214,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'categories', label: 'Categories', icon: FolderTree },
         { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
+        { tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true },
       ]
     },
     { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
@@ -290,7 +292,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">Y</span>
                 </div>
-                <span className="text-xl font-bold text-gray-900 dark:text-white">Yatra</span>
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">Yatra</span>
+                  <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
+                    <span>v{window.yatraAdmin?.version || '1.0.0'}</span>
+                    {window.yatraAdmin?.proVersion && (
+                      <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium">
+                        Pro v{window.yatraAdmin.proVersion}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               <a
                 href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'}

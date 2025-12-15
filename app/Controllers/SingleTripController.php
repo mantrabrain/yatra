@@ -170,9 +170,60 @@ class SingleTripController
         // Get currency
         $trip->currency = $trip->currency ?? get_option('yatra_currency', 'USD');
 
+        // Compute effective pricing (same logic as TripRepository::computeEffectivePricing)
+        $trip->effective_price_min = 0;
+        $trip->min_category_original_price = 0;
+        $trip->max_discount_percentage = 0;
+        
+        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based' && !empty($trip->price_types)) {
+            // For traveler-based pricing, find minimum effective price from price_types
+            $min_price = PHP_FLOAT_MAX;
+            $min_original = 0;
+            $max_discount = 0;
+            
+            foreach ($trip->price_types as $pt) {
+                $original = (float) ($pt->original_price ?? 0);
+                $discounted = (float) ($pt->discounted_price ?? 0);
+                $effective = ($discounted > 0 && $discounted < $original) ? $discounted : $original;
+                
+                if ($effective > 0 && $effective < $min_price) {
+                    $min_price = $effective;
+                    $min_original = $original;
+                }
+                
+                // Calculate discount percentage for this category
+                if ($original > 0 && $discounted > 0 && $discounted < $original) {
+                    $discount_pct = round((($original - $discounted) / $original) * 100);
+                    if ($discount_pct > $max_discount) {
+                        $max_discount = $discount_pct;
+                    }
+                }
+            }
+            
+            if ($min_price < PHP_FLOAT_MAX) {
+                $trip->effective_price_min = $min_price;
+                $trip->min_category_original_price = $min_original;
+                $trip->max_discount_percentage = $max_discount;
+            }
+        } else {
+            // Regular pricing logic
+            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                $trip->effective_price_min = (float)$trip->discounted_price;
+            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                $trip->effective_price_min = (float)$trip->sale_price;
+            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                $trip->effective_price_min = (float)$trip->original_price;
+            }
+            
+            // Set min_category_original_price for regular pricing
+            $trip->min_category_original_price = (float)($trip->original_price ?? 0);
+        }
+
         // Calculate discount percentage
         $trip->discount_percentage = 0;
-        if ($trip->original_price > 0 && $trip->sale_price < $trip->original_price) {
+        if ($trip->max_discount_percentage > 0) {
+            $trip->discount_percentage = $trip->max_discount_percentage;
+        } elseif ($trip->original_price > 0 && $trip->sale_price < $trip->original_price) {
             $trip->discount_percentage = round((($trip->original_price - $trip->sale_price) / $trip->original_price) * 100);
         }
 
@@ -244,8 +295,30 @@ class SingleTripController
             $avail->seats_available = (int) $avail->seats_available;
             $avail->seats_reserved = (int) ($avail->seats_reserved ?? 0);
             
+            // Parse price_types JSON for traveler-based pricing
+            $price_types_raw = $avail->price_types ?? null;
+            $avail->price_types = [];
+            if (!empty($price_types_raw) && is_string($price_types_raw)) {
+                $decoded = json_decode($price_types_raw, true);
+                if (is_array($decoded)) {
+                    $avail->price_types = $decoded;
+                }
+            }
+            
             // Calculate effective price for this date
-            $avail->effective_price = $avail->discounted_price ?? $avail->original_price;
+            // For traveler-based pricing, get the minimum price from price_types
+            if (!empty($avail->price_types) && is_array($avail->price_types)) {
+                $min_price = PHP_FLOAT_MAX;
+                foreach ($avail->price_types as $pt) {
+                    $pt_price = (float) ($pt['effective_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
+                    if ($pt_price > 0 && $pt_price < $min_price) {
+                        $min_price = $pt_price;
+                    }
+                }
+                $avail->effective_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($avail->discounted_price ?? $avail->original_price);
+            } else {
+                $avail->effective_price = $avail->discounted_price ?? $avail->original_price;
+            }
             
             // Calculate if limited availability
             $avail->is_limited = ($avail->seats_available <= 5 && $avail->seats_available > 0);
@@ -268,7 +341,8 @@ class SingleTripController
         
         $sql = $this->wpdb->prepare(
                 "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
-                        tc.description as category_description, tc.age_min, tc.age_max
+                        tc.description as category_description, tc.age_min, tc.age_max,
+                        tc.pricing_mode, tc.min_pax, tc.max_pax
                  FROM {$table} pt
                  LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
                  WHERE pt.trip_id = %d
@@ -287,6 +361,9 @@ class SingleTripController
             $pt->max_quantity = $pt->max_quantity ? (int) $pt->max_quantity : null;
             $pt->age_min = $pt->age_min ? (int) $pt->age_min : null;
             $pt->age_max = $pt->age_max ? (int) $pt->age_max : null;
+            $pt->pricing_mode = $pt->pricing_mode ?? 'per_person';
+            $pt->min_pax = $pt->min_pax ? (int) $pt->min_pax : null;
+            $pt->max_pax = $pt->max_pax ? (int) $pt->max_pax : null;
             
             // Calculate effective price (sale_price > discounted_price > original_price)
             $pt->effective_price = $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price;

@@ -12,6 +12,8 @@ export interface ModuleDefinition {
   docs_url?: string;
   is_core?: boolean;
   is_premium?: boolean;
+  is_available?: boolean;
+  requires_pro?: boolean;
   purchase_url?: string;
   video_url?: string;
   enabled: boolean;

@@ -37,6 +37,34 @@ $permalink = $trip->getPermalink();
 $destinations = $trip->getDestinations();
 $categories = $trip->getCategories();
 $activities = $trip->getActivities();
+
+// Check for group discounts availability
+$has_group_discounts = false;
+$group_discount_summary = '';
+try {
+    // Call the group discount API to check availability
+    $api_url = rest_url('yatra/v1/discounts/group-discounts');
+    $response = wp_remote_post($api_url, [
+        'method' => 'GET',
+        'body' => [
+            'trip_ids' => [$trip->id]
+        ],
+        'headers' => [
+            'Content-Type' => 'application/json',
+        ],
+    ]);
+
+    if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+        $data = json_decode(wp_remote_retrieve_body($response), true);
+        if (isset($data[$trip->id]) && $data[$trip->id]['has_group_discounts']) {
+            $has_group_discounts = true;
+            $group_discount_summary = $data[$trip->id]['summary'];
+        }
+    }
+} catch (Exception $e) {
+    // Silently fail if API call fails - don't break the page
+    $has_group_discounts = false;
+}
 ?>
 
 <div class="yatra-trip-card">
@@ -51,6 +79,14 @@ $activities = $trip->getActivities();
         <?php if ($discount['has_discount']): ?>
         <div class="yatra-discount-badge">
             <?php echo esc_html($discount['discount_text']); ?> OFF
+        </div>
+        <?php endif; ?>
+        <?php if ($has_group_discounts): ?>
+        <div class="yatra-group-discount-badge" title="<?php echo esc_attr($group_discount_summary); ?>">
+            <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <?php _e('Group Discounts', 'Group Discounts'); ?>
         </div>
         <?php endif; ?>
         <button class="yatra-favorite-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>" title="Add to favorites" aria-label="Add to favorites">

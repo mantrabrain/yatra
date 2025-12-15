@@ -19,6 +19,20 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 
+interface GroupDiscountRange {
+  id: string;
+  min_group_size: string;
+  max_group_size: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_amount: string;
+}
+
+interface CategoryDiscount {
+  traveler_category_id: string;
+  traveler_category_label: string;
+  ranges: GroupDiscountRange[];
+}
+
 interface Discount {
   id: number;
   code: string;
@@ -37,9 +51,13 @@ interface Discount {
   min_amount?: number;
   first_time_customer_only?: boolean;
   is_group_discount?: boolean;
+  discount_mode?: 'promo' | 'group' | 'both'; // Type of discount
   min_group_size?: number;
   group_discount_type?: 'percentage' | 'fixed';
   group_discount_amount?: number;
+  group_discount_mode?: 'total' | 'category_based';
+  group_discount_ranges?: GroupDiscountRange[];
+  category_discounts?: CategoryDiscount[];
   created_at: string;
   updated_at: string;
   created_by: number; // user_id
@@ -60,6 +78,7 @@ const Discounts: React.FC = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [isBulkPending, setIsBulkPending] = useState(false);
+  const [showDiscountTypeModal, setShowDiscountTypeModal] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === 'undefined') {
       return {
@@ -207,13 +226,6 @@ const Discounts: React.FC = () => {
     );
   };
 
-  const formatDiscount = (discount: Discount) => {
-    if (discount.type === 'percentage') {
-      return `${discount.amount}%`;
-    }
-    return `$${discount.amount}`;
-  };
-
   const handleEdit = (discount: Discount) => {
     window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
   };
@@ -227,7 +239,12 @@ const Discounts: React.FC = () => {
   };
 
   const handleCreateDiscount = () => {
-    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create`;
+    setShowDiscountTypeModal(true);
+  };
+
+  const handleSelectDiscountType = (type: 'promo' | 'group' | 'both') => {
+    setShowDiscountTypeModal(false);
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&discount_mode=${type}`;
   };
 
   const handleResetFilters = () => {
@@ -435,41 +452,48 @@ const Discounts: React.FC = () => {
   const columns = [
     {
       key: 'code',
-      label: __('Coupon Code', 'Coupon Code'),
+      label: __('Name / Code', 'Name / Code'),
       sortable: true,
       visible: visibleColumns.code,
-      width: 'w-[260px]',
+      width: 'w-[280px]',
       render: (discount: Discount) => (
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <Tag className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            {/* Discount Mode Badge */}
+            {discount.discount_mode === 'group' ? (
+              <Badge variant="success" className="text-xs flex items-center gap-1">
+                <Users className="w-3 h-3" />
+                {__('Group Only', 'Group Only')}
+              </Badge>
+            ) : discount.discount_mode === 'promo' ? (
+              <Badge variant="info" className="text-xs flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                {__('Promo Code', 'Promo Code')}
+              </Badge>
+            ) : discount.is_group_discount ? (
+              <Badge variant="warning" className="text-xs flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                <Users className="w-3 h-3" />
+                {__('Promo + Group', 'Promo + Group')}
+              </Badge>
+            ) : (
+              <Badge variant="info" className="text-xs flex items-center gap-1">
+                <Tag className="w-3 h-3" />
+                {__('Promo Code', 'Promo Code')}
+              </Badge>
+            )}
+          </div>
+          <div className="flex items-center gap-2 mt-1">
             <a
               href={`${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`}
               className="font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
             >
               {discount.code}
             </a>
-            {discount.is_group_discount && (
-              <Badge variant="info" className="text-xs flex items-center gap-1">
-                <Users className="w-3 h-3" />
-                {__('Group', 'Group')}
-              </Badge>
-            )}
           </div>
           {discount.description && (
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {discount.description}
-            </div>
-          )}
-          {discount.is_group_discount && discount.min_group_size && (
-            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1">
-              <Users className="w-3 h-3" />
-              {__('Min', 'Min')} {discount.min_group_size}{' '}
-              {__('people', 'people')} -{' '}
-              {discount.group_discount_type === 'percentage'
-                ? `${discount.group_discount_amount}%`
-                : `$${discount.group_discount_amount}`}{' '}
-              {__('extra discount', 'extra discount')}
             </div>
           )}
         </div>
@@ -477,29 +501,71 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'type',
-      label: __('Type', 'Type'),
+      label: __('Discount', 'Discount'),
       sortable: true,
       visible: visibleColumns.type,
       render: (discount: Discount) => (
-        <Badge
-          variant={discount.type === 'percentage' ? 'info' : 'default'}
-          className="text-xs"
-        >
-          {discount.type === 'percentage'
-            ? __('Percentage', 'Percentage')
-            : __('Fixed', 'Fixed')}
-        </Badge>
-      ),
-    },
-    {
-      key: 'discount',
-      label: __('Discount', 'Discount'),
-      sortable: true,
-      visible: visibleColumns.discount,
-      render: (discount: Discount) => (
-        <span className="font-medium text-gray-900 dark:text-white">
-          {formatDiscount(discount)}
-        </span>
+        <div className="space-y-1.5">
+          {/* Base discount - only show if not group-only */}
+          {discount.discount_mode !== 'group' && (
+            <div className="flex items-center gap-1">
+              <span className="font-medium text-gray-900 dark:text-white">
+                {discount.type === 'percentage' ? `${discount.amount}%` : `$${discount.amount}`}
+              </span>
+              <span className="text-xs text-gray-500">
+                {__('off', 'off')}
+              </span>
+            </div>
+          )}
+          {/* Group discount info */}
+          {discount.is_group_discount && (
+            <div className="space-y-1">
+              {/* Category-based discounts */}
+              {discount.group_discount_mode === 'category_based' && discount.category_discounts && discount.category_discounts.length > 0 ? (
+                <div className="space-y-1">
+                  {discount.category_discounts.map((cat, idx) => (
+                    <div key={idx} className="text-xs">
+                      <span className="font-medium text-gray-700 dark:text-gray-300">{cat.traveler_category_label}:</span>
+                      <span className="ml-1 text-green-600 dark:text-green-400">
+                        {cat.ranges && cat.ranges.length > 0 ? (
+                          cat.ranges.map((range, rIdx) => (
+                            <span key={rIdx}>
+                              {rIdx > 0 && ', '}
+                              {range.min_group_size}{range.max_group_size ? `-${range.max_group_size}` : '+'}: 
+                              {range.discount_type === 'percentage' ? `${range.discount_amount}%` : `$${range.discount_amount}`}
+                            </span>
+                          ))
+                        ) : '-'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : discount.group_discount_ranges && discount.group_discount_ranges.length > 0 ? (
+                /* Total-based group discount ranges */
+                <div className="space-y-0.5">
+                  {discount.group_discount_ranges.map((range, idx) => (
+                    <div key={idx} className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      <span>
+                        {range.min_group_size}{range.max_group_size ? `-${range.max_group_size}` : '+'} {__('pax', 'pax')}: 
+                        {range.discount_type === 'percentage' ? ` ${range.discount_amount}%` : ` $${range.discount_amount}`} {__('off', 'off')}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                /* Fallback for legacy data */
+                <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  {discount.min_group_size 
+                    ? `${discount.min_group_size}+ ${__('travelers', 'travelers')}: ${discount.group_discount_type === 'percentage' ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`}`
+                    : __('Group pricing', 'Group pricing')
+                  }
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       ),
     },
     {
@@ -662,6 +728,86 @@ const Discounts: React.FC = () => {
 
   return (
     <div className="space-y-3">
+      {/* Discount Type Selection Modal */}
+      {showDiscountTypeModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div 
+            className="absolute inset-0 bg-black/50" 
+            onClick={() => setShowDiscountTypeModal(false)}
+          />
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                {__('What type of discount do you want to create?', 'What type of discount do you want to create?')}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {__('Choose the discount type that best fits your needs', 'Choose the discount type that best fits your needs')}
+              </p>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Promo Code Option */}
+              <button
+                onClick={() => handleSelectDiscountType('promo')}
+                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group text-left"
+              >
+                <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+                  <Tag className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  {__('Promo Code', 'Promo Code')}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {__('Customer enters a code to get a percentage or fixed discount', 'Customer enters a code to get a percentage or fixed discount')}
+                </p>
+              </button>
+
+              {/* Group Discount Option */}
+              <button
+                onClick={() => handleSelectDiscountType('group')}
+                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left"
+              >
+                <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+                  <Users className="w-7 h-7 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  {__('Group Discount', 'Group Discount')}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {__('Auto-applies when booking multiple travelers. No code needed.', 'Auto-applies when booking multiple travelers. No code needed.')}
+                </p>
+              </button>
+
+              {/* Both Option */}
+              <button
+                onClick={() => handleSelectDiscountType('both')}
+                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left"
+              >
+                <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                  <div className="flex -space-x-1">
+                    <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                    <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                </div>
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+                  {__('Promo + Group', 'Promo + Group')}
+                </h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                  {__('Promo code gives base discount + extra savings for groups', 'Promo code gives base discount + extra savings for groups')}
+                </p>
+              </button>
+            </div>
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowDiscountTypeModal(false)}
+              >
+                {__('Cancel', 'Cancel')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <ConfirmationDialog
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, discount: null })}

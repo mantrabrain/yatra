@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, P as Plane, l as MessageSquare, S as Star, m as BarChart3, n as Puzzle, o as Settings$1, p as ChevronDown, q as ChevronRight, s as RefreshCw, t as Loader2, v as Sun, w as Moon, x as Bell, U as User, y as commonjsGlobal, z as getDefaultExportFromCjs, D as reactIsExports, E as React, G as Animate, H as Users, I as Clock, J as DollarSign, K as ArrowRight, N as Info, O as CheckCircle, Q as HelpCircle, V as MoreVertical, W as AlertTriangle, X, Y as Columns, Z as ExternalLink, _ as Mountain, $ as PenSquare, a0 as Copy, a1 as ArrowUp, a2 as ArrowDown, a3 as Archive, a4 as Trash2, a5 as Plus, a6 as Search, a7 as ArrowUpDown, a8 as AlertCircle, a9 as XCircle, aa as Flame, ab as Zap, ac as Heart, ad as ShoppingBag, ae as BookOpen, af as Gamepad2, ag as Music, ah as Image, ai as Eye, aj as Footprints, ak as Bed, al as Coffee, am as Hotel, an as Car, ao as Palette, ap as Waves, aq as Camera, ar as Target, as as Package, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Download, aC as Lightbulb, aD as Database, aE as History, aF as Save, aG as Sparkles, aH as ChevronLeft, aI as Box, aJ as ChevronUp, aK as Upload, aL as RotateCcw, aM as Pen, aN as Phone, aO as Globe, aP as Award, aQ as Server, aR as Folder, aS as UserCheck, aT as ClipboardList, aU as Receipt, aV as Plug, aW as Shield, aX as Lock, aY as EyeOff, aZ as Ban, a_ as Send, a$ as Crown, b0 as reactDomExports, b1 as Filter, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-MMNwjThF.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-ZAc9H3xe.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, A as ArrowLeft, L as LayoutDashboard, c as List, d as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Puzzle, p as Settings$1, q as ChevronDown, s as ChevronRight, t as RefreshCw, v as Loader2, w as Sun, x as Moon, y as Bell, U as User, z as commonjsGlobal, D as getDefaultExportFromCjs, E as reactIsExports, G as React, H as Animate, I as Users, J as Clock, K as DollarSign, N as ArrowRight, O as Info, Q as CheckCircle, V as HelpCircle, W as MoreVertical, X as AlertTriangle, Y as X, Z as Columns, _ as ExternalLink, $ as Mountain, a0 as PenSquare, a1 as Copy, a2 as ArrowUp, a3 as ArrowDown, a4 as Archive, a5 as Trash2, a6 as Plus, a7 as Search, a8 as ArrowUpDown, a9 as AlertCircle, aa as XCircle, ab as Flame, ac as Zap, ad as Heart, ae as ShoppingBag, af as BookOpen, ag as Gamepad2, ah as Music, ai as Image, aj as Eye, ak as Footprints, al as Bed, am as Coffee, an as Hotel, ao as Car, ap as Palette, aq as Waves, ar as Camera, as as Target, at as Bus, au as Building2, av as UtensilsCrossed, aw as CheckCircle2, ax as GripVertical, ay as Pencil, az as Check, aA as Mail, aB as Download, aC as Lightbulb, aD as Database, aE as History, aF as Save, aG as Sparkles, aH as ChevronLeft, aI as Box, aJ as ChevronUp, aK as Upload, aL as RotateCcw, aM as Pen, aN as Phone, aO as Globe, aP as Award, aQ as Server, aR as Folder, aS as UserCheck, aT as ClipboardList, aU as Receipt, aV as Plug, aW as Shield, aX as Lock, aY as EyeOff, aZ as Ban, a_ as Send, a$ as Crown, b0 as reactDomExports, b1 as Filter, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-PUxdxtyr.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BLpJYGJ9.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -259,7 +259,7 @@ const useBulkToggleModules = () => {
   });
 };
 const Layout = ({ children }) => {
-  var _a, _b, _c;
+  var _a, _b, _c, _d, _e;
   const [darkMode, setDarkMode] = reactExports.useState(() => {
     const saved = localStorage.getItem("yatra-dark-mode");
     return saved === "true";
@@ -386,7 +386,8 @@ const Layout = ({ children }) => {
         { tab: "destinations", label: "Destinations", icon: Map$5 },
         { tab: "categories", label: "Categories", icon: FolderTree },
         { tab: "difficulty-levels", label: "Difficulty Levels", icon: TrendingUp },
-        { tab: "availability", label: "Availability", icon: CalendarDays }
+        { tab: "availability", label: "Availability", icon: CalendarDays },
+        { tab: "additional-services", label: "Additional Services", icon: Package, isPremium: true }
       ]
     },
     { subpage: "traveler-categories", label: "Traveler Categories", icon: CircleUser },
@@ -447,12 +448,24 @@ const Layout = ({ children }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-16 px-6 flex items-center border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col w-full gap-1", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-white font-bold text-lg", children: "Y" }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl font-bold text-gray-900 dark:text-white", children: "Yatra" })
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xl font-bold text-gray-900 dark:text-white", children: "Yatra" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                "v",
+                ((_a = window.yatraAdmin) == null ? void 0 : _a.version) || "1.0.0"
+              ] }),
+              ((_b = window.yatraAdmin) == null ? void 0 : _b.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium", children: [
+                "Pro v",
+                window.yatraAdmin.proVersion
+              ] })
+            ] })
+          ] })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "a",
           {
-            href: ((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+            href: ((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
             className: "inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -512,7 +525,7 @@ const Layout = ({ children }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         "a",
         {
-          href: ((_b = window.yatraAdmin) == null ? void 0 : _b.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+          href: ((_d = window.yatraAdmin) == null ? void 0 : _d.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
           className: "flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -671,7 +684,7 @@ const Layout = ({ children }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-5 h-5 text-white" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_c = window.yatraAdmin) == null ? void 0 : _c.currentUser) || "Admin" }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_e = window.yatraAdmin) == null ? void 0 : _e.currentUser) || "Admin" }) })
           ] })
         ] })
       ] }) }),
@@ -35002,6 +35015,132 @@ const Skeleton = ({ className = "" }) => {
     }
   );
 };
+function getDateFormat() {
+  var _a, _b;
+  return ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.date_format) || ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.dateFormat) || "Y-m-d";
+}
+function getTimeFormat() {
+  var _a, _b;
+  return ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.time_format) || ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.timeFormat) || "H:i";
+}
+function formatDate$1(dateString, includeTime = false) {
+  if (!dateString) return "-";
+  try {
+    const date2 = typeof dateString === "string" ? new Date(dateString) : dateString;
+    if (isNaN(date2.getTime())) {
+      return String(dateString);
+    }
+    const phpDateFormat = getDateFormat();
+    const phpTimeFormat = getTimeFormat();
+    const formattedDate = formatDatePart(date2, phpDateFormat);
+    if (includeTime) {
+      const formattedTime = formatTimePart(date2, phpTimeFormat);
+      return `${formattedDate} ${formattedTime}`;
+    }
+    return formattedDate;
+  } catch (e) {
+    return String(dateString);
+  }
+}
+function formatDatePart(date2, phpFormat) {
+  const year = date2.getFullYear();
+  const month = date2.getMonth();
+  const day = date2.getDate();
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+  const monthShort = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+  const pad2 = (n) => n.toString().padStart(2, "0");
+  const dayNames2 = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const dayShort = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const dayOfWeek = date2.getDay();
+  switch (phpFormat) {
+    case "Y-m-d":
+      return `${year}-${pad2(month + 1)}-${pad2(day)}`;
+    case "Y/m/d":
+      return `${year}/${pad2(month + 1)}/${pad2(day)}`;
+    case "m/d/Y":
+      return `${pad2(month + 1)}/${pad2(day)}/${year}`;
+    case "d/m/Y":
+      return `${pad2(day)}/${pad2(month + 1)}/${year}`;
+    case "d-m-Y":
+      return `${pad2(day)}-${pad2(month + 1)}-${year}`;
+    case "d.m.Y":
+      return `${pad2(day)}.${pad2(month + 1)}.${year}`;
+    case "M d, Y":
+      return `${monthShort[month]} ${pad2(day)}, ${year}`;
+    case "F d, Y":
+      return `${monthNames[month]} ${pad2(day)}, ${year}`;
+    case "d M Y":
+      return `${pad2(day)} ${monthShort[month]} ${year}`;
+    case "d F Y":
+      return `${pad2(day)} ${monthNames[month]} ${year}`;
+    case "M j, Y":
+      return `${monthShort[month]} ${day}, ${year}`;
+    case "F j, Y":
+      return `${monthNames[month]} ${day}, ${year}`;
+    case "j M Y":
+      return `${day} ${monthShort[month]} ${year}`;
+    case "j F Y":
+      return `${day} ${monthNames[month]} ${year}`;
+    case "Y M j":
+      return `${year} ${monthShort[month]} ${day}`;
+    case "Y F j":
+      return `${year} ${monthNames[month]} ${day}`;
+    case "l, F j, Y":
+      return `${dayNames2[dayOfWeek]}, ${monthNames[month]} ${day}, ${year}`;
+    case "D, M j, Y":
+      return `${dayShort[dayOfWeek]}, ${monthShort[month]} ${day}, ${year}`;
+    default:
+      return `${year}-${pad2(month + 1)}-${pad2(day)}`;
+  }
+}
+function formatTimePart(date2, phpFormat) {
+  const hours = date2.getHours();
+  const minutes = date2.getMinutes();
+  const seconds = date2.getSeconds();
+  const pad2 = (n) => n.toString().padStart(2, "0");
+  const hours12 = hours % 12 || 12;
+  const ampm = hours >= 12 ? "PM" : "AM";
+  switch (phpFormat) {
+    case "H:i":
+      return `${pad2(hours)}:${pad2(minutes)}`;
+    case "h:i A":
+      return `${pad2(hours12)}:${pad2(minutes)} ${ampm}`;
+    case "h:i a":
+      return `${pad2(hours12)}:${pad2(minutes)} ${ampm.toLowerCase()}`;
+    case "H:i:s":
+      return `${pad2(hours)}:${pad2(minutes)}:${pad2(seconds)}`;
+    case "h:i:s A":
+      return `${pad2(hours12)}:${pad2(minutes)}:${pad2(seconds)} ${ampm}`;
+    default:
+      return `${pad2(hours)}:${pad2(minutes)}`;
+  }
+}
 const Bookings = () => {
   var _a, _b, _c;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
@@ -35157,11 +35296,7 @@ const Bookings = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatPrice = (price, currencyCode = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
@@ -35776,9 +35911,11 @@ const countryList = [
   { code: "ZA", name: "South Africa" }
 ];
 const BookingForm = () => {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
+  const globalCurrency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || "USD";
+  const currencySymbol = getCurrencySymbol(globalCurrency);
   const [formData, setFormData] = reactExports.useState({
     customer_name: "",
     customer_email: "",
@@ -35798,6 +35935,18 @@ const BookingForm = () => {
   const [emergencyContactData, setEmergencyContactData] = reactExports.useState({});
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
+  const [tripSearchQuery, setTripSearchQuery] = reactExports.useState("");
+  const [isTripDropdownOpen, setIsTripDropdownOpen] = reactExports.useState(false);
+  const tripDropdownRef = reactExports.useRef(null);
+  reactExports.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (tripDropdownRef.current && !tripDropdownRef.current.contains(event.target)) {
+        setIsTripDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
   const { data: formConfig } = useQuery({
     queryKey: ["booking-form-config"],
     queryFn: async () => {
@@ -35865,15 +36014,23 @@ const BookingForm = () => {
     }
   });
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ["trips-list"],
+    queryKey: ["trips-list-all"],
     queryFn: async () => {
       var _a2, _b2;
-      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/trips?per_page=100`, {
+      const apiUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1";
+      const nonce = ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || "";
+      console.log("Fetching trips from:", apiUrl);
+      const response = await fetch(`${apiUrl}/trips?per_page=500`, {
         headers: {
-          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
-        }
+          "X-WP-Nonce": nonce,
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
       });
+      console.log("Trips API Response status:", response.status);
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Trips API Error:", errorText);
         throw new Error("Failed to fetch trips");
       }
       const result = await response.json();
@@ -35884,16 +36041,18 @@ const BookingForm = () => {
           id: String(trip.id),
           title: trip.title,
           price: parseFloat(trip.sale_price || trip.original_price || 0),
-          currency: trip.currency || "USD"
+          currency: trip.currency || "USD",
+          status: trip.status || "publish"
         }));
-        console.log("Mapped trips:", trips);
+        console.log("Mapped trips:", trips, "Total:", trips.length);
         return { data: trips };
       }
       console.log("No trips found in response");
       return { data: [] };
     },
     // Always fetch trips when user can manage bookings
-    enabled: can("yatra_view_bookings") || can("yatra_view_trips")
+    enabled: can("yatra_view_bookings") || can("yatra_view_trips"),
+    retry: 1
   });
   const { data: bookingData, isLoading: isLoadingBooking } = useQuery({
     queryKey: ["booking", bookingId],
@@ -35910,22 +36069,31 @@ const BookingForm = () => {
       }
       const result = await response.json();
       console.log("Booking API Response:", result);
-      if (result.success) {
-        const booking = result.data;
+      const booking = result.success && result.data ? result.data : result;
+      if (booking && booking.id) {
         const customerName = booking.customer_name || `${booking.contact_first_name || ""} ${booking.contact_last_name || ""}`.trim();
         let travelers = [];
         if (booking.travelers && Array.isArray(booking.travelers)) {
           travelers = booking.travelers.map((t) => {
             const traveler = {};
-            Object.entries(t).forEach(([key, value]) => {
-              traveler[key] = String(value || "");
-            });
+            const fieldsData = t.fields || t;
+            if (fieldsData && typeof fieldsData === "object") {
+              Object.entries(fieldsData).forEach(([key, value]) => {
+                if (!["id", "booking_id", "traveller_index", "is_lead", "created_at", "updated_at"].includes(key)) {
+                  traveler[key] = String(value || "");
+                }
+              });
+            }
+            if (t.is_lead !== void 0) {
+              traveler["is_lead"] = String(t.is_lead);
+            }
             return traveler;
           });
         }
         if (travelers.length === 0) {
           travelers = [{}];
         }
+        console.log("Parsed travelers data:", travelers);
         let emergencyContact = {};
         if (booking.emergency_contact && typeof booking.emergency_contact === "object") {
           Object.entries(booking.emergency_contact).forEach(([key, value]) => {
@@ -35938,6 +36106,7 @@ const BookingForm = () => {
           customer_email: booking.customer_email || "",
           customer_phone: booking.customer_phone || "",
           trip_id: String(booking.trip_id || ""),
+          trip_title: booking.trip_title || "",
           booking_date: booking.created_at ? booking.created_at.split(" ")[0] : (/* @__PURE__ */ new Date()).toISOString().split("T")[0],
           travel_date: booking.travel_date || "",
           travelers: booking.travelers_count || 1,
@@ -36075,8 +36244,8 @@ const BookingForm = () => {
         status: data.booking_status,
         payment_gateway: data.payment_method.trim(),
         special_requests: data.notes.trim(),
-        // Include travelers data
-        travelers_data: travelersData,
+        // Include travelers data - use 'travelers' key as expected by BookingService.updateBooking
+        travelers: travelersData,
         // Include emergency contact data
         emergency_contact: emergencyContactData
       };
@@ -36294,30 +36463,95 @@ const BookingForm = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Booking Details", "Booking Details") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "trip_id", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { ref: tripDropdownRef, className: "relative", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "trip_search", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
                 __("Trip", "Trip"),
                 " ",
                 /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                Select,
-                {
-                  id: "trip_id",
-                  value: formData.trip_id,
-                  onChange: (e) => handleFieldChange("trip_id", e.target.value),
-                  className: errors.trip_id ? "border-red-500" : "",
-                  required: true,
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: isLoadingTrips ? __("Loading trips...", "Loading trips...") : __("Select a trip", "Select a trip") }),
-                    (_a = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _a.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: String(trip.id), children: [
-                      trip.title,
-                      " - $",
-                      trip.price
-                    ] }, trip.id))
-                  ]
-                }
-              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "div",
+                  {
+                    className: `flex items-center border rounded-md bg-white dark:bg-gray-800 cursor-pointer ${errors.trip_id ? "border-red-500" : "border-gray-300 dark:border-gray-600"} ${isTripDropdownOpen ? "ring-2 ring-blue-500" : ""}`,
+                    onClick: () => setIsTripDropdownOpen(!isTripDropdownOpen),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 px-3 py-2 text-sm", children: formData.trip_id ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-900 dark:text-white", children: ((_c = (_b = tripsData == null ? void 0 : tripsData.data) == null ? void 0 : _b.find((t) => String(t.id) === formData.trip_id)) == null ? void 0 : _c.title) || (bookingData == null ? void 0 : bookingData.trip_title) || `Trip ID: ${formData.trip_id}` }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: isLoadingTrips ? __("Loading trips...", "Loading trips...") : __("Select a trip", "Select a trip") }) }),
+                      formData.trip_id && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "button",
+                        {
+                          type: "button",
+                          className: "p-2 text-gray-400 hover:text-gray-600",
+                          onClick: (e) => {
+                            e.stopPropagation();
+                            handleFieldChange("trip_id", "");
+                            setTripSearchQuery("");
+                          },
+                          children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 text-gray-400", children: /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: `w-4 h-4 transition-transform ${isTripDropdownOpen ? "rotate-180" : ""}` }) })
+                    ]
+                  }
+                ),
+                isTripDropdownOpen && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-hidden", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Search, { className: "absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "text",
+                        className: "w-full pl-8 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500",
+                        placeholder: __("Search trips...", "Search trips..."),
+                        value: tripSearchQuery,
+                        onChange: (e) => setTripSearchQuery(e.target.value),
+                        onClick: (e) => e.stopPropagation(),
+                        autoFocus: true
+                      }
+                    )
+                  ] }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-48 overflow-y-auto", children: (() => {
+                    let allTrips = [...(tripsData == null ? void 0 : tripsData.data) || []];
+                    if (isEditMode && (bookingData == null ? void 0 : bookingData.trip_id) && (bookingData == null ? void 0 : bookingData.trip_title)) {
+                      const bookedTripExists = allTrips.some((t) => String(t.id) === String(bookingData.trip_id));
+                      if (!bookedTripExists) {
+                        allTrips.unshift({
+                          id: bookingData.trip_id,
+                          title: bookingData.trip_title,
+                          price: bookingData.total_amount || 0,
+                          currency: globalCurrency,
+                          status: "publish"
+                        });
+                      }
+                    }
+                    const filteredTrips = allTrips.filter(
+                      (trip) => trip.title.toLowerCase().includes(tripSearchQuery.toLowerCase()) || String(trip.id).includes(tripSearchQuery)
+                    );
+                    if (filteredTrips.length === 0) {
+                      return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-3 py-4 text-sm text-gray-500 text-center", children: __("No trips found", "No trips found") });
+                    }
+                    return filteredTrips.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                      "div",
+                      {
+                        className: `px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${formData.trip_id === String(trip.id) ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" : "text-gray-900 dark:text-white"}`,
+                        onClick: () => {
+                          handleFieldChange("trip_id", String(trip.id));
+                          setIsTripDropdownOpen(false);
+                          setTripSearchQuery("");
+                        },
+                        children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium", children: trip.title }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                            "ID: ",
+                            trip.id
+                          ] })
+                        ]
+                      },
+                      trip.id
+                    ));
+                  })() })
+                ] })
+              ] }),
               errors.trip_id && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.trip_id })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
@@ -36384,11 +36618,13 @@ const BookingForm = () => {
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "total_amount", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
                   __("Total Amount", "Total Amount"),
-                  " (USD) ",
+                  " (",
+                  globalCurrency,
+                  ") ",
                   /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500", children: "$" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500", children: currencySymbol }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     Input,
                     {
@@ -36423,13 +36659,13 @@ const BookingForm = () => {
             ] })
           ] })
         ] }),
-        ((_b = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _b.enabled) !== false && emergencyContactFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        ((_d = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _d.enabled) !== false && emergencyContactFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
-              ((_c = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _c.title) || __("Emergency Contact", "Emergency Contact")
+              ((_e = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _e.title) || __("Emergency Contact", "Emergency Contact")
             ] }),
-            ((_d = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _d.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.emergency_contact_form.description })
+            ((_f = formConfig == null ? void 0 : formConfig.emergency_contact_form) == null ? void 0 : _f.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.emergency_contact_form.description })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: emergencyContactFields.map((field) => {
             var _a2;
@@ -36497,12 +36733,12 @@ const BookingForm = () => {
             );
           }) }) })
         ] }),
-        ((_e = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _e.enabled) !== false && travelerFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+        ((_g = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _g.enabled) !== false && travelerFields.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "pb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-4 h-4" }),
-                ((_f = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _f.title) || __("Travelers Information", "Travelers Information"),
+                ((_h = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _h.title) || __("Travelers Information", "Travelers Information"),
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-normal text-gray-500 dark:text-gray-400", children: [
                   "(",
                   travelersData.length,
@@ -36541,7 +36777,7 @@ const BookingForm = () => {
                 )
               ] })
             ] }),
-            ((_g = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _g.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.traveler_form.description })
+            ((_i = formConfig == null ? void 0 : formConfig.traveler_form) == null ? void 0 : _i.description) && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: formConfig.traveler_form.description })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-3", children: travelersData.map((traveler, travelerIndex) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
             "div",
@@ -36707,7 +36943,7 @@ const BookingForm = () => {
                   onChange: (e) => handleFieldChange("payment_method", e.target.value),
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Select payment method", "Select payment method") }),
-                    (_h = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _h.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
+                    (_j = gatewaysData == null ? void 0 : gatewaysData.data) == null ? void 0 : _j.map((gw) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: gw.id, children: gw.title }, gw.id)),
                     (!(gatewaysData == null ? void 0 : gatewaysData.data) || gatewaysData.data.length === 0) && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "pay_later", children: __("Pay Later", "Pay Later") }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "bank_transfer", children: __("Bank Transfer", "Bank Transfer") }),
@@ -36755,7 +36991,7 @@ const BookingForm = () => {
   ] });
 };
 const ViewBooking = () => {
-  var _a, _b;
+  var _a, _b, _c, _d;
   const { can } = usePermissions();
   const bookingId = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
@@ -36764,7 +37000,7 @@ const ViewBooking = () => {
   const { data: formConfig } = useQuery({
     queryKey: ["booking-form-config"],
     queryFn: async () => {
-      var _a2, _b2, _c;
+      var _a2, _b2, _c2;
       const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/settings`, {
         headers: {
           "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
@@ -36774,7 +37010,7 @@ const ViewBooking = () => {
         throw new Error("Failed to fetch settings");
       }
       const result = await response.json();
-      return ((_c = result.data) == null ? void 0 : _c.booking_form_config) || result.booking_form_config || null;
+      return ((_c2 = result.data) == null ? void 0 : _c2.booking_form_config) || result.booking_form_config || null;
     }
   });
   const travelerFields = reactExports.useMemo(() => {
@@ -36794,7 +37030,7 @@ const ViewBooking = () => {
   const { data: booking, isLoading, error } = useQuery({
     queryKey: ["booking", bookingId],
     queryFn: async () => {
-      var _a2, _b2, _c, _d;
+      var _a2, _b2, _c2, _d2;
       if (!bookingId) return null;
       const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/bookings/${bookingId}`, {
         headers: {
@@ -36805,12 +37041,12 @@ const ViewBooking = () => {
         throw new Error("Failed to fetch booking");
       }
       const result = await response.json();
-      if (result.success && result.data) {
-        const data = result.data;
+      const data = result.success && result.data ? result.data : result;
+      if (data && data.id) {
         return {
           id: data.id,
           booking_number: data.reference,
-          customer_name: data.customer_name || (((_c = data.contact) == null ? void 0 : _c.first_name) && ((_d = data.contact) == null ? void 0 : _d.last_name) ? `${data.contact.first_name} ${data.contact.last_name}`.trim() : `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim()) || "N/A",
+          customer_name: data.customer_name || (((_c2 = data.contact) == null ? void 0 : _c2.first_name) && ((_d2 = data.contact) == null ? void 0 : _d2.last_name) ? `${data.contact.first_name} ${data.contact.last_name}`.trim() : `${data.contact_first_name || ""} ${data.contact_last_name || ""}`.trim()) || "N/A",
           customer_email: data.customer_email,
           customer_phone: data.customer_phone,
           customer_country: data.contact_country,
@@ -36825,6 +37061,8 @@ const ViewBooking = () => {
           total_amount: data.total_amount,
           amount_paid: data.amount_paid || 0,
           amount_due: data.amount_due || 0,
+          discount_amount: data.discount_amount || 0,
+          discount_code: data.discount_code || null,
           currency: data.currency || "USD",
           payment_status: data.payment_status,
           booking_status: data.status,
@@ -36849,12 +37087,7 @@ const ViewBooking = () => {
     enabled: !!bookingId && can("yatra_view_bookings")
   });
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatPrice = (price, currencyCode = "USD") => {
     const numPrice = Number(price) || 0;
@@ -37451,6 +37684,33 @@ const ViewBooking = () => {
             ] })
           ] })
         ] }),
+        booking.discount_amount > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { width: "16", height: "16", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", className: "w-4 h-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12 2L2 7l10 5 10-5-10-5z" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M2 17l10 5 10-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M2 12l10 5 10-5" })
+            ] }),
+            __("Discount Applied", "Discount Applied")
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1", children: __("Discount Type", "Discount Type") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-emerald-700 dark:text-emerald-300", children: ((_c = booking.discount_code) == null ? void 0 : _c.toLowerCase().includes("group")) || ((_d = booking.discount_code) == null ? void 0 : _d.includes("GROUP")) ? __("Group Discount", "Group Discount") : __("Coupon Discount", "Coupon Discount") })
+            ] }),
+            booking.discount_code && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1", children: __("Code", "Code") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded inline-block", children: booking.discount_code })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1", children: __("Savings", "Savings") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xl font-bold text-emerald-700 dark:text-emerald-300", children: [
+                "-",
+                formatPrice(booking.discount_amount, booking.currency)
+              ] })
+            ] })
+          ] })
+        ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Timeline", "Timeline") }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
@@ -37570,12 +37830,7 @@ const Customers = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = (data == null ? void 0 : data.pages) || Math.ceil(total / 10);
   const formatDate2 = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatPrice = (price, currencyCode = "USD") => {
     const symbol = getCurrencySymbol(currencyCode);
@@ -38846,21 +39101,10 @@ const ViewCustomer = () => {
     enabled: !!customerId && can("yatra_view_bookings")
   });
   const formatDate2 = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatShortDate = (dateString) => {
-    if (!dateString) return "-";
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatPrice = (price, currencyCode = "USD") => {
     const symbol = getCurrencySymbol(currencyCode);
@@ -39413,11 +39657,7 @@ const Reviews = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const renderStars = (rating) => {
     return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-0.5", children: [
@@ -44725,10 +44965,62 @@ const Settings = () => {
                       name: "date_format",
                       onChange: handleFieldChange,
                       children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "Y-m-d", children: "YYYY-MM-DD" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "m/d/Y", children: "MM/DD/YYYY" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "d/m/Y", children: "DD/MM/YYYY" }),
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "d-m-Y", children: "DD-MM-YYYY" })
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "Y-m-d", children: [
+                          (/* @__PURE__ */ new Date()).toLocaleDateString("en-CA"),
+                          " (YYYY-MM-DD)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "Y/m/d", children: [
+                          `${(/* @__PURE__ */ new Date()).getFullYear()}/${String((/* @__PURE__ */ new Date()).getMonth() + 1).padStart(2, "0")}/${String((/* @__PURE__ */ new Date()).getDate()).padStart(2, "0")}`,
+                          " (YYYY/MM/DD)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "m/d/Y", children: [
+                          `${String((/* @__PURE__ */ new Date()).getMonth() + 1).padStart(2, "0")}/${String((/* @__PURE__ */ new Date()).getDate()).padStart(2, "0")}/${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (MM/DD/YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "d/m/Y", children: [
+                          `${String((/* @__PURE__ */ new Date()).getDate()).padStart(2, "0")}/${String((/* @__PURE__ */ new Date()).getMonth() + 1).padStart(2, "0")}/${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (DD/MM/YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "d-m-Y", children: [
+                          `${String((/* @__PURE__ */ new Date()).getDate()).padStart(2, "0")}-${String((/* @__PURE__ */ new Date()).getMonth() + 1).padStart(2, "0")}-${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (DD-MM-YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "d.m.Y", children: [
+                          `${String((/* @__PURE__ */ new Date()).getDate()).padStart(2, "0")}.${String((/* @__PURE__ */ new Date()).getMonth() + 1).padStart(2, "0")}.${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (DD.MM.YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "M j, Y", children: [
+                          (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }),
+                          " (Mon D, YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "F j, Y", children: [
+                          (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+                          " (Month D, YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "j M Y", children: [
+                          `${(/* @__PURE__ */ new Date()).getDate()} ${(/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "short" })} ${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (D Mon YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "j F Y", children: [
+                          `${(/* @__PURE__ */ new Date()).getDate()} ${(/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "long" })} ${(/* @__PURE__ */ new Date()).getFullYear()}`,
+                          " (D Month YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "Y M j", children: [
+                          `${(/* @__PURE__ */ new Date()).getFullYear()} ${(/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "short" })} ${(/* @__PURE__ */ new Date()).getDate()}`,
+                          " (YYYY Mon D)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "Y F j", children: [
+                          `${(/* @__PURE__ */ new Date()).getFullYear()} ${(/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { month: "long" })} ${(/* @__PURE__ */ new Date()).getDate()}`,
+                          " (YYYY Month D)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "l, F j, Y", children: [
+                          (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" }),
+                          " (Day, Month D, YYYY)"
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("option", { value: "D, M j, Y", children: [
+                          (/* @__PURE__ */ new Date()).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" }),
+                          " (Day, Mon D, YYYY)"
+                        ] })
                       ]
                     }
                   )
@@ -52157,6 +52449,7 @@ const Discounts = () => {
   const [bulkAction, setBulkAction] = reactExports.useState("");
   const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
   const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
+  const [showDiscountTypeModal, setShowDiscountTypeModal] = reactExports.useState(false);
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     if (typeof window === "undefined") {
       return {
@@ -52275,12 +52568,6 @@ const Discounts = () => {
     };
     return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`, children: statusInfo.label });
   };
-  const formatDiscount = (discount) => {
-    if (discount.type === "percentage") {
-      return `${discount.amount}%`;
-    }
-    return `$${discount.amount}`;
-  };
   const handleEdit = (discount) => {
     window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`;
   };
@@ -52291,7 +52578,11 @@ const Discounts = () => {
     window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&duplicate=${discount.id}`;
   };
   const handleCreateDiscount = () => {
-    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create`;
+    setShowDiscountTypeModal(true);
+  };
+  const handleSelectDiscountType = (type) => {
+    setShowDiscountTypeModal(false);
+    window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&discount_mode=${type}`;
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -52469,62 +52760,81 @@ const Discounts = () => {
   const columns = [
     {
       key: "code",
-      label: __("Coupon Code", "Coupon Code"),
+      label: __("Name / Code", "Name / Code"),
       sortable: true,
       visible: visibleColumns.code,
-      width: "w-[260px]",
+      width: "w-[280px]",
       render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-4 h-4 text-gray-400" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "a",
-            {
-              href: `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`,
-              className: "font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2",
-              children: discount.code
-            }
-          ),
-          discount.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
-            __("Group", "Group")
-          ] })
-        ] }),
-        discount.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: discount.description }),
-        discount.is_group_discount && discount.min_group_size && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center gap-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mb-1 flex-wrap", children: discount.discount_mode === "group" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "success", className: "text-xs flex items-center gap-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
-          __("Min", "Min"),
-          " ",
-          discount.min_group_size,
-          " ",
-          __("people", "people"),
-          " -",
-          " ",
-          discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`,
-          " ",
-          __("extra discount", "extra discount")
-        ] })
+          __("Group Only", "Group Only")
+        ] }) : discount.discount_mode === "promo" ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-3 h-3" }),
+          __("Promo Code", "Promo Code")
+        ] }) : discount.is_group_discount ? /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "warning", className: "text-xs flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-3 h-3" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+          __("Promo + Group", "Promo + Group")
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", className: "text-xs flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-3 h-3" }),
+          __("Promo Code", "Promo Code")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2 mt-1", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "a",
+          {
+            href: `${baseAdminUrl}?page=yatra&subpage=discounts&action=edit&id=${discount.id}`,
+            className: "font-medium font-mono text-sm text-blue-600 dark:text-blue-400 hover:underline underline-offset-2",
+            children: discount.code
+          }
+        ) }),
+        discount.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: discount.description })
       ] })
     },
     {
       key: "type",
-      label: __("Type", "Type"),
-      sortable: true,
-      visible: visibleColumns.type,
-      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Badge,
-        {
-          variant: discount.type === "percentage" ? "info" : "default",
-          className: "text-xs",
-          children: discount.type === "percentage" ? __("Percentage", "Percentage") : __("Fixed", "Fixed")
-        }
-      )
-    },
-    {
-      key: "discount",
       label: __("Discount", "Discount"),
       sortable: true,
-      visible: visibleColumns.discount,
-      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: formatDiscount(discount) })
+      visible: visibleColumns.type,
+      render: (discount) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1.5", children: [
+        discount.discount_mode !== "group" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: discount.type === "percentage" ? `${discount.amount}%` : `$${discount.amount}` }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500", children: __("off", "off") })
+        ] }),
+        discount.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: discount.group_discount_mode === "category_based" && discount.category_discounts && discount.category_discounts.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1", children: discount.category_discounts.map((cat, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-gray-700 dark:text-gray-300", children: [
+            cat.traveler_category_label,
+            ":"
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-1 text-green-600 dark:text-green-400", children: cat.ranges && cat.ranges.length > 0 ? cat.ranges.map((range3, rIdx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+            rIdx > 0 && ", ",
+            range3.min_group_size,
+            range3.max_group_size ? `-${range3.max_group_size}` : "+",
+            ":",
+            range3.discount_type === "percentage" ? `${range3.discount_amount}%` : `$${range3.discount_amount}`
+          ] }, rIdx)) : "-" })
+        ] }, idx)) }) : discount.group_discount_ranges && discount.group_discount_ranges.length > 0 ? (
+          /* Total-based group discount ranges */
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-0.5", children: discount.group_discount_ranges.map((range3, idx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-green-600 dark:text-green-400 flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+              range3.min_group_size,
+              range3.max_group_size ? `-${range3.max_group_size}` : "+",
+              " ",
+              __("pax", "pax"),
+              ":",
+              range3.discount_type === "percentage" ? ` ${range3.discount_amount}%` : ` $${range3.discount_amount}`,
+              " ",
+              __("off", "off")
+            ] })
+          ] }, idx)) })
+        ) : (
+          /* Fallback for legacy data */
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-green-600 dark:text-green-400 flex items-center gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-3 h-3" }),
+            discount.min_group_size ? `${discount.min_group_size}+ ${__("travelers", "travelers")}: ${discount.group_discount_type === "percentage" ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`}` : __("Group pricing", "Group pricing")
+          ] })
+        ) })
+      ] })
     },
     {
       key: "usage",
@@ -52671,6 +52981,70 @@ const Discounts = () => {
     }
   ];
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    showDiscountTypeModal && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "absolute inset-0 bg-black/50",
+          onClick: () => setShowDiscountTypeModal(false)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: __("What type of discount do you want to create?", "What type of discount do you want to create?") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: __("Choose the discount type that best fits your needs", "Choose the discount type that best fits your needs") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => handleSelectDiscountType("promo"),
+              className: "flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group text-left",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-7 h-7 text-blue-600 dark:text-blue-400" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 dark:text-white mb-2", children: __("Promo Code", "Promo Code") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 text-center", children: __("Customer enters a code to get a percentage or fixed discount", "Customer enters a code to get a percentage or fixed discount") })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => handleSelectDiscountType("group"),
+              className: "flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-7 h-7 text-green-600 dark:text-green-400" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 dark:text-white mb-2", children: __("Group Discount", "Group Discount") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 text-center", children: __("Auto-applies when booking multiple travelers. No code needed.", "Auto-applies when booking multiple travelers. No code needed.") })
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => handleSelectDiscountType("both"),
+              className: "flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex -space-x-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" })
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 dark:text-white mb-2", children: __("Promo + Group", "Promo + Group") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 text-center", children: __("Promo code gives base discount + extra savings for groups", "Promo code gives base discount + extra savings for groups") })
+              ]
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+          Button,
+          {
+            variant: "outline",
+            onClick: () => setShowDiscountTypeModal(false),
+            children: __("Cancel", "Cancel")
+          }
+        ) })
+      ] })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       ConfirmationDialog,
       {
@@ -56555,28 +56929,54 @@ const DiscountForm = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
-  const [formData, setFormData] = reactExports.useState({
-    code: "",
-    description: "",
-    type: "percentage",
-    amount: "",
-    max_discount_amount: "",
-    usage_limit: "0",
-    usage_limit_per_customer: "0",
-    valid_from: "",
-    expiry_date: "",
-    status: "draft",
-    applicable_to: "all",
-    trip_ids: [],
-    min_amount: "",
-    first_time_customer_only: false,
-    is_group_discount: false,
-    min_group_size: "",
-    group_discount_type: "percentage",
-    group_discount_amount: ""
-  });
+  const getInitialState = () => {
+    const params = new URLSearchParams(window.location.search);
+    const urlDiscountMode = params.get("discount_mode") || "both";
+    const isGroupOnly = urlDiscountMode === "group";
+    return {
+      code: "",
+      description: "",
+      type: "percentage",
+      amount: isGroupOnly ? "0" : "",
+      max_discount_amount: "",
+      usage_limit: "0",
+      usage_limit_per_customer: "0",
+      valid_from: "",
+      expiry_date: "",
+      status: "draft",
+      applicable_to: "all",
+      trip_ids: [],
+      min_amount: "",
+      first_time_customer_only: false,
+      is_group_discount: isGroupOnly,
+      discount_mode: urlDiscountMode,
+      group_discount_mode: "total",
+      group_discount_ranges: [
+        {
+          id: String(Date.now()),
+          min_group_size: "",
+          max_group_size: "",
+          discount_type: "percentage",
+          discount_amount: "",
+          categories: []
+        }
+      ],
+      category_discounts: []
+    };
+  };
+  const [formData, setFormData] = reactExports.useState(getInitialState);
   const [errors, setErrors] = reactExports.useState({});
   const [isSubmitting, setIsSubmitting] = reactExports.useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = reactExports.useState(false);
+  const [tripSearchQuery, setTripSearchQuery] = reactExports.useState("");
+  const [debouncedTripSearch, setDebouncedTripSearch] = reactExports.useState("");
+  const [showTripDropdown, setShowTripDropdown] = reactExports.useState(false);
+  reactExports.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTripSearch(tripSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tripSearchQuery]);
   const action = reactExports.useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("action") || "create";
@@ -56589,8 +56989,17 @@ const DiscountForm = () => {
     const params = new URLSearchParams(window.location.search);
     return params.get("duplicate") ? parseInt(params.get("duplicate") || "0") : null;
   }, []);
+  const discountMode = reactExports.useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("discount_mode") || "both";
+  }, []);
   const isEditMode = action === "edit" && discountId !== null;
   const isDuplicateMode = action === "create" && duplicateId !== null;
+  const isGroupOnlyMode = discountMode === "group";
+  const isPromoOnlyMode = discountMode === "promo";
+  const effectiveDiscountMode = isEditMode ? formData.discount_mode : discountMode;
+  const isEffectiveGroupOnly = effectiveDiscountMode === "group";
+  const isEffectivePromoOnly = effectiveDiscountMode === "promo";
   const { data: discountData, isLoading: isLoadingDiscount } = useQuery({
     queryKey: ["discount", discountId || duplicateId],
     queryFn: async () => {
@@ -56607,7 +57016,7 @@ const DiscountForm = () => {
     enabled: (isEditMode || isDuplicateMode) && can("yatra_view_bookings")
   });
   reactExports.useEffect(() => {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     if (discountData && (isEditMode || isDuplicateMode)) {
       setFormData({
         code: isDuplicateMode ? `${discountData.code}_COPY` : discountData.code || "",
@@ -56625,39 +57034,265 @@ const DiscountForm = () => {
         min_amount: ((_e = discountData.min_amount) == null ? void 0 : _e.toString()) || "",
         first_time_customer_only: discountData.first_time_customer_only || false,
         is_group_discount: discountData.is_group_discount || false,
-        min_group_size: ((_f = discountData.min_group_size) == null ? void 0 : _f.toString()) || "",
-        group_discount_type: discountData.group_discount_type || "percentage",
-        group_discount_amount: ((_g = discountData.group_discount_amount) == null ? void 0 : _g.toString()) || ""
+        discount_mode: discountData.discount_mode || "both",
+        group_discount_mode: discountData.group_discount_mode || "total",
+        group_discount_ranges: Array.isArray(discountData.group_discount_ranges) && discountData.group_discount_ranges.length ? discountData.group_discount_ranges : [
+          {
+            id: String(Date.now()),
+            min_group_size: ((_f = discountData.min_group_size) == null ? void 0 : _f.toString()) || "",
+            max_group_size: ((_g = discountData.max_group_size) == null ? void 0 : _g.toString()) || "",
+            discount_type: discountData.group_discount_type || "percentage",
+            discount_amount: ((_h = discountData.group_discount_amount) == null ? void 0 : _h.toString()) || "",
+            categories: []
+          }
+        ],
+        category_discounts: Array.isArray(discountData.category_discounts) && ((_i = discountData.category_discounts) == null ? void 0 : _i.length) ? discountData.category_discounts : []
       });
     }
   }, [discountData, isEditMode, isDuplicateMode]);
+  reactExports.useEffect(() => {
+    if (!isEditMode && !isDuplicateMode && !discountData) {
+      if (isGroupOnlyMode) {
+        setFormData((prev) => ({
+          ...prev,
+          is_group_discount: true,
+          discount_mode: "group",
+          amount: "0",
+          type: "percentage"
+        }));
+      } else if (isPromoOnlyMode) {
+        setFormData((prev) => ({
+          ...prev,
+          is_group_discount: false,
+          discount_mode: "promo"
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          discount_mode: "both"
+        }));
+      }
+    }
+  }, [isGroupOnlyMode, isPromoOnlyMode, isEditMode, isDuplicateMode, discountData]);
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
+    if (field === "group_discount_mode") {
+      if (value === "category_based") {
+        setFormData((prev) => ({
+          ...prev,
+          group_discount_mode: "category_based",
+          group_discount_ranges: [],
+          category_discounts: []
+          // Ensure empty categories array
+        }));
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          group_discount_mode: "total",
+          group_discount_ranges: [
+            {
+              id: String(Date.now()),
+              min_group_size: "",
+              max_group_size: "",
+              discount_type: "percentage",
+              discount_amount: "",
+              categories: []
+            }
+          ],
+          category_discounts: []
+          // Ensure empty categories array
+        }));
+      }
+    }
+  };
+  const travelerCategoriesQuery = useQuery({
+    queryKey: ["traveler-categories"],
+    queryFn: async () => {
+      var _a;
+      try {
+        const response = await apiClient.get("/traveler-categories", {
+          params: {
+            per_page: 100,
+            status: "publish"
+          }
+        });
+        const categories = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response || [];
+        return Array.isArray(categories) ? categories : [];
+      } catch (error) {
+        console.error("Failed to load traveler categories:", error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1e3
+  });
+  const travelerCategoryOptions = reactExports.useMemo(() => {
+    const items = travelerCategoriesQuery.data || [];
+    return items.filter((c2) => !!c2 && (typeof c2.id === "number" || typeof c2.id === "string") && (c2.status === "publish" || c2.status === "active")).map((c2) => ({
+      value: String(c2.id),
+      label: c2.label || c2.slug || String(c2.id),
+      description: c2.description || "",
+      age_min: c2.age_min,
+      age_max: c2.age_max,
+      pricing_mode: c2.pricing_mode || "per_person"
+    }));
+  }, [travelerCategoriesQuery.data]);
+  const tripsQuery = useQuery({
+    queryKey: ["trips-for-discount", debouncedTripSearch],
+    queryFn: async () => {
+      var _a;
+      try {
+        const params = {
+          per_page: 100
+          // Don't filter by status - show all non-deleted trips so admin can select any trip
+        };
+        if (debouncedTripSearch.trim()) {
+          params.search = debouncedTripSearch.trim();
+        }
+        const response = await apiClient.get("/trips", { params });
+        const trips = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response || [];
+        return Array.isArray(trips) ? trips : [];
+      } catch (error) {
+        console.error("Failed to load trips:", error);
+        return [];
+      }
+    },
+    enabled: formData.applicable_to === "specific_trips",
+    // Only fetch when specific_trips is selected
+    staleTime: 5 * 60 * 1e3
+  });
+  const tripOptions = reactExports.useMemo(() => {
+    const items = tripsQuery.data || [];
+    return items.filter((t) => !!t && (typeof t.id === "number" || typeof t.id === "string")).map((t) => ({
+      value: Number(t.id),
+      label: t.title || t.name || `Trip #${t.id}`
+    }));
+  }, [tripsQuery.data]);
+  const addRange = () => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: [
+        ...prev.group_discount_ranges,
+        {
+          id: String(Date.now() + Math.random()),
+          min_group_size: "",
+          max_group_size: "",
+          discount_type: "percentage",
+          discount_amount: "",
+          categories: []
+        }
+      ]
+    }));
+  };
+  const removeRange = (rangeId) => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: prev.group_discount_ranges.filter((r2) => r2.id !== rangeId)
+    }));
+  };
+  const updateRange = (rangeId, patch) => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: prev.group_discount_ranges.map((r2) => r2.id === rangeId ? { ...r2, ...patch } : r2)
+    }));
+  };
+  const addTravelerCategory = () => {
+    setShowCategoryDropdown((prev) => !prev);
+  };
+  const selectCategory = (categoryId, categoryLabel) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: [
+        ...prev.category_discounts,
+        {
+          traveler_category_id: categoryId,
+          traveler_category_label: categoryLabel,
+          ranges: [],
+          isSelecting: false
+        }
+      ]
+    }));
+    setShowCategoryDropdown(false);
+  };
+  const removeTravelerCategory = (categoryIndex) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.filter((_, idx) => idx !== categoryIndex)
+    }));
+  };
+  const updateTravelerCategory = (categoryIndex, patch) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map(
+        (cat, idx) => idx === categoryIndex ? { ...cat, ...patch } : cat
+      )
+    }));
+  };
+  const addRangeToCategory = (categoryIndex) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        return {
+          ...cat,
+          ranges: [
+            ...cat.ranges,
+            {
+              id: String(Date.now() + Math.random()),
+              min_group_size: "",
+              max_group_size: "",
+              discount_type: "percentage",
+              discount_amount: ""
+            }
+          ]
+        };
+      })
+    }));
+  };
+  const removeRangeFromCategory = (categoryIndex, rangeId) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        return { ...cat, ranges: cat.ranges.filter((r2) => r2.id !== rangeId) };
+      })
+    }));
+  };
+  const updateRangeInCategory = (categoryIndex, rangeId, patch) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        const ranges = cat.ranges.map((r2) => r2.id === rangeId ? { ...r2, ...patch } : r2);
+        return { ...cat, ranges };
+      })
+    }));
   };
   const validateForm = () => {
     const newErrors = {};
     if (!formData.code.trim()) {
-      newErrors.code = __("Coupon code is required", "Coupon code is required");
+      newErrors.code = isEffectiveGroupOnly ? __("Internal name is required", "Internal name is required") : __("Coupon code is required", "Coupon code is required");
     } else if (!/^[A-Z0-9_-]+$/.test(formData.code)) {
-      newErrors.code = __("Coupon code can only contain uppercase letters, numbers, hyphens, and underscores", "Coupon code can only contain uppercase letters, numbers, hyphens, and underscores");
+      newErrors.code = __("Only uppercase letters, numbers, hyphens, and underscores are allowed", "Only uppercase letters, numbers, hyphens, and underscores are allowed");
     }
-    if (!formData.amount.trim()) {
-      newErrors.amount = __("Discount amount is required", "Discount amount is required");
-    } else {
-      const amount = parseFloat(formData.amount);
-      if (isNaN(amount) || amount <= 0) {
-        newErrors.amount = __("Discount amount must be a positive number", "Discount amount must be a positive number");
-      } else if (formData.type === "percentage" && amount > 100) {
-        newErrors.amount = __("Percentage discount cannot exceed 100%", "Percentage discount cannot exceed 100%");
+    if (!isEffectiveGroupOnly) {
+      if (!formData.amount.trim()) {
+        newErrors.amount = __("Discount amount is required", "Discount amount is required");
+      } else {
+        const amount = parseFloat(formData.amount);
+        if (isNaN(amount) || amount < 0) {
+          newErrors.amount = __("Discount amount must be a positive number", "Discount amount must be a positive number");
+        } else if (formData.type === "percentage" && amount > 100) {
+          newErrors.amount = __("Percentage discount cannot exceed 100%", "Percentage discount cannot exceed 100%");
+        }
       }
-    }
-    if (formData.type === "percentage" && formData.max_discount_amount && formData.max_discount_amount.trim()) {
-      const maxAmount = parseFloat(formData.max_discount_amount);
-      if (isNaN(maxAmount) || maxAmount <= 0) {
-        newErrors.max_discount_amount = __("Maximum discount amount must be a positive number", "Maximum discount amount must be a positive number");
+      if (formData.type === "percentage" && formData.max_discount_amount && formData.max_discount_amount.trim()) {
+        const maxAmount = parseFloat(formData.max_discount_amount);
+        if (isNaN(maxAmount) || maxAmount <= 0) {
+          newErrors.max_discount_amount = __("Maximum discount amount must be a positive number", "Maximum discount amount must be a positive number");
+        }
       }
     }
     if (formData.usage_limit && formData.usage_limit !== "0") {
@@ -56693,27 +57328,92 @@ const DiscountForm = () => {
         newErrors.min_amount = __("Minimum amount must be a positive number", "Minimum amount must be a positive number");
       }
     }
-    if (formData.is_group_discount) {
-      if (!formData.min_group_size.trim()) {
-        newErrors.min_group_size = __("Minimum group size is required for group discounts", "Minimum group size is required for group discounts");
+    if (formData.is_group_discount && formData.group_discount_mode === "total") {
+      if (!formData.group_discount_ranges || formData.group_discount_ranges.length === 0) {
+        newErrors.group_discount_ranges = __("At least one group discount range is required", "At least one group discount range is required");
       } else {
-        const groupSize = parseInt(formData.min_group_size);
-        if (isNaN(groupSize) || groupSize < 2) {
-          newErrors.min_group_size = __("Minimum group size must be at least 2", "Minimum group size must be at least 2");
-        }
+        formData.group_discount_ranges.forEach((range3, idx) => {
+          const prefix2 = `group_discount_ranges_${idx}`;
+          const min2 = parseInt(range3.min_group_size);
+          const max2 = range3.max_group_size ? parseInt(range3.max_group_size) : null;
+          if (Number.isNaN(min2) || min2 < 1) {
+            newErrors[`${prefix2}_min`] = __("Minimum group size must be at least 1", "Minimum group size must be at least 1");
+          }
+          if (max2 !== null) {
+            if (Number.isNaN(max2) || max2 < 1) {
+              newErrors[`${prefix2}_max`] = __("Maximum group size must be a positive number", "Maximum group size must be a positive number");
+            } else if (!Number.isNaN(min2) && max2 <= min2) {
+              newErrors[`${prefix2}_max`] = __("Maximum group size must be greater than minimum group size", "Maximum group size must be greater than minimum group size");
+            }
+          }
+          const amount = range3.discount_amount ? parseFloat(range3.discount_amount) : NaN;
+          if (!range3.discount_type) {
+            newErrors[`${prefix2}_type`] = __("Discount type is required", "Discount type is required");
+          }
+          if (Number.isNaN(amount) || amount <= 0) {
+            newErrors[`${prefix2}_amount`] = __("Discount amount must be a positive number", "Discount amount must be a positive number");
+          } else if (range3.discount_type === "percentage" && amount > 100) {
+            newErrors[`${prefix2}_amount`] = __("Percentage discount cannot exceed 100%", "Percentage discount cannot exceed 100%");
+          }
+        });
       }
-      if (!formData.group_discount_amount.trim()) {
-        newErrors.group_discount_amount = __("Group discount amount is required", "Group discount amount is required");
+    }
+    if (formData.is_group_discount && formData.group_discount_mode === "category_based") {
+      if (!formData.category_discounts || formData.category_discounts.length === 0) {
+        newErrors.category_discounts = __("Add at least one traveler category", "Add at least one traveler category");
       } else {
-        const groupAmount = parseFloat(formData.group_discount_amount);
-        if (isNaN(groupAmount) || groupAmount <= 0) {
-          newErrors.group_discount_amount = __("Group discount amount must be a positive number", "Group discount amount must be a positive number");
-        } else if (formData.group_discount_type === "percentage" && groupAmount > 100) {
-          newErrors.group_discount_amount = __("Group discount percentage cannot exceed 100%", "Group discount percentage cannot exceed 100%");
-        }
+        formData.category_discounts.forEach((cat, catIdx) => {
+          const catPrefix = `category_discounts_${catIdx}`;
+          if (!cat.traveler_category_id) {
+            newErrors[`${catPrefix}_id`] = __("Traveler category is required", "Traveler category is required");
+          }
+          if (!cat.ranges || cat.ranges.length === 0) {
+            newErrors[`${catPrefix}_ranges`] = __("Add at least one discount range", "Add at least one discount range");
+          } else {
+            cat.ranges.forEach((range3, rIdx) => {
+              const rangePrefix = `${catPrefix}_ranges_${rIdx}`;
+              const min2 = parseInt(range3.min_group_size);
+              const max2 = range3.max_group_size ? parseInt(range3.max_group_size) : null;
+              if (Number.isNaN(min2) || min2 < 1) {
+                newErrors[`${rangePrefix}_min`] = __("Minimum group size must be at least 1", "Minimum group size must be at least 1");
+              }
+              if (max2 !== null) {
+                if (Number.isNaN(max2) || max2 < 1) {
+                  newErrors[`${rangePrefix}_max`] = __("Maximum group size must be a positive number", "Maximum group size must be a positive number");
+                } else if (!Number.isNaN(min2) && max2 <= min2) {
+                  newErrors[`${rangePrefix}_max`] = __("Maximum group size must be greater than minimum group size", "Maximum group size must be greater than minimum group size");
+                }
+              }
+              const amount = range3.discount_amount ? parseFloat(range3.discount_amount) : NaN;
+              if (!range3.discount_type) {
+                newErrors[`${rangePrefix}_type`] = __("Discount type is required", "Discount type is required");
+              }
+              if (Number.isNaN(amount) || amount <= 0) {
+                newErrors[`${rangePrefix}_amount`] = __("Discount amount must be a positive number", "Discount amount must be a positive number");
+              } else if (range3.discount_type === "percentage" && amount > 100) {
+                newErrors[`${rangePrefix}_amount`] = __("Percentage discount cannot exceed 100%", "Percentage discount cannot exceed 100%");
+              }
+            });
+          }
+        });
       }
     }
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorKey = Object.keys(newErrors)[0];
+      const errorElement = document.querySelector(`[name="${firstErrorKey}"], #${firstErrorKey}, [data-field="${firstErrorKey}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (errorElement instanceof HTMLInputElement || errorElement instanceof HTMLSelectElement || errorElement instanceof HTMLTextAreaElement) {
+          setTimeout(() => errorElement.focus(), 300);
+        }
+      } else {
+        const errorMessage = document.querySelector(".text-red-500, .text-red-600");
+        if (errorMessage) {
+          errorMessage.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      }
+    }
     return Object.keys(newErrors).length === 0;
   };
   const saveMutation = useMutation({
@@ -56722,7 +57422,7 @@ const DiscountForm = () => {
         code: data.code.trim().toUpperCase(),
         description: data.description.trim(),
         type: data.type,
-        amount: parseFloat(data.amount),
+        amount: parseFloat(data.amount) || 0,
         max_discount_amount: data.max_discount_amount ? parseFloat(data.max_discount_amount) : null,
         usage_limit: parseInt(data.usage_limit) || 0,
         usage_limit_per_customer: parseInt(data.usage_limit_per_customer) || 0,
@@ -56734,9 +57434,20 @@ const DiscountForm = () => {
         min_amount: data.min_amount ? parseFloat(data.min_amount) : null,
         first_time_customer_only: data.first_time_customer_only,
         is_group_discount: data.is_group_discount,
-        min_group_size: data.is_group_discount && data.min_group_size ? parseInt(data.min_group_size) : null,
-        group_discount_type: data.is_group_discount ? data.group_discount_type : null,
-        group_discount_amount: data.is_group_discount && data.group_discount_amount ? parseFloat(data.group_discount_amount) : null
+        discount_mode: data.discount_mode,
+        group_discount_mode: data.is_group_discount ? data.group_discount_mode : null,
+        group_discount_ranges: data.is_group_discount ? data.group_discount_ranges : [],
+        category_discounts: data.is_group_discount && data.group_discount_mode === "category_based" ? data.category_discounts.map((cat) => ({
+          traveler_category_id: cat.traveler_category_id,
+          traveler_category_label: cat.traveler_category_label,
+          ranges: cat.ranges.map((range3) => ({
+            id: range3.id,
+            min_group_size: range3.min_group_size,
+            max_group_size: range3.max_group_size,
+            discount_type: range3.discount_type,
+            discount_amount: range3.discount_amount
+          }))
+        })) : []
       };
       if (isEditMode && discountId) {
         return await apiClient.put(`/discounts/${discountId}`, payload);
@@ -56751,10 +57462,13 @@ const DiscountForm = () => {
         isEditMode ? __("Discount updated successfully", "Discount updated successfully") : __("Discount created successfully", "Discount created successfully"),
         "success"
       );
-      setTimeout(() => {
-        var _a;
-        window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
-      }, 1e3);
+      if (!isEditMode) {
+        setTimeout(() => {
+          var _a;
+          window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+        }, 1e3);
+      }
+      setIsSubmitting(false);
     },
     onError: (error) => {
       const errorMessage = (error == null ? void 0 : error.message) || __("An error occurred while saving the discount", "An error occurred while saving the discount");
@@ -56780,7 +57494,95 @@ const DiscountForm = () => {
     window.location.href = `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/wp-admin/admin.php?page=yatra&subpage=discounts`;
   };
   if (isLoadingDiscount) {
-    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-6 h-6 animate-spin text-gray-400" }) });
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-5 h-5 bg-blue-200 dark:bg-blue-700 rounded animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-blue-200 dark:bg-blue-700 rounded animate-pulse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-full bg-blue-100 dark:bg-blue-800 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-3/4 bg-blue-100 dark:bg-blue-800 rounded animate-pulse" })
+          ] })
+        ] })
+      ] }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-20 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-44 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+            ] }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) }) })
+        ] })
+      ] })
+    ] });
   }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -56841,10 +57643,19 @@ const DiscountForm = () => {
       ] }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("form", { onSubmit: handleSubmit, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-3", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-3", children: [
+          (() => {
+            const currentMode = isEditMode ? formData.discount_mode : discountMode;
+            const isGroupOnly = currentMode === "group";
+            const isPromoOnly = currentMode === "promo";
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-3 rounded-lg border-2 mb-3 ${isGroupOnly ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800" : isPromoOnly ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800" : "bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              isGroupOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-5 h-5 text-green-600 dark:text-green-400" }) : isPromoOnly ? /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `font-medium ${isGroupOnly ? "text-green-700 dark:text-green-300" : isPromoOnly ? "text-blue-700 dark:text-blue-300" : "text-purple-700 dark:text-purple-300"}`, children: isGroupOnly ? isEditMode ? __("Group Discount (Auto-applies, no code needed)", "Group Discount (Auto-applies, no code needed)") : __("Creating Group Discount (Auto-applies, no code needed)", "Creating Group Discount (Auto-applies, no code needed)") : isPromoOnly ? isEditMode ? __("Promo Code Discount", "Promo Code Discount") : __("Creating Promo Code Discount", "Creating Promo Code Discount") : isEditMode ? __("Promo Code + Group Discount", "Promo Code + Group Discount") : __("Creating Promo Code + Group Discount", "Creating Promo Code + Group Discount") })
+            ] }) });
+          })(),
           /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Basic Information", "Basic Information") }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: isEffectiveGroupOnly ? __("Group Discount Information", "Group Discount Information") : __("Basic Information", "Basic Information") }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              !isEffectiveGroupOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "code", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
                   __("Coupon Code", "Coupon Code"),
                   " ",
@@ -56861,10 +57672,42 @@ const DiscountForm = () => {
                   Input,
                   {
                     id: "code",
+                    name: "code",
                     type: "text",
                     value: formData.code,
                     onChange: (e) => handleFieldChange("code", e.target.value.toUpperCase()),
                     placeholder: __("e.g., SUMMER2024", "e.g., SUMMER2024"),
+                    className: errors.code ? "border-red-500" : "",
+                    required: true
+                  }
+                ),
+                errors.code && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                  errors.code
+                ] })
+              ] }),
+              isEffectiveGroupOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "code", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                  __("Internal Name", "Internal Name"),
+                  " ",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  HelpText,
+                  {
+                    text: __("Enter a unique internal name for this group discount. This is for your reference only and won't be shown to customers.", "Enter a unique internal name for this group discount. This is for your reference only and won't be shown to customers."),
+                    className: "mb-2"
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    id: "code",
+                    name: "code",
+                    type: "text",
+                    value: formData.code,
+                    onChange: (e) => handleFieldChange("code", e.target.value.toUpperCase().replace(/\s+/g, "_")),
+                    placeholder: __("e.g., GROUP_DISCOUNT_2024", "e.g., GROUP_DISCOUNT_2024"),
                     className: errors.code ? "border-red-500" : "",
                     required: true
                   }
@@ -56895,7 +57738,7 @@ const DiscountForm = () => {
                   }
                 )
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+              !isEffectiveGroupOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "type", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
                     __("Discount Type", "Discount Type"),
@@ -56906,6 +57749,7 @@ const DiscountForm = () => {
                     Select,
                     {
                       id: "type",
+                      name: "type",
                       value: formData.type,
                       onChange: (e) => handleFieldChange("type", e.target.value),
                       className: errors.type ? "border-red-500" : "",
@@ -56932,6 +57776,7 @@ const DiscountForm = () => {
                       Input,
                       {
                         id: "amount",
+                        name: "amount",
                         type: "number",
                         min: "0",
                         max: "100",
@@ -56948,6 +57793,7 @@ const DiscountForm = () => {
                         Input,
                         {
                           id: "amount",
+                          name: "amount",
                           type: "number",
                           min: "0",
                           step: "0.01",
@@ -56967,7 +57813,7 @@ const DiscountForm = () => {
                   ] })
                 ] })
               ] }),
-              formData.type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              !isEffectiveGroupOnly && formData.type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "max_discount_amount", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Maximum Discount Amount", "Maximum Discount Amount") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpText,
@@ -57105,61 +57951,49 @@ const DiscountForm = () => {
                   errors.min_amount
                 ] })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "valid_from", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Valid From Date", "Valid From Date") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  HelpText,
-                  {
-                    text: __("Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed.", "Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed."),
-                    className: "mb-2"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  DatePicker,
-                  {
-                    value: formData.valid_from,
-                    onChange: (value) => handleFieldChange("valid_from", value),
-                    placeholder: __("Select start date", "Select start date"),
-                    error: !!errors.valid_from,
-                    className: errors.valid_from ? "border-red-500" : ""
-                  }
-                ),
-                errors.valid_from && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
-                  errors.valid_from
-                ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "expiry_date", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Expiry Date", "Expiry Date") }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  HelpText,
-                  {
-                    text: __("Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date.", "Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date."),
-                    className: "mb-2"
-                  }
-                ),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  DatePicker,
-                  {
-                    value: formData.expiry_date,
-                    onChange: (value) => handleFieldChange("expiry_date", value),
-                    placeholder: __("Select expiry date", "Select expiry date"),
-                    minDate: formData.valid_from ? new Date(formData.valid_from) : /* @__PURE__ */ new Date(),
-                    error: !!errors.expiry_date,
-                    className: errors.expiry_date ? "border-red-500" : ""
-                  }
-                ),
-                errors.expiry_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
-                  errors.expiry_date
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "valid_from", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Valid From", "Valid From") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    DatePicker,
+                    {
+                      value: formData.valid_from,
+                      onChange: (value) => handleFieldChange("valid_from", value),
+                      placeholder: __("Select start date", "Select start date"),
+                      error: !!errors.valid_from,
+                      className: errors.valid_from ? "border-red-500" : ""
+                    }
+                  ),
+                  errors.valid_from && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                    errors.valid_from
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "expiry_date", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Expiry Date", "Expiry Date") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    DatePicker,
+                    {
+                      value: formData.expiry_date,
+                      onChange: (value) => handleFieldChange("expiry_date", value),
+                      placeholder: __("Select expiry date", "Select expiry date"),
+                      minDate: formData.valid_from ? new Date(formData.valid_from) : /* @__PURE__ */ new Date(),
+                      error: !!errors.expiry_date,
+                      className: errors.expiry_date ? "border-red-500" : ""
+                    }
+                  ),
+                  errors.expiry_date && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                    errors.expiry_date
+                  ] })
                 ] })
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Group Discount", "Group Discount") }) }),
+          !isEffectivePromoOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "text-base", children: __("Group Discount Settings", "Group Discount Settings") }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              !isEffectiveGroupOnly && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "flex items-center gap-2 cursor-pointer", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     "input",
@@ -57175,114 +58009,425 @@ const DiscountForm = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   HelpText,
                   {
-                    text: __("Enable additional discount for group bookings. The group discount is applied AFTER the regular discount. For example: Regular 15% off, then additional 10% group discount on the discounted price.", "Enable additional discount for group bookings. The group discount is applied AFTER the regular discount. For example: Regular 15% off, then additional 10% group discount on the discounted price."),
+                    text: __("Apply discounts for group bookings based on traveler count.", "Apply discounts for group bookings based on traveler count."),
                     className: "mb-2 mt-1"
                   }
                 )
               ] }),
               formData.is_group_discount && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "min_group_size", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
-                    __("Minimum Group Size", "Minimum Group Size"),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "group_discount_mode", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                    __("Discount Mode", "Discount Mode"),
                     " ",
                     /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
                   ] }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(
                     HelpText,
                     {
-                      text: __("Minimum number of participants required to qualify for the group discount.", "Minimum number of participants required to qualify for the group discount."),
+                      text: __("Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.", "Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type."),
                       className: "mb-2"
                     }
                   ),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    Input,
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    Select,
                     {
-                      id: "min_group_size",
-                      type: "number",
-                      min: "2",
-                      value: formData.min_group_size,
-                      onChange: (e) => handleFieldChange("min_group_size", e.target.value),
-                      placeholder: __("e.g., 5", "e.g., 5"),
-                      className: errors.min_group_size ? "border-red-500" : "",
-                      required: formData.is_group_discount
+                      id: "group_discount_mode",
+                      value: formData.group_discount_mode,
+                      onChange: (e) => handleFieldChange("group_discount_mode", e.target.value),
+                      className: errors.group_discount_mode ? "border-red-500" : "",
+                      required: formData.is_group_discount,
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "total", children: __("Total Discount", "Total Discount") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "category_based", children: __("Category-Based Discount", "Category-Based Discount") })
+                      ]
                     }
                   ),
-                  errors.min_group_size && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                  errors.group_discount_mode && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
-                    errors.min_group_size
+                    errors.group_discount_mode
                   ] })
                 ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "group_discount_type", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
-                      __("Group Discount Type", "Group Discount Type"),
-                      " ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                formData.group_discount_mode === "total" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: __("Group Size Ranges", "Group Size Ranges") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.", "Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.") })
                     ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                      Select,
-                      {
-                        id: "group_discount_type",
-                        value: formData.group_discount_type,
-                        onChange: (e) => handleFieldChange("group_discount_type", e.target.value),
-                        className: errors.group_discount_type ? "border-red-500" : "",
-                        required: formData.is_group_discount,
-                        children: [
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage", "Percentage") }),
-                          /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "fixed", children: __("Fixed Amount", "Fixed Amount") })
-                        ]
-                      }
-                    ),
-                    errors.group_discount_type && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
-                      errors.group_discount_type
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", variant: "outline", onClick: addRange, className: "flex items-center gap-2", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                      __("Add Range", "Add Range")
                     ] })
                   ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "group_discount_amount", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
-                      __("Group Discount Amount", "Group Discount Amount"),
-                      " ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
-                    ] }),
-                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                      formData.group_discount_type === "percentage" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
-                        Input,
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: formData.group_discount_ranges.map((range3, idx) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+                        __("Range", "Range"),
+                        " #",
+                        idx + 1
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Button,
                         {
-                          id: "group_discount_amount",
-                          type: "number",
-                          min: "0",
-                          max: "100",
-                          step: "0.01",
-                          value: formData.group_discount_amount,
-                          onChange: (e) => handleFieldChange("group_discount_amount", e.target.value),
-                          placeholder: __("e.g., 10", "e.g., 10"),
-                          className: errors.group_discount_amount ? "border-red-500" : "",
-                          required: formData.is_group_discount
+                          type: "button",
+                          variant: "outline",
+                          onClick: () => removeRange(range3.id),
+                          disabled: formData.group_discount_ranges.length === 1,
+                          className: "flex items-center gap-2",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                            __("Remove", "Remove")
+                          ]
                         }
-                      ) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                          __("Minimum Group Size", "Minimum Group Size"),
+                          " ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                        ] }),
                         /* @__PURE__ */ jsxRuntimeExports.jsx(
                           Input,
                           {
-                            id: "group_discount_amount",
                             type: "number",
-                            min: "0",
-                            step: "0.01",
-                            value: formData.group_discount_amount,
-                            onChange: (e) => handleFieldChange("group_discount_amount", e.target.value),
-                            placeholder: __("e.g., 50", "e.g., 50"),
-                            className: `pl-7 ${errors.group_discount_amount ? "border-red-500" : ""}`,
-                            required: formData.is_group_discount
+                            min: "1",
+                            value: range3.min_group_size,
+                            onChange: (e) => updateRange(range3.id, { min_group_size: e.target.value }),
+                            placeholder: __("e.g., 10", "e.g., 10"),
+                            className: errors[`group_discount_ranges_${idx}_min`] ? "border-red-500" : ""
+                          }
+                        ),
+                        errors[`group_discount_ranges_${idx}_min`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                          errors[`group_discount_ranges_${idx}_min`]
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Maximum Group Size", "Maximum Group Size") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Input,
+                          {
+                            type: "number",
+                            min: range3.min_group_size ? parseInt(range3.min_group_size, 10) + 1 : 2,
+                            value: range3.max_group_size,
+                            onChange: (e) => updateRange(range3.id, { max_group_size: e.target.value }),
+                            placeholder: __("Leave empty for unlimited", "Leave empty for unlimited"),
+                            className: errors[`group_discount_ranges_${idx}_max`] ? "border-red-500" : ""
+                          }
+                        ),
+                        errors[`group_discount_ranges_${idx}_max`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                          errors[`group_discount_ranges_${idx}_max`]
+                        ] })
+                      ] })
+                    ] }),
+                    formData.group_discount_mode === "total" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                          __("Discount Type", "Discount Type"),
+                          " ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Select,
+                          {
+                            value: range3.discount_type || "percentage",
+                            onChange: (e) => updateRange(range3.id, { discount_type: e.target.value }),
+                            className: errors[`group_discount_ranges_${idx}_type`] ? "border-red-500" : "",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage", "Percentage") }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "fixed", children: __("Fixed Amount", "Fixed Amount") }),
+                              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage_of_total", children: __("Percentage of Total", "Percentage of Total") })
+                            ]
+                          }
+                        ),
+                        errors[`group_discount_ranges_${idx}_type`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                          errors[`group_discount_ranges_${idx}_type`]
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                          __("Discount Amount", "Discount Amount"),
+                          " ",
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                          range3.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              type: "number",
+                              min: "0",
+                              max: range3.discount_type === "percentage" ? 100 : void 0,
+                              step: "0.01",
+                              value: range3.discount_amount || "",
+                              onChange: (e) => updateRange(range3.id, { discount_amount: e.target.value }),
+                              placeholder: range3.discount_type === "percentage" ? __("e.g., 10", "e.g., 10") : __("e.g., 50", "e.g., 50"),
+                              className: `${range3.discount_type === "fixed" ? "pl-7" : ""} ${errors[`group_discount_ranges_${idx}_amount`] ? "border-red-500" : ""}`
+                            }
+                          ),
+                          range3.discount_type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "%" })
+                        ] }),
+                        errors[`group_discount_ranges_${idx}_amount`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                          errors[`group_discount_ranges_${idx}_amount`]
+                        ] })
+                      ] })
+                    ] })
+                  ] }) }, range3.id)) })
+                ] }),
+                formData.group_discount_mode === "category_based" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: __("Traveler Categories", "Traveler Categories") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("Add traveler categories and define discount ranges for each category.", "Add traveler categories and define discount ranges for each category.") })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", onClick: addTravelerCategory, className: "flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                        __("Add Category", "Add Category")
+                      ] }),
+                      showCategoryDropdown && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute right-0 top-full mt-2 z-50 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-lg min-w-[320px]", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: __("Select a category to add pricing", "Select a category to add pricing") }) }),
+                        travelerCategoryOptions.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-700 max-h-[300px] overflow-y-auto", children: travelerCategoryOptions.map((cat) => {
+                          var _a;
+                          return /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            "div",
+                            {
+                              onClick: () => selectCategory(cat.value, cat.label),
+                              className: "px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
+                              children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col", children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold text-gray-900 dark:text-white", children: cat.label }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
+                                    "(",
+                                    cat.age_min || "null",
+                                    "-",
+                                    cat.age_max || "null",
+                                    " ",
+                                    __("years", "years"),
+                                    ")"
+                                  ] })
+                                ] }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm text-gray-500 dark:text-gray-400", children: [
+                                  cat.description && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                                    cat.description,
+                                    " • "
+                                  ] }),
+                                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "capitalize", children: ((_a = cat.pricing_mode) == null ? void 0 : _a.replace("_", " ")) || "Per person" })
+                                ] })
+                              ] })
+                            },
+                            cat.value
+                          );
+                        }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-sm text-gray-500 dark:text-gray-400", children: __("No traveler categories available. Please create categories first.", "No traveler categories available. Please create categories first.") })
+                      ] })
+                    ] })
+                  ] }),
+                  errors.category_discounts && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                    errors.category_discounts
+                  ] }),
+                  formData.category_discounts.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center space-y-4", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-8 h-8 text-gray-500 dark:text-gray-400" }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-medium mb-2", children: __("No traveler categories added yet", "No traveler categories added yet") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm mb-4", children: __("Select traveler categories to apply group-specific discounts", "Select traveler categories to apply group-specific discounts") })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", onClick: addTravelerCategory, className: "flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                      __("Add Your First Category", "Add Your First Category")
+                    ] })
+                  ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: formData.category_discounts.map((category, catIdx) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-4 space-y-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-semibold text-gray-900 dark:text-white", children: [
+                          __("Traveler Category", "Traveler Category"),
+                          " #",
+                          catIdx + 1
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("Configure discount ranges for this traveler category.", "Configure discount ranges for this traveler category.") })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Button,
+                        {
+                          type: "button",
+                          variant: "outline",
+                          onClick: () => removeTravelerCategory(catIdx),
+                          disabled: formData.category_discounts.length === 1,
+                          className: "flex items-center gap-2",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+                            __("Remove", "Remove")
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                        __("Select Traveler Category", "Select Traveler Category"),
+                        " ",
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        Select,
+                        {
+                          value: category.traveler_category_id,
+                          onChange: (e) => {
+                            const selected = travelerCategoryOptions.find((opt) => opt.value === e.target.value);
+                            updateTravelerCategory(catIdx, {
+                              traveler_category_id: e.target.value,
+                              traveler_category_label: (selected == null ? void 0 : selected.label) || ""
+                            });
+                          },
+                          className: errors[`category_discounts_${catIdx}_id`] ? "border-red-500" : "",
+                          children: travelerCategoryOptions.map((opt) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: opt.value, children: opt.label }, opt.value))
+                        }
+                      ),
+                      errors[`category_discounts_${catIdx}_id`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                        errors[`category_discounts_${catIdx}_id`]
+                      ] })
+                    ] }) }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: __("Discount Ranges", "Discount Ranges") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400", children: __("Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+).", "Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+.") })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { type: "button", variant: "outline", onClick: () => addRangeToCategory(catIdx), className: "flex items-center gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+                        __("Add Range", "Add Range")
+                      ] })
+                    ] }),
+                    errors[`category_discounts_${catIdx}_ranges`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                      errors[`category_discounts_${catIdx}_ranges`]
+                    ] }),
+                    category.ranges.length === 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-6 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-gray-500 dark:text-gray-400", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm font-medium mb-1", children: __("No discount ranges added yet", "No discount ranges added yet") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs", children: __('Click "Add Range" to create discount tiers', 'Click "Add Range" to create discount tiers') })
+                    ] }) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: category.ranges.map((range3, rIdx) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-gray-800", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm font-medium text-gray-900 dark:text-white", children: [
+                          __("Range", "Range"),
+                          " #",
+                          rIdx + 1
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Button,
+                          {
+                            type: "button",
+                            variant: "outline",
+                            size: "sm",
+                            onClick: () => removeRangeFromCategory(catIdx, range3.id),
+                            disabled: category.ranges.length === 1,
+                            className: "flex items-center gap-1",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-3 h-3" }),
+                              __("Remove", "Remove")
+                            ]
                           }
                         )
                       ] }),
-                      formData.group_discount_type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "%" })
-                    ] }),
-                    errors.group_discount_amount && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
-                      errors.group_discount_amount
-                    ] })
-                  ] })
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                            __("Minimum Group Size", "Minimum Group Size"),
+                            " ",
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              type: "number",
+                              min: "1",
+                              value: range3.min_group_size,
+                              onChange: (e) => updateRangeInCategory(catIdx, range3.id, { min_group_size: e.target.value }),
+                              placeholder: __("e.g., 10", "e.g., 10"),
+                              className: errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] ? "border-red-500" : ""
+                            }
+                          ),
+                          errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                            errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`]
+                          ] })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Maximum Group Size", "Maximum Group Size") }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsx(
+                            Input,
+                            {
+                              type: "number",
+                              min: range3.min_group_size ? parseInt(range3.min_group_size, 10) + 1 : 2,
+                              value: range3.max_group_size,
+                              onChange: (e) => updateRangeInCategory(catIdx, range3.id, { max_group_size: e.target.value }),
+                              placeholder: __("Leave empty for unlimited", "Leave empty for unlimited"),
+                              className: errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] ? "border-red-500" : ""
+                            }
+                          ),
+                          errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                            errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`]
+                          ] })
+                        ] })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                            __("Discount Type", "Discount Type"),
+                            " ",
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                            Select,
+                            {
+                              value: range3.discount_type || "percentage",
+                              onChange: (e) => updateRangeInCategory(catIdx, range3.id, { discount_type: e.target.value }),
+                              className: errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] ? "border-red-500" : "",
+                              children: [
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage", "Percentage") }),
+                                /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "fixed", children: __("Fixed Amount", "Fixed Amount") })
+                              ]
+                            }
+                          ),
+                          errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                            errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`]
+                          ] })
+                        ] }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: [
+                            __("Discount Amount", "Discount Amount"),
+                            " ",
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+                          ] }),
+                          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                            range3.discount_type === "fixed" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "$" }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              Input,
+                              {
+                                type: "number",
+                                min: "0",
+                                max: range3.discount_type === "percentage" ? 100 : void 0,
+                                step: "0.01",
+                                value: range3.discount_amount || "",
+                                onChange: (e) => updateRangeInCategory(catIdx, range3.id, { discount_amount: e.target.value }),
+                                placeholder: range3.discount_type === "percentage" ? __("e.g., 10", "e.g., 10") : __("e.g., 50", "e.g., 50"),
+                                className: `${range3.discount_type === "fixed" ? "pl-7" : ""} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? "border-red-500" : ""}`
+                              }
+                            ),
+                            range3.discount_type === "percentage" && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm", children: "%" })
+                          ] }),
+                          errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+                            errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`]
+                          ] })
+                        ] })
+                      ] })
+                    ] }, range3.id)) })
+                  ] }) }, catIdx)) })
                 ] })
               ] })
             ] })
@@ -57321,7 +58466,114 @@ const DiscountForm = () => {
                   ]
                 }
               ),
-              formData.applicable_to === "specific_trips" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-2", children: __("Trip selection will be available in a future update.", "Trip selection will be available in a future update.") }) })
+              formData.applicable_to === "specific_trips" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 space-y-2 relative", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    className: "border border-gray-300 dark:border-gray-600 rounded-lg p-2 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-800",
+                    onClick: () => setShowTripDropdown(!showTripDropdown),
+                    children: formData.trip_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1.5", children: [
+                      formData.trip_ids.slice(0, 3).map((tripId) => {
+                        const trip = tripOptions.find((t) => t.value === tripId);
+                        return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          "span",
+                          {
+                            className: "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded",
+                            children: [
+                              (trip == null ? void 0 : trip.label) || `Trip #${tripId}`,
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                                "button",
+                                {
+                                  type: "button",
+                                  onClick: (e) => {
+                                    e.stopPropagation();
+                                    handleFieldChange("trip_ids", formData.trip_ids.filter((id) => id !== tripId));
+                                  },
+                                  className: "hover:text-blue-600 dark:hover:text-blue-200",
+                                  children: "×"
+                                }
+                              )
+                            ]
+                          },
+                          tripId
+                        );
+                      }),
+                      formData.trip_ids.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded", children: [
+                        "+",
+                        formData.trip_ids.length - 3,
+                        " ",
+                        __("more", "more")
+                      ] })
+                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Click to select trips...", "Click to select trips...") })
+                  }
+                ),
+                showTripDropdown && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        type: "text",
+                        placeholder: __("Search trips...", "Search trips..."),
+                        value: tripSearchQuery,
+                        onChange: (e) => setTripSearchQuery(e.target.value),
+                        className: "w-full text-sm",
+                        onClick: (e) => e.stopPropagation()
+                      }
+                    ),
+                    tripsQuery.isFetching && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute right-3 top-1/2 transform -translate-y-1/2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin text-gray-400" }) })
+                  ] }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[200px] overflow-y-auto", children: tripsQuery.isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 text-center text-sm text-gray-500 dark:text-gray-400", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-5 h-5 animate-spin mx-auto mb-2" }),
+                    __("Loading trips...", "Loading trips...")
+                  ] }) : tripOptions.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-700", children: tripOptions.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                    "label",
+                    {
+                      className: "flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50",
+                      onClick: (e) => e.stopPropagation(),
+                      children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "input",
+                          {
+                            type: "checkbox",
+                            checked: formData.trip_ids.includes(trip.value),
+                            onChange: (e) => {
+                              if (e.target.checked) {
+                                handleFieldChange("trip_ids", [...formData.trip_ids, trip.value]);
+                              } else {
+                                handleFieldChange("trip_ids", formData.trip_ids.filter((id) => id !== trip.value));
+                              }
+                            },
+                            className: "w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-900 dark:text-white truncate flex-1", children: trip.label }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-400 dark:text-gray-500", children: [
+                          "#",
+                          trip.value
+                        ] })
+                      ]
+                    },
+                    trip.value
+                  )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-sm text-gray-500 dark:text-gray-400", children: tripSearchQuery ? __("No trips found", "No trips found") : __("No trips available", "No trips available") }) }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                      formData.trip_ids.length,
+                      " ",
+                      __("selected", "selected")
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Button,
+                      {
+                        type: "button",
+                        variant: "outline",
+                        size: "sm",
+                        onClick: () => setShowTripDropdown(false),
+                        children: __("Done", "Done")
+                      }
+                    )
+                  ] })
+                ] })
+              ] })
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -57508,11 +58760,7 @@ const Payments = () => {
   const total = (data == null ? void 0 : data.total) || 0;
   const totalPages = Math.ceil(total / 10);
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatPrice = (price, currencyCode = defaultCurrency) => {
     const symbol = getCurrencySymbol(currencyCode);
@@ -65372,11 +66620,7 @@ const ViewDeparture = () => {
     }).format(amount);
   };
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const formatTime = (timeString) => {
     return (/* @__PURE__ */ new Date(`2000-01-01T${timeString}`)).toLocaleTimeString("en-US", {
@@ -66134,11 +67378,7 @@ const Enquiries = () => {
   const perPage = 10;
   const totalPages = Math.ceil(total / perPage || 1);
   const formatDate2 = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    });
+    return formatDate$1(dateString);
   };
   const getStatusBadge = (status) => {
     const statusMap = {
@@ -67534,15 +68774,16 @@ const Modules = () => {
   const [premiumDialog, setPremiumDialog] = reactExports.useState({ open: false });
   const handleToggle = (module) => {
     if (module.is_core || !canManageModules) return;
-    if (module.is_premium && !module.enabled) {
+    if (module.is_premium && !module.enabled && !module.is_available) {
       setPremiumDialog({ open: true, module });
       return;
     }
     toggleMutation.mutate({ slug: module.slug, enabled: !module.enabled, name: module.name });
   };
   const renderToggle = (module) => {
-    const isLockedPremium = module.is_premium && !module.enabled;
-    const disabled = module.is_core || toggleMutation.isPending || !canManageModules;
+    const isLockedPremium = module.is_premium && !module.enabled && !module.is_available;
+    const isProControlled = module.is_premium && module.is_available;
+    const disabled = module.is_core || isProControlled || toggleMutation.isPending || !canManageModules;
     return /* @__PURE__ */ jsxRuntimeExports.jsx(
       "button",
       {
@@ -67569,7 +68810,7 @@ const Modules = () => {
   };
   const handleSelect = (slug) => {
     const module = moduleMap.get(slug);
-    if ((module == null ? void 0 : module.is_premium) && !module.enabled) {
+    if ((module == null ? void 0 : module.is_premium) && !module.enabled && !module.is_available) {
       setPremiumDialog({ open: true, module });
       return;
     }
@@ -67596,10 +68837,10 @@ const Modules = () => {
     });
   };
   const bulkUpdate = (enabled) => {
-    const items = Array.from(selected).map((slug) => moduleMap.get(slug)).filter((module) => !!module).filter((module) => !(module.is_premium && enabled));
+    const items = Array.from(selected).map((slug) => moduleMap.get(slug)).filter((module) => !!module).filter((module) => !(module.is_premium && enabled && !module.is_available));
     if (items.length === 0) {
       if (selected.size > 0 && enabled) {
-        const premiumModules = Array.from(selected).map((slug) => moduleMap.get(slug)).filter((module) => module == null ? void 0 : module.is_premium);
+        const premiumModules = Array.from(selected).map((slug) => moduleMap.get(slug)).filter((module) => (module == null ? void 0 : module.is_premium) && !(module == null ? void 0 : module.is_available));
         if (premiumModules.length > 0) {
           setPremiumDialog({ open: true, module: premiumModules[0] });
         }
@@ -67756,8 +68997,9 @@ const Modules = () => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-3 md:grid-cols-3", children: categoryModules.map((module) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Card,
         {
-          className: `border ${module.is_premium ? "border-amber-300 dark:border-amber-500/60 bg-amber-50/80 dark:bg-amber-500/10 relative overflow-hidden" : "border-gray-200 dark:border-gray-700"}`,
-          ...module.is_premium && canManageModules && !module.enabled ? {
+          className: `border ${// Only show premium styling if module is premium AND not available (Pro not active)
+          module.is_premium && !module.is_available ? "border-amber-300 dark:border-amber-500/60 bg-amber-50/80 dark:bg-amber-500/10 relative overflow-hidden" : "border-gray-200 dark:border-gray-700"}`,
+          ...module.is_premium && !module.is_available && canManageModules && !module.enabled ? {
             role: "button",
             tabIndex: 0,
             onClick: () => setPremiumDialog({ open: true, module }),
@@ -67804,7 +69046,7 @@ const Modules = () => {
                       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2 flex-wrap", children: [
                         module.name,
                         module.is_core && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: __("Core", "Core") }),
-                        module.is_premium && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        module.is_premium && !module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                           Badge,
                           {
                             variant: "outline",
@@ -67812,6 +69054,17 @@ const Modules = () => {
                             children: [
                               /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
                               __("Premium", "Premium")
+                            ]
+                          }
+                        ),
+                        module.is_premium && module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                          Badge,
+                          {
+                            variant: "outline",
+                            className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-green-400 border-green-600 text-white shadow-sm dark:bg-green-600/60 dark:border-green-500 dark:text-green-50",
+                            children: [
+                              /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
+                              __("Pro", "Pro")
                             ]
                           }
                         )
@@ -68789,6 +70042,1130 @@ const GoogleCalendar = () => {
     ] })
   ] });
 };
+const isModuleAvailable$1 = () => {
+  const yatraAdmin = window == null ? void 0 : window.yatraAdmin;
+  return Boolean(yatraAdmin == null ? void 0 : yatraAdmin.isPro);
+};
+const PremiumUpgradeCard = () => {
+  const features = [
+    {
+      icon: Package,
+      title: __("Unlimited Add-ons"),
+      description: __("Create unlimited services like transfers, insurance, meals, and equipment rental.")
+    },
+    {
+      icon: DollarSign,
+      title: __("Flexible Pricing"),
+      description: __("Set prices per person, per booking, or per day with fixed or percentage-based pricing.")
+    },
+    {
+      icon: Users,
+      title: __("Trip Assignment"),
+      description: __("Assign services to specific trips with optional price overrides.")
+    },
+    {
+      icon: TrendingUp,
+      title: __("Revenue Tracking"),
+      description: __("Track service revenue and popularity with detailed analytics.")
+    }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "min-h-[600px] flex items-center justify-center p-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-4xl w-full", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center mb-12", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-10 h-10 text-white" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-3xl font-bold text-gray-900 dark:text-white mb-4", children: __("Additional Services") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto", children: __("Boost your revenue by offering optional add-ons like airport transfers, travel insurance, equipment rental, and meals during trip booking.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { className: "mt-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-3 h-3 mr-1" }),
+        __("Premium Feature")
+      ] })
+    ] }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-6 mb-12", children: features.map((feature, index) => /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(feature.icon, { className: "w-6 h-6 text-purple-600 dark:text-purple-400" }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 dark:text-white mb-1", children: feature.title }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: feature.description })
+      ] })
+    ] }) }) }, index)) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border-2 border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-8 text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-center gap-2 mb-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Shield, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-purple-600 dark:text-purple-400", children: __("Included in Yatra Pro") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-2xl font-bold text-gray-900 dark:text-white mb-4", children: __("Unlock Additional Services") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-6 max-w-lg mx-auto", children: __("Get access to Additional Services and 20+ other premium features with Yatra Pro.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row items-center justify-center gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            size: "lg",
+            className: "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8",
+            onClick: () => window.open("https://wpyatra.com/pricing?module=additional-services", "_blank"),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4 mr-2" }),
+              __("Upgrade to Pro"),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "w-4 h-4 ml-2" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            variant: "outline",
+            size: "lg",
+            onClick: () => window.open("https://docs.yatra.com/modules/additional-services", "_blank"),
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4 mr-2" }),
+              __("Learn More")
+            ]
+          }
+        )
+      ] })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-8 flex items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-400", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("30-day money-back guarantee") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Priority support") })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-500" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: __("Lifetime updates") })
+      ] })
+    ] })
+  ] }) });
+};
+const ServicesList = () => {
+  const [searchTerm, setSearchTerm] = reactExports.useState("");
+  const [statusFilter, setStatusFilter] = reactExports.useState("all");
+  const [sortBy2, setSortBy] = reactExports.useState("name");
+  const [sortOrder, setSortOrder] = reactExports.useState("asc");
+  const [page, setPage] = reactExports.useState(1);
+  const [selectedIds, setSelectedIds] = reactExports.useState([]);
+  const [bulkAction, setBulkAction] = reactExports.useState("");
+  const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
+  const [permanentDeleteConfirm, setPermanentDeleteConfirm] = reactExports.useState({
+    isOpen: false,
+    service: null
+  });
+  const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
+    const saved = localStorage.getItem("yatra-additional-services-columns");
+    return saved ? JSON.parse(saved) : {
+      name: true,
+      price: true,
+      trips: true,
+      status: true,
+      created_at: false,
+      updated_at: false
+    };
+  });
+  const { showToast } = useToast();
+  const queryClient2 = useQueryClient();
+  const { can } = usePermissions();
+  const toggleColumn = (columnKey) => {
+    const newVisibleColumns = {
+      ...visibleColumns,
+      [columnKey]: !visibleColumns[columnKey]
+    };
+    setVisibleColumns(newVisibleColumns);
+    localStorage.setItem("yatra-additional-services-columns", JSON.stringify(newVisibleColumns));
+  };
+  const queryParams = reactExports.useMemo(() => {
+    const params = {
+      page,
+      per_page: 10,
+      orderby: sortBy2,
+      order: sortOrder
+    };
+    if (searchTerm) params.search = searchTerm;
+    if (statusFilter !== "all") params.status = statusFilter;
+    return params;
+  }, [searchTerm, statusFilter, sortBy2, sortOrder, page]);
+  const { data: statsData } = useQuery({
+    queryKey: ["additional-services-stats"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/additional-services/stats");
+        return response;
+      } catch {
+        return { all: 0, publish: 0, draft: 0, trash: 0 };
+      }
+    },
+    enabled: isModuleAvailable$1()
+  });
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["additional-services", queryParams],
+    queryFn: async () => {
+      const response = await apiClient.get("/additional-services", { params: queryParams });
+      return response;
+    },
+    enabled: isModuleAvailable$1()
+  });
+  const services = (data == null ? void 0 : data.data) || [];
+  const total = (data == null ? void 0 : data.total) || 0;
+  const totalPages = Math.ceil(total / 10);
+  const statusCounts = reactExports.useMemo(() => {
+    if (statsData) {
+      return {
+        all: statsData.all ?? 0,
+        publish: statsData.publish ?? 0,
+        draft: statsData.draft ?? 0,
+        trash: statsData.trash ?? 0
+      };
+    }
+    return { all: 0, publish: 0, draft: 0, trash: 0 };
+  }, [statsData]);
+  const bulkMutation = useMutation({
+    mutationFn: async ({ action, ids }) => {
+      return await apiClient.post("/additional-services/bulk", { action, ids });
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["additional-services"] });
+      queryClient2.invalidateQueries({ queryKey: ["additional-services-stats"] });
+      showToast(__("Action completed successfully"), "success");
+      setSelectedIds([]);
+      setBulkAction("");
+    },
+    onError: () => {
+      showToast(__("Failed to perform action"), "error");
+    }
+  });
+  const navigateToForm = (action, id) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("subpage", "trips");
+    params.set("tab", "additional-services");
+    params.set("action", action);
+    if (id) params.set("id", id.toString());
+    window.history.pushState({}, "", `${window.location.pathname}?${params}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+  const formatPrice = (price, priceType, pricePer) => {
+    var _a;
+    const currency = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.currency) || "USD";
+    const symbol = currency === "USD" ? "$" : currency;
+    const numPrice = Number(price) || 0;
+    if (priceType === "percentage") return `${numPrice}%`;
+    const perLabel = { person: __("/person"), booking: __("/booking"), day: __("/day") }[pricePer] || "";
+    return `${symbol}${numPrice.toFixed(2)}${perLabel}`;
+  };
+  const handleEdit = (service) => {
+    navigateToForm("edit", service.id);
+  };
+  const handlePermanentDelete = (service) => {
+    setPermanentDeleteConfirm({ isOpen: true, service });
+  };
+  const confirmPermanentDelete = () => {
+    if (permanentDeleteConfirm.service) {
+      bulkMutation.mutate({ action: "delete", ids: [permanentDeleteConfirm.service.id] });
+      setPermanentDeleteConfirm({ isOpen: false, service: null });
+    }
+  };
+  const handleSort = (field) => {
+    if (sortBy2 === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+  const getSortIcon = (field) => {
+    if (sortBy2 !== field) {
+      return null;
+    }
+    return sortOrder === "asc" ? "↑" : "↓";
+  };
+  const handleBulkApply = () => {
+    if (!bulkAction) {
+      showToast(__("Select a bulk action first."), "warning");
+      return;
+    }
+    if (selectedIds.length === 0) {
+      showToast(__("Select at least one service."), "warning");
+      return;
+    }
+    bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
+  };
+  const handleResetFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+    setSortBy("name");
+    setSortOrder("asc");
+    setPage(1);
+    setSelectedIds([]);
+    setBulkAction("");
+  };
+  const hasFilters = searchTerm || statusFilter !== "all" || sortBy2 !== "name" || sortOrder !== "asc";
+  reactExports.useEffect(() => {
+    setSelectedIds(
+      (prev) => prev.filter((id) => services.some((s2) => s2.id === id))
+    );
+  }, [services]);
+  const viewFilters = [
+    { key: "all", label: __("All"), count: statusCounts.all ?? 0 },
+    { key: "publish", label: __("Published"), count: statusCounts.publish ?? 0 },
+    { key: "draft", label: __("Draft"), count: statusCounts.draft ?? 0 },
+    { key: "trash", label: __("Trash"), count: statusCounts.trash ?? 0 }
+  ];
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      ConfirmationDialog,
+      {
+        isOpen: permanentDeleteConfirm.isOpen,
+        onClose: () => setPermanentDeleteConfirm({ isOpen: false, service: null }),
+        onConfirm: confirmPermanentDelete,
+        title: __("Delete Service Permanently"),
+        message: permanentDeleteConfirm.service ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace("{name}", permanentDeleteConfirm.service.name) : __("Are you sure you want to permanently delete this service?"),
+        confirmText: __("Delete Permanently"),
+        cancelText: __("Cancel"),
+        variant: "danger",
+        isLoading: bulkMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      SearchFilterToolbar,
+      {
+        searchTerm,
+        onSearchChange: setSearchTerm,
+        statusFilter,
+        onStatusChange: (value) => {
+          setStatusFilter(value);
+          setPage(1);
+          setSelectedIds([]);
+          setBulkAction("");
+        },
+        statusOptions: [
+          { value: "all", label: __("All Status") },
+          { value: "publish", label: __("Published") },
+          { value: "draft", label: __("Draft") },
+          { value: "trash", label: __("Trash") }
+        ],
+        sortBy: sortBy2,
+        onSortByChange: setSortBy,
+        sortOrder,
+        onSortOrderChange: setSortOrder,
+        sortOptions: [
+          { value: "name", label: __("Name") },
+          { value: "price", label: __("Price") },
+          { value: "status", label: __("Status") },
+          { value: "created_at", label: __("Created At") },
+          { value: "updated_at", label: __("Updated At") }
+        ],
+        onResetFilters: handleResetFilters,
+        hasFilters: !!hasFilters,
+        placeholder: __("Search services...")
+      }
+    ) }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ConditionalRender, { capability: "yatra_view_trips", children: error ? /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-8 text-center text-red-500", children: __("Error loading services") }) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        BulkActionToolbar,
+        {
+          selectedIds,
+          bulkAction,
+          setBulkAction,
+          onApply: handleBulkApply,
+          onClearSelection: () => setSelectedIds([]),
+          statusFilter,
+          setStatusFilter: (value) => {
+            setStatusFilter(value);
+            setPage(1);
+            setSelectedIds([]);
+            setBulkAction("");
+          },
+          statusOptions: viewFilters,
+          showColumnsDropdown,
+          setShowColumnsDropdown,
+          columnOptions: [
+            { key: "name", label: __("Service"), visible: visibleColumns.name },
+            { key: "price", label: __("Price"), visible: visibleColumns.price },
+            { key: "trips", label: __("Trips"), visible: visibleColumns.trips },
+            { key: "status", label: __("Status"), visible: visibleColumns.status },
+            { key: "created_at", label: __("Created Date"), visible: visibleColumns.created_at },
+            { key: "updated_at", label: __("Updated Date"), visible: visibleColumns.updated_at }
+          ],
+          onToggleColumn: toggleColumn,
+          bulkMutationPending: bulkMutation.isPending,
+          totalItems: services.length,
+          bulkActionOptions: getDefaultBulkStatusOptions(statusFilter)
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "overflow-visible", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-0 overflow-visible", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Table,
+        {
+          data: services,
+          columns: [
+            {
+              key: "name",
+              label: __("Service"),
+              sortable: true,
+              visible: visibleColumns.name,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0", children: service.icon ? service.icon.type === "image" ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: service.icon.value,
+                    alt: service.name,
+                    className: "w-full h-full object-cover rounded-lg"
+                  }
+                ) : /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  IconSelector,
+                  {
+                    iconName: service.icon.value,
+                    className: "w-5 h-5 text-purple-600 dark:text-purple-400"
+                  }
+                ) : /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "a",
+                      {
+                        href: "#",
+                        onClick: (e) => {
+                          e.preventDefault();
+                          handleEdit(service);
+                        },
+                        className: "font-medium text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 hover:underline transition-colors cursor-pointer",
+                        children: service.name
+                      }
+                    ),
+                    (service.is_required === true || service.is_required === 1 || service.is_required === "1") && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "text-xs bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-700", children: __("Required") })
+                  ] }),
+                  service.description && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-500 dark:text-gray-400 truncate max-w-xs", children: service.description })
+                ] })
+              ] })
+            },
+            {
+              key: "price",
+              label: __("Price"),
+              sortable: true,
+              visible: visibleColumns.price,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: service.status === "trash" ? "text-gray-400 dark:text-gray-600" : "font-medium text-gray-900 dark:text-white", children: formatPrice(service.price, service.price_type, service.price_per) })
+            },
+            {
+              key: "trips",
+              label: __("Trips"),
+              sortable: false,
+              visible: visibleColumns.trips,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col gap-1", children: service.applicable_to === "all" ? /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300", children: __("All Trips") }) : service.trips && service.trips.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1", children: [
+                service.trips.slice(0, 2).map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "span",
+                  {
+                    className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 max-w-[120px] truncate",
+                    title: trip.title,
+                    children: trip.title
+                  },
+                  trip.id
+                )),
+                service.trips.length > 2 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300", children: [
+                  "+",
+                  service.trips.length - 2,
+                  " ",
+                  __("more")
+                ] })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400 dark:text-gray-600 text-xs", children: __("No trips assigned") }) })
+            },
+            {
+              key: "status",
+              label: __("Status"),
+              sortable: true,
+              visible: visibleColumns.status,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${service.status === "trash" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : service.status === "publish" ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"}`, children: service.status === "trash" ? __("Trash") : service.status === "publish" ? __("Published") : __("Draft") })
+            },
+            {
+              key: "created_at",
+              label: __("Created Date"),
+              sortable: true,
+              visible: visibleColumns.created_at,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: service.status === "trash" ? "text-gray-400 dark:text-gray-600" : "text-gray-600 dark:text-gray-400", children: new Date(service.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+              }) })
+            },
+            {
+              key: "updated_at",
+              label: __("Updated Date"),
+              sortable: true,
+              visible: visibleColumns.updated_at,
+              render: (service) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: service.status === "trash" ? "text-gray-400 dark:text-gray-600" : "text-gray-600 dark:text-gray-400", children: new Date(service.updated_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric"
+              }) })
+            }
+          ],
+          actions: [
+            {
+              key: "edit",
+              label: __("Edit"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(PenSquare, { className: "w-4 h-4" }),
+              onClick: handleEdit,
+              condition: () => can("yatra_edit_trips")
+            },
+            {
+              key: "publish",
+              label: __("Publish"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+              onClick: (service) => {
+                bulkMutation.mutate({ action: "publish", ids: [service.id] });
+              },
+              condition: (service) => service.status !== "publish" && service.status !== "trash" && can("yatra_edit_trips")
+            },
+            {
+              key: "draft",
+              label: __("Set as Draft"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
+              onClick: (service) => {
+                bulkMutation.mutate({ action: "draft", ids: [service.id] });
+              },
+              condition: (service) => service.status !== "draft" && service.status !== "trash" && can("yatra_edit_trips")
+            },
+            {
+              key: "restore",
+              label: __("Restore"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(RotateCcw, { className: "w-4 h-4" }),
+              onClick: (service) => {
+                bulkMutation.mutate({ action: "restore", ids: [service.id] });
+              },
+              condition: (service) => (service.status === "trash" || statusFilter === "trash") && can("yatra_edit_trips")
+            },
+            {
+              key: "trash",
+              label: __("Move to Trash"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+              onClick: (service) => {
+                bulkMutation.mutate({ action: "trash", ids: [service.id] });
+              },
+              condition: (service) => service.status !== "trash" && statusFilter !== "trash" && can("yatra_edit_trips")
+            },
+            {
+              key: "delete",
+              label: __("Delete Permanently"),
+              icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
+              onClick: handlePermanentDelete,
+              condition: (service) => (service.status === "trash" || statusFilter === "trash") && can("yatra_delete_trips"),
+              variant: "destructive"
+            }
+          ],
+          isLoading,
+          isError: !!error,
+          errorText: __("Error loading services"),
+          emptyText: __("No services found"),
+          emptyDescription: hasFilters ? __("Try adjusting your filters to see more results.") : __("Get started by creating your first service."),
+          onCreateClick: can("yatra_edit_trips") ? () => navigateToForm("create") : void 0,
+          onSort: handleSort,
+          getSortIcon,
+          selectedItemIds: selectedIds,
+          onSelectItem: (id, checked) => {
+            if (checked) {
+              setSelectedIds([...selectedIds, id]);
+            } else {
+              setSelectedIds(selectedIds.filter((selectedId) => selectedId !== id));
+            }
+          },
+          onSelectAll: (checked) => {
+            if (checked) {
+              setSelectedIds(services.map((s2) => s2.id));
+            } else {
+              setSelectedIds([]);
+            }
+          },
+          isAllSelected: services.length > 0 && selectedIds.length === services.length,
+          getItemId: (service) => service.id,
+          getItemStatus: (service) => service.status,
+          statusFilter,
+          skeletonRows: 5
+        }
+      ) }) }),
+      total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Pagination,
+        {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: 10,
+          onPageChange: (newPage) => setPage(newPage),
+          itemName: __("services")
+        }
+      ) })
+    ] }) })
+  ] });
+};
+const AdditionalServices = () => {
+  const moduleAvailable = isModuleAvailable$1();
+  const handleCreateService = () => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("subpage", "trips");
+    params.set("tab", "additional-services");
+    params.set("action", "create");
+    window.history.pushState({}, "", `${window.location.pathname}?${params}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+  if (!moduleAvailable) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(PremiumUpgradeCard, {});
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        title: __("Additional Services"),
+        description: __("Manage optional add-ons that customers can purchase during booking."),
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateService, className: "flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+          __("Add New Service")
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(ServicesList, {})
+  ] });
+};
+const defaultService = {
+  name: "",
+  description: "",
+  price: 0,
+  price_type: "fixed",
+  price_per: "person",
+  icon: null,
+  status: "publish",
+  sort_order: 0,
+  applicable_to: "all",
+  trip_ids: [],
+  is_required: false
+};
+const isModuleAvailable = () => {
+  const yatraAdmin = window == null ? void 0 : window.yatraAdmin;
+  return Boolean((yatraAdmin == null ? void 0 : yatraAdmin.isPro) && (yatraAdmin == null ? void 0 : yatraAdmin.additionalServicesEnabled));
+};
+const AdditionalServicesForm = () => {
+  const [formData, setFormData] = reactExports.useState(defaultService);
+  const [errors, setErrors] = reactExports.useState({});
+  const [showTripDropdown, setShowTripDropdown] = reactExports.useState(false);
+  const [tripSearchQuery, setTripSearchQuery] = reactExports.useState("");
+  const [debouncedTripSearch, setDebouncedTripSearch] = reactExports.useState("");
+  const { showToast } = useToast();
+  const queryClient2 = useQueryClient();
+  const { can } = usePermissions();
+  const params = new URLSearchParams(window.location.search);
+  const serviceId = params.get("id");
+  const isEditMode = !!serviceId;
+  reactExports.useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTripSearch(tripSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tripSearchQuery]);
+  const tripsQuery = useQuery({
+    queryKey: ["trips-for-service", debouncedTripSearch],
+    queryFn: async () => {
+      var _a;
+      try {
+        const params2 = {
+          per_page: 100
+        };
+        if (debouncedTripSearch.trim()) {
+          params2.search = debouncedTripSearch.trim();
+        }
+        const response = await apiClient.get("/trips", { params: params2 });
+        const trips = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response || [];
+        return Array.isArray(trips) ? trips : [];
+      } catch (error) {
+        console.error("Failed to load trips:", error);
+        return [];
+      }
+    },
+    enabled: formData.applicable_to === "specific_trips",
+    staleTime: 5 * 60 * 1e3
+  });
+  const tripOptions = (tripsQuery.data || []).filter((t) => !!t && (typeof t.id === "number" || typeof t.id === "string")).map((trip) => ({
+    value: Number(trip.id),
+    label: trip.title || trip.name || `Trip #${trip.id}`
+  }));
+  const { data: serviceData, isLoading: isLoadingService } = useQuery({
+    queryKey: ["additional-service", serviceId],
+    queryFn: async () => {
+      var _a;
+      const response = await apiClient.get(`/additional-services/${serviceId}`);
+      return ((_a = response.data) == null ? void 0 : _a.data) || response.data;
+    },
+    enabled: isEditMode && isModuleAvailable()
+  });
+  reactExports.useEffect(() => {
+    if (serviceData) {
+      let iconValue = null;
+      if (serviceData.icon) {
+        iconValue = serviceData.icon;
+      } else if (serviceData.image_url) {
+        iconValue = { type: "image", value: serviceData.image_url };
+      }
+      setFormData({
+        id: serviceData.id,
+        name: serviceData.name || "",
+        description: serviceData.description || "",
+        price: parseFloat(serviceData.price) || 0,
+        price_type: serviceData.price_type || "fixed",
+        price_per: serviceData.price_per || "person",
+        icon: iconValue,
+        status: serviceData.status || "draft",
+        sort_order: serviceData.sort_order || 0,
+        applicable_to: serviceData.applicable_to || "all",
+        trip_ids: serviceData.trip_ids || [],
+        is_required: serviceData.is_required === true || serviceData.is_required === 1 || serviceData.is_required === "1"
+      });
+    }
+  }, [serviceData]);
+  const saveMutation = useMutation({
+    mutationFn: async (data) => {
+      if (isEditMode) {
+        return apiClient.put(`/additional-services/${serviceId}`, data);
+      }
+      return apiClient.post("/additional-services", data);
+    },
+    onSuccess: () => {
+      showToast(
+        isEditMode ? __("Service updated successfully") : __("Service created successfully"),
+        "success"
+      );
+      queryClient2.invalidateQueries({ queryKey: ["additional-services"] });
+      if (!isEditMode) {
+        navigateBack();
+      }
+    },
+    onError: (error) => {
+      var _a, _b;
+      const message2 = ((_b = (_a = error == null ? void 0 : error.response) == null ? void 0 : _a.data) == null ? void 0 : _b.message) || __("Failed to save service");
+      showToast(message2, "error");
+    }
+  });
+  const navigateBack = () => {
+    const params2 = new URLSearchParams(window.location.search);
+    params2.delete("action");
+    params2.delete("id");
+    params2.set("subpage", "trips");
+    params2.set("tab", "additional-services");
+    window.history.pushState({}, "", `${window.location.pathname}?${params2}`);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+  const handleFieldChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) {
+      newErrors.name = __("Service name is required");
+    }
+    if (formData.price < 0) {
+      newErrors.price = __("Price cannot be negative");
+    }
+    if (formData.price_type === "percentage" && formData.price > 100) {
+      newErrors.price = __("Percentage cannot exceed 100%");
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validateForm()) {
+      showToast(__("Please fix the errors before saving"), "error");
+      return;
+    }
+    saveMutation.mutate(formData);
+  };
+  const hasPermission = can("manage_options") || can("yatra_manage_settings") || can("yatra_edit_trips");
+  if (!hasPermission) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-12 text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400", children: __("You do not have permission to manage services.") }) }) });
+  }
+  if (!isModuleAvailable()) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "p-12 text-center", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Package, { className: "w-12 h-12 mx-auto text-gray-400 mb-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: __("Premium Feature") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 mb-6", children: __("Additional Services is a premium feature. Upgrade to Yatra Pro to unlock.") }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          onClick: () => window.open("https://wpyatra.com/pricing?module=additional-services", "_blank"),
+          children: __("Upgrade to Pro")
+        }
+      )
+    ] }) });
+  }
+  if (isEditMode && isLoadingService) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse" })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 animate-pulse" })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 bg-gray-200 dark:bg-gray-700 rounded w-36 animate-pulse" }) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }) })
+          ] })
+        ] })
+      ] })
+    ] });
+  }
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PageHeader,
+      {
+        description: isEditMode ? __("Update the details of this additional service.") : __("Create a new additional service that customers can add to their bookings."),
+        actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { variant: "outline", onClick: navigateBack, children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-4 h-4 mr-2" }),
+          __("Back to Services")
+        ] })
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("form", { onSubmit: handleSubmit, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-3 gap-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "lg:col-span-2 space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Service Details") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: [
+                __("Service Name"),
+                " ",
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  value: formData.name,
+                  onChange: (e) => handleFieldChange("name", e.target.value),
+                  placeholder: __("e.g., Airport Transfer, Travel Insurance"),
+                  className: errors.name ? "border-red-500" : ""
+                }
+              ),
+              errors.name && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.name })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Description") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "textarea",
+                {
+                  value: formData.description,
+                  onChange: (e) => handleFieldChange("description", e.target.value),
+                  placeholder: __("Describe what this service includes..."),
+                  rows: 4,
+                  className: "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "checkbox",
+                  id: "is_required",
+                  checked: formData.is_required,
+                  onChange: (e) => handleFieldChange("is_required", e.target.checked),
+                  className: "mt-0.5 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded"
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "is_required", className: "text-sm font-medium text-gray-900 dark:text-white cursor-pointer", children: __("Required Service") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __("If enabled, customers must select this service when booking.") })
+              ] })
+            ] })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Pricing") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Price") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Input,
+                  {
+                    type: "number",
+                    min: "0",
+                    step: "0.01",
+                    value: formData.price,
+                    onChange: (e) => handleFieldChange("price", parseFloat(e.target.value) || 0),
+                    className: errors.price ? "border-red-500" : ""
+                  }
+                ),
+                errors.price && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-sm text-red-500", children: errors.price })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Price Type") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: formData.price_type,
+                    onChange: (e) => handleFieldChange("price_type", e.target.value),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "fixed", children: __("Fixed Amount") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "percentage", children: __("Percentage of Trip Price") })
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Price Per") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  Select,
+                  {
+                    value: formData.price_per,
+                    onChange: (e) => handleFieldChange("price_per", e.target.value),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "person", children: __("Per Person") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "booking", children: __("Per Booking") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "day", children: __("Per Day") })
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: formData.price_type === "percentage" ? __("The price will be calculated as a percentage of the trip base price.") : formData.price_per === "person" ? __("This price will be multiplied by the number of travelers.") : formData.price_per === "day" ? __("This price will be multiplied by the trip duration in days.") : __("This is a flat fee charged once per booking.") })
+          ] })
+        ] })
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Publish") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Status") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Select,
+                {
+                  value: formData.status,
+                  onChange: (e) => handleFieldChange("status", e.target.value),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "draft", children: __("Draft") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "publish", children: __("Published") })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", children: __("Sort Order") }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  type: "number",
+                  min: "0",
+                  value: formData.sort_order,
+                  onChange: (e) => handleFieldChange("sort_order", parseInt(e.target.value) || 0)
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "mt-1 text-xs text-gray-500 dark:text-gray-400", children: __("Lower numbers appear first") })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "pt-4 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                type: "submit",
+                className: "w-full",
+                disabled: saveMutation.isPending,
+                children: saveMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 mr-2 animate-spin" }),
+                  __("Saving...")
+                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Save, { className: "w-4 h-4 mr-2" }),
+                  isEditMode ? __("Update Service") : __("Create Service")
+                ] })
+              }
+            ) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Applicable To") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Select,
+              {
+                value: formData.applicable_to,
+                onChange: (e) => handleFieldChange("applicable_to", e.target.value),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "all", children: __("All Trips") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "specific_trips", children: __("Specific Trips") })
+                ]
+              }
+            ),
+            formData.applicable_to === "specific_trips" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 space-y-2 relative", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  className: "border border-gray-300 dark:border-gray-600 rounded-lg p-2 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-800",
+                  onClick: () => setShowTripDropdown(!showTripDropdown),
+                  children: formData.trip_ids.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-1.5", children: [
+                    formData.trip_ids.slice(0, 3).map((tripId) => {
+                      const trip = tripOptions.find((t) => t.value === tripId);
+                      return /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "span",
+                        {
+                          className: "inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded",
+                          children: [
+                            (trip == null ? void 0 : trip.label) || `Trip #${tripId}`,
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(
+                              "button",
+                              {
+                                type: "button",
+                                onClick: (e) => {
+                                  e.stopPropagation();
+                                  handleFieldChange("trip_ids", formData.trip_ids.filter((id) => id !== tripId));
+                                },
+                                className: "hover:text-blue-600 dark:hover:text-blue-200",
+                                children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-3 h-3" })
+                              }
+                            )
+                          ]
+                        },
+                        tripId
+                      );
+                    }),
+                    formData.trip_ids.length > 3 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded", children: [
+                      "+",
+                      formData.trip_ids.length - 3,
+                      " ",
+                      __("more")
+                    ] })
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-500 dark:text-gray-400", children: __("Click to select trips...") })
+                }
+              ),
+              showTripDropdown && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    Input,
+                    {
+                      type: "text",
+                      placeholder: __("Search trips..."),
+                      value: tripSearchQuery,
+                      onChange: (e) => setTripSearchQuery(e.target.value),
+                      className: "w-full text-sm",
+                      onClick: (e) => e.stopPropagation()
+                    }
+                  ),
+                  tripsQuery.isFetching && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute right-3 top-1/2 transform -translate-y-1/2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-4 h-4 animate-spin text-gray-400" }) })
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-h-[200px] overflow-y-auto", children: tripsQuery.isLoading ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 text-center text-sm text-gray-500 dark:text-gray-400", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Loader2, { className: "w-5 h-5 animate-spin mx-auto mb-2" }),
+                  __("Loading trips...")
+                ] }) : tripOptions.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-700", children: tripOptions.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "label",
+                  {
+                    className: "flex items-center justify-between gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50",
+                    onClick: (e) => e.stopPropagation(),
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          "input",
+                          {
+                            type: "checkbox",
+                            checked: formData.trip_ids.includes(trip.value),
+                            onChange: (e) => {
+                              if (e.target.checked) {
+                                handleFieldChange("trip_ids", [...formData.trip_ids, trip.value]);
+                              } else {
+                                handleFieldChange("trip_ids", formData.trip_ids.filter((id) => id !== trip.value));
+                              }
+                            },
+                            className: "rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500"
+                          }
+                        ),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-700 dark:text-gray-300", children: trip.label })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-400 dark:text-gray-500", children: [
+                        "#",
+                        trip.value
+                      ] })
+                    ]
+                  },
+                  trip.value
+                )) }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 text-center text-sm text-gray-500 dark:text-gray-400", children: __("No trips found") }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    type: "button",
+                    variant: "outline",
+                    size: "sm",
+                    className: "w-full",
+                    onClick: () => setShowTripDropdown(false),
+                    children: __("Done")
+                  }
+                ) })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: formData.applicable_to === "all" ? __("This service will be available for all trips.") : __("This service will only be available for the selected trips.") })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { children: __("Service Icon or Image") }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            IconPicker,
+            {
+              value: formData.icon,
+              onChange: (value) => handleFieldChange("icon", value),
+              label: __("Service Icon or Image"),
+              helpText: __("Select an icon from the library or upload a custom image for this service."),
+              allowImageUpload: true,
+              allowIconSelection: true,
+              size: "md"
+            }
+          ) })
+        ] })
+      ] })
+    ] }) })
+  ] });
+};
 const App = () => {
   const [urlKey, setUrlKey] = reactExports.useState(0);
   reactExports.useEffect(() => {
@@ -68852,6 +71229,11 @@ const App = () => {
               return /* @__PURE__ */ jsxRuntimeExports.jsx(AvailabilityForm, {});
             }
             return /* @__PURE__ */ jsxRuntimeExports.jsx(Availability, {});
+          case "additional-services":
+            if (action === "create" || action === "edit") {
+              return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServicesForm, {});
+            }
+            return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServices, {});
           case "all":
           default:
             if (action === "create" || action === "edit") {
@@ -68949,6 +71331,11 @@ const App = () => {
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Modules, {});
       case "yatra-google-calendar":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(GoogleCalendar, {});
+      case "yatra-additional-services":
+        if (action === "create" || action === "edit") {
+          return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServicesForm, {});
+        }
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(AdditionalServices, {});
       case "dashboard":
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Dashboard, {});

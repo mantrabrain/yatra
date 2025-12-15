@@ -3,11 +3,12 @@
  * Add/Edit Booking form with clean, minimal SaaS-style design
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp, AlertCircle, Search, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
+import { getCurrencySymbol } from '../data/currencies';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -99,6 +100,11 @@ const countryList = [
 const BookingForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
+  
+  // Get global currency settings
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
+  const currencySymbol = getCurrencySymbol(globalCurrency);
+  
   const [formData, setFormData] = useState<BookingFormData>({
     customer_name: '',
     customer_email: '',
@@ -118,6 +124,22 @@ const BookingForm: React.FC = () => {
   const [emergencyContactData, setEmergencyContactData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  // Trip search state
+  const [tripSearchQuery, setTripSearchQuery] = useState('');
+  const [isTripDropdownOpen, setIsTripDropdownOpen] = useState(false);
+  const tripDropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (tripDropdownRef.current && !tripDropdownRef.current.contains(event.target as Node)) {
+        setIsTripDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Fetch booking form configuration
   const { data: formConfig } = useQuery<BookingFormConfig>({
@@ -199,18 +221,32 @@ const BookingForm: React.FC = () => {
     },
   });
 
-  // Fetch trips for dropdown
+  // Fetch trips for dropdown - get all trips regardless of status
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ['trips-list'],
+    queryKey: ['trips-list-all'],
     queryFn: async () => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/trips?per_page=100`, {
+      // Fetch all trips - try without status filter first, then with status=all
+      const apiUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+      const nonce = window.yatraAdmin?.nonce || '';
+      
+      console.log('Fetching trips from:', apiUrl);
+      
+      const response = await fetch(`${apiUrl}/trips?per_page=500`, {
         headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+          'X-WP-Nonce': nonce,
+          'Content-Type': 'application/json',
         },
+        credentials: 'same-origin',
       });
+      
+      console.log('Trips API Response status:', response.status);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Trips API Error:', errorText);
         throw new Error('Failed to fetch trips');
       }
+      
       const result = await response.json();
       console.log('Trips API Response:', result);
       
@@ -223,8 +259,9 @@ const BookingForm: React.FC = () => {
           title: trip.title,
           price: parseFloat(trip.sale_price || trip.original_price || 0),
           currency: trip.currency || 'USD',
+          status: trip.status || 'publish',
         }));
-        console.log('Mapped trips:', trips);
+        console.log('Mapped trips:', trips, 'Total:', trips.length);
         return { data: trips };
       }
       
@@ -233,6 +270,7 @@ const BookingForm: React.FC = () => {
     },
     // Always fetch trips when user can manage bookings
     enabled: can('yatra_view_bookings') || can('yatra_view_trips'),
+    retry: 1,
   });
 
   // Fetch booking data if editing
@@ -250,8 +288,11 @@ const BookingForm: React.FC = () => {
       }
       const result = await response.json();
       console.log('Booking API Response:', result);
-      if (result.success) {
-        const booking = result.data;
+      
+      // Handle both wrapped { success, data } and direct data response formats
+      const booking = (result.success && result.data) ? result.data : result;
+      
+      if (booking && booking.id) {
         // Use customer_name if available, otherwise construct from first/last name
         const customerName = booking.customer_name || 
           `${booking.contact_first_name || ''} ${booking.contact_last_name || ''}`.trim();
@@ -260,11 +301,27 @@ const BookingForm: React.FC = () => {
         let travelers: TravelerData[] = [];
         if (booking.travelers && Array.isArray(booking.travelers)) {
           // Map all stored fields dynamically (keys are field IDs from form builder)
+          // The API returns travelers with a nested 'fields' object containing the form data
           travelers = booking.travelers.map((t: any) => {
             const traveler: TravelerData = {};
-            Object.entries(t).forEach(([key, value]) => {
-              traveler[key] = String(value || '');
-            });
+            
+            // Check if fields are nested in a 'fields' property (from TravellerRepository)
+            const fieldsData = t.fields || t;
+            
+            if (fieldsData && typeof fieldsData === 'object') {
+              Object.entries(fieldsData).forEach(([key, value]) => {
+                // Skip internal fields like id, booking_id, traveller_index, etc.
+                if (!['id', 'booking_id', 'traveller_index', 'is_lead', 'created_at', 'updated_at'].includes(key)) {
+                  traveler[key] = String(value || '');
+                }
+              });
+            }
+            
+            // Also copy is_lead if present
+            if (t.is_lead !== undefined) {
+              traveler['is_lead'] = String(t.is_lead);
+            }
+            
             return traveler;
           });
         }
@@ -273,6 +330,8 @@ const BookingForm: React.FC = () => {
         if (travelers.length === 0) {
           travelers = [{}]; // Empty object - fields will be populated from form config
         }
+        
+        console.log('Parsed travelers data:', travelers);
         
         // Parse emergency contact data
         let emergencyContact: Record<string, string> = {};
@@ -288,6 +347,7 @@ const BookingForm: React.FC = () => {
           customer_email: booking.customer_email || '',
           customer_phone: booking.customer_phone || '',
           trip_id: String(booking.trip_id || ''),
+          trip_title: booking.trip_title || '',
           booking_date: booking.created_at ? booking.created_at.split(' ')[0] : new Date().toISOString().split('T')[0],
           travel_date: booking.travel_date || '',
           travelers: booking.travelers_count || 1,
@@ -460,8 +520,8 @@ const BookingForm: React.FC = () => {
         status: data.booking_status,
         payment_gateway: data.payment_method.trim(),
         special_requests: data.notes.trim(),
-        // Include travelers data
-        travelers_data: travelersData,
+        // Include travelers data - use 'travelers' key as expected by BookingService.updateBooking
+        travelers: travelersData,
         // Include emergency contact data
         emergency_contact: emergencyContactData,
       };
@@ -716,25 +776,121 @@ const BookingForm: React.FC = () => {
                   <CardTitle className="text-base">{__('Booking Details', 'Booking Details')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Trip Selection */}
-                  <div>
-                    <label htmlFor="trip_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                  {/* Trip Selection - Searchable Dropdown */}
+                  <div ref={tripDropdownRef} className="relative">
+                    <label htmlFor="trip_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Trip', 'Trip')} <span className="text-red-500">*</span>
                     </label>
-                    <Select
-                      id="trip_id"
-                      value={formData.trip_id}
-                      onChange={(e) => handleFieldChange('trip_id', e.target.value)}
-                      className={errors.trip_id ? 'border-red-500' : ''}
-                      required
-                    >
-                      <option value="">{isLoadingTrips ? __('Loading trips...', 'Loading trips...') : __('Select a trip', 'Select a trip')}</option>
-                      {tripsData?.data?.map((trip: any) => (
-                        <option key={trip.id} value={String(trip.id)}>
-                          {trip.title} - ${trip.price}
-                        </option>
-                      ))}
-                    </Select>
+                    <div className="relative">
+                      <div 
+                        className={`flex items-center border rounded-md bg-white dark:bg-gray-800 cursor-pointer ${errors.trip_id ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} ${isTripDropdownOpen ? 'ring-2 ring-blue-500' : ''}`}
+                        onClick={() => setIsTripDropdownOpen(!isTripDropdownOpen)}
+                      >
+                        <div className="flex-1 px-3 py-2 text-sm">
+                          {formData.trip_id ? (
+                            <span className="text-gray-900 dark:text-white">
+                              {tripsData?.data?.find((t: any) => String(t.id) === formData.trip_id)?.title || 
+                               bookingData?.trip_title || 
+                               `Trip ID: ${formData.trip_id}`}
+                            </span>
+                          ) : (
+                            <span className="text-gray-500">{isLoadingTrips ? __('Loading trips...', 'Loading trips...') : __('Select a trip', 'Select a trip')}</span>
+                          )}
+                        </div>
+                        {formData.trip_id && (
+                          <button
+                            type="button"
+                            className="p-2 text-gray-400 hover:text-gray-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleFieldChange('trip_id', '');
+                              setTripSearchQuery('');
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        )}
+                        <div className="p-2 text-gray-400">
+                          <ChevronDown className={`w-4 h-4 transition-transform ${isTripDropdownOpen ? 'rotate-180' : ''}`} />
+                        </div>
+                      </div>
+                      
+                      {/* Dropdown */}
+                      {isTripDropdownOpen && (
+                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-hidden">
+                          {/* Search Input */}
+                          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+                            <div className="relative">
+                              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                              <input
+                                type="text"
+                                className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder={__('Search trips...', 'Search trips...')}
+                                value={tripSearchQuery}
+                                onChange={(e) => setTripSearchQuery(e.target.value)}
+                                onClick={(e) => e.stopPropagation()}
+                                autoFocus
+                              />
+                            </div>
+                          </div>
+                          
+                          {/* Trip List */}
+                          <div className="max-h-48 overflow-y-auto">
+                            {(() => {
+                              // Combine booked trip with trips list
+                              let allTrips = [...(tripsData?.data || [])];
+                              
+                              // Add booked trip if not in list
+                              if (isEditMode && bookingData?.trip_id && bookingData?.trip_title) {
+                                const bookedTripExists = allTrips.some((t: any) => String(t.id) === String(bookingData.trip_id));
+                                if (!bookedTripExists) {
+                                  allTrips.unshift({
+                                    id: bookingData.trip_id,
+                                    title: bookingData.trip_title,
+                                    price: bookingData.total_amount || 0,
+                                    currency: globalCurrency,
+                                    status: 'publish',
+                                  });
+                                }
+                              }
+                              
+                              // Filter by search query
+                              const filteredTrips = allTrips.filter((trip: any) => 
+                                trip.title.toLowerCase().includes(tripSearchQuery.toLowerCase()) ||
+                                String(trip.id).includes(tripSearchQuery)
+                              );
+                              
+                              if (filteredTrips.length === 0) {
+                                return (
+                                  <div className="px-3 py-4 text-sm text-gray-500 text-center">
+                                    {__('No trips found', 'No trips found')}
+                                  </div>
+                                );
+                              }
+                              
+                              return filteredTrips.map((trip: any) => (
+                                <div
+                                  key={trip.id}
+                                  className={`px-3 py-2 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 ${
+                                    formData.trip_id === String(trip.id) ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' : 'text-gray-900 dark:text-white'
+                                  }`}
+                                  onClick={() => {
+                                    handleFieldChange('trip_id', String(trip.id));
+                                    setIsTripDropdownOpen(false);
+                                    setTripSearchQuery('');
+                                  }}
+                                >
+                                  <div className="font-medium">{trip.title}</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                                    ID: {trip.id}
+                                  </div>
+                                </div>
+                              ));
+                            })()}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     {errors.trip_id && (
                       <p className="mt-1 text-sm text-red-500">{errors.trip_id}</p>
                     )}
@@ -801,10 +957,10 @@ const BookingForm: React.FC = () => {
                     {/* Total Amount */}
                     <div>
                       <label htmlFor="total_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Total Amount', 'Total Amount')} (USD) <span className="text-red-500">*</span>
+                        {__('Total Amount', 'Total Amount')} ({globalCurrency}) <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{currencySymbol}</span>
                         <Input
                           id="total_amount"
                           type="number"

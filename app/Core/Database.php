@@ -737,9 +737,14 @@ class Database
             `min_amount` decimal(10,2) DEFAULT NULL,
             `first_time_customer_only` tinyint(1) DEFAULT 0,
             `is_group_discount` tinyint(1) DEFAULT 0,
+            `discount_mode` varchar(20) DEFAULT 'both' COMMENT 'promo, group, or both',
             `min_group_size` int(11) DEFAULT NULL,
+            `max_group_size` int(11) DEFAULT NULL,
             `group_discount_type` varchar(20) DEFAULT 'percentage',
             `group_discount_amount` decimal(10,2) DEFAULT NULL,
+            `group_discount_mode` varchar(20) DEFAULT 'total',
+            `group_discount_ranges` longtext DEFAULT NULL,
+            `category_discounts` longtext DEFAULT NULL,
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             `created_by` bigint(20) UNSIGNED NOT NULL DEFAULT 0,
@@ -1221,6 +1226,41 @@ class Database
         
         if (!$departureColumnExists('total_revenue')) {
             $wpdb->query("ALTER TABLE `{$table_departures}` ADD COLUMN `total_revenue` decimal(10,2) DEFAULT 0.00 AFTER `price_by_traveler_type`");
+        }
+        
+        // Add missing columns to discounts table for group discount features
+        $table_discounts = $wpdb->prefix . 'yatra_discounts';
+        $discountColumnExists = function($column) use ($wpdb, $table_discounts) {
+            return $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                     WHERE TABLE_SCHEMA = DATABASE() 
+                     AND TABLE_NAME = %s 
+                     AND COLUMN_NAME = %s",
+                    $table_discounts,
+                    $column
+                )
+            ) > 0;
+        };
+        
+        if (!$discountColumnExists('max_group_size')) {
+            $wpdb->query("ALTER TABLE `{$table_discounts}` ADD COLUMN `max_group_size` int(11) DEFAULT NULL AFTER `min_group_size`");
+        }
+        
+        if (!$discountColumnExists('group_discount_mode')) {
+            $wpdb->query("ALTER TABLE `{$table_discounts}` ADD COLUMN `group_discount_mode` varchar(20) DEFAULT 'total' AFTER `group_discount_amount`");
+        }
+        
+        if (!$discountColumnExists('group_discount_ranges')) {
+            $wpdb->query("ALTER TABLE `{$table_discounts}` ADD COLUMN `group_discount_ranges` longtext DEFAULT NULL AFTER `group_discount_mode`");
+        }
+        
+        if (!$discountColumnExists('category_discounts')) {
+            $wpdb->query("ALTER TABLE `{$table_discounts}` ADD COLUMN `category_discounts` longtext DEFAULT NULL AFTER `group_discount_ranges`");
+        }
+        
+        if (!$discountColumnExists('discount_mode')) {
+            $wpdb->query("ALTER TABLE `{$table_discounts}` ADD COLUMN `discount_mode` varchar(20) DEFAULT 'both' COMMENT 'promo, group, or both' AFTER `is_group_discount`");
         }
         
         // Migrate difficulty_level from enum to varchar (for dynamic difficulty levels)

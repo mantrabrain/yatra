@@ -273,6 +273,21 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'yatra-downloads',
             ],
+            [
+                'slug' => 'additional_services',
+                'name' => __('Additional Services', 'yatra'),
+                'description' => __('Offer optional add-ons like airport transfers, travel insurance, equipment rental, and meals during trip booking.', 'yatra'),
+                'category' => __('Sales', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/additional-services',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=additional-services',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['upsell', 'services', 'add-ons', 'extras'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'settings_page' => 'yatra-additional-services',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);
@@ -295,10 +310,24 @@ class ModuleManager
                 ? (bool) $state['enabled']
                 : (bool) ($module['enabled'] ?? false);
 
+            // Check if module is available (can be enabled)
+            $is_available = true;
+            if (!empty($module['requires_pro'])) {
+                $pro_active = apply_filters('yatra_is_pro_active', false);
+                if ($pro_active) {
+                    // Check if this module is available in Pro
+                    $available_modules = apply_filters('yatra_pro_available_modules', []);
+                    $is_available = in_array($slug, $available_modules, true);
+                } else {
+                    $is_available = false;
+                }
+            }
+
             $modules[] = array_merge($module, [
                 'enabled' => $enabled,
                 'updated_at' => $state['updated_at'] ?? null,
                 'video_url' => $state['video_url'] ?? ($module['video_url'] ?? self::DEFAULT_VIDEO_URL),
+                'is_available' => $is_available,
             ]);
         }
 

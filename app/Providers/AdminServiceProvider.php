@@ -305,6 +305,8 @@ class AdminServiceProvider extends ServiceProvider
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,
             'isPro' => defined('YATRA_PRO_VERSION'),
+            'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
+            'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
             'showGoogleCalendarSettingsUI' => apply_filters(
                 'yatra_show_google_calendar_settings_ui',
                 class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('google_calendar') : false
@@ -312,6 +314,8 @@ class AdminServiceProvider extends ServiceProvider
             'translations' => $translations,
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
+            'time_format' => \Yatra\Services\SettingsService::get('time_format', 'H:i'),
         ]));
     }
 

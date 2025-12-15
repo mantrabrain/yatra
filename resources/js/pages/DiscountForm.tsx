@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Info, Plus, Trash2, Users } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
@@ -24,7 +24,7 @@ interface DiscountFormData {
   description: string;
   type: 'percentage' | 'fixed';
   amount: string;
-  max_discount_amount: string; // Maximum discount cap for percentage discounts
+  max_discount_amount: string; // Maximum discount amount for percentage discounts
   usage_limit: string; // Total usage limit
   usage_limit_per_customer: string; // Usage limit per customer
   valid_from: string; // Start date
@@ -35,37 +35,92 @@ interface DiscountFormData {
   min_amount: string; // Minimum booking amount
   first_time_customer_only: boolean; // Only for first-time customers
   is_group_discount: boolean;
-  min_group_size: string;
-  group_discount_type: 'percentage' | 'fixed';
-  group_discount_amount: string;
+  discount_mode: 'promo' | 'group' | 'both'; // Type of discount: promo code only, group only, or both
+  group_discount_mode: 'total' | 'category_based';
+  group_discount_ranges: Array<{
+    id: string;
+    min_group_size: string;
+    max_group_size: string; // empty = unlimited
+    discount_type: 'percentage' | 'fixed';
+    discount_amount: string;
+    categories: Array<{
+      id: string;
+      traveler_category_id: string;
+      discount_type: 'percentage' | 'fixed';
+      discount_amount: string;
+    }>;
+  }>;
+  category_discounts: Array<{
+    traveler_category_id: string;
+    traveler_category_label: string;
+    isSelecting?: boolean;
+    ranges: Array<{
+      id: string;
+      min_group_size: string;
+      max_group_size: string; // empty = unlimited
+      discount_type: 'percentage' | 'fixed';
+      discount_amount: string;
+    }>;
+  }>;
 }
 
 const DiscountForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
-  const [formData, setFormData] = useState<DiscountFormData>({
-    code: '',
-    description: '',
-    type: 'percentage',
-    amount: '',
-    max_discount_amount: '',
-    usage_limit: '0',
-    usage_limit_per_customer: '0',
-    valid_from: '',
-    expiry_date: '',
-    status: 'draft',
-    applicable_to: 'all',
-    trip_ids: [],
-    min_amount: '',
-    first_time_customer_only: false,
-    is_group_discount: false,
-    min_group_size: '',
-    group_discount_type: 'percentage',
-    group_discount_amount: '',
-  });
+  // Get initial discount_mode from URL at initialization time
+  const getInitialState = (): DiscountFormData => {
+    const params = new URLSearchParams(window.location.search);
+    const urlDiscountMode = (params.get('discount_mode') || 'both') as 'promo' | 'group' | 'both';
+    const isGroupOnly = urlDiscountMode === 'group';
+    
+    return {
+      code: '',
+      description: '',
+      type: 'percentage',
+      amount: isGroupOnly ? '0' : '',
+      max_discount_amount: '',
+      usage_limit: '0',
+      usage_limit_per_customer: '0',
+      valid_from: '',
+      expiry_date: '',
+      status: 'draft',
+      applicable_to: 'all',
+      trip_ids: [],
+      min_amount: '',
+      first_time_customer_only: false,
+      is_group_discount: isGroupOnly,
+      discount_mode: urlDiscountMode,
+      group_discount_mode: 'total',
+      group_discount_ranges: [
+        {
+          id: String(Date.now()),
+          min_group_size: '',
+          max_group_size: '',
+          discount_type: 'percentage',
+          discount_amount: '',
+          categories: [],
+        },
+      ],
+      category_discounts: [],
+    };
+  };
+  
+  const [formData, setFormData] = useState<DiscountFormData>(getInitialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [tripSearchQuery, setTripSearchQuery] = useState('');
+  const [debouncedTripSearch, setDebouncedTripSearch] = useState('');
+  const [showTripDropdown, setShowTripDropdown] = useState(false);
+
+  // Debounce trip search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedTripSearch(tripSearchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [tripSearchQuery]);
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -83,8 +138,24 @@ const DiscountForm: React.FC = () => {
     return params.get('duplicate') ? parseInt(params.get('duplicate') || '0') : null;
   }, []);
 
+  // Get discount_mode from URL (promo, group, or both) - compute once at module level
+  const discountMode = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('discount_mode') || 'both') as 'promo' | 'group' | 'both';
+  }, []);
+  
+  
   const isEditMode = action === 'edit' && discountId !== null;
   const isDuplicateMode = action === 'create' && duplicateId !== null;
+  
+  // For new discounts, use URL param; for edit mode, we'll use formData.discount_mode after it's loaded
+  const isGroupOnlyMode = discountMode === 'group';
+  const isPromoOnlyMode = discountMode === 'promo';
+  
+  // Computed mode that works for both create and edit - use formData when available
+  const effectiveDiscountMode = isEditMode ? formData.discount_mode : discountMode;
+  const isEffectiveGroupOnly = effectiveDiscountMode === 'group';
+  const isEffectivePromoOnly = effectiveDiscountMode === 'promo';
 
   // Fetch discount data if editing or duplicating
   const { data: discountData, isLoading: isLoadingDiscount } = useQuery({
@@ -122,45 +193,305 @@ const DiscountForm: React.FC = () => {
         min_amount: discountData.min_amount?.toString() || '',
         first_time_customer_only: discountData.first_time_customer_only || false,
         is_group_discount: discountData.is_group_discount || false,
-        min_group_size: discountData.min_group_size?.toString() || '',
-        group_discount_type: (discountData.group_discount_type || 'percentage') as 'percentage' | 'fixed',
-        group_discount_amount: discountData.group_discount_amount?.toString() || '',
+        discount_mode: (discountData.discount_mode || 'both') as 'promo' | 'group' | 'both',
+        group_discount_mode: (discountData.group_discount_mode || 'total') as 'total' | 'category_based',
+        group_discount_ranges: Array.isArray(discountData.group_discount_ranges) && discountData.group_discount_ranges.length
+          ? discountData.group_discount_ranges
+          : [
+              {
+                id: String(Date.now()),
+                min_group_size: discountData.min_group_size?.toString() || '',
+                max_group_size: discountData.max_group_size?.toString() || '',
+                discount_type: (discountData.group_discount_type || 'percentage') as 'percentage' | 'fixed',
+                discount_amount: discountData.group_discount_amount?.toString() || '',
+                categories: [],
+              },
+            ],
+        category_discounts: Array.isArray(discountData.category_discounts) && discountData.category_discounts?.length
+          ? discountData.category_discounts
+          : [],
       });
     }
   }, [discountData, isEditMode, isDuplicateMode]);
 
-  const handleFieldChange = (field: keyof DiscountFormData, value: string | number[] | boolean) => {
+  // Set initial form state based on discount mode (only for new discounts)
+  useEffect(() => {
+    if (!isEditMode && !isDuplicateMode && !discountData) {
+      if (isGroupOnlyMode) {
+        // Group discount only - auto-enable group discount, set amount to 0
+        setFormData(prev => ({
+          ...prev,
+          is_group_discount: true,
+          discount_mode: 'group',
+          amount: '0',
+          type: 'percentage',
+        }));
+      } else if (isPromoOnlyMode) {
+        // Promo code only - disable group discount
+        setFormData(prev => ({
+          ...prev,
+          is_group_discount: false,
+          discount_mode: 'promo',
+        }));
+      } else {
+        // Both - default
+        setFormData(prev => ({
+          ...prev,
+          discount_mode: 'both',
+        }));
+      }
+    }
+  }, [isGroupOnlyMode, isPromoOnlyMode, isEditMode, isDuplicateMode, discountData]);
+
+  const handleFieldChange = (field: keyof DiscountFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
+    
+    // Clear ranges when switching discount modes
+    if (field === 'group_discount_mode') {
+      if (value === 'category_based') {
+        // Switch to category-based - clear regular ranges and start with empty categories
+        setFormData(prev => ({
+          ...prev,
+          group_discount_mode: 'category_based',
+          group_discount_ranges: [],
+          category_discounts: [] // Ensure empty categories array
+        }));
+      } else {
+        // Switch to total - clear category discounts and start with one empty range
+        setFormData(prev => ({
+          ...prev,
+          group_discount_mode: 'total',
+          group_discount_ranges: [
+            {
+              id: String(Date.now()),
+              min_group_size: '',
+              max_group_size: '',
+              discount_type: 'percentage',
+              discount_amount: '',
+              categories: [],
+            },
+          ],
+          category_discounts: [] // Ensure empty categories array
+        }));
+      }
+    }
+  };
+
+  const travelerCategoriesQuery = useQuery({
+    queryKey: ['traveler-categories'],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get('/traveler-categories', {
+          params: {
+            per_page: 100,
+            status: 'publish'
+          }
+        });
+        const categories = response?.data?.data || response?.data || response || [];
+        return Array.isArray(categories) ? categories : [];
+      } catch (error: any) {
+        console.error('Failed to load traveler categories:', error);
+        return [];
+      }
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const travelerCategoryOptions = useMemo(() => {
+    const items = travelerCategoriesQuery.data || [];
+    return items
+      .filter((c: any) => !!c && (typeof c.id === 'number' || typeof c.id === 'string') && (c.status === 'publish' || c.status === 'active'))
+      .map((c: any) => ({ 
+        value: String(c.id), 
+        label: c.label || c.slug || String(c.id),
+        description: c.description || '',
+        age_min: c.age_min,
+        age_max: c.age_max,
+        pricing_mode: c.pricing_mode || 'per_person'
+      }));
+  }, [travelerCategoriesQuery.data]);
+
+  // Fetch trips for applicable_to selection - always fetch when specific_trips is selected
+  const tripsQuery = useQuery({
+    queryKey: ['trips-for-discount', debouncedTripSearch],
+    queryFn: async () => {
+      try {
+        const params: any = {
+          per_page: 100,
+          // Don't filter by status - show all non-deleted trips so admin can select any trip
+        };
+        if (debouncedTripSearch.trim()) {
+          params.search = debouncedTripSearch.trim();
+        }
+        const response = await apiClient.get('/trips', { params });
+        const trips = response?.data?.data || response?.data || response || [];
+        return Array.isArray(trips) ? trips : [];
+      } catch (error: any) {
+        console.error('Failed to load trips:', error);
+        return [];
+      }
+    },
+    enabled: formData.applicable_to === 'specific_trips', // Only fetch when specific_trips is selected
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const tripOptions = useMemo(() => {
+    const items = tripsQuery.data || [];
+    return items
+      .filter((t: any) => !!t && (typeof t.id === 'number' || typeof t.id === 'string'))
+      .map((t: any) => ({ 
+        value: Number(t.id), 
+        label: t.title || t.name || `Trip #${t.id}`
+      }));
+  }, [tripsQuery.data]);
+
+  const addRange = () => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: [
+        ...prev.group_discount_ranges,
+        {
+          id: String(Date.now() + Math.random()),
+          min_group_size: '',
+          max_group_size: '',
+          discount_type: 'percentage',
+          discount_amount: '',
+          categories: [],
+        },
+      ],
+    }));
+  };
+
+  const removeRange = (rangeId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: prev.group_discount_ranges.filter((r) => r.id !== rangeId),
+    }));
+  };
+
+  const updateRange = (rangeId: string, patch: Partial<DiscountFormData['group_discount_ranges'][number]>) => {
+    setFormData((prev) => ({
+      ...prev,
+      group_discount_ranges: prev.group_discount_ranges.map((r) => (r.id === rangeId ? { ...r, ...patch } : r)),
+    }));
+  };
+
+  // Category-based discount functions
+  const addTravelerCategory = () => {
+    // Toggle category selection dropdown
+    setShowCategoryDropdown(prev => !prev);
+  };
+
+  const selectCategory = (categoryId: string, categoryLabel: string) => {
+    // Add selected category and close dropdown
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: [
+        ...prev.category_discounts,
+        {
+          traveler_category_id: categoryId,
+          traveler_category_label: categoryLabel,
+          ranges: [],
+          isSelecting: false,
+        },
+      ],
+    }));
+    setShowCategoryDropdown(false);
+  };
+
+  const removeTravelerCategory = (categoryIndex: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.filter((_, idx) => idx !== categoryIndex),
+    }));
+  };
+
+  const updateTravelerCategory = (categoryIndex: number, patch: Partial<DiscountFormData['category_discounts'][number]>) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => 
+        idx === categoryIndex ? { ...cat, ...patch } : cat
+      ),
+    }));
+  };
+
+  const addRangeToCategory = (categoryIndex: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        return {
+          ...cat,
+          ranges: [
+            ...cat.ranges,
+            {
+              id: String(Date.now() + Math.random()),
+              min_group_size: '',
+              max_group_size: '',
+              discount_type: 'percentage',
+              discount_amount: '',
+            },
+          ],
+        };
+      }),
+    }));
+  };
+
+  const removeRangeFromCategory = (categoryIndex: number, rangeId: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        return { ...cat, ranges: cat.ranges.filter((r) => r.id !== rangeId) };
+      }),
+    }));
+  };
+
+  const updateRangeInCategory = (categoryIndex: number, rangeId: string, patch: Partial<DiscountFormData['category_discounts'][number]['ranges'][number]>) => {
+    setFormData((prev) => ({
+      ...prev,
+      category_discounts: prev.category_discounts.map((cat, idx) => {
+        if (idx !== categoryIndex) return cat;
+        const ranges = cat.ranges.map((r) => (r.id === rangeId ? { ...r, ...patch } : r));
+        return { ...cat, ranges };
+      }),
+    }));
   };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
+    // Internal name/code is always required
     if (!formData.code.trim()) {
-      newErrors.code = __('Coupon code is required', 'Coupon code is required');
+      newErrors.code = isEffectiveGroupOnly 
+        ? __('Internal name is required', 'Internal name is required')
+        : __('Coupon code is required', 'Coupon code is required');
     } else if (!/^[A-Z0-9_-]+$/.test(formData.code)) {
-      newErrors.code = __('Coupon code can only contain uppercase letters, numbers, hyphens, and underscores', 'Coupon code can only contain uppercase letters, numbers, hyphens, and underscores');
+      newErrors.code = __('Only uppercase letters, numbers, hyphens, and underscores are allowed', 'Only uppercase letters, numbers, hyphens, and underscores are allowed');
     }
 
-    if (!formData.amount.trim()) {
-      newErrors.amount = __('Discount amount is required', 'Discount amount is required');
-    } else {
-      const amount = parseFloat(formData.amount);
-      if (isNaN(amount) || amount <= 0) {
-        newErrors.amount = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
-      } else if (formData.type === 'percentage' && amount > 100) {
-        newErrors.amount = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+    // Discount amount validation - skip for group-only mode
+    if (!isEffectiveGroupOnly) {
+      if (!formData.amount.trim()) {
+        newErrors.amount = __('Discount amount is required', 'Discount amount is required');
+      } else {
+        const amount = parseFloat(formData.amount);
+        if (isNaN(amount) || amount < 0) {
+          newErrors.amount = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+        } else if (formData.type === 'percentage' && amount > 100) {
+          newErrors.amount = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+        }
       }
-    }
 
-    // Maximum discount amount validation (for percentage discounts)
-    if (formData.type === 'percentage' && formData.max_discount_amount && formData.max_discount_amount.trim()) {
-      const maxAmount = parseFloat(formData.max_discount_amount);
-      if (isNaN(maxAmount) || maxAmount <= 0) {
-        newErrors.max_discount_amount = __('Maximum discount amount must be a positive number', 'Maximum discount amount must be a positive number');
+      // Maximum discount amount validation (for percentage discounts)
+      if (formData.type === 'percentage' && formData.max_discount_amount && formData.max_discount_amount.trim()) {
+        const maxAmount = parseFloat(formData.max_discount_amount);
+        if (isNaN(maxAmount) || maxAmount <= 0) {
+          newErrors.max_discount_amount = __('Maximum discount amount must be a positive number', 'Maximum discount amount must be a positive number');
+        }
       }
     }
 
@@ -208,30 +539,108 @@ const DiscountForm: React.FC = () => {
       }
     }
 
-    // Group discount validation
-    if (formData.is_group_discount) {
-      if (!formData.min_group_size.trim()) {
-        newErrors.min_group_size = __('Minimum group size is required for group discounts', 'Minimum group size is required for group discounts');
+    // Group discount validation (multiple ranges) - only for 'total' mode
+    if (formData.is_group_discount && formData.group_discount_mode === 'total') {
+      if (!formData.group_discount_ranges || formData.group_discount_ranges.length === 0) {
+        newErrors.group_discount_ranges = __('At least one group discount range is required', 'At least one group discount range is required');
       } else {
-        const groupSize = parseInt(formData.min_group_size);
-        if (isNaN(groupSize) || groupSize < 2) {
-          newErrors.min_group_size = __('Minimum group size must be at least 2', 'Minimum group size must be at least 2');
-        }
-      }
+        formData.group_discount_ranges.forEach((range, idx) => {
+          const prefix = `group_discount_ranges_${idx}`;
+          const min = parseInt(range.min_group_size);
+          const max = range.max_group_size ? parseInt(range.max_group_size) : null;
 
-      if (!formData.group_discount_amount.trim()) {
-        newErrors.group_discount_amount = __('Group discount amount is required', 'Group discount amount is required');
+          if (Number.isNaN(min) || min < 1) {
+            newErrors[`${prefix}_min`] = __('Minimum group size must be at least 1', 'Minimum group size must be at least 1');
+          }
+
+          if (max !== null) {
+            if (Number.isNaN(max) || max < 1) {
+              newErrors[`${prefix}_max`] = __('Maximum group size must be a positive number', 'Maximum group size must be a positive number');
+            } else if (!Number.isNaN(min) && max <= min) {
+              newErrors[`${prefix}_max`] = __('Maximum group size must be greater than minimum group size', 'Maximum group size must be greater than minimum group size');
+            }
+          }
+
+          const amount = range.discount_amount ? parseFloat(range.discount_amount) : NaN;
+          if (!range.discount_type) {
+            newErrors[`${prefix}_type`] = __('Discount type is required', 'Discount type is required');
+          }
+          if (Number.isNaN(amount) || amount <= 0) {
+            newErrors[`${prefix}_amount`] = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+          } else if (range.discount_type === 'percentage' && amount > 100) {
+            newErrors[`${prefix}_amount`] = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+          }
+        });
+      }
+    }
+
+    // Category-based discounts validation
+    if (formData.is_group_discount && formData.group_discount_mode === 'category_based') {
+      if (!formData.category_discounts || formData.category_discounts.length === 0) {
+        newErrors.category_discounts = __('Add at least one traveler category', 'Add at least one traveler category');
       } else {
-        const groupAmount = parseFloat(formData.group_discount_amount);
-        if (isNaN(groupAmount) || groupAmount <= 0) {
-          newErrors.group_discount_amount = __('Group discount amount must be a positive number', 'Group discount amount must be a positive number');
-        } else if (formData.group_discount_type === 'percentage' && groupAmount > 100) {
-          newErrors.group_discount_amount = __('Group discount percentage cannot exceed 100%', 'Group discount percentage cannot exceed 100%');
-        }
+        formData.category_discounts.forEach((cat, catIdx) => {
+          const catPrefix = `category_discounts_${catIdx}`;
+          if (!cat.traveler_category_id) {
+            newErrors[`${catPrefix}_id`] = __('Traveler category is required', 'Traveler category is required');
+          }
+          if (!cat.ranges || cat.ranges.length === 0) {
+            newErrors[`${catPrefix}_ranges`] = __('Add at least one discount range', 'Add at least one discount range');
+          } else {
+            cat.ranges.forEach((range, rIdx) => {
+              const rangePrefix = `${catPrefix}_ranges_${rIdx}`;
+              const min = parseInt(range.min_group_size);
+              const max = range.max_group_size ? parseInt(range.max_group_size) : null;
+
+              if (Number.isNaN(min) || min < 1) {
+                newErrors[`${rangePrefix}_min`] = __('Minimum group size must be at least 1', 'Minimum group size must be at least 1');
+              }
+
+              if (max !== null) {
+                if (Number.isNaN(max) || max < 1) {
+                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be a positive number', 'Maximum group size must be a positive number');
+                } else if (!Number.isNaN(min) && max <= min) {
+                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be greater than minimum group size', 'Maximum group size must be greater than minimum group size');
+                }
+              }
+
+              const amount = range.discount_amount ? parseFloat(range.discount_amount) : NaN;
+              if (!range.discount_type) {
+                newErrors[`${rangePrefix}_type`] = __('Discount type is required', 'Discount type is required');
+              }
+              if (Number.isNaN(amount) || amount <= 0) {
+                newErrors[`${rangePrefix}_amount`] = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+              } else if (range.discount_type === 'percentage' && amount > 100) {
+                newErrors[`${rangePrefix}_amount`] = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+              }
+            });
+          }
+        });
       }
     }
 
     setErrors(newErrors);
+    
+    // Scroll to first error field
+    if (Object.keys(newErrors).length > 0) {
+      const firstErrorKey = Object.keys(newErrors)[0];
+      // Try to find the element by name or id
+      const errorElement = document.querySelector(`[name="${firstErrorKey}"], #${firstErrorKey}, [data-field="${firstErrorKey}"]`);
+      if (errorElement) {
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Focus the element if it's an input
+        if (errorElement instanceof HTMLInputElement || errorElement instanceof HTMLSelectElement || errorElement instanceof HTMLTextAreaElement) {
+          setTimeout(() => errorElement.focus(), 300);
+        }
+      } else {
+        // Fallback: scroll to the first error message
+        const errorMessage = document.querySelector('.text-red-500, .text-red-600');
+        if (errorMessage) {
+          errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    }
+    
     return Object.keys(newErrors).length === 0;
   };
 
@@ -242,7 +651,7 @@ const DiscountForm: React.FC = () => {
         code: data.code.trim().toUpperCase(),
         description: data.description.trim(),
         type: data.type,
-        amount: parseFloat(data.amount),
+        amount: parseFloat(data.amount) || 0,
         max_discount_amount: data.max_discount_amount ? parseFloat(data.max_discount_amount) : null,
         usage_limit: parseInt(data.usage_limit) || 0,
         usage_limit_per_customer: parseInt(data.usage_limit_per_customer) || 0,
@@ -254,9 +663,22 @@ const DiscountForm: React.FC = () => {
         min_amount: data.min_amount ? parseFloat(data.min_amount) : null,
         first_time_customer_only: data.first_time_customer_only,
         is_group_discount: data.is_group_discount,
-        min_group_size: data.is_group_discount && data.min_group_size ? parseInt(data.min_group_size) : null,
-        group_discount_type: data.is_group_discount ? data.group_discount_type : null,
-        group_discount_amount: data.is_group_discount && data.group_discount_amount ? parseFloat(data.group_discount_amount) : null,
+        discount_mode: data.discount_mode,
+        group_discount_mode: data.is_group_discount ? data.group_discount_mode : null,
+        group_discount_ranges: data.is_group_discount ? data.group_discount_ranges : [],
+        category_discounts: data.is_group_discount && data.group_discount_mode === 'category_based' 
+          ? data.category_discounts.map(cat => ({
+              traveler_category_id: cat.traveler_category_id,
+              traveler_category_label: cat.traveler_category_label,
+              ranges: cat.ranges.map(range => ({
+                id: range.id,
+                min_group_size: range.min_group_size,
+                max_group_size: range.max_group_size,
+                discount_type: range.discount_type,
+                discount_amount: range.discount_amount
+              }))
+            }))
+          : [],
       };
 
       if (isEditMode && discountId) {
@@ -274,9 +696,13 @@ const DiscountForm: React.FC = () => {
           : __('Discount created successfully', 'Discount created successfully'),
         'success'
       );
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts`;
-      }, 1000);
+      // Only redirect to listing page on create, not on update
+      if (!isEditMode) {
+        setTimeout(() => {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=discounts`;
+        }, 1000);
+      }
+      setIsSubmitting(false);
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the discount', 'An error occurred while saving the discount');
@@ -308,8 +734,139 @@ const DiscountForm: React.FC = () => {
 
   if (isLoadingDiscount) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+      <div className="space-y-3">
+        {/* Skeleton Header */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+            <div className="h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          </div>
+          <div className="h-10 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+
+        {/* Skeleton Info Card */}
+        <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <CardContent className="p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-5 h-5 bg-blue-200 dark:bg-blue-700 rounded animate-pulse" />
+              <div className="flex-1 space-y-2">
+                <div className="h-4 w-40 bg-blue-200 dark:bg-blue-700 rounded animate-pulse" />
+                <div className="space-y-1">
+                  <div className="h-3 w-full bg-blue-100 dark:bg-blue-800 rounded animate-pulse" />
+                  <div className="h-3 w-3/4 bg-blue-100 dark:bg-blue-800 rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Form Skeleton */}
+          <div className="lg:col-span-2 space-y-3">
+            {/* Basic Information Card Skeleton */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Coupon Code */}
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                {/* Description */}
+                <div className="space-y-2">
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-20 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+                {/* Type and Amount */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Usage Limits Card Skeleton */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                </div>
+                {/* Dates */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Group Discount Card Skeleton */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-44 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-5 w-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                  <div className="h-4 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar Skeleton */}
+          <div className="space-y-3">
+            {/* Status Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardContent>
+            </Card>
+
+            {/* Applicable To Card */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="h-5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardContent>
+            </Card>
+
+            {/* Submit Button */}
+            <Card>
+              <CardContent className="p-3">
+                <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -352,13 +909,64 @@ const DiscountForm: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
             {/* Main Form Fields */}
             <div className="lg:col-span-2 space-y-3">
+              {/* Discount Mode Indicator - Show on both Create and Edit */}
+              {(() => {
+                // Determine mode: use URL param for new discounts, formData for existing
+                const currentMode = isEditMode ? formData.discount_mode : discountMode;
+                const isGroupOnly = currentMode === 'group';
+                const isPromoOnly = currentMode === 'promo';
+                
+                return (
+                  <div className={`p-3 rounded-lg border-2 mb-3 ${
+                    isGroupOnly 
+                      ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                      : isPromoOnly 
+                        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                        : 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800'
+                  }`}>
+                    <div className="flex items-center gap-2">
+                      {isGroupOnly ? (
+                        <Users className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      ) : isPromoOnly ? (
+                        <Info className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      ) : (
+                        <Info className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      )}
+                      <span className={`font-medium ${
+                        isGroupOnly 
+                          ? 'text-green-700 dark:text-green-300' 
+                          : isPromoOnly 
+                            ? 'text-blue-700 dark:text-blue-300'
+                            : 'text-purple-700 dark:text-purple-300'
+                      }`}>
+                        {isGroupOnly 
+                          ? (isEditMode 
+                              ? __('Group Discount (Auto-applies, no code needed)', 'Group Discount (Auto-applies, no code needed)')
+                              : __('Creating Group Discount (Auto-applies, no code needed)', 'Creating Group Discount (Auto-applies, no code needed)'))
+                          : isPromoOnly 
+                            ? (isEditMode 
+                                ? __('Promo Code Discount', 'Promo Code Discount')
+                                : __('Creating Promo Code Discount', 'Creating Promo Code Discount'))
+                            : (isEditMode 
+                                ? __('Promo Code + Group Discount', 'Promo Code + Group Discount')
+                                : __('Creating Promo Code + Group Discount', 'Creating Promo Code + Group Discount'))
+                        }
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
+
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {isEffectiveGroupOnly ? __('Group Discount Information', 'Group Discount Information') : __('Basic Information', 'Basic Information')}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Coupon Code */}
+                  {/* Coupon Code - Only show for promo modes */}
+                  {!isEffectiveGroupOnly && (
                   <div>
                     <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Coupon Code', 'Coupon Code')} <span className="text-red-500">*</span>
@@ -369,6 +977,7 @@ const DiscountForm: React.FC = () => {
                     />
                     <Input
                       id="code"
+                      name="code"
                       type="text"
                       value={formData.code}
                       onChange={(e) => handleFieldChange('code', e.target.value.toUpperCase())}
@@ -383,6 +992,36 @@ const DiscountForm: React.FC = () => {
                       </p>
                     )}
                   </div>
+                  )}
+
+                  {/* Internal Name for Group Discount Only */}
+                  {isEffectiveGroupOnly && (
+                  <div>
+                    <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      {__('Internal Name', 'Internal Name')} <span className="text-red-500">*</span>
+                    </label>
+                    <HelpText 
+                      text={__('Enter a unique internal name for this group discount. This is for your reference only and won\'t be shown to customers.', 'Enter a unique internal name for this group discount. This is for your reference only and won\'t be shown to customers.')}
+                      className="mb-2"
+                    />
+                    <Input
+                      id="code"
+                      name="code"
+                      type="text"
+                      value={formData.code}
+                      onChange={(e) => handleFieldChange('code', e.target.value.toUpperCase().replace(/\s+/g, '_'))}
+                      placeholder={__('e.g., GROUP_DISCOUNT_2024', 'e.g., GROUP_DISCOUNT_2024')}
+                      className={errors.code ? 'border-red-500' : ''}
+                      required
+                    />
+                    {errors.code && (
+                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                        <Info className="w-4 h-4" />
+                        {errors.code}
+                      </p>
+                    )}
+                  </div>
+                  )}
 
                   {/* Description */}
                   <div>
@@ -403,7 +1042,8 @@ const DiscountForm: React.FC = () => {
                     />
                   </div>
 
-                  {/* Discount Type and Amount */}
+                  {/* Discount Type and Amount - Only show for promo modes */}
+                  {!isEffectiveGroupOnly && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Discount Type */}
                     <div>
@@ -412,6 +1052,7 @@ const DiscountForm: React.FC = () => {
                       </label>
                       <Select
                         id="type"
+                        name="type"
                         value={formData.type}
                         onChange={(e) => handleFieldChange('type', e.target.value as 'percentage' | 'fixed')}
                         className={errors.type ? 'border-red-500' : ''}
@@ -437,6 +1078,7 @@ const DiscountForm: React.FC = () => {
                         {formData.type === 'percentage' ? (
                           <Input
                             id="amount"
+                            name="amount"
                             type="number"
                             min="0"
                             max="100"
@@ -452,6 +1094,7 @@ const DiscountForm: React.FC = () => {
                             <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
                             <Input
                               id="amount"
+                              name="amount"
                               type="number"
                               min="0"
                               step="0.01"
@@ -475,9 +1118,10 @@ const DiscountForm: React.FC = () => {
                       )}
                     </div>
                   </div>
+                  )}
 
-                  {/* Maximum Discount Amount (for percentage discounts) */}
-                  {formData.type === 'percentage' && (
+                  {/* Maximum Discount Amount (for percentage discounts) - Only show for promo modes */}
+                  {!isEffectiveGroupOnly && formData.type === 'percentage' && (
                     <div>
                       <label htmlFor="max_discount_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         {__('Maximum Discount Amount', 'Maximum Discount Amount')}
@@ -617,64 +1261,61 @@ const DiscountForm: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Valid From Date */}
-                  <div>
-                    <label htmlFor="valid_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Valid From Date', 'Valid From Date')}
-                    </label>
-                    <HelpText 
-                      text={__('Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed.', 'Date when this coupon becomes active. Leave empty to activate immediately. You can select a past date if needed.')}
-                      className="mb-2"
-                    />
-                    <DatePicker
-                      value={formData.valid_from}
-                      onChange={(value) => handleFieldChange('valid_from', value)}
-                      placeholder={__('Select start date', 'Select start date')}
-                      error={!!errors.valid_from}
-                      className={errors.valid_from ? 'border-red-500' : ''}
-                    />
-                    {errors.valid_from && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.valid_from}
-                      </p>
-                    )}
-                  </div>
+                  {/* Valid From Date and Expiry Date - Same Line */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {/* Valid From Date */}
+                    <div>
+                      <label htmlFor="valid_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Valid From', 'Valid From')}
+                      </label>
+                      <DatePicker
+                        value={formData.valid_from}
+                        onChange={(value) => handleFieldChange('valid_from', value)}
+                        placeholder={__('Select start date', 'Select start date')}
+                        error={!!errors.valid_from}
+                        className={errors.valid_from ? 'border-red-500' : ''}
+                      />
+                      {errors.valid_from && (
+                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                          <Info className="w-4 h-4" />
+                          {errors.valid_from}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Expiry Date */}
-                  <div>
-                    <label htmlFor="expiry_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Expiry Date', 'Expiry Date')}
-                    </label>
-                    <HelpText 
-                      text={__('Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date.', 'Date when this coupon expires. Leave empty for no expiry. Must be after the valid from date.')}
-                      className="mb-2"
-                    />
-                    <DatePicker
-                      value={formData.expiry_date}
-                      onChange={(value) => handleFieldChange('expiry_date', value)}
-                      placeholder={__('Select expiry date', 'Select expiry date')}
-                      minDate={formData.valid_from ? new Date(formData.valid_from) : new Date()}
-                      error={!!errors.expiry_date}
-                      className={errors.expiry_date ? 'border-red-500' : ''}
-                    />
-                    {errors.expiry_date && (
-                      <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                        <Info className="w-4 h-4" />
-                        {errors.expiry_date}
-                      </p>
-                    )}
+                    {/* Expiry Date */}
+                    <div>
+                      <label htmlFor="expiry_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                        {__('Expiry Date', 'Expiry Date')}
+                      </label>
+                      <DatePicker
+                        value={formData.expiry_date}
+                        onChange={(value) => handleFieldChange('expiry_date', value)}
+                        placeholder={__('Select expiry date', 'Select expiry date')}
+                        minDate={formData.valid_from ? new Date(formData.valid_from) : new Date()}
+                        error={!!errors.expiry_date}
+                        className={errors.expiry_date ? 'border-red-500' : ''}
+                      />
+                      {errors.expiry_date && (
+                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                          <Info className="w-4 h-4" />
+                          {errors.expiry_date}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Group Discount */}
+              {/* Group Discount - Hide for promo-only mode */}
+              {!isEffectivePromoOnly && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Group Discount', 'Group Discount')}</CardTitle>
+                  <CardTitle className="text-base">{__('Group Discount Settings', 'Group Discount Settings')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Enable Group Discount */}
+                  {/* Enable Group Discount - Hide checkbox for group-only mode (already enabled) */}
+                  {!isEffectiveGroupOnly && (
                   <div>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -687,117 +1328,474 @@ const DiscountForm: React.FC = () => {
                         {__('Enable Group Discount', 'Enable Group Discount')}
                       </span>
                     </label>
-                    <HelpText 
-                      text={__('Enable additional discount for group bookings. The group discount is applied AFTER the regular discount. For example: Regular 15% off, then additional 10% group discount on the discounted price.', 'Enable additional discount for group bookings. The group discount is applied AFTER the regular discount. For example: Regular 15% off, then additional 10% group discount on the discounted price.')}
+                    <HelpText
+                      text={__('Apply discounts for group bookings based on traveler count.', 'Apply discounts for group bookings based on traveler count.')}
                       className="mb-2 mt-1"
                     />
                   </div>
+                  )}
 
                   {formData.is_group_discount && (
                     <>
-                      {/* Minimum Group Size */}
+                      {/* Group Discount Mode */}
                       <div>
-                        <label htmlFor="min_group_size" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                          {__('Minimum Group Size', 'Minimum Group Size')} <span className="text-red-500">*</span>
+                        <label htmlFor="group_discount_mode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                          {__('Discount Mode', 'Discount Mode')} <span className="text-red-500">*</span>
                         </label>
-                        <HelpText 
-                          text={__('Minimum number of participants required to qualify for the group discount.', 'Minimum number of participants required to qualify for the group discount.')}
+                        <HelpText
+                          text={__('Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.', 'Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.')}
                           className="mb-2"
                         />
-                        <Input
-                          id="min_group_size"
-                          type="number"
-                          min="2"
-                          value={formData.min_group_size}
-                          onChange={(e) => handleFieldChange('min_group_size', e.target.value)}
-                          placeholder={__('e.g., 5', 'e.g., 5')}
-                          className={errors.min_group_size ? 'border-red-500' : ''}
+                        <Select
+                          id="group_discount_mode"
+                          value={formData.group_discount_mode}
+                          onChange={(e) => handleFieldChange('group_discount_mode', e.target.value as 'total' | 'category_based')}
+                          className={errors.group_discount_mode ? 'border-red-500' : ''}
                           required={formData.is_group_discount}
-                        />
-                        {errors.min_group_size && (
+                        >
+                          <option value="total">{__('Total Discount', 'Total Discount')}</option>
+                          <option value="category_based">{__('Category-Based Discount', 'Category-Based Discount')}</option>
+                        </Select>
+                        {errors.group_discount_mode && (
                           <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                             <Info className="w-4 h-4" />
-                            {errors.min_group_size}
+                            {errors.group_discount_mode}
                           </p>
                         )}
                       </div>
 
-                      {/* Group Discount Type and Amount */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {/* Group Discount Type */}
-                        <div>
-                          <label htmlFor="group_discount_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            {__('Group Discount Type', 'Group Discount Type')} <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            id="group_discount_type"
-                            value={formData.group_discount_type}
-                            onChange={(e) => handleFieldChange('group_discount_type', e.target.value as 'percentage' | 'fixed')}
-                            className={errors.group_discount_type ? 'border-red-500' : ''}
-                            required={formData.is_group_discount}
-                          >
-                            <option value="percentage">{__('Percentage', 'Percentage')}</option>
-                            <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
-                          </Select>
-                          {errors.group_discount_type && (
-                            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                              <Info className="w-4 h-4" />
-                              {errors.group_discount_type}
-                            </p>
-                          )}
-                        </div>
 
-                        {/* Group Discount Amount */}
-                        <div>
-                          <label htmlFor="group_discount_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                            {__('Group Discount Amount', 'Group Discount Amount')} <span className="text-red-500">*</span>
-                          </label>
-                          <div className="relative">
-                            {formData.group_discount_type === 'percentage' ? (
-                              <Input
-                                id="group_discount_amount"
-                                type="number"
-                                min="0"
-                                max="100"
-                                step="0.01"
-                                value={formData.group_discount_amount}
-                                onChange={(e) => handleFieldChange('group_discount_amount', e.target.value)}
-                                placeholder={__('e.g., 10', 'e.g., 10')}
-                                className={errors.group_discount_amount ? 'border-red-500' : ''}
-                                required={formData.is_group_discount}
-                              />
-                            ) : (
-                              <div className="relative">
-                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
-                                <Input
-                                  id="group_discount_amount"
-                                  type="number"
-                                  min="0"
-                                  step="0.01"
-                                  value={formData.group_discount_amount}
-                                  onChange={(e) => handleFieldChange('group_discount_amount', e.target.value)}
-                                  placeholder={__('e.g., 50', 'e.g., 50')}
-                                  className={`pl-7 ${errors.group_discount_amount ? 'border-red-500' : ''}`}
-                                  required={formData.is_group_discount}
-                                />
-                              </div>
-                            )}
-                            {formData.group_discount_type === 'percentage' && (
-                              <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
-                            )}
+                      {/* Ranges - Only show for Total Discount mode */}
+                      {formData.group_discount_mode === 'total' && (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Group Size Ranges', 'Group Size Ranges')}</h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {__('Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.', 'Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.')}
+                              </p>
+                            </div>
+                            <Button type="button" variant="outline" onClick={addRange} className="flex items-center gap-2">
+                              <Plus className="w-4 h-4" />
+                              {__('Add Range', 'Add Range')}
+                            </Button>
                           </div>
-                          {errors.group_discount_amount && (
-                            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+
+                          <div className="space-y-3">
+                            {formData.group_discount_ranges.map((range, idx) => (
+                              <Card key={range.id} className="border border-gray-200 dark:border-gray-700">
+                                <CardContent className="p-4 space-y-3">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                                      {__('Range', 'Range')} #{idx + 1}
+                                    </div>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => removeRange(range.id)}
+                                      disabled={formData.group_discount_ranges.length === 1}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                      {__('Remove', 'Remove')}
+                                    </Button>
+                                  </div>
+
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        {__('Minimum Group Size', 'Minimum Group Size')} <span className="text-red-500">*</span>
+                                      </label>
+                                      <Input
+                                        type="number"
+                                        min="1"
+                                        value={range.min_group_size}
+                                        onChange={(e) => updateRange(range.id, { min_group_size: e.target.value })}
+                                        placeholder={__('e.g., 10', 'e.g., 10')}
+                                        className={errors[`group_discount_ranges_${idx}_min`] ? 'border-red-500' : ''}
+                                      />
+                                      {errors[`group_discount_ranges_${idx}_min`] && (
+                                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                          <Info className="w-4 h-4" />
+                                          {errors[`group_discount_ranges_${idx}_min`]}
+                                        </p>
+                                      )}
+                                    </div>
+
+                                    <div>
+                                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                        {__('Maximum Group Size', 'Maximum Group Size')}
+                                      </label>
+                                      <Input
+                                        type="number"
+                                        min={range.min_group_size ? parseInt(range.min_group_size, 10) + 1 : 2}
+                                        value={range.max_group_size}
+                                        onChange={(e) => updateRange(range.id, { max_group_size: e.target.value })}
+                                        placeholder={__('Leave empty for unlimited', 'Leave empty for unlimited')}
+                                        className={errors[`group_discount_ranges_${idx}_max`] ? 'border-red-500' : ''}
+                                      />
+                                      {errors[`group_discount_ranges_${idx}_max`] && (
+                                        <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                          <Info className="w-4 h-4" />
+                                          {errors[`group_discount_ranges_${idx}_max`]}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {formData.group_discount_mode === 'total' && (
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                          {__('Discount Type', 'Discount Type')} <span className="text-red-500">*</span>
+                                        </label>
+                                        <Select
+                                          value={range.discount_type || 'percentage'}
+                                          onChange={(e) => updateRange(range.id, { discount_type: e.target.value as 'percentage' | 'fixed' })}
+                                          className={errors[`group_discount_ranges_${idx}_type`] ? 'border-red-500' : ''}
+                                        >
+                                          <option value="percentage">{__('Percentage', 'Percentage')}</option>
+                                          <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+                                          <option value="percentage_of_total">{__('Percentage of Total', 'Percentage of Total')}</option>
+                                    </Select>
+                                        {errors[`group_discount_ranges_${idx}_type`] && (
+                                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <Info className="w-4 h-4" />
+                                            {errors[`group_discount_ranges_${idx}_type`]}
+                                          </p>
+                                        )}
+                                      </div>
+
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                          {__('Discount Amount', 'Discount Amount')} <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                          {range.discount_type === 'fixed' && (
+                                            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                                          )}
+                                          <Input
+                                            type="number"
+                                            min="0"
+                                            max={range.discount_type === 'percentage' ? 100 : undefined}
+                                            step="0.01"
+                                            value={range.discount_amount || ''}
+                                            onChange={(e) => updateRange(range.id, { discount_amount: e.target.value })}
+                                            placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'e.g., 10') : __('e.g., 50', 'e.g., 50')}
+                                            className={`${range.discount_type === 'fixed' ? 'pl-7' : ''} ${errors[`group_discount_ranges_${idx}_amount`] ? 'border-red-500' : ''}`}
+                                          />
+                                          {range.discount_type === 'percentage' && (
+                                            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
+                                          )}
+                                        </div>
+                                        {errors[`group_discount_ranges_${idx}_amount`] && (
+                                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <Info className="w-4 h-4" />
+                                            {errors[`group_discount_ranges_${idx}_amount`]}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </CardContent>
+                              </Card>
+                            ))}
+                            </div>
+                          </>
+                      )}
+
+                      {formData.group_discount_mode === 'category_based' && (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Traveler Categories', 'Traveler Categories')}</h4>
+                              <p className="text-xs text-gray-500 dark:text-gray-400">
+                                {__('Add traveler categories and define discount ranges for each category.', 'Add traveler categories and define discount ranges for each category.')}
+                              </p>
+                            </div>
+                            <div className="relative">
+                              <Button type="button" onClick={addTravelerCategory} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                <Plus className="w-4 h-4" />
+                                {__('Add Category', 'Add Category')}
+                              </Button>
+                              
+                              {/* Category Selection Dropdown */}
+                              {showCategoryDropdown && (
+                                <div className="absolute right-0 top-full mt-2 z-50 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-lg min-w-[320px]">
+                                  <div className="p-3 border-b border-gray-200 dark:border-gray-700">
+                                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                                      {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                    </p>
+                                  </div>
+                                  
+                                  {travelerCategoryOptions.length > 0 ? (
+                                    <div className="divide-y divide-gray-100 dark:divide-gray-700 max-h-[300px] overflow-y-auto">
+                                      {travelerCategoryOptions.map((cat) => (
+                                        <div
+                                          key={cat.value}
+                                          onClick={() => selectCategory(cat.value, cat.label)}
+                                          className="px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                                        >
+                                          <div className="flex flex-col">
+                                            <div className="flex items-center gap-2">
+                                              <span className="font-semibold text-gray-900 dark:text-white">{cat.label}</span>
+                                              <span className="text-sm text-gray-500 dark:text-gray-400">
+                                                ({cat.age_min || 'null'}-{cat.age_max || 'null'} {__('years', 'years')})
+                                              </span>
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                              {cat.description && <span>{cat.description} • </span>}
+                                              <span className="capitalize">{cat.pricing_mode?.replace('_', ' ') || 'Per person'}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                      {__('No traveler categories available. Please create categories first.', 'No traveler categories available. Please create categories first.')}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          {errors.category_discounts && (
+                            <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                               <Info className="w-4 h-4" />
-                              {errors.group_discount_amount}
+                              {errors.category_discounts}
                             </p>
                           )}
+
+                          {formData.category_discounts.length === 0 ? (
+                            <div className="text-center py-12 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                              <div className="flex flex-col items-center space-y-4">
+                                <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                                  <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
+                                </div>
+                                <div className="text-gray-500 dark:text-gray-400">
+                                  <div className="text-lg font-medium mb-2">{__('No traveler categories added yet', 'No traveler categories added yet')}</div>
+                                  <div className="text-sm mb-4">{__('Select traveler categories to apply group-specific discounts', 'Select traveler categories to apply group-specific discounts')}</div>
+                                </div>
+                                <Button type="button" onClick={addTravelerCategory} className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
+                                  <Plus className="w-4 h-4" />
+                                  {__('Add Your First Category', 'Add Your First Category')}
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="space-y-4">
+                              {formData.category_discounts.map((category, catIdx) => (
+                                    <Card key={catIdx} className="border border-gray-200 dark:border-gray-700">
+                                  <CardContent className="p-4 space-y-3">
+                                    <div className="flex items-start justify-between gap-3">
+                                      <div className="flex-1">
+                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                                          {__('Traveler Category', 'Traveler Category')} #{catIdx + 1}
+                                        </div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                          {__('Configure discount ranges for this traveler category.', 'Configure discount ranges for this traveler category.')}
+                                        </div>
+                                      </div>
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        onClick={() => removeTravelerCategory(catIdx)}
+                                        disabled={formData.category_discounts.length === 1}
+                                        className="flex items-center gap-2"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                        {__('Remove', 'Remove')}
+                                      </Button>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                      <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                          {__('Select Traveler Category', 'Select Traveler Category')} <span className="text-red-500">*</span>
+                                        </label>
+                                        <Select
+                                          value={category.traveler_category_id}
+                                          onChange={(e) => {
+                                            const selected = travelerCategoryOptions.find(opt => opt.value === e.target.value);
+                                            updateTravelerCategory(catIdx, {
+                                              traveler_category_id: e.target.value,
+                                              traveler_category_label: selected?.label || ''
+                                            });
+                                          }}
+                                          className={errors[`category_discounts_${catIdx}_id`] ? 'border-red-500' : ''}
+                                        >
+                                          {travelerCategoryOptions.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                          ))}
+                                        </Select>
+                                        {errors[`category_discounts_${catIdx}_id`] && (
+                                          <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                            <Info className="w-4 h-4" />
+                                            {errors[`category_discounts_${catIdx}_id`]}
+                                          </p>
+                                        )}
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between">
+                                      <div>
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{__('Discount Ranges', 'Discount Ranges')}</div>
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                          {__('Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+).', 'Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+.')}
+                                        </div>
+                                      </div>
+                                      <Button type="button" variant="outline" onClick={() => addRangeToCategory(catIdx)} className="flex items-center gap-2">
+                                        <Plus className="w-4 h-4" />
+                                        {__('Add Range', 'Add Range')}
+                                      </Button>
+                                    </div>
+
+                                    {errors[`category_discounts_${catIdx}_ranges`] && (
+                                      <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                        <Info className="w-4 h-4" />
+                                        {errors[`category_discounts_${catIdx}_ranges`]}
+                                      </p>
+                                    )}
+
+                                    {category.ranges.length === 0 ? (
+                                      <div className="text-center py-6 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg">
+                                        <div className="text-gray-500 dark:text-gray-400">
+                                          <div className="text-sm font-medium mb-1">{__('No discount ranges added yet', 'No discount ranges added yet')}</div>
+                                          <div className="text-xs">{__('Click "Add Range" to create discount tiers', 'Click "Add Range" to create discount tiers')}</div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="space-y-3">
+                                        {category.ranges.map((range, rIdx) => (
+                                      <div key={range.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-gray-800">
+                                        <div className="flex items-start justify-between gap-3">
+                                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                                            {__('Range', 'Range')} #{rIdx + 1}
+                                          </div>
+                                          <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => removeRangeFromCategory(catIdx, range.id)}
+                                            disabled={category.ranges.length === 1}
+                                            className="flex items-center gap-1"
+                                          >
+                                            <Trash2 className="w-3 h-3" />
+                                            {__('Remove', 'Remove')}
+                                          </Button>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                              {__('Minimum Group Size', 'Minimum Group Size')} <span className="text-red-500">*</span>
+                                            </label>
+                                            <Input
+                                              type="number"
+                                              min="1"
+                                              value={range.min_group_size}
+                                              onChange={(e) => updateRangeInCategory(catIdx, range.id, { min_group_size: e.target.value })}
+                                              placeholder={__('e.g., 10', 'e.g., 10')}
+                                              className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] ? 'border-red-500' : ''}
+                                            />
+                                            {errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] && (
+                                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <Info className="w-4 h-4" />
+                                                {errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`]}
+                                              </p>
+                                            )}
+                                          </div>
+
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                              {__('Maximum Group Size', 'Maximum Group Size')}
+                                            </label>
+                                            <Input
+                                              type="number"
+                                              min={range.min_group_size ? parseInt(range.min_group_size, 10) + 1 : 2}
+                                              value={range.max_group_size}
+                                              onChange={(e) => updateRangeInCategory(catIdx, range.id, { max_group_size: e.target.value })}
+                                              placeholder={__('Leave empty for unlimited', 'Leave empty for unlimited')}
+                                              className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] ? 'border-red-500' : ''}
+                                            />
+                                            {errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] && (
+                                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <Info className="w-4 h-4" />
+                                                {errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`]}
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                              {__('Discount Type', 'Discount Type')} <span className="text-red-500">*</span>
+                                            </label>
+                                            <Select
+                                              value={range.discount_type || 'percentage'}
+                                              onChange={(e) => updateRangeInCategory(catIdx, range.id, { discount_type: e.target.value as 'percentage' | 'fixed' })}
+                                              className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] ? 'border-red-500' : ''}
+                                            >
+                                              <option value="percentage">{__('Percentage', 'Percentage')}</option>
+                                              <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+                                            </Select>
+                                            {errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] && (
+                                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <Info className="w-4 h-4" />
+                                                {errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`]}
+                                              </p>
+                                            )}
+                                          </div>
+
+                                          <div>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                              {__('Discount Amount', 'Discount Amount')} <span className="text-red-500">*</span>
+                                            </label>
+                                            <div className="relative">
+                                              {range.discount_type === 'fixed' && (
+                                                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                                              )}
+                                              <Input
+                                                type="number"
+                                                min="0"
+                                                max={range.discount_type === 'percentage' ? 100 : undefined}
+                                                step="0.01"
+                                                value={range.discount_amount || ''}
+                                                onChange={(e) => updateRangeInCategory(catIdx, range.id, { discount_amount: e.target.value })}
+                                                placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'e.g., 10') : __('e.g., 50', 'e.g., 50')}
+                                                className={`${range.discount_type === 'fixed' ? 'pl-7' : ''} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? 'border-red-500' : ''}`}
+                                              />
+                                              {range.discount_type === 'percentage' && (
+                                                <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">%</span>
+                                              )}
+                                            </div>
+                                            {errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] && (
+                                              <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                                <Info className="w-4 h-4" />
+                                                {errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`]}
+                                              </p>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                      </div>
+                                    )}
+                                  </CardContent>
+                                </Card>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                      </div>
+                      )}
                     </>
                   )}
                 </CardContent>
               </Card>
+              )}
             </div>
 
             {/* Sidebar */}
@@ -836,10 +1834,125 @@ const DiscountForm: React.FC = () => {
                     <option value="specific_trips">{__('Specific Trips', 'Specific Trips')}</option>
                   </Select>
                   {formData.applicable_to === 'specific_trips' && (
-                    <div className="mt-2">
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                        {__('Trip selection will be available in a future update.', 'Trip selection will be available in a future update.')}
-                      </p>
+                    <div className="mt-3 space-y-2 relative">
+                      {/* Selected trips display / Dropdown trigger */}
+                      <div 
+                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-800"
+                        onClick={() => setShowTripDropdown(!showTripDropdown)}
+                      >
+                        {formData.trip_ids.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {formData.trip_ids.slice(0, 3).map((tripId) => {
+                              const trip = tripOptions.find(t => t.value === tripId);
+                              return (
+                                <span
+                                  key={tripId}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
+                                >
+                                  {trip?.label || `Trip #${tripId}`}
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFieldChange('trip_ids', formData.trip_ids.filter(id => id !== tripId));
+                                    }}
+                                    className="hover:text-blue-600 dark:hover:text-blue-200"
+                                  >
+                                    ×
+                                  </button>
+                                </span>
+                              );
+                            })}
+                            {formData.trip_ids.length > 3 && (
+                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
+                                +{formData.trip_ids.length - 3} {__('more', 'more')}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {__('Click to select trips...', 'Click to select trips...')}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Dropdown panel */}
+                      {showTripDropdown && (
+                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
+                          {/* Search Input */}
+                          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
+                            <div className="relative">
+                              <Input
+                                type="text"
+                                placeholder={__('Search trips...', 'Search trips...')}
+                                value={tripSearchQuery}
+                                onChange={(e) => setTripSearchQuery(e.target.value)}
+                                className="w-full text-sm"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              {tripsQuery.isFetching && (
+                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                          
+                          {/* Trip list */}
+                          <div className="max-h-[200px] overflow-y-auto">
+                            {tripsQuery.isLoading ? (
+                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
+                                {__('Loading trips...', 'Loading trips...')}
+                              </div>
+                            ) : tripOptions.length > 0 ? (
+                              <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                                {tripOptions.map((trip) => (
+                                  <label
+                                    key={trip.value}
+                                    className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                                    onClick={(e) => e.stopPropagation()}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={formData.trip_ids.includes(trip.value)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          handleFieldChange('trip_ids', [...formData.trip_ids, trip.value]);
+                                        } else {
+                                          handleFieldChange('trip_ids', formData.trip_ids.filter(id => id !== trip.value));
+                                        }
+                                      }}
+                                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                    />
+                                    <span className="text-sm text-gray-900 dark:text-white truncate flex-1">{trip.label}</span>
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">#{trip.value}</span>
+                                  </label>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                {tripSearchQuery ? __('No trips found', 'No trips found') : __('No trips available', 'No trips available')}
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Footer */}
+                          <div className="p-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {formData.trip_ids.length} {__('selected', 'selected')}
+                            </span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowTripDropdown(false)}
+                            >
+                              {__('Done', 'Done')}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </CardContent>

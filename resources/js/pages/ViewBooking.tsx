@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
@@ -102,8 +103,10 @@ const ViewBooking: React.FC = () => {
 
       const result = await response.json();
       
-      if (result.success && result.data) {
-        const data = result.data;
+      // Handle both wrapped { success, data } and direct data response formats
+      const data = (result.success && result.data) ? result.data : result;
+      
+      if (data && data.id) {
         return {
           id: data.id,
           booking_number: data.reference,
@@ -124,6 +127,8 @@ const ViewBooking: React.FC = () => {
           total_amount: data.total_amount,
           amount_paid: data.amount_paid || 0,
           amount_due: data.amount_due || 0,
+          discount_amount: data.discount_amount || 0,
+          discount_code: data.discount_code || null,
           currency: data.currency || 'USD',
           payment_status: data.payment_status,
           booking_status: data.status,
@@ -150,12 +155,7 @@ const ViewBooking: React.FC = () => {
   });
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatPrice = (price: number, currencyCode: string = 'USD') => {
@@ -760,8 +760,54 @@ const ViewBooking: React.FC = () => {
                     {formatPrice(booking.total_amount || 0, booking.currency)}
                   </div>
                 </div>
-              </CardContent>
+                </CardContent>
             </Card>
+
+            {/* Discount Applied Card */}
+            {booking.discount_amount > 0 && (
+              <Card className="border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base flex items-center gap-2 text-emerald-700 dark:text-emerald-400">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+                      <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                      <path d="M2 17l10 5 10-5"></path>
+                      <path d="M2 12l10 5 10-5"></path>
+                    </svg>
+                    {__('Discount Applied', 'Discount Applied')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
+                      {__('Discount Type', 'Discount Type')}
+                    </div>
+                    <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
+                      {booking.discount_code?.toLowerCase().includes('group') || booking.discount_code?.includes('GROUP') 
+                        ? __('Group Discount', 'Group Discount')
+                        : __('Coupon Discount', 'Coupon Discount')}
+                    </div>
+                  </div>
+                  {booking.discount_code && (
+                    <div>
+                      <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
+                        {__('Code', 'Code')}
+                      </div>
+                      <div className="text-sm font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded inline-block">
+                        {booking.discount_code}
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
+                      {__('Savings', 'Savings')}
+                    </div>
+                    <div className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
+                      -{formatPrice(booking.discount_amount, booking.currency)}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Booking Timeline */}
             <Card>

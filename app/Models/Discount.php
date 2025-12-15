@@ -28,8 +28,14 @@ class Discount
     public bool $first_time_customer_only;
     public bool $is_group_discount;
     public ?int $min_group_size;
-    public ?string $group_discount_type; // 'percentage' | 'fixed'
-    public ?float $group_discount_amount;
+    public ?int $max_group_size; // DEPRECATED - kept for backward compatibility
+    public ?string $group_discount_type; // DEPRECATED - kept for backward compatibility
+    public ?float $group_discount_amount; // DEPRECATED - kept for backward compatibility
+    public ?string $group_discount_mode; // 'total' | 'category_based' - DEPRECATED, replaced by ranges
+    public ?array $category_discounts; // DEPRECATED - replaced by ranges
+
+    // New: Multiple group size ranges
+    public ?array $group_discount_ranges; // JSON array of ranges with different rates
     public string $created_at;
     public string $updated_at;
     public int $created_by;
@@ -57,8 +63,17 @@ class Discount
         $discount->first_time_customer_only = (bool) ($data['first_time_customer_only'] ?? false);
         $discount->is_group_discount = (bool) ($data['is_group_discount'] ?? false);
         $discount->min_group_size = isset($data['min_group_size']) ? (int) $data['min_group_size'] : null;
+        $discount->max_group_size = isset($data['max_group_size']) ? (int) $data['max_group_size'] : null;
         $discount->group_discount_type = $data['group_discount_type'] ?? null;
         $discount->group_discount_amount = isset($data['group_discount_amount']) ? (float) $data['group_discount_amount'] : null;
+        $discount->group_discount_mode = $data['group_discount_mode'] ?? 'total';
+        $discount->category_discounts = isset($data['category_discounts']) ? 
+            (is_array($data['category_discounts']) ? $data['category_discounts'] : json_decode($data['category_discounts'], true)) : null;
+        
+        // New: Group discount ranges
+        $discount->group_discount_ranges = isset($data['group_discount_ranges']) ?
+            (is_array($data['group_discount_ranges']) ? $data['group_discount_ranges'] : json_decode($data['group_discount_ranges'], true)) : null;
+        
         $discount->created_at = $data['created_at'] ?? '';
         $discount->updated_at = $data['updated_at'] ?? '';
         $discount->created_by = (int) ($data['created_by'] ?? 0);
@@ -88,8 +103,12 @@ class Discount
             'first_time_customer_only' => $this->first_time_customer_only,
             'is_group_discount' => $this->is_group_discount,
             'min_group_size' => $this->min_group_size,
+            'max_group_size' => $this->max_group_size,
             'group_discount_type' => $this->group_discount_type,
             'group_discount_amount' => $this->group_discount_amount,
+            'group_discount_mode' => $this->group_discount_mode,
+            'category_discounts' => $this->category_discounts,
+            'group_discount_ranges' => $this->group_discount_ranges,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'created_by' => $this->created_by,

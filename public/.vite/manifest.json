@@ -3,18 +3,18 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-ZAc9H3xe.js": {
-    "file": "js/index-ZAc9H3xe.js",
+  "_index-BLpJYGJ9.js": {
+    "file": "js/index-BLpJYGJ9.js",
     "name": "index",
     "imports": [
-      "_react-vendor-MMNwjThF.js"
+      "_react-vendor-PUxdxtyr.js"
     ],
     "css": [
       "css/index.css"
     ]
   },
-  "_react-vendor-MMNwjThF.js": {
-    "file": "js/react-vendor-MMNwjThF.js",
+  "_react-vendor-PUxdxtyr.js": {
+    "file": "js/react-vendor-PUxdxtyr.js",
     "name": "react-vendor"
   },
   "resources/js/account-page.tsx": {
@@ -23,8 +23,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-MMNwjThF.js",
-      "_index-ZAc9H3xe.js"
+      "_react-vendor-PUxdxtyr.js",
+      "_index-BLpJYGJ9.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -33,8 +33,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-MMNwjThF.js",
-      "_index-ZAc9H3xe.js"
+      "_react-vendor-PUxdxtyr.js",
+      "_index-BLpJYGJ9.js"
     ]
   }
 }

@@ -2235,10 +2235,20 @@ onChange={handleFieldChange}
                     name="date_format"
 onChange={handleFieldChange}
                   >
-                    <option value="Y-m-d">YYYY-MM-DD</option>
-                    <option value="m/d/Y">MM/DD/YYYY</option>
-                    <option value="d/m/Y">DD/MM/YYYY</option>
-                    <option value="d-m-Y">DD-MM-YYYY</option>
+                    <option value="Y-m-d">{new Date().toLocaleDateString('en-CA')} (YYYY-MM-DD)</option>
+                    <option value="Y/m/d">{`${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}`} (YYYY/MM/DD)</option>
+                    <option value="m/d/Y">{`${String(new Date().getMonth() + 1).padStart(2, '0')}/${String(new Date().getDate()).padStart(2, '0')}/${new Date().getFullYear()}`} (MM/DD/YYYY)</option>
+                    <option value="d/m/Y">{`${String(new Date().getDate()).padStart(2, '0')}/${String(new Date().getMonth() + 1).padStart(2, '0')}/${new Date().getFullYear()}`} (DD/MM/YYYY)</option>
+                    <option value="d-m-Y">{`${String(new Date().getDate()).padStart(2, '0')}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${new Date().getFullYear()}`} (DD-MM-YYYY)</option>
+                    <option value="d.m.Y">{`${String(new Date().getDate()).padStart(2, '0')}.${String(new Date().getMonth() + 1).padStart(2, '0')}.${new Date().getFullYear()}`} (DD.MM.YYYY)</option>
+                    <option value="M j, Y">{new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} (Mon D, YYYY)</option>
+                    <option value="F j, Y">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} (Month D, YYYY)</option>
+                    <option value="j M Y">{`${new Date().getDate()} ${new Date().toLocaleDateString('en-US', { month: 'short' })} ${new Date().getFullYear()}`} (D Mon YYYY)</option>
+                    <option value="j F Y">{`${new Date().getDate()} ${new Date().toLocaleDateString('en-US', { month: 'long' })} ${new Date().getFullYear()}`} (D Month YYYY)</option>
+                    <option value="Y M j">{`${new Date().getFullYear()} ${new Date().toLocaleDateString('en-US', { month: 'short' })} ${new Date().getDate()}`} (YYYY Mon D)</option>
+                    <option value="Y F j">{`${new Date().getFullYear()} ${new Date().toLocaleDateString('en-US', { month: 'long' })} ${new Date().getDate()}`} (YYYY Month D)</option>
+                    <option value="l, F j, Y">{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })} (Day, Month D, YYYY)</option>
+                    <option value="D, M j, Y">{new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} (Day, Mon D, YYYY)</option>
                   </Select>
                 </FormField>
 

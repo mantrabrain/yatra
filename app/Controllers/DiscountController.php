@@ -41,6 +41,157 @@ class DiscountController extends BaseController
                 ],
             ]
         ));
+
+        // Group discount discoverability endpoint
+        register_rest_route($this->namespace, '/' . $this->rest_base . '/group-discounts', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_group_discounts'],
+                'permission_callback' => [$this, 'check_public_permission'],
+                'args' => [
+                    'trip_ids' => [
+                        'required' => false,
+                        'type' => 'array',
+                        'items' => ['type' => 'integer'],
+                        'description' => 'Array of trip IDs to check for group discounts',
+                    ],
+                ],
+            ],
+        ]);
+    }
+
+    public function check_public_permission(?WP_REST_Request $request = null): bool
+    {
+        // Allow public access to group discount discoverability
+        return true;
+    }
+
+    /**
+     * Get group discount availability for trips
+     * Public endpoint for frontend discoverability
+     */
+    public function get_group_discounts(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $tripIds = $request->get_param('trip_ids');
+
+            if (empty($tripIds) || !is_array($tripIds)) {
+                return $this->error_response(__('Trip IDs are required', 'yatra'), 400);
+            }
+
+            // Sanitize trip IDs
+            $tripIds = array_map('absint', array_filter($tripIds));
+
+            if (empty($tripIds)) {
+                return $this->error_response(__('Valid trip IDs are required', 'yatra'), 400);
+            }
+
+            $result = [];
+
+            foreach ($tripIds as $tripId) {
+                $groupDiscounts = $this->getTripGroupDiscounts($tripId);
+                $result[$tripId] = [
+                    'has_group_discounts' => !empty($groupDiscounts),
+                    'discounts' => $groupDiscounts,
+                    'summary' => $this->generateGroupDiscountSummary($groupDiscounts),
+                ];
+            }
+
+            return $this->success_response($result);
+
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get group discounts for a specific trip
+     */
+    private function getTripGroupDiscounts(int $tripId): array
+    {
+        $discounts = \Yatra\Models\Discount::where('is_group_discount', true)
+            ->where('status', 'publish')
+            ->where(function($query) {
+                $query->whereNull('valid_from')
+                      ->orWhere('valid_from', '<=', date('Y-m-d'));
+            })
+            ->where(function($query) {
+                $query->whereNull('expiry_date')
+                      ->orWhere('expiry_date', '>=', date('Y-m-d'));
+            })
+            ->where(function($query) use ($tripId) {
+                $query->where('applicable_to', 'all')
+                      ->orWhere(function($subQuery) use ($tripId) {
+                          $subQuery->where('applicable_to', 'specific_trips')
+                                   ->whereJsonContains('trip_ids', $tripId);
+                      });
+            })
+            ->orderBy('min_group_size', 'asc')
+            ->get();
+
+        $result = [];
+        foreach ($discounts as $discount) {
+            $result[] = [
+                'id' => $discount->id,
+                'min_group_size' => $discount->min_group_size,
+                'max_group_size' => $discount->max_group_size,
+                'discount_type' => $discount->group_discount_type,
+                'discount_amount' => $discount->group_discount_amount,
+                'discount_mode' => $discount->group_discount_mode,
+                'category_discounts' => $discount->category_discounts,
+                'range_label' => $this->formatGroupSizeRange($discount),
+                'discount_label' => $this->formatDiscountLabel($discount),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Generate summary text for group discounts
+     */
+    private function generateGroupDiscountSummary(array $discounts): string
+    {
+        if (empty($discounts)) {
+            return '';
+        }
+
+        $ranges = array_map(function($discount) {
+            return $discount['range_label'];
+        }, $discounts);
+
+        $uniqueRanges = array_unique($ranges);
+
+        if (count($uniqueRanges) === 1) {
+            return "Up to {$discounts[0]['discount_label']} for {$uniqueRanges[0]}";
+        } else {
+            $firstDiscount = $discounts[0];
+            return "Up to {$firstDiscount['discount_label']} for groups starting at {$firstDiscount['min_group_size']} people";
+        }
+    }
+
+    /**
+     * Format group size range for display
+     */
+    private function formatGroupSizeRange($discount): string
+    {
+        if ($discount->max_group_size) {
+            return "{$discount->min_group_size}-{$discount->max_group_size} people";
+        } else {
+            return "{$discount->min_group_size}+ people";
+        }
+    }
+
+    /**
+     * Format discount label for display
+     */
+    private function formatDiscountLabel($discount): string
+    {
+        if ($discount->group_discount_type === 'percentage') {
+            return "{$discount->group_discount_amount}% off";
+        } else {
+            return "$" . number_format($discount->group_discount_amount, 2) . " off";
+        }
     }
 
     public function check_permission(?WP_REST_Request $request = null): bool
@@ -177,6 +328,21 @@ class DiscountController extends BaseController
 
         if (isset($prepared['trip_ids']) && is_string($prepared['trip_ids'])) {
             $prepared['trip_ids'] = maybe_unserialize($prepared['trip_ids']);
+        }
+        
+        // Ensure trip_ids is always an array
+        if (!is_array($prepared['trip_ids'])) {
+            $prepared['trip_ids'] = [];
+        }
+
+        // Deserialize category_discounts if it's a JSON string
+        if (isset($prepared['category_discounts']) && is_string($prepared['category_discounts'])) {
+            $prepared['category_discounts'] = json_decode($prepared['category_discounts'], true) ?: [];
+        }
+        
+        // Deserialize group_discount_ranges if it's a JSON string
+        if (isset($prepared['group_discount_ranges']) && is_string($prepared['group_discount_ranges'])) {
+            $prepared['group_discount_ranges'] = json_decode($prepared['group_discount_ranges'], true) ?: [];
         }
 
         $prepared['first_time_customer_only'] = (bool) ($prepared['first_time_customer_only'] ?? false);

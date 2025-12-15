@@ -7,6 +7,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { apiClient } from '../lib/api';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 // Button available for future use
@@ -142,11 +143,7 @@ const ViewDeparture: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatTime = (timeString: string) => {

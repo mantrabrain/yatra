@@ -54,10 +54,30 @@ get_header();
                 </svg>
             </div>
             <h1 class="yatra-confirmation-title">
-                <?php esc_html_e('Booking Confirmed!', 'yatra'); ?>
+                <?php 
+                if ($booking->status === 'confirmed') {
+                    esc_html_e('Booking Confirmed!', 'yatra');
+                } elseif ($booking->status === 'pending') {
+                    esc_html_e('Booking Received!', 'yatra');
+                } elseif ($booking->status === 'cancelled') {
+                    esc_html_e('Booking Cancelled', 'yatra');
+                } else {
+                    esc_html_e('Booking Submitted!', 'yatra');
+                }
+                ?>
             </h1>
             <p class="yatra-confirmation-subtitle">
-                <?php esc_html_e('Thank you for your booking. We look forward to hosting you!', 'yatra'); ?>
+                <?php 
+                if ($booking->status === 'confirmed') {
+                    esc_html_e('Thank you for your booking. We look forward to hosting you!', 'yatra');
+                } elseif ($booking->status === 'pending') {
+                    esc_html_e('Thank you for your booking. Your booking is pending confirmation.', 'yatra');
+                } elseif ($booking->status === 'cancelled') {
+                    esc_html_e('This booking has been cancelled.', 'yatra');
+                } else {
+                    esc_html_e('Thank you for your booking submission.', 'yatra');
+                }
+                ?>
             </p>
             <div class="yatra-confirmation-reference">
                 <span class="yatra-ref-label"><?php esc_html_e('Booking Reference:', 'yatra'); ?></span>
@@ -268,24 +288,35 @@ get_header();
                         </h3>
                         
                         <div class="yatra-payment-rows">
+                            <?php 
+                            // Calculate gross amount (total before discount)
+                            $gross_amount = $booking->total_amount + ($booking->discount_amount ?? 0);
+                            ?>
                             <div class="yatra-payment-row">
                                 <span><?php esc_html_e('Total Amount', 'yatra'); ?></span>
-                                <span><?php echo esc_html(yatra_format_price($booking->total_amount)); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($gross_amount)); ?></span>
                             </div>
                             
-                            <?php if ($booking->discount_amount > 0) : ?>
+                            <?php if (!empty($booking->discount_amount) && $booking->discount_amount > 0) : ?>
                             <div class="yatra-payment-row yatra-discount-row">
-                                <span><?php esc_html_e('Discount', 'yatra'); ?></span>
-                                <span>-<?php echo esc_html(yatra_format_price($booking->discount_amount)); ?></span>
+                                <span><?php esc_html_e('Group Discount', 'yatra'); ?></span>
+                                <span style="color: #059669; font-weight: 500;">-<?php echo esc_html(yatra_format_price($booking->discount_amount)); ?></span>
                             </div>
                             <?php endif; ?>
                             
                             <div class="yatra-payment-row">
+                                <span><?php esc_html_e('Net Amount', 'yatra'); ?></span>
+                                <span><?php echo esc_html(yatra_format_price($booking->total_amount)); ?></span>
+                            </div>
+                            
+                            <?php if (($booking->amount_paid ?? 0) > 0) : ?>
+                            <div class="yatra-payment-row">
                                 <span><?php esc_html_e('Amount Paid', 'yatra'); ?></span>
                                 <span><?php echo esc_html(yatra_format_price($booking->amount_paid)); ?></span>
                             </div>
+                            <?php endif; ?>
                             
-                            <?php if ($booking->amount_due > 0 && $booking->amount_due < $booking->total_amount) : ?>
+                            <?php if ($booking->amount_due > 0) : ?>
                             <div class="yatra-payment-row yatra-due-row">
                                 <span><?php esc_html_e('Amount Due', 'yatra'); ?></span>
                                 <span><?php echo esc_html(yatra_format_price($booking->amount_due)); ?></span>

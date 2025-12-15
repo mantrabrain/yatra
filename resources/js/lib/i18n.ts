@@ -14,6 +14,8 @@ declare global {
       roles?: string[];
       capabilities?: Record<string, boolean>;
       isPro?: boolean;
+      version?: string;
+      proVersion?: string | null;
       translations?: Record<string, string>;
       locale?: string;
     };

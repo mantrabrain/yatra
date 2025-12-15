@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, i as Calendar, h as FileText, P as Plane, K as ArrowRight, e as MapPin, U as User, q as ChevronRight, aG as Sparkles, as as Package, k as CreditCard, b5 as LifeBuoy, x as Bell, a8 as AlertCircle, aw as CheckCircle2, I as Clock, Z as ExternalLink, H as Users, J as DollarSign, aA as Mail, aN as Phone, aB as Download, r as reactExports, u as useQuery, E as React, O as CheckCircle, ai as Eye, Q as HelpCircle, $ as PenSquare, a9 as XCircle, b6 as ShieldCheck, ac as Heart, W as AlertTriangle, L as LayoutDashboard, b7 as LogOut, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-MMNwjThF.js";
-import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-ZAc9H3xe.js";
+import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, N as ArrowRight, e as MapPin, U as User, s as ChevronRight, aG as Sparkles, P as Package, k as CreditCard, b5 as LifeBuoy, y as Bell, a9 as AlertCircle, aw as CheckCircle2, J as Clock, _ as ExternalLink, I as Users, K as DollarSign, aA as Mail, aN as Phone, aB as Download, r as reactExports, u as useQuery, G as React, Q as CheckCircle, aj as Eye, a0 as PenSquare, aa as XCircle, b6 as ShieldCheck, ad as Heart, X as AlertTriangle, L as LayoutDashboard, b7 as LogOut, b2 as QueryClient, b3 as client, b4 as QueryClientProvider } from "./react-vendor-PUxdxtyr.js";
+import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-BLpJYGJ9.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");
@@ -457,6 +457,63 @@ const Dashboard = ({
       ] }) })
     ] })
   ] });
+};
+const downloadDocument = async (options) => {
+  try {
+    let documents = [];
+    let targetDoc = null;
+    if (options.bookingId) {
+      const response = await apiClient.get(`/customer/bookings/${options.bookingId}/documents`);
+      documents = response.data || [];
+      targetDoc = documents.find((doc) => doc.category === options.documentType);
+      if (!targetDoc && options.fallbackUrl) {
+        const link = document.createElement("a");
+        link.href = options.fallbackUrl;
+        link.download = `${options.documentType}-${options.bookingId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+    } else if (options.paymentId && options.fallbackUrl) {
+      const link = document.createElement("a");
+      link.href = options.fallbackUrl;
+      link.download = `${options.documentType}-${options.paymentId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+    if (targetDoc && targetDoc.url) {
+      const link = document.createElement("a");
+      link.href = targetDoc.url;
+      link.download = targetDoc.name || `${options.documentType}-${options.bookingId || options.paymentId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      console.error(`No ${options.documentType} document found`);
+    }
+  } catch (error) {
+    console.error(`Error downloading ${options.documentType}:`, error);
+  }
+};
+const downloadVoucher = (bookingId) => {
+  return downloadDocument({
+    bookingId,
+    documentType: "voucher"
+  });
+};
+const downloadInvoice = (paymentId) => {
+  var _a, _b;
+  const siteUrl = ((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.siteUrl) || "";
+  const nonce = ((_b = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _b.nonce) || "";
+  const fallbackUrl = `${siteUrl}/?yatra_invoice=${paymentId}&_wpnonce=${nonce}`;
+  return downloadDocument({
+    paymentId,
+    documentType: "invoice",
+    fallbackUrl
+  });
 };
 const COUNTRY_NAMES = {
   "AF": "Afghanistan",
@@ -999,6 +1056,9 @@ const Bookings = ({ bookings, onSectionChange }) => {
     setSelectedBookingId(null);
     setBookingDetails(null);
   };
+  const handleDownloadClick = (bookingId) => {
+    downloadVoucher(bookingId);
+  };
   const startRemainingPaymentSession = async (bookingId) => {
     setPayLoading(bookingId);
     try {
@@ -1184,30 +1244,34 @@ const Bookings = ({ bookings, onSectionChange }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-booking-actions flex flex-wrap gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "div",
                 {
                   role: "button",
                   tabIndex: 0,
                   onClick: () => handleBookingSelect(bookingId),
-                  className: "yatra-booking-action yatra-booking-action-view inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
-                    __("View Details", "View Details")
-                  ]
+                  className: "yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer",
+                  children: __("View Details", "View Details")
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "div",
+                {
+                  role: "button",
+                  tabIndex: 0,
+                  onClick: () => handleDownloadClick(bookingId),
+                  className: "yatra-booking-action yatra-booking-action-download inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer",
+                  children: __("Download Voucher", "Download Voucher")
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "div",
                 {
                   role: "button",
                   tabIndex: 0,
                   onClick: () => onSectionChange("payments"),
-                  className: "yatra-booking-action yatra-booking-action-payment inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" }),
-                    __("Payment", "Payment")
-                  ]
+                  className: "yatra-booking-action yatra-booking-action-payment inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer",
+                  children: __("Payment", "Payment")
                 }
               ),
               canPayRemaining && /* @__PURE__ */ jsxRuntimeExports.jsxs(
@@ -1216,27 +1280,24 @@ const Bookings = ({ bookings, onSectionChange }) => {
                   type: "button",
                   onClick: () => bookingId && startRemainingPaymentSession(bookingId),
                   disabled: payLoading === bookingId,
-                  className: "yatra-booking-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50",
+                  className: "yatra-booking-action inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50",
                   children: [
                     payLoading === bookingId ? /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "w-4 h-4 animate-spin", viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "2", children: [
                       /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "10", strokeOpacity: "0.25" }),
                       /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M4 12a8 8 0 0 1 8-8" })
-                    ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx(CreditCard, { className: "w-4 h-4" }),
+                    ] }) : null,
                     __("Pay Remaining Balance", "Pay Remaining Balance")
                   ]
                 }
               ),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "div",
                 {
                   role: "button",
                   tabIndex: 0,
                   onClick: () => onSectionChange("support"),
-                  className: "yatra-booking-action yatra-booking-action-support inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer",
-                  children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(HelpCircle, { className: "w-4 h-4" }),
-                    __("Support", "Support")
-                  ]
+                  className: "yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer",
+                  children: __("Support", "Support")
                 }
               )
             ] })
@@ -1339,6 +1400,7 @@ const Payments = ({ payments, onSectionChange }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-400 font-medium mb-1", children: __("No payments found", "No payments found") }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-400 dark:text-gray-500", children: __("Payment history will appear here once you make a booking.", "Payment history will appear here once you make a booking.") })
     ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: displayPayments.map((payment) => {
+      var _a, _b;
       const bookingTotal = typeof payment.booking_total_amount === "number" ? payment.booking_total_amount : null;
       const bookingPaid = typeof payment.booking_amount_paid === "number" ? payment.booking_amount_paid : null;
       const bookingDue = typeof payment.booking_amount_due === "number" ? payment.booking_amount_due : null;
@@ -1347,6 +1409,7 @@ const Payments = ({ payments, onSectionChange }) => {
       const dueRaw = bookingDue ?? (bookingTotal !== null ? bookingTotal - paid : total - paid);
       const due = Math.max(0, dueRaw || 0);
       const canPayRemaining = typeof payment.booking_id === "number" && due > 0.01;
+      const isPaid = payment.status === "paid" || payment.status === "completed";
       const isPending = payment.status === "pending";
       return /* @__PURE__ */ jsxRuntimeExports.jsx(
         "div",
@@ -1398,6 +1461,32 @@ const Payments = ({ payments, onSectionChange }) => {
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-payment-actions flex flex-wrap gap-3", children: [
+              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "button",
+                {
+                  onClick: () => downloadInvoice(payment.id),
+                  className: "yatra-payment-action yatra-payment-action-invoice inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
+                  style: { backgroundColor: "#059669", color: "#ffffff" },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
+                    __("Download Invoice", "Download Invoice")
+                  ]
+                }
+              ),
+              isPaid && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "a",
+                {
+                  href: `${((_a = window.yatraAdmin) == null ? void 0 : _a.siteUrl) || ""}/?yatra_invoice=${payment.id}&_wpnonce=${((_b = window.yatraAdmin) == null ? void 0 : _b.nonce) || ""}&view=1`,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  className: "yatra-payment-action yatra-payment-action-receipt inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium",
+                  style: { backgroundColor: "#2563eb", color: "#ffffff" },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-4 h-4" }),
+                    __("View Receipt", "View Receipt")
+                  ]
+                }
+              ),
               isPending && !canPayRemaining && /* @__PURE__ */ jsxRuntimeExports.jsxs("button", { type: "button", className: "yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "w-4 h-4" }),
                 __("Pending approval", "Pending approval")
@@ -1407,7 +1496,7 @@ const Payments = ({ payments, onSectionChange }) => {
                 {
                   type: "button",
                   onClick: () => onSectionChange("bookings"),
-                  className: "yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
+                  className: "yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
                     __("View Booking", "View Booking")
@@ -1425,39 +1514,6 @@ const Payments = ({ payments, onSectionChange }) => {
 const Documents = ({ documents }) => {
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [selectedCategory, setSelectedCategory] = reactExports.useState("all");
-  const handleDownload = async (url, name) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error("Error downloading document:", error);
-      window.open(url, "_blank");
-    }
-  };
-  const handlePreview = async (url) => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const newWindow = window.open(blobUrl, "_blank");
-      if (newWindow) {
-        newWindow.addEventListener("beforeunload", () => {
-          URL.revokeObjectURL(blobUrl);
-        });
-      }
-    } catch (error) {
-      console.error("Error previewing document:", error);
-      window.open(url, "_blank");
-    }
-  };
   const displayDocuments = documents;
   let filteredDocuments = [...displayDocuments];
   if (selectedCategory !== "all") {
@@ -1565,28 +1621,18 @@ const Documents = ({ documents }) => {
             ] })
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "yatra-document-actions flex flex-wrap gap-3 mt-4", children: [
-            doc.locked || !doc.url ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors text-sm font-medium cursor-not-allowed", title: doc.locked_reason || __("Not available", "Not available"), children: __("Not Available", "Not Available") }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            doc.locked || !doc.url ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors text-sm font-medium cursor-not-allowed", title: doc.locked_reason || __("Not available", "Not available"), children: __("Not Available", "Not Available") }) : /* @__PURE__ */ jsxRuntimeExports.jsx(
               "button",
               {
-                onClick: () => handleDownload(doc.url, doc.name || `${doc.category}-document.pdf`),
-                className: "yatra-document-action yatra-document-action-download inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
-                  doc.category === "invoice" ? __("Download Invoice", "Download Invoice") : doc.category === "voucher" ? __("Download Voucher", "Download Voucher") : doc.category === "itinerary" ? __("Download Itinerary", "Download Itinerary") : __("Download", "Download")
-                ]
+                onClick: () => downloadDocument({
+                  documentType: doc.category,
+                  fallbackUrl: doc.url
+                }),
+                className: "yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium",
+                children: __("Download", "Download")
               }
             ),
-            doc.url ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              "button",
-              {
-                onClick: () => handlePreview(doc.url),
-                className: "yatra-document-action yatra-document-action-preview inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition-all text-sm font-medium",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
-                  doc.category === "invoice" ? __("Preview Invoice", "Preview Invoice") : doc.category === "voucher" ? __("Preview Voucher", "Preview Voucher") : doc.category === "itinerary" ? __("Preview Itinerary", "Preview Itinerary") : __("Preview", "Preview")
-                ]
-              }
-            ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500 text-sm font-medium cursor-not-allowed", children: __("Preview", "Preview") })
+            doc.url ? /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: doc.url, target: "_blank", rel: "noreferrer", className: "yatra-document-action yatra-document-action-preview inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium", children: __("Preview", "Preview") }) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500 text-sm font-medium cursor-not-allowed", children: __("Preview", "Preview") })
           ] })
         ] }) }) })
       },

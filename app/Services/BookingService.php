@@ -595,6 +595,8 @@ class BookingService
             'total_amount' => (float) $booking->total_amount,
             'amount_paid' => (float) $booking->amount_paid,
             'amount_due' => (float) $booking->amount_due,
+            'discount_amount' => (float) ($booking->discount_amount ?? 0),
+            'discount_code' => $booking->discount_code ?? null,
             'currency' => $booking->currency,
             'status' => $booking->status,
             'payment_status' => $booking->payment_status,
@@ -648,6 +650,16 @@ class BookingService
         $formatted['cancellation_reason'] = $booking->cancellation_reason;
         $formatted['confirmed_at'] = $booking->confirmed_at;
         $formatted['completed_at'] = $booking->completed_at;
+
+        /**
+         * Filter: Add additional services to booking details
+         * Allows premium modules to include services data in booking response
+         * 
+         * @param array $services Empty array by default
+         * @param int $booking_id The booking ID
+         * @since 3.0.0
+         */
+        $formatted['additional_services'] = apply_filters('yatra_booking_get_services', [], (int) $booking->id);
 
         return $formatted;
     }

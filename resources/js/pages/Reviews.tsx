@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Star } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api';
 import { Button } from '../components/ui/button';
@@ -143,11 +144,7 @@ const Reviews: React.FC = () => {
   const totalPages = Math.ceil(total / 10);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const renderStars = (rating: number) => {

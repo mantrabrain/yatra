@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Download, Eye } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatDate } from './utils';
+import { downloadDocument } from './utils/downloads';
 import type { TravelDocument } from './types';
 
 interface DocumentsProps {
@@ -11,59 +11,6 @@ interface DocumentsProps {
 const Documents: React.FC<DocumentsProps> = ({ documents }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'itinerary' | 'voucher' | 'invoice' | 'downloads'>('all');
-  
-  // Handle download with blob
-  const handleDownload = async (url: string, name: string) => {
-    try {
-      // Fetch the document as a blob
-      const response = await fetch(url);
-      const blob = await response.blob();
-      
-      // Create a blob URL
-      const blobUrl = URL.createObjectURL(blob);
-      
-      // Create a temporary link to download the file
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Clean up the blob URL
-      URL.revokeObjectURL(blobUrl);
-    } catch (error) {
-      console.error('Error downloading document:', error);
-      // Fallback to direct link
-      window.open(url, '_blank');
-    }
-  };
-
-  // Handle preview with blob URL
-  const handlePreview = async (url: string) => {
-    try {
-      // Fetch the document as a blob
-      const response = await fetch(url);
-      const blob = await response.blob();
-      
-      // Create a blob URL
-      const blobUrl = URL.createObjectURL(blob);
-      
-      // Open in new tab for preview
-      const newWindow = window.open(blobUrl, '_blank');
-      
-      // Clean up the blob URL when the window is closed
-      if (newWindow) {
-        newWindow.addEventListener('beforeunload', () => {
-          URL.revokeObjectURL(blobUrl);
-        });
-      }
-    } catch (error) {
-      console.error('Error previewing document:', error);
-      // Fallback to direct URL if blob fails
-      window.open(url, '_blank');
-    }
-  };
   
   const displayDocuments = documents;
   
@@ -220,28 +167,20 @@ const Documents: React.FC<DocumentsProps> = ({ documents }) => {
                         </div>
                       ) : (
                         <button
-                          onClick={() => handleDownload(doc.url, doc.name || `${doc.category}-document.pdf`)}
-                          className="yatra-document-action yatra-document-action-download inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                          onClick={() => downloadDocument({
+                            documentType: doc.category as any,
+                            fallbackUrl: doc.url
+                          })}
+                          className="yatra-document-action yatra-document-action-download inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
                         >
-                          <Download className="w-4 h-4" />
-                          {doc.category === 'invoice' ? __('Download Invoice', 'Download Invoice') : 
-                           doc.category === 'voucher' ? __('Download Voucher', 'Download Voucher') : 
-                           doc.category === 'itinerary' ? __('Download Itinerary', 'Download Itinerary') : 
-                           __('Download', 'Download')}
+                          {__('Download', 'Download')}
                         </button>
                       )}
 
                       {doc.url ? (
-                        <button
-                          onClick={() => handlePreview(doc.url)}
-                          className="yatra-document-action yatra-document-action-preview inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-white hover:bg-gray-700 dark:hover:bg-gray-800 transition-all text-sm font-medium"
-                        >
-                          <Eye className="w-4 h-4" />
-                          {doc.category === 'invoice' ? __('Preview Invoice', 'Preview Invoice') : 
-                           doc.category === 'voucher' ? __('Preview Voucher', 'Preview Voucher') : 
-                           doc.category === 'itinerary' ? __('Preview Itinerary', 'Preview Itinerary') : 
-                           __('Preview', 'Preview')}
-                        </button>
+                        <a href={doc.url} target="_blank" rel="noreferrer" className="yatra-document-action yatra-document-action-preview inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium">
+                          {__('Preview', 'Preview')}
+                        </a>
                       ) : (
                         <div className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-500 text-sm font-medium cursor-not-allowed">
                           {__('Preview', 'Preview')}

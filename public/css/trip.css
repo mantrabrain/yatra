@@ -1903,6 +1903,109 @@
     font-weight: 500;
 }
 
+/* Booking Discount Badge */
+.yatra-booking-discount-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 8px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Contact for pricing styling */
+.yatra-contact-pricing {
+    font-size: 18px !important;
+    color: #ef4444 !important;
+}
+
+/* Group Discount Badge - Minimal */
+.yatra-group-discount-badge-minimal {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    margin-bottom: 12px;
+    background: #ecfdf5;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #059669;
+}
+
+.yatra-group-discount-badge-minimal svg {
+    flex-shrink: 0;
+}
+
+/* Applied Group Discount Display */
+.yatra-applied-group-discount {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    border-radius: 8px;
+    display: none;
+}
+
+.yatra-applied-group-discount.active {
+    display: block;
+}
+
+.yatra-applied-group-discount-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.yatra-applied-group-discount-icon {
+    color: #10b981;
+}
+
+.yatra-applied-group-discount-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #047857;
+}
+
+.yatra-applied-group-discount-amount {
+    font-size: 14px;
+    font-weight: 700;
+    color: #059669;
+    margin-left: auto;
+}
+
+.yatra-applied-group-discount-desc {
+    font-size: 12px;
+    color: #059669;
+}
+
+/* Pricing Mode Labels */
+.yatra-quantity-price-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.yatra-pricing-mode-label {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.yatra-pricing-mode-group {
+    background: #fef3c7;
+    color: #92400e;
+    border: 1px solid #f59e0b;
+}
+
 .yatra-booking-form {
     display: flex;
     flex-direction: column;

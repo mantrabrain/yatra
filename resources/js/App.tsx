@@ -48,6 +48,8 @@ import EnquiryForm from './pages/EnquiryForm';
 import Modules from './pages/Modules';
 import Travelers from './pages/Travelers';
 import GoogleCalendar from './pages/GoogleCalendar';
+import AdditionalServices from './pages/AdditionalServices';
+import AdditionalServicesForm from './pages/AdditionalServicesForm';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -132,6 +134,12 @@ const App: React.FC = () => {
               return <AvailabilityForm />;
             }
             return <Availability />;
+          case 'additional-services':
+            // Check if we're creating or editing a service
+            if (action === 'create' || action === 'edit') {
+              return <AdditionalServicesForm />;
+            }
+            return <AdditionalServices />;
           case 'all':
           default:
             // Check if we're creating or editing a trip
@@ -242,6 +250,12 @@ const App: React.FC = () => {
         return <Modules />;
       case 'yatra-google-calendar':
         return <GoogleCalendar />;
+      case 'yatra-additional-services':
+        // Check if we're creating or editing a service
+        if (action === 'create' || action === 'edit') {
+          return <AdditionalServicesForm />;
+        }
+        return <AdditionalServices />;
       case 'dashboard':
       default:
         return <Dashboard />;

@@ -17,6 +17,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 
 interface Payment {
   id: number;
@@ -208,11 +209,7 @@ const Payments: React.FC = () => {
   const totalPages = Math.ceil(total / 10);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatPrice = (price: number, currencyCode: string = defaultCurrency) => {

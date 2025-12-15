@@ -1634,11 +1634,18 @@ class TripRepository extends BaseRepository
         
         $searchTerm = '%' . $this->wpdb->esc_like($keyword) . '%';
         
+        // Build search condition
+        $searchCondition = "(title LIKE %s OR description LIKE %s OR short_description LIKE %s)";
+        
+        // If we have a WHERE clause, add AND; otherwise start with WHERE
+        if (!empty($where)) {
+            $whereClause = "{$where} AND {$searchCondition}";
+        } else {
+            $whereClause = "WHERE {$searchCondition}";
+        }
+        
         $query = $this->wpdb->prepare(
-            "SELECT * FROM `{$table}` 
-             {$where} 
-             AND (title LIKE %s OR description LIKE %s OR short_description LIKE %s)
-             {$order} {$limit}",
+            "SELECT * FROM `{$table}` {$whereClause} {$order} {$limit}",
             $searchTerm,
             $searchTerm,
             $searchTerm

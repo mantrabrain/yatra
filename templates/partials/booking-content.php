@@ -42,6 +42,12 @@ $total_amount = isset($booking->total_amount) ? (float) $booking->total_amount :
 $require_login = \Yatra\Services\SettingsService::get('require_login', false);
 $allow_guest_checkout = \Yatra\Services\SettingsService::get('allow_guest_checkout', true);
 $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest_checkout);
+
+// Get group discount from booking object (calculated in AppServiceProvider)
+$group_discount = $booking->group_discount ?? null;
+$group_discount_amount = $group_discount['amount'] ?? 0;
+$group_discount_code = $group_discount['code'] ?? null;
+$group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra');
 ?>
 
 <div class="yatra-booking-page">
@@ -490,8 +496,85 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                         </div>
                     </div>
 
+                    <!-- Additional Services Section (Premium Feature) -->
+                    <?php
+                    /**
+                     * Filter: Get additional services for this trip
+                     * Allows premium modules to add extra services to the booking
+                     */
+                    $additional_services = apply_filters('yatra_booking_additional_services', [], $trip_id, $total_travelers, $traveler_counts ?? [], $travel_date);
+                    
+                    // Get selected services from session (set from popup)
+                    $session = yatra_get_booking_session();
+                    $selected_service_ids = isset($session['additional_services']) && is_array($session['additional_services']) 
+                        ? array_map('intval', $session['additional_services']) 
+                        : [];
+                    
+                    if (!empty($additional_services)) :
+                    ?>
+                    <div class="yatra-additional-services-section">
+                        <div class="yatra-services-header">
+                            <h4><?php esc_html_e('Additional Services', 'yatra'); ?></h4>
+                            <p class="yatra-services-subtitle"><?php esc_html_e('Enhance your trip with these optional add-ons', 'yatra'); ?></p>
+                        </div>
+                        <div class="yatra-services-list" id="yatra-additional-services">
+                            <?php foreach ($additional_services as $service) : 
+                                $service_id = (int) $service['id'];
+                                $service_name = $service['name'];
+                                $service_description = $service['description'] ?? '';
+                                $service_price = (float) $service['price'];
+                                $service_price_per = $service['price_per'] ?? 'person';
+                                $service_image = $service['image_url'] ?? '';
+                                // Check is_required - handle various formats (bool, string "1", int 1)
+                                $is_required = isset($service['is_required']) && ($service['is_required'] === true || $service['is_required'] === 1 || $service['is_required'] === '1');
+                                $is_included = isset($service['is_included']) && ($service['is_included'] === true || $service['is_included'] === 1 || $service['is_included'] === '1');
+                                $is_selected = in_array($service_id, $selected_service_ids, false);
+                                
+                                $price_label = yatra_format_price($service_price);
+                                if ($service_price_per === 'person') {
+                                    $price_label .= ' ' . __('per person', 'yatra');
+                                } elseif ($service_price_per === 'day') {
+                                    $price_label .= ' ' . __('per day', 'yatra');
+                                } else {
+                                    $price_label .= ' ' . __('per booking', 'yatra');
+                                }
+                                if ($is_included) {
+                                    $price_label = __('Included', 'yatra');
+                                }
+                                
+                                // Determine checked and disabled states
+                                $is_checked = $is_required || $is_included || $is_selected;
+                                $is_disabled = $is_required || $is_included;
+                            ?>
+                            <div class="yatra-service-item <?php echo $is_required ? 'yatra-service-required' : ''; ?> <?php echo $is_checked ? 'yatra-service-selected' : ''; ?>"
+                                 data-service-id="<?php echo esc_attr($service_id); ?>"
+                                 data-service-price="<?php echo esc_attr($service_price); ?>"
+                                 data-service-price-per="<?php echo esc_attr($service_price_per); ?>"
+                                 data-is-required="<?php echo $is_required ? '1' : '0'; ?>">
+                                <label class="yatra-service-label">
+                                    <input type="checkbox" 
+                                           name="additional_services[]" 
+                                           value="<?php echo esc_attr($service_id); ?>"
+                                           <?php echo $is_checked ? 'checked' : ''; ?>
+                                           <?php echo $is_disabled ? 'disabled' : ''; ?>
+                                           form="yatra-booking-form">
+                                    <div class="yatra-service-info">
+                                        <span class="yatra-service-name"><?php echo esc_html($service_name); ?></span>
+                                        <?php if ($service_description) : ?>
+                                        <span class="yatra-service-description"><?php echo esc_html($service_description); ?></span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <span class="yatra-service-price"><?php echo esc_html($price_label); ?></span>
+                                </label>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                     <!-- Price Breakdown -->
-                    <div class="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>" data-is-remaining="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>">
+                    <div class="yatra-summary-pricing" id="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>" data-is-remaining="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>">
+                        <!-- This section is loaded/updated via AJAX -->
                         <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): 
                             // Calculate total for traveler-based pricing
                             $calculated_total = 0;
@@ -521,6 +604,12 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <?php endif; endforeach; ?>
                         </div>
                         
+                        <!-- Gross Total (subtotal before discounts) -->
+                        <div class="yatra-price-row yatra-price-subtotal">
+                            <span><strong><?php esc_html_e('Gross Total', 'yatra'); ?></strong></span>
+                            <span id="summary-gross-total"><strong><?php echo esc_html(yatra_format_price($calculated_total)); ?></strong></span>
+                        </div>
+                        
                         <!-- Coupon Discount Row (hidden by default) -->
                         <div class="yatra-price-row yatra-price-discount" id="yatra-discount-row" style="display: none;">
                             <span class="yatra-discount-label">
@@ -530,16 +619,38 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <span id="summary-discount" class="yatra-discount-amount">-$0.00</span>
                         </div>
                         
+                        <?php if ($group_discount && $group_discount_amount > 0) : ?>
+                        <!-- Group Discount Row -->
+                        <div class="yatra-price-row yatra-price-discount yatra-group-discount-row" id="yatra-group-discount-row" 
+                             data-discount-type="<?php echo esc_attr($group_discount['type'] ?? ''); ?>"
+                             data-discount-value="<?php echo esc_attr($group_discount['value'] ?? $group_discount_amount); ?>"
+                             data-discount-code="<?php echo esc_attr($group_discount_code ?? ''); ?>">
+                            <span class="yatra-discount-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <?php echo esc_html($group_discount_label); ?>
+                            </span>
+                            <span class="yatra-discount-amount" style="color: #059669; font-weight: 500;">-<?php echo esc_html(yatra_format_price($group_discount_amount)); ?></span>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Additional Services (individual rows rendered from AJAX) -->
+                        <div id="yatra-services-breakdown-traveler" class="yatra-services-breakdown"></div>
+                        
                         <?php if ($deposit_required) : ?>
                         <div class="yatra-price-row yatra-price-deposit" style="display: none;">
                             <span><?php printf(esc_html__('Deposit (%d%%)', 'yatra'), $deposit_percentage); ?></span>
-                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price($calculated_total * ($deposit_percentage / 100))); ?></span>
+                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price(($calculated_total - $group_discount_amount) * ($deposit_percentage / 100))); ?></span>
                         </div>
                         <?php endif; ?>
                         
                         <div class="yatra-price-row yatra-price-total">
-                            <span><strong><?php esc_html_e('Total Amount', 'yatra'); ?></strong></span>
-                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($calculated_total)); ?></strong></span>
+                            <span><strong><?php esc_html_e('Net Amount', 'yatra'); ?></strong></span>
+                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($calculated_total - $group_discount_amount)); ?></strong></span>
                         </div>
                         
                         <div class="yatra-price-row yatra-price-due" style="display: none;">
@@ -558,6 +669,12 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <span id="summary-travelers"><?php echo esc_html($total_travelers); ?></span>
                         </div>
                         
+                        <!-- Gross Total (subtotal before discounts) -->
+                        <div class="yatra-price-row yatra-price-subtotal">
+                            <span><strong><?php esc_html_e('Gross Total', 'yatra'); ?></strong></span>
+                            <span id="summary-gross-total"><strong><?php echo esc_html(yatra_format_price($summary_total_amount)); ?></strong></span>
+                        </div>
+                        
                         <!-- Coupon Discount Row (hidden by default) -->
                         <div class="yatra-price-row yatra-price-discount" id="yatra-discount-row-regular" style="display: none;">
                             <span class="yatra-discount-label">
@@ -567,16 +684,38 @@ $needs_authentication = !is_user_logged_in() && ($require_login || !$allow_guest
                             <span class="yatra-discount-amount">-$0.00</span>
                         </div>
                         
+                        <?php if ($group_discount && $group_discount_amount > 0) : ?>
+                        <!-- Group Discount Row (Regular Pricing) -->
+                        <div class="yatra-price-row yatra-price-discount yatra-group-discount-row" id="yatra-group-discount-row-regular" 
+                             data-discount-type="<?php echo esc_attr($group_discount['type'] ?? ''); ?>"
+                             data-discount-value="<?php echo esc_attr($group_discount['value'] ?? $group_discount_amount); ?>"
+                             data-discount-code="<?php echo esc_attr($group_discount_code ?? ''); ?>">
+                            <span class="yatra-discount-label">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                <?php echo esc_html($group_discount_label); ?>
+                            </span>
+                            <span class="yatra-discount-amount" style="color: #059669; font-weight: 500;">-<?php echo esc_html(yatra_format_price($group_discount_amount)); ?></span>
+                        </div>
+                        <?php endif; ?>
+                        
+                        <!-- Additional Services (individual rows rendered from AJAX) -->
+                        <div id="yatra-services-breakdown-regular" class="yatra-services-breakdown"></div>
+                        
                         <?php if ($deposit_required) : ?>
                         <div class="yatra-price-row yatra-price-deposit" style="display: none;">
                             <span><?php printf(esc_html__('Deposit (%d%%)', 'yatra'), $deposit_percentage); ?></span>
-                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price(($trip->price * $total_travelers) * ($deposit_percentage / 100))); ?></span>
+                            <span id="summary-deposit"><?php echo esc_html(yatra_format_price(($summary_total_amount - $group_discount_amount) * ($deposit_percentage / 100))); ?></span>
                         </div>
                         <?php endif; ?>
                         
                         <div class="yatra-price-row yatra-price-total">
-                            <span><strong><?php esc_html_e('Total Amount', 'yatra'); ?></strong></span>
-                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($summary_total_amount)); ?></strong></span>
+                            <span><strong><?php esc_html_e('Net Amount', 'yatra'); ?></strong></span>
+                            <span id="summary-total"><strong><?php echo esc_html(yatra_format_price($summary_total_amount - $group_discount_amount)); ?></strong></span>
                         </div>
                         
                         <div class="yatra-price-row yatra-price-due" style="<?php echo $is_remaining_payment ? '' : 'display: none;'; ?>">

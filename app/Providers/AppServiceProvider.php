@@ -899,6 +899,8 @@ class AppServiceProvider extends ServiceProvider
                 'decimalPlaces' => SettingsService::getInt('decimal_places', 2),
                 'thousandSeparator' => SettingsService::getString('thousand_separator', ','),
                 'decimalSeparator' => SettingsService::getString('decimal_separator', '.'),
+                'date_format' => SettingsService::get('date_format', 'Y-m-d'),
+                'time_format' => SettingsService::get('time_format', 'H:i'),
             ]);
         }
     }
@@ -2053,6 +2055,17 @@ HTML;
         // Load enabled payment gateways
         $booking->enabled_gateways = $this->getEnabledGateways();
 
+        // Calculate applicable group discount
+        $booking->group_discount = null;
+        if (!empty($booking->traveler_counts) && !empty($booking->price_types)) {
+            $discountService = new \Yatra\Services\DiscountService();
+            $booking->group_discount = $discountService->calculateGroupDiscount(
+                (int) $trip_id,
+                $booking->traveler_counts,
+                $booking->price_types
+            );
+        }
+
         return $booking;
     }
 
@@ -2296,6 +2309,15 @@ HTML;
                 $localized_data['minTravelers'] = $booking->trip->min_travelers ?? 1;
                 $localized_data['maxTravelers'] = $booking->trip->max_travelers ?? 20;
                 $localized_data['tripTitle'] = $booking->trip->title ?? __('Trip Booking', 'yatra');
+                
+                // Add group discounts for this trip
+                try {
+                    $discountService = new \Yatra\Services\DiscountService();
+                    $groupDiscounts = $discountService->getGroupDiscountsForTrip((int) $booking->trip->id);
+                    $localized_data['groupDiscounts'] = $groupDiscounts;
+                } catch (\Exception $e) {
+                    $localized_data['groupDiscounts'] = [];
+                }
             }
 
             $localized_data['companyCountry'] = SettingsService::get('company_country', 'US');

@@ -1,71 +1,88 @@
+import { apiClient } from '../../../lib/api';
+
 export interface DocumentDownloadOptions {
   bookingId?: number;
   paymentId?: number;
   documentType: 'voucher' | 'invoice' | 'itinerary' | 'all';
-  documentName?: string;
+  fallbackUrl?: string;
 }
 
-// Helper functions for specific document types
-export const downloadVoucher = async (bookingId: number, apiClient: any) => {
+export const downloadDocument = async (options: DocumentDownloadOptions): Promise<void> => {
   try {
-    // Fetch documents for this booking
-    const response = await apiClient.get(`/customer/bookings/${bookingId}/documents`);
-    const documents = response.data;
+    let documents: any[] = [];
+    let targetDoc: any = null;
+
+    // For booking-related documents (voucher, itinerary)
+    if (options.bookingId) {
+      const response = await apiClient.get(`/customer/bookings/${options.bookingId}/documents`);
+      documents = response.data || [];
+      
+      // Find specific document type
+      targetDoc = documents.find((doc: any) => doc.category === options.documentType);
+      
+      // Fallback to direct URL if API doesn't have the document
+      if (!targetDoc && options.fallbackUrl) {
+        const link = document.createElement('a');
+        link.href = options.fallbackUrl;
+        link.download = `${options.documentType}-${options.bookingId}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+    }
     
-    // Find the voucher document
-    const voucherDoc = documents.find((doc: any) => doc.category === 'voucher');
-    
-    if (voucherDoc && voucherDoc.url) {
-      // Create a temporary link to download the file
+    // For payment-related documents (invoice)
+    else if (options.paymentId && options.fallbackUrl) {
+      // Use direct URL for invoices as fallback
       const link = document.createElement('a');
-      link.href = voucherDoc.url;
-      link.download = voucherDoc.name || `voucher-${bookingId}.pdf`;
+      link.href = options.fallbackUrl;
+      link.download = `${options.documentType}-${options.paymentId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    }
+
+    // Download the document if found
+    if (targetDoc && targetDoc.url) {
+      const link = document.createElement('a');
+      link.href = targetDoc.url;
+      link.download = targetDoc.name || `${options.documentType}-${options.bookingId || options.paymentId}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     } else {
-      console.error('No voucher document found');
+      console.error(`No ${options.documentType} document found`);
     }
   } catch (error) {
-    console.error('Error downloading voucher:', error);
+    console.error(`Error downloading ${options.documentType}:`, error);
   }
+};
+
+// Helper functions for specific document types
+export const downloadVoucher = (bookingId: number) => {
+  return downloadDocument({
+    bookingId,
+    documentType: 'voucher'
+  });
 };
 
 export const downloadInvoice = (paymentId: number) => {
   const siteUrl = (window as any)?.yatraAdmin?.siteUrl || '';
   const nonce = (window as any)?.yatraAdmin?.nonce || '';
-  const invoiceUrl = `${siteUrl}/?yatra_invoice=${paymentId}&_wpnonce=${nonce}`;
+  const fallbackUrl = `${siteUrl}/?yatra_invoice=${paymentId}&_wpnonce=${nonce}`;
   
-  // Create a temporary link to download the file
-  const link = document.createElement('a');
-  link.href = invoiceUrl;
-  link.download = `invoice-${paymentId}.pdf`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  return downloadDocument({
+    paymentId,
+    documentType: 'invoice',
+    fallbackUrl
+  });
 };
 
-export const downloadItinerary = async (bookingId: number, apiClient: any) => {
-  try {
-    // Fetch documents for this booking
-    const response = await apiClient.get(`/customer/bookings/${bookingId}/documents`);
-    const documents = response.data;
-    
-    // Find the itinerary document
-    const itineraryDoc = documents.find((doc: any) => doc.category === 'itinerary');
-    
-    if (itineraryDoc && itineraryDoc.url) {
-      // Create a temporary link to download the file
-      const link = document.createElement('a');
-      link.href = itineraryDoc.url;
-      link.download = itineraryDoc.name || `itinerary-${bookingId}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } else {
-      console.error('No itinerary document found');
-    }
-  } catch (error) {
-    console.error('Error downloading itinerary:', error);
-  }
+export const downloadItinerary = (bookingId: number) => {
+  return downloadDocument({
+    bookingId,
+    documentType: 'itinerary'
+  });
 };

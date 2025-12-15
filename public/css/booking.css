@@ -1989,35 +1989,215 @@
     color: #6b7280;
 }
 
-/* Pricing */
+/* Pricing Summary */
 .yatra-summary-pricing {
     margin-bottom: 24px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid #e5e7eb;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.yatra-price-breakdown-categories {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px dashed #cbd5e1;
 }
 
 .yatra-price-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #475569;
+    transition: background-color 0.2s ease;
+}
+
+.yatra-price-row:not(:last-child) {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.yatra-category-subtotal {
+    font-size: 13px;
+}
+
+.yatra-category-subtotal .category-count {
+    font-weight: 600;
+    color: #3b82f6;
+}
+
+.yatra-category-subtotal .category-subtotal {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+/* Subtotal / Gross Total */
+.yatra-price-subtotal {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.6);
+    margin: 12px -12px 0;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+.yatra-price-subtotal span {
+    color: #334155;
     font-size: 15px;
-    color: #374151;
 }
 
-.yatra-price-row:last-child {
-    margin-bottom: 0;
+/* Discount Rows */
+.yatra-price-discount {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.08) 0%, transparent 100%);
+    margin: 8px -12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none !important;
 }
 
+
+.yatra-discount-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #059669;
+    font-weight: 500;
+}
+
+.yatra-discount-code {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.yatra-discount-amount {
+    font-weight: 600;
+    color: #059669 !important;
+}
+
+/* Group Discount */
+.yatra-group-discount-row {
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
+}
+
+
+.yatra-group-discount-row .yatra-discount-label {
+    color: #2563eb;
+}
+
+.yatra-group-discount-row .yatra-discount-amount {
+    color: #2563eb !important;
+}
+
+/* Additional Services */
+.yatra-price-service {
+    background: linear-gradient(90deg, rgba(139, 92, 246, 0.06) 0%, transparent 100%);
+    margin: 4px -12px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: none !important;
+}
+
+
+.yatra-price-service span:first-child {
+    color: #6d28d9;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.yatra-price-service span:first-child::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background: #8b5cf6;
+    border-radius: 50%;
+}
+
+.yatra-price-service span:last-child {
+    font-weight: 600;
+    color: #5b21b6;
+}
+
+/* Included Service */
+.yatra-service-included {
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.06) 0%, transparent 100%);
+}
+
+.yatra-service-included span:first-child {
+    color: #047857;
+}
+
+.yatra-service-included span:first-child::before {
+    background: #10b981;
+}
+
+.yatra-service-included-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #047857 !important;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Service Badges */
+.yatra-service-badge {
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.yatra-badge-required {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+/* Net Amount / Total */
 .yatra-price-total {
-    padding-top: 16px;
     margin-top: 16px;
-    border-top: 1px solid #e5e7eb;
-    font-size: 18px;
+    padding-top: 16px;
+    border-top: 2px solid #e2e8f0 !important;
+    border-bottom: none !important;
 }
 
 .yatra-price-total span {
-    color: #111827;
+    color: #1e293b;
+    font-size: 16px;
+}
+
+.yatra-price-total span strong {
+    font-weight: 700;
+}
+
+/* Due Now */
+.yatra-price-due {
+    margin-top: 8px;
+    padding: 12px;
+    background: rgba(251, 191, 36, 0.1);
+    margin: 8px -12px 0;
+    border-radius: 8px;
+    border: 1px dashed #f59e0b !important;
+}
+
+
+.yatra-price-due span {
+    color: #b45309;
+    font-size: 14px;
+}
+
+.yatra-price-due span strong {
+    color: #92400e;
 }
 
 /* Info */
@@ -2751,5 +2931,117 @@
         flex-direction: column;
         gap: 8px;
     }
+}
+
+/* Additional Services Section */
+.yatra-additional-services-section {
+    margin: 20px 0;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.yatra-services-header h4 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.yatra-services-subtitle {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.yatra-services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-service-item {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.yatra-service-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.yatra-service-item.yatra-service-required {
+    background: #fefce8;
+    border-color: #fde047;
+}
+
+.yatra-service-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.yatra-service-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #7c3aed;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.yatra-service-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.yatra-service-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.yatra-service-name {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.yatra-service-description {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+    line-height: 1.4;
+}
+
+.yatra-service-price {
+    font-size: 13px;
+    font-weight: 600;
+    color: #7c3aed;
+    white-space: nowrap;
+}
+
+/* Services Total Row in Price Summary */
+.yatra-services-total-row {
+    background: #f5f3ff;
+    margin: 8px -16px;
+    padding: 10px 16px !important;
+    border-top: 1px dashed #c4b5fd;
+    border-bottom: 1px dashed #c4b5fd;
+}
+
+.yatra-services-total-row span:first-child {
+    color: #5b21b6;
+}
+
+.yatra-services-total-row span:last-child {
+    color: #7c3aed;
+    font-weight: 600;
 }
 

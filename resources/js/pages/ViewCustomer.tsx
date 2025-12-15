@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, Users, DollarSign, FileText, Edit, Award, CreditCard, Globe, User, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
@@ -130,22 +131,11 @@ const ViewCustomer: React.FC = () => {
   });
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatShortDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatPrice = (price: number, currencyCode: string = 'USD') => {

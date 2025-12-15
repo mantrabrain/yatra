@@ -34,6 +34,10 @@
         
         // Coupon state
         let appliedCoupon = null;
+        
+        // Group discount state (used for dynamic updates when traveler count changes)
+        let appliedGroupDiscount = null;
+        const groupDiscounts = window.yatraBookingData?.groupDiscounts || [];
 
         // Country options for dynamically added travelers
         const countryOptions = generateCountryOptions();
@@ -109,17 +113,139 @@
             });
             return total;
         }
+        
+        /**
+         * Debounce timer for AJAX calls
+         */
+        let summaryDebounceTimer = null;
 
         /**
-         * Update booking summary prices
+         * Fetch booking summary from server via AJAX
+         */
+        function fetchBookingSummary() {
+            // Clear any pending debounce
+            if (summaryDebounceTimer) {
+                clearTimeout(summaryDebounceTimer);
+            }
+            
+            // Debounce to avoid too many requests
+            summaryDebounceTimer = setTimeout(() => {
+                doFetchBookingSummary();
+            }, 300);
+        }
+
+        /**
+         * Actually fetch the booking summary from server
+         */
+        function doFetchBookingSummary() {
+            const tripId = window.yatraBookingData?.tripId || $('input[name="trip_id"]').val();
+            if (!tripId) return;
+            
+            // Collect traveler counts by category
+            const travelerCounts = {};
+            $('.yatra-qty-input[data-category-id]').each(function() {
+                const categoryId = $(this).data('category-id');
+                const count = parseInt($(this).val()) || 0;
+                travelerCounts[categoryId] = count;
+            });
+            
+            // For regular pricing, use total travelers
+            if (Object.keys(travelerCounts).length === 0) {
+                const totalTravelers = getTravelerCount();
+                travelerCounts['default'] = totalTravelers;
+            }
+            
+            const travelDate = $('input[name="travel_date"]').val() || '';
+            const couponCode = $('input[name="coupon_code"]').val() || '';
+            const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
+            
+            // Collect selected additional services
+            const selectedServices = [];
+            $('#yatra-additional-services input[type="checkbox"]:checked').each(function() {
+                const $serviceItem = $(this).closest('.yatra-service-item');
+                const serviceId = parseInt($serviceItem.data('service-id'));
+                if (serviceId) {
+                    selectedServices.push(serviceId);
+                }
+            });
+            
+            // Call the AJAX endpoint
+            $.ajax({
+                url: (window.yatraBookingData?.restUrl || '/wp-json/') + 'yatra/v1/booking/summary',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    trip_id: tripId,
+                    traveler_counts: travelerCounts,
+                    travel_date: travelDate,
+                    coupon_code: couponCode,
+                    payment_method: paymentMethod,
+                    additional_services: selectedServices,
+                }),
+                success: function(response) {
+                    // Handle both wrapped and unwrapped response formats
+                    const data = response.data || response;
+                    if (data && data.pricing_html) {
+                        renderBookingSummary(data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('[Yatra] Failed to fetch booking summary:', error);
+                }
+            });
+        }
+
+        /**
+         * Render booking summary from server response
+         */
+        function renderBookingSummary(data) {
+            const selectedGateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
+            
+            // Replace the entire pricing section with server-rendered HTML
+            if (data.pricing_html) {
+                $('#yatra-summary-pricing').html(data.pricing_html);
+            }
+            
+            // Update travelers display text
+            if (data.is_traveler_based) {
+                updateTravelersDisplayText();
+            } else {
+                updateRegularTravelersDisplayText(data.total_travelers);
+            }
+            
+            // Update pay button amount
+            $('#pay-amount').text(data.amount_due_formatted);
+            
+            // Update form data
+            if ($form && $form.length) {
+                $form.data('paymentDue', data.amount_due);
+                $form.attr('data-payment-due', data.amount_due);
+            }
+            
+            // Update global state
+            window.yatraBookingData = window.yatraBookingData || {};
+            window.yatraBookingData.paymentDue = data.amount_due;
+            window.yatraBookingData.groupDiscountAmount = data.group_discount?.amount || 0;
+            window.yatraBookingSummary = {
+                totalAmount: data.total_amount,
+                amountDue: data.amount_due,
+                amountPaid: (window.yatraBookingData?.amountPaid ?? 0),
+                paymentMethod: $('input[name="payment_method"]:checked').val() || 'full',
+                groupDiscount: data.group_discount,
+                couponDiscount: data.coupon_discount,
+            };
+            
+            updateButtonText(selectedGateway, data.amount_due);
+        }
+
+        /**
+         * Update booking summary prices (now uses AJAX)
          */
         function updateBookingSummary() {
-            let total = 0;
-            let travelers = 0;
             const selectedGateway = $('input[name="payment_gateway"]:checked').val() || 'pay_later';
 
             if (isRemainingPayment) {
-                total = totalRemainingAmount ?? remainingAmount;
+                const total = totalRemainingAmount ?? remainingAmount;
                 const dueNow = remainingAmount;
                 $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
                 $('#summary-due strong').text(formatCurrency(dueNow, currency));
@@ -139,79 +265,10 @@
                 return;
             }
             
-            if (isTravelerBasedPricing()) {
-                // Traveler-based pricing: sum up category prices
-                total = calculateTravelerBasedTotal();
-                travelers = getTravelerCount();
-                
-                // Update category breakdown
-                $('#price-breakdown-categories').empty();
-                $('.yatra-qty-input[data-category-id]').each(function() {
-                    const count = parseInt($(this).val()) || 0;
-                    const price = parseFloat($(this).data('price')) || 0;
-                    const categoryId = $(this).data('category-id');
-                    const quantityRow = $(this).closest('.yatra-quantity-row');
-                    const categoryLabel = quantityRow.find('.yatra-quantity-title').text();
-                    
-                    if (count > 0) {
-                        const subtotal = count * price;
-                        $('#price-breakdown-categories').append(
-                            `<div class="yatra-price-row yatra-category-subtotal" data-category-id="${categoryId}">
-                                <span>${categoryLabel} x <span class="category-count">${count}</span></span>
-                                <span class="category-subtotal">${formatCurrency(subtotal, currency)}</span>
-                            </div>`
-                        );
-                    }
-                });
-                
-                // Update the dropdown display text
-                updateTravelersDisplayText();
-            } else {
-                // Regular pricing
-                travelers = getTravelerCount();
-                total = pricePerPerson * travelers;
-                $('#summary-travelers').text(travelers);
-                
-                // Update display for regular pricing
-                updateRegularTravelersDisplayText(travelers);
-            }
-            
-            const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
-            
-            let dueNow = total;
-            if (paymentMethod === 'deposit') {
-                dueNow = total * (depositPercentage / 100);
-            } else if (paymentMethod === 'partial') {
-                dueNow = total * (partialPercentage / 100);
-            }
-
-            // Update UI
-            $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
-            $('#summary-due strong').text(formatCurrency(dueNow, currency));
-            $('#pay-amount').text(formatCurrency(dueNow, currency));
-            
-            if ($form && $form.length) {
-                $form.data('paymentDue', dueNow);
-                $form.attr('data-payment-due', dueNow);
-            }
-            window.yatraBookingData = window.yatraBookingData || {};
-            window.yatraBookingData.paymentDue = dueNow;
-            window.yatraBookingSummary = {
-                totalAmount: total,
-                amountDue: dueNow,
-                amountPaid: Math.max(0, total - dueNow),
-                paymentMethod,
-            };
-
-            // Update deposit display
-            if ($('.yatra-price-deposit').length) {
-                $('#summary-deposit').text(formatCurrency(total * (depositPercentage / 100), currency));
-            }
-            
-            // Update button text based on gateway
-            updateButtonText(selectedGateway, dueNow);
+            // Use AJAX to fetch and render the booking summary
+            fetchBookingSummary();
         }
-        
+
         /**
          * Update the dropdown display text for traveler-based pricing
          */
@@ -888,6 +945,22 @@
             });
         }
         
+        // Toggle coupon form visibility
+        $('#yatra-coupon-toggle-btn').on('click', function() {
+            const $form = $('#yatra-coupon-form');
+            const $chevron = $(this).find('.yatra-coupon-chevron');
+            
+            if ($form.is(':visible')) {
+                $form.slideUp(200);
+                $chevron.css('transform', 'rotate(0deg)');
+            } else {
+                $form.slideDown(200);
+                $chevron.css('transform', 'rotate(180deg)');
+                // Focus the input field
+                setTimeout(() => $('#yatra-coupon-code').focus(), 200);
+            }
+        });
+        
         // Apply coupon
         $('#yatra-apply-coupon').on('click', function() {
             applyCoupon();
@@ -1013,65 +1086,9 @@
         }
         
         function updatePriceWithDiscount(couponData) {
-            const discountAmount = parseFloat(couponData.discount_amount) || 0;
-            const discountFormatted = couponData.discount_formatted || formatCurrency(discountAmount, currency);
-            
-            // Show discount row
-            const $discountRow = isTravelerBasedPricing() ? $('#yatra-discount-row') : $('#yatra-discount-row-regular');
-            $discountRow.find('.yatra-discount-code').text('(' + couponData.code + ')');
-            $discountRow.find('.yatra-discount-amount').text('-' + discountFormatted);
-            $discountRow.show();
-            
-            // Recalculate and update totals
-            updateBookingSummaryWithDiscount();
+            // Recalculate totals via AJAX (coupon discount is rendered server-side)
+            updateBookingSummary();
         }
-        
-        function updateBookingSummaryWithDiscount() {
-            let subtotal = 0;
-            
-            if (isTravelerBasedPricing()) {
-                subtotal = calculateTravelerBasedTotal();
-            } else {
-                subtotal = pricePerPerson * getTravelerCount();
-            }
-            
-            let discountAmount = 0;
-            if (appliedCoupon) {
-                discountAmount = parseFloat(appliedCoupon.discount_amount) || 0;
-            }
-            
-            const total = Math.max(0, subtotal - discountAmount);
-            
-            const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
-            let dueNow = total;
-            if (paymentMethod === 'deposit') {
-                dueNow = total * (depositPercentage / 100);
-            } else if (paymentMethod === 'partial') {
-                dueNow = total * (partialPercentage / 100);
-            }
-            
-            // Update UI
-            $('#summary-total').html('<strong>' + formatCurrency(total, currency) + '</strong>');
-            $('#summary-due strong').text(formatCurrency(dueNow, currency));
-            $('#pay-amount').text(formatCurrency(dueNow, currency));
-            
-            // Update deposit display
-            if ($('.yatra-price-deposit').length) {
-                $('#summary-deposit').text(formatCurrency(total * (depositPercentage / 100), currency));
-            }
-        }
-        
-        // Override the original updateBookingSummary to include discount
-        const originalUpdateBookingSummary = updateBookingSummary;
-        updateBookingSummary = function() {
-            originalUpdateBookingSummary();
-            
-            // If we have an applied coupon, recalculate with discount
-            if (appliedCoupon) {
-                updateBookingSummaryWithDiscount();
-            }
-        };
-        
 
         /**
          * Load existing coupon from session and display it
@@ -1160,6 +1177,86 @@
         
         // Trigger gateway change to show initial info
         $('input[name="payment_gateway"]:checked').trigger('change');
+        
+        // =====================
+        // Additional Services Selection
+        // =====================
+        
+        // Handle additional service checkbox changes
+        $(document).on('change', '#yatra-additional-services input[type="checkbox"]', function() {
+            const $checkbox = $(this);
+            const $serviceItem = $checkbox.closest('.yatra-service-item');
+            const serviceId = $serviceItem.data('service-id');
+            const servicePrice = parseFloat($serviceItem.data('service-price')) || 0;
+            const servicePricePer = $serviceItem.data('service-price-per') || 'booking';
+            const isRequired = $serviceItem.data('is-required') === 1 || $serviceItem.data('is-required') === '1';
+            const isChecked = $checkbox.is(':checked');
+            
+            // Prevent unchecking required services
+            if (isRequired && !isChecked) {
+                $checkbox.prop('checked', true);
+                return;
+            }
+            
+            // Update visual state
+            if (isChecked) {
+                $serviceItem.addClass('yatra-service-selected');
+            } else {
+                $serviceItem.removeClass('yatra-service-selected');
+            }
+            
+            // Update booking session with selected services
+            updateServicesInSession();
+            
+            // Update the booking summary to recalculate totals
+            updateBookingSummary();
+        });
+        
+        /**
+         * Get selected additional services
+         */
+        function getSelectedServices() {
+            const services = [];
+            $('#yatra-additional-services input[type="checkbox"]:checked').each(function() {
+                const $serviceItem = $(this).closest('.yatra-service-item');
+                services.push({
+                    id: parseInt($serviceItem.data('service-id')),
+                    price: parseFloat($serviceItem.data('service-price')) || 0,
+                    price_per: $serviceItem.data('service-price-per') || 'booking'
+                });
+            });
+            return services;
+        }
+        
+        /**
+         * Update services in booking session
+         */
+        function updateServicesInSession() {
+            const selectedServices = getSelectedServices();
+            const serviceIds = selectedServices.map(s => s.id);
+            
+            fetch(apiUrl + '/booking/session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    additional_services: serviceIds
+                })
+            })
+            .then(response => response.json())
+            .then(response => {
+                if (response.success) {
+                    // Session updated successfully
+                    console.log('Services updated in session:', serviceIds);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating services in session:', error);
+            });
+        }
     });
 
     // Add CSS for spinner animation

@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin, Send, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -353,11 +354,7 @@ const Enquiries: React.FC = () => {
   const totalPages = Math.ceil(total / perPage || 1);
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const getStatusBadge = (status: string) => {

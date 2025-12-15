@@ -19,6 +19,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 
 interface Customer {
   id: number;
@@ -162,12 +163,7 @@ const Customers: React.FC = () => {
   const totalPages = data?.pages || Math.ceil(total / 10);
 
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    });
+    return formatDateUtil(dateString);
   };
 
   const formatPrice = (price: number, currencyCode: string = 'USD') => {

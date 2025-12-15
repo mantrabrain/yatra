@@ -103,7 +103,8 @@ const Modules: React.FC = () => {
 
   const handleToggle = (module: ModuleDefinition) => {
     if (module.is_core || !canManageModules) return;
-    if (module.is_premium && !module.enabled) {
+    // Show premium dialog only if module requires Pro and is NOT available (Pro not active or module not in Pro)
+    if (module.is_premium && !module.enabled && !module.is_available) {
       setPremiumDialog({ open: true, module });
       return;
     }
@@ -111,9 +112,13 @@ const Modules: React.FC = () => {
   };
 
   const renderToggle = (module: ModuleDefinition) => {
-    const isLockedPremium = module.is_premium && !module.enabled;
+    // Module is locked if it's premium, not enabled, and not available (Pro not active)
+    const isLockedPremium = module.is_premium && !module.enabled && !module.is_available;
+    // Module is always-on if it's premium and available (Pro is active) - disable toggle
+    const isProControlled = module.is_premium && module.is_available;
     const disabled =
       module.is_core ||
+      isProControlled ||
       toggleMutation.isPending ||
       !canManageModules;
     return (
@@ -150,7 +155,8 @@ const Modules: React.FC = () => {
 
   const handleSelect = (slug: string) => {
     const module = moduleMap.get(slug);
-    if (module?.is_premium && !module.enabled) {
+    // Only show premium dialog if module is premium, not enabled, and not available
+    if (module?.is_premium && !module.enabled && !module.is_available) {
       setPremiumDialog({ open: true, module });
       return;
     }
@@ -183,13 +189,15 @@ const Modules: React.FC = () => {
     const items = Array.from(selected)
       .map((slug) => moduleMap.get(slug))
       .filter((module): module is ModuleDefinition => !!module)
-      .filter((module) => !(module.is_premium && enabled));
+      // Only filter out premium modules that are NOT available (Pro not active)
+      .filter((module) => !(module.is_premium && enabled && !module.is_available));
 
     if (items.length === 0) {
       if (selected.size > 0 && enabled) {
+        // Only show premium dialog for modules that are not available
         const premiumModules = Array.from(selected)
           .map((slug) => moduleMap.get(slug))
-          .filter((module) => module?.is_premium);
+          .filter((module) => module?.is_premium && !module?.is_available);
         if (premiumModules.length > 0) {
           setPremiumDialog({ open: true, module: premiumModules[0] });
         }
@@ -371,11 +379,12 @@ const Modules: React.FC = () => {
                   <Card
                     key={module.slug}
                     className={`border ${
-                      module.is_premium
+                      // Only show premium styling if module is premium AND not available (Pro not active)
+                      module.is_premium && !module.is_available
                         ? 'border-amber-300 dark:border-amber-500/60 bg-amber-50/80 dark:bg-amber-500/10 relative overflow-hidden'
                         : 'border-gray-200 dark:border-gray-700'
                     }`}
-                    {...(module.is_premium && canManageModules && !module.enabled
+                    {...(module.is_premium && !module.is_available && canManageModules && !module.enabled
                       ? {
                           role: 'button' as const,
                           tabIndex: 0,
@@ -426,13 +435,24 @@ const Modules: React.FC = () => {
                               {module.is_core && (
                                 <Badge variant="outline">{__('Core', 'Core')}</Badge>
                               )}
-                              {module.is_premium && (
+                              {/* Only show Premium badge if module is premium AND not available (Pro not active) */}
+                              {module.is_premium && !module.is_available && (
                                 <Badge
                                   variant="outline"
                                   className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50"
                                 >
                                   <Crown className="w-3 h-3" />
                                   {__('Premium', 'Premium')}
+                                </Badge>
+                              )}
+                              {/* Show Pro badge if module is premium AND available (Pro is active) */}
+                              {module.is_premium && module.is_available && (
+                                <Badge
+                                  variant="outline"
+                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-green-400 border-green-600 text-white shadow-sm dark:bg-green-600/60 dark:border-green-500 dark:text-green-50"
+                                >
+                                  <Crown className="w-3 h-3" />
+                                  {__('Pro', 'Pro')}
                                 </Badge>
                               )}
                             </CardTitle>
