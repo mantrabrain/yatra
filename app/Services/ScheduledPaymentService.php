@@ -86,6 +86,21 @@ class ScheduledPaymentService
      */
     public static function syncScheduledPaymentStatus(): void
     {
+        global $wpdb;
+        
+        // Check if table exists before querying
+        $table = $wpdb->prefix . 'yatra_scheduled_payments';
+        $tableExists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+            DB_NAME,
+            $table
+        ));
+        
+        if (!$tableExists) {
+            // Table doesn't exist yet - skip silently
+            return;
+        }
+        
         $repository = self::getRepository();
 
         // Get processing payments that might have been updated by gateway webhook
@@ -124,6 +139,21 @@ class ScheduledPaymentService
      */
     public static function sendPaymentReminders(): void
     {
+        global $wpdb;
+        
+        // Check if table exists before querying
+        $table = $wpdb->prefix . 'yatra_scheduled_payments';
+        $tableExists = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+            DB_NAME,
+            $table
+        ));
+        
+        if (!$tableExists) {
+            // Table doesn't exist yet - skip silently
+            return;
+        }
+        
         $repository = self::getRepository();
 
         $reminder_days = (int) SettingsService::get('scheduled_payment_reminder_days', 3);

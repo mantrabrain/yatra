@@ -485,6 +485,17 @@ class BookingService
 
         // Send status change notification
         $this->sendStatusChangeNotification($id, $oldStatus, $status);
+        
+        /**
+         * Action: Booking status changed
+         * Fires when booking status changes
+         * 
+         * @param int $id The booking ID
+         * @param string $oldStatus Previous status
+         * @param string $status New status
+         * @since 3.0.0
+         */
+        do_action('yatra_booking_status_changed', $id, $oldStatus, $status);
 
         return [
             'success' => true,

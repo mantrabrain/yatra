@@ -74,7 +74,7 @@ const EmailSequenceForm: React.FC = () => {
   const isEditing = !!id;
   
   const goBack = () => {
-    window.location.href = `admin.php?page=yatra&subpage=email-automation`;
+    window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=sequences`;
   };
   
   const queryClient = useQueryClient();

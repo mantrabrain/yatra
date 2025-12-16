@@ -164,6 +164,24 @@ class ToolsController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+        
+        // Get cron jobs
+        register_rest_route($namespace, '/' . $base . '/cron-jobs', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getCronJobs'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+        
+        // Run cron job manually
+        register_rest_route($namespace, '/' . $base . '/cron-jobs/(?P<hook>[a-zA-Z0-9_-]+)/run', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'runCronJob'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -1177,6 +1195,96 @@ class ToolsController extends BaseController
             
         } catch (\Exception $e) {
             Logger::error('Failed to clear caches: ' . $e->getMessage());
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+    
+    /**
+     * Get all Yatra-related cron jobs
+     */
+    public function getCronJobs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $crons = _get_cron_array();
+            $yatraCrons = [];
+            $schedules = wp_get_schedules();
+            
+            if (!is_array($crons)) {
+                return $this->success_response([]);
+            }
+            
+            foreach ($crons as $timestamp => $cronhooks) {
+                foreach ($cronhooks as $hook => $events) {
+                    // Only include yatra-related cron jobs
+                    if (strpos($hook, 'yatra') !== false) {
+                        foreach ($events as $key => $event) {
+                            $schedule = $event['schedule'] ?? false;
+                            $interval = 0;
+                            $scheduleLabel = __('One-time', 'yatra');
+                            
+                            if ($schedule && isset($schedules[$schedule])) {
+                                $interval = $schedules[$schedule]['interval'] ?? 0;
+                                $scheduleLabel = $schedules[$schedule]['display'] ?? $schedule;
+                            }
+                            
+                            $yatraCrons[] = [
+                                'hook' => $hook,
+                                'next_run' => $timestamp,
+                                'next_run_formatted' => date_i18n(get_option('date_format') . ' ' . get_option('time_format'), $timestamp),
+                                'next_run_relative' => human_time_diff($timestamp, time()) . ($timestamp > time() ? ' from now' : ' ago'),
+                                'schedule' => $schedule ?: 'once',
+                                'schedule_label' => $scheduleLabel,
+                                'interval' => $interval,
+                                'args' => $event['args'] ?? [],
+                                'is_overdue' => $timestamp < time(),
+                            ];
+                        }
+                    }
+                }
+            }
+            
+            // Sort by next run time
+            usort($yatraCrons, function($a, $b) {
+                return $a['next_run'] - $b['next_run'];
+            });
+            
+            return $this->success_response([
+                'cron_jobs' => $yatraCrons,
+                'schedules' => $schedules,
+                'wp_cron_disabled' => defined('DISABLE_WP_CRON') && DISABLE_WP_CRON,
+                'alternate_cron' => defined('ALTERNATE_WP_CRON') && ALTERNATE_WP_CRON,
+            ]);
+            
+        } catch (\Exception $e) {
+            Logger::error('Failed to get cron jobs: ' . $e->getMessage());
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+    
+    /**
+     * Manually run a cron job
+     */
+    public function runCronJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $hook = $request->get_param('hook');
+            
+            if (empty($hook) || strpos($hook, 'yatra') === false) {
+                return $this->error_response(__('Invalid cron hook', 'yatra'), 400);
+            }
+            
+            // Run the cron hook
+            do_action($hook);
+            
+            Logger::info("Manually triggered cron job: {$hook}");
+            
+            return $this->success_response([
+                'success' => true,
+                'message' => sprintf(__('Cron job "%s" executed successfully', 'yatra'), $hook),
+            ]);
+            
+        } catch (\Exception $e) {
+            Logger::error('Failed to run cron job: ' . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }

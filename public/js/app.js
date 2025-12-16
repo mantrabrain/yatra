@@ -41867,6 +41867,10 @@ const Tools = () => {
   const [isLoadingJobs, setIsLoadingJobs] = reactExports.useState(false);
   const [allJobs, setAllJobs] = reactExports.useState([]);
   const [isClearingCache, setIsClearingCache] = reactExports.useState(false);
+  const [cronJobs, setCronJobs] = reactExports.useState([]);
+  const [cronInfo, setCronInfo] = reactExports.useState(null);
+  const [isLoadingCronJobs, setIsLoadingCronJobs] = reactExports.useState(false);
+  const [runningCronJob, setRunningCronJob] = reactExports.useState(null);
   const { showToast } = useToast();
   const [exportJob, setExportJob] = reactExports.useState(null);
   const [importJob, setImportJob] = reactExports.useState(null);
@@ -42250,13 +42254,62 @@ const Tools = () => {
         }
       });
       const data = await response.json();
-      if (data.success) {
-        setAllJobs(data.data || []);
+      console.log("All Jobs API response:", data);
+      if (response.ok) {
+        console.log("Setting allJobs:", data);
+        setAllJobs(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error("Failed to load jobs:", error);
     } finally {
       setIsLoadingJobs(false);
+    }
+  };
+  const loadCronJobs = async () => {
+    setIsLoadingCronJobs(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/cron-jobs`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      console.log("Cron Jobs API response:", data);
+      if (response.ok) {
+        console.log("Setting cronJobs:", data == null ? void 0 : data.cron_jobs);
+        setCronJobs((data == null ? void 0 : data.cron_jobs) || []);
+        setCronInfo({
+          wp_cron_disabled: (data == null ? void 0 : data.wp_cron_disabled) || false,
+          alternate_cron: (data == null ? void 0 : data.alternate_cron) || false
+        });
+      }
+    } catch (error) {
+      console.error("Failed to load cron jobs:", error);
+    } finally {
+      setIsLoadingCronJobs(false);
+    }
+  };
+  const handleRunCronJob = async (hook) => {
+    setRunningCronJob(hook);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/cron-jobs/${hook}/run`, {
+        method: "POST",
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        showToast(data.message || `Cron job "${hook}" executed successfully`, "success");
+        loadCronJobs();
+      } else {
+        showToast(data.message || "Failed to run cron job", "error");
+      }
+    } catch (error) {
+      console.error("Failed to run cron job:", error);
+      showToast("Failed to run cron job", "error");
+    } finally {
+      setRunningCronJob(null);
     }
   };
   const clearAllCache = async () => {
@@ -42298,6 +42351,7 @@ const Tools = () => {
       loadLogs(selectedLogType);
     } else if (activeTab === "jobs") {
       loadAllJobs();
+      loadCronJobs();
     }
   }, [activeTab, selectedLogType]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -42679,139 +42733,192 @@ const Tools = () => {
           "Retry"
         ] })
       ] }) }) }),
-      activeTab === "jobs" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: "All Jobs" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: loadAllJobs,
-              disabled: isLoadingJobs,
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isLoadingJobs ? "animate-spin" : ""}` }),
-                "Refresh"
-              ]
-            }
-          )
-        ] }),
-        isLoadingJobs ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: [...Array(5)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
+      activeTab === "jobs" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "overflow-hidden", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-20 h-6 bg-gray-200 dark:bg-gray-700 rounded" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-32 h-5 bg-gray-200 dark:bg-gray-700 rounded" })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-5 bg-gray-200 dark:bg-gray-700 rounded" })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full h-2 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3/4 h-4 bg-gray-200 dark:bg-gray-700 rounded" })
-        ] }, index)) }) : allJobs.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: allJobs.map((job) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: job.type === "export" ? "default" : "info", children: [
-                job.type === "export" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-3 h-3 mr-1" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-3 h-3 mr-1" }),
-                job.type.toUpperCase()
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-gray-900 dark:text-white", children: [
-                "Job ID: ",
-                job.id
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              job.status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "success", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-3 h-3 mr-1" }),
-                "Completed"
-              ] }),
-              job.status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "info", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3 mr-1 animate-spin" }),
-                "Running"
-              ] }),
-              job.status === "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "warning", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-3 h-3 mr-1" }),
-                "Pending"
-              ] }),
-              job.status === "failed" && /* @__PURE__ */ jsxRuntimeExports.jsxs(Badge, { variant: "error", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-3 h-3 mr-1" }),
-                "Failed"
-              ] })
-            ] })
-          ] }),
-          (job.status === "running" || job.status === "completed") && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mb-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-sm mb-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Progress" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-gray-900 dark:text-white", children: [
-                job.progress,
-                "%"
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "div",
-              {
-                className: `h-2 rounded-full transition-all ${job.status === "completed" ? "bg-green-500" : "bg-blue-500"}`,
-                style: { width: `${job.progress}%` }
-              }
-            ) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 md:grid-cols-4 gap-4 text-sm", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Created:" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.created_at).toLocaleString() })
-            ] }),
-            job.started_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Started:" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.started_at).toLocaleString() })
-            ] }),
-            job.completed_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Completed:" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium text-gray-900 dark:text-white", children: new Date(job.completed_at).toLocaleString() })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400", children: "Records:" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "font-medium text-gray-900 dark:text-white", children: [
-                job.processed_records || 0,
-                " / ",
-                job.total_records || 0
-              ] })
-            ] })
-          ] }),
-          job.type === "import" && job.import_stats && Object.keys(job.import_stats).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("details", { className: "text-sm", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer text-gray-600 dark:text-gray-400 font-medium mb-2", children: "Import Details" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-2 md:grid-cols-3 gap-2 mt-2", children: Object.entries(job.import_stats).map(([dataType, stats]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-900 rounded p-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-600 dark:text-gray-400 capitalize mb-1", children: dataType.replace("_", " ") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm font-medium text-green-600 dark:text-green-400", children: stats.imported }),
-                stats.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-red-600 dark:text-red-400", children: [
-                  "(",
-                  stats.failed,
-                  " failed)"
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white", children: "Export & Import Jobs" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                  allJobs.length,
+                  " job",
+                  allJobs.length !== 1 ? "s" : "",
+                  " in history"
                 ] })
               ] })
-            ] }, dataType)) })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: loadAllJobs,
+                disabled: isLoadingJobs,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isLoadingJobs ? "animate-spin" : ""}` })
+              }
+            )
+          ] }),
+          isLoadingJobs ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-3", children: [...Array(3)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between py-3 animate-pulse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-48 h-3 bg-gray-200 dark:bg-gray-700 rounded" })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-20 h-6 bg-gray-200 dark:bg-gray-700 rounded" })
+          ] }, index)) }) : allJobs.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-800", children: allJobs.map((job) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between gap-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0 flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `p-2 rounded-lg flex-shrink-0 ${job.type === "export" ? "bg-blue-100 dark:bg-blue-900/30" : "bg-green-100 dark:bg-green-900/30"}`, children: job.type === "export" ? /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(Upload, { className: "w-4 h-4 text-green-600 dark:text-green-400" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "font-medium text-sm text-gray-900 dark:text-white", children: [
+                      job.type === "export" ? "Export" : "Import",
+                      " #",
+                      job.id.slice(-6)
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: `inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${job.status === "completed" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : job.status === "running" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" : job.status === "pending" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`, children: [
+                      job.status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3 mr-1 animate-spin" }),
+                      job.status.charAt(0).toUpperCase() + job.status.slice(1)
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: new Date(job.created_at).toLocaleDateString() }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
+                      job.processed_records || 0,
+                      "/",
+                      job.total_records || 0,
+                      " records"
+                    ] }),
+                    job.status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "•" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-blue-600 dark:text-blue-400", children: [
+                        job.progress,
+                        "%"
+                      ] })
+                    ] })
+                  ] })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-shrink-0", children: [
+                job.status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-24 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    className: "h-full bg-blue-500 rounded-full transition-all",
+                    style: { width: `${job.progress}%` }
+                  }
+                ) }),
+                job.type === "export" && job.status === "completed" && job.file_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: job.file_url,
+                    download: true,
+                    className: "text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-3 h-3" }),
+                      "Download"
+                    ]
+                  }
+                )
+              ] })
+            ] }),
+            job.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 ml-11 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-700 dark:text-red-400", children: job.error })
+          ] }, job.id)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8 px-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "No export/import jobs yet" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "overflow-hidden", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Activity, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-base font-semibold text-gray-900 dark:text-white", children: "Scheduled Tasks" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400", children: [
+                  cronJobs.length,
+                  " active cron job",
+                  cronJobs.length !== 1 ? "s" : ""
+                ] })
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "outline",
+                size: "sm",
+                onClick: loadCronJobs,
+                disabled: isLoadingCronJobs,
+                children: /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isLoadingCronJobs ? "animate-spin" : ""}` })
+              }
+            )
+          ] }),
+          (cronInfo == null ? void 0 : cronInfo.wp_cron_disabled) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-amber-800 dark:text-amber-400", children: "WP-Cron is disabled. A server-side cron is required." })
           ] }) }),
-          job.error && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-red-800 dark:text-red-400", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("strong", { children: "Error:" }),
-            " ",
-            job.error
-          ] }) }),
-          job.type === "export" && job.status === "completed" && job.file_url && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            "a",
+          isLoadingCronJobs ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-4 space-y-3", children: [...Array(3)].map((_, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between py-3 animate-pulse", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-48 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-32 h-3 bg-gray-200 dark:bg-gray-700 rounded" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded" })
+          ] }, index)) }) : cronJobs.length > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "divide-y divide-gray-100 dark:divide-gray-800", children: cronJobs.map((cron, index) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "div",
             {
-              href: job.file_url,
-              download: true,
-              className: "inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline",
+              className: `flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${cron.is_overdue ? "bg-red-50/50 dark:bg-red-900/10" : ""}`,
               children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-4 h-4" }),
-                "Download Export File"
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 min-w-0 flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `w-2 h-2 rounded-full flex-shrink-0 ${cron.is_overdue ? "bg-red-500" : "bg-green-500"}` }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "min-w-0 flex-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 flex-wrap", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-sm text-gray-900 dark:text-white truncate", children: cron.hook.replace("yatra_", "").replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded", children: cron.schedule || "once" }),
+                      cron.is_overdue && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400", children: "Overdue" })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        "span",
+                        {
+                          className: "flex items-center gap-1 cursor-help",
+                          title: cron.next_run_formatted,
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-3 h-3" }),
+                            cron.next_run_relative
+                          ]
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "hidden sm:inline", children: "•" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "hidden sm:flex items-center gap-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3" }),
+                        cron.schedule_label
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-0.5 text-xs text-gray-400 dark:text-gray-500 font-mono", children: cron.hook })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  Button,
+                  {
+                    variant: "ghost",
+                    size: "sm",
+                    onClick: () => handleRunCronJob(cron.hook),
+                    disabled: runningCronJob === cron.hook,
+                    className: "ml-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20",
+                    children: runningCronJob === cron.hook ? /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 animate-spin" }) : /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium", children: "Run" })
+                  }
+                )
               ]
-            }
-          ) })
-        ] }, job.id)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-16 h-16 text-gray-400 mx-auto mb-4" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 text-lg font-medium mb-2", children: "No jobs found" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-500 dark:text-gray-500 text-sm", children: "Export or import data to see job history here" })
+            },
+            `${cron.hook}-${index}`
+          )) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8 px-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(Activity, { className: "w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "No scheduled tasks" })
+          ] })
         ] })
-      ] }) }),
+      ] }),
       activeTab === "logs" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: logTypes.map((type) => {
           const Icon = type.icon;
@@ -73466,6 +73573,16 @@ const PreviewForm = ({ formData, showToast, generateSimpleForm, setActiveTab }) 
     ] })
   ] }) });
 };
+const getEffectiveRecipientType = (template) => {
+  const toEmail = template.to_email || "";
+  if (toEmail.includes("{{admin_email}}") || toEmail.includes("admin")) {
+    return "admin";
+  }
+  if (toEmail.includes("{{customer_email}}") || toEmail === "") {
+    return "customer";
+  }
+  return template.recipient_type;
+};
 const isModuleAvailable = () => {
   const yatraAdmin = window == null ? void 0 : window.yatraAdmin;
   return Boolean((yatraAdmin == null ? void 0 : yatraAdmin.isPro) && (yatraAdmin == null ? void 0 : yatraAdmin.emailAutomationEnabled));
@@ -73746,7 +73863,14 @@ const EmailTemplatesList = () => {
       key: "recipient_type",
       label: __("Recipient"),
       visible: visibleColumns.recipient_type,
-      render: (template) => /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${template.recipient_type === "admin" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`, children: template.recipient_type === "admin" ? __("Admin") : __("Customer") })
+      render: (template) => {
+        const effectiveRecipient = getEffectiveRecipientType(template);
+        const toEmail = template.to_email || "";
+        return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${effectiveRecipient === "admin" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" : "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"}`, children: effectiveRecipient === "admin" ? __("Admin") : __("Customer") }),
+          toEmail && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]", title: toEmail, children: toEmail })
+        ] });
+      }
     },
     {
       key: "is_active",
@@ -74304,10 +74428,6 @@ const EmailTemplateForm = () => {
       showToast(__("Template name is required"), "error");
       return;
     }
-    if (!formData.event_key) {
-      showToast(__("Please select a trigger event"), "error");
-      return;
-    }
     if (!formData.subject.trim()) {
       showToast(__("Subject line is required"), "error");
       return;
@@ -74756,8 +74876,8 @@ const EmailTemplateForm = () => {
         ] })
       ] })
     ] }),
-    showPreview && previewData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4", onClick: () => setShowPreview(false), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden", onClick: (e) => e.stopPropagation(), children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800", children: [
+    showPreview && previewData && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2", onClick: () => setShowPreview(false), children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-[95vw] max-w-6xl h-[95vh] max-h-[95vh] overflow-hidden flex flex-col", onClick: (e) => e.stopPropagation(), children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }) }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -74776,18 +74896,18 @@ const EmailTemplateForm = () => {
           }
         )
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-4 h-4 text-gray-400" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide", children: __("Subject") })
         ] }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-base font-medium text-gray-900 dark:text-white", children: previewData.subject })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "overflow-auto max-h-[60vh] bg-gray-100 dark:bg-gray-950", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 overflow-auto bg-gray-100 dark:bg-gray-950", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         "iframe",
         {
           srcDoc: previewData.body,
-          className: "w-full min-h-[400px] border-0",
+          className: "w-full h-full min-h-[500px] border-0",
           title: "Email Preview",
           sandbox: "allow-same-origin"
         }
@@ -74810,7 +74930,7 @@ const EmailSequenceForm = () => {
   }, []);
   const isEditing = !!id;
   const goBack = () => {
-    window.location.href = `admin.php?page=yatra&subpage=email-automation`;
+    window.location.href = `admin.php?page=yatra&subpage=email-automation&tab=sequences`;
   };
   const queryClient2 = useQueryClient();
   const { showToast } = useToast();

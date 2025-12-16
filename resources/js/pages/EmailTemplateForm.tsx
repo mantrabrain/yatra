@@ -168,10 +168,7 @@ const EmailTemplateForm: React.FC = () => {
       showToast(__('Template name is required'), 'error');
       return;
     }
-    if (!formData.event_key) {
-      showToast(__('Please select a trigger event'), 'error');
-      return;
-    }
+    // Event is optional for custom templates
     if (!formData.subject.trim()) {
       showToast(__('Subject line is required'), 'error');
       return;
@@ -793,10 +790,10 @@ const EmailTemplateForm: React.FC = () => {
       
       {/* Preview Modal */}
       {showPreview && previewData && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowPreview(false)}>
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2" onClick={() => setShowPreview(false)}>
+          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl w-[95vw] max-w-6xl h-[95vh] max-h-[95vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             {/* Modal Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
                   <Eye className="w-5 h-5 text-blue-600 dark:text-blue-400" />
@@ -821,7 +818,7 @@ const EmailTemplateForm: React.FC = () => {
             </div>
             
             {/* Subject Line */}
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
+            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 flex-shrink-0">
               <div className="flex items-center gap-2 mb-1">
                 <Mail className="w-4 h-4 text-gray-400" />
                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -834,12 +831,12 @@ const EmailTemplateForm: React.FC = () => {
             </div>
             
             {/* Email Body */}
-            <div className="overflow-auto max-h-[60vh] bg-gray-100 dark:bg-gray-950">
-              <div className="p-6">
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-950">
+              <div className="p-6 h-full">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
                   <iframe
                     srcDoc={previewData.body}
-                    className="w-full min-h-[400px] border-0"
+                    className="w-full h-full min-h-[500px] border-0"
                     title="Email Preview"
                     sandbox="allow-same-origin"
                   />

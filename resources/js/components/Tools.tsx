@@ -100,6 +100,19 @@ interface JobStatus {
   seen_notification?: boolean;
 }
 
+interface CronJob {
+  hook: string;
+  next_run: number;
+  next_run_formatted: string;
+  next_run_relative: string;
+  schedule: string;
+  schedule_label: string;
+  interval: number;
+  args: any[];
+  is_overdue: boolean;
+}
+
+
 const Tools: React.FC = () => {
   const [activeTab, setActiveTab] = useState('export-import');
   const [isExporting, setIsExporting] = useState(false);
@@ -121,6 +134,10 @@ const Tools: React.FC = () => {
   const [isLoadingJobs, setIsLoadingJobs] = useState(false);
   const [allJobs, setAllJobs] = useState<JobStatus[]>([]);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const [cronJobs, setCronJobs] = useState<CronJob[]>([]);
+  const [cronInfo, setCronInfo] = useState<{ wp_cron_disabled: boolean; alternate_cron: boolean } | null>(null);
+  const [isLoadingCronJobs, setIsLoadingCronJobs] = useState(false);
+  const [runningCronJob, setRunningCronJob] = useState<string | null>(null);
   const { showToast } = useToast();
   
   // Background job states
@@ -616,13 +633,70 @@ const Tools: React.FC = () => {
         },
       });
       const data = await response.json();
-      if (data.success) {
-        setAllJobs(data.data || []);
+      console.log('All Jobs API response:', data);
+      // API returns data directly, not wrapped in {success, data}
+      if (response.ok) {
+        console.log('Setting allJobs:', data);
+        setAllJobs(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error('Failed to load jobs:', error);
     } finally {
       setIsLoadingJobs(false);
+    }
+  };
+
+  // Load cron jobs
+  const loadCronJobs = async () => {
+    setIsLoadingCronJobs(true);
+    try {
+      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/cron-jobs`, {
+        headers: {
+          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+        },
+      });
+      const data = await response.json();
+      console.log('Cron Jobs API response:', data);
+      // API returns data directly: {cron_jobs: [], wp_cron_disabled: bool, ...}
+      if (response.ok) {
+        console.log('Setting cronJobs:', data?.cron_jobs);
+        setCronJobs(data?.cron_jobs || []);
+        setCronInfo({
+          wp_cron_disabled: data?.wp_cron_disabled || false,
+          alternate_cron: data?.alternate_cron || false,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load cron jobs:', error);
+    } finally {
+      setIsLoadingCronJobs(false);
+    }
+  };
+
+  // Run a cron job manually
+  const handleRunCronJob = async (hook: string) => {
+    setRunningCronJob(hook);
+    try {
+      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/cron-jobs/${hook}/run`, {
+        method: 'POST',
+        headers: {
+          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+        },
+      });
+      const data = await response.json();
+      // API returns data directly: {success: true, message: ...}
+      if (response.ok && data.success) {
+        showToast(data.message || `Cron job "${hook}" executed successfully`, 'success');
+        // Reload cron jobs to update next run times
+        loadCronJobs();
+      } else {
+        showToast(data.message || 'Failed to run cron job', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to run cron job:', error);
+      showToast('Failed to run cron job', 'error');
+    } finally {
+      setRunningCronJob(null);
     }
   };
 
@@ -681,6 +755,7 @@ const Tools: React.FC = () => {
       loadLogs(selectedLogType);
     } else if (activeTab === 'jobs') {
       loadAllJobs();
+      loadCronJobs();
     }
   }, [activeTab, selectedLogType]);
 
@@ -1175,189 +1250,248 @@ const Tools: React.FC = () => {
         {/* Jobs Tab */}
         {activeTab === 'jobs' && (
           <div className="space-y-6">
-            <Card className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">All Jobs</h3>
+            {/* Export/Import Jobs Section */}
+            <Card className="overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                    <List className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Export & Import Jobs</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {allJobs.length} job{allJobs.length !== 1 ? 's' : ''} in history
+                    </p>
+                  </div>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={loadAllJobs}
                   disabled={isLoadingJobs}
                 >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingJobs ? 'animate-spin' : ''}`} />
-                  Refresh
+                  <RefreshCw className={`w-4 h-4 ${isLoadingJobs ? 'animate-spin' : ''}`} />
                 </Button>
               </div>
 
               {isLoadingJobs ? (
-                <div className="space-y-4">
-                  {/* Jobs Skeleton */}
-                  {[...Array(5)].map((_, index) => (
-                    <div key={index} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 animate-pulse">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-20 h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                          <div className="w-32 h-5 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="p-4 space-y-3">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="flex items-center justify-between py-3 animate-pulse">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                        <div className="flex-1">
+                          <div className="w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                          <div className="w-48 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
                         </div>
-                        <div className="w-24 h-5 bg-gray-200 dark:bg-gray-700 rounded"></div>
                       </div>
-                      <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
-                      <div className="w-3/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      <div className="w-20 h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
                     </div>
                   ))}
                 </div>
               ) : allJobs.length > 0 ? (
-                <div className="space-y-4">
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
                   {allJobs.map((job) => (
-                    <div key={job.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-center gap-3">
-                          <Badge variant={job.type === 'export' ? 'default' : 'info'}>
-                            {job.type === 'export' ? <Download className="w-3 h-3 mr-1" /> : <Upload className="w-3 h-3 mr-1" />}
-                            {job.type.toUpperCase()}
-                          </Badge>
-                          <span className="font-medium text-gray-900 dark:text-white">Job ID: {job.id}</span>
-                        </div>
-                        <div>
-                          {job.status === 'completed' && (
-                            <Badge variant="success">
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Completed
-                            </Badge>
-                          )}
-                          {job.status === 'running' && (
-                            <Badge variant="info">
-                              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                              Running
-                            </Badge>
-                          )}
-                          {job.status === 'pending' && (
-                            <Badge variant="warning">
-                              <AlertCircle className="w-3 h-3 mr-1" />
-                              Pending
-                            </Badge>
-                          )}
-                          {job.status === 'failed' && (
-                            <Badge variant="error">
-                              <XCircle className="w-3 h-3 mr-1" />
-                              Failed
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Progress Bar */}
-                      {(job.status === 'running' || job.status === 'completed') && (
-                        <div className="mb-3">
-                          <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-gray-600 dark:text-gray-400">Progress</span>
-                            <span className="font-medium text-gray-900 dark:text-white">{job.progress}%</span>
+                    <div key={job.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Left: Icon + Info */}
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className={`p-2 rounded-lg flex-shrink-0 ${
+                            job.type === 'export' 
+                              ? 'bg-blue-100 dark:bg-blue-900/30' 
+                              : 'bg-green-100 dark:bg-green-900/30'
+                          }`}>
+                            {job.type === 'export' 
+                              ? <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" /> 
+                              : <Upload className="w-4 h-4 text-green-600 dark:text-green-400" />
+                            }
                           </div>
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full transition-all ${
-                                job.status === 'completed' ? 'bg-green-500' : 'bg-blue-500'
-                              }`}
-                              style={{ width: `${job.progress}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Job Details */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Created:</span>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {new Date(job.created_at).toLocaleString()}
-                          </p>
-                        </div>
-                        {job.started_at && (
-                          <div>
-                            <span className="text-gray-600 dark:text-gray-400">Started:</span>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {new Date(job.started_at).toLocaleString()}
-                            </p>
-                          </div>
-                        )}
-                        {job.completed_at && (
-                          <div>
-                            <span className="text-gray-600 dark:text-gray-400">Completed:</span>
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {new Date(job.completed_at).toLocaleString()}
-                            </p>
-                          </div>
-                        )}
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">Records:</span>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {job.processed_records || 0} / {job.total_records || 0}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Import Stats */}
-                      {job.type === 'import' && job.import_stats && Object.keys(job.import_stats).length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                          <details className="text-sm">
-                            <summary className="cursor-pointer text-gray-600 dark:text-gray-400 font-medium mb-2">
-                              Import Details
-                            </summary>
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
-                              {Object.entries(job.import_stats).map(([dataType, stats]: [string, any]) => (
-                                <div key={dataType} className="bg-white dark:bg-gray-900 rounded p-2">
-                                  <div className="text-xs text-gray-600 dark:text-gray-400 capitalize mb-1">
-                                    {dataType.replace('_', ' ')}
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                                      {stats.imported}
-                                    </span>
-                                    {stats.failed > 0 && (
-                                      <span className="text-xs text-red-600 dark:text-red-400">
-                                        ({stats.failed} failed)
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-medium text-sm text-gray-900 dark:text-white">
+                                {job.type === 'export' ? 'Export' : 'Import'} #{job.id.slice(-6)}
+                              </span>
+                              {/* Status Badge */}
+                              <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                                job.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                job.status === 'running' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                job.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                              }`}>
+                                {job.status === 'running' && <RefreshCw className="w-3 h-3 mr-1 animate-spin" />}
+                                {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
+                              </span>
                             </div>
-                          </details>
+                            <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              <span>{new Date(job.created_at).toLocaleDateString()}</span>
+                              <span>•</span>
+                              <span>{job.processed_records || 0}/{job.total_records || 0} records</span>
+                              {job.status === 'running' && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-blue-600 dark:text-blue-400">{job.progress}%</span>
+                                </>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      )}
+
+                        {/* Right: Progress or Action */}
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          {job.status === 'running' && (
+                            <div className="w-24 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-blue-500 rounded-full transition-all"
+                                style={{ width: `${job.progress}%` }}
+                              ></div>
+                            </div>
+                          )}
+                          {job.type === 'export' && job.status === 'completed' && job.file_url && (
+                            <a
+                              href={job.file_url}
+                              download
+                              className="text-xs font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 flex items-center gap-1"
+                            >
+                              <Download className="w-3 h-3" />
+                              Download
+                            </a>
+                          )}
+                        </div>
+                      </div>
 
                       {/* Error Message */}
                       {job.error && (
-                        <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded">
-                          <p className="text-sm text-red-800 dark:text-red-400">
-                            <strong>Error:</strong> {job.error}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Download Button for Completed Exports */}
-                      {job.type === 'export' && job.status === 'completed' && job.file_url && (
-                        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                          <a
-                            href={job.file_url}
-                            download
-                            className="inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
-                          >
-                            <Download className="w-4 h-4" />
-                            Download Export File
-                          </a>
+                        <div className="mt-2 ml-11 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-xs text-red-700 dark:text-red-400">
+                          {job.error}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12">
-                  <List className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400 text-lg font-medium mb-2">No jobs found</p>
-                  <p className="text-gray-500 dark:text-gray-500 text-sm">
-                    Export or import data to see job history here
-                  </p>
+                <div className="text-center py-8 px-4">
+                  <List className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No export/import jobs yet</p>
+                </div>
+              )}
+            </Card>
+
+            {/* Cron Jobs Section */}
+            <Card className="overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                    <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-semibold text-gray-900 dark:text-white">Scheduled Tasks</h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {cronJobs.length} active cron job{cronJobs.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadCronJobs}
+                  disabled={isLoadingCronJobs}
+                >
+                  <RefreshCw className={`w-4 h-4 ${isLoadingCronJobs ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
+
+              {/* WP Cron Status Warning */}
+              {cronInfo?.wp_cron_disabled && (
+                <div className="px-4 py-3 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800">
+                  <div className="flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                    <span className="text-sm text-amber-800 dark:text-amber-400">
+                      WP-Cron is disabled. A server-side cron is required.
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {isLoadingCronJobs ? (
+                <div className="p-4 space-y-3">
+                  {[...Array(3)].map((_, index) => (
+                    <div key={index} className="flex items-center justify-between py-3 animate-pulse">
+                      <div className="flex-1">
+                        <div className="w-48 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                        <div className="w-32 h-3 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                      </div>
+                      <div className="w-20 h-8 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    </div>
+                  ))}
+                </div>
+              ) : cronJobs.length > 0 ? (
+                <div className="divide-y divide-gray-100 dark:divide-gray-800">
+                  {cronJobs.map((cron, index) => (
+                    <div 
+                      key={`${cron.hook}-${index}`} 
+                      className={`flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                        cron.is_overdue ? 'bg-red-50/50 dark:bg-red-900/10' : ''
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                          cron.is_overdue 
+                            ? 'bg-red-500' 
+                            : 'bg-green-500'
+                        }`}></div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
+                              {cron.hook.replace('yatra_', '').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </span>
+                            <code className="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                              {cron.schedule || 'once'}
+                            </code>
+                            {cron.is_overdue && (
+                              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                                Overdue
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-3 mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            <span 
+                              className="flex items-center gap-1 cursor-help"
+                              title={cron.next_run_formatted}
+                            >
+                              <Calendar className="w-3 h-3" />
+                              {cron.next_run_relative}
+                            </span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="hidden sm:flex items-center gap-1">
+                              <RefreshCw className="w-3 h-3" />
+                              {cron.schedule_label}
+                            </span>
+                          </div>
+                          <div className="mt-0.5 text-xs text-gray-400 dark:text-gray-500 font-mono">
+                            {cron.hook}
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRunCronJob(cron.hook)}
+                        disabled={runningCronJob === cron.hook}
+                        className="ml-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-900/20"
+                      >
+                        {runningCronJob === cron.hook ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <span className="text-xs font-medium">Run</span>
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 px-4">
+                  <Activity className="w-10 h-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">No scheduled tasks</p>
                 </div>
               )}
             </Card>

@@ -48,9 +48,28 @@ interface EmailTemplate {
   is_active: boolean;
   is_system: boolean;
   variables: string[];
+  to_email?: string;
+  from_email?: string;
+  from_name?: string;
+  reply_to?: string;
   created_at: string;
   updated_at: string;
 }
+
+// Helper to detect actual recipient type based on to_email field
+const getEffectiveRecipientType = (template: EmailTemplate): 'customer' | 'admin' => {
+  const toEmail = template.to_email || '';
+  // If to_email contains admin_email placeholder, it's for admin
+  if (toEmail.includes('{{admin_email}}') || toEmail.includes('admin')) {
+    return 'admin';
+  }
+  // If to_email contains customer_email placeholder or is empty (default to customer), it's for customer
+  if (toEmail.includes('{{customer_email}}') || toEmail === '') {
+    return 'customer';
+  }
+  // Fall back to the stored recipient_type
+  return template.recipient_type;
+};
 
 
 interface EmailLog {
@@ -418,15 +437,26 @@ const EmailTemplatesList: React.FC = () => {
       key: 'recipient_type',
       label: __('Recipient'),
       visible: visibleColumns.recipient_type,
-      render: (template: EmailTemplate) => (
-        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          template.recipient_type === 'admin'
-            ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-        }`}>
-          {template.recipient_type === 'admin' ? __('Admin') : __('Customer')}
-        </span>
-      ),
+      render: (template: EmailTemplate) => {
+        const effectiveRecipient = getEffectiveRecipientType(template);
+        const toEmail = template.to_email || '';
+        return (
+          <div className="flex flex-col gap-1">
+            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium w-fit ${
+              effectiveRecipient === 'admin'
+                ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+            }`}>
+              {effectiveRecipient === 'admin' ? __('Admin') : __('Customer')}
+            </span>
+            {toEmail && (
+              <span className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[150px]" title={toEmail}>
+                {toEmail}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       key: 'is_active',

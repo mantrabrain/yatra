@@ -1302,6 +1302,42 @@ class BookingSessionController extends BaseController
         );
 
         // ========================================
+        // FIRE BOOKING CREATED ACTION
+        // ========================================
+        // Get the full booking object for the action
+        $booking = $wpdb->get_row($wpdb->prepare(
+            "SELECT b.*, t.title as trip_title, t.slug as trip_slug 
+             FROM {$bookings_table} b 
+             LEFT JOIN {$wpdb->prefix}yatra_trips t ON b.trip_id = t.id 
+             WHERE b.id = %d",
+            $booking_id
+        ));
+        
+        /**
+         * Action: Booking created
+         * Fires after a new booking is successfully created
+         * 
+         * @param int $booking_id The booking ID
+         * @param object $booking The booking object with trip data
+         * @since 3.0.0
+         */
+        do_action('yatra_booking_created', $booking_id, $booking);
+        
+        // If booking was auto-confirmed, also fire status changed action
+        if ($booking_status === 'confirmed') {
+            /**
+             * Action: Booking status changed
+             * Fires when booking status changes
+             * 
+             * @param int $booking_id The booking ID
+             * @param string $old_status Previous status
+             * @param string $new_status New status
+             * @since 3.0.0
+             */
+            do_action('yatra_booking_status_changed', $booking_id, 'pending', 'confirmed');
+        }
+
+        // ========================================
         // SEND CONFIRMATION EMAIL
         // ========================================
         if ($settings['booking_confirmation']) {

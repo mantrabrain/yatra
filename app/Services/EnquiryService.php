@@ -94,6 +94,18 @@ class EnquiryService
         if (!$enquiryId) {
             return ['success' => false, 'message' => __('Failed to submit enquiry.', 'yatra')];
         }
+        
+        // Get the full enquiry object for the action
+        $enquiry = $this->enquiryRepository->find($enquiryId);
+        
+        /**
+         * Action: Enquiry created
+         * Fires after a new enquiry is successfully created
+         * 
+         * @param object $enquiry The enquiry object
+         * @since 3.0.0
+         */
+        do_action('yatra_enquiry_created', $enquiry);
 
         // Send admin notification
         $this->sendAdminNotification($enquiryId);
@@ -159,6 +171,16 @@ class EnquiryService
         if (!$updated) {
             return ['success' => false, 'message' => __('Failed to save response.', 'yatra')];
         }
+        
+        /**
+         * Action: Enquiry responded
+         * Fires after admin responds to an enquiry
+         * 
+         * @param object $enquiry The enquiry object
+         * @param string $response The response message
+         * @since 3.0.0
+         */
+        do_action('yatra_enquiry_responded', $enquiry, $response);
 
         // Send response email to customer
         $this->sendResponseEmail($enquiry, $response);
