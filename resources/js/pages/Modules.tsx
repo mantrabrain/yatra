@@ -114,11 +114,9 @@ const Modules: React.FC = () => {
   const renderToggle = (module: ModuleDefinition) => {
     // Module is locked if it's premium, not enabled, and not available (Pro not active)
     const isLockedPremium = module.is_premium && !module.enabled && !module.is_available;
-    // Module is always-on if it's premium and available (Pro is active) - disable toggle
-    const isProControlled = module.is_premium && module.is_available;
+    // When Pro is active and module is available, allow toggling (user can enable/disable)
     const disabled =
       module.is_core ||
-      isProControlled ||
       toggleMutation.isPending ||
       !canManageModules;
     return (

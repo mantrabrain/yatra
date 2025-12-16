@@ -5,7 +5,8 @@
 
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText, AlertCircle, FileSignature, CheckCircle, Clock, Send } from 'lucide-react';
+import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
@@ -152,6 +153,18 @@ const ViewBooking: React.FC = () => {
       return null;
     },
     enabled: !!bookingId && can('yatra_view_bookings'),
+  });
+
+  // Fetch consent status for this booking (only if Pro is active)
+  const isPro = !!(window as any).yatraAdmin?.isPro;
+  const { data: consentStatus } = useQuery({
+    queryKey: ['booking-consent-status', bookingId],
+    queryFn: async () => {
+      if (!bookingId) return null;
+      const response = await apiClient.get(`/bookings/${bookingId}/consent-status`);
+      return response?.data || null;
+    },
+    enabled: !!bookingId && isPro,
   });
 
   const formatDate = (dateString: string) => {
@@ -805,6 +818,91 @@ const ViewBooking: React.FC = () => {
                       -{formatPrice(booking.discount_amount, booking.currency)}
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Consent Status Card - Only show if Pro is active and there are consent forms */}
+            {isPro && consentStatus && consentStatus.total_required > 0 && (
+              <Card className={consentStatus.all_signed 
+                ? "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20"
+                : "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20"
+              }>
+                <CardHeader className="pb-2">
+                  <CardTitle className={`text-base flex items-center gap-2 ${
+                    consentStatus.all_signed 
+                      ? "text-green-700 dark:text-green-400"
+                      : "text-amber-700 dark:text-amber-400"
+                  }`}>
+                    <FileSignature className="w-4 h-4" />
+                    {__('Consent Status', 'Consent Status')}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-sm ${consentStatus.all_signed ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"}`}>
+                      {consentStatus.all_signed ? (
+                        <span className="flex items-center gap-1">
+                          <CheckCircle className="w-4 h-4" />
+                          {__('All Consents Signed', 'All Consents Signed')}
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {__('Pending Signatures', 'Pending Signatures')}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">{__('Signed', 'Signed')}</span>
+                    <span className="font-medium text-gray-900 dark:text-white">
+                      {consentStatus.total_signed} / {consentStatus.total_required}
+                    </span>
+                  </div>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${consentStatus.all_signed ? "bg-green-500" : "bg-amber-500"}`}
+                      style={{ width: `${(consentStatus.total_signed / consentStatus.total_required) * 100}%` }}
+                    />
+                  </div>
+                  
+                  {/* Pending requests */}
+                  {consentStatus.pending_requests && consentStatus.pending_requests.length > 0 && (
+                    <div className="pt-2 border-t border-amber-200 dark:border-amber-700">
+                      <div className="text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-2">
+                        {__('Pending', 'Pending')}
+                      </div>
+                      <div className="space-y-1">
+                        {consentStatus.pending_requests.slice(0, 3).map((req: any, idx: number) => (
+                          <div key={idx} className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <Send className="w-3 h-3" />
+                            {req.recipient_name || req.recipient_email}
+                          </div>
+                        ))}
+                        {consentStatus.pending_requests.length > 3 && (
+                          <div className="text-xs text-gray-500">
+                            +{consentStatus.pending_requests.length - 3} {__('more', 'more')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Link to consent management */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={() => {
+                      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=trip-consent`;
+                    }}
+                  >
+                    {__('Manage Consents', 'Manage Consents')}
+                  </Button>
                 </CardContent>
               </Card>
             )}

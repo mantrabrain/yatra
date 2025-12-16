@@ -2304,13 +2304,31 @@ class BookingSessionController extends BaseController
                 : [];
         }
         
-        // Mark which services are selected (required and included are always selected)
+        // Mark which services are selected and calculate their price based on price_per
+        $duration_days = (int) ($trip->duration_days ?? 1);
         foreach ($additional_services as &$service) {
             $serviceId = (int) $service['id'];
             $isInRequest = in_array($serviceId, $selected_service_ids, true);
             $isRequired = !empty($service['is_required']);
             $isIncluded = !empty($service['is_included']);
             $service['selected'] = $isInRequest || $isRequired || $isIncluded;
+            
+            // Calculate the price based on price_per (person, day, booking)
+            $basePrice = (float) ($service['price'] ?? 0);
+            $pricePer = $service['price_per'] ?? 'person';
+            
+            switch ($pricePer) {
+                case 'person':
+                    $service['calculated_price'] = $basePrice * $total_travelers;
+                    break;
+                case 'day':
+                    $service['calculated_price'] = $basePrice * max(1, $duration_days);
+                    break;
+                case 'booking':
+                default:
+                    $service['calculated_price'] = $basePrice;
+                    break;
+            }
         }
         unset($service);
         

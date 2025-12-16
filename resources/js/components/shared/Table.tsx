@@ -80,7 +80,7 @@ export const Table: React.FC<TableProps> = ({
   getChildren,
   renderRowContent,
 }) => {
-  const [openDropdownId, setOpenDropdownId] = useState<number | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | number | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
 
   // Close dropdown when clicking outside

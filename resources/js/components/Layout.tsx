@@ -30,7 +30,9 @@ import {
   Loader2,
   Plane,
   ArrowLeft,
-  Package
+  Package,
+  FileSignature,
+  Mail
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -214,7 +216,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'categories', label: 'Categories', icon: FolderTree },
         { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
-        { tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true },
+        // Additional Services - only show if module is enabled
+        ...((window as any).yatraAdmin?.additionalServicesEnabled ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
+        // Trip Consent - only show if module is enabled
+        ...((window as any).yatraAdmin?.tripConsentEnabled ? [{ tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true }] : []),
       ]
     },
     { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
@@ -237,6 +242,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
+    // Email Automation - only show if module is enabled
+    ...((window as any).yatraAdmin?.emailAutomationEnabled ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
     { subpage: 'settings', label: 'Settings', icon: Settings },
   ];

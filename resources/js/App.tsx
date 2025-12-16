@@ -50,6 +50,11 @@ import Travelers from './pages/Travelers';
 import GoogleCalendar from './pages/GoogleCalendar';
 import AdditionalServices from './pages/AdditionalServices';
 import AdditionalServicesForm from './pages/AdditionalServicesForm';
+import TripConsent from './pages/TripConsent';
+import TripConsentForm from './pages/TripConsentForm';
+import EmailAutomation from './pages/EmailAutomation';
+import EmailTemplateForm from './pages/EmailTemplateForm';
+import EmailSequenceForm from './pages/EmailSequenceForm';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -140,6 +145,12 @@ const App: React.FC = () => {
               return <AdditionalServicesForm />;
             }
             return <AdditionalServices />;
+          case 'trip-consent':
+            // Check if we're creating or editing a consent form
+            if (action === 'create' || action === 'edit') {
+              return <TripConsentForm />;
+            }
+            return <TripConsent />;
           case 'all':
           default:
             // Check if we're creating or editing a trip
@@ -186,6 +197,25 @@ const App: React.FC = () => {
           return <ReviewForm />;
         }
         return <Reviews />;
+      case 'email-automation':
+        // Check if we're creating or editing a template or sequence
+        if (action === 'create' && tab === 'template') {
+          return <EmailTemplateForm />;
+        }
+        if (action === 'edit' && tab === 'template') {
+          return <EmailTemplateForm />;
+        }
+        if (action === 'create' && tab === 'sequence') {
+          return <EmailSequenceForm />;
+        }
+        if (action === 'edit' && tab === 'sequence') {
+          return <EmailSequenceForm />;
+        }
+        // Default: if action is edit without tab, assume template
+        if (action === 'edit') {
+          return <EmailTemplateForm />;
+        }
+        return <EmailAutomation />;
       case 'itinerary':
         // Handle itinerary tabs
         switch (tab.toLowerCase()) {
@@ -256,6 +286,18 @@ const App: React.FC = () => {
           return <AdditionalServicesForm />;
         }
         return <AdditionalServices />;
+      case 'yatra-trip-consent':
+        // Check if we're creating or editing a consent form
+        if (action === 'create' || action === 'edit') {
+          return <TripConsentForm />;
+        }
+        return <TripConsent />;
+      case 'yatra-email-automation':
+        // Check if we're editing a template
+        if (action === 'edit') {
+          return <EmailTemplateForm />;
+        }
+        return <EmailAutomation />;
       case 'dashboard':
       default:
         return <Dashboard />;
