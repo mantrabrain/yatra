@@ -13,8 +13,36 @@
       "css/index.css"
     ]
   },
+  "_index-CdB6klcj.js": {
+    "file": "js/index-CdB6klcj.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-Ce6OMGOB.js"
+    ],
+    "css": [
+      "css/index.css"
+    ]
+  },
+  "_index-D37VWYy9.js": {
+    "file": "js/index-D37VWYy9.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-BeebwjlM.js"
+    ],
+    "css": [
+      "css/index.css"
+    ]
+  },
+  "_react-vendor-BeebwjlM.js": {
+    "file": "js/react-vendor-BeebwjlM.js",
+    "name": "react-vendor"
+  },
   "_react-vendor-COYu2GpU.js": {
     "file": "js/react-vendor-COYu2GpU.js",
+    "name": "react-vendor"
+  },
+  "_react-vendor-Ce6OMGOB.js": {
+    "file": "js/react-vendor-Ce6OMGOB.js",
     "name": "react-vendor"
   },
   "resources/js/account-page.tsx": {

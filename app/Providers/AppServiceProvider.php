@@ -48,8 +48,10 @@ class AppServiceProvider extends ServiceProvider
         // Register cron jobs for booking reminders and expiry
         \Yatra\Services\BookingCronService::register();
         
-        // Register scheduled payment processing
-        \Yatra\Services\ScheduledPaymentService::register();
+        // Register scheduled payment processing (only if Pro enables it via filter)
+        if (apply_filters('yatra_enable_scheduled_payments', false)) {
+            \Yatra\Services\ScheduledPaymentService::register();
+        }
         
         // Register export/import background job handlers
         \Yatra\Services\ExportImportService::register();
@@ -2038,15 +2040,18 @@ HTML;
         $session_type = $is_remaining ? 'remaining' : 'booking';
 
         // Initialize booking data object using SettingsService
+        // Flexible payments (deposit/partial) are Pro features - check if module is enabled
+        $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+        
         $booking = (object) [
             'has_session' => false,
             'session_type' => $session_type,
             'trip' => null,
             'travel_date' => '',
             'travelers' => 1,
-            'deposit_required' => SettingsService::isEnabled('deposit_required'),
+            'deposit_required' => $flexible_payments_enabled && SettingsService::isEnabled('deposit_required'),
             'deposit_percentage' => SettingsService::getInt('deposit_percentage', 20),
-            'partial_payment' => SettingsService::isEnabled('partial_payment'),
+            'partial_payment' => $flexible_payments_enabled && SettingsService::isEnabled('partial_payment'),
             'partial_payment_percentage' => SettingsService::getInt('partial_payment_percentage', 30),
             'enabled_gateways' => [],
             'error' => null,

@@ -173,6 +173,21 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'yatra-google-analytics',
             ],
+            [
+                'slug' => 'flexible_payments',
+                'name' => __('Flexible Payments', 'yatra'),
+                'description' => __('Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later. Perfect for high-value trips and improving conversion rates.', 'yatra'),
+                'category' => __('Payments', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/flexible-payments',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=flexible-payments',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['payments', 'deposit', 'partial', 'installments', 'booking'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'settings_page' => 'yatra-settings',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);

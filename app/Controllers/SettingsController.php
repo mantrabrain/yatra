@@ -69,14 +69,14 @@ class SettingsController extends BaseController
         'gateway_configs' => [],
         'gateway_order' => [],
         
-        // Scheduled/Recurring Payment Settings
-        'enable_scheduled_payments' => true,
+        // Scheduled/Recurring Payment Settings (Pro feature - defaults disabled)
+        'enable_scheduled_payments' => false,
         'scheduled_payment_type' => 'single', // single, installments
         'scheduled_payment_days' => 15, // Days until first scheduled payment
         'scheduled_payment_installments' => 1, // Number of installments (if type is installments)
         'scheduled_payment_interval' => 30, // Days between installments
         'scheduled_payment_reminder_days' => 3, // Days before to send reminder
-        'allow_save_payment_methods' => true,
+        'allow_save_payment_methods' => false,
         
         // Email Settings
         'admin_email' => '',
@@ -276,6 +276,12 @@ class SettingsController extends BaseController
             // Special handling for booking_form_config - always use getBookingFormConfig which handles locked fields
             $settings['booking_form_config'] = \Yatra\Services\SettingsService::getBookingFormConfig();
 
+            // Merge in flexible payment settings from Pro module if enabled
+            $flexible_payment_settings = apply_filters('yatra_get_flexible_payment_settings', []);
+            if (!empty($flexible_payment_settings)) {
+                $settings = array_merge($settings, $flexible_payment_settings);
+            }
+
             return $this->success_response($settings);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
@@ -300,11 +306,34 @@ class SettingsController extends BaseController
             // Check if Dynamic Form Field module is enabled
             $is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
             
+            // Check if Flexible Payments module is enabled (Pro feature)
+            $is_flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+            
+            // Flexible payment settings keys (Pro only)
+            $flexible_payment_keys = [
+                'deposit_required', 'deposit_percentage', 'partial_payment', 
+                'partial_payment_percentage', 'enable_deposit', 'enable_scheduled_payments',
+                'scheduled_payment_type', 'scheduled_payment_days', 'scheduled_payment_installments',
+                'scheduled_payment_interval', 'scheduled_payment_reminder_days', 'allow_save_payment_methods',
+            ];
+            
+            // Collect flexible payment settings to delegate to Pro
+            $flexible_payment_settings = [];
+            
             // Process each setting
             foreach ($data as $key => $value) {
                 // Skip booking_form_config if Dynamic Form Field module is not enabled
                 // This allows the settings to save without error when the module is disabled
                 if ($key === 'booking_form_config' && !$is_dynamic_form_enabled) {
+                    continue;
+                }
+                
+                // Delegate flexible payment settings to Pro module
+                if (in_array($key, $flexible_payment_keys, true)) {
+                    if ($is_flexible_payments_enabled) {
+                        $flexible_payment_settings[$key] = $value;
+                    }
+                    // Skip saving in Free plugin - Pro handles these
                     continue;
                 }
                 
@@ -335,6 +364,12 @@ class SettingsController extends BaseController
                 if ($result !== false) {
                     $updated[] = $key;
                 }
+            }
+
+            // Delegate flexible payment settings to Pro module for saving
+            if (!empty($flexible_payment_settings) && $is_flexible_payments_enabled) {
+                do_action('yatra_save_flexible_payment_settings', $flexible_payment_settings);
+                $updated = array_merge($updated, array_keys($flexible_payment_settings));
             }
 
             if (!empty($errors)) {

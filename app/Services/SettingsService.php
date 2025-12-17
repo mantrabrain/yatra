@@ -60,6 +60,8 @@ class SettingsService
         'thousand_separator' => ',',
         'decimal_separator' => '.',
         'decimal_places' => 2,
+        // Flexible payments (deposit/partial) - Pro feature
+        // These defaults are overridden by Pro's FlexiblePaymentsModule when active
         'enable_deposit' => false,
         'deposit_type' => 'percentage',
         'deposit_amount' => 20,
@@ -71,14 +73,15 @@ class SettingsService
         'gateway_configs' => [],
         'gateway_order' => [],
         
-        // Scheduled/Recurring Payments
-        'enable_scheduled_payments' => true,
+        // Scheduled/Recurring Payments - Pro feature
+        // These defaults are overridden by Pro's FlexiblePaymentsModule when active
+        'enable_scheduled_payments' => false,
         'scheduled_payment_type' => 'single',
         'scheduled_payment_days' => 15,
         'scheduled_payment_installments' => 1,
         'scheduled_payment_interval' => 30,
         'scheduled_payment_reminder_days' => 3,
-        'allow_save_payment_methods' => true,
+        'allow_save_payment_methods' => false,
         
         // Email
         'email_from_name' => '',
@@ -319,6 +322,12 @@ class SettingsService
      */
     public static function isEnabled(string $key): bool
     {
+        // Flexible payment settings require Pro module
+        if (self::isFlexiblePaymentSetting($key)) {
+            $value = apply_filters('yatra_flexible_payment_setting', false, $key);
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        }
+        
         $value = self::get($key, false);
         return filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
@@ -332,6 +341,11 @@ class SettingsService
      */
     public static function getInt(string $key, int $default = 0): int
     {
+        // Flexible payment settings require Pro module
+        if (self::isFlexiblePaymentSetting($key)) {
+            return (int) apply_filters('yatra_flexible_payment_setting', $default, $key);
+        }
+        
         return (int) self::get($key, $default);
     }
 
@@ -525,6 +539,42 @@ class SettingsService
     public static function getTripsPerPage(): int
     {
         return self::getInt('trips_per_page', 12);
+    }
+
+    /**
+     * Check if a setting key is a flexible payment setting (Pro feature)
+     * 
+     * @param string $key Setting key
+     * @return bool
+     */
+    private static function isFlexiblePaymentSetting(string $key): bool
+    {
+        $flexiblePaymentSettings = [
+            'deposit_required',
+            'deposit_percentage',
+            'partial_payment',
+            'partial_payment_percentage',
+            'enable_deposit',
+            'enable_scheduled_payments',
+            'scheduled_payment_type',
+            'scheduled_payment_days',
+            'scheduled_payment_installments',
+            'scheduled_payment_interval',
+            'scheduled_payment_reminder_days',
+            'allow_save_payment_methods',
+        ];
+        
+        return in_array($key, $flexiblePaymentSettings, true);
+    }
+
+    /**
+     * Check if flexible payments module is available (Pro active + module enabled)
+     * 
+     * @return bool
+     */
+    public static function isFlexiblePaymentsAvailable(): bool
+    {
+        return apply_filters('yatra_flexible_payments_enabled', false);
     }
 }
 

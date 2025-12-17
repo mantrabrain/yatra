@@ -470,7 +470,27 @@ $initial_due_amount = $initial_total_amount;
 <?php endif; ?>
 
 <!-- Payment Method Section -->
-<?php if (!$is_remaining_payment && ($deposit_required || $partial_payment)) : ?>
+<?php 
+/**
+ * Filter to check if flexible payments module is enabled (Pro feature)
+ * When enabled, deposit and partial payment options will be available
+ */
+$flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+
+/**
+ * Filter to get payment method options
+ * Pro module can add deposit/partial payment options via this filter
+ */
+$payment_method_options = apply_filters('yatra_payment_method_options', [], [
+    'deposit_required' => $deposit_required,
+    'deposit_percentage' => $deposit_percentage,
+    'partial_payment' => $partial_payment,
+    'partial_payment_percentage' => $partial_payment_percentage,
+]);
+
+$has_flexible_options = $flexible_payments_enabled && !empty($payment_method_options);
+?>
+<?php if (!$is_remaining_payment && $has_flexible_options) : ?>
 <div class="yatra-booking-section">
     <h2 class="yatra-section-title"><?php esc_html_e('Payment Method', 'yatra'); ?></h2>
     
@@ -483,25 +503,15 @@ $initial_due_amount = $initial_total_amount;
             </span>
         </label>
         
-        <?php if ($deposit_required) : ?>
+        <?php foreach ($payment_method_options as $option_key => $option) : ?>
         <label class="yatra-payment-option">
-            <input type="radio" name="payment_method" value="deposit">
+            <input type="radio" name="payment_method" value="<?php echo esc_attr($option['value']); ?>">
             <span class="yatra-payment-label">
-                <strong><?php printf(esc_html__('Pay %d%% Deposit', 'yatra'), (int) $deposit_percentage); ?></strong>
-                <span><?php esc_html_e('Pay deposit now, rest later', 'yatra'); ?></span>
+                <strong><?php echo esc_html($option['label']); ?></strong>
+                <span><?php echo esc_html($option['description']); ?></span>
             </span>
         </label>
-        <?php endif; ?>
-        
-        <?php if ($partial_payment) : ?>
-        <label class="yatra-payment-option">
-            <input type="radio" name="payment_method" value="partial">
-            <span class="yatra-payment-label">
-                <strong><?php printf(esc_html__('Pay %d%% Now', 'yatra'), (int) $partial_payment_percentage); ?></strong>
-                <span><?php esc_html_e('Partial payment option', 'yatra'); ?></span>
-            </span>
-        </label>
-        <?php endif; ?>
+        <?php endforeach; ?>
     </div>
 </div>
 <?php endif; ?>

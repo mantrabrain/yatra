@@ -774,9 +774,11 @@ class BookingSessionController extends BaseController
         $frontend_due = isset($data['amount_due']) ? (float) $data['amount_due'] : null;
         $frontend_paid = isset($data['amount_paid']) ? (float) $data['amount_paid'] : null;
 
-        // Use SettingsService for settings
-        $deposit_percentage = (int) \Yatra\Services\SettingsService::get('deposit_percentage', 20);
-        $partial_percentage = (int) \Yatra\Services\SettingsService::get('partial_payment_percentage', 30);
+        // Use filters for flexible payment settings (Pro feature)
+        // These filters allow the Pro FlexiblePayments module to provide the actual values
+        $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+        $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
+        $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
 
         if ($frontend_total !== null && $frontend_total > 0) {
             $total_amount = $frontend_total;
@@ -2385,8 +2387,10 @@ class BookingSessionController extends BaseController
         $total_amount = $total_amount + $services_total;
         
         // Calculate due amount based on payment method
-        $deposit_percentage = (int) \Yatra\Services\SettingsService::get('deposit_percentage', 20);
-        $partial_percentage = (int) \Yatra\Services\SettingsService::get('partial_payment_percentage', 30);
+        // Use filters for flexible payment settings (Pro feature)
+        $flexible_payments_enabled = apply_filters('yatra_flexible_payments_enabled', false);
+        $deposit_percentage = (int) apply_filters('yatra_deposit_percentage', 20);
+        $partial_percentage = (int) apply_filters('yatra_partial_payment_percentage', 30);
         
         $amount_due = $total_amount;
         if ($payment_method === 'deposit') {

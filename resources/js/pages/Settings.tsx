@@ -2428,8 +2428,16 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Payment Options', 'Payment Options')}
+                {__('Flexible Payments', 'Flexible Payments')}
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                  PRO
+                </span>
               </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                {__('Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later.', 'Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later.')}
+              </p>
+              
+              {(window as any).yatraAdmin?.isProActive && (window as any).yatraAdmin?.flexiblePaymentsEnabled ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                   <input
@@ -2512,28 +2520,59 @@ onChange={handleFieldChange}
                     </div>
                   </FormField>
                 )}
-
-                {/* Auto-confirm Pay Later Bookings */}
-                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                  <input
-                    type="checkbox"
-                    id="auto_confirm_pay_later"
-                    checked={formData.auto_confirm_pay_later}
-                    name='auto_confirm_pay_later'
-                    onChange={handleFieldChange}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="auto_confirm_pay_later" className="font-medium cursor-pointer">
-                      {__('Auto-confirm "Pay Later" Bookings', 'Auto-confirm "Pay Later" Bookings')}
-                    </Label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {__('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.')}
-                    </p>
+              </div>
+              ) : (
+                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0">
+                      <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
+                        {__('Upgrade to Pro for Flexible Payments', 'Upgrade to Pro for Flexible Payments')}
+                      </h4>
+                      <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                        {__('Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.', 'Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.')}
+                      </p>
+                      <a
+                        href="https://wpyatra.com/pricing?module=flexible-payments"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400"
+                      >
+                        {__('Learn More', 'Learn More')}
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                      </a>
+                    </div>
                   </div>
                 </div>
+              )}
+            </div>
+
+            {/* Auto-confirm Pay Later Bookings - Available in Free version */}
+            <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+              <input
+                type="checkbox"
+                id="auto_confirm_pay_later"
+                checked={formData.auto_confirm_pay_later}
+                name='auto_confirm_pay_later'
+                onChange={handleFieldChange}
+                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+              <div className="flex-1">
+                <Label htmlFor="auto_confirm_pay_later" className="font-medium cursor-pointer">
+                  {__('Auto-confirm "Pay Later" Bookings', 'Auto-confirm "Pay Later" Bookings')}
+                </Label>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                  {__('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.')}
+                </p>
               </div>
             </div>
+          </div>
 
             <SectionDivider title={__('Payment Gateways', 'Payment Gateways')} />
 
