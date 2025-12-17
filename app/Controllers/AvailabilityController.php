@@ -1,4 +1,13 @@
 <?php
+/**
+ * Availability REST API Controller
+ * API endpoints for trip availability dates management
+ * 
+ * This is a FREE feature - no Pro plugin required
+ * 
+ * @package Yatra\Controllers
+ * @since 3.0.0
+ */
 
 declare(strict_types=1);
 
@@ -10,10 +19,6 @@ use WP_Error;
 use Yatra\Services\AvailabilityService;
 use Yatra\Repositories\AvailabilityRepository;
 
-/**
- * Availability REST API Controller
- * API endpoints for trip availability dates management
- */
 class AvailabilityController extends BaseController
 {
     private AvailabilityService $service;

@@ -109,6 +109,11 @@ class DiscountController extends BaseController
      */
     private function getTripGroupDiscounts(int $tripId): array
     {
+        // Check if Advanced Discount module is enabled - group discounts are a Pro feature
+        if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            return [];
+        }
+        
         $discounts = \Yatra\Models\Discount::where('is_group_discount', true)
             ->where('status', 'publish')
             ->where(function($query) {
@@ -273,7 +278,18 @@ class DiscountController extends BaseController
     public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $id = $this->service->create($this->getBody($request));
+            $data = $this->getBody($request);
+            
+            // Check if Advanced Discount module is required for this discount type
+            $discount_mode = $data['discount_mode'] ?? 'promo';
+            $is_group_discount = !empty($data['is_group_discount']);
+            
+            if (($discount_mode === 'group' || $discount_mode === 'both' || $is_group_discount) 
+                && !apply_filters('yatra_advanced_discount_enabled', false)) {
+                return $this->validation_error(__('Advanced Discount module is required for Group Discounts. Please enable it in Modules.', 'yatra'));
+            }
+            
+            $id = $this->service->create($data);
 
             return $this->success_response([
                 'id' => $id,
@@ -289,7 +305,18 @@ class DiscountController extends BaseController
     public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $result = $this->service->update($this->getId($request), $this->getBody($request));
+            $data = $this->getBody($request);
+            
+            // Check if Advanced Discount module is required for this discount type
+            $discount_mode = $data['discount_mode'] ?? 'promo';
+            $is_group_discount = !empty($data['is_group_discount']);
+            
+            if (($discount_mode === 'group' || $discount_mode === 'both' || $is_group_discount) 
+                && !apply_filters('yatra_advanced_discount_enabled', false)) {
+                return $this->validation_error(__('Advanced Discount module is required for Group Discounts. Please enable it in Modules.', 'yatra'));
+            }
+            
+            $result = $this->service->update($this->getId($request), $data);
 
             if (!$result) {
                 return $this->error_response(__('Failed to update discount', 'yatra'), 500);

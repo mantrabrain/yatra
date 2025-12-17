@@ -611,6 +611,41 @@ interface SettingsData {
   recaptcha_site_key: string;
   recaptcha_secret_key: string;
   
+  // Mailchimp Integration (Pro)
+  mailchimp_api_key?: string;
+  mailchimp_list_id?: string;
+  mailchimp_list_name?: string;
+  mailchimp_sync_on_booking?: boolean;
+  mailchimp_sync_on_payment?: boolean;
+  mailchimp_double_optin?: boolean;
+  mailchimp_add_tags?: boolean;
+  mailchimp_default_tags?: string[];
+  mailchimp_field_mapping?: Record<string, string>;
+  
+  // Facebook Pixel Enhanced (Pro)
+  facebook_pixel_id?: string;
+  fb_track_view_content?: boolean;
+  fb_track_initiate_checkout?: boolean;
+  fb_track_purchase?: boolean;
+  fb_track_add_to_cart?: boolean;
+  fb_use_conversions_api?: boolean;
+  facebook_access_token?: string;
+  fb_test_event_code?: string;
+  fb_event_config?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+  fb_parameter_mapping?: Record<string, string>;
+  
+  // Google Analytics 4 Enhanced (Pro)
+  ga4_measurement_id?: string;
+  ga4_track_view_item?: boolean;
+  ga4_track_add_to_cart?: boolean;
+  ga4_track_begin_checkout?: boolean;
+  ga4_track_purchase?: boolean;
+  ga4_use_measurement_protocol?: boolean;
+  ga4_api_secret?: string;
+  ga4_debug_mode?: boolean;
+  ga4_custom_dimensions?: Array<{ name: string; yatra_field: string; scope?: string }>;
+  ga4_event_config?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+  
   // Permalink Settings
   trip_base: string;
   destination_base: string;
@@ -655,6 +690,31 @@ const getInitialFormSubTab = (): BookingFormSubTab => {
 
 const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFormData }) => {
   const [activeFormTab, setActiveFormTab] = useState<BookingFormSubTab>(getInitialFormSubTab);
+  
+  // Check if Dynamic Form Field module is enabled via modules API
+  const { data: modulesData } = useQuery({
+    queryKey: ['modules'],
+    queryFn: async () => {
+      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/modules`, {
+        headers: {
+          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
+        },
+      });
+      if (!response.ok) throw new Error('Failed to fetch modules');
+      return response.json();
+    },
+    staleTime: 30000, // Cache for 30 seconds
+  });
+  
+  // Check if module is enabled from API response or fallback to yatraAdmin
+  const isDynamicFormFieldEnabled = React.useMemo(() => {
+    if (modulesData?.data) {
+      const module = modulesData.data.find((m: any) => m.slug === 'dynamic_form_field');
+      return module?.enabled === true && module?.is_available === true;
+    }
+    // Fallback to yatraAdmin if modules API hasn't loaded yet
+    return window.yatraAdmin?.dynamicFormFieldEnabled === true;
+  }, [modulesData]);
   
   // Save sub-tab to localStorage when it changes
   const handleSubTabChange = (tab: BookingFormSubTab) => {
@@ -891,6 +951,70 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
   };
 
   const currentConfig = getCurrentFormConfig();
+
+  // Show upgrade message if module is not enabled
+  if (!isDynamicFormFieldEnabled) {
+    return (
+      <div className="space-y-6">
+        <Card className="border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-4">
+              <div className="p-3 bg-amber-100 dark:bg-amber-800/30 rounded-full">
+                <Lock className="w-6 h-6 text-amber-600 dark:text-amber-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
+                  {__('Dynamic Form Field Module Required', 'Dynamic Form Field Module Required')}
+                </h3>
+                <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
+                  {__('Customize your booking forms with drag-and-drop field builder. Add custom fields for traveler information, emergency contacts, and more. This feature requires the Dynamic Form Field module.', 'Customize your booking forms with drag-and-drop field builder.')}
+                </p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => window.location.href = '#/modules'}
+                    className="bg-amber-600 hover:bg-amber-700 text-white"
+                  >
+                    {__('Enable Module', 'Enable Module')}
+                  </Button>
+                  <a
+                    href="https://wpyatra.com/pricing?module=dynamic-form-field"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
+                  >
+                    {__('Learn More', 'Learn More')}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Preview of what they'll get */}
+        <Card className="opacity-60 pointer-events-none">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Lock className="w-4 h-4 text-gray-400" />
+              {__('Form Builder Preview', 'Form Builder Preview')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+                <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+              </div>
+              <div className="h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse"></div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -3876,38 +4000,555 @@ onChange={handleFieldChange}
                 <GoogleCalendarIntegrationSection formData={formData} setFormData={setFormData} />
               </>
             )}
-            
-            <SectionDivider title={__('Analytics & Tracking', 'Analytics & Tracking')} />
-            
+
+            {/* Mailchimp Integration - Pro Feature */}
+            <SectionDivider title={__('Mailchimp Integration', 'Mailchimp Integration')} />
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Mail className="w-5 h-5 text-yellow-500" />
+                  {__('Mailchimp', 'Mailchimp')}
+                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
+                </CardTitle>
+                {(window as any).yatraAdmin?.mailchimpConnected ? (
+                  <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    {__('Connected', 'Connected')}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <XCircle className="w-4 h-4" />
+                    {__('Not Connected', 'Not Connected')}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {__('Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.', 'Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.')}
+                </p>
+                
+                {(window as any).yatraAdmin?.isProActive ? (
+                  <div className="space-y-4">
+                    <FormField
+                      id="mailchimp_api_key"
+                      label={__('API Key', 'API Key')}
+                      description={(
+                        <>
+                          {__('Get your API key from', 'Get your API key from')}{' '}
+                          <a href="https://admin.mailchimp.com/account/api/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
+                            {__('Mailchimp Account Settings', 'Mailchimp Account Settings')}
+                          </a>
+                        </>
+                      )}
+                    >
+                      <Input
+                        id="mailchimp_api_key"
+                        type="password"
+                        value={formData.mailchimp_api_key || ''}
+                        name="mailchimp_api_key"
+                        onChange={handleFieldChange}
+                        placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"
+                      />
+                    </FormField>
+                    
+                    <FormField
+                      id="mailchimp_list_id"
+                      label={__('Audience/List ID', 'Audience/List ID')}
+                      description={__('The ID of the Mailchimp audience to sync subscribers to.', 'The ID of the Mailchimp audience to sync subscribers to.')}
+                    >
+                      <Input
+                        id="mailchimp_list_id"
+                        value={formData.mailchimp_list_id || ''}
+                        name="mailchimp_list_id"
+                        onChange={handleFieldChange}
+                        placeholder="abc123def4"
+                      />
+                    </FormField>
+                    
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                      <input
+                        type="checkbox"
+                        id="mailchimp_sync_on_booking"
+                        checked={formData.mailchimp_sync_on_booking ?? true}
+                        name="mailchimp_sync_on_booking"
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="mailchimp_sync_on_booking" className="font-medium cursor-pointer">
+                          {__('Sync on Booking', 'Sync on Booking')}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {__('Automatically add customers to Mailchimp when they make a booking', 'Automatically add customers to Mailchimp when they make a booking')}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                      <input
+                        type="checkbox"
+                        id="mailchimp_double_optin"
+                        checked={formData.mailchimp_double_optin ?? false}
+                        name="mailchimp_double_optin"
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="mailchimp_double_optin" className="font-medium cursor-pointer">
+                          {__('Double Opt-in', 'Double Opt-in')}
+                        </Label>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                          {__('Require email confirmation before adding to list (recommended for GDPR)', 'Require email confirmation before adding to list (recommended for GDPR)')}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Advanced Field Mapping Section */}
+                    {formData.mailchimp_api_key && formData.mailchimp_list_id && (
+                      <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                          <ClipboardList className="w-4 h-4" />
+                          {__('Field Mapping', 'Field Mapping')}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                          {__('Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.', 'Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.')}
+                        </p>
+                        
+                        <div className="space-y-3">
+                          {/* First Name Mapping */}
+                          <div className="grid grid-cols-2 gap-3 items-center">
+                            <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                              {__('First Name', 'First Name')}
+                            </div>
+                            <Select
+                              value={(formData as any).mailchimp_field_mapping?.FNAME || 'first_name'}
+                              onChange={(e) => {
+                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  mailchimp_field_mapping: { ...currentMapping, FNAME: e.target.value }
+                                }));
+                              }}
+                            >
+                              <option value="first_name">{__('Customer First Name', 'Customer First Name')}</option>
+                              <option value="billing_first_name">{__('Billing First Name', 'Billing First Name')}</option>
+                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                            </Select>
+                          </div>
+                          
+                          {/* Last Name Mapping */}
+                          <div className="grid grid-cols-2 gap-3 items-center">
+                            <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                              {__('Last Name', 'Last Name')}
+                            </div>
+                            <Select
+                              value={(formData as any).mailchimp_field_mapping?.LNAME || 'last_name'}
+                              onChange={(e) => {
+                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  mailchimp_field_mapping: { ...currentMapping, LNAME: e.target.value }
+                                }));
+                              }}
+                            >
+                              <option value="last_name">{__('Customer Last Name', 'Customer Last Name')}</option>
+                              <option value="billing_last_name">{__('Billing Last Name', 'Billing Last Name')}</option>
+                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                            </Select>
+                          </div>
+                          
+                          {/* Phone Mapping */}
+                          <div className="grid grid-cols-2 gap-3 items-center">
+                            <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                              {__('Phone', 'Phone')}
+                            </div>
+                            <Select
+                              value={(formData as any).mailchimp_field_mapping?.PHONE || 'phone'}
+                              onChange={(e) => {
+                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  mailchimp_field_mapping: { ...currentMapping, PHONE: e.target.value }
+                                }));
+                              }}
+                            >
+                              <option value="phone">{__('Customer Phone', 'Customer Phone')}</option>
+                              <option value="billing_phone">{__('Billing Phone', 'Billing Phone')}</option>
+                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                            </Select>
+                          </div>
+                          
+                          {/* Country Mapping */}
+                          <div className="grid grid-cols-2 gap-3 items-center">
+                            <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                              {__('Country', 'Country')}
+                            </div>
+                            <Select
+                              value={(formData as any).mailchimp_field_mapping?.COUNTRY || 'country'}
+                              onChange={(e) => {
+                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
+                                setFormData((prev: any) => ({
+                                  ...prev,
+                                  mailchimp_field_mapping: { ...currentMapping, COUNTRY: e.target.value }
+                                }));
+                              }}
+                            >
+                              <option value="country">{__('Customer Country', 'Customer Country')}</option>
+                              <option value="billing_country">{__('Billing Country', 'Billing Country')}</option>
+                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                            </Select>
+                          </div>
+                        </div>
+
+                        {/* Tags Configuration */}
+                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                          <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                            <input
+                              type="checkbox"
+                              id="mailchimp_add_tags"
+                              checked={(formData as any).mailchimp_add_tags ?? true}
+                              onChange={(e) => setFormData((prev: any) => ({ ...prev, mailchimp_add_tags: e.target.checked }))}
+                              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <div className="flex-1">
+                              <Label htmlFor="mailchimp_add_tags" className="font-medium cursor-pointer">
+                                {__('Add Trip Tags', 'Add Trip Tags')}
+                              </Label>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                {__('Automatically tag subscribers with the trip name they booked', 'Automatically tag subscribers with the trip name they booked')}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <FormField
+                            id="mailchimp_default_tags"
+                            label={__('Default Tags', 'Default Tags')}
+                            description={__('Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")', 'Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")')}
+                          >
+                            <Input
+                              id="mailchimp_default_tags"
+                              value={(formData as any).mailchimp_default_tags || ''}
+                              onChange={(e) => setFormData((prev: any) => ({ ...prev, mailchimp_default_tags: e.target.value }))}
+                              placeholder="yatra, booking"
+                            />
+                          </FormField>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
+                      {__('Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.', 'Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.')}
+                    </p>
+                    <a
+                      href="https://wpyatra.com/pricing?module=mailchimp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
+                    >
+                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Facebook Pixel Integration - Pro Feature */}
+            <SectionDivider title={__('Facebook Pixel', 'Facebook Pixel')} />
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                  {__('Facebook Pixel', 'Facebook Pixel')}
+                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
+                </CardTitle>
+                {(window as any).yatraAdmin?.facebookPixel?.connected ? (
+                  <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    {__('Connected', 'Connected')}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <XCircle className="w-4 h-4" />
+                    {__('Not Connected', 'Not Connected')}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {__('Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.', 'Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.')}
+                </p>
+                
+                {(window as any).yatraAdmin?.isProActive ? (
+                  <div className="space-y-4">
+                    <FormField
+                      id="facebook_pixel_id"
+                      label={__('Pixel ID', 'Pixel ID')}
+                      description={(
+                        <>
+                          {__('Get your Pixel ID from', 'Get your Pixel ID from')}{' '}
+                          <a href="https://business.facebook.com/events_manager" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
+                            {__('Facebook Events Manager', 'Facebook Events Manager')}
+                          </a>
+                        </>
+                      )}
+                    >
+                      <Input
+                        id="facebook_pixel_id"
+                        value={formData.facebook_pixel_id || ''}
+                        name="facebook_pixel_id"
+                        onChange={handleFieldChange}
+                        placeholder="123456789012345"
+                      />
+                    </FormField>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="fb_track_view_content"
+                          checked={formData.fb_track_view_content ?? true}
+                          name="fb_track_view_content"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="fb_track_view_content" className="text-sm cursor-pointer">
+                          {__('Track ViewContent', 'Track ViewContent')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="fb_track_initiate_checkout"
+                          checked={formData.fb_track_initiate_checkout ?? true}
+                          name="fb_track_initiate_checkout"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="fb_track_initiate_checkout" className="text-sm cursor-pointer">
+                          {__('Track InitiateCheckout', 'Track InitiateCheckout')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="fb_track_purchase"
+                          checked={formData.fb_track_purchase ?? true}
+                          name="fb_track_purchase"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="fb_track_purchase" className="text-sm cursor-pointer">
+                          {__('Track Purchase', 'Track Purchase')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="fb_use_conversions_api"
+                          checked={formData.fb_use_conversions_api ?? false}
+                          name="fb_use_conversions_api"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="fb_use_conversions_api" className="text-sm cursor-pointer">
+                          {__('Use Conversions API', 'Use Conversions API')}
+                        </Label>
+                      </div>
+                    </div>
+                    
+                    {formData.fb_use_conversions_api && (
+                      <FormField
+                        id="facebook_access_token"
+                        label={__('Access Token', 'Access Token')}
+                        description={__('Required for server-side Conversions API tracking.', 'Required for server-side Conversions API tracking.')}
+                      >
+                        <Input
+                          id="facebook_access_token"
+                          type="password"
+                          value={formData.facebook_access_token || ''}
+                          name="facebook_access_token"
+                          onChange={handleFieldChange}
+                          placeholder="EAAxxxxxxx..."
+                        />
+                      </FormField>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
+                      {__('Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.', 'Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.')}
+                    </p>
+                    <a
+                      href="https://wpyatra.com/pricing?module=facebook-pixel"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
+                    >
+                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Google Analytics 4 Enhanced - Pro Feature */}
+            <SectionDivider title={__('Google Analytics 4 Enhanced', 'Google Analytics 4 Enhanced')} />
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <svg className="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
+                  </svg>
+                  {__('Google Analytics 4 Enhanced', 'Google Analytics 4 Enhanced')}
+                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
+                </CardTitle>
+                {(window as any).yatraAdmin?.googleAnalytics?.connected ? (
+                  <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    {__('Connected', 'Connected')}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <XCircle className="w-4 h-4" />
+                    {__('Not Connected', 'Not Connected')}
+                  </div>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {__('Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.', 'Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.')}
+                </p>
+                
+                {(window as any).yatraAdmin?.isProActive ? (
+                  <div className="space-y-4">
+                    <FormField
+                      id="ga4_measurement_id"
+                      label={__('Measurement ID', 'Measurement ID')}
+                      description={(
+                        <>
+                          {__('Get your Measurement ID from', 'Get your Measurement ID from')}{' '}
+                          <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
+                            {__('Google Analytics', 'Google Analytics')}
+                          </a>
+                          {' '}{__('(Admin > Data Streams)', '(Admin > Data Streams)')}
+                        </>
+                      )}
+                    >
+                      <Input
+                        id="ga4_measurement_id"
+                        value={formData.ga4_measurement_id || ''}
+                        name="ga4_measurement_id"
+                        onChange={handleFieldChange}
+                        placeholder="G-XXXXXXXXXX"
+                      />
+                    </FormField>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="ga4_track_view_item"
+                          checked={formData.ga4_track_view_item ?? true}
+                          name="ga4_track_view_item"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="ga4_track_view_item" className="text-sm cursor-pointer">
+                          {__('Track view_item', 'Track view_item')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="ga4_track_begin_checkout"
+                          checked={formData.ga4_track_begin_checkout ?? true}
+                          name="ga4_track_begin_checkout"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="ga4_track_begin_checkout" className="text-sm cursor-pointer">
+                          {__('Track begin_checkout', 'Track begin_checkout')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="ga4_track_purchase"
+                          checked={formData.ga4_track_purchase ?? true}
+                          name="ga4_track_purchase"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="ga4_track_purchase" className="text-sm cursor-pointer">
+                          {__('Track purchase', 'Track purchase')}
+                        </Label>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="ga4_use_measurement_protocol"
+                          checked={formData.ga4_use_measurement_protocol ?? false}
+                          name="ga4_use_measurement_protocol"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label htmlFor="ga4_use_measurement_protocol" className="text-sm cursor-pointer">
+                          {__('Use Measurement Protocol', 'Use Measurement Protocol')}
+                        </Label>
+                      </div>
+                    </div>
+                    
+                    {formData.ga4_use_measurement_protocol && (
+                      <FormField
+                        id="ga4_api_secret"
+                        label={__('API Secret', 'API Secret')}
+                        description={__('Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.', 'Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.')}
+                      >
+                        <Input
+                          id="ga4_api_secret"
+                          type="password"
+                          value={formData.ga4_api_secret || ''}
+                          name="ga4_api_secret"
+                          onChange={handleFieldChange}
+                          placeholder="xxxxxxxxxxxxxxxx"
+                        />
+                      </FormField>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
+                      {__('Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.', 'Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.')}
+                    </p>
+                    <a
+                      href="https://wpyatra.com/pricing?module=google-analytics"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
+                    >
+                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      <ExternalLink className="w-4 h-4" />
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Google Maps API - Free Feature */}
+            <SectionDivider title={__('Google Maps', 'Google Maps')} />
             <div className="space-y-4">
-              <FormField
-                id="google_analytics"
-                label={__('Google Analytics ID', 'Google Analytics ID')}
-                description={__('Your Google Analytics tracking ID (e.g., UA-XXXXXXXXX-X or G-XXXXXXXXXX)', 'Your Google Analytics tracking ID (e.g., UA-XXXXXXXXX-X or G-XXXXXXXXXX)')}
-              >
-                <Input
-                  id="google_analytics"
-                  value={formData.google_analytics}
-                  name='google_analytics'
-                      onChange={handleFieldChange}
-                  placeholder="UA-XXXXXXXXX-X"
-                />
-              </FormField>
-
-              <FormField
-                id="facebook_pixel"
-                label={__('Facebook Pixel ID', 'Facebook Pixel ID')}
-                description={__('Your Facebook Pixel ID for tracking conversions', 'Your Facebook Pixel ID for tracking conversions')}
-              >
-                <Input
-                  id="facebook_pixel"
-                  value={formData.facebook_pixel}
-                  name='facebook_pixel'
-                      onChange={handleFieldChange}
-                  placeholder={__('Enter Facebook Pixel ID', 'Enter Facebook Pixel ID')}
-                />
-              </FormField>
-
               <FormField
                 id="google_maps_api"
                 label={__('Google Maps API Key', 'Google Maps API Key')}

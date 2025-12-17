@@ -1953,6 +1953,29 @@ class Database
             KEY `idx_image_id` (`image_id`)
         ) {$charset_collate} COMMENT='Trip itinerary entry images';";
         \dbDelta($sql_trip_itinerary_entry_images);
+        
+        // ============================================
+        // TRIP DOWNLOADS (FREE FEATURE)
+        // ============================================
+        $table_trip_downloads = $wpdb->prefix . 'yatra_trip_downloads';
+        $sql_trip_downloads = "CREATE TABLE IF NOT EXISTS `{$table_trip_downloads}` (
+            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+            `trip_id` bigint(20) UNSIGNED NOT NULL,
+            `title` varchar(255) NOT NULL,
+            `description` text DEFAULT NULL,
+            `attachment_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
+            `protected_path` text DEFAULT NULL COMMENT 'Protected file path',
+            `visibility` varchar(20) NOT NULL DEFAULT 'booked_only' COMMENT 'public, logged_in, booked_only',
+            `enabled` tinyint(1) NOT NULL DEFAULT 1,
+            `sort_order` int(11) NOT NULL DEFAULT 0,
+            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (`id`),
+            KEY `idx_trip_id` (`trip_id`),
+            KEY `idx_attachment_id` (`attachment_id`),
+            KEY `idx_visibility` (`visibility`)
+        ) {$charset_collate} COMMENT='Trip downloadable files';";
+        \dbDelta($sql_trip_downloads);
     }
 
     /**

@@ -75,30 +75,7 @@ const Modules: React.FC = () => {
     return map;
   }, [modules]);
 
-  const groupedModules = useMemo(() => {
-    const grouped = filteredModules.reduce<Record<string, ModuleDefinition[]>>((acc, module) => {
-      const category = module.category || __('General', 'General');
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(module);
-      return acc;
-    }, {});
-    
-    // Sort modules within each category: premium first, then by name
-    Object.keys(grouped).forEach((category) => {
-      grouped[category].sort((a, b) => {
-        // Premium modules first
-        if (a.is_premium && !b.is_premium) return -1;
-        if (!a.is_premium && b.is_premium) return 1;
-        // Then sort by name
-        return a.name.localeCompare(b.name);
-      });
-    });
-    
-    return grouped;
-  }, [filteredModules]);
-
+  
   const [premiumDialog, setPremiumDialog] = useState<{ open: boolean; module?: ModuleDefinition }>({ open: false });
 
   const handleToggle = (module: ModuleDefinition) => {
@@ -365,15 +342,9 @@ const Modules: React.FC = () => {
         </Card>
       )}
 
-      {!isLoading && !error && Object.keys(groupedModules).length > 0 && (
-        <div className="space-y-4">
-          {Object.entries(groupedModules).map(([category, categoryModules]) => (
-            <div key={category}>
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2">
-                {category}
-              </h3>
-              <div className="grid gap-3 md:grid-cols-3">
-                {categoryModules.map((module) => (
+      {!isLoading && !error && filteredModules.length > 0 && (
+        <div className="grid gap-3 md:grid-cols-3">
+          {filteredModules.map((module) => (
                   <Card
                     key={module.slug}
                     className={`border ${
@@ -443,21 +414,11 @@ const Modules: React.FC = () => {
                                   {__('Premium', 'Premium')}
                                 </Badge>
                               )}
-                              {/* Show Pro badge if module is premium AND available (Pro is active) */}
-                              {module.is_premium && module.is_available && (
-                                <Badge
-                                  variant="outline"
-                                  className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-green-400 border-green-600 text-white shadow-sm dark:bg-green-600/60 dark:border-green-500 dark:text-green-50"
-                                >
-                                  <Crown className="w-3 h-3" />
-                                  {__('Pro', 'Pro')}
-                                </Badge>
-                              )}
-                            </CardTitle>
-                            <CardDescription className="mt-1 text-sm">
+                              </CardTitle>
+                            <CardDescription className="mt-1 text-sm line-clamp-3">
                               {module.description}
                             </CardDescription>
-                            <p className="inline-flex items-center px-2 py-0.5 mt-2 text-[11px] font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                            <p className="inline-flex items-center px-2 py-0.5 mt-1 text-[11px] font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1"></span>
                               {module.category || __('General', 'General')}
                             </p>
@@ -469,24 +430,51 @@ const Modules: React.FC = () => {
                       </div>
                     </CardHeader>
                     <CardContent className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-                      <div className="h-5" />
-                      {module.docs_url && (
-                        <a
-                          href={module.docs_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          {__('Docs', 'Docs')}
-                        </a>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {module.video_url && (
+                          <a
+                            href={module.video_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-red-600 hover:text-red-500 dark:text-red-400 text-xs font-medium"
+                            title={__('Watch video tutorial', 'Watch video tutorial')}
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            {__('Video', 'Video')}
+                          </a>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {module.slug === 'dynamic_form_field' && module.enabled && (
+                          <a
+                            href={`${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`}
+                            className="flex items-center gap-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs font-medium"
+                            title={__('Settings', 'Settings')}
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                              <circle cx="12" cy="12" r="3"></circle>
+                              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            {__('Settings', 'Settings')}
+                          </a>
+                        )}
+                        {module.docs_url && (
+                          <a
+                            href={module.docs_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            {__('Docs', 'Docs')}
+                          </a>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
-              </div>
-            </div>
-          ))}
         </div>
       )}
       <PremiumUpgradeDialog

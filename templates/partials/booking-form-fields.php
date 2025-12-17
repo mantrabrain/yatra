@@ -2,8 +2,8 @@
 /**
  * Booking Form Fields Partial
  * 
- * Dynamically renders form fields based on saved configuration from Settings -> Booking Form
- * All form fields, sections, and their properties are controlled by the admin form builder.
+ * Renders form fields based on configuration from Settings -> Booking Form
+ * Dynamic form customization requires the Dynamic Form Field module (Pro).
  * 
  * @package Yatra
  * 
@@ -27,7 +27,10 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Get form configuration from Settings -> Booking Form builder
+// Check if Dynamic Form Field module is enabled (Pro feature)
+$is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
+
+// Get form configuration - returns default config if module disabled, custom config if enabled
 $form_config = yatra_get_booking_form_config();
 
 // Country list for country type fields

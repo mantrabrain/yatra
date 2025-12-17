@@ -1,4 +1,13 @@
 <?php
+/**
+ * Availability Service
+ * Business logic for trip availability dates
+ * 
+ * This is a FREE feature - no Pro plugin required
+ * 
+ * @package Yatra\Services
+ * @since 3.0.0
+ */
 
 declare(strict_types=1);
 
@@ -7,10 +16,6 @@ namespace Yatra\Services;
 use Yatra\Models\Availability;
 use Yatra\Repositories\AvailabilityRepository;
 
-/**
- * Availability Service
- * Business logic for trip availability dates
- */
 class AvailabilityService
 {
     private AvailabilityRepository $repository;

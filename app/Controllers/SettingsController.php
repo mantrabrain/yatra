@@ -296,8 +296,18 @@ class SettingsController extends BaseController
 
             $updated = [];
             $errors = [];
+            
+            // Check if Dynamic Form Field module is enabled
+            $is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
+            
             // Process each setting
             foreach ($data as $key => $value) {
+                // Skip booking_form_config if Dynamic Form Field module is not enabled
+                // This allows the settings to save without error when the module is disabled
+                if ($key === 'booking_form_config' && !$is_dynamic_form_enabled) {
+                    continue;
+                }
+                
                 // Validate that the key exists in default settings
                 if (!array_key_exists($key, $this->default_settings)) {
                     $errors[] = sprintf('Unknown setting: %s', $key);

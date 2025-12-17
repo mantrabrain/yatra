@@ -19,6 +19,7 @@ export interface ModuleDefinition {
   enabled: boolean;
   tags?: string[];
   updated_at?: string | null;
+  settings_page?: string;
 }
 
 interface ModulesResponse {
@@ -69,6 +70,38 @@ export const useToggleModule = () => {
     },
     onSuccess: (data, variables) => {
       queryClient.setQueryData(['modules'], data);
+      
+      // Update global admin variables for navigation
+      if (window.yatraAdmin) {
+        // Update module-specific flags based on the enabled modules
+        const enabledModules = data.filter(m => m.enabled);
+        
+        // Check for specific modules that affect navigation
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(m => 
+          m.slug === 'email_automation' || m.slug === 'email-automation'
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(m => 
+          m.slug === 'trip_consent' || m.slug === 'trip-consent'
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
+          m.slug === 'additional_services' || m.slug === 'additional-services'
+        );
+        // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
+        
+        // Trigger a navigation refresh by updating a custom event
+        window.dispatchEvent(new CustomEvent('yatra-modules-updated', { 
+          detail: { 
+            enabledModules: enabledModules,
+            updatedModule: variables 
+          } 
+        }));
+        
+        // Force a layout re-render by updating the URL key
+        const urlKey = (window as any).__yatraUrlKey || 0;
+        (window as any).__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent('yatra-force-nav-refresh'));
+      }
+      
       const label = variables.name || variables.slug;
       showToast(
         variables.enabled
@@ -92,8 +125,40 @@ export const useBulkToggleModules = () => {
       const response: ModulesResponse = await apiClient.post('/modules/bulk-toggle', { items });
       return Array.isArray(response?.data) ? response.data : [];
     },
-    onSuccess: (_data, variables = []) => {
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
+    onSuccess: (data, variables = []) => {
+      queryClient.setQueryData(['modules'], data);
+      
+      // Update global admin variables for navigation
+      if (window.yatraAdmin && data) {
+        // Update module-specific flags based on the enabled modules
+        const enabledModules = data.filter(m => m.enabled);
+        
+        // Check for specific modules that affect navigation
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(m => 
+          m.slug === 'email_automation' || m.slug === 'email-automation'
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(m => 
+          m.slug === 'trip_consent' || m.slug === 'trip-consent'
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
+          m.slug === 'additional_services' || m.slug === 'additional-services'
+        );
+        // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
+        
+        // Trigger a navigation refresh by updating a custom event
+        window.dispatchEvent(new CustomEvent('yatra-modules-updated', { 
+          detail: { 
+            enabledModules: enabledModules,
+            updatedModules: variables || []
+          } 
+        }));
+        
+        // Force a layout re-render by updating the URL key
+        const urlKey = (window as any).__yatraUrlKey || 0;
+        (window as any).__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent('yatra-force-nav-refresh'));
+      }
+      
       if (variables.length > 0) {
         const names = variables.map((item) => item.name || item.slug);
         const summary = formatNamesList(names);

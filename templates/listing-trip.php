@@ -926,21 +926,23 @@ get_header();
                         }
                     }
                     
-                    // Check for group discounts (with column existence check)
-                    $group_discount_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$wpdb->prefix}yatra_trips' 
-                           AND COLUMN_NAME = 'group_pricing_enabled'"
-                    );
-                    if ($column_exists) {
-                        $group_discount_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND group_pricing_enabled = 1"
+                    // Check for group discounts (with column existence check) - only if Advanced Discount module is enabled
+                    if (apply_filters('yatra_advanced_discount_enabled', false)) {
+                        $group_discount_count = 0;
+                        $column_exists = $wpdb->get_var(
+                            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+                             WHERE TABLE_SCHEMA = DATABASE() 
+                               AND TABLE_NAME = '{$wpdb->prefix}yatra_trips' 
+                               AND COLUMN_NAME = 'group_pricing_enabled'"
                         );
-                        if ($group_discount_count > 0) {
-                            $special_offers[] = ['value' => 'group-discount', 'label' => 'Group Discount', 'count' => $group_discount_count];
+                        if ($column_exists) {
+                            $group_discount_count = $wpdb->get_var(
+                                "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
+                                 WHERE status = 'published' AND group_pricing_enabled = 1"
+                            );
+                            if ($group_discount_count > 0) {
+                                $special_offers[] = ['value' => 'group-discount', 'label' => 'Group Discount', 'count' => $group_discount_count];
+                            }
                         }
                     }
                     

@@ -14,10 +14,66 @@ declare global {
       roles?: string[];
       capabilities?: Record<string, boolean>;
       isPro?: boolean;
+      isProActive?: boolean;
       version?: string;
       proVersion?: string | null;
       translations?: Record<string, string>;
       locale?: string;
+      emailAutomationEnabled?: boolean;
+      tripConsentEnabled?: boolean;
+      additionalServicesEnabled?: boolean;
+      dynamicFormFieldEnabled?: boolean;
+      advancedDiscountEnabled?: boolean;
+      showGoogleCalendarSettingsUI?: boolean;
+      showMailchimpSettingsUI?: boolean;
+      showFacebookPixelSettingsUI?: boolean;
+      showGoogleAnalyticsSettingsUI?: boolean;
+      mailchimpConnected?: boolean;
+      mailchimp?: {
+        connected?: boolean;
+        listId?: string;
+        listName?: string;
+        syncOnBooking?: boolean;
+        syncOnPayment?: boolean;
+        addTags?: boolean;
+        defaultTags?: string[];
+        doubleOptin?: boolean;
+        fieldMapping?: Record<string, string>;
+      };
+      facebookPixel?: {
+        connected?: boolean;
+        pixelId?: string;
+        trackViewContent?: boolean;
+        trackInitiateCheckout?: boolean;
+        trackPurchase?: boolean;
+        trackAddToCart?: boolean;
+        useConversionsApi?: boolean;
+        testEventCode?: string;
+        eventConfig?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+        parameterMapping?: Record<string, string>;
+      };
+      googleAnalytics?: {
+        connected?: boolean;
+        measurementId?: string;
+        trackViewItem?: boolean;
+        trackAddToCart?: boolean;
+        trackBeginCheckout?: boolean;
+        trackPurchase?: boolean;
+        useMeasurementProtocol?: boolean;
+        debugMode?: boolean;
+        customDimensions?: Array<{ name: string; yatra_field: string; scope?: string }>;
+        eventConfig?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+      };
+      googleCalendar?: {
+        client_id?: string;
+        client_secret?: string;
+        calendar_id?: string;
+        calendar_name?: string;
+        connected?: boolean;
+        redirect_uri?: string;
+        last_sync?: string | null;
+      };
+      googleCalendarRedirectUri?: string;
     };
   }
 }

@@ -587,6 +587,11 @@ class DiscountService extends BaseService
      * Calculate group discounts for booking
      */
     public function calculateGroupDiscounts(array $bookingData): array {
+        // Check if Advanced Discount module is enabled - group discounts are a Pro feature
+        if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            return [];
+        }
+        
         $totalTravelers = $this->countTotalTravelers($bookingData);
 
         // Find applicable group discounts
@@ -803,6 +808,11 @@ class DiscountService extends BaseService
      */
     public function getGroupDiscountsForTrip(int $tripId): array
     {
+        // Check if Advanced Discount module is enabled - group discounts are a Pro feature
+        if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            return [];
+        }
+        
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_discounts';
         $today = date('Y-m-d');
@@ -884,6 +894,11 @@ class DiscountService extends BaseService
      */
     public function calculateGroupDiscount(int $tripId, array $travelerCounts, array $priceTypes = []): ?array
     {
+        // Check if Advanced Discount module is enabled - group discounts are a Pro feature
+        if (!apply_filters('yatra_advanced_discount_enabled', false)) {
+            return null;
+        }
+        
         $groupDiscounts = $this->getGroupDiscountsForTrip($tripId);
         
         if (empty($groupDiscounts)) {

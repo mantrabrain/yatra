@@ -1,4 +1,13 @@
 <?php
+/**
+ * Recurring Availability REST API Controller
+ * API endpoints for recurring availability rules management
+ * 
+ * This is a FREE feature - no Pro plugin required
+ * 
+ * @package Yatra\Controllers
+ * @since 3.0.0
+ */
 
 declare(strict_types=1);
 
@@ -10,10 +19,6 @@ use WP_Error;
 use Yatra\Services\RecurringAvailabilityService;
 use Yatra\Repositories\RecurringAvailabilityRepository;
 
-/**
- * Recurring Availability REST API Controller
- * API endpoints for recurring availability rules management
- */
 class RecurringAvailabilityController extends BaseController
 {
     private RecurringAvailabilityService $service;
@@ -142,15 +147,15 @@ class RecurringAvailabilityController extends BaseController
                 $item->generated_count = $preview['total'];
             }
 
-            return $this->success_response([
+            return new WP_REST_Response([
                 'data' => $items,
                 'total' => $total,
                 'pages' => ceil($total / ($filters['per_page'] ?: 1)),
                 'page' => (int) $filters['page'],
                 'per_page' => (int) $filters['per_page'],
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -164,16 +169,16 @@ class RecurringAvailabilityController extends BaseController
             $item = $this->service->find($id);
 
             if (!$item) {
-                return $this->error_response('Rule not found', 404);
+                return new WP_Error('not_found', 'Rule not found', ['status' => 404]);
             }
 
             // Add preview data
             $preview = $this->service->previewDates((array) $item, 20);
             $item->preview = $preview;
 
-            return $this->success_response($item);
+            return new WP_REST_Response(['data' => $item], 200);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -191,14 +196,14 @@ class RecurringAvailabilityController extends BaseController
 
             $id = $this->service->create($data);
 
-            return $this->success_response([
+            return new WP_REST_Response([
                 'id' => $id,
                 'message' => __('Recurring rule created successfully', 'yatra'),
             ], 201);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return new WP_Error('validation_error', $e->getMessage(), ['status' => 400]);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -215,25 +220,24 @@ class RecurringAvailabilityController extends BaseController
                 $data = $request->get_body_params();
             }
 
-            // Check if exists
             $existing = $this->service->find($id);
             if (!$existing) {
-                return $this->error_response('Rule not found', 404);
+                return new WP_Error('not_found', 'Rule not found', ['status' => 404]);
             }
 
             $success = $this->service->update($id, $data);
 
             if (!$success) {
-                return $this->error_response('Failed to update rule', 500);
+                return new WP_Error('error', 'Failed to update rule', ['status' => 500]);
             }
 
-            return $this->success_response([
+            return new WP_REST_Response([
                 'message' => __('Recurring rule updated successfully', 'yatra'),
-            ]);
+            ], 200);
         } catch (\InvalidArgumentException $e) {
-            return $this->error_response($e->getMessage(), 400);
+            return new WP_Error('validation_error', $e->getMessage(), ['status' => 400]);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -245,23 +249,22 @@ class RecurringAvailabilityController extends BaseController
         try {
             $id = (int) $request->get_param('id');
 
-            // Check if exists
             $existing = $this->service->find($id);
             if (!$existing) {
-                return $this->error_response('Rule not found', 404);
+                return new WP_Error('not_found', 'Rule not found', ['status' => 404]);
             }
 
             $success = $this->service->delete($id);
 
             if (!$success) {
-                return $this->error_response('Failed to delete rule', 500);
+                return new WP_Error('error', 'Failed to delete rule', ['status' => 500]);
             }
 
-            return $this->success_response([
+            return new WP_REST_Response([
                 'message' => __('Recurring rule deleted successfully', 'yatra'),
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -277,17 +280,16 @@ class RecurringAvailabilityController extends BaseController
                 $data = $request->get_body_params();
             }
 
-            // Validate required fields
             if (empty($data['rule_type']) || empty($data['start_date'])) {
-                return $this->error_response('Rule type and start date are required for preview', 400);
+                return new WP_Error('validation_error', 'Rule type and start date are required for preview', ['status' => 400]);
             }
 
             $limit = (int) ($data['preview_limit'] ?? 20);
             $preview = $this->service->previewDates($data, $limit);
 
-            return $this->success_response($preview);
+            return new WP_REST_Response(['data' => $preview], 200);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 
@@ -304,14 +306,14 @@ class RecurringAvailabilityController extends BaseController
 
             $dates = $this->service->generateDatesForTrip($tripId, $fromDate, $toDate);
 
-            return $this->success_response([
+            return new WP_REST_Response([
                 'data' => $dates,
                 'total' => count($dates),
                 'from_date' => $fromDate,
                 'to_date' => $toDate,
-            ]);
+            ], 200);
         } catch (\Exception $e) {
-            return $this->error_response($e->getMessage(), 500);
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
         }
     }
 

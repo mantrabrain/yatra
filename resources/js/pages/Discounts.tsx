@@ -5,7 +5,8 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Copy, Tag, Users } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Copy, Tag, Users, Lock } from 'lucide-react';
+import { PremiumUpgradeDialog } from '../components/modules/PremiumUpgradeDialog';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -79,6 +80,7 @@ const Discounts: React.FC = () => {
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [isBulkPending, setIsBulkPending] = useState(false);
   const [showDiscountTypeModal, setShowDiscountTypeModal] = useState(false);
+  const [premiumDialog, setPremiumDialog] = useState<{ open: boolean; type: 'group' | 'both' | null }>({ open: false, type: null });
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === 'undefined') {
       return {
@@ -242,9 +244,33 @@ const Discounts: React.FC = () => {
     setShowDiscountTypeModal(true);
   };
 
+  // Check if Advanced Discount module is enabled (Pro plugin sets this flag via yatraAdmin)
+  const isAdvancedDiscountEnabled = !!(window as any).yatraAdmin?.advancedDiscountEnabled;
+
   const handleSelectDiscountType = (type: 'promo' | 'group' | 'both') => {
+    // Block group and both options if Advanced Discount module is not enabled - show premium dialog
+    if ((type === 'group' || type === 'both') && !isAdvancedDiscountEnabled) {
+      setPremiumDialog({ open: true, type });
+      return;
+    }
     setShowDiscountTypeModal(false);
     window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&discount_mode=${type}`;
+  };
+  
+  // Get premium dialog content based on type
+  const getPremiumDialogContent = () => {
+    if (premiumDialog.type === 'group') {
+      return {
+        name: __('Group Discount', 'Group Discount'),
+        description: __('Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.', 'Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.'),
+        purchaseUrl: 'https://wpyatra.com/pricing?module=advanced-discount',
+      };
+    }
+    return {
+      name: __('Promo + Group Discount', 'Promo + Group Discount'),
+      description: __('Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.', 'Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.'),
+      purchaseUrl: 'https://wpyatra.com/pricing?module=advanced-discount',
+    };
   };
 
   const handleResetFilters = () => {
@@ -764,8 +790,17 @@ const Discounts: React.FC = () => {
               {/* Group Discount Option */}
               <button
                 onClick={() => handleSelectDiscountType('group')}
-                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left"
+                className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left"
               >
+                {!isAdvancedDiscountEnabled && (
+                  <div 
+                    className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
+                    style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
+                  >
+                    <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
+                    <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+                  </div>
+                )}
                 <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
                   <Users className="w-7 h-7 text-green-600 dark:text-green-400" />
                 </div>
@@ -780,8 +815,17 @@ const Discounts: React.FC = () => {
               {/* Both Option */}
               <button
                 onClick={() => handleSelectDiscountType('both')}
-                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left"
+                className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left"
               >
+                {!isAdvancedDiscountEnabled && (
+                  <div 
+                    className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
+                    style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
+                  >
+                    <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
+                    <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+                  </div>
+                )}
                 <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
                   <div className="flex -space-x-1">
                     <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
@@ -821,6 +865,15 @@ const Discounts: React.FC = () => {
         cancelText={__('Cancel', 'Cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
+      />
+
+      {/* Premium Upgrade Dialog for Group Discount features */}
+      <PremiumUpgradeDialog
+        open={premiumDialog.open}
+        onClose={() => setPremiumDialog({ open: false, type: null })}
+        moduleName={getPremiumDialogContent().name}
+        moduleDescription={getPremiumDialogContent().description}
+        purchaseUrl={getPremiumDialogContent().purchaseUrl}
       />
 
       <PageHeader

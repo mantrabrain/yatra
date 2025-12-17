@@ -370,7 +370,8 @@ const TripForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
-  const showDownloadsUI = !!(window as any)?.yatraAdmin?.showDownloadsUI;
+  // Downloads is now a FREE feature - always show the UI
+  const showDownloadsUI = true;
   
   // Get section from URL on initial load
   const getInitialSection = (): SectionId => {

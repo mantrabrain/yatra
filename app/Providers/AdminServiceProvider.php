@@ -311,6 +311,22 @@ class AdminServiceProvider extends ServiceProvider
                 'yatra_show_google_calendar_settings_ui',
                 class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('google_calendar') : false
             ),
+            'dynamicFormFieldEnabled' => apply_filters(
+                'yatra_dynamic_form_field_enabled',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('dynamic_form_field') : false
+            ),
+            'showMailchimpSettingsUI' => apply_filters(
+                'yatra_show_mailchimp_settings_ui',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('mailchimp') : false
+            ),
+            'showFacebookPixelSettingsUI' => apply_filters(
+                'yatra_show_facebook_pixel_settings_ui',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('facebook_pixel') : false
+            ),
+            'showGoogleAnalyticsSettingsUI' => apply_filters(
+                'yatra_show_google_analytics_settings_ui',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('google_analytics') : false
+            ),
             'translations' => $translations,
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),

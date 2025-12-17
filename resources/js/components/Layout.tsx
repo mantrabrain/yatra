@@ -71,11 +71,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isModulesPanelOpen, setIsModulesPanelOpen] = useState(false);
   const modulesPanelRef = useRef<HTMLDivElement | null>(null);
-  const { data: modulesData = [], isLoading: isLoadingModules } = useModulesQuery({
+  const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen,
   });
   const toggleModuleMutation = useToggleModule();
-  const modulesPreview = useMemo<ModuleDefinition[]>(() => modulesData.slice(0, 3), [modulesData]);
+  // Ensure modulesData is always an array before slicing
+  const safeModulesData = Array.isArray(modulesData) ? modulesData : [];
+  const modulesPreview = useMemo<ModuleDefinition[]>(() => safeModulesData.slice(0, 3), [safeModulesData]);
   const handleQuickToggle = (module: ModuleDefinition, enabled: boolean) => {
     toggleModuleMutation.mutate({ slug: module.slug, enabled, name: module.name });
   };
@@ -95,6 +97,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Track URL changes to update menu state
   const [urlKey, setUrlKey] = useState(0);
+  const [navRefreshKey, setNavRefreshKey] = useState(0);
 
   useEffect(() => {
     const handleLocationChange = () => {
@@ -116,6 +119,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => {
       window.removeEventListener('popstate', handleLocationChange);
       clearInterval(interval);
+    };
+  }, []);
+
+  // Listen for module updates to refresh navigation
+  useEffect(() => {
+    const handleModuleUpdate = () => {
+      // Force re-render of menu items by updating navRefreshKey
+      setNavRefreshKey(prev => prev + 1);
+      // Also update urlKey to ensure all memoized values refresh
+      setUrlKey(prev => prev + 1);
+    };
+
+    const handleForceRefresh = () => {
+      setNavRefreshKey(prev => prev + 1);
+      setUrlKey(prev => prev + 1);
+    };
+
+    window.addEventListener('yatra-modules-updated', handleModuleUpdate);
+    window.addEventListener('yatra-force-nav-refresh', handleForceRefresh);
+
+    return () => {
+      window.removeEventListener('yatra-modules-updated', handleModuleUpdate);
+      window.removeEventListener('yatra-force-nav-refresh', handleForceRefresh);
     };
   }, []);
 
@@ -203,7 +229,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const modulesPageUrl = useMemo(() => `${baseUrl}&subpage=modules`, [baseUrl]);
 
-  const menuItems = [
+  const menuItems = useMemo(() => [
     { subpage: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { 
       subpage: 'trips', 
@@ -215,6 +241,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'destinations', label: 'Destinations', icon: Map },
         { tab: 'categories', label: 'Categories', icon: FolderTree },
         { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
+        // Availability - FREE feature, always show
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
         // Additional Services - only show if module is enabled
         ...((window as any).yatraAdmin?.additionalServicesEnabled ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
@@ -233,6 +260,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'itinerary', label: 'Itinerary', icon: FileText },
       ]
     },
+    // Departures - FREE feature, always show
     { subpage: 'departures', label: 'Departures', icon: Calendar },
     { subpage: 'discounts', label: 'Discounts', icon: BadgePercent },
     { subpage: 'payments', label: 'Payments', icon: CreditCard },
@@ -246,7 +274,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     ...((window as any).yatraAdmin?.emailAutomationEnabled ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
     { subpage: 'settings', label: 'Settings', icon: Settings },
-  ];
+  ], [navRefreshKey]); // Re-calculate when navRefreshKey changes
 
   const isActive = (subpage: string, tab?: string) => {
     if (tab) {

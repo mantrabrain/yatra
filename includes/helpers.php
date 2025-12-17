@@ -52,7 +52,16 @@ function yatra_reviews_enabled(): bool
  */
 function yatra_get_booking_form_config(): array
 {
-    return SettingsService::getBookingFormConfig();
+    // Check if Dynamic Form Field module is enabled via Pro plugin
+    $is_dynamic_enabled = apply_filters('yatra_dynamic_form_field_enabled', false);
+    
+    if ($is_dynamic_enabled) {
+        // Pro module is active - use customizable form config
+        return SettingsService::getBookingFormConfig();
+    }
+    
+    // Free version - return default static form config
+    return SettingsService::getDefaultBookingFormConfig();
 }
 
 /**

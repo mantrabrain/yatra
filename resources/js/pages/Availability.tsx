@@ -83,6 +83,7 @@ const Availability: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   
+  
   // Get trip_id from URL on mount and when URL changes
   const [urlKey, setUrlKey] = useState(0);
   useEffect(() => {

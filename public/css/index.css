@@ -813,6 +813,12 @@ video {
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
 .block {
   display: block;
 }
@@ -1701,10 +1707,6 @@ video {
   --tw-border-opacity: 1;
   border-color: rgb(34 197 94 / var(--tw-border-opacity, 1));
 }
-.border-green-600 {
-  --tw-border-opacity: 1;
-  border-color: rgb(22 163 74 / var(--tw-border-opacity, 1));
-}
 .border-indigo-200 {
   --tw-border-opacity: 1;
   border-color: rgb(199 210 254 / var(--tw-border-opacity, 1));
@@ -2061,11 +2063,6 @@ video {
   --tw-gradient-to: rgb(249 250 251 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
-.from-green-500 {
-  --tw-gradient-from: #22c55e var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(34 197 94 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
 .from-orange-50\/30 {
   --tw-gradient-from: rgb(255 247 237 / 0.3) var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(255 247 237 / 0) var(--tw-gradient-to-position);
@@ -2115,6 +2112,12 @@ video {
 .to-blue-100 {
   --tw-gradient-to: #dbeafe var(--tw-gradient-to-position);
 }
+.to-blue-50 {
+  --tw-gradient-to: #eff6ff var(--tw-gradient-to-position);
+}
+.to-blue-500 {
+  --tw-gradient-to: #3b82f6 var(--tw-gradient-to-position);
+}
 .to-blue-600 {
   --tw-gradient-to: #2563eb var(--tw-gradient-to-position);
 }
@@ -2126,9 +2129,6 @@ video {
 }
 .to-gray-50\/50 {
   --tw-gradient-to: rgb(249 250 251 / 0.5) var(--tw-gradient-to-position);
-}
-.to-green-400 {
-  --tw-gradient-to: #4ade80 var(--tw-gradient-to-position);
 }
 .to-indigo-50 {
   --tw-gradient-to: #eef2ff var(--tw-gradient-to-position);
@@ -2957,6 +2957,10 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(255 251 235 / var(--tw-bg-opacity, 1));
 }
+.hover\:bg-amber-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(180 83 9 / var(--tw-bg-opacity, 1));
+}
 .hover\:bg-black\/80:hover {
   background-color: rgb(0 0 0 / 0.8);
 }
@@ -3067,6 +3071,9 @@ video {
   --tw-gradient-from: #7e22ce var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(126 34 206 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.hover\:to-blue-700:hover {
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position);
 }
 .hover\:to-indigo-700:hover {
   --tw-gradient-to: #4338ca var(--tw-gradient-to-position);
@@ -3359,10 +3366,6 @@ video {
 .dark\:border-gray-800\/80:is(.dark *) {
   border-color: rgb(31 41 55 / 0.8);
 }
-.dark\:border-green-500:is(.dark *) {
-  --tw-border-opacity: 1;
-  border-color: rgb(34 197 94 / var(--tw-border-opacity, 1));
-}
 .dark\:border-green-600:is(.dark *) {
   --tw-border-opacity: 1;
   border-color: rgb(22 163 74 / var(--tw-border-opacity, 1));
@@ -3416,6 +3419,9 @@ video {
 .dark\:bg-amber-800:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(146 64 14 / var(--tw-bg-opacity, 1));
+}
+.dark\:bg-amber-800\/30:is(.dark *) {
+  background-color: rgb(146 64 14 / 0.3);
 }
 .dark\:bg-amber-900\/10:is(.dark *) {
   background-color: rgb(120 53 15 / 0.1);
@@ -3523,9 +3529,6 @@ video {
 .dark\:bg-green-400:is(.dark *) {
   --tw-bg-opacity: 1;
   background-color: rgb(74 222 128 / var(--tw-bg-opacity, 1));
-}
-.dark\:bg-green-600\/60:is(.dark *) {
-  background-color: rgb(22 163 74 / 0.6);
 }
 .dark\:bg-green-800:is(.dark *) {
   --tw-bg-opacity: 1;
@@ -3647,6 +3650,9 @@ video {
 .dark\:to-blue-800\/30:is(.dark *) {
   --tw-gradient-to: rgb(30 64 175 / 0.3) var(--tw-gradient-to-position);
 }
+.dark\:to-blue-900\/20:is(.dark *) {
+  --tw-gradient-to: rgb(30 58 138 / 0.2) var(--tw-gradient-to-position);
+}
 .dark\:to-gray-800\/50:is(.dark *) {
   --tw-gradient-to: rgb(31 41 55 / 0.5) var(--tw-gradient-to-position);
 }
@@ -3744,10 +3750,6 @@ video {
 .dark\:text-green-400:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(74 222 128 / var(--tw-text-opacity, 1));
-}
-.dark\:text-green-50:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(240 253 244 / var(--tw-text-opacity, 1));
 }
 .dark\:text-indigo-300:is(.dark *) {
   --tw-text-opacity: 1;

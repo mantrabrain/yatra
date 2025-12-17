@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as Puzzle, q as Settings$1, s as ArrowLeft, t as ChevronDown, v as ChevronRight, w as RefreshCw, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, K as Users, N as Clock, O as DollarSign, Q as ArrowRight, V as Info, W as CheckCircle, X as HelpCircle, Y as MoreVertical, Z as AlertTriangle, _ as X, $ as Columns, a0 as ExternalLink, a1 as Mountain, a2 as PenSquare, a3 as Copy, a4 as ArrowUp, a5 as ArrowDown, a6 as Archive, a7 as Trash2, a8 as Plus, a9 as Search, aa as ArrowUpDown, ab as AlertCircle, ac as XCircle, ad as Flame, ae as Zap, af as Heart, ag as ShoppingBag, ah as BookOpen, ai as Gamepad2, aj as Music, ak as Image, al as Eye, am as Footprints, an as Bed, ao as Coffee, ap as Hotel, aq as Car, ar as Palette, as as Waves, at as Camera, au as Target, av as Bus, aw as Building2, ax as UtensilsCrossed, ay as CheckCircle2, az as GripVertical, aA as Pencil, aB as Check, aC as Download, aD as Lightbulb, aE as Database, aF as History, aG as Save, aH as Sparkles, aI as ChevronLeft, aJ as Box, aK as ChevronUp, aL as Upload, aM as RotateCcw, aN as Pen, aO as Phone, aP as Send, aQ as Globe, aR as Award, aS as Server, aT as Folder, aU as UserCheck, aV as ClipboardList, aW as Receipt, aX as Plug, aY as Shield, aZ as Lock, a_ as EyeOff, a$ as Ban, b0 as Crown, b1 as reactDomExports, b2 as Filter, b3 as ClipboardCheck, b4 as PenTool, b5 as Hash$2, b6 as CheckSquare, b7 as AlignLeft, b8 as Type, b9 as GitBranch, ba as Megaphone, bb as Pause, bc as Play, bd as Code, be as QueryClient, bf as client, bg as QueryClientProvider } from "./react-vendor-Ce6OMGOB.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-CdB6klcj.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as Puzzle, q as Settings$1, s as ArrowLeft, t as ChevronDown, v as ChevronRight, w as RefreshCw, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, K as Users, N as Clock, O as DollarSign, Q as ArrowRight, V as Info, W as CheckCircle, X as HelpCircle, Y as MoreVertical, Z as AlertTriangle, _ as X, $ as Columns, a0 as ExternalLink, a1 as Mountain, a2 as PenSquare, a3 as Copy, a4 as ArrowUp, a5 as ArrowDown, a6 as Archive, a7 as Trash2, a8 as Plus, a9 as Search, aa as ArrowUpDown, ab as AlertCircle, ac as XCircle, ad as Flame, ae as Zap, af as Heart, ag as ShoppingBag, ah as BookOpen, ai as Gamepad2, aj as Music, ak as Image, al as Eye, am as Footprints, an as Bed, ao as Coffee, ap as Hotel, aq as Car, ar as Palette, as as Waves, at as Camera, au as Target, av as Bus, aw as Building2, ax as UtensilsCrossed, ay as CheckCircle2, az as GripVertical, aA as Pencil, aB as Check, aC as Download, aD as Lightbulb, aE as Database, aF as History, aG as Save, aH as Sparkles, aI as ChevronLeft, aJ as Box, aK as ChevronUp, aL as Upload, aM as RotateCcw, aN as Pen, aO as Phone, aP as Send, aQ as Globe, aR as Award, aS as Server, aT as Folder, aU as UserCheck, aV as ClipboardList, aW as Receipt, aX as Plug, aY as Shield, aZ as Lock, a_ as EyeOff, a$ as Crown, b0 as reactDomExports, b1 as Ban, b2 as Filter, b3 as ClipboardCheck, b4 as PenTool, b5 as Hash$2, b6 as CheckSquare, b7 as AlignLeft, b8 as Type, b9 as GitBranch, ba as Megaphone, bb as Pause, bc as Play, bd as Code, be as QueryClient, bf as client, bg as QueryClientProvider } from "./react-vendor-COYu2GpU.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-B-dzYxLp.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -223,6 +223,27 @@ const useToggleModule = () => {
     },
     onSuccess: (data, variables) => {
       queryClient2.setQueryData(["modules"], data);
+      if (window.yatraAdmin) {
+        const enabledModules = data.filter((m) => m.enabled);
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation"
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) => m.slug === "additional_services" || m.slug === "additional-services"
+        );
+        window.dispatchEvent(new CustomEvent("yatra-modules-updated", {
+          detail: {
+            enabledModules,
+            updatedModule: variables
+          }
+        }));
+        const urlKey = window.__yatraUrlKey || 0;
+        window.__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
+      }
       const label = variables.name || variables.slug;
       showToast(
         variables.enabled ? __("{module} enabled successfully.", "{module} enabled successfully.").replace("{module}", label) : __("{module} disabled successfully.", "{module} disabled successfully.").replace("{module}", label),
@@ -242,8 +263,29 @@ const useBulkToggleModules = () => {
       const response = await apiClient.post("/modules/bulk-toggle", { items });
       return Array.isArray(response == null ? void 0 : response.data) ? response.data : [];
     },
-    onSuccess: (_data, variables = []) => {
-      queryClient2.invalidateQueries({ queryKey: ["modules"] });
+    onSuccess: (data, variables = []) => {
+      queryClient2.setQueryData(["modules"], data);
+      if (window.yatraAdmin && data) {
+        const enabledModules = data.filter((m) => m.enabled);
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation"
+        );
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent"
+        );
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) => m.slug === "additional_services" || m.slug === "additional-services"
+        );
+        window.dispatchEvent(new CustomEvent("yatra-modules-updated", {
+          detail: {
+            enabledModules,
+            updatedModules: variables || []
+          }
+        }));
+        const urlKey = window.__yatraUrlKey || 0;
+        window.__yatraUrlKey = urlKey + 1;
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
+      }
       if (variables.length > 0) {
         const names = variables.map((item) => item.name || item.slug);
         const summary = formatNamesList(names);
@@ -259,7 +301,7 @@ const useBulkToggleModules = () => {
   });
 };
 const Layout = ({ children }) => {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e;
   const [darkMode, setDarkMode] = reactExports.useState(() => {
     const saved = localStorage.getItem("yatra-dark-mode");
     return saved === "true";
@@ -278,11 +320,12 @@ const Layout = ({ children }) => {
   const [isRegenerating, setIsRegenerating] = reactExports.useState(false);
   const [isModulesPanelOpen, setIsModulesPanelOpen] = reactExports.useState(false);
   const modulesPanelRef = reactExports.useRef(null);
-  const { data: modulesData = [], isLoading: isLoadingModules } = useModulesQuery({
+  const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen
   });
   const toggleModuleMutation = useToggleModule();
-  const modulesPreview = reactExports.useMemo(() => modulesData.slice(0, 3), [modulesData]);
+  const safeModulesData = Array.isArray(modulesData) ? modulesData : [];
+  const modulesPreview = reactExports.useMemo(() => safeModulesData.slice(0, 3), [safeModulesData]);
   const handleQuickToggle = (module, enabled) => {
     toggleModuleMutation.mutate({ slug: module.slug, enabled, name: module.name });
   };
@@ -299,6 +342,7 @@ const Layout = ({ children }) => {
     }
   };
   const [urlKey, setUrlKey] = reactExports.useState(0);
+  const [navRefreshKey, setNavRefreshKey] = reactExports.useState(0);
   reactExports.useEffect(() => {
     const handleLocationChange = () => {
       setUrlKey((prev) => prev + 1);
@@ -314,6 +358,22 @@ const Layout = ({ children }) => {
     return () => {
       window.removeEventListener("popstate", handleLocationChange);
       clearInterval(interval);
+    };
+  }, []);
+  reactExports.useEffect(() => {
+    const handleModuleUpdate = () => {
+      setNavRefreshKey((prev) => prev + 1);
+      setUrlKey((prev) => prev + 1);
+    };
+    const handleForceRefresh = () => {
+      setNavRefreshKey((prev) => prev + 1);
+      setUrlKey((prev) => prev + 1);
+    };
+    window.addEventListener("yatra-modules-updated", handleModuleUpdate);
+    window.addEventListener("yatra-force-nav-refresh", handleForceRefresh);
+    return () => {
+      window.removeEventListener("yatra-modules-updated", handleModuleUpdate);
+      window.removeEventListener("yatra-force-nav-refresh", handleForceRefresh);
     };
   }, []);
   reactExports.useEffect(() => {
@@ -374,50 +434,55 @@ const Layout = ({ children }) => {
     return ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/admin.php?page=yatra` : "/wp-admin/admin.php?page=yatra";
   }, []);
   const modulesPageUrl = reactExports.useMemo(() => `${baseUrl}&subpage=modules`, [baseUrl]);
-  const menuItems = [
-    { subpage: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    {
-      subpage: "trips",
-      label: "Trips",
-      icon: MapPin,
-      submenu: [
-        { tab: "all", label: "All Trips", icon: List },
-        { tab: "activities", label: "Activities", icon: Activity },
-        { tab: "destinations", label: "Destinations", icon: Map$5 },
-        { tab: "categories", label: "Categories", icon: FolderTree },
-        { tab: "difficulty-levels", label: "Difficulty Levels", icon: TrendingUp },
-        { tab: "availability", label: "Availability", icon: CalendarDays },
-        // Additional Services - only show if module is enabled
-        ...((_a = window.yatraAdmin) == null ? void 0 : _a.additionalServicesEnabled) ? [{ tab: "additional-services", label: "Additional Services", icon: Package, isPremium: true }] : [],
-        // Trip Consent - only show if module is enabled
-        ...((_b = window.yatraAdmin) == null ? void 0 : _b.tripConsentEnabled) ? [{ tab: "trip-consent", label: "Trip Consent", icon: FileSignature, isPremium: true }] : []
-      ]
-    },
-    { subpage: "traveler-categories", label: "Traveler Categories", icon: CircleUser },
-    {
-      subpage: "itinerary",
-      label: "Itinerary",
-      icon: FileText,
-      submenu: [
-        { tab: "item-types", label: "Item Types", icon: Tag },
-        { tab: "items", label: "Items", icon: Route },
-        { tab: "itinerary", label: "Itinerary", icon: FileText }
-      ]
-    },
-    { subpage: "departures", label: "Departures", icon: Calendar$1 },
-    { subpage: "discounts", label: "Discounts", icon: BadgePercent },
-    { subpage: "payments", label: "Payments", icon: CreditCard },
-    { subpage: "bookings", label: "Bookings", icon: Calendar$1 },
-    { subpage: "customers", label: "Customers", icon: CircleUser },
-    { subpage: "travelers", label: "Travelers", icon: Plane },
-    { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
-    { subpage: "reviews", label: "Reviews", icon: Star },
-    { subpage: "reports", label: "Reports", icon: BarChart3 },
-    // Email Automation - only show if module is enabled
-    ...((_c = window.yatraAdmin) == null ? void 0 : _c.emailAutomationEnabled) ? [{ subpage: "email-automation", label: "Email Automation", icon: Mail, isPremium: true }] : [],
-    { subpage: "modules", label: "Modules", icon: Puzzle },
-    { subpage: "settings", label: "Settings", icon: Settings$1 }
-  ];
+  const menuItems = reactExports.useMemo(() => {
+    var _a2, _b2, _c2;
+    return [
+      { subpage: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+      {
+        subpage: "trips",
+        label: "Trips",
+        icon: MapPin,
+        submenu: [
+          { tab: "all", label: "All Trips", icon: List },
+          { tab: "activities", label: "Activities", icon: Activity },
+          { tab: "destinations", label: "Destinations", icon: Map$5 },
+          { tab: "categories", label: "Categories", icon: FolderTree },
+          { tab: "difficulty-levels", label: "Difficulty Levels", icon: TrendingUp },
+          // Availability - FREE feature, always show
+          { tab: "availability", label: "Availability", icon: CalendarDays },
+          // Additional Services - only show if module is enabled
+          ...((_a2 = window.yatraAdmin) == null ? void 0 : _a2.additionalServicesEnabled) ? [{ tab: "additional-services", label: "Additional Services", icon: Package, isPremium: true }] : [],
+          // Trip Consent - only show if module is enabled
+          ...((_b2 = window.yatraAdmin) == null ? void 0 : _b2.tripConsentEnabled) ? [{ tab: "trip-consent", label: "Trip Consent", icon: FileSignature, isPremium: true }] : []
+        ]
+      },
+      { subpage: "traveler-categories", label: "Traveler Categories", icon: CircleUser },
+      {
+        subpage: "itinerary",
+        label: "Itinerary",
+        icon: FileText,
+        submenu: [
+          { tab: "item-types", label: "Item Types", icon: Tag },
+          { tab: "items", label: "Items", icon: Route },
+          { tab: "itinerary", label: "Itinerary", icon: FileText }
+        ]
+      },
+      // Departures - FREE feature, always show
+      { subpage: "departures", label: "Departures", icon: Calendar$1 },
+      { subpage: "discounts", label: "Discounts", icon: BadgePercent },
+      { subpage: "payments", label: "Payments", icon: CreditCard },
+      { subpage: "bookings", label: "Bookings", icon: Calendar$1 },
+      { subpage: "customers", label: "Customers", icon: CircleUser },
+      { subpage: "travelers", label: "Travelers", icon: Plane },
+      { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
+      { subpage: "reviews", label: "Reviews", icon: Star },
+      { subpage: "reports", label: "Reports", icon: BarChart3 },
+      // Email Automation - only show if module is enabled
+      ...((_c2 = window.yatraAdmin) == null ? void 0 : _c2.emailAutomationEnabled) ? [{ subpage: "email-automation", label: "Email Automation", icon: Mail, isPremium: true }] : [],
+      { subpage: "modules", label: "Modules", icon: Puzzle },
+      { subpage: "settings", label: "Settings", icon: Settings$1 }
+    ];
+  }, [navRefreshKey]);
   const isActive = (subpage, tab) => {
     if (tab) {
       return currentSubpage === subpage && currentTab === tab;
@@ -458,9 +523,9 @@ const Layout = ({ children }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
                 "v",
-                ((_d = window.yatraAdmin) == null ? void 0 : _d.version) || "1.0.0"
+                ((_a = window.yatraAdmin) == null ? void 0 : _a.version) || "1.0.0"
               ] }),
-              ((_e = window.yatraAdmin) == null ? void 0 : _e.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium", children: [
+              ((_b = window.yatraAdmin) == null ? void 0 : _b.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium", children: [
                 "Pro v",
                 window.yatraAdmin.proVersion
               ] })
@@ -470,7 +535,7 @@ const Layout = ({ children }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "a",
           {
-            href: ((_f = window.yatraAdmin) == null ? void 0 : _f.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+            href: ((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
             className: "inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -530,7 +595,7 @@ const Layout = ({ children }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         "a",
         {
-          href: ((_g = window.yatraAdmin) == null ? void 0 : _g.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+          href: ((_d = window.yatraAdmin) == null ? void 0 : _d.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
           className: "flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -689,7 +754,7 @@ const Layout = ({ children }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-5 h-5 text-white" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_h = window.yatraAdmin) == null ? void 0 : _h.currentUser) || "Admin" }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_e = window.yatraAdmin) == null ? void 0 : _e.currentUser) || "Admin" }) })
           ] })
         ] })
       ] }) }),
@@ -26519,11 +26584,10 @@ const normalizeAmenityItems = (items) => {
   return [];
 };
 const TripForm = () => {
-  var _a, _b, _c, _d;
+  var _a, _b, _c;
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
-  const showDownloadsUI = !!((_a = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a.showDownloadsUI);
   const getInitialSection = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sectionFromUrl = urlParams.get("section");
@@ -27147,7 +27211,7 @@ const TripForm = () => {
     enabled: isEditMode && can("yatra_view_trips")
   });
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d2, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     if (tripData && isEditMode) {
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
@@ -27306,7 +27370,7 @@ const TripForm = () => {
         longitude: ((_b2 = tripData.longitude) == null ? void 0 : _b2.toString()) || "",
         landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
         trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_c2 = tripData.duration_days) == null ? void 0 : _c2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
-        duration_days: ((_d2 = tripData.duration_days) == null ? void 0 : _d2.toString()) || "",
+        duration_days: ((_d = tripData.duration_days) == null ? void 0 : _d.toString()) || "",
         duration_nights: ((_e = tripData.duration_nights) == null ? void 0 : _e.toString()) || "",
         available_from: tripData.available_from || "",
         available_to: tripData.available_to || "",
@@ -27414,7 +27478,7 @@ const TripForm = () => {
       label: __("Basic Information", "Basic Information"),
       icon: FileText,
       required: true,
-      completed: !!(((_b = formData.title) == null ? void 0 : _b.trim()) && ((_c = formData.slug) == null ? void 0 : _c.trim())),
+      completed: !!(((_a = formData.title) == null ? void 0 : _a.trim()) && ((_b = formData.slug) == null ? void 0 : _b.trim())),
       hasErrors: getSectionErrors("basic").length > 0
     },
     // Step 2: Location & Geography
@@ -27472,7 +27536,7 @@ const TripForm = () => {
       completed: formData.gallery_images.length > 0 || !!formData.video_url,
       hasErrors: getSectionErrors("media").length > 0
     },
-    ...showDownloadsUI ? [
+    ...[
       {
         id: "downloads",
         label: __("Downloads", "Downloads"),
@@ -27481,7 +27545,7 @@ const TripForm = () => {
         completed: (formData.downloadable_items || []).length > 0,
         hasErrors: getSectionErrors("downloads").length > 0
       }
-    ] : [],
+    ],
     {
       id: "categorization",
       label: __("Categorization", "Categorization"),
@@ -27610,13 +27674,13 @@ const TripForm = () => {
         const selection = mediaUploader.state().get("selection");
         const newImages = [];
         selection.each((attachment) => {
-          var _a2, _b2, _c2, _d2;
+          var _a2, _b2, _c2, _d;
           const image = attachment.toJSON();
           if (image.url) {
             newImages.push({
               id: image.id || 0,
               url: image.url,
-              thumbnail_url: ((_b2 = (_a2 = image.sizes) == null ? void 0 : _a2.thumbnail) == null ? void 0 : _b2.url) || ((_d2 = (_c2 = image.sizes) == null ? void 0 : _c2.medium) == null ? void 0 : _d2.url) || image.url,
+              thumbnail_url: ((_b2 = (_a2 = image.sizes) == null ? void 0 : _a2.thumbnail) == null ? void 0 : _b2.url) || ((_d = (_c2 = image.sizes) == null ? void 0 : _c2.medium) == null ? void 0 : _d.url) || image.url,
               alt_text: image.alt || "",
               caption: image.caption || ""
             });
@@ -28060,7 +28124,7 @@ const TripForm = () => {
         meta_description: data.meta_description || "",
         meta_keywords: data.meta_keywords || ""
       };
-      if (showDownloadsUI) {
+      {
         payload.downloadable_items = (data.downloadable_items || []).map((item, idx) => ({
           id: item.id ?? null,
           title: (item.title || "").trim(),
@@ -29335,9 +29399,6 @@ const TripForm = () => {
           ] })
         ] });
       case "downloads":
-        if (!showDownloadsUI) {
-          return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "info", children: __("Downloads module is not enabled.", "Downloads module is not enabled.") }) });
-        }
         return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap items-center gap-2 mb-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Download, { className: "w-5 h-5 text-gray-500" }),
@@ -30354,7 +30415,7 @@ const TripForm = () => {
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "itinerary", children: __("Itinerary", "Itinerary") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "included_excluded", children: __("Included/Excluded", "Included/Excluded") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "gallery", children: __("Gallery", "Gallery") }),
-                            showDownloadsUI && /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "downloads", children: __("Downloads", "Downloads") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "downloads", children: __("Downloads", "Downloads") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "faqs", children: __("FAQs", "FAQs") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "reviews", children: __("Reviews", "Reviews") }),
                             /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "custom", children: __("Custom Content", "Custom Content") })
@@ -30666,7 +30727,7 @@ const TripForm = () => {
             style: { width: `${completionPercentage}%` }
           }
         ) }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center", children: ((_d = allSections[currentStepIndex]) == null ? void 0 : _d.label) || __("Overview", "Overview") })
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center", children: ((_c = allSections[currentStepIndex]) == null ? void 0 : _c.label) || __("Overview", "Overview") })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(
         Button,
@@ -43664,6 +43725,29 @@ const getInitialFormSubTab = () => {
 const BookingFormBuilder = ({ formData, setFormData }) => {
   var _a, _b, _c;
   const [activeFormTab, setActiveFormTab] = reactExports.useState(getInitialFormSubTab);
+  const { data: modulesData } = useQuery({
+    queryKey: ["modules"],
+    queryFn: async () => {
+      var _a2, _b2;
+      const response = await fetch(`${((_a2 = window.yatraAdmin) == null ? void 0 : _a2.apiUrl) || "/wp-json/yatra/v1"}/modules`, {
+        headers: {
+          "X-WP-Nonce": ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.nonce) || ""
+        }
+      });
+      if (!response.ok) throw new Error("Failed to fetch modules");
+      return response.json();
+    },
+    staleTime: 3e4
+    // Cache for 30 seconds
+  });
+  const isDynamicFormFieldEnabled = React.useMemo(() => {
+    var _a2;
+    if (modulesData == null ? void 0 : modulesData.data) {
+      const module = modulesData.data.find((m) => m.slug === "dynamic_form_field");
+      return (module == null ? void 0 : module.enabled) === true && (module == null ? void 0 : module.is_available) === true;
+    }
+    return ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.dynamicFormFieldEnabled) === true;
+  }, [modulesData]);
   const handleSubTabChange = (tab) => {
     setActiveFormTab(tab);
     if (typeof window !== "undefined") {
@@ -43853,6 +43937,56 @@ const BookingFormBuilder = ({ formData, setFormData }) => {
     setShowAddField(false);
   };
   const currentConfig = getCurrentFormConfig();
+  if (!isDynamicFormFieldEnabled) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { className: "border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/20", children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-amber-100 dark:bg-amber-800/30 rounded-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { className: "w-6 h-6 text-amber-600 dark:text-amber-400" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2", children: __("Dynamic Form Field Module Required", "Dynamic Form Field Module Required") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-amber-700 dark:text-amber-300 mb-4", children: __("Customize your booking forms with drag-and-drop field builder. Add custom fields for traveler information, emergency contacts, and more. This feature requires the Dynamic Form Field module.", "Customize your booking forms with drag-and-drop field builder.") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: "default",
+                size: "sm",
+                onClick: () => window.location.href = "#/modules",
+                className: "bg-amber-600 hover:bg-amber-700 text-white",
+                children: __("Enable Module", "Enable Module")
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "a",
+              {
+                href: "https://wpyatra.com/pricing?module=dynamic-form-field",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                className: "text-sm text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1",
+                children: [
+                  __("Learn More", "Learn More"),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" })
+                ]
+              }
+            )
+          ] })
+        ] })
+      ] }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "opacity-60 pointer-events-none", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-base flex items-center gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { className: "w-4 h-4 text-gray-400" }),
+          __("Form Builder Preview", "Form Builder Preview")
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 bg-gray-100 dark:bg-gray-800 rounded animate-pulse" })
+        ] }) })
+      ] })
+    ] });
+  }
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex gap-4", "aria-label": "Form Types", children: formTabs.map((tab) => /* @__PURE__ */ jsxRuntimeExports.jsx(
       "button",
@@ -44925,7 +45059,7 @@ const Settings = () => {
   ];
   const SectionDivider = ({ title: title2 }) => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4 mt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-4", children: title2 }) });
   const renderSettingsContent = () => {
-    var _a;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m;
     if (!formData) return null;
     switch (viewingSection) {
       case "general":
@@ -45393,7 +45527,7 @@ const Settings = () => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
             gatewayDefinitions && gatewayOrder.filter((id) => gatewayDefinitions[id]).map((gatewayId, index) => {
-              var _a2, _b;
+              var _a2, _b2;
               const gateway = gatewayDefinitions[gatewayId];
               const config2 = ((_a2 = formData.gateway_configs) == null ? void 0 : _a2[gatewayId]) || gateway.config || { enabled: false };
               const isExpanded = expandedGateways[gatewayId];
@@ -45474,7 +45608,7 @@ const Settings = () => {
                           size: "sm",
                           onClick: () => toggleGatewayExpanded(gatewayId),
                           className: "h-8",
-                          disabled: !((_b = gateway.fields) == null ? void 0 : _b.length),
+                          disabled: !((_b2 = gateway.fields) == null ? void 0 : _b2.length),
                           children: isExpanded ? /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronRight, { className: "w-4 h-4" })
                         }
                       )
@@ -46798,64 +46932,540 @@ const Settings = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Google Calendar Integration", "Google Calendar Integration") }),
             /* @__PURE__ */ jsxRuntimeExports.jsx(GoogleCalendarIntegrationSection, { formData, setFormData })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Analytics & Tracking", "Analytics & Tracking") }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "google_analytics",
-                label: __("Google Analytics ID", "Google Analytics ID"),
-                description: __("Your Google Analytics tracking ID (e.g., UA-XXXXXXXXX-X or G-XXXXXXXXXX)", "Your Google Analytics tracking ID (e.g., UA-XXXXXXXXX-X or G-XXXXXXXXXX)"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Mailchimp Integration", "Mailchimp Integration") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "flex flex-row items-center justify-between pb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Mail, { className: "w-5 h-5 text-yellow-500" }),
+                __("Mailchimp", "Mailchimp"),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium", children: "PRO" })
+              ] }),
+              ((_a = window.yatraAdmin) == null ? void 0 : _a.mailchimpConnected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-green-600 dark:text-green-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+                __("Connected", "Connected")
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+                __("Not Connected", "Not Connected")
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-300", children: __("Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.", "Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.") }),
+              ((_b = window.yatraAdmin) == null ? void 0 : _b.isProActive) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
                   {
-                    id: "google_analytics",
-                    value: formData.google_analytics,
-                    name: "google_analytics",
-                    onChange: handleFieldChange,
-                    placeholder: "UA-XXXXXXXXX-X"
+                    id: "mailchimp_api_key",
+                    label: __("API Key", "API Key"),
+                    description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      __("Get your API key from", "Get your API key from"),
+                      " ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://admin.mailchimp.com/account/api/", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Mailchimp Account Settings", "Mailchimp Account Settings") })
+                    ] }),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "mailchimp_api_key",
+                        type: "password",
+                        value: formData.mailchimp_api_key || "",
+                        name: "mailchimp_api_key",
+                        onChange: handleFieldChange,
+                        placeholder: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"
+                      }
+                    )
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
+                  {
+                    id: "mailchimp_list_id",
+                    label: __("Audience/List ID", "Audience/List ID"),
+                    description: __("The ID of the Mailchimp audience to sync subscribers to.", "The ID of the Mailchimp audience to sync subscribers to."),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "mailchimp_list_id",
+                        value: formData.mailchimp_list_id || "",
+                        name: "mailchimp_list_id",
+                        onChange: handleFieldChange,
+                        placeholder: "abc123def4"
+                      }
+                    )
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "checkbox",
+                      id: "mailchimp_sync_on_booking",
+                      checked: formData.mailchimp_sync_on_booking ?? true,
+                      name: "mailchimp_sync_on_booking",
+                      onChange: handleFieldChange,
+                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "mailchimp_sync_on_booking", className: "font-medium cursor-pointer", children: __("Sync on Booking", "Sync on Booking") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __("Automatically add customers to Mailchimp when they make a booking", "Automatically add customers to Mailchimp when they make a booking") })
+                  ] })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(
+                    "input",
+                    {
+                      type: "checkbox",
+                      id: "mailchimp_double_optin",
+                      checked: formData.mailchimp_double_optin ?? false,
+                      name: "mailchimp_double_optin",
+                      onChange: handleFieldChange,
+                      className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    }
+                  ),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "mailchimp_double_optin", className: "font-medium cursor-pointer", children: __("Double Opt-in", "Double Opt-in") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __("Require email confirmation before adding to list (recommended for GDPR)", "Require email confirmation before adding to list (recommended for GDPR)") })
+                  ] })
+                ] }),
+                formData.mailchimp_api_key && formData.mailchimp_list_id && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-6 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(ClipboardList, { className: "w-4 h-4" }),
+                    __("Field Mapping", "Field Mapping")
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-4", children: __("Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.", "Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.") }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3 items-center", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded", children: __("First Name", "First Name") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Select,
+                        {
+                          value: ((_c = formData.mailchimp_field_mapping) == null ? void 0 : _c.FNAME) || "first_name",
+                          onChange: (e) => {
+                            const currentMapping = formData.mailchimp_field_mapping || {};
+                            setFormData((prev) => ({
+                              ...prev,
+                              mailchimp_field_mapping: { ...currentMapping, FNAME: e.target.value }
+                            }));
+                          },
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "first_name", children: __("Customer First Name", "Customer First Name") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "billing_first_name", children: __("Billing First Name", "Billing First Name") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Do not sync", "Do not sync") })
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3 items-center", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded", children: __("Last Name", "Last Name") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Select,
+                        {
+                          value: ((_d = formData.mailchimp_field_mapping) == null ? void 0 : _d.LNAME) || "last_name",
+                          onChange: (e) => {
+                            const currentMapping = formData.mailchimp_field_mapping || {};
+                            setFormData((prev) => ({
+                              ...prev,
+                              mailchimp_field_mapping: { ...currentMapping, LNAME: e.target.value }
+                            }));
+                          },
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "last_name", children: __("Customer Last Name", "Customer Last Name") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "billing_last_name", children: __("Billing Last Name", "Billing Last Name") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Do not sync", "Do not sync") })
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3 items-center", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded", children: __("Phone", "Phone") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Select,
+                        {
+                          value: ((_e = formData.mailchimp_field_mapping) == null ? void 0 : _e.PHONE) || "phone",
+                          onChange: (e) => {
+                            const currentMapping = formData.mailchimp_field_mapping || {};
+                            setFormData((prev) => ({
+                              ...prev,
+                              mailchimp_field_mapping: { ...currentMapping, PHONE: e.target.value }
+                            }));
+                          },
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "phone", children: __("Customer Phone", "Customer Phone") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "billing_phone", children: __("Billing Phone", "Billing Phone") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Do not sync", "Do not sync") })
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-2 gap-3 items-center", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded", children: __("Country", "Country") }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Select,
+                        {
+                          value: ((_f = formData.mailchimp_field_mapping) == null ? void 0 : _f.COUNTRY) || "country",
+                          onChange: (e) => {
+                            const currentMapping = formData.mailchimp_field_mapping || {};
+                            setFormData((prev) => ({
+                              ...prev,
+                              mailchimp_field_mapping: { ...currentMapping, COUNTRY: e.target.value }
+                            }));
+                          },
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "country", children: __("Customer Country", "Customer Country") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "billing_country", children: __("Billing Country", "Billing Country") }),
+                            /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("Do not sync", "Do not sync") })
+                          ]
+                        }
+                      )
+                    ] })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(
+                        "input",
+                        {
+                          type: "checkbox",
+                          id: "mailchimp_add_tags",
+                          checked: formData.mailchimp_add_tags ?? true,
+                          onChange: (e) => setFormData((prev) => ({ ...prev, mailchimp_add_tags: e.target.checked })),
+                          className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        }
+                      ),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "mailchimp_add_tags", className: "font-medium cursor-pointer", children: __("Add Trip Tags", "Add Trip Tags") }),
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-0.5", children: __("Automatically tag subscribers with the trip name they booked", "Automatically tag subscribers with the trip name they booked") })
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      FormField,
+                      {
+                        id: "mailchimp_default_tags",
+                        label: __("Default Tags", "Default Tags"),
+                        description: __('Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")', 'Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")'),
+                        children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                          Input,
+                          {
+                            id: "mailchimp_default_tags",
+                            value: formData.mailchimp_default_tags || "",
+                            onChange: (e) => setFormData((prev) => ({ ...prev, mailchimp_default_tags: e.target.value })),
+                            placeholder: "yatra, booking"
+                          }
+                        )
+                      }
+                    )
+                  ] })
+                ] })
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-800 dark:text-purple-300 mb-3", children: __("Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.", "Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: "https://wpyatra.com/pricing?module=mailchimp",
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    className: "inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all",
+                    children: [
+                      __("Upgrade to Pro", "Upgrade to Pro"),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
+                    ]
                   }
                 )
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "facebook_pixel",
-                label: __("Facebook Pixel ID", "Facebook Pixel ID"),
-                description: __("Your Facebook Pixel ID for tracking conversions", "Your Facebook Pixel ID for tracking conversions"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "facebook_pixel",
-                    value: formData.facebook_pixel,
-                    name: "facebook_pixel",
-                    onChange: handleFieldChange,
-                    placeholder: __("Enter Facebook Pixel ID", "Enter Facebook Pixel ID")
-                  }
-                )
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              FormField,
-              {
-                id: "google_maps_api",
-                label: __("Google Maps API Key", "Google Maps API Key"),
-                description: __("API key for displaying maps and location features", "API key for displaying maps and location features"),
-                children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "google_maps_api",
-                    type: "password",
-                    value: formData.google_maps_api,
-                    name: "google_maps_api",
-                    onChange: handleFieldChange,
-                    placeholder: __("Enter Google Maps API Key", "Enter Google Maps API Key")
-                  }
-                )
-              }
-            )
+              ] })
+            ] })
           ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Facebook Pixel", "Facebook Pixel") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "flex flex-row items-center justify-between pb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-blue-600", viewBox: "0 0 24 24", fill: "currentColor", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" }) }),
+                __("Facebook Pixel", "Facebook Pixel"),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium", children: "PRO" })
+              ] }),
+              ((_h = (_g = window.yatraAdmin) == null ? void 0 : _g.facebookPixel) == null ? void 0 : _h.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-green-600 dark:text-green-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+                __("Connected", "Connected")
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+                __("Not Connected", "Not Connected")
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-300", children: __("Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.", "Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.") }),
+              ((_i = window.yatraAdmin) == null ? void 0 : _i.isProActive) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
+                  {
+                    id: "facebook_pixel_id",
+                    label: __("Pixel ID", "Pixel ID"),
+                    description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      __("Get your Pixel ID from", "Get your Pixel ID from"),
+                      " ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://business.facebook.com/events_manager", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Facebook Events Manager", "Facebook Events Manager") })
+                    ] }),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "facebook_pixel_id",
+                        value: formData.facebook_pixel_id || "",
+                        name: "facebook_pixel_id",
+                        onChange: handleFieldChange,
+                        placeholder: "123456789012345"
+                      }
+                    )
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "fb_track_view_content",
+                        checked: formData.fb_track_view_content ?? true,
+                        name: "fb_track_view_content",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "fb_track_view_content", className: "text-sm cursor-pointer", children: __("Track ViewContent", "Track ViewContent") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "fb_track_initiate_checkout",
+                        checked: formData.fb_track_initiate_checkout ?? true,
+                        name: "fb_track_initiate_checkout",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "fb_track_initiate_checkout", className: "text-sm cursor-pointer", children: __("Track InitiateCheckout", "Track InitiateCheckout") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "fb_track_purchase",
+                        checked: formData.fb_track_purchase ?? true,
+                        name: "fb_track_purchase",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "fb_track_purchase", className: "text-sm cursor-pointer", children: __("Track Purchase", "Track Purchase") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "fb_use_conversions_api",
+                        checked: formData.fb_use_conversions_api ?? false,
+                        name: "fb_use_conversions_api",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "fb_use_conversions_api", className: "text-sm cursor-pointer", children: __("Use Conversions API", "Use Conversions API") })
+                  ] })
+                ] }),
+                formData.fb_use_conversions_api && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
+                  {
+                    id: "facebook_access_token",
+                    label: __("Access Token", "Access Token"),
+                    description: __("Required for server-side Conversions API tracking.", "Required for server-side Conversions API tracking."),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "facebook_access_token",
+                        type: "password",
+                        value: formData.facebook_access_token || "",
+                        name: "facebook_access_token",
+                        onChange: handleFieldChange,
+                        placeholder: "EAAxxxxxxx..."
+                      }
+                    )
+                  }
+                )
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-800 dark:text-purple-300 mb-3", children: __("Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.", "Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: "https://wpyatra.com/pricing?module=facebook-pixel",
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    className: "inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all",
+                    children: [
+                      __("Upgrade to Pro", "Upgrade to Pro"),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
+                    ]
+                  }
+                )
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Google Analytics 4 Enhanced", "Google Analytics 4 Enhanced") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { className: "flex flex-row items-center justify-between pb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-5 h-5 text-orange-500", viewBox: "0 0 24 24", fill: "currentColor", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" }) }),
+                __("Google Analytics 4 Enhanced", "Google Analytics 4 Enhanced"),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium", children: "PRO" })
+              ] }),
+              ((_k = (_j = window.yatraAdmin) == null ? void 0 : _j.googleAnalytics) == null ? void 0 : _k.connected) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-green-600 dark:text-green-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4" }),
+                __("Connected", "Connected")
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+                __("Not Connected", "Not Connected")
+              ] })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-300", children: __("Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.", "Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.") }),
+              ((_l = window.yatraAdmin) == null ? void 0 : _l.isProActive) ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
+                  {
+                    id: "ga4_measurement_id",
+                    label: __("Measurement ID", "Measurement ID"),
+                    description: /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                      __("Get your Measurement ID from", "Get your Measurement ID from"),
+                      " ",
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("a", { href: "https://analytics.google.com/analytics/web/", target: "_blank", rel: "noopener noreferrer", className: "text-blue-600 hover:text-blue-500 dark:text-blue-400 underline", children: __("Google Analytics", "Google Analytics") }),
+                      " ",
+                      __("(Admin > Data Streams)", "(Admin > Data Streams)")
+                    ] }),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "ga4_measurement_id",
+                        value: formData.ga4_measurement_id || "",
+                        name: "ga4_measurement_id",
+                        onChange: handleFieldChange,
+                        placeholder: "G-XXXXXXXXXX"
+                      }
+                    )
+                  }
+                ),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-3", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "ga4_track_view_item",
+                        checked: formData.ga4_track_view_item ?? true,
+                        name: "ga4_track_view_item",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "ga4_track_view_item", className: "text-sm cursor-pointer", children: __("Track view_item", "Track view_item") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "ga4_track_begin_checkout",
+                        checked: formData.ga4_track_begin_checkout ?? true,
+                        name: "ga4_track_begin_checkout",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "ga4_track_begin_checkout", className: "text-sm cursor-pointer", children: __("Track begin_checkout", "Track begin_checkout") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "ga4_track_purchase",
+                        checked: formData.ga4_track_purchase ?? true,
+                        name: "ga4_track_purchase",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "ga4_track_purchase", className: "text-sm cursor-pointer", children: __("Track purchase", "Track purchase") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "input",
+                      {
+                        type: "checkbox",
+                        id: "ga4_use_measurement_protocol",
+                        checked: formData.ga4_use_measurement_protocol ?? false,
+                        name: "ga4_use_measurement_protocol",
+                        onChange: handleFieldChange,
+                        className: "w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "ga4_use_measurement_protocol", className: "text-sm cursor-pointer", children: __("Use Measurement Protocol", "Use Measurement Protocol") })
+                  ] })
+                ] }),
+                formData.ga4_use_measurement_protocol && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  FormField,
+                  {
+                    id: "ga4_api_secret",
+                    label: __("API Secret", "API Secret"),
+                    description: __("Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.", "Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets."),
+                    children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "ga4_api_secret",
+                        type: "password",
+                        value: formData.ga4_api_secret || "",
+                        name: "ga4_api_secret",
+                        onChange: handleFieldChange,
+                        placeholder: "xxxxxxxxxxxxxxxx"
+                      }
+                    )
+                  }
+                )
+              ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-800 dark:text-purple-300 mb-3", children: __("Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.", "Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.") }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "a",
+                  {
+                    href: "https://wpyatra.com/pricing?module=google-analytics",
+                    target: "_blank",
+                    rel: "noopener noreferrer",
+                    className: "inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all",
+                    children: [
+                      __("Upgrade to Pro", "Upgrade to Pro"),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
+                    ]
+                  }
+                )
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("Google Maps", "Google Maps") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+            FormField,
+            {
+              id: "google_maps_api",
+              label: __("Google Maps API Key", "Google Maps API Key"),
+              description: __("API key for displaying maps and location features", "API key for displaying maps and location features"),
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Input,
+                {
+                  id: "google_maps_api",
+                  type: "password",
+                  value: formData.google_maps_api,
+                  name: "google_maps_api",
+                  onChange: handleFieldChange,
+                  placeholder: __("Enter Google Maps API Key", "Enter Google Maps API Key")
+                }
+              )
+            }
+          ) }),
           /* @__PURE__ */ jsxRuntimeExports.jsx(SectionDivider, { title: __("reCAPTCHA Settings", "reCAPTCHA Settings") }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md", children: [
@@ -47128,7 +47738,7 @@ const Settings = () => {
                     formData.booking_page_id > 0 && pagesData && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
                       __("Booking URL:", "Booking URL:"),
                       " ",
-                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 dark:bg-gray-800 px-1 rounded", children: ((_a = pagesData.find((p) => p.id === formData.booking_page_id)) == null ? void 0 : _a.url) || "" })
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "bg-gray-100 dark:bg-gray-800 px-1 rounded", children: ((_m = pagesData.find((p) => p.id === formData.booking_page_id)) == null ? void 0 : _m.url) || "" })
                     ] })
                   ]
                 }
@@ -52616,8 +53226,124 @@ const ItineraryForm = () => {
     )
   ] });
 };
+const PremiumUpgradeDialog = ({
+  open,
+  onClose,
+  moduleName,
+  purchaseUrl,
+  videoUrl,
+  moduleDescription
+}) => {
+  if (!open) return null;
+  const dialogContent = /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 m-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center px-4 pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full max-w-5xl", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -inset-0.5 bg-gradient-to-r from-orange-500/20 via-orange-400/20 to-orange-500/20 rounded-2xl blur-2xl" }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "relative w-full shadow-2xl border border-orange-300/80 dark:border-orange-700/50 bg-white dark:bg-slate-900 overflow-hidden max-h-[90vh] flex flex-col", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "relative pb-4 pt-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0 bg-gradient-to-b from-orange-50/30 to-transparent dark:from-orange-950/20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-orange-400 rounded-lg blur-md opacity-40" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative p-2.5 rounded-lg bg-gradient-to-br from-orange-500 to-orange-400 shadow-md", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-5 h-5 text-white" }) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white", children: moduleName || __("Premium Feature", "Premium Feature") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: __("Unlock advanced capabilities with Pro", "Unlock advanced capabilities with Pro") })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "button",
+          {
+            onClick: onClose,
+            className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800",
+            "aria-label": __("Close", "Close"),
+            children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-5 h-5" })
+          }
+        )
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "relative flex-1 overflow-hidden pt-6 px-6 pb-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6 h-full", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col overflow-y-auto pr-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4 text-orange-500" }),
+              __("What This Module Does", "What This Module Does")
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-5", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-4", children: moduleDescription || (moduleName ? __('"{module}" is a premium feature that unlocks advanced capabilities for your tour and activity business. This module provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.', '"{module}" is a premium feature that unlocks advanced capabilities for your tour and activity business. This module provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.').replace("{module}", moduleName) : __("This premium module unlocks advanced capabilities for your tour and activity business. It provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.", "This premium module unlocks advanced capabilities for your tour and activity business. It provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.")) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2.5", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Advanced automation and workflow optimization", "Advanced automation and workflow optimization") })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Priority support and dedicated onboarding", "Priority support and dedicated onboarding") })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Exclusive integrations with industry partners", "Exclusive integrations with industry partners") })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Regular updates and new feature releases", "Regular updates and new feature releases") })
+                ] })
+              ] })
+            ] })
+          ] }) }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-4 h-4 text-orange-500" }),
+              __("Video Tutorial", "Video Tutorial")
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg bg-black flex-shrink-0", children: videoUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative w-full overflow-hidden aspect-video", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "iframe",
+              {
+                src: videoUrl,
+                title: `${moduleName || "Premium module"} tutorial`,
+                allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
+                allowFullScreen: true,
+                className: "w-full h-full"
+              }
+            ) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center aspect-video text-center space-y-3 text-gray-400 dark:text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 rounded-full bg-orange-100 dark:bg-orange-900/40", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-8 h-8 text-orange-500 dark:text-orange-400" }) }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium", children: __("Video walkthrough coming soon.", "Video walkthrough coming soon.") })
+            ] }) })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 mt-6 border-t border-gray-200 dark:border-gray-800 flex-shrink-0", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: onClose,
+              className: "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium",
+              children: __("Maybe Later", "Maybe Later")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              className: "bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group",
+              onClick: () => {
+                if (purchaseUrl) {
+                  window.open(purchaseUrl, "_blank");
+                } else {
+                  window.open("https://wpyatra.com/pricing", "_blank");
+                }
+              },
+              children: [
+                __("Upgrade to Pro", "Upgrade to Pro"),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "w-4 h-4 group-hover:translate-x-1 transition-transform" })
+              ]
+            }
+          )
+        ] })
+      ] })
+    ] })
+  ] }) });
+  return reactDomExports.createPortal(dialogContent, document.body);
+};
 const Discounts = () => {
-  var _a;
+  var _a, _b;
   const [searchTerm, setSearchTerm] = reactExports.useState("");
   const [statusFilter, setStatusFilter] = reactExports.useState("all");
   const [typeFilter, setTypeFilter] = reactExports.useState("all");
@@ -52630,6 +53356,7 @@ const Discounts = () => {
   const [showColumnsDropdown, setShowColumnsDropdown] = reactExports.useState(false);
   const [isBulkPending, setIsBulkPending] = reactExports.useState(false);
   const [showDiscountTypeModal, setShowDiscountTypeModal] = reactExports.useState(false);
+  const [premiumDialog, setPremiumDialog] = reactExports.useState({ open: false, type: null });
   const [visibleColumns, setVisibleColumns] = reactExports.useState(() => {
     if (typeof window === "undefined") {
       return {
@@ -52760,9 +53487,28 @@ const Discounts = () => {
   const handleCreateDiscount = () => {
     setShowDiscountTypeModal(true);
   };
+  const isAdvancedDiscountEnabled = !!((_b = window.yatraAdmin) == null ? void 0 : _b.advancedDiscountEnabled);
   const handleSelectDiscountType = (type) => {
+    if ((type === "group" || type === "both") && !isAdvancedDiscountEnabled) {
+      setPremiumDialog({ open: true, type });
+      return;
+    }
     setShowDiscountTypeModal(false);
     window.location.href = `${baseAdminUrl}?page=yatra&subpage=discounts&action=create&discount_mode=${type}`;
+  };
+  const getPremiumDialogContent = () => {
+    if (premiumDialog.type === "group") {
+      return {
+        name: __("Group Discount", "Group Discount"),
+        description: __("Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.", "Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes."),
+        purchaseUrl: "https://wpyatra.com/pricing?module=advanced-discount"
+      };
+    }
+    return {
+      name: __("Promo + Group Discount", "Promo + Group Discount"),
+      description: __("Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.", "Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings."),
+      purchaseUrl: "https://wpyatra.com/pricing?module=advanced-discount"
+    };
   };
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -53191,8 +53937,19 @@ const Discounts = () => {
             "button",
             {
               onClick: () => handleSelectDiscountType("group"),
-              className: "flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left",
+              className: "relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left",
               children: [
+                !isAdvancedDiscountEnabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "div",
+                  {
+                    className: "absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md",
+                    style: { background: "linear-gradient(to right, #f59e0b, #f97316)", color: "#ffffff", border: "1px solid #fbbf24" },
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { className: "w-3 h-3", style: { color: "#ffffff" } }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#ffffff" }, children: __("Pro", "Pro") })
+                    ]
+                  }
+                ),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-7 h-7 text-green-600 dark:text-green-400" }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "font-semibold text-gray-900 dark:text-white mb-2", children: __("Group Discount", "Group Discount") }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 text-center", children: __("Auto-applies when booking multiple travelers. No code needed.", "Auto-applies when booking multiple travelers. No code needed.") })
@@ -53203,8 +53960,19 @@ const Discounts = () => {
             "button",
             {
               onClick: () => handleSelectDiscountType("both"),
-              className: "flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left",
+              className: "relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left",
               children: [
+                !isAdvancedDiscountEnabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "div",
+                  {
+                    className: "absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md",
+                    style: { background: "linear-gradient(to right, #f59e0b, #f97316)", color: "#ffffff", border: "1px solid #fbbf24" },
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx(Lock, { className: "w-3 h-3", style: { color: "#ffffff" } }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { style: { color: "#ffffff" }, children: __("Pro", "Pro") })
+                    ]
+                  }
+                ),
                 /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex -space-x-1", children: [
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Tag, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx(Users, { className: "w-5 h-5 text-purple-600 dark:text-purple-400" })
@@ -53237,6 +54005,16 @@ const Discounts = () => {
         cancelText: __("Cancel", "Cancel"),
         variant: "danger",
         isLoading: deleteMutation.isPending
+      }
+    ),
+    /* @__PURE__ */ jsxRuntimeExports.jsx(
+      PremiumUpgradeDialog,
+      {
+        open: premiumDialog.open,
+        onClose: () => setPremiumDialog({ open: false, type: null }),
+        moduleName: getPremiumDialogContent().name,
+        moduleDescription: getPremiumDialogContent().description,
+        purchaseUrl: getPremiumDialogContent().purchaseUrl
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -68760,122 +69538,6 @@ const EnquiryForm = () => {
     ] }) })
   ] });
 };
-const PremiumUpgradeDialog = ({
-  open,
-  onClose,
-  moduleName,
-  purchaseUrl,
-  videoUrl,
-  moduleDescription
-}) => {
-  if (!open) return null;
-  const dialogContent = /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 m-0 bg-black/60 backdrop-blur-sm z-[9999] flex items-center justify-center px-4 pb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative w-full max-w-5xl", children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute -inset-0.5 bg-gradient-to-r from-orange-500/20 via-orange-400/20 to-orange-500/20 rounded-2xl blur-2xl" }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "relative w-full shadow-2xl border border-orange-300/80 dark:border-orange-700/50 bg-white dark:bg-slate-900 overflow-hidden max-h-[90vh] flex flex-col", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-orange-400 to-orange-500" }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "relative pb-4 pt-6 border-b border-gray-200 dark:border-gray-800 flex-shrink-0 bg-gradient-to-b from-orange-50/30 to-transparent dark:from-orange-950/20", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "absolute inset-0 bg-orange-400 rounded-lg blur-md opacity-40" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative p-2.5 rounded-lg bg-gradient-to-br from-orange-500 to-orange-400 shadow-md", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-5 h-5 text-white" }) })
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardTitle, { className: "flex items-center gap-2 text-2xl font-bold text-gray-900 dark:text-white", children: moduleName || __("Premium Feature", "Premium Feature") }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: __("Unlock advanced capabilities with Pro", "Unlock advanced capabilities with Pro") })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(
-          "button",
-          {
-            onClick: onClose,
-            className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800",
-            "aria-label": __("Close", "Close"),
-            children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-5 h-5" })
-          }
-        )
-      ] }) }),
-      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "relative flex-1 overflow-hidden pt-6 px-6 pb-6", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 lg:grid-cols-2 gap-6 h-full", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-col overflow-y-auto pr-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Zap, { className: "w-4 h-4 text-orange-500" }),
-              __("What This Module Does", "What This Module Does")
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-5", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-4", children: moduleDescription || (moduleName ? __('"{module}" is a premium feature that unlocks advanced capabilities for your tour and activity business. This module provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.', '"{module}" is a premium feature that unlocks advanced capabilities for your tour and activity business. This module provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.').replace("{module}", moduleName) : __("This premium module unlocks advanced capabilities for your tour and activity business. It provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.", "This premium module unlocks advanced capabilities for your tour and activity business. It provides powerful tools and integrations designed to streamline your operations, enhance customer experience, and drive revenue growth.")) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2.5", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Advanced automation and workflow optimization", "Advanced automation and workflow optimization") })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Priority support and dedicated onboarding", "Priority support and dedicated onboarding") })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Exclusive integrations with industry partners", "Exclusive integrations with industry partners") })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2.5", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle2, { className: "w-4 h-4 text-orange-500 dark:text-orange-400 mt-0.5 flex-shrink-0" }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs leading-relaxed text-gray-600 dark:text-gray-400", children: __("Regular updates and new feature releases", "Regular updates and new feature releases") })
-                ] })
-              ] })
-            ] })
-          ] }) }) }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col space-y-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Sparkles, { className: "w-4 h-4 text-orange-500" }),
-              __("Video Tutorial", "Video Tutorial")
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-lg bg-black flex-shrink-0", children: videoUrl ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "relative w-full overflow-hidden aspect-video", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "iframe",
-              {
-                src: videoUrl,
-                title: `${moduleName || "Premium module"} tutorial`,
-                allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture",
-                allowFullScreen: true,
-                className: "w-full h-full"
-              }
-            ) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center justify-center aspect-video text-center space-y-3 text-gray-400 dark:text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 rounded-full bg-orange-100 dark:bg-orange-900/40", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-8 h-8 text-orange-500 dark:text-orange-400" }) }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium", children: __("Video walkthrough coming soon.", "Video walkthrough coming soon.") })
-            ] }) })
-          ] })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col sm:flex-row gap-3 sm:justify-end pt-6 mt-6 border-t border-gray-200 dark:border-gray-800 flex-shrink-0", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(
-            Button,
-            {
-              variant: "outline",
-              onClick: onClose,
-              className: "border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 font-medium",
-              children: __("Maybe Later", "Maybe Later")
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              className: "bg-gradient-to-r from-orange-500 to-orange-400 hover:from-orange-600 hover:to-orange-500 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 group",
-              onClick: () => {
-                if (purchaseUrl) {
-                  window.open(purchaseUrl, "_blank");
-                } else {
-                  window.open("https://wpyatra.com/pricing", "_blank");
-                }
-              },
-              children: [
-                __("Upgrade to Pro", "Upgrade to Pro"),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowRight, { className: "w-4 h-4 group-hover:translate-x-1 transition-transform" })
-              ]
-            }
-          )
-        ] })
-      ] })
-    ] })
-  ] }) });
-  return reactDomExports.createPortal(dialogContent, document.body);
-};
 const Modules = () => {
   var _a, _b, _c, _d;
   const { can } = usePermissions();
@@ -68933,24 +69595,6 @@ const Modules = () => {
     });
     return map2;
   }, [modules]);
-  const groupedModules = reactExports.useMemo(() => {
-    const grouped = filteredModules.reduce((acc, module) => {
-      const category = module.category || __("General", "General");
-      if (!acc[category]) {
-        acc[category] = [];
-      }
-      acc[category].push(module);
-      return acc;
-    }, {});
-    Object.keys(grouped).forEach((category) => {
-      grouped[category].sort((a2, b) => {
-        if (a2.is_premium && !b.is_premium) return -1;
-        if (!a2.is_premium && b.is_premium) return 1;
-        return a2.name.localeCompare(b.name);
-      });
-    });
-    return grouped;
-  }, [filteredModules]);
   const [premiumDialog, setPremiumDialog] = reactExports.useState({ open: false });
   const handleToggle = (module) => {
     if (module.is_core || !canManageModules) return;
@@ -69171,96 +69815,112 @@ const Modules = () => {
     ] }) }) }),
     error && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-6 text-red-600 dark:text-red-400", children: __("Failed to load modules", "Failed to load modules") }) }),
     !isLoading && !error && modules.length === 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "p-6 text-gray-500 dark:text-gray-400", children: __("No modules available yet.", "No modules available yet.") }) }),
-    !isLoading && !error && Object.keys(groupedModules).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: Object.entries(groupedModules).map(([category, categoryModules]) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-2", children: category }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-3 md:grid-cols-3", children: categoryModules.map((module) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Card,
-        {
-          className: `border ${// Only show premium styling if module is premium AND not available (Pro not active)
-          module.is_premium && !module.is_available ? "border-amber-300 dark:border-amber-500/60 bg-amber-50/80 dark:bg-amber-500/10 relative overflow-hidden" : "border-gray-200 dark:border-gray-700"}`,
-          ...module.is_premium && !module.is_available && canManageModules && !module.enabled ? {
-            role: "button",
-            tabIndex: 0,
-            onClick: () => setPremiumDialog({ open: true, module }),
-            onKeyDown: (event) => {
-              if (event.key === "Enter" || event.key === " ") {
-                event.preventDefault();
-                setPremiumDialog({ open: true, module });
-              }
+    !isLoading && !error && filteredModules.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid gap-3 md:grid-cols-3", children: filteredModules.map((module) => /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Card,
+      {
+        className: `border ${// Only show premium styling if module is premium AND not available (Pro not active)
+        module.is_premium && !module.is_available ? "border-amber-300 dark:border-amber-500/60 bg-amber-50/80 dark:bg-amber-500/10 relative overflow-hidden" : "border-gray-200 dark:border-gray-700"}`,
+        ...module.is_premium && !module.is_available && canManageModules && !module.enabled ? {
+          role: "button",
+          tabIndex: 0,
+          onClick: () => setPremiumDialog({ open: true, module }),
+          onKeyDown: (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setPremiumDialog({ open: true, module });
             }
-          } : {},
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 flex-wrap", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 flex-1", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(
-                    "input",
-                    {
-                      id: `module-select-${module.slug}`,
-                      type: "checkbox",
-                      className: "mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer",
-                      checked: selected.has(module.slug),
-                      onChange: () => handleSelect(module.slug)
-                    }
-                  ),
-                  module.enabled && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[11px] font-semibold text-green-700 uppercase tracking-wide [writing-mode:vertical-rl] [text-orientation:mixed] transform rotate-180 bg-green-100 dark:bg-green-900/40 px-1 py-1 rounded", children: __("Enabled", "Enabled") })
-                ] }),
-                /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                  "div",
+          }
+        } : {},
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CardHeader, { className: "pb-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between gap-3 flex-wrap", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col items-center gap-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "input",
                   {
-                    className: "cursor-pointer select-none",
-                    onClick: (event) => {
-                      event.stopPropagation();
-                      handleSelect(module.slug);
-                    },
-                    role: "button",
-                    tabIndex: 0,
-                    onKeyDown: (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleSelect(module.slug);
-                      }
-                    },
-                    children: [
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2 flex-wrap", children: [
-                        module.name,
-                        module.is_core && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: __("Core", "Core") }),
-                        module.is_premium && !module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Badge,
-                          {
-                            variant: "outline",
-                            className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50",
-                            children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
-                              __("Premium", "Premium")
-                            ]
-                          }
-                        ),
-                        module.is_premium && module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
-                          Badge,
-                          {
-                            variant: "outline",
-                            className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-green-500 to-green-400 border-green-600 text-white shadow-sm dark:bg-green-600/60 dark:border-green-500 dark:text-green-50",
-                            children: [
-                              /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
-                              __("Pro", "Pro")
-                            ]
-                          }
-                        )
-                      ] }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm", children: module.description }),
-                      /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "inline-flex items-center px-2 py-0.5 mt-2 text-[11px] font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300", children: [
-                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-blue-500 mr-1" }),
-                        module.category || __("General", "General")
-                      ] })
-                    ]
+                    id: `module-select-${module.slug}`,
+                    type: "checkbox",
+                    className: "mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer",
+                    checked: selected.has(module.slug),
+                    onChange: () => handleSelect(module.slug)
                   }
-                )
+                ),
+                module.enabled && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-[11px] font-semibold text-green-700 uppercase tracking-wide [writing-mode:vertical-rl] [text-orientation:mixed] transform rotate-180 bg-green-100 dark:bg-green-900/40 px-1 py-1 rounded", children: __("Enabled", "Enabled") })
               ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center", children: renderToggle(module) })
-            ] }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "flex items-center justify-between text-xs text-gray-500 dark:text-gray-400", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "div",
+                {
+                  className: "cursor-pointer select-none",
+                  onClick: (event) => {
+                    event.stopPropagation();
+                    handleSelect(module.slug);
+                  },
+                  role: "button",
+                  tabIndex: 0,
+                  onKeyDown: (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleSelect(module.slug);
+                    }
+                  },
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "text-lg flex items-center gap-2 flex-wrap", children: [
+                      module.name,
+                      module.is_core && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", children: __("Core", "Core") }),
+                      module.is_premium && !module.is_available && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                        Badge,
+                        {
+                          variant: "outline",
+                          className: "flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50",
+                          children: [
+                            /* @__PURE__ */ jsxRuntimeExports.jsx(Crown, { className: "w-3 h-3" }),
+                            __("Premium", "Premium")
+                          ]
+                        }
+                      )
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { className: "mt-1 text-sm line-clamp-3", children: module.description }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "inline-flex items-center px-2 py-0.5 mt-1 text-[11px] font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "w-1.5 h-1.5 rounded-full bg-blue-500 mr-1" }),
+                      module.category || __("General", "General")
+                    ] })
+                  ]
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center", children: renderToggle(module) })
+          ] }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "flex items-center justify-between text-xs text-gray-500 dark:text-gray-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center gap-2", children: module.video_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "a",
+              {
+                href: module.video_url,
+                target: "_blank",
+                rel: "noreferrer",
+                className: "flex items-center gap-1 text-red-600 hover:text-red-500 dark:text-red-400 text-xs font-medium",
+                title: __("Watch video tutorial", "Watch video tutorial"),
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("polygon", { points: "5 3 19 12 5 21 5 3" }) }),
+                  __("Video", "Video")
+                ]
+              }
+            ) }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+              module.slug === "dynamic_form_field" && module.enabled && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                "a",
+                {
+                  href: `${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`,
+                  className: "flex items-center gap-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs font-medium",
+                  title: __("Settings", "Settings"),
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round", viewBox: "0 0 24 24", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("circle", { cx: "12", cy: "12", r: "3" }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
+                    ] }),
+                    __("Settings", "Settings")
+                  ]
+                }
+              ),
               module.docs_url && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 "a",
                 {
@@ -69275,11 +69935,11 @@ const Modules = () => {
                 }
               )
             ] })
-          ]
-        },
-        module.slug
-      )) })
-    ] }, category)) }),
+          ] })
+        ]
+      },
+      module.slug
+    )) }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PremiumUpgradeDialog,
       {

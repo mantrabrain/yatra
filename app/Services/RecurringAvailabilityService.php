@@ -1,4 +1,13 @@
 <?php
+/**
+ * Recurring Availability Service
+ * Handles business logic for recurring availability rules and date generation
+ * 
+ * This is a FREE feature - no Pro plugin required
+ * 
+ * @package Yatra\Services
+ * @since 3.0.0
+ */
 
 declare(strict_types=1);
 
@@ -6,10 +15,6 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\RecurringAvailabilityRepository;
 
-/**
- * Recurring Availability Service
- * Handles business logic for recurring availability rules and date generation
- */
 class RecurringAvailabilityService
 {
     private RecurringAvailabilityRepository $repository;
