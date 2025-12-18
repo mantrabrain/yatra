@@ -272,6 +272,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
     // Email Automation - only show if module is enabled
     ...((window as any).yatraAdmin?.emailAutomationEnabled ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
+    // Abandoned Booking Recovery - only show if module is enabled
+    ...((window as any).yatraAdmin?.abandonedBookingRecoveryEnabled ? [{ subpage: 'yatra-abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true }] : []),
+    // Dynamic Pricing - only show if module is enabled
+    ...((window as any).yatraAdmin?.dynamicPricingEnabled ? [{ subpage: 'yatra-dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
     { subpage: 'settings', label: 'Settings', icon: Settings },
   ], [navRefreshKey]); // Re-calculate when navRefreshKey changes

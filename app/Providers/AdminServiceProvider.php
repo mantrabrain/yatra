@@ -327,6 +327,14 @@ class AdminServiceProvider extends ServiceProvider
                 'yatra_show_google_analytics_settings_ui',
                 class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('google_analytics') : false
             ),
+            'abandonedBookingRecoveryEnabled' => apply_filters(
+                'yatra_abandoned_booking_recovery_enabled',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('abandoned_booking_recovery') : false
+            ),
+            'dynamicPricingEnabled' => apply_filters(
+                'yatra_dynamic_pricing_enabled',
+                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? ModuleManager::isModuleEnabled('dynamic_pricing') : false
+            ),
             'translations' => $translations,
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),

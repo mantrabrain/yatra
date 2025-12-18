@@ -55,6 +55,9 @@ import TripConsentForm from './pages/TripConsentForm';
 import EmailAutomation from './pages/EmailAutomation';
 import EmailTemplateForm from './pages/EmailTemplateForm';
 import EmailSequenceForm from './pages/EmailSequenceForm';
+import AbandonedRecovery from './pages/AbandonedRecovery';
+import DynamicPricing from './pages/DynamicPricing';
+import DynamicPricingRuleForm from './pages/DynamicPricingRuleForm';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -96,8 +99,10 @@ const App: React.FC = () => {
 
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action');
-  }, [urlKey]);
+    const actionParam = params.get('action');
+    console.log('App.tsx - Subpage:', subpage, 'Action:', actionParam);
+    return actionParam;
+  }, [urlKey, subpage]);
 
   // Render the appropriate page based on subpage, tab, and action parameters
   const renderPage = () => {
@@ -298,6 +303,16 @@ const App: React.FC = () => {
           return <EmailTemplateForm />;
         }
         return <EmailAutomation />;
+      case 'yatra-abandoned-recovery':
+        return <AbandonedRecovery />;
+      case 'yatra-dynamic-pricing':
+        console.log('Dynamic Pricing Route - Action:', action);
+        if (action === 'create-pricing-rule' || action === 'edit-pricing-rule') {
+          console.log('Rendering DynamicPricingRuleForm');
+          return <DynamicPricingRuleForm />;
+        }
+        console.log('Rendering DynamicPricing main page');
+        return <DynamicPricing />;
       case 'dashboard':
       default:
         return <Dashboard />;

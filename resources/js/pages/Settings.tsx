@@ -2425,6 +2425,7 @@ onChange={handleFieldChange}
 
       case 'payment':
         return (
+          <>
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
@@ -2574,6 +2575,7 @@ onChange={handleFieldChange}
             </div>
           </div>
 
+          <div>
             <SectionDivider title={__('Payment Gateways', 'Payment Gateways')} />
 
             {/* Global Test Mode Toggle */}
@@ -3018,6 +3020,7 @@ onChange={handleFieldChange}
               )}
             </div>
           </div>
+          </>
         );
 
       // Continue with other sections... (I'll add the most important ones)

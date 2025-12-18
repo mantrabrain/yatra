@@ -118,10 +118,28 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                         <div class="yatra-card-discount-badge"><?php echo esc_html($card['discount_text']); ?></div>
                         <?php endif; ?>
                         <div class="yatra-card-price-group">
-                            <?php if ($original_price > $sale_price): ?>
-                            <span class="yatra-card-price-original"><?php echo esc_html(yatra_format_price($original_price)); ?></span>
+                            <?php 
+                            // Apply dynamic pricing if module is enabled
+                            $display_original_price = $original_price;
+                            $display_sale_price = $sale_price;
+                            
+                            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                                $display_original_price = apply_filters('yatra_availability_price', $original_price, $trip_id, [
+                                    'departure_date' => $card['date'] ?? null,
+                                    'spots_remaining' => $card['spots_remaining'] ?? null,
+                                    'availability_id' => $item_id,
+                                ]);
+                                $display_sale_price = apply_filters('yatra_availability_price', $sale_price, $trip_id, [
+                                    'departure_date' => $card['date'] ?? null,
+                                    'spots_remaining' => $card['spots_remaining'] ?? null,
+                                    'availability_id' => $item_id,
+                                ]);
+                            }
+                            ?>
+                            <?php if ($display_original_price > $display_sale_price): ?>
+                            <span class="yatra-card-price-original"><?php echo esc_html(yatra_format_price($display_original_price)); ?></span>
                             <?php endif; ?>
-                            <span class="yatra-card-price-sale"><?php echo esc_html(yatra_format_price($sale_price)); ?></span>
+                            <span class="yatra-card-price-sale"><?php echo esc_html(yatra_format_price($display_sale_price)); ?></span>
                         </div>
                     </div>
                     
@@ -340,8 +358,8 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                     <div class="yatra-card-total-box">
                         <div class="yatra-card-total-label"><?php esc_html_e('Total', 'yatra'); ?></div>
                         <div class="yatra-card-total-note" data-item="<?php echo esc_attr($item_id); ?>"><?php esc_html_e('for 1 traveler', 'yatra'); ?></div>
-                        <div class="yatra-card-total-amount" data-item="<?php echo esc_attr($item_id); ?>" data-base-price="<?php echo esc_attr($sale_price); ?>">
-                            <?php echo esc_html(yatra_format_price($sale_price)); ?>
+                        <div class="yatra-card-total-amount" data-item="<?php echo esc_attr($item_id); ?>" data-base-price="<?php echo esc_attr($display_sale_price ?? $sale_price); ?>">
+                            <?php echo esc_html(yatra_format_price($display_sale_price ?? $sale_price)); ?>
                         </div>
                     </div>
                     <?php 

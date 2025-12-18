@@ -335,6 +335,16 @@ class BookingSessionController extends BaseController
         
         $pricing_type = !empty($data['pricing_type']) ? sanitize_text_field($data['pricing_type']) : ($trip->pricing_type ?? 'regular');
         $trip_price = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+        
+        // Apply dynamic pricing if module is enabled
+        if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+            $trip_price = apply_filters('yatra_booking_trip_price', $trip_price, (int) $trip->id, [
+                'departure_date' => $travel_date,
+                'spots_remaining' => $availability ? (int) ($availability->spots_remaining ?? null) : null,
+                'availability_id' => $availability_id,
+            ]);
+        }
+        
         $price_types = [];
         
         // First priority: price_types sent from frontend (from availability card)

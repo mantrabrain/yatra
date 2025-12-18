@@ -24,6 +24,7 @@ import { StatCard } from '../components/common/StatCard';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { ConditionalRender } from '../components/ui/conditional-render';
+import { Skeleton } from '../components/ui/skeleton';
 import { SimpleBarChart } from '../components/charts/SimpleBarChart';
 import BookingsOverviewChart from '../components/charts/BookingsOverviewChart';
 import BookingStatusChart from '../components/charts/BookingStatusChart';
@@ -32,6 +33,31 @@ import { PendingPayments } from '../components/dashboard/PendingPayments';
 import { RecentBookings } from '../components/dashboard/RecentBookings';
 import { apiClient } from '../lib/api';
 import { getCurrencySymbol } from '../data/currencies';
+
+// Skeleton components
+const SkeletonStatCard = () => (
+  <Card>
+    <CardContent className="pt-6">
+      <div className="flex items-center justify-between">
+        <div className="flex-1">
+          <Skeleton className="h-4 w-24 mb-2" />
+          <Skeleton className="h-8 w-32" />
+        </div>
+        <Skeleton className="w-12 h-12 rounded-full" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
+const SkeletonQuickStat = () => (
+  <div className="flex items-center gap-3">
+    <Skeleton className="w-10 h-10 rounded-full" />
+    <div className="flex-1">
+      <Skeleton className="h-3 w-16 mb-1" />
+      <Skeleton className="h-5 w-12" />
+    </div>
+  </div>
+);
 
 const Dashboard: React.FC = () => {
   const { can } = usePermissions();
@@ -164,6 +190,7 @@ const Dashboard: React.FC = () => {
   });
 
   // Derive booking status breakdown from bookingStats.by_status
+  // MUST be before any conditional returns (React Hooks rule)
   const statusData = React.useMemo(() => {
     const byStatus = (bookingStats as any)?.by_status || {};
 
@@ -302,6 +329,95 @@ const Dashboard: React.FC = () => {
     enabled: can('yatra_view_bookings'),
   });
 
+  // Show skeleton while loading - AFTER all hooks
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        {/* Skeleton for KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+          <SkeletonStatCard />
+        </div>
+
+        {/* Skeleton for Quick Stats */}
+        <Card>
+          <CardHeader>
+            <Skeleton className="h-6 w-32" />
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <SkeletonQuickStat />
+              <SkeletonQuickStat />
+              <SkeletonQuickStat />
+              <SkeletonQuickStat />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Skeleton for Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full" />
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Skeleton for Widgets */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-40" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-16 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
