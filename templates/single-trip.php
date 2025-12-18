@@ -122,6 +122,14 @@ if ($has_availability) {
     // Regular pricing
     $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
 }
+
+// Apply dynamic pricing if module is enabled
+if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)) {
+    $base_price = apply_filters('yatra_trip_display_price', $base_price, $trip->id ?? 0, [
+        'departure_date' => null, // Generic display for single trip page
+        'spots_remaining' => null,
+    ]);
+}
 ?>
 
 <!-- Flatpickr CSS -->
@@ -1512,7 +1520,18 @@ if ($has_availability) {
                                         </span>
                                         <?php endif; ?>
                                         <div class="yatra-quantity-price-wrapper">
-                                            <span class="yatra-quantity-price"><?php echo yatra_format_price($price_type->effective_price); ?></span>
+                                            <?php
+                                            // Apply dynamic pricing to price type
+                                            $display_price_type = $price_type->effective_price;
+                                            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                                                $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->id ?? 0, [
+                                                    'departure_date' => null,
+                                                    'spots_remaining' => null,
+                                                    'price_type_id' => $price_type->id ?? null,
+                                                ]);
+                                            }
+                                            ?>
+                                            <span class="yatra-quantity-price"><?php echo yatra_format_price($display_price_type); ?></span>
                                             <?php if ($is_per_group): ?>
                                             <span class="yatra-pricing-mode-label yatra-pricing-mode-group"><?php echo esc_html($pricing_label); ?></span>
                                             <?php endif; ?>
@@ -1686,7 +1705,18 @@ if ($has_availability) {
                                         </span>
                                         <?php endif; ?>
                                         <div class="yatra-quantity-price-wrapper">
-                                            <span class="yatra-quantity-price"><?php echo yatra_format_price($price_type->effective_price); ?></span>
+                                            <?php
+                                            // Apply dynamic pricing to price type
+                                            $display_price_type = $price_type->effective_price;
+                                            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                                                $display_price_type = apply_filters('yatra_trip_display_price', $display_price_type, $trip->id ?? 0, [
+                                                    'departure_date' => null,
+                                                    'spots_remaining' => null,
+                                                    'price_type_id' => $price_type->id ?? null,
+                                                ]);
+                                            }
+                                            ?>
+                                            <span class="yatra-quantity-price"><?php echo yatra_format_price($display_price_type); ?></span>
                                             <?php if ($is_per_group): ?>
                                             <span class="yatra-pricing-mode-label yatra-pricing-mode-group"><?php echo esc_html($pricing_label); ?></span>
                                             <?php endif; ?>

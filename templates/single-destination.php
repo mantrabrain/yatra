@@ -208,15 +208,33 @@ get_header();
                             
                             <div class="yatra-trip-footer">
                                 <div class="yatra-trip-price">
-                                    <?php if (!empty($trip->original_price) && !empty($trip->effective_price_min) && $trip->original_price > $trip->effective_price_min): ?>
-                                        <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($trip->original_price)); ?></div>
+                                    <?php 
+                                    // Apply dynamic pricing if module is enabled
+                                    $display_original_price = $trip->original_price ?? 0;
+                                    $display_effective_price = $trip->effective_price_min ?? $trip->original_price ?? 0;
+                                    
+                                    if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                                        if (!empty($display_original_price)) {
+                                            $display_original_price = apply_filters('yatra_trip_display_price', $display_original_price, $trip->id ?? 0, [
+                                                'departure_date' => null,
+                                                'spots_remaining' => null,
+                                            ]);
+                                        }
+                                        if (!empty($display_effective_price)) {
+                                            $display_effective_price = apply_filters('yatra_trip_display_price', $display_effective_price, $trip->id ?? 0, [
+                                                'departure_date' => null,
+                                                'spots_remaining' => null,
+                                            ]);
+                                        }
+                                    }
+                                    ?>
+                                    <?php if (!empty($display_original_price) && !empty($display_effective_price) && $display_original_price > $display_effective_price): ?>
+                                        <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($display_original_price)); ?></div>
                                     <?php endif; ?>
                                     <div class="yatra-current-price">
                                         <?php 
-                                        if (!empty($trip->effective_price_min)) {
-                                            echo esc_html(yatra_format_price($trip->effective_price_min));
-                                        } elseif (!empty($trip->original_price)) {
-                                            echo esc_html(yatra_format_price($trip->original_price));
+                                        if (!empty($display_effective_price)) {
+                                            echo esc_html(yatra_format_price($display_effective_price));
                                         } else {
                                             echo esc_html__('Price on request', 'yatra');
                                         }

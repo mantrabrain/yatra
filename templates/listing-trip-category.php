@@ -194,6 +194,14 @@ get_header();
                             : 0.0;
                         $has_starting_price = $starting_price_raw > 0;
 
+                        // Apply dynamic pricing if module is enabled
+                        if ($has_starting_price && apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                            $starting_price_raw = apply_filters('yatra_trip_display_price', $starting_price_raw, $category->id ?? 0, [
+                                'departure_date' => null, // Generic display for category
+                                'spots_remaining' => null,
+                            ]);
+                        }
+
                         // Use core helper to format price with correct currency symbol & settings.
                         $starting_price  = $has_starting_price
                             ? yatra_format_price($starting_price_raw)
