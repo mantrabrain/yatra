@@ -100,6 +100,14 @@ class AvailabilityController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/duplicate', [
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'duplicate_item'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -142,6 +150,34 @@ class AvailabilityController extends BaseController
         } catch (\Exception $e) {
             return new WP_Error(
                 'availability_fetch_error',
+                $e->getMessage(),
+                ['status' => 500]
+            );
+        }
+    }
+
+    public function duplicate_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $id = (int) $request->get_param('id');
+            $data = $request->get_json_params();
+
+            if (empty($data)) {
+                $data = $request->get_body_params();
+            }
+
+            $item = $this->service->duplicate($id, is_array($data) ? $data : []);
+
+            return new WP_REST_Response($this->prepare_item_for_response($item, $request), 201);
+        } catch (\InvalidArgumentException $e) {
+            return new WP_Error(
+                'validation_error',
+                $e->getMessage(),
+                ['status' => 400]
+            );
+        } catch (\Exception $e) {
+            return new WP_Error(
+                'availability_duplicate_error',
                 $e->getMessage(),
                 ['status' => 500]
             );

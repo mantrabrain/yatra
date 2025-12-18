@@ -158,6 +158,9 @@
             const travelDate = $('input[name="travel_date"]').val() || '';
             const couponCode = $('input[name="coupon_code"]').val() || '';
             const paymentMethod = $('input[name="payment_method"]:checked').val() || 'full';
+            const departureTime = $('input[name="departure_time"]').val() || '';
+            const pricingType = $('#yatra-summary-pricing').data('pricing-type') || '';
+            const availabilityId = $('input[name="availability_id"]').val() || window.yatraBookingData?.availabilityId || '';
             
             // Collect selected additional services
             const selectedServices = [];
@@ -178,8 +181,11 @@
                     trip_id: tripId,
                     traveler_counts: travelerCounts,
                     travel_date: travelDate,
+                    departure_time: departureTime,
+                    availability_id: availabilityId,
                     coupon_code: couponCode,
                     payment_method: paymentMethod,
+                    pricing_type: pricingType,
                     additional_services: selectedServices,
                 }),
                 success: function(response) {

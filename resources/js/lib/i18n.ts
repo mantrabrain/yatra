@@ -22,6 +22,8 @@ declare global {
       emailAutomationEnabled?: boolean;
       tripConsentEnabled?: boolean;
       additionalServicesEnabled?: boolean;
+      abandonedBookingRecoveryEnabled?: boolean;
+      dynamicPricingEnabled?: boolean;
       dynamicFormFieldEnabled?: boolean;
       advancedDiscountEnabled?: boolean;
       showGoogleCalendarSettingsUI?: boolean;

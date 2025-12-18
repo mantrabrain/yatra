@@ -1488,6 +1488,8 @@
     border-radius: 12px;
     padding: 24px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    position: relative;
 }
 
 .yatra-booking-summary h3 {
@@ -1503,6 +1505,8 @@
     margin-bottom: 24px;
     padding-bottom: 24px;
     border-bottom: 1px solid #e5e7eb;
+    position: relative;
+    overflow: visible;
 }
 
 .yatra-summary-form-group {
@@ -1542,7 +1546,17 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.yatra-booking-sidebar .yatra-traveler-selector {
+.yatra-summary-readonly-field {
+    padding: 10px 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.yatra-booking-sidebar .yatra-traveler-selector:not(.yatra-booking-participants-select) {
     display: flex;
     align-items: center;
     border: 1px solid #d1d5db;
@@ -1551,7 +1565,7 @@
     overflow: hidden;
 }
 
-.yatra-booking-sidebar .yatra-traveler-selector input {
+.yatra-booking-sidebar .yatra-traveler-selector:not(.yatra-booking-participants-select) input {
     flex: 1;
     border: none;
     text-align: center;
@@ -1562,11 +1576,11 @@
     width: 60px;
 }
 
-.yatra-booking-sidebar .yatra-traveler-selector input:focus {
+.yatra-booking-sidebar .yatra-traveler-selector:not(.yatra-booking-participants-select) input:focus {
     outline: none;
 }
 
-.yatra-booking-sidebar .yatra-quantity-btn {
+.yatra-booking-sidebar .yatra-traveler-selector:not(.yatra-booking-participants-select) .yatra-quantity-btn {
     width: 40px;
     height: 40px;
     border: none;
@@ -1730,6 +1744,7 @@
 .yatra-booking-participants-select.active {
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    z-index: 1100;
 }
 
 .yatra-booking-field-icon {

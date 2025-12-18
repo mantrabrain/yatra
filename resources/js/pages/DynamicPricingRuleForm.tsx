@@ -477,16 +477,14 @@ const DynamicPricingRuleForm: React.FC = () => {
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{selectedRuleType.description}</p>
                       </div>
                     </div>
-                    {!isEdit && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setShowRuleTypeModal(true)}
-                      >
-                        {__('Change')}
-                      </Button>
-                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowRuleTypeModal(true)}
+                    >
+                      {__('Change')}
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -582,6 +580,32 @@ const DynamicPricingRuleForm: React.FC = () => {
                     onChange={(e) => handleChange('max_days_before', parseInt(e.target.value))}
                     min="0"
                   />
+                </div>
+
+                <div>
+                  <Label htmlFor="start_date">{__('Start Date (Optional)')}</Label>
+                  <Input
+                    id="start_date"
+                    type="date"
+                    value={formData.start_date}
+                    onChange={(e) => handleChange('start_date', e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__('Leave empty for no date restriction')}
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="end_date">{__('End Date (Optional)')}</Label>
+                  <Input
+                    id="end_date"
+                    type="date"
+                    value={formData.end_date}
+                    onChange={(e) => handleChange('end_date', e.target.value)}
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {__('Leave empty for no date restriction')}
+                  </p>
                 </div>
               </>
             )}

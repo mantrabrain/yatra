@@ -234,6 +234,12 @@ const useToggleModule = () => {
         window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
           (m) => m.slug === "additional_services" || m.slug === "additional-services"
         );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
+        );
         window.dispatchEvent(new CustomEvent("yatra-modules-updated", {
           detail: {
             enabledModules,
@@ -275,6 +281,12 @@ const useBulkToggleModules = () => {
         );
         window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
           (m) => m.slug === "additional_services" || m.slug === "additional-services"
+        );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) => m.slug === "abandoned_booking_recovery" || m.slug === "abandoned-booking-recovery"
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing"
         );
         window.dispatchEvent(new CustomEvent("yatra-modules-updated", {
           detail: {
@@ -62824,6 +62836,158 @@ const RecurringRules = ({
     ] }) }) })
   ] });
 };
+const TimePicker = ({
+  value,
+  onChange,
+  placeholder = "Select time",
+  disabled = false,
+  className = "",
+  error = false
+}) => {
+  const [open, setOpen] = reactExports.useState(false);
+  const [hours, setHours] = reactExports.useState("");
+  const [minutes, setMinutes] = reactExports.useState("");
+  const [ampm, setAmpm] = reactExports.useState("AM");
+  reactExports.useEffect(() => {
+    if (value) {
+      const [h, m] = value.split(":");
+      const hour = parseInt(h);
+      if (hour === 0) {
+        setHours("12");
+        setAmpm("AM");
+      } else if (hour < 12) {
+        setHours(hour.toString());
+        setAmpm("AM");
+      } else if (hour === 12) {
+        setHours("12");
+        setAmpm("PM");
+      } else {
+        setHours((hour - 12).toString());
+        setAmpm("PM");
+      }
+      setMinutes(m || "00");
+    }
+  }, [value]);
+  const handleTimeSelect = (h, m, a2) => {
+    let hour24 = parseInt(h);
+    if (a2 === "PM" && hour24 !== 12) {
+      hour24 += 12;
+    } else if (a2 === "AM" && hour24 === 12) {
+      hour24 = 0;
+    }
+    const timeString = `${hour24.toString().padStart(2, "0")}:${m.padStart(2, "0")}`;
+    onChange == null ? void 0 : onChange(timeString);
+    setOpen(false);
+  };
+  const formatDisplayTime = () => {
+    if (!value) return "";
+    const [h, m] = value.split(":");
+    const hour = parseInt(h);
+    if (hour === 0) return `12:${m} AM`;
+    if (hour < 12) return `${hour}:${m} AM`;
+    if (hour === 12) return `12:${m} PM`;
+    return `${hour - 12}:${m} PM`;
+  };
+  const hourOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
+  const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Popover, { open, onOpenChange: setOpen, children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
+      Button,
+      {
+        type: "button",
+        variant: "outline",
+        disabled,
+        className: `w-full justify-start text-left font-normal ${error ? "border-red-500" : ""} ${!value ? "text-gray-500" : ""} ${className}`,
+        children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "mr-2 h-4 w-4" }),
+          formatDisplayTime() || /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: placeholder })
+        ]
+      }
+    ) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { className: "w-auto p-4", align: "start", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "Hour" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-1 max-h-48 overflow-y-auto", children: hourOptions.map((h) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setHours(h);
+                if (hours && minutes) {
+                  handleTimeSelect(h, minutes, ampm);
+                }
+              },
+              className: `px-3 py-2 text-sm rounded-md transition-colors ${hours === h ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+              children: h
+            },
+            h
+          )) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "Minute" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-1 max-h-48 overflow-y-auto", children: minuteOptions.map((m) => /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              type: "button",
+              onClick: () => {
+                setMinutes(m);
+                if (hours && m) {
+                  handleTimeSelect(hours, m, ampm);
+                }
+              },
+              className: `px-3 py-2 text-sm rounded-md transition-colors ${minutes === m ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+              children: m
+            },
+            m
+          )) })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "AM/PM" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                onClick: () => {
+                  setAmpm("AM");
+                  if (hours && minutes) {
+                    handleTimeSelect(hours, minutes, "AM");
+                  }
+                },
+                className: `px-4 py-2 text-sm rounded-md transition-colors ${ampm === "AM" ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+                children: "AM"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                type: "button",
+                onClick: () => {
+                  setAmpm("PM");
+                  if (hours && minutes) {
+                    handleTimeSelect(hours, minutes, "PM");
+                  }
+                },
+                className: `px-4 py-2 text-sm rounded-md transition-colors ${ampm === "PM" ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+                children: "PM"
+              }
+            )
+          ] })
+        ] })
+      ] }),
+      hours && minutes && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+        Button,
+        {
+          onClick: () => handleTimeSelect(hours, minutes, ampm),
+          className: "w-full",
+          size: "sm",
+          children: "Set Time"
+        }
+      ) })
+    ] })
+  ] });
+};
 const Availability = () => {
   const { navigate } = useNavigate();
   const queryClient2 = useQueryClient();
@@ -63138,6 +63302,30 @@ const Availability = () => {
     isOpen: false,
     date: null
   });
+  const [duplicateConfirm, setDuplicateConfirm] = reactExports.useState({
+    isOpen: false,
+    date: null
+  });
+  const [duplicateDepartureDate, setDuplicateDepartureDate] = reactExports.useState("");
+  const [duplicateDepartureTime, setDuplicateDepartureTime] = reactExports.useState("");
+  const duplicateMutation = useMutation({
+    mutationFn: async (payload) => {
+      return await apiClient.post(`/availability/${payload.id}/duplicate`, {
+        departure_date: payload.departure_date,
+        departure_time: payload.departure_time ?? null
+      });
+    },
+    onSuccess: () => {
+      queryClient2.invalidateQueries({ queryKey: ["availability"] });
+      showToast(__("Availability date duplicated successfully", "Availability date duplicated successfully"), "success");
+      setDuplicateConfirm({ isOpen: false, date: null });
+      setDuplicateDepartureDate("");
+      setDuplicateDepartureTime("");
+    },
+    onError: (error) => {
+      showToast((error == null ? void 0 : error.message) || __("Failed to duplicate availability date", "Failed to duplicate availability date"), "error");
+    }
+  });
   const tableColumns = reactExports.useMemo(() => {
     const cols = [];
     cols.push({
@@ -63266,6 +63454,16 @@ const Availability = () => {
       onClick: (date2) => navigate({ subpage: "trips", tab: "availability", action: "edit", id: date2.id })
     },
     {
+      key: "duplicate",
+      label: __("Duplicate", "Duplicate"),
+      icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-4 h-4" }),
+      onClick: (date2) => {
+        setDuplicateConfirm({ isOpen: true, date: date2 });
+        setDuplicateDepartureDate(date2.departure_date || "");
+        setDuplicateDepartureTime(date2.departure_time || "");
+      }
+    },
+    {
       key: "delete",
       label: __("Delete", "Delete"),
       icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
@@ -63292,6 +63490,79 @@ const Availability = () => {
         isLoading: deleteMutation.isPending
       }
     ),
+    duplicateConfirm.isOpen && duplicateConfirm.date && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "fixed inset-0 z-50 flex items-center justify-center p-4", style: { marginTop: "-32px" }, children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        "div",
+        {
+          className: "absolute inset-0 bg-black/50",
+          onClick: () => {
+            if (!duplicateMutation.isPending) {
+              setDuplicateConfirm({ isOpen: false, date: null });
+            }
+          }
+        }
+      ),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Duplicate Availability Date", "Duplicate Availability Date") }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: __("Select the new departure date. Arrival/return will be shifted automatically.", "Select the new departure date. Arrival/return will be shifted automatically.") })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Departure Date", "Departure Date") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              DatePicker,
+              {
+                value: duplicateDepartureDate,
+                onChange: (value) => setDuplicateDepartureDate(value),
+                placeholder: __("Select date", "Select date")
+              }
+            )
+          ] }),
+          (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Departure Time", "Departure Time") }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              TimePicker,
+              {
+                value: duplicateDepartureTime,
+                onChange: (value) => setDuplicateDepartureTime(value),
+                placeholder: __("Select departure time", "Select departure time")
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: () => setDuplicateConfirm({ isOpen: false, date: null }),
+              disabled: duplicateMutation.isPending,
+              children: __("Cancel", "Cancel")
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              onClick: () => {
+                if (!duplicateConfirm.date) return;
+                if (!duplicateDepartureDate) {
+                  showToast(__("Please select a departure date", "Please select a departure date"), "warning");
+                  return;
+                }
+                duplicateMutation.mutate({
+                  id: duplicateConfirm.date.id,
+                  departure_date: duplicateDepartureDate,
+                  departure_time: (selectedTrip == null ? void 0 : selectedTrip.trip_type) === "single_day" ? duplicateDepartureTime || null : null
+                });
+              },
+              disabled: duplicateMutation.isPending,
+              children: duplicateMutation.isPending ? __("Duplicating...", "Duplicating...") : __("Duplicate", "Duplicate")
+            }
+          )
+        ] })
+      ] })
+    ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx(
       PageHeader,
       {
@@ -63749,158 +64020,6 @@ const Availability = () => {
     ] })
   ] });
 };
-const TimePicker = ({
-  value,
-  onChange,
-  placeholder = "Select time",
-  disabled = false,
-  className = "",
-  error = false
-}) => {
-  const [open, setOpen] = reactExports.useState(false);
-  const [hours, setHours] = reactExports.useState("");
-  const [minutes, setMinutes] = reactExports.useState("");
-  const [ampm, setAmpm] = reactExports.useState("AM");
-  reactExports.useEffect(() => {
-    if (value) {
-      const [h, m] = value.split(":");
-      const hour = parseInt(h);
-      if (hour === 0) {
-        setHours("12");
-        setAmpm("AM");
-      } else if (hour < 12) {
-        setHours(hour.toString());
-        setAmpm("AM");
-      } else if (hour === 12) {
-        setHours("12");
-        setAmpm("PM");
-      } else {
-        setHours((hour - 12).toString());
-        setAmpm("PM");
-      }
-      setMinutes(m || "00");
-    }
-  }, [value]);
-  const handleTimeSelect = (h, m, a2) => {
-    let hour24 = parseInt(h);
-    if (a2 === "PM" && hour24 !== 12) {
-      hour24 += 12;
-    } else if (a2 === "AM" && hour24 === 12) {
-      hour24 = 0;
-    }
-    const timeString = `${hour24.toString().padStart(2, "0")}:${m.padStart(2, "0")}`;
-    onChange == null ? void 0 : onChange(timeString);
-    setOpen(false);
-  };
-  const formatDisplayTime = () => {
-    if (!value) return "";
-    const [h, m] = value.split(":");
-    const hour = parseInt(h);
-    if (hour === 0) return `12:${m} AM`;
-    if (hour < 12) return `${hour}:${m} AM`;
-    if (hour === 12) return `12:${m} PM`;
-    return `${hour - 12}:${m} PM`;
-  };
-  const hourOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
-  const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
-  return /* @__PURE__ */ jsxRuntimeExports.jsxs(Popover, { open, onOpenChange: setOpen, children: [
-    /* @__PURE__ */ jsxRuntimeExports.jsx(PopoverTrigger, { asChild: true, children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-      Button,
-      {
-        type: "button",
-        variant: "outline",
-        disabled,
-        className: `w-full justify-start text-left font-normal ${error ? "border-red-500" : ""} ${!value ? "text-gray-500" : ""} ${className}`,
-        children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(Clock, { className: "mr-2 h-4 w-4" }),
-          formatDisplayTime() || /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-500", children: placeholder })
-        ]
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(PopoverContent, { className: "w-auto p-4", align: "start", children: [
-      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "Hour" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-1 max-h-48 overflow-y-auto", children: hourOptions.map((h) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              type: "button",
-              onClick: () => {
-                setHours(h);
-                if (hours && minutes) {
-                  handleTimeSelect(h, minutes, ampm);
-                }
-              },
-              className: `px-3 py-2 text-sm rounded-md transition-colors ${hours === h ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-              children: h
-            },
-            h
-          )) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "Minute" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-3 gap-1 max-h-48 overflow-y-auto", children: minuteOptions.map((m) => /* @__PURE__ */ jsxRuntimeExports.jsx(
-            "button",
-            {
-              type: "button",
-              onClick: () => {
-                setMinutes(m);
-                if (hours && m) {
-                  handleTimeSelect(hours, m, ampm);
-                }
-              },
-              className: `px-3 py-2 text-sm rounded-md transition-colors ${minutes === m ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-              children: m
-            },
-            m
-          )) })
-        ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "text-xs font-medium text-gray-700 dark:text-gray-300", children: "AM/PM" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-col gap-1", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                type: "button",
-                onClick: () => {
-                  setAmpm("AM");
-                  if (hours && minutes) {
-                    handleTimeSelect(hours, minutes, "AM");
-                  }
-                },
-                className: `px-4 py-2 text-sm rounded-md transition-colors ${ampm === "AM" ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-                children: "AM"
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsx(
-              "button",
-              {
-                type: "button",
-                onClick: () => {
-                  setAmpm("PM");
-                  if (hours && minutes) {
-                    handleTimeSelect(hours, minutes, "PM");
-                  }
-                },
-                className: `px-4 py-2 text-sm rounded-md transition-colors ${ampm === "PM" ? "bg-blue-600 text-white" : "hover:bg-gray-100 dark:hover:bg-gray-700"}`,
-                children: "PM"
-              }
-            )
-          ] })
-        ] })
-      ] }),
-      hours && minutes && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 pt-4 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
-        Button,
-        {
-          onClick: () => handleTimeSelect(hours, minutes, ampm),
-          className: "w-full",
-          size: "sm",
-          children: "Set Time"
-        }
-      ) })
-    ] })
-  ] });
-};
 const AvailabilityFormSkeleton = () => {
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-pulse", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
@@ -64040,7 +64159,10 @@ const AvailabilityForm = () => {
     queryFn: async () => {
       if (!tripId) return null;
       const response = await apiClient.get(`/trips/${tripId}`);
-      return (response == null ? void 0 : response.data) || response;
+      const data = (response == null ? void 0 : response.data) || response;
+      console.log("Trip Data:", data);
+      console.log("Trip Pricing Type:", data == null ? void 0 : data.pricing_type);
+      return data;
     },
     enabled: !!tripId
   });
@@ -64073,6 +64195,7 @@ const AvailabilityForm = () => {
   }, [availabilityData, tripId]);
   reactExports.useEffect(() => {
     if (tripData && !isEditMode) {
+      console.log("Setting form data from trip. Pricing type:", tripData.pricing_type);
       setFormData((prev) => ({
         ...prev,
         from_location: tripData.starting_location || "",
@@ -64088,7 +64211,10 @@ const AvailabilityForm = () => {
       const totalSeats = availabilityData.total_seats || availabilityData.seats_total || 0;
       const availableSeats = availabilityData.available_seats || availabilityData.seats_available || 0;
       const bookedSeats = totalSeats - availableSeats;
-      const pricingType = availabilityData.pricing_type || (tripData == null ? void 0 : tripData.pricing_type) || "regular";
+      const pricingType = (tripData == null ? void 0 : tripData.pricing_type) || availabilityData.pricing_type || "regular";
+      console.log("Edit mode - Availability pricing_type:", availabilityData.pricing_type);
+      console.log("Edit mode - Trip pricing_type:", tripData == null ? void 0 : tripData.pricing_type);
+      console.log("Edit mode - Using pricing_type:", pricingType);
       setFormData({
         departure_date: availabilityData.departure_date || "",
         departure_time: availabilityData.departure_time || "",
@@ -64127,9 +64253,15 @@ const AvailabilityForm = () => {
     if (formData.price_types.some((pt) => pt.category_id === categoryId)) {
       return;
     }
+    const category = activeCategories.find((cat) => cat.id === categoryId);
     setFormData((prev) => ({
       ...prev,
-      price_types: [...prev.price_types, { category_id: categoryId, original_price: "", discounted_price: "" }]
+      price_types: [...prev.price_types, {
+        category_id: categoryId,
+        category_label: (category == null ? void 0 : category.label) || "",
+        original_price: "",
+        discounted_price: ""
+      }]
     }));
   };
   const handlePriceTypeRemove = (categoryId) => {
@@ -64235,14 +64367,18 @@ const AvailabilityForm = () => {
         seats_available: availableSeats,
         seats_reserved: 0,
         seats_waitlist: 0,
+        pricing_type: data.pricing_type,
         original_price: data.pricing_type === "regular" && data.original_price ? parseFloat(data.original_price) : null,
         discounted_price: data.pricing_type === "regular" && data.discounted_price ? parseFloat(data.discounted_price) : null,
+        price_types: data.pricing_type === "traveler_based" ? data.price_types : null,
         status: data.is_blocked ? "blocked" : data.status,
         from_location: data.from_location || null,
         to_location: data.to_location || null,
         special_notes: null,
         cutoff_hours: 24
       };
+      console.log("Saving availability with payload:", payload);
+      console.log("Price types:", data.price_types);
       if (isEditMode && availabilityId) {
         const response = await apiClient.put(`/availability/${availabilityId}`, payload);
         return (response == null ? void 0 : response.data) || response;
@@ -64309,7 +64445,7 @@ const AvailabilityForm = () => {
       PageHeader,
       {
         title: isEditMode ? __("Edit Availability Date", "Edit Availability Date") : __("Add Availability Date", "Add Availability Date"),
-        description: tripData ? `${isEditMode ? __("Edit", "Edit") : __("Add")} availability date for ${tripData.title}` : __("Add a new availability date for this trip", "Add a new availability date for this trip"),
+        description: tripData ? `${isEditMode ? __("Edit", "Edit") : __("Add")} availability date for ${tripData.title} (Trip ID: ${tripId})` : __("Add a new availability date for this trip", "Add a new availability date for this trip"),
         actions: tripId ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
           Button,
           {
@@ -78966,7 +79102,7 @@ const DynamicPricingRuleForm = () => {
                 /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: selectedRuleType.description })
               ] })
             ] }),
-            !isEdit && /* @__PURE__ */ jsxRuntimeExports.jsx(
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
               {
                 type: "button",
@@ -79078,6 +79214,32 @@ const DynamicPricingRuleForm = () => {
                         min: "0"
                       }
                     )
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "start_date", children: __("Start Date (Optional)") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "start_date",
+                        type: "date",
+                        value: formData.start_date,
+                        onChange: (e) => handleChange("start_date", e.target.value)
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("Leave empty for no date restriction") })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Label, { htmlFor: "end_date", children: __("End Date (Optional)") }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      Input,
+                      {
+                        id: "end_date",
+                        type: "date",
+                        value: formData.end_date,
+                        onChange: (e) => handleChange("end_date", e.target.value)
+                      }
+                    ),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: __("Leave empty for no date restriction") })
                   ] })
                 ] }),
                 formData.rule_type === "inventory" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [

@@ -417,6 +417,7 @@ class TripService extends BaseService
             'availability_dates',
             'trip_category',
             'price_types', // Include price_types in relationship fields
+            'downloadable_items', // Managed in separate yatra_trip_downloads table
         ];
         
         foreach ($relationshipFields as $field) {
@@ -456,6 +457,7 @@ class TripService extends BaseService
             'availability_dates',
             'trip_category',
             'price_types', // Include price_types in relationship fields
+            'downloadable_items', // Managed in separate yatra_trip_downloads table
         ];
         
         error_log("Yatra TripService: updateWithRelations START - id={$id}");

@@ -8,6 +8,7 @@ use Yatra\Core\ServiceProvider;
 use Yatra\Core\Container;
 use Yatra\Core\Modules\ModuleManager;
 use Yatra\Controllers\SingleTripController;
+use Yatra\Helpers\CurrencyHelper;
 use Yatra\Services\SettingsService;
 use Yatra\Repositories\ReviewRepository;
 use Yatra\Repositories\EnquiryRepository;
@@ -2088,6 +2089,53 @@ HTML;
         $booking->contact_last_name = $session['contact_last_name'] ?? '';
         $booking->contact_email = $session['contact_email'] ?? '';
         $booking->contact_phone = $session['contact_phone'] ?? '';
+
+        if (is_user_logged_in()) {
+            $user_id = get_current_user_id();
+            $user = wp_get_current_user();
+
+            if (empty($booking->contact_email) && !empty($user->user_email)) {
+                $booking->contact_email = (string) $user->user_email;
+            }
+
+            if (empty($booking->contact_first_name) && !empty($user->first_name)) {
+                $booking->contact_first_name = (string) $user->first_name;
+            }
+
+            if (empty($booking->contact_last_name) && !empty($user->last_name)) {
+                $booking->contact_last_name = (string) $user->last_name;
+            }
+
+            if ((empty($booking->contact_first_name) || empty($booking->contact_last_name)) && !empty($user->display_name)) {
+                $name_parts = preg_split('/\s+/', (string) $user->display_name, -1, PREG_SPLIT_NO_EMPTY);
+                if (is_array($name_parts) && !empty($name_parts)) {
+                    if (empty($booking->contact_first_name)) {
+                        $booking->contact_first_name = (string) $name_parts[0];
+                    }
+                    if (empty($booking->contact_last_name) && count($name_parts) > 1) {
+                        $booking->contact_last_name = (string) implode(' ', array_slice($name_parts, 1));
+                    }
+                }
+            }
+
+            if (empty($booking->contact_phone) && $user_id > 0) {
+                $phone_meta_keys = [
+                    'contact_phone',
+                    'phone',
+                    'billing_phone',
+                    'woocommerce_billing_phone',
+                    'user_phone',
+                ];
+
+                foreach ($phone_meta_keys as $meta_key) {
+                    $meta_val = get_user_meta($user_id, $meta_key, true);
+                    if (!empty($meta_val)) {
+                        $booking->contact_phone = sanitize_text_field((string) $meta_val);
+                        break;
+                    }
+                }
+            }
+        }
         
         // Session-based availability data
         $booking->departure_time = $session['departure_time'] ?? '';
@@ -2565,6 +2613,19 @@ HTML;
                 $css_version
             );
         }
+        
+        // Enqueue availability cards clean CSS
+        $availability_css = YATRA_PLUGIN_PATH . 'public/css/availability-cards-clean.css';
+        if (file_exists($availability_css)) {
+            $availability_css_url = str_replace(YATRA_PLUGIN_PATH, YATRA_PLUGIN_URL, $availability_css);
+            $availability_css_version = YATRA_VERSION . '.' . filemtime($availability_css);
+            wp_enqueue_style(
+                'yatra-availability-cards-clean',
+                $availability_css_url,
+                ['yatra-trip'],
+                $availability_css_version
+            );
+        }
 
         // Enqueue JS
         $js_file = YATRA_PLUGIN_PATH . 'public/js/trip.js';
@@ -2592,6 +2653,7 @@ HTML;
             $decimal_places = SettingsService::getInt('decimal_places', 2);
             $thousand_separator = SettingsService::getString('thousand_separator', ',');
             $decimal_separator = SettingsService::getString('decimal_separator', '.');
+            $currency_symbol = CurrencyHelper::getSymbol($currency);
             
             wp_localize_script('yatra-trip', 'yatraTripData', [
                 'tripId' => $trip_id,
@@ -2604,6 +2666,7 @@ HTML;
                 'isLoggedIn' => is_user_logged_in(),
                 'loginUrl' => wp_login_url(get_permalink()),
                 'currency' => $currency,
+                'currencySymbol' => $currency_symbol,
                 'currencyPosition' => $currency_position,
                 'decimalPlaces' => $decimal_places,
                 'thousandSeparator' => $thousand_separator,

@@ -62,6 +62,28 @@ class AvailabilityRepository extends BaseRepository
         return $result ?: null;
     }
 
+    public function existsForTripDateTime(int $tripId, string $departureDate, ?string $departureTime): bool
+    {
+        $table = esc_sql($this->table);
+
+        if ($departureTime === null || $departureTime === '') {
+            $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time IS NULL",
+                $tripId,
+                $departureDate
+            ));
+        } else {
+            $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT COUNT(*) FROM `{$table}` WHERE trip_id = %d AND departure_date = %s AND departure_time = %s",
+                $tripId,
+                $departureDate,
+                $departureTime
+            ));
+        }
+
+        return $count > 0;
+    }
+
     /**
      * Find all by trip ID
      */

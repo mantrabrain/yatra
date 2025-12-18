@@ -375,23 +375,35 @@ if (!function_exists('yatra_svg_icon')) {
                 $icons_data = json_decode(file_get_contents($icons_file), true);
                 $icons = [];
                 
-                // Convert JSON data to PHP array with class attribute
+                // Convert JSON data to PHP array
                 foreach ($icons_data as $name => $data) {
                     if (isset($data['svg'])) {
-                        // Add class attribute to the SVG
-                        $svg = $data['svg'];
-                        if (!empty($class)) {
-                            $svg = str_replace('<svg', '<svg class="' . esc_attr($class) . '"', $svg);
-                        }
-                        $icons[$name] = $svg;
+                        $icons[$name] = (string) $data['svg'];
                     }
                 }
             } else {
                 $icons = [];
             }
         }
-        
-        return $icons[$icon_name] ?? '';
+
+        $svg = $icons[$icon_name] ?? '';
+        if ($svg === '' || !is_string($svg)) {
+            return '';
+        }
+
+        if ($class !== '') {
+            $class_attr = esc_attr($class);
+
+            if (preg_match('/<svg[^>]*\sclass="([^"]*)"/i', $svg, $m)) {
+                $existing = trim((string) ($m[1] ?? ''));
+                $merged = trim($existing . ' ' . $class_attr);
+                $svg = preg_replace('/(<svg[^>]*\sclass=")([^"]*)(")/i', '$1' . $merged . '$3', $svg, 1);
+            } else {
+                $svg = preg_replace('/<svg\b/i', '<svg class="' . $class_attr . '"', $svg, 1);
+            }
+        }
+
+        return (string) $svg;
     }
 }
 

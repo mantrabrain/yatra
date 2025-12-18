@@ -86,6 +86,12 @@ export const useToggleModule = () => {
         window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
           m.slug === 'additional_services' || m.slug === 'additional-services'
         );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(m => 
+          m.slug === 'abandoned_booking_recovery' || m.slug === 'abandoned-booking-recovery'
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(m => 
+          m.slug === 'dynamic_pricing' || m.slug === 'dynamic-pricing'
+        );
         // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
         
         // Trigger a navigation refresh by updating a custom event
@@ -142,6 +148,12 @@ export const useBulkToggleModules = () => {
         );
         window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
           m.slug === 'additional_services' || m.slug === 'additional-services'
+        );
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(m => 
+          m.slug === 'abandoned_booking_recovery' || m.slug === 'abandoned-booking-recovery'
+        );
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(m => 
+          m.slug === 'dynamic_pricing' || m.slug === 'dynamic-pricing'
         );
         // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
         

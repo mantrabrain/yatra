@@ -11,6 +11,7 @@ use Yatra\Services\TripService;
 use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Repositories\ItemTypeRepository;
 use Yatra\Repositories\ItemRepository;
+use Yatra\Repositories\TravelerCategoryRepository;
 use Yatra\Models\Trip;
 use Yatra\Validators\TripValidator;
 use Yatra\Exceptions\TripNotFoundException;
@@ -126,6 +127,15 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_availability_template'],
+                'permission_callback' => '__return_true', // Public endpoint
+            ],
+        ]);
+
+        // Date-specific pricing endpoint (public, no auth required)
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/date-pricing', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_date_pricing'],
                 'permission_callback' => '__return_true', // Public endpoint
             ],
         ]);
@@ -1117,6 +1127,12 @@ class TripController extends BaseController
             $id = (int) $request->get_param('id');
             $trip = $this->service->getWithRelations($id);
 
+            $sort_key = sanitize_text_field((string) ($request->get_param('sort') ?? 'date-asc'));
+            $allowed_sorts = ['date-asc', 'date-desc', 'price-asc', 'price-desc', 'seats-desc'];
+            if (!in_array($sort_key, $allowed_sorts, true)) {
+                $sort_key = 'date-asc';
+            }
+
             if (!$trip) {
                 return $this->error_response('Trip not found', 404);
             }
@@ -1153,7 +1169,7 @@ class TripController extends BaseController
             }
             
             // Merge and deduplicate (specific dates take priority)
-            $availability_dates = $this->mergeAvailabilityDates($specific_dates, $recurring_dates);
+            $availability_dates = array_merge($specific_dates, $recurring_dates);
 
             // Prepare trip data for template
             $trip_data = (object) [
@@ -1176,7 +1192,7 @@ class TripController extends BaseController
             ob_start();
             
             // Generate availability HTML
-            $this->render_availability_template($trip_data);
+            $this->render_availability_template($trip_data, $sort_key);
             
             $html = ob_get_clean();
 
@@ -1191,7 +1207,7 @@ class TripController extends BaseController
     /**
      * Render availability template
      */
-    private function render_availability_template($trip_data): void
+    private function render_availability_template($trip_data, string $sort_key = 'date-asc'): void
     {
         // Check if we have real availability data
         $has_availability = !empty($trip_data->availability_dates) && is_array($trip_data->availability_dates);
@@ -1202,6 +1218,112 @@ class TripController extends BaseController
         
         // Determine if this is a day trip (duration <= 1 day)
         $is_single_day = ($trip_data->duration_days ?? 1) <= 1;
+
+        $traveler_category_labels = [];
+        $traveler_category_ids = [];
+        $add_category_ids = static function ($price_types_raw) use (&$traveler_category_ids): void {
+            if (empty($price_types_raw)) {
+                return;
+            }
+
+            $decoded = $price_types_raw;
+            if (is_string($price_types_raw)) {
+                $decoded = json_decode($price_types_raw, true) ?: [];
+            }
+
+            if (!is_array($decoded)) {
+                return;
+            }
+
+            foreach ($decoded as $pt) {
+                if (is_object($pt)) {
+                    $pt = (array) $pt;
+                }
+                if (!is_array($pt)) {
+                    continue;
+                }
+                $cat_id = $pt['category_id'] ?? null;
+                if ($cat_id !== null && $cat_id !== '') {
+                    $traveler_category_ids[] = (string) $cat_id;
+                }
+            }
+        };
+
+        if (!empty($trip_data->price_types) && is_array($trip_data->price_types)) {
+            $add_category_ids($trip_data->price_types);
+        }
+
+        if ($has_availability) {
+            foreach ($trip_data->availability_dates as $avail_for_cats) {
+                if (!empty($avail_for_cats->price_types)) {
+                    $add_category_ids($avail_for_cats->price_types);
+                }
+                if (!empty($avail_for_cats->traveler_pricing)) {
+                    $add_category_ids($avail_for_cats->traveler_pricing);
+                }
+            }
+        }
+
+        $traveler_category_ids = array_values(array_unique(array_filter($traveler_category_ids)));
+        if (!empty($traveler_category_ids)) {
+            $traveler_category_repo = new TravelerCategoryRepository();
+            $categories = $traveler_category_repo->all([
+                'where' => [
+                    'id' => $traveler_category_ids,
+                ],
+            ]);
+            foreach ($categories as $cat) {
+                if (!empty($cat->id) && isset($cat->label)) {
+                    $traveler_category_labels[(string) $cat->id] = (string) $cat->label;
+                }
+            }
+        }
+
+        $enrich_price_types = static function ($price_types_raw) use ($traveler_category_labels): array {
+            if (empty($price_types_raw)) {
+                return [];
+            }
+
+            $decoded = $price_types_raw;
+            if (is_string($price_types_raw)) {
+                $decoded = json_decode($price_types_raw, true) ?: [];
+            }
+
+            if (!is_array($decoded)) {
+                return [];
+            }
+
+            return array_map(static function ($pt) use ($traveler_category_labels) {
+                if (is_object($pt)) {
+                    $pt = (array) $pt;
+                }
+                if (!is_array($pt)) {
+                    return $pt;
+                }
+
+                if (empty($pt['category_label']) && !empty($pt['traveler_category_label'])) {
+                    $pt['category_label'] = $pt['traveler_category_label'];
+                }
+
+                $cat_id = $pt['category_id'] ?? null;
+                if ((empty($pt['category_label']) && empty($pt['label'])) && $cat_id !== null) {
+                    $label = $traveler_category_labels[(string) $cat_id] ?? null;
+                    if (!empty($label)) {
+                        $pt['category_label'] = $label;
+                    }
+                }
+
+                if (empty($pt['label']) && !empty($pt['category_label'])) {
+                    $pt['label'] = $pt['category_label'];
+                }
+
+                return $pt;
+            }, $decoded);
+        };
+
+        if (!empty($trip_data->price_types)) {
+            $trip_data->price_types = $enrich_price_types($trip_data->price_types);
+        }
         
         if ($has_availability) {
             $current_time = time();
@@ -1226,7 +1348,10 @@ class TripController extends BaseController
                     continue;
                 }
                 
-                $return_date = !empty($avail->return_date) ? strtotime($avail->return_date) : strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days');
+                // Use arrival_date if set, otherwise return_date, otherwise calculate from duration
+                $return_date = !empty($avail->arrival_date) ? strtotime($avail->arrival_date) : 
+                              (!empty($avail->return_date) ? strtotime($avail->return_date) : 
+                              strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days'));
                 
                 $original_price = !empty($avail->original_price) ? (float) $avail->original_price : (float) ($trip_data->original_price ?? 0);
                 $sale_price = !empty($avail->discounted_price) ? (float) $avail->discounted_price : $original_price;
@@ -1291,12 +1416,16 @@ class TripController extends BaseController
                 $card_traveler_pricing = [];
                 
                 // Get traveler pricing from availability or rule
-                if (!empty($avail->traveler_pricing)) {
-                    // From recurring rule
-                    $card_traveler_pricing = is_array($avail->traveler_pricing) ? $avail->traveler_pricing : (json_decode($avail->traveler_pricing, true) ?: []);
-                } elseif (!empty($avail->price_types)) {
-                    // From specific availability date
-                    $card_traveler_pricing = is_array($avail->price_types) ? $avail->price_types : (json_decode($avail->price_types, true) ?: []);
+                if (!empty($avail->price_types)) {
+                    // From specific availability date (priority)
+                    $card_traveler_pricing = is_string($avail->price_types) ? (json_decode($avail->price_types, true) ?: []) : (is_array($avail->price_types) ? $avail->price_types : []);
+                } elseif (!empty($avail->traveler_pricing)) {
+                    // From recurring rule (fallback)
+                    $card_traveler_pricing = is_string($avail->traveler_pricing) ? (json_decode($avail->traveler_pricing, true) ?: []) : (is_array($avail->traveler_pricing) ? $avail->traveler_pricing : []);
+                }
+
+                if (!empty($card_traveler_pricing) && is_array($card_traveler_pricing)) {
+                    $card_traveler_pricing = $enrich_price_types($card_traveler_pricing);
                 }
                 
                 // If no availability-specific pricing, fall back to trip pricing
@@ -1313,6 +1442,8 @@ class TripController extends BaseController
                     'to_date' => $to_display,
                     'to_location' => $to_location,
                     'date_display' => $date_display, // For day trips: "Saturday, 30 Nov 2025"
+                    'date' => $avail->departure_date, // Raw date for dynamic pricing
+                    'spots_remaining' => $seats, // For dynamic pricing
                     'seats' => $seats > 10 ? '10+' : (string) $seats,
                     'seats_available' => $seats,
                     'discount_text' => $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '',
@@ -1376,6 +1507,8 @@ class TripController extends BaseController
             $month_filters[strtolower(date('M-Y', strtotime('+7 days')))] = date('M Y', strtotime('+7 days'));
         }
 
+        $availability_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);
+
         // Prepare additional data for the template
         $pricing_type = $trip_data->pricing_type ?? 'regular';
         $price_types = $trip_data->price_types ?? [];
@@ -1385,8 +1518,50 @@ class TripController extends BaseController
         $template_path = YATRA_PLUGIN_PATH . 'templates/partials/availability-section.php';
         
         if (file_exists($template_path)) {
+            $sort_key = $sort_key;
             include $template_path;
         }
+    }
+
+    private function sortAvailabilityCards(array $cards, string $sort_key): array
+    {
+        $sort_key = sanitize_text_field($sort_key);
+
+        usort($cards, function ($a, $b) use ($sort_key) {
+            $aDate = (string) ($a['data_date'] ?? '');
+            $bDate = (string) ($b['data_date'] ?? '');
+            $aTime = (string) ($a['departure_time'] ?? '');
+            $bTime = (string) ($b['departure_time'] ?? '');
+
+            $aDateTime = trim($aDate . ' ' . $aTime);
+            $bDateTime = trim($bDate . ' ' . $bTime);
+
+            $aPrice = (float) ($a['sale_price'] ?? 0);
+            $bPrice = (float) ($b['sale_price'] ?? 0);
+
+            $aSeats = (int) ($a['seats_available'] ?? 0);
+            $bSeats = (int) ($b['seats_available'] ?? 0);
+
+            if ($sort_key === 'date-desc') {
+                $cmp = strcmp($bDateTime, $aDateTime);
+            } elseif ($sort_key === 'price-asc') {
+                $cmp = $aPrice <=> $bPrice;
+            } elseif ($sort_key === 'price-desc') {
+                $cmp = $bPrice <=> $aPrice;
+            } elseif ($sort_key === 'seats-desc') {
+                $cmp = $bSeats <=> $aSeats;
+            } else {
+                $cmp = strcmp($aDateTime, $bDateTime);
+            }
+
+            if ($cmp !== 0) {
+                return $cmp;
+            }
+
+            return strcmp($aDateTime, $bDateTime);
+        });
+
+        return $cards;
     }
 
     /**
@@ -1428,5 +1603,88 @@ class TripController extends BaseController
         });
         
         return $merged;
+    }
+
+    /**
+     * Get date-specific pricing and availability info
+     */
+    public function get_date_pricing(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    {
+        try {
+            $trip_id = (int) $request->get_param('id');
+            $date = sanitize_text_field($request->get_param('date'));
+
+            if (!$date) {
+                return $this->error_response('Date parameter is required', 400);
+            }
+
+            $trip = $this->service->getWithRelations($trip_id);
+            if (!$trip) {
+                return $this->error_response('Trip not found', 404);
+            }
+
+            // Count departures for this date
+            global $wpdb;
+            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+            $departures_count = $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*) FROM {$availability_table} 
+                 WHERE trip_id = %d 
+                 AND departure_date = %s
+                 AND status IN ('available', 'limited')",
+                $trip_id,
+                $date
+            ));
+
+            // Generate travelers HTML with dynamic pricing
+            ob_start();
+            $pricing_type = $trip->pricing_type ?? 'regular';
+            $price_types = $trip->price_types ?? [];
+            
+            if ($pricing_type === 'traveler_based' && !empty($price_types)) {
+                // Apply dynamic pricing to each price type
+                $dp_enabled = apply_filters('yatra_dynamic_pricing_enabled', false);
+                
+                foreach ($price_types as &$pt) {
+                    $pt = is_array($pt) ? (object) $pt : $pt;
+                    $price = 0;
+                    
+                    if (isset($pt->sale_price) && $pt->sale_price > 0) {
+                        $price = (float) $pt->sale_price;
+                    } elseif (isset($pt->original_price) && $pt->original_price > 0) {
+                        $price = (float) $pt->original_price;
+                    }
+                    
+                    // Apply dynamic pricing
+                    if ($dp_enabled && $price > 0) {
+                        $price = apply_filters('yatra_availability_price', $price, $trip_id, [
+                            'departure_date' => $date,
+                            'price_type_id' => $pt->id ?? null,
+                        ]);
+                    }
+                    
+                    $pt->effective_price = $price;
+                }
+                
+                // Render traveler-based pricing HTML
+                include YATRA_ABSPATH . '/templates/partials/booking-form-fields.php';
+            } else {
+                // Regular pricing - simple number input
+                echo '<div class="yatra-booking-field">';
+                echo '<label for="num_travelers">' . esc_html__('Number of Travelers', 'yatra') . '</label>';
+                echo '<input type="number" id="num_travelers" name="num_travelers" value="1" min="1" max="' . esc_attr($trip->max_travelers ?? 20) . '" />';
+                echo '</div>';
+            }
+            
+            $travelers_html = ob_get_clean();
+
+            return $this->success_response([
+                'success' => true,
+                'departures_count' => (int) $departures_count,
+                'travelers_html' => $travelers_html,
+                'pricing_type' => $pricing_type,
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
     }
 }

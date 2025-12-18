@@ -183,6 +183,95 @@ class AvailabilityService
         return $this->repository->findModel($id);
     }
 
+    public function duplicate(int $id, array $data): Availability
+    {
+        $existing = $this->repository->findModel($id);
+        if (!$existing) {
+            throw new \InvalidArgumentException('Availability date not found');
+        }
+
+        $newDepartureDate = isset($data['departure_date']) ? (string) $data['departure_date'] : '';
+        if (empty($newDepartureDate)) {
+            throw new \InvalidArgumentException('Departure date is required');
+        }
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $newDepartureDate)) {
+            throw new \InvalidArgumentException('Invalid departure date format. Use YYYY-MM-DD');
+        }
+
+        $newDepartureTime = null;
+        if (array_key_exists('departure_time', $data)) {
+            $newDepartureTime = !empty($data['departure_time']) ? $this->normalizeTimeFormat((string) $data['departure_time']) : null;
+            if ($newDepartureTime === false) {
+                throw new \InvalidArgumentException('Invalid departure time format. Use HH:MM');
+            }
+        } else {
+            $newDepartureTime = $existing->departure_time;
+        }
+
+        if ($this->repository->existsForTripDateTime($existing->trip_id, $newDepartureDate, $newDepartureTime)) {
+            throw new \InvalidArgumentException('Availability date already exists for the selected departure');
+        }
+
+        $oldDepartureTs = strtotime($existing->departure_date);
+        $newDepartureTs = strtotime($newDepartureDate);
+        if ($oldDepartureTs === false || $newDepartureTs === false) {
+            throw new \InvalidArgumentException('Invalid departure date');
+        }
+
+        $shiftedArrivalDate = null;
+        if (!empty($existing->arrival_date)) {
+            $oldArrivalTs = strtotime($existing->arrival_date);
+            if ($oldArrivalTs !== false) {
+                $diffDays = (int) round(($oldArrivalTs - $oldDepartureTs) / 86400);
+                $shiftedArrivalDate = date('Y-m-d', strtotime('+' . $diffDays . ' days', $newDepartureTs));
+            }
+        }
+
+        $shiftedReturnDate = null;
+        if (!empty($existing->return_date)) {
+            $oldReturnTs = strtotime($existing->return_date);
+            if ($oldReturnTs !== false) {
+                $diffDays = (int) round(($oldReturnTs - $oldDepartureTs) / 86400);
+                $shiftedReturnDate = date('Y-m-d', strtotime('+' . $diffDays . ' days', $newDepartureTs));
+            }
+        }
+
+        $payload = $existing->toArray();
+        unset($payload['id'], $payload['created_at'], $payload['updated_at']);
+        unset($payload['booked_seats'], $payload['total_seats'], $payload['available_seats'], $payload['waitlist_count']);
+
+        $payload['departure_date'] = $newDepartureDate;
+        $payload['departure_time'] = $newDepartureTime;
+        $payload['arrival_date'] = $shiftedArrivalDate;
+        $payload['return_date'] = $shiftedReturnDate;
+
+        $payload['seats_total'] = (int) $existing->seats_total;
+        $payload['seats_available'] = (int) $existing->seats_total;
+        $payload['seats_reserved'] = 0;
+        $payload['seats_waitlist'] = 0;
+
+        if (array_key_exists('seats_total', $data)) {
+            $payload['seats_total'] = (int) $data['seats_total'];
+            $payload['seats_available'] = (int) $data['seats_total'];
+        }
+
+        if (array_key_exists('arrival_time', $data)) {
+            $arrivalTime = !empty($data['arrival_time']) ? $this->normalizeTimeFormat((string) $data['arrival_time']) : null;
+            if ($arrivalTime === false) {
+                throw new \InvalidArgumentException('Invalid arrival time format. Use HH:MM');
+            }
+            $payload['arrival_time'] = $arrivalTime;
+        }
+
+        if (array_key_exists('status', $data)) {
+            $payload['status'] = (string) $data['status'];
+        }
+
+        $this->validate($payload);
+        $newId = $this->repository->create($payload);
+        return $this->repository->findModel($newId);
+    }
+
     /**
      * Delete availability date
      */

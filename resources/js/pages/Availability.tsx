@@ -12,6 +12,7 @@ import {
   Search, 
   X, 
   Edit, 
+  Copy,
   Trash2, 
   MapPin,
   Users,
@@ -41,6 +42,8 @@ import { apiClient } from '../lib/api';
 import { useToast } from '../components/ui/toast';
 import { BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { DatePicker } from '../components/ui/date-picker';
+import { TimePicker } from '../components/ui/time-picker';
 
 interface Trip {
   id: number;
@@ -478,6 +481,33 @@ const Availability: React.FC = () => {
     date: null,
   });
 
+  const [duplicateConfirm, setDuplicateConfirm] = useState<{ isOpen: boolean; date: AvailabilityDate | null }>({
+    isOpen: false,
+    date: null,
+  });
+
+  const [duplicateDepartureDate, setDuplicateDepartureDate] = useState<string>('');
+  const [duplicateDepartureTime, setDuplicateDepartureTime] = useState<string>('');
+
+  const duplicateMutation = useMutation({
+    mutationFn: async (payload: { id: string; departure_date: string; departure_time?: string | null }) => {
+      return await apiClient.post(`/availability/${payload.id}/duplicate`, {
+        departure_date: payload.departure_date,
+        departure_time: payload.departure_time ?? null,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['availability'] });
+      showToast(__('Availability date duplicated successfully', 'Availability date duplicated successfully'), 'success');
+      setDuplicateConfirm({ isOpen: false, date: null });
+      setDuplicateDepartureDate('');
+      setDuplicateDepartureTime('');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to duplicate availability date', 'Failed to duplicate availability date'), 'error');
+    },
+  });
+
   // Table columns and actions for shared Table
   const tableColumns = useMemo(() => {
     const cols: { key: string; label: string; visible?: boolean; render?: (date: AvailabilityDate, index: number) => React.ReactNode }[] = [];
@@ -674,6 +704,16 @@ const Availability: React.FC = () => {
       onClick: (date: AvailabilityDate) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id }),
     },
     {
+      key: 'duplicate',
+      label: __('Duplicate', 'Duplicate'),
+      icon: <Copy className="w-4 h-4" />,
+      onClick: (date: AvailabilityDate) => {
+        setDuplicateConfirm({ isOpen: true, date });
+        setDuplicateDepartureDate(date.departure_date || '');
+        setDuplicateDepartureTime(date.departure_time || '');
+      },
+    },
+    {
       key: 'delete',
       label: __('Delete', 'Delete'),
       icon: <Trash2 className="w-4 h-4" />,
@@ -702,6 +742,83 @@ const Availability: React.FC = () => {
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
+
+      {duplicateConfirm.isOpen && duplicateConfirm.date && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ marginTop: '-32px' }}>
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => {
+              if (!duplicateMutation.isPending) {
+                setDuplicateConfirm({ isOpen: false, date: null });
+              }
+            }}
+          />
+          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {__('Duplicate Availability Date', 'Duplicate Availability Date')}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {__('Select the new departure date. Arrival/return will be shifted automatically.', 'Select the new departure date. Arrival/return will be shifted automatically.')}
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  {__('Departure Date', 'Departure Date')}
+                </label>
+                <DatePicker
+                  value={duplicateDepartureDate}
+                  onChange={(value: string) => setDuplicateDepartureDate(value)}
+                  placeholder={__('Select date', 'Select date')}
+                />
+              </div>
+
+              {selectedTrip?.trip_type === 'single_day' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {__('Departure Time', 'Departure Time')}
+                  </label>
+                  <TimePicker
+                    value={duplicateDepartureTime}
+                    onChange={(value: string) => setDuplicateDepartureTime(value)}
+                    placeholder={__('Select departure time', 'Select departure time')}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setDuplicateConfirm({ isOpen: false, date: null })}
+                disabled={duplicateMutation.isPending}
+              >
+                {__('Cancel', 'Cancel')}
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!duplicateConfirm.date) return;
+                  if (!duplicateDepartureDate) {
+                    showToast(__('Please select a departure date', 'Please select a departure date'), 'warning');
+                    return;
+                  }
+                  duplicateMutation.mutate({
+                    id: duplicateConfirm.date.id,
+                    departure_date: duplicateDepartureDate,
+                    departure_time: selectedTrip?.trip_type === 'single_day' ? (duplicateDepartureTime || null) : null,
+                  });
+                }}
+                disabled={duplicateMutation.isPending}
+              >
+                {duplicateMutation.isPending
+                  ? __('Duplicating...', 'Duplicating...')
+                  : __('Duplicate', 'Duplicate')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <PageHeader
         title={__('Availability Management', 'Availability Management')}
         description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.')}

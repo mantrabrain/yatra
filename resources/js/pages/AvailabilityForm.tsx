@@ -100,7 +100,10 @@ const AvailabilityForm: React.FC = () => {
     queryFn: async () => {
       if (!tripId) return null;
       const response = await apiClient.get(`/trips/${tripId}`);
-      return response?.data || response;
+      const data = response?.data || response;
+      console.log('Trip Data:', data);
+      console.log('Trip Pricing Type:', data?.pricing_type);
+      return data;
     },
     enabled: !!tripId,
   });
@@ -143,6 +146,7 @@ const AvailabilityForm: React.FC = () => {
   // Load form data when trip or availability data is available
   useEffect(() => {
     if (tripData && !isEditMode) {
+      console.log('Setting form data from trip. Pricing type:', tripData.pricing_type);
       setFormData(prev => ({
         ...prev,
         from_location: tripData.starting_location || '',
@@ -159,8 +163,12 @@ const AvailabilityForm: React.FC = () => {
       const availableSeats = availabilityData.available_seats || availabilityData.seats_available || 0;
       const bookedSeats = totalSeats - availableSeats;
       
-      // Determine pricing type from availability data or fallback to trip's pricing type
-      const pricingType = availabilityData.pricing_type || tripData?.pricing_type || 'regular';
+      // ALWAYS use trip's pricing type, not the old availability pricing type
+      // This ensures availability dates match the current trip pricing configuration
+      const pricingType = tripData?.pricing_type || availabilityData.pricing_type || 'regular';
+      console.log('Edit mode - Availability pricing_type:', availabilityData.pricing_type);
+      console.log('Edit mode - Trip pricing_type:', tripData?.pricing_type);
+      console.log('Edit mode - Using pricing_type:', pricingType);
       
       setFormData({
         departure_date: availabilityData.departure_date || '',
@@ -205,9 +213,18 @@ const AvailabilityForm: React.FC = () => {
     if (formData.price_types.some(pt => pt.category_id === categoryId)) {
       return;
     }
+    
+    // Find the category to get its label
+    const category = activeCategories.find(cat => cat.id === categoryId);
+    
     setFormData(prev => ({
       ...prev,
-      price_types: [...prev.price_types, { category_id: categoryId, original_price: '', discounted_price: '' }],
+      price_types: [...prev.price_types, { 
+        category_id: categoryId, 
+        category_label: category?.label || '',
+        original_price: '', 
+        discounted_price: '' 
+      }],
     }));
   };
 
@@ -334,14 +351,19 @@ const AvailabilityForm: React.FC = () => {
         seats_available: availableSeats,
         seats_reserved: 0,
         seats_waitlist: 0,
+        pricing_type: data.pricing_type,
         original_price: data.pricing_type === 'regular' && data.original_price ? parseFloat(data.original_price) : null,
         discounted_price: data.pricing_type === 'regular' && data.discounted_price ? parseFloat(data.discounted_price) : null,
+        price_types: data.pricing_type === 'traveler_based' ? data.price_types : null,
         status: data.is_blocked ? 'blocked' : data.status,
         from_location: data.from_location || null,
         to_location: data.to_location || null,
         special_notes: null,
         cutoff_hours: 24,
       };
+      
+      console.log('Saving availability with payload:', payload);
+      console.log('Price types:', data.price_types);
 
       if (isEditMode && availabilityId) {
         const response = await apiClient.put(`/availability/${availabilityId}`, payload);
@@ -422,7 +444,7 @@ const AvailabilityForm: React.FC = () => {
         title={isEditMode ? __('Edit Availability Date', 'Edit Availability Date') : __('Add Availability Date', 'Add Availability Date')}
         description={
           tripData 
-            ? `${isEditMode ? __('Edit', 'Edit') : __('Add')} availability date for ${tripData.title}`
+            ? `${isEditMode ? __('Edit', 'Edit') : __('Add')} availability date for ${tripData.title} (Trip ID: ${tripId})`
             : __('Add a new availability date for this trip', 'Add a new availability date for this trip')
         }
         actions={

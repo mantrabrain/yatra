@@ -61,6 +61,7 @@ $countries = [
  * @param string $custom_name Optional custom field name (for array-style names like travelers[1][field_id])
  * @param string $custom_id Optional custom field ID
  */
+if (!function_exists('yatra_render_form_field')) {
 function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_name = null, $custom_id = null) {
     if (empty($field['enabled'])) {
         return;
@@ -71,6 +72,17 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
     $required = !empty($field['required']);
     $required_attr = $required ? 'required' : '';
     $required_star = $required ? '<span class="required">*</span>' : '';
+
+    $prefill_value = '';
+    if ($custom_name === null && $prefix === 'contact_') {
+        global $booking;
+        if (isset($booking) && is_object($booking)) {
+            $prop = 'contact_' . ($field['id'] ?? '');
+            if (!empty($prop) && isset($booking->{$prop}) && $booking->{$prop} !== null && $booking->{$prop} !== '') {
+                $prefill_value = (string) $booking->{$prop};
+            }
+        }
+    }
     
     $width_class = '';
     if (!empty($field['width'])) {
@@ -98,7 +110,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                     <option value=""><?php echo esc_html($field['placeholder'] ?? 'Select...'); ?></option>
                     <?php if (!empty($field['options'])) : ?>
                         <?php foreach ($field['options'] as $option) : ?>
-                            <option value="<?php echo esc_attr($option['value']); ?>">
+                            <option value="<?php echo esc_attr($option['value']); ?>" <?php echo selected($prefill_value, (string) ($option['value'] ?? ''), false); ?>>
                                 <?php echo esc_html($option['label']); ?>
                             </option>
                         <?php endforeach; ?>
@@ -112,7 +124,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                 <select id="<?php echo $field_id; ?>" name="<?php echo $field_name; ?>" <?php echo $required_attr; ?>>
                     <option value=""><?php echo esc_html($field['placeholder'] ?? 'Select Country'); ?></option>
                     <?php foreach ($countries as $code => $name) : ?>
-                        <option value="<?php echo esc_attr($code); ?>">
+                        <option value="<?php echo esc_attr($code); ?>" <?php echo selected($prefill_value, (string) $code, false); ?>>
                             <?php echo esc_html($name); ?>
                         </option>
                     <?php endforeach; ?>
@@ -128,7 +140,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                     placeholder="<?php echo esc_attr($field['placeholder'] ?? ''); ?>"
                     <?php echo $required_attr; ?>
                     rows="3"
-                ></textarea>
+                ><?php echo esc_textarea($prefill_value); ?></textarea>
                 <?php
                 break;
                 
@@ -145,6 +157,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                     name="<?php echo $field_name; ?>"
                     <?php echo $min_attr; ?>
                     <?php echo $required_attr; ?>
+                    value="<?php echo esc_attr($prefill_value); ?>"
                 >
                 <?php
                 break;
@@ -157,6 +170,7 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
                     name="<?php echo $field_name; ?>" 
                     placeholder="<?php echo esc_attr($field['placeholder'] ?? ''); ?>"
                     <?php echo $required_attr; ?>
+                    value="<?php echo esc_attr($prefill_value); ?>"
                 >
                 <?php
                 break;
@@ -165,10 +179,12 @@ function yatra_render_form_field($field, $prefix = '', $countries = [], $custom_
     </div>
     <?php
 }
+} // End function_exists check for yatra_render_form_field
 
 /**
  * Render a form section with all its fields
  */
+if (!function_exists('yatra_render_form_section')) {
 function yatra_render_form_section($section_config, $prefix = '', $countries = []) {
     if (isset($section_config['enabled']) && !$section_config['enabled']) {
         return;
@@ -233,6 +249,7 @@ function yatra_render_form_section($section_config, $prefix = '', $countries = [
     </div>
     <?php
 }
+} // End function_exists check for yatra_render_form_section
 ?>
 
 <!-- Hidden Fields -->

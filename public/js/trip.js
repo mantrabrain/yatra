@@ -6,6 +6,38 @@
 (function() {
     'use strict';
 
+    // Currency formatting helper for trip page (uses localized yatraTripData)
+    if (typeof window.yatra_format_price_js !== 'function') {
+        window.yatra_format_price_js = function(amount) {
+            const cfg = window.yatraTripData || {};
+            const symbol = (typeof cfg.currencySymbol === 'string' && cfg.currencySymbol.length)
+                ? cfg.currencySymbol
+                : (typeof cfg.currency === 'string' ? cfg.currency : '$');
+
+            const position = (cfg.currencyPosition || 'before').toString();
+            const decimals = Number.isFinite(Number(cfg.decimalPlaces)) ? Number(cfg.decimalPlaces) : 2;
+            const thousandSep = (typeof cfg.thousandSeparator === 'string') ? cfg.thousandSeparator : ',';
+            const decimalSep = (typeof cfg.decimalSeparator === 'string') ? cfg.decimalSeparator : '.';
+
+            const num = Number(amount) || 0;
+
+            const formatted = new Intl.NumberFormat(undefined, {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals,
+            }).format(num)
+                .replace(/,/g, 'TEMP_THOUSAND')
+                .replace(/\./g, 'TEMP_DECIMAL')
+                .replace(/TEMP_THOUSAND/g, thousandSep)
+                .replace(/TEMP_DECIMAL/g, decimalSep);
+
+            // Accept common variants: before/left vs after/right
+            if (position === 'after' || position === 'right') {
+                return `${formatted} ${symbol}`;
+            }
+            return `${symbol}${formatted}`;
+        };
+    }
+
     /**
      * Gallery Modal Class
      * Handles image gallery modal functionality
@@ -318,6 +350,8 @@
                 },
                 onChange: (selectedDates, dateStr) => {
                     this.dateInput.value = dateStr;
+                    // Update sidebar content for the selected date
+                    this.updateSidebarForDate(dateStr);
                 }
             });
 
@@ -639,9 +673,11 @@
             }
 
             // Show loading state
-            const originalText = this.checkAvailabilityBtn ? this.checkAvailabilityBtn.textContent : 'Check availability';
+            if (this.checkAvailabilityBtn && !this.checkAvailabilityBtn.dataset.originalHtml) {
+                this.checkAvailabilityBtn.dataset.originalHtml = this.checkAvailabilityBtn.innerHTML;
+            }
             if (this.checkAvailabilityBtn) {
-                this.checkAvailabilityBtn.textContent = 'Checking...';
+                this.checkAvailabilityBtn.innerHTML = '<svg class="animate-spin" width="18" height="18" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity="0.25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Checking...';
                 this.checkAvailabilityBtn.disabled = true;
             }
 
@@ -660,7 +696,7 @@
                 this.scrollToAvailability(availabilitySection);
                 // Sync sidebar travelers to cards
                 this.syncSidebarTravelersToCards();
-                this.resetButton(originalText);
+                this.resetButton();
                 return;
             }
 
@@ -759,16 +795,19 @@
                 // Scroll to the new section
                 this.scrollToAvailability(newSection);
 
+                // Auto-select the card matching the selected date
+                this.autoSelectDateCard(date);
+
                 // Sync sidebar travelers to cards
                 this.syncSidebarTravelersToCards();
 
                 // Reset button state
-                this.resetButton(originalText);
+                this.resetButton();
             })
             .catch(error => {
                 console.error('Error loading availability:', error);
                 alert('Failed to load availability. Please try again.');
-                this.resetButton(originalText);
+                this.resetButton();
             });
         }
 
@@ -875,11 +914,134 @@
             }, 100);
         }
 
-        resetButton(originalText) {
+        resetButton() {
             if (this.checkAvailabilityBtn) {
-                this.checkAvailabilityBtn.textContent = originalText;
+                const originalHtml = this.checkAvailabilityBtn.dataset.originalHtml;
+                if (originalHtml) {
+                    this.checkAvailabilityBtn.innerHTML = originalHtml;
+                }
                 this.checkAvailabilityBtn.disabled = false;
             }
+        }
+
+        autoSelectDateCard(selectedDate) {
+            if (!selectedDate) return;
+
+            // Wait a bit for the availability section to render
+            setTimeout(() => {
+                const availabilityCards = document.querySelectorAll('.yatra-availability-card-item');
+                if (!availabilityCards.length) return;
+
+                let matchingCard = null;
+                let nearestCard = null;
+                let minDiff = Infinity;
+
+                const selectedTime = new Date(selectedDate).getTime();
+
+                // Find exact match or nearest date
+                availabilityCards.forEach(card => {
+                    const cardDate = card.dataset.date;
+                    if (!cardDate) return;
+
+                    if (cardDate === selectedDate) {
+                        matchingCard = card;
+                    } else {
+                        const cardTime = new Date(cardDate).getTime();
+                        const diff = Math.abs(cardTime - selectedTime);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            nearestCard = card;
+                        }
+                    }
+                });
+
+                // Use exact match if found, otherwise use nearest
+                const cardToOpen = matchingCard || nearestCard;
+                
+                if (cardToOpen) {
+                    // Open the card
+                    const toggle = cardToOpen.querySelector('.yatra-availability-toggle');
+                    if (toggle && !cardToOpen.classList.contains('open')) {
+                        toggle.click();
+                    }
+
+                    // Scroll to the card
+                    setTimeout(() => {
+                        const offset = 150;
+                        const elementPosition = cardToOpen.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }, 300);
+                }
+            }, 500);
+        }
+
+        updateSidebarForDate(dateStr) {
+            if (!dateStr) return;
+
+            // Get trip ID
+            const tripId = this.checkAvailabilityBtn?.dataset?.tripId || 
+                          document.querySelector('[data-trip-id]')?.dataset?.tripId ||
+                          (window.yatraTripData && window.yatraTripData.tripId);
+
+            if (!tripId) return;
+
+            // Build REST URL
+            let baseUrl = '/wp-json';
+            if (window.yatraTripData && window.yatraTripData.restUrl) {
+                baseUrl = window.yatraTripData.restUrl;
+            } else if (window.wpApiSettings && window.wpApiSettings.root) {
+                baseUrl = window.wpApiSettings.root;
+            }
+            
+            baseUrl = baseUrl.replace(/\/$/, '');
+            
+            let restUrl;
+            if (baseUrl.includes('/yatra/v1')) {
+                restUrl = baseUrl + '/trips/' + tripId + '/date-pricing?date=' + dateStr;
+            } else {
+                restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/date-pricing?date=' + dateStr;
+            }
+
+            const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
+
+            // Fetch date-specific data
+            fetch(restUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.success) {
+                    // Update departures available text
+                    const departuresText = document.querySelector('.yatra-departures-available-text');
+                    if (departuresText && data.departures_count !== undefined) {
+                        departuresText.textContent = data.departures_count + ' departure' + (data.departures_count !== 1 ? 's' : '') + ' available';
+                    }
+
+                    // Update traveler dropdown HTML
+                    const quantitySelector = document.getElementById('quantity-selector');
+                    if (quantitySelector && data.travelers_html) {
+                        quantitySelector.innerHTML = data.travelers_html;
+                        // Re-initialize quantity controls
+                        this.initQuantityControls();
+                    }
+
+                    // Update total price
+                    this.updateTotal();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching date pricing:', error);
+            });
         }
 
         /**
@@ -1026,7 +1188,7 @@
                 totalAmountEl.textContent = yatra_format_price_js(total);
             } else {
                 // Fallback formatting
-                totalAmountEl.textContent = '£ ' + total.toFixed(2);
+                totalAmountEl.textContent = String(total.toFixed(2));
             }
             
             if (totalNoteEl) {
@@ -1503,11 +1665,10 @@
             this.sidebar.style.top = topPosition + 'px';
         }
 
-        scrollToSection(sectionId) {
-            const section = document.getElementById(sectionId);
+        scrollToAvailability(section) {
             if (!section) return;
-
-            const offset = 100;
+            
+            const offset = 100; // Account for sticky header
             const elementPosition = section.getBoundingClientRect().top;
             const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -1515,6 +1676,62 @@
                 top: offsetPosition,
                 behavior: 'smooth'
             });
+        }
+
+        autoSelectDateCard(selectedDate) {
+            if (!selectedDate) return;
+
+            // Wait a bit for the availability section to render
+            setTimeout(() => {
+                const availabilityCards = document.querySelectorAll('.yatra-availability-card-item');
+                if (!availabilityCards.length) return;
+
+                let matchingCard = null;
+                let nearestCard = null;
+                let minDiff = Infinity;
+
+                const selectedTime = new Date(selectedDate).getTime();
+
+                // Find exact match or nearest date
+                availabilityCards.forEach(card => {
+                    const cardDate = card.dataset.date;
+                    if (!cardDate) return;
+
+                    if (cardDate === selectedDate) {
+                        matchingCard = card;
+                    } else {
+                        const cardTime = new Date(cardDate).getTime();
+                        const diff = Math.abs(cardTime - selectedTime);
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            nearestCard = card;
+                        }
+                    }
+                });
+
+                // Use exact match if found, otherwise use nearest
+                const cardToOpen = matchingCard || nearestCard;
+                
+                if (cardToOpen) {
+                    // Open the card
+                    const toggle = cardToOpen.querySelector('.yatra-availability-toggle');
+                    if (toggle && !cardToOpen.classList.contains('open')) {
+                        toggle.click();
+                    }
+
+                    // Scroll to the card
+                    setTimeout(() => {
+                        const offset = 150;
+                        const elementPosition = cardToOpen.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+                        window.scrollTo({
+                            top: offsetPosition,
+                            behavior: 'smooth'
+                        });
+                    }, 300);
+                }
+            }, 500);
         }
 
         handleScroll() {
@@ -1575,6 +1792,8 @@
             this.section = null;
             this.filterButtons = [];
             this.availabilityItems = [];
+            this.currentMonthFilter = 'all';
+            this.currentSortKey = 'date-asc';
             this.init();
         }
 
@@ -1593,6 +1812,11 @@
             this.filterButtons = this.section.querySelectorAll('.yatra-availability-filter-btn');
             this.availabilityItems = this.section.querySelectorAll('.yatra-availability-card');
 
+            const sortSelect = this.section.querySelector('#availability-sort');
+            if (sortSelect && sortSelect.value) {
+                this.currentSortKey = sortSelect.value;
+            }
+
             this.attachEventListeners();
         }
 
@@ -1601,6 +1825,7 @@
             this.filterButtons.forEach((btn) => {
                 btn.addEventListener('click', () => {
                     const filter = btn.getAttribute('data-filter');
+                    this.currentMonthFilter = filter || 'all';
                     this.filterByMonth(filter);
                     
                     // Update active state
@@ -1613,7 +1838,9 @@
             const sortSelect = document.getElementById('availability-sort');
             if (sortSelect) {
                 sortSelect.addEventListener('change', (e) => {
-                    this.sortItems(e.target.value);
+                    const value = e && e.target ? e.target.value : '';
+                    this.currentSortKey = value || 'date-asc';
+                    this.reloadAvailabilityWithSort(this.currentSortKey, sortSelect);
                 });
             }
 
@@ -1680,8 +1907,11 @@
                             travelers = parseInt(adults) + parseInt(children);
                         }
                     }
-                    
-                    if (travelers < 1) travelers = 1;
+
+                    if (travelers < 1) {
+                        this.showBookingError(btn, 'Please select at least 1 traveler to continue.');
+                        return;
+                    }
                     
                     // Show loading state
                     const originalText = btn.innerHTML;
@@ -1766,6 +1996,72 @@
                     this.handleLoadMore();
                 });
             }
+        }
+
+        reloadAvailabilityWithSort(sortKey, selectEl) {
+            const tripId = window.yatraTripData?.tripId || this.section?.getAttribute('data-trip-id') || 0;
+            if (!tripId) {
+                this.sortItems(sortKey);
+                return;
+            }
+
+            const base = (window.yatraTripData?.restUrl || window.yatraTripData?.apiUrl || '/wp-json/yatra/v1').replace(/\/$/, '');
+            const url = `${base}/trips/${tripId}/availability-template?sort=${encodeURIComponent(sortKey || 'date-asc')}`;
+            const nonce = window.yatraTripData?.nonce || '';
+
+            const prevDisabled = !!(selectEl && selectEl.disabled);
+            if (selectEl) {
+                selectEl.disabled = true;
+            }
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-WP-Nonce': nonce,
+                },
+                credentials: 'same-origin',
+            })
+            .then((resp) => resp.json())
+            .then((data) => {
+                const html = data?.html || data?.data?.html;
+                if (!html) {
+                    throw new Error('No HTML returned');
+                }
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const newSection = tempDiv.querySelector('#availability') || tempDiv.firstElementChild;
+                if (!newSection) {
+                    throw new Error('Invalid HTML');
+                }
+
+                const oldSection = document.getElementById('availability');
+                if (oldSection) {
+                    oldSection.replaceWith(newSection);
+                }
+
+                // Rebind handlers on the new section
+                this.setup();
+
+                // Re-apply the active month filter (client-side)
+                const activeBtn = this.section.querySelector(`.yatra-availability-filter-btn[data-filter="${this.currentMonthFilter}"]`);
+                if (activeBtn) {
+                    this.filterButtons.forEach((b) => b.classList.remove('active'));
+                    activeBtn.classList.add('active');
+                }
+                this.filterByMonth(this.currentMonthFilter);
+            })
+            .catch((err) => {
+                console.error('[Yatra] Availability sort reload failed:', err);
+                // Fallback to client-side sort
+                this.sortItems(sortKey);
+            })
+            .finally(() => {
+                if (selectEl) {
+                    selectEl.disabled = prevDisabled;
+                }
+            });
         }
         
         /**
@@ -1919,6 +2215,9 @@
                         if (plusBtn) plusBtn.disabled = value >= max;
                     }
                 });
+                
+                // Initialize total price for this card
+                this.updateTotalPrice(itemIndex);
             });
             
             // Initialize regular pricing selectors (simple number inputs)
@@ -1963,6 +2262,9 @@
                         }
                     });
                 });
+                
+                // Initialize total price for this card
+                this.updateTotalPrice(itemIndex);
             });
         }
 
@@ -2075,10 +2377,12 @@
             const groupDiscountApplied = groupDiscountResult.discountApplied;
             const groupDiscountAmount = groupDiscountResult.discountAmount;
 
-            // Format price using the existing format from the element
-            const existingText = totalAmountElement.textContent.trim();
-            const currencySymbol = existingText.match(/^[^\d]+/)?.[0] || '£ ';
-            totalAmountElement.textContent = currencySymbol + finalPrice.toFixed(2);
+            // Format price with shared formatter (uses yatraTripData settings)
+            if (typeof yatra_format_price_js === 'function') {
+                totalAmountElement.textContent = yatra_format_price_js(finalPrice);
+            } else {
+                totalAmountElement.textContent = String(finalPrice.toFixed(2));
+            }
 
             // Update the note text
             const noteElement = this.section.querySelector(
@@ -2091,7 +2395,10 @@
                 
                 // Add group discount info if applied
                 if (groupDiscountApplied && groupDiscountAmount > 0) {
-                    travelerText += ` (Group discount: -${currencySymbol}${groupDiscountAmount.toFixed(2)})`;
+                    const discountText = (typeof yatra_format_price_js === 'function')
+                        ? yatra_format_price_js(groupDiscountAmount)
+                        : String(groupDiscountAmount.toFixed(2));
+                    travelerText += ` (Group discount: -${discountText})`;
                 }
                 noteElement.textContent = travelerText;
             }
@@ -2388,6 +2695,11 @@
                     const adults = this.getTravelerCount(itemIndex, 'adults');
                     const children = this.getTravelerCount(itemIndex, 'children');
                     const travelers = parseInt(adults) + parseInt(children);
+
+                    if (!travelers || travelers < 1) {
+                        this.showBookingError(newBtn, 'Please select at least 1 traveler to continue.');
+                        return;
+                    }
                     
                     // Show loading state
                     const originalText = newBtn.innerHTML;
@@ -2413,7 +2725,7 @@
                         },
                         body: JSON.stringify({
                             trip_id: parseInt(tripId),
-                            travelers: travelers || 1,
+                            travelers: travelers,
                             travel_date: date || ''
                         })
                     })
