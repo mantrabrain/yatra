@@ -64226,61 +64226,7 @@ const Availability = () => {
       PageHeader,
       {
         title: __("Availability Management", "Availability Management"),
-        description: __("Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.", "Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year."),
-        actions: selectedTripId ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Button,
-              {
-                variant: viewMode === "list" ? "default" : "ghost",
-                size: "sm",
-                onClick: () => setViewMode("list"),
-                className: "rounded-none border-0",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-4 h-4 mr-1" }),
-                  __("List", "List")
-                ]
-              }
-            ),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs(
-              Button,
-              {
-                variant: viewMode === "calendar" ? "default" : "ghost",
-                size: "sm",
-                onClick: () => setViewMode("calendar"),
-                className: "rounded-none border-0",
-                children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4 mr-1" }),
-                  __("Calendar", "Calendar")
-                ]
-              }
-            )
-          ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              variant: "outline",
-              size: "sm",
-              onClick: handleSync,
-              disabled: isSyncing,
-              title: lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __("Sync availability", "Sync availability"),
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}` }),
-                __("Sync", "Sync")
-              ]
-            }
-          ),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs(
-            Button,
-            {
-              onClick: () => navigate({ subpage: "trips", tab: "availability", action: "create", trip_id: selectedTripId.toString() }),
-              children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
-                __("Add Availability Date", "Add Availability Date")
-              ]
-            }
-          )
-        ] }) : null
+        description: __("Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.", "Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.")
       }
     ),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6", children: [
@@ -64373,6 +64319,60 @@ const Availability = () => {
         }
       ),
       tabMode === "specific" && /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+        selectedTripId && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-end gap-2 mb-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                variant: viewMode === "list" ? "default" : "ghost",
+                size: "sm",
+                onClick: () => setViewMode("list"),
+                className: "rounded-none border-0",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(List, { className: "w-4 h-4 mr-1" }),
+                  __("List", "List")
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              Button,
+              {
+                variant: viewMode === "calendar" ? "default" : "ghost",
+                size: "sm",
+                onClick: () => setViewMode("calendar"),
+                className: "rounded-none border-0",
+                children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(Calendar$1, { className: "w-4 h-4 mr-1" }),
+                  __("Calendar", "Calendar")
+                ]
+              }
+            )
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              variant: "outline",
+              size: "sm",
+              onClick: handleSync,
+              disabled: isSyncing,
+              title: lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __("Sync availability", "Sync availability"),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}` }),
+                __("Sync", "Sync")
+              ]
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: () => navigate({ subpage: "trips", tab: "availability", action: "create", trip_id: selectedTripId.toString() }),
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4 mr-2" }),
+                __("Add Availability Date", "Add Availability Date")
+              ]
+            }
+          )
+        ] }),
         showAlerts && inventoryAlerts.length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsx(Alert, { variant: "warning", className: "border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between w-full", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 flex-1", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(Bell, { className: "w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" }),

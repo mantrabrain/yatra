@@ -827,53 +827,6 @@ const Availability: React.FC = () => {
       <PageHeader
         title={__('Availability Management', 'Availability Management')}
         description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.')}
-        actions={
-          selectedTripId ? (
-            <div className="flex items-center gap-2">
-              {/* View Toggle */}
-              <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className="rounded-none border-0"
-                >
-                  <List className="w-4 h-4 mr-1" />
-                  {__('List', 'List')}
-                </Button>
-                <Button
-                  variant={viewMode === 'calendar' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('calendar')}
-                  className="rounded-none border-0"
-                >
-                  <Calendar className="w-4 h-4 mr-1" />
-                  {__('Calendar', 'Calendar')}
-                </Button>
-              </div>
-              
-              {/* Sync Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSync}
-                disabled={isSyncing}
-                title={lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __('Sync availability', 'Sync availability')}
-              >
-                <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-                {__('Sync', 'Sync')}
-              </Button>
-              
-              {/* Add Availability Button */}
-              <Button
-                onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                {__('Add Availability Date', 'Add Availability Date')}
-              </Button>
-            </div>
-          ) : null
-        }
       />
 
       {/* Trip Selector - Clean Design */}
@@ -1005,6 +958,53 @@ const Availability: React.FC = () => {
           {/* Specific Dates Tab Content */}
           {tabMode === 'specific' && (
             <>
+              {/* Action Buttons - Right Aligned */}
+              {selectedTripId && (
+                <div className="flex items-center justify-end gap-2 mb-4">
+                  {/* View Toggle */}
+                  <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden">
+                    <Button
+                      variant={viewMode === 'list' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('list')}
+                      className="rounded-none border-0"
+                    >
+                      <List className="w-4 h-4 mr-1" />
+                      {__('List', 'List')}
+                    </Button>
+                    <Button
+                      variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+                      size="sm"
+                      onClick={() => setViewMode('calendar')}
+                      className="rounded-none border-0"
+                    >
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {__('Calendar', 'Calendar')}
+                    </Button>
+                  </div>
+                  
+                  {/* Sync Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSync}
+                    disabled={isSyncing}
+                    title={lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __('Sync availability', 'Sync availability')}
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                    {__('Sync', 'Sync')}
+                  </Button>
+                  
+                  {/* Add Availability Button */}
+                  <Button
+                    onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {__('Add Availability Date', 'Add Availability Date')}
+                  </Button>
+                </div>
+              )}
+
               {/* Inventory Alerts */}
               {showAlerts && inventoryAlerts.length > 0 && (
             <Alert variant="warning" className="border-yellow-300 bg-yellow-50 dark:bg-yellow-900/10">
