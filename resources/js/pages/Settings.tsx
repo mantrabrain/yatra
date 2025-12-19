@@ -113,10 +113,6 @@ const GoogleCalendarIntegrationSection: React.FC<{
     const allSettings = {
       google_calendar_client_id: clientId,
       google_calendar_client_secret: clientSecret,
-      google_calendar_calendar_id: calendarId,
-      google_calendar_calendar_name: calendarName,
-      google_calendar_connected: connected,
-      google_calendar_last_sync: lastSync,
       google_calendar_enabled: true, // Enable by default when settings are provided
     };
     
@@ -133,7 +129,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   // Update formData when any setting changes
   useEffect(() => {
     syncSettingsToFormData();
-  }, [clientId, clientSecret, calendarId, calendarName, connected, lastSync]);
+  }, [clientId, clientSecret]);
 
   const handleConnect = async () => {
     setConnecting(true);

@@ -303,6 +303,13 @@ class BookingService
                 'execution_time' => $executionTime
             ]);
 
+            $booking = $this->bookingRepository->find((int) $bookingId);
+            if (!is_object($booking)) {
+                $booking = (object) [];
+            }
+
+            do_action('yatra_booking_created', (int) $bookingId, $booking);
+
             return [
                 'success' => true,
                 'booking_id' => $bookingId,
@@ -527,6 +534,12 @@ class BookingService
             return ['success' => false, 'message' => __('Failed to delete booking.', 'yatra')];
         }
 
+        if (!is_object($booking)) {
+            $booking = (object) [];
+        }
+
+        do_action('yatra_booking_deleted', (int) $id, $booking);
+
         return [
             'success' => true,
             'message' => __('Booking deleted successfully.', 'yatra'),
@@ -671,6 +684,8 @@ class BookingService
          * @since 3.0.0
          */
         $formatted['additional_services'] = apply_filters('yatra_booking_get_services', [], (int) $booking->id);
+
+        $formatted = apply_filters('yatra_booking_details', $formatted, (int) $booking->id);
 
         return $formatted;
     }

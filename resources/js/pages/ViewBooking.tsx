@@ -17,6 +17,16 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
 
+interface GoogleCalendarSyncInfo {
+  synced: boolean;
+  calendar_id: string | null;
+  event_id: string | null;
+  event_type: string | null;
+  sync_status: string | null;
+  error_message: string | null;
+  last_synced_at: string | null;
+}
+
 interface FormFieldConfig {
   id: string;
   type: string;
@@ -147,6 +157,7 @@ const ViewBooking: React.FC = () => {
           cancelled_at: data.cancelled_at,
           cancellation_reason: data.cancellation_reason,
           trip_details: data.trip_details,
+          google_calendar: data.google_calendar as GoogleCalendarSyncInfo | undefined,
         };
       }
 
@@ -732,6 +743,68 @@ const ViewBooking: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-3">
+            {/* Google Calendar Sync */}
+            {(window as any).yatraAdmin?.isPro &&
+              !!(window as any).yatraAdmin?.googleCalendar?.enabled &&
+              (booking as any).google_calendar && (
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Google Calendar Sync', 'Google Calendar Sync')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {(() => {
+                    const gc = (booking as any).google_calendar as GoogleCalendarSyncInfo;
+                    const status = gc.sync_status || (gc.synced ? 'synced' : 'not_synced');
+                    const statusClass =
+                      status === 'synced'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                        : status === 'failed'
+                          ? 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                          : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
+
+                    return (
+                      <>
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Status', 'Status')}</div>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${statusClass}`}>
+                            {status}
+                          </span>
+                        </div>
+
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Last Synced', 'Last Synced')}</div>
+                          <div className="text-sm text-gray-900 dark:text-white">
+                            {gc.last_synced_at ? formatDate(gc.last_synced_at) : __('—', '—')}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Calendar', 'Calendar')}</div>
+                          <div className="text-sm text-gray-900 dark:text-white break-all">
+                            {gc.calendar_id || __('—', '—')}
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Event ID', 'Event ID')}</div>
+                          <div className="text-sm text-gray-900 dark:text-white font-mono break-all">
+                            {gc.event_id || __('—', '—')}
+                          </div>
+                        </div>
+
+                        {gc.error_message && (
+                          <div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Error', 'Error')}</div>
+                            <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-wrap">{gc.error_message}</div>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            )}
+
             {/* Payment Information */}
             <Card>
               <CardHeader className="pb-2">

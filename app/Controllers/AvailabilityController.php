@@ -137,8 +137,74 @@ class AvailabilityController extends BaseController
             $items = $this->service->getByTripId($tripId, $filters);
             $total = $this->service->countByTripId($tripId, $filters);
 
-            $data = array_map(function ($item) use ($request) {
-                return $this->prepare_item_for_response($item, $request);
+            global $wpdb;
+            $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+
+            $activeBookingStatuses = [
+                'pending',
+                'confirmed',
+                'processing',
+                'completed',
+                'on_hold',
+            ];
+            $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
+
+            // Aggregate bookings count per availability date for this trip
+            $countsByAvailabilityId = [];
+
+            $rows = $wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT availability_id, SUM(travelers_count) AS booked_count
+                     FROM {$bookingsTable}
+                     WHERE trip_id = %d
+                       AND availability_id IS NOT NULL
+                       AND status IN ({$placeholders})
+                     GROUP BY availability_id",
+                    array_merge([(int) $tripId], $activeBookingStatuses)
+                ),
+                ARRAY_A
+            );
+
+            foreach ($rows as $row) {
+                $aid = (int) ($row['availability_id'] ?? 0);
+                if ($aid > 0) {
+                    $countsByAvailabilityId[$aid] = (int) ($row['booked_count'] ?? 0);
+                }
+            }
+
+            $data = array_map(function ($item) use ($request, $countsByAvailabilityId) {
+                $prepared = $this->prepare_item_for_response($item, $request);
+
+                $availabilityId = (int) ($prepared['id'] ?? 0);
+                $bookedCount = 0;
+
+                if ($availabilityId > 0 && isset($countsByAvailabilityId[$availabilityId])) {
+                    $bookedCount = (int) $countsByAvailabilityId[$availabilityId];
+                }
+
+                $seatsTotal = (int) ($prepared['seats_total'] ?? 0);
+                $seatsReserved = (int) ($prepared['seats_reserved'] ?? 0);
+                $available = max(0, $seatsTotal - $bookedCount - $seatsReserved);
+
+                $prepared['booked_seats'] = $bookedCount;
+                $prepared['total_seats'] = $seatsTotal;
+                $prepared['available_seats'] = $available;
+                $prepared['seats_available'] = $available;
+
+                // Keep status consistent with derived availability
+                if ($available === 0) {
+                    $prepared['status'] = 'sold_out';
+                } elseif ($seatsTotal > 0 && $available <= (int) ceil($seatsTotal * 0.2)) {
+                    if ($prepared['status'] !== 'blocked' && $prepared['status'] !== 'closed' && $prepared['status'] !== 'cancelled') {
+                        $prepared['status'] = 'limited';
+                    }
+                } else {
+                    if ($prepared['status'] !== 'blocked' && $prepared['status'] !== 'closed' && $prepared['status'] !== 'cancelled') {
+                        $prepared['status'] = 'available';
+                    }
+                }
+
+                return $prepared;
             }, $items);
 
             return new WP_REST_Response([

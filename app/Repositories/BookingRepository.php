@@ -696,7 +696,7 @@ class BookingRepository extends BaseRepository
             'ip_address', 'payment_session_id', 'payment_transaction_id', 'cancellation_reason',
         ];
 
-        $intFields = ['trip_id', 'customer_id', 'user_id', 'travelers_count', 'cancelled_by'];
+        $intFields = ['trip_id', 'customer_id', 'user_id', 'travelers_count', 'cancelled_by', 'availability_id'];
 
         $floatFields = ['total_amount', 'amount_paid', 'amount_due', 'discount_amount'];
 

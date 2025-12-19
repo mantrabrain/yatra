@@ -209,6 +209,8 @@ class BookingCronService
                 __('Booking expired due to non-payment', 'yatra')
             );
 
+            do_action('yatra_booking_status_changed', (int) $booking->id, 'pending', 'cancelled');
+
             // Get trip title for email
             $trip = $tripRepository->find($booking->trip_id);
 

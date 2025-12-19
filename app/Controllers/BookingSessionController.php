@@ -1073,6 +1073,7 @@ class BookingSessionController extends BaseController
                 'contact_data' => wp_json_encode($contact_data),
                 'emergency_contact' => wp_json_encode($emergency_data),
                 'travel_date' => sanitize_text_field($travel_date),
+                'availability_id' => !empty($availability_id) ? (int) $availability_id : null,
                 'travelers_count' => $travelers_count,
                 'travelers_data' => '', // Legacy field - travellers now stored in separate table
                 'total_amount' => $total_amount,
@@ -1090,7 +1091,7 @@ class BookingSessionController extends BaseController
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),
             ],
-            ['%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
+            ['%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
         );
 
         if ($result === false) {
@@ -1330,6 +1331,10 @@ class BookingSessionController extends BaseController
              WHERE b.id = %d",
             $booking_id
         ));
+
+        if (!is_object($booking)) {
+            $booking = (object) [];
+        }
         
         /**
          * Action: Booking created
@@ -1339,7 +1344,7 @@ class BookingSessionController extends BaseController
          * @param object $booking The booking object with trip data
          * @since 3.0.0
          */
-        do_action('yatra_booking_created', $booking_id, $booking);
+        do_action('yatra_booking_created', (int) $booking_id, $booking);
         
         // If booking was auto-confirmed, also fire status changed action
         if ($booking_status === 'confirmed') {
@@ -1352,7 +1357,7 @@ class BookingSessionController extends BaseController
              * @param string $new_status New status
              * @since 3.0.0
              */
-            do_action('yatra_booking_status_changed', $booking_id, 'pending', 'confirmed');
+            do_action('yatra_booking_status_changed', (int) $booking_id, 'pending', 'confirmed');
         }
 
         // ========================================

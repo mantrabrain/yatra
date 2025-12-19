@@ -51,6 +51,10 @@ class Bootstrap
             if (class_exists('\Yatra\Hooks\CacheHooks')) {
                 \Yatra\Hooks\CacheHooks::init();
             }
+
+            if (class_exists('\Yatra\Hooks\AvailabilityInventoryHooks')) {
+                \Yatra\Hooks\AvailabilityInventoryHooks::init();
+            }
             
             // Initialize core components
             $this->initializeCore();

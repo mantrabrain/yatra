@@ -23,6 +23,16 @@ import { Table as SharedTable } from '../components/shared/Table';
 import { SearchFilterToolbar, BulkActionToolbar } from '../components/shared';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
+import { getCurrencySymbol } from '../data/currencies';
+import {
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from 'recharts';
 import { 
   TrendingUp, 
   DollarSign, 
@@ -438,7 +448,7 @@ const DynamicPricingPage: React.FC = () => {
   });
 
   // Fetch statistics
-  const { data: statsData } = useQuery({
+  const { data: statsData, isLoading: isStatsLoading, error: statsError } = useQuery({
     queryKey: ['dynamic-pricing-statistics'],
     queryFn: async () => {
       const response = await apiClient.get('/dynamic-pricing/statistics');
@@ -447,8 +457,58 @@ const DynamicPricingPage: React.FC = () => {
     },
   });
 
-  const rules = rulesData?.data || [];
-  const stats = statsData?.data || {};
+  // The API client returns the decoded JSON body.
+  // Some endpoints return { data: {...} } while others might return { data: { data: {...} } }.
+  const rulesPayload = (rulesData as any)?.data?.data ?? (rulesData as any)?.data ?? [];
+  const statsPayload = (statsData as any)?.data?.data ?? (statsData as any)?.data ?? {};
+
+  const rules = rulesPayload || [];
+  const stats = statsPayload || {};
+
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
+  const currencyPosition = (window as any)?.yatraAdmin?.currencyPosition || (window as any)?.yatraAdmin?.currency_position || 'before';
+  const decimalPlaces = Number((window as any)?.yatraAdmin?.decimalPlaces || (window as any)?.yatraAdmin?.currency_decimals || 2);
+  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+
+  const formatCurrencyAmount = (amount: number) => {
+    const numPrice = Number(amount) || 0;
+    const formattedAmount = new Intl.NumberFormat(undefined, {
+      minimumFractionDigits: decimalPlaces,
+      maximumFractionDigits: decimalPlaces,
+    })
+      .format(numPrice)
+      .replace(/,/g, 'TEMP_THOUSAND')
+      .replace(/\./g, decimalSeparator)
+      .replace(/TEMP_THOUSAND/g, thousandSeparator);
+
+    const currencySymbol = getCurrencySymbol(globalCurrency);
+    if (currencyPosition === 'after' || currencyPosition === 'right') {
+      return `${formattedAmount} ${currencySymbol}`;
+    }
+    return `${currencySymbol}${formattedAmount}`;
+  };
+
+  const trendData = Array.isArray((stats as any)?.pricing_history_trend_last_30_days)
+    ? (stats as any).pricing_history_trend_last_30_days.map((row: any) => {
+        const day = String(row.day || '');
+        const dateLabel = day ? new Date(day).toLocaleDateString() : '';
+        return {
+          day,
+          dateLabel,
+          events: Number(row.events) || 0,
+          totalAdjustmentAmount: Number(row.total_adjustment_amount) || 0,
+          avgAdjustmentPercentage: Number(row.avg_adjustment_percentage) || 0,
+        };
+      })
+    : [];
+
+  const ruleImpact = Array.isArray((stats as any)?.pricing_history_rule_impact_last_30_days)
+    ? (stats as any).pricing_history_rule_impact_last_30_days
+    : [];
+
+  const analyticsLoading = isLoading || isStatsLoading;
+  const statsErrorMessage = statsError ? (statsError as any)?.message || String(statsError) : '';
   
   // Filter and sort rules
   const filteredRules = useMemo(() => {
@@ -954,7 +1014,7 @@ const DynamicPricingPage: React.FC = () => {
       {activeTab === 'analytics' && (
         <div className="space-y-6">
           {/* Performance Metrics */}
-          {isLoading ? (
+          {analyticsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (
                 <Card key={i}>
@@ -1022,6 +1082,79 @@ const DynamicPricingPage: React.FC = () => {
             </div>
           )}
 
+          {/* Pricing History Metrics (what powers analytics) */}
+          {analyticsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i}>
+                  <CardContent className="pt-6">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-28 mb-2 animate-pulse"></div>
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-32 animate-pulse"></div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Pricing Events')}</p>
+                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.pricing_history_total || 0}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('Recorded price adjustments')}</p>
+                    </div>
+                    <BarChart className="w-8 h-8 text-blue-600 dark:text-blue-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Trips Affected')}</p>
+                      <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.pricing_history_trips_affected || 0}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('Unique trips with adjustments')}</p>
+                    </div>
+                    <Package className="w-8 h-8 text-orange-600 dark:text-orange-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Avg Adjustment')}</p>
+                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                        {typeof stats.pricing_history_avg_adjustment_percentage === 'number'
+                          ? `${stats.pricing_history_avg_adjustment_percentage.toFixed(2)}%`
+                          : '0%'}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('Average % change')}</p>
+                    </div>
+                    <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Last 30 Days')}</p>
+                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.pricing_history_last_30_days || 0}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('Recent pricing events')}</p>
+                    </div>
+                    <Clock className="w-8 h-8 text-green-600 dark:text-green-400" />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* Rule Performance */}
           <Card>
             <CardHeader>
@@ -1029,7 +1162,7 @@ const DynamicPricingPage: React.FC = () => {
               <CardDescription>{__('How each pricing rule is performing')}</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
+              {analyticsLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
                     <div key={i} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
@@ -1043,28 +1176,28 @@ const DynamicPricingPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {rules.length > 0 ? (
-                    rules.slice(0, 5).map((rule: any) => (
-                      <div key={rule.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                  {ruleImpact.length > 0 ? (
+                    ruleImpact.map((ri: any) => (
+                      <div key={ri.rule_id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
-                            <h4 className="font-semibold text-gray-900 dark:text-white">{rule.name}</h4>
+                            <h4 className="font-semibold text-gray-900 dark:text-white">{ri.name || `${__('Rule')} #${ri.rule_id}`}</h4>
                             <Badge variant="default" className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
-                              {rule.rule_type?.replace('_', ' ')}
+                              {(ri.rule_type || '').replace('_', ' ')}
                             </Badge>
-                            <Badge variant={rule.status === 'active' ? 'success' : 'outline'}>
-                              {rule.status}
+                            <Badge variant="outline">
+                              {ri.adjustment_type || ''}
                             </Badge>
                           </div>
                           <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                            <span>{__('Priority')}: {rule.priority}</span>
+                            <span>{__('Events')}: {ri.events || 0}</span>
                             <span>•</span>
-                            <span>{rule.adjustment_type === 'percentage' ? `${rule.adjustment_value}%` : `$${rule.adjustment_value}`}</span>
+                            <span>{__('Avg Adjustment')}: {typeof ri.avg_adjustment_value === 'number' ? ri.avg_adjustment_value.toFixed(2) : Number(ri.avg_adjustment_value || 0).toFixed(2)}</span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{__('Created')}</p>
-                          <p className="text-xs text-gray-400 dark:text-gray-500">{new Date(rule.created_at).toLocaleDateString()}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{__('Impact (30d)')}</p>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatCurrencyAmount(Number(ri.total_adjustment_amount) || 0)}</p>
                         </div>
                       </div>
                     ))
@@ -1086,14 +1219,74 @@ const DynamicPricingPage: React.FC = () => {
               <CardDescription>{__('30-day revenue comparison with and without dynamic pricing')}</CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? (
+              {!analyticsLoading && statsErrorMessage ? (
+                <div className="mb-4 text-sm text-red-600 dark:text-red-400">
+                  {__('Failed to load statistics:')} {statsErrorMessage}
+                </div>
+              ) : null}
+
+              {analyticsLoading ? (
                 <div className="h-80 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              ) : trendData.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="w-full" style={{ height: 280 }}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={trendData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis
+                          dataKey="day"
+                          tick={{ fontSize: 12 }}
+                          tickFormatter={(v: any) => (v ? new Date(String(v)).toLocaleDateString() : '')}
+                        />
+                        <YAxis tick={{ fontSize: 12 }} tickFormatter={(v: any) => formatCurrencyAmount(Number(v) || 0)} />
+                        <Tooltip
+                          formatter={(value: any, name: any) => {
+                            if (name === 'totalAdjustmentAmount') {
+                              return [formatCurrencyAmount(Number(value) || 0), __('Revenue Impact')];
+                            }
+                            if (name === 'events') {
+                              return [Number(value) || 0, __('Events')];
+                            }
+                            if (name === 'avgAdjustmentPercentage') {
+                              return [`${Number(value || 0).toFixed(2)}%`, __('Avg Adjustment')];
+                            }
+                            return [value, name];
+                          }}
+                        />
+                        <Line type="monotone" dataKey="totalAdjustmentAmount" stroke="#22c55e" strokeWidth={2} dot={{ r: 2 }} activeDot={{ r: 4 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="w-full overflow-x-auto">
+                    <div className="max-h-[420px] overflow-y-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                      <table className="w-full table-fixed border-collapse text-sm">
+                        <thead className="sticky top-0 bg-white dark:bg-gray-900">
+                          <tr className="text-left text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
+                            <th className="py-3 px-4 w-1/4">{__('Date')}</th>
+                            <th className="py-3 px-4 w-1/6 text-right">{__('Events')}</th>
+                            <th className="py-3 px-4 w-1/3 text-right">{__('Revenue Impact')}</th>
+                            <th className="py-3 px-4 w-1/4 text-right">{__('Avg Adjustment')}</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trendData.map((row: any) => (
+                            <tr key={row.day} className="border-b border-gray-100 dark:border-gray-800">
+                              <td className="py-3 px-4 text-gray-900 dark:text-white">{row.day ? new Date(String(row.day)).toLocaleDateString() : ''}</td>
+                              <td className="py-3 px-4 text-right text-gray-900 dark:text-white">{row.events ?? 0}</td>
+                              <td className="py-3 px-4 text-right text-gray-900 dark:text-white tabular-nums">{formatCurrencyAmount(Number(row.totalAdjustmentAmount) || 0)}</td>
+                              <td className="py-3 px-4 text-right text-gray-900 dark:text-white tabular-nums">{`${Number(row.avgAdjustmentPercentage || 0).toFixed(2)}%`}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               ) : (
-                <div className="h-80 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+                <div className="h-40 flex items-center justify-center border border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
                   <div className="text-center">
-                    <BarChart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <p className="text-gray-500 dark:text-gray-400">{__('Chart visualization will be displayed here')}</p>
-                    <p className="text-sm text-gray-400 dark:text-gray-500 mt-2">{__('Showing revenue with vs without dynamic pricing')}</p>
+                    <p className="text-gray-500 dark:text-gray-400">{__('No pricing history in the last 30 days')}</p>
                   </div>
                 </div>
               )}

@@ -931,6 +931,7 @@ class Database
             `contact_data` text COMMENT 'JSON with full contact details',
             `emergency_contact` text COMMENT 'JSON with emergency contact details',
             `travel_date` date NOT NULL,
+            `availability_id` bigint(20) UNSIGNED DEFAULT NULL,
             `travelers_count` smallint(5) UNSIGNED NOT NULL DEFAULT 1,
             `travelers_data` longtext NOT NULL COMMENT 'JSON array of traveler details',
             `total_amount` decimal(12,2) NOT NULL,
@@ -972,6 +973,7 @@ class Database
             KEY `idx_status` (`status`),
             KEY `idx_payment_status` (`payment_status`),
             KEY `idx_travel_date` (`travel_date`),
+            KEY `idx_availability_id` (`availability_id`),
             KEY `idx_created` (`created_at`)
         ) {$charset_collate} COMMENT='Trip bookings';";
 
@@ -1784,6 +1786,46 @@ class Database
                 $wpdb->query(
                     "ALTER TABLE `{$table_bookings}` 
                      ADD KEY `idx_customer_id` (`customer_id`)"
+                );
+            }
+
+            if (!$bookingColumnExists('availability_id')) {
+                $wpdb->query(
+                    "ALTER TABLE `{$table_bookings}` 
+                     ADD COLUMN `availability_id` bigint(20) UNSIGNED DEFAULT NULL 
+                     AFTER `travel_date`"
+                );
+
+                $wpdb->query(
+                    "ALTER TABLE `{$table_bookings}` 
+                     ADD KEY `idx_availability_id` (`availability_id`)"
+                );
+            }
+
+            if ($bookingColumnExists('departure_time')) {
+                $indexExists = function($index) use ($wpdb, $table_bookings) {
+                    return (int) $wpdb->get_var(
+                        $wpdb->prepare(
+                            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.STATISTICS 
+                             WHERE TABLE_SCHEMA = DATABASE() 
+                             AND TABLE_NAME = %s 
+                             AND INDEX_NAME = %s",
+                            $table_bookings,
+                            $index
+                        )
+                    ) > 0;
+                };
+
+                if ($indexExists('idx_trip_date_time')) {
+                    $wpdb->query(
+                        "ALTER TABLE `{$table_bookings}` 
+                         DROP INDEX `idx_trip_date_time`"
+                    );
+                }
+
+                $wpdb->query(
+                    "ALTER TABLE `{$table_bookings}` 
+                     DROP COLUMN `departure_time`"
                 );
             }
         }
