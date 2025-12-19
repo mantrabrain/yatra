@@ -35,8 +35,8 @@ class CapacityService
     {
         // 1. Check Availability Date first (specific date overrides)
         $availability = $this->availabilityRepository->findByTripIdAndDate($tripId, $date);
-        if ($availability && isset($availability->max_travellers) && $availability->max_travellers > 0) {
-            return (int) $availability->max_travellers;
+        if ($availability && isset($availability->seats_total) && $availability->seats_total > 0) {
+            return (int) $availability->seats_total;
         }
 
         // 2. Check Recurring Availability Rules

@@ -72,8 +72,13 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
             $original_price = (float) ($card['original_price'] ?? $sale_price);
             $seats_available = (int) ($card['seats_available'] ?? 0);
             $is_limited = !empty($card['is_limited']);
+            $card_status = $card['status'] ?? 'available';
+            $is_sold_out = isset($card['is_sold_out']) && $card['is_sold_out'];
+            if ($is_sold_out || $card_status === 'sold_out') {
+                $card_status = 'sold_out';
+            }
         ?>
-        <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> <?php echo $is_hidden ? 'yatra-hidden-departure' : ''; ?>"
+        <div class="yatra-availability-card <?php echo $index === 0 ? 'open' : ''; ?> <?php echo $is_limited ? 'limited' : ''; ?> <?php echo $is_hidden ? 'yatra-hidden-departure' : ''; ?> yatra-card-status-<?php echo esc_attr($card_status); ?>"
              data-availability-id="<?php echo esc_attr($item_id); ?>"
              data-month="<?php echo esc_attr($card['data_month'] ?? ''); ?>"
              data-date="<?php echo esc_attr($card['data_date'] ?? ''); ?>"
@@ -85,6 +90,7 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
             
             <!-- Card Header (Clickable) -->
             <div class="yatra-availability-card-header yatra-availability-toggle" role="button" tabindex="0" aria-label="<?php esc_attr_e('Toggle availability details', 'yatra'); ?>">
+                
                 <?php
                 // Placeholder for discount badge (will be set after price calculation)
                 $final_discount_badge = '';
@@ -97,6 +103,7 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                 </div>
                 <?php endif; ?>
                 <div class="yatra-card-header-grid <?php echo !empty($card['date_display']) ? 'yatra-day-trip-grid' : ''; ?>">
+                    
                     <!-- Start/Departure -->
                     <div class="yatra-card-header-item">
                         <div class="yatra-card-header-label"><?php echo esc_html($card['from_label'] ?? __('Departure', 'yatra')); ?></div>
@@ -210,43 +217,50 @@ $max_travelers = (int) ($trip_data->max_travelers ?? 20);
                             echo '<!-- Departure Date: ' . ($card['date'] ?? 'null') . ' -->';
                             echo '<!-- Trip ID: ' . $trip_id . ' -->';
                             echo '<!-- Original Price: ' . $original_price . ' -->';
-                            echo '<!-- Sale Price Before Dynamic: ' . $sale_before . ' -->';
-                            echo '<!-- Final Price After Dynamic: ' . $display_sale_price . ' -->';
-                            echo '<!-- Regular Discount: ' . round($regular_discount) . '% -->';
-                            echo '<!-- Dynamic Change: ' . round($dynamic_change) . '% -->';
-                            echo '<!-- Total Discount: ' . $total_discount_percent . '% -->';
-                            echo '<!-- END DEBUG -->';
+                            echo '<span class="yatra-sale-price">' . yatra_format_price($display_sale_price) . '</span>';
                             ?>
-                            <?php if ($card_pricing_type === 'traveler_based'): ?>
-                            <span class="yatra-card-price-prefix"><?php esc_html_e('From', 'yatra'); ?></span>
-                            <?php endif; ?>
-                            <?php if ($display_original_price > $display_sale_price): ?>
-                            <span class="yatra-card-price-original"><?php echo esc_html(yatra_format_price($display_original_price)); ?></span>
-                            <?php endif; ?>
-                            <span class="yatra-card-price-sale"><?php echo esc_html(yatra_format_price($display_sale_price)); ?></span>
                         </div>
+                        <span class="yatra-price-label"><?php echo esc_html__('per person', 'yatra'); ?></span>
                     </div>
                     
-                    <!-- Arrow -->
+                    <!-- Toggle Arrow -->
                     <div class="yatra-card-header-arrow">
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
                 </div>
                 
-                <?php
-                // DEBUG: Check if badge variable is set
-                echo '<!-- BADGE DEBUG: final_discount_badge = ' . (!empty($final_discount_badge) ? 'SET' : 'EMPTY') . ' -->';
-                if (!empty($final_discount_badge)) {
-                    echo '<!-- BADGE HTML: ' . esc_html($final_discount_badge) . ' -->';
-                }
-                
-                // Output the discount badge at card header level (top-right corner)
-                if (!empty($final_discount_badge)) {
-                    echo $final_discount_badge;
-                }
-                ?>
+                <!-- Badges Container (Status + Discount) -->
+                <div class="yatra-card-badges-container">
+                    <!-- Status Badge -->
+                    <?php
+                    $card_status = $card['status'] ?? 'available';
+                    $is_sold_out = isset($card['is_sold_out']) && $card['is_sold_out'];
+                    
+                    // Determine status display
+                    if ($is_sold_out || $card_status === 'sold_out') {
+                        echo '<div class="yatra-badge-status yatra-badge-sold-out">' . esc_html__('Sold Out', 'yatra') . '</div>';
+                    } elseif ($card_status === 'limited') {
+                        echo '<div class="yatra-badge-status yatra-badge-limited">' . esc_html__('Limited', 'yatra') . '</div>';
+                    } elseif ($card_status === 'blocked') {
+                        echo '<div class="yatra-badge-status yatra-badge-blocked">' . esc_html__('Blocked', 'yatra') . '</div>';
+                    } elseif ($card_status === 'closed') {
+                        echo '<div class="yatra-badge-status yatra-badge-closed">' . esc_html__('Closed', 'yatra') . '</div>';
+                    } elseif ($card_status === 'cancelled') {
+                        echo '<div class="yatra-badge-status yatra-badge-cancelled">' . esc_html__('Cancelled', 'yatra') . '</div>';
+                    } else {
+                        echo '<div class="yatra-badge-status yatra-badge-available">' . esc_html__('Available', 'yatra') . '</div>';
+                    }
+                    ?>
+                    
+                    <!-- Discount Badge -->
+                    <?php
+                    if (!empty($final_discount_badge)) {
+                        echo $final_discount_badge;
+                    }
+                    ?>
+                </div>
             </div>
 
             <!-- Card Body (Expandable) -->

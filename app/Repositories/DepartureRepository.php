@@ -70,6 +70,43 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
+     * Find a departure by trip, start date (or date), and optional time
+     */
+    public function findByTripIdAndStartDate(int $tripId, string $date, ?string $time = null): ?Departure
+    {
+        if (!$this->tableExists()) {
+            return null;
+        }
+
+        $table = esc_sql($this->table);
+        $where = ['trip_id = %d'];
+        $params = [$tripId];
+
+        // prefer start_date if exists, else fall back to date column
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $hasStartDate = in_array('start_date', $columns, true);
+
+        if ($hasStartDate) {
+            $where[] = '((start_date IS NOT NULL AND start_date = %s) OR (start_date IS NULL AND date = %s))';
+            $params[] = $date;
+            $params[] = $date;
+        } else {
+            $where[] = 'date = %s';
+            $params[] = $date;
+        }
+
+        if ($time !== null && $time !== '') {
+            $where[] = 'time = %s';
+            $params[] = $time;
+        }
+
+        $query = "SELECT * FROM {$table} WHERE " . implode(' AND ', $where) . " LIMIT 1";
+        $row = $this->wpdb->get_row($this->wpdb->prepare($query, ...$params), ARRAY_A);
+
+        return $row ? Departure::fromArray($row) : null;
+    }
+
+    /**
      * Find all departures across all trips
      * 
      * @param array $filters Filters: status, date_from, date_to, source
@@ -230,19 +267,10 @@ class DepartureRepository extends BaseRepository
             $params[] = $offset;
         }
         
-        // Debug: Log the query and parameters
-        error_log('DepartureRepository findAll Query: ' . $query);
-        error_log('DepartureRepository findAll Params: ' . print_r($params, true));
-        
         $results = $this->wpdb->get_results(
             $this->wpdb->prepare($query, ...$params),
             ARRAY_A
         );
-        
-        // Debug: Log any SQL errors
-        if ($this->wpdb->last_error) {
-            error_log('DepartureRepository findAll SQL Error: ' . $this->wpdb->last_error);
-        }
         
         return array_map(function ($row) {
             return Departure::fromArray($row);
@@ -274,36 +302,6 @@ class DepartureRepository extends BaseRepository
     public function findByTripIdAndDate(int $tripId, string $date, ?string $time = null): ?Departure
     {
         return $this->findByTripIdAndStartDate($tripId, $date, $time);
-    }
-
-    /**
-     * Find departure by trip ID and start_date
-     */
-    public function findByTripIdAndStartDate(int $tripId, string $startDate, ?string $time = null): ?Departure
-    {
-        // Return null if table doesn't exist
-        if (!$this->tableExists()) {
-            return null;
-        }
-
-        $table = esc_sql($this->table);
-        // Check both start_date and date fields for backward compatibility
-        $where = ['trip_id = %d', '(start_date = %s OR date = %s)'];
-        $params = [$tripId, $startDate, $startDate];
-        
-        if ($time !== null) {
-            $where[] = 'time = %s';
-            $params[] = $time;
-        }
-        
-        $query = "SELECT * FROM `{$table}` WHERE " . implode(' AND ', $where) . " LIMIT 1";
-        
-        $result = $this->wpdb->get_row(
-            $this->wpdb->prepare($query, ...$params),
-            ARRAY_A
-        );
-        
-        return $result ? Departure::fromArray($result) : null;
     }
 
     /**

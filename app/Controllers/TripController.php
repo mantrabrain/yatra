@@ -1143,8 +1143,6 @@ class TripController extends BaseController
             $specific_dates = $wpdb->get_results($wpdb->prepare(
                 "SELECT *, 0 as is_recurring FROM {$availability_table} 
                  WHERE trip_id = %d 
-                 AND departure_date >= CURDATE()
-                 AND status IN ('available', 'limited')
                  ORDER BY departure_date ASC",
                 $id
             )) ?: [];
@@ -1331,22 +1329,18 @@ class TripController extends BaseController
             foreach ($trip_data->availability_dates as $avail) {
                 $departure_date = strtotime($avail->departure_date);
                 
-                // Check booking cutoff - skip if past cutoff time
+                // Check booking cutoff - show all dates regardless of cutoff time
                 $cutoff_hours = (int) ($avail->cutoff_hours ?? 24); // Default 24 hours before
                 $departure_time_str = !empty($avail->departure_time) ? $avail->departure_time : '00:00:00';
                 $departure_datetime = strtotime($avail->departure_date . ' ' . $departure_time_str);
                 $cutoff_datetime = $departure_datetime - ($cutoff_hours * 3600);
                 
-                // Skip this availability if we're past the cutoff time
-                if ($current_time > $cutoff_datetime) {
-                    continue;
-                }
+                // Show all dates even if past cutoff time
+                $is_past_cutoff = $current_time > $cutoff_datetime;
                 
-                // Also skip if no seats available
+                // Show all dates even if no seats available
                 $seats = (int) ($avail->seats_available ?? 0);
-                if ($seats <= 0) {
-                    continue;
-                }
+                $is_sold_out = $seats <= 0;
                 
                 // Use arrival_date if set, otherwise return_date, otherwise calculate from duration
                 $return_date = !empty($avail->arrival_date) ? strtotime($avail->arrival_date) : 
@@ -1462,6 +1456,7 @@ class TripController extends BaseController
                     'is_day_trip' => $is_single_day,
                     'status' => $avail->status ?? 'available',
                     'is_limited' => $seats <= 5 && $seats > 0,
+                    'is_sold_out' => $is_sold_out,
                     // Card-specific pricing
                     'pricing_type' => $card_pricing_type,
                     'traveler_pricing' => $card_traveler_pricing,

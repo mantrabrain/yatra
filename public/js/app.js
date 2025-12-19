@@ -38298,7 +38298,12 @@ const ViewBooking = () => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1", children: __("Trip", "Trip") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: booking.trip_title })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: booking.trip_title }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: [
+                __("Trip ID", "Trip ID"),
+                ": #",
+                booking.trip_id
+              ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1", children: [
@@ -63703,6 +63708,7 @@ const Availability = () => {
     waitlist: true,
     price: true,
     status: true
+    // Always show status column
   });
   const toggleColumn = (key) => {
     setVisibleColumns((prev) => ({
@@ -63813,22 +63819,25 @@ const Availability = () => {
     return symbols[currency] || currency;
   };
   const getStatusBadge = (status, isBlocked) => {
+    console.log("Status Badge:", { status, isBlocked });
     if (isBlocked) {
       return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400", children: __("Blocked", "Blocked") });
     }
     switch (status) {
       case "available":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "success", className: "text-xs", children: __("Available", "Available") });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "success", className: "text-xs bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400", children: __("Available", "Available") });
       case "limited":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", className: "text-xs", children: __("Limited", "Limited") });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "warning", className: "text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400", children: __("Limited", "Limited") });
       case "sold_out":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "error", className: "text-xs", children: __("Sold Out", "Sold Out") });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "error", className: "text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400", children: __("Sold Out", "Sold Out") });
       case "closed":
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "text-xs", children: __("Closed", "Closed") });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400", children: __("Closed", "Closed") });
       case "blocked":
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400", children: __("Blocked", "Blocked") });
+      case "cancelled":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: "text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400", children: __("Cancelled", "Cancelled") });
       default:
-        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "text-xs", children: status });
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "outline", className: "text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400", children: status || "Unknown" });
     }
   };
   const handleSync = async () => {

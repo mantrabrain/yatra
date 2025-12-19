@@ -325,10 +325,6 @@ class ActivityService extends BaseService
             'trash' => (int) $trash,
         ];
 
-        // Debug logging
-        error_log('Activity Status Counts - Raw: ' . print_r($counts, true));
-        error_log('Activity Status Counts - Result: ' . print_r($result, true));
-
         return $result;
     }
 }

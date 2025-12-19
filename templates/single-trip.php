@@ -42,6 +42,11 @@ get_header();
 // Check if availability dates exist (PRIORITY)
 $has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
 
+// Debug: Log how many availability dates are available for rendering
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    error_log('Yatra Debug: Template - Trip ID ' . ($trip->id ?? 'unknown') . ' - Rendering ' . count($trip->availability_dates ?? []) . ' availability dates');
+}
+
 // Determine pricing type from trip settings
 $pricing_type = $trip->pricing_type ?? 'regular';
 $has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));

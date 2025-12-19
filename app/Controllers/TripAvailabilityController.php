@@ -184,9 +184,21 @@ class TripAvailabilityController extends BaseController
             $travellerRepo = new \Yatra\Repositories\TravellerRepository();
             $bookingRepo = new \Yatra\Repositories\BookingRepository();
             
+            // Get capacity service to sync capacity from availability
+            $capacityService = new \Yatra\Services\CapacityService();
+            $departureRepo = new \Yatra\Repositories\DepartureRepository();
+            
             return new WP_REST_Response([
                 'success' => true,
-                'data' => array_map(function ($d) use ($trip, $bookingDepartureRepo, $travellerRepo, $bookingRepo) {
+                'data' => array_map(function ($d) use ($trip, $bookingDepartureRepo, $travellerRepo, $bookingRepo, $capacityService, $departureRepo) {
+                    // Sync capacity from availability before returning
+                    $date = $d->start_date ?: $d->date;
+                    $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date);
+                    if ($correctCapacity > 0 && $d->max_capacity !== $correctCapacity) {
+                        $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
+                        $d->max_capacity = $correctCapacity;
+                    }
+                    
                     $departureArray = $d->toArray();
                     
                     // Add trip information
@@ -305,6 +317,15 @@ class TripAvailabilityController extends BaseController
                 'success' => false,
                 'message' => 'Departure not found',
             ], 404);
+        }
+
+        // Sync capacity from availability before returning
+        $capacityService = new \Yatra\Services\CapacityService();
+        $date = $departure->start_date ?: $departure->date;
+        $correctCapacity = $capacityService->getCapacityForDate($departure->trip_id, $date);
+        if ($correctCapacity > 0 && $departure->max_capacity !== $correctCapacity) {
+            $repo->update($departure->id, ['max_capacity' => $correctCapacity]);
+            $departure->max_capacity = $correctCapacity;
         }
 
         // Base departure array
@@ -552,8 +573,20 @@ class TripAvailabilityController extends BaseController
             $bookingRepo = new \Yatra\Repositories\BookingRepository();
             $tripRepository = new \Yatra\Repositories\TripRepository();
             
+            // Get capacity service to sync capacity from availability
+            $capacityService = new \Yatra\Services\CapacityService();
+            $departureRepo = new \Yatra\Repositories\DepartureRepository();
+            
             // Process each departure to add related data
-            $processed = array_map(function ($d) use ($tripRepository, $bookingDepartureRepo, $travellerRepo, $bookingRepo) {
+            $processed = array_map(function ($d) use ($tripRepository, $bookingDepartureRepo, $travellerRepo, $bookingRepo, $capacityService, $departureRepo) {
+                // Sync capacity from availability before returning
+                $date = $d->start_date ?: $d->date;
+                $correctCapacity = $capacityService->getCapacityForDate($d->trip_id, $date);
+                if ($correctCapacity > 0 && $d->max_capacity !== $correctCapacity) {
+                    $departureRepo->update($d->id, ['max_capacity' => $correctCapacity]);
+                    $d->max_capacity = $correctCapacity;
+                }
+                
                 $departureArray = $d->toArray();
                 
                 // Add trip information

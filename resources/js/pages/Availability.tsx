@@ -175,7 +175,7 @@ const Availability: React.FC = () => {
     available: true,
     waitlist: true,
     price: true,
-    status: true,
+    status: true, // Always show status column
   });
 
   const toggleColumn = (key: keyof typeof visibleColumns) => {
@@ -300,22 +300,27 @@ const Availability: React.FC = () => {
 
   // Get status badge variant
   const getStatusBadge = (status: string, isBlocked?: boolean) => {
+    // Debug: Log the status values to help with debugging
+    console.log('Status Badge:', { status, isBlocked });
+    
     if (isBlocked) {
       return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
     }
     switch (status) {
       case 'available':
-        return <Badge variant="success" className="text-xs">{__('Available', 'Available')}</Badge>;
+        return <Badge variant="success" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">{__('Available', 'Available')}</Badge>;
       case 'limited':
-        return <Badge variant="warning" className="text-xs">{__('Limited', 'Limited')}</Badge>;
+        return <Badge variant="warning" className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400">{__('Limited', 'Limited')}</Badge>;
       case 'sold_out':
-        return <Badge variant="error" className="text-xs">{__('Sold Out', 'Sold Out')}</Badge>;
+        return <Badge variant="error" className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Sold Out', 'Sold Out')}</Badge>;
       case 'closed':
-        return <Badge variant="outline" className="text-xs">{__('Closed', 'Closed')}</Badge>;
+        return <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">{__('Closed', 'Closed')}</Badge>;
       case 'blocked':
         return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
+      case 'cancelled':
+        return <Badge className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400">{__('Cancelled', 'Cancelled')}</Badge>;
       default:
-        return <Badge variant="outline" className="text-xs">{status}</Badge>;
+        return <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">{status || 'Unknown'}</Badge>;
     }
   };
 

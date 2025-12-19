@@ -140,6 +140,43 @@ class AvailabilityController extends BaseController
             global $wpdb;
             $bookingsTable = $wpdb->prefix . 'yatra_bookings';
 
+            $availabilityIdByDate = [];
+            $dateCounts = [];
+            foreach ($items as $item) {
+                $date = (string) ($item->departure_date ?? '');
+                if ($date === '') {
+                    continue;
+                }
+                $dateCounts[$date] = ($dateCounts[$date] ?? 0) + 1;
+                $availabilityIdByDate[$date] = (int) ($item->id ?? 0);
+            }
+
+            foreach ($dateCounts as $date => $count) {
+                if ($count !== 1) {
+                    unset($availabilityIdByDate[$date]);
+                }
+            }
+
+            if (!empty($availabilityIdByDate)) {
+                foreach ($availabilityIdByDate as $date => $availabilityId) {
+                    if ($availabilityId <= 0) {
+                        continue;
+                    }
+                    $wpdb->query(
+                        $wpdb->prepare(
+                            "UPDATE {$bookingsTable}
+                             SET availability_id = %d
+                             WHERE trip_id = %d
+                               AND travel_date = %s
+                               AND (availability_id IS NULL OR availability_id = 0)",
+                            $availabilityId,
+                            (int) $tripId,
+                            $date
+                        )
+                    );
+                }
+            }
+
             $activeBookingStatuses = [
                 'pending',
                 'confirmed',
@@ -184,25 +221,23 @@ class AvailabilityController extends BaseController
 
                 $seatsTotal = (int) ($prepared['seats_total'] ?? 0);
                 $seatsReserved = (int) ($prepared['seats_reserved'] ?? 0);
-                $available = max(0, $seatsTotal - $bookedCount - $seatsReserved);
+                $available = max(0, $seatsTotal - $bookedCount);
 
                 $prepared['booked_seats'] = $bookedCount;
                 $prepared['total_seats'] = $seatsTotal;
                 $prepared['available_seats'] = $available;
                 $prepared['seats_available'] = $available;
 
-                // Keep status consistent with derived availability
-                if ($available === 0) {
+                // Preserve original database status - don't override calculated status
+                // The status should reflect what's actually stored in the database
+                $original_status = $prepared['status'] ?? 'available';
+                
+                // Only update status if seats are actually sold out (0 available)
+                if ($available === 0 && $original_status !== 'blocked' && $original_status !== 'closed' && $original_status !== 'cancelled') {
                     $prepared['status'] = 'sold_out';
-                } elseif ($seatsTotal > 0 && $available <= (int) ceil($seatsTotal * 0.2)) {
-                    if ($prepared['status'] !== 'blocked' && $prepared['status'] !== 'closed' && $prepared['status'] !== 'cancelled') {
-                        $prepared['status'] = 'limited';
-                    }
-                } else {
-                    if ($prepared['status'] !== 'blocked' && $prepared['status'] !== 'closed' && $prepared['status'] !== 'cancelled') {
-                        $prepared['status'] = 'available';
-                    }
                 }
+                // For all other cases, preserve the original database status
+                // This allows 'available', 'limited', 'blocked', 'closed', 'cancelled' to show correctly
 
                 return $prepared;
             }, $items);
@@ -267,7 +302,40 @@ class AvailabilityController extends BaseController
                 );
             }
 
-            return new WP_REST_Response($this->prepare_item_for_response($item, $request), 200);
+            $prepared = $this->prepare_item_for_response($item, $request);
+
+            // Compute live booked seats for this availability_id
+            if (!empty($prepared['id'])) {
+                global $wpdb;
+                $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+                $activeBookingStatuses = [
+                    'pending',
+                    'confirmed',
+                    'processing',
+                    'completed',
+                    'on_hold',
+                ];
+                $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
+
+                $bookedCount = (int) $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT COALESCE(SUM(travelers_count), 0)
+                         FROM {$bookingsTable}
+                         WHERE availability_id = %d
+                           AND status IN ({$placeholders})",
+                        array_merge([(int) $prepared['id']], $activeBookingStatuses)
+                    )
+                );
+
+                $seatsTotal = (int) ($prepared['seats_total'] ?? 0);
+                $seatsReserved = (int) ($prepared['seats_reserved'] ?? 0);
+                $available = max(0, $seatsTotal - $bookedCount);
+
+                $prepared['booked_seats'] = $bookedCount;
+                $prepared['seats_available'] = $available;
+            }
+
+            return new WP_REST_Response($prepared, 200);
         } catch (\Exception $e) {
             return new WP_Error(
                 'availability_fetch_error',
@@ -290,6 +358,9 @@ class AvailabilityController extends BaseController
             }
 
             $item = $this->service->create($data);
+            
+            // Trigger hook to sync departure capacity
+            do_action('yatra_availability_updated', $item->id);
 
             return new WP_REST_Response($this->prepare_item_for_response($item, $request), 201);
         } catch (\InvalidArgumentException $e) {
@@ -321,6 +392,9 @@ class AvailabilityController extends BaseController
             }
 
             $item = $this->service->update($id, $data);
+            
+            // Trigger hook to sync departure capacity
+            do_action('yatra_availability_updated', $id);
 
             return new WP_REST_Response($this->prepare_item_for_response($item, $request), 200);
         } catch (\InvalidArgumentException $e) {

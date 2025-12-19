@@ -101,6 +101,9 @@ class DepartureService
         // Create departure
         $id = $this->repository->create($data);
         
+        // Trigger hook to sync capacity from availability
+        do_action('yatra_departure_saved', $id);
+        
         // Recalculate status
         $departure = $this->repository->findModel($id);
         if ($departure) {
@@ -160,6 +163,11 @@ class DepartureService
         
         // Update departure
         $result = $this->repository->update($id, $data);
+        
+        // Trigger hook to sync capacity from availability
+        if ($result) {
+            do_action('yatra_departure_saved', $id);
+        }
 
         // If status is being explicitly set to 'trash' (admin trash feature),
         // skip automatic status recalculation so the trashed state is preserved.
@@ -376,11 +384,15 @@ class DepartureService
             throw new \InvalidArgumentException('Invalid end date format. Use YYYY-MM-DD');
         }
 
-        // Try to find existing departure by start_date
-        $departure = $this->repository->findByTripIdAndStartDate($tripId, $startDate);
+        // Try to find existing departure by start_date and time
+        $departure = $this->repository->findByTripIdAndStartDate($tripId, $startDate, $time);
 
         if ($departure) {
-            // Departure exists, return it
+            // Departure exists, sync capacity from availability before returning
+            if ($maxCapacity > 0 && $departure->max_capacity !== $maxCapacity) {
+                $this->repository->update($departure->id, ['max_capacity' => $maxCapacity]);
+                $departure->max_capacity = $maxCapacity;
+            }
             return $departure;
         }
 
@@ -409,9 +421,10 @@ class DepartureService
             // Priority: Availability Date > Recurring Availability Rule > Trip Default
             $maxCapacity = $this->capacityService->getCapacityForDate($tripId, $startDate);
             
-            // If no capacity found, default to 50
+            // If no capacity found, use trip default or 1 as minimum
             if ($maxCapacity === null || $maxCapacity <= 0) {
-                $maxCapacity = 50;
+                $trip = $this->tripRepository->find($tripId);
+                $maxCapacity = $trip ? (int) ($trip->max_travelers ?? 1) : 1;
             }
         }
 

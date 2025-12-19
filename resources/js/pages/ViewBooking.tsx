@@ -520,6 +520,9 @@ const ViewBooking: React.FC = () => {
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {booking.trip_title}
                     </div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__('Trip ID', 'Trip ID')}: #{booking.trip_id}
+                    </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">

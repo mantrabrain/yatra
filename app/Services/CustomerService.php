@@ -607,9 +607,6 @@ class CustomerService
 
         // Apply downloads filter (which groups by trip)
         $documents = apply_filters('yatra_customer_documents', $documents, $bookings, $customerId);
-        
-        // Debug: Log the documents being returned
-        error_log('CustomerService Debug: Final documents array: ' . print_r($documents, true));
 
         return is_array($documents) ? $documents : [];
     }

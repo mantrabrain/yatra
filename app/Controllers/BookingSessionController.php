@@ -326,6 +326,10 @@ class BookingSessionController extends BaseController
             
             $query .= " LIMIT 1";
             $availability = $wpdb->get_row($wpdb->prepare($query, ...$params));
+
+            if (empty($availability_id) && $availability && !empty($availability->id)) {
+                $availability_id = (string) (int) $availability->id;
+            }
         }
         
         // Priority: Use data sent from frontend (availability card) first

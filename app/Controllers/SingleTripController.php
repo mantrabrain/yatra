@@ -151,6 +151,11 @@ class SingleTripController
         
         // Fetch availability dates from database table
         $trip->availability_dates = $this->getAvailabilityDates((int) $trip->id);
+        
+        // Debug: Log how many availability dates are loaded
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra Debug: Trip ID ' . $trip->id . ' - Loaded ' . count($trip->availability_dates) . ' availability dates');
+        }
         $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
 
         // Set default values for numeric fields
@@ -273,13 +278,11 @@ class SingleTripController
     {
         $table = $this->wpdb->prefix . 'yatra_trip_availability_dates';
         
-        // Get future availability dates only
+        // Get all availability dates for this trip
         $availability = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT * FROM {$table} 
-                 WHERE trip_id = %d 
-                 AND departure_date >= CURDATE()
-                 AND status IN ('available', 'limited')
+                "SELECT * FROM {$table}
+                 WHERE trip_id = %d
                  ORDER BY departure_date ASC",
                 $trip_id
             )
