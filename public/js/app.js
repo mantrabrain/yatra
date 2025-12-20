@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as RefreshCw, q as Puzzle, s as Settings$1, t as ArrowLeft, v as ChevronDown, w as ChevronRight, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, K as Users, N as Clock, O as DollarSign, Q as ArrowRight, V as Info, W as CheckCircle, X as HelpCircle, Y as MoreVertical, Z as AlertTriangle, _ as X, $ as Columns, a0 as ExternalLink, a1 as Mountain, a2 as PenSquare, a3 as Copy, a4 as ArrowUp, a5 as ArrowDown, a6 as Archive, a7 as Trash2, a8 as Plus, a9 as Search, aa as ArrowUpDown, ab as AlertCircle, ac as XCircle, ad as Flame, ae as Zap, af as Heart, ag as ShoppingBag, ah as BookOpen, ai as Gamepad2, aj as Music, ak as Image, al as Eye, am as Footprints, an as Bed, ao as Coffee, ap as Hotel, aq as Car, ar as Palette, as as Waves, at as Camera, au as Target, av as Bus, aw as Building2, ax as UtensilsCrossed, ay as CheckCircle2, az as GripVertical, aA as Pencil, aB as Check, aC as Download, aD as Lightbulb, aE as Database, aF as History, aG as Save, aH as Sparkles, aI as ChevronLeft, aJ as Box, aK as ChevronUp, aL as Upload, aM as RotateCcw, aN as Pen, aO as Phone, aP as Send, aQ as Globe, aR as Award, aS as Server, aT as Folder, aU as UserCheck, aV as ClipboardList, aW as Receipt, aX as Plug, aY as Shield, aZ as Lock, a_ as EyeOff, a$ as Crown, b0 as reactDomExports, b1 as Ban, b2 as Filter, b3 as ClipboardCheck, b4 as PenTool, b5 as Hash$2, b6 as CheckSquare, b7 as AlignLeft, b8 as Type, b9 as GitBranch, ba as Megaphone, bb as Pause, bc as Play, bd as Code, be as BarChart$1, bf as QueryClient, bg as client, bh as QueryClientProvider } from "./react-vendor-BKl5nxb-.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-BbqMnhnK.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as RefreshCw, q as Puzzle, K as Key, s as Settings$1, t as ArrowLeft, v as ChevronDown, w as ChevronRight, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, N as Users, O as Clock, Q as DollarSign, V as ArrowRight, W as Info, X as CheckCircle, Y as HelpCircle, Z as MoreVertical, _ as AlertTriangle, $ as X, a0 as Columns, a1 as ExternalLink, a2 as Mountain, a3 as PenSquare, a4 as Copy, a5 as ArrowUp, a6 as ArrowDown, a7 as Archive, a8 as Trash2, a9 as Plus, aa as Search, ab as ArrowUpDown, ac as AlertCircle, ad as XCircle, ae as Flame, af as Zap, ag as Heart, ah as ShoppingBag, ai as BookOpen, aj as Gamepad2, ak as Music, al as Image, am as Eye, an as Footprints, ao as Bed, ap as Coffee, aq as Hotel, ar as Car, as as Palette, at as Waves, au as Camera, av as Target, aw as Bus, ax as Building2, ay as UtensilsCrossed, az as CheckCircle2, aA as GripVertical, aB as Pencil, aC as Check, aD as Download, aE as Lightbulb, aF as Database, aG as History, aH as Save, aI as Sparkles, aJ as ChevronLeft, aK as Box, aL as ChevronUp, aM as Upload, aN as RotateCcw, aO as Pen, aP as Phone, aQ as Send, aR as Globe, aS as Award, aT as Server, aU as Folder, aV as UserCheck, aW as ClipboardList, aX as Receipt, aY as Plug, aZ as Shield, a_ as Lock, a$ as EyeOff, b0 as Crown, b1 as reactDomExports, b2 as Ban, b3 as Filter, b4 as ClipboardCheck, b5 as PenTool, b6 as Hash$2, b7 as CheckSquare, b8 as AlignLeft, b9 as Type, ba as GitBranch, bb as Megaphone, bc as Pause, bd as Play, be as Code, bf as BarChart$1, bg as Bug, bh as QueryClient, bi as client, bj as QueryClientProvider } from "./react-vendor-CP-I3kRS.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-Bln5Mynq.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -313,7 +313,7 @@ const useBulkToggleModules = () => {
   });
 };
 const Layout = ({ children }) => {
-  var _a, _b, _c, _d, _e;
+  var _a, _b, _c, _d, _e, _f, _g;
   const [darkMode, setDarkMode] = reactExports.useState(() => {
     const saved = localStorage.getItem("yatra-dark-mode");
     return saved === "true";
@@ -332,6 +332,9 @@ const Layout = ({ children }) => {
   const [isRegenerating, setIsRegenerating] = reactExports.useState(false);
   const [isModulesPanelOpen, setIsModulesPanelOpen] = reactExports.useState(false);
   const modulesPanelRef = reactExports.useRef(null);
+  const [licenseStatus, setLicenseStatus] = reactExports.useState(
+    ((_a = window.yatraAdmin) == null ? void 0 : _a.licenseStatus) || null
+  );
   const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen
   });
@@ -381,11 +384,20 @@ const Layout = ({ children }) => {
       setNavRefreshKey((prev) => prev + 1);
       setUrlKey((prev) => prev + 1);
     };
+    const handleLicenseStatusUpdate = (event) => {
+      var _a2;
+      const newStatus = (_a2 = event.detail) == null ? void 0 : _a2.status;
+      if (newStatus) {
+        setLicenseStatus(newStatus);
+      }
+    };
     window.addEventListener("yatra-modules-updated", handleModuleUpdate);
     window.addEventListener("yatra-force-nav-refresh", handleForceRefresh);
+    window.addEventListener("yatra-license-status-updated", handleLicenseStatusUpdate);
     return () => {
       window.removeEventListener("yatra-modules-updated", handleModuleUpdate);
       window.removeEventListener("yatra-force-nav-refresh", handleForceRefresh);
+      window.removeEventListener("yatra-license-status-updated", handleLicenseStatusUpdate);
     };
   }, []);
   reactExports.useEffect(() => {
@@ -496,6 +508,7 @@ const Layout = ({ children }) => {
       // Dynamic Pricing - only show if module is enabled
       ...((_e2 = window.yatraAdmin) == null ? void 0 : _e2.dynamicPricingEnabled) ? [{ subpage: "yatra-dynamic-pricing", label: "Dynamic Pricing", icon: TrendingUp, isPremium: true }] : [],
       { subpage: "modules", label: "Modules", icon: Puzzle },
+      { subpage: "license", label: "License", icon: Key },
       { subpage: "settings", label: "Settings", icon: Settings$1 }
     ];
   }, [navRefreshKey]);
@@ -539,9 +552,9 @@ const Layout = ({ children }) => {
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { children: [
                 "v",
-                ((_a = window.yatraAdmin) == null ? void 0 : _a.version) || "1.0.0"
+                ((_b = window.yatraAdmin) == null ? void 0 : _b.version) || "1.0.0"
               ] }),
-              ((_b = window.yatraAdmin) == null ? void 0 : _b.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium", children: [
+              ((_c = window.yatraAdmin) == null ? void 0 : _c.proVersion) && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium", children: [
                 "Pro v",
                 window.yatraAdmin.proVersion
               ] })
@@ -551,7 +564,7 @@ const Layout = ({ children }) => {
         /* @__PURE__ */ jsxRuntimeExports.jsxs(
           "a",
           {
-            href: ((_c = window.yatraAdmin) == null ? void 0 : _c.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+            href: ((_d = window.yatraAdmin) == null ? void 0 : _d.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
             className: "inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400",
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -561,6 +574,7 @@ const Layout = ({ children }) => {
         )
       ] }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("nav", { className: "flex-1 p-4 space-y-1 overflow-y-auto", children: menuItems.map((item) => {
+        var _a2;
         const Icon = item.icon;
         const hasSubmenu = item.submenu && item.submenu.length > 0;
         const isExpanded = hasSubmenu && isMenuExpanded(item.subpage);
@@ -600,10 +614,20 @@ const Layout = ({ children }) => {
           "a",
           {
             href: getUrl(item.subpage),
-            className: `flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
+            className: `flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${active ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium" : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`,
             children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-5 h-5" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Icon, { className: "w-5 h-5" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: item.label })
+              ] }),
+              item.subpage === "license" && ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.isPro) && licenseStatus && /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Badge,
+                {
+                  variant: licenseStatus === "active" ? "success" : licenseStatus === "expired" ? "error" : licenseStatus === "invalid" ? "error" : "error",
+                  className: "text-[10px] px-2 py-0.5",
+                  children: licenseStatus === "active" ? "Active" : licenseStatus === "expired" ? "Expired" : licenseStatus === "invalid" ? "Invalid" : "Inactive"
+                }
+              )
             ]
           }
         ) }, item.subpage);
@@ -611,7 +635,7 @@ const Layout = ({ children }) => {
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-t border-gray-200 dark:border-gray-700 p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
         "a",
         {
-          href: ((_d = window.yatraAdmin) == null ? void 0 : _d.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
+          href: ((_e = window.yatraAdmin) == null ? void 0 : _e.siteUrl) ? `${window.yatraAdmin.siteUrl}/wp-admin/` : "/wp-admin/",
           className: "flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700",
           children: /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "inline-flex items-center gap-2", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(ArrowLeft, { className: "w-3 h-3" }),
@@ -770,10 +794,25 @@ const Layout = ({ children }) => {
           ] }),
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(User, { className: "w-5 h-5 text-white" }) }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_e = window.yatraAdmin) == null ? void 0 : _e.currentUser) || "Admin" }) })
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: ((_f = window.yatraAdmin) == null ? void 0 : _f.currentUser) || "Admin" }) })
           ] })
         ] })
       ] }) }),
+      ((_g = window.yatraAdmin) == null ? void 0 : _g.isPro) && licenseStatus && licenseStatus !== "active" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-red-50 dark:bg-red-950/30 border-l-4 border-b-2 border-red-500", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "px-6 py-3", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-6 h-6 text-white", fill: "currentColor", viewBox: "0 0 20 20", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" }) }) }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-1 min-w-0", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm font-medium text-red-800 dark:text-red-200", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-semibold", children: licenseStatus === "expired" ? "License Expired: " : licenseStatus === "invalid" ? "Invalid License: " : "License Not Activated: " }),
+          licenseStatus === "expired" ? "Renew your license to continue receiving updates and support." : licenseStatus === "invalid" ? "Please check your license key." : "Activate your license to receive updates and support."
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "a",
+          {
+            href: getUrl("license"),
+            className: "flex-shrink-0 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors",
+            children: licenseStatus === "expired" ? "Renew Now" : "Activate Now"
+          }
+        )
+      ] }) }) }),
       /* @__PURE__ */ jsxRuntimeExports.jsx("main", { className: `flex-1 ${isTripFormPage ? "p-0 h-full min-h-0" : "p-6 overflow-y-auto"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: currentSubpage === "tools" ? "" : "space-y-6", children }) })
     ] })
   ] }) });
@@ -44625,7 +44664,7 @@ const BookingFormBuilder = ({ formData, setFormData }) => {
     const currentConfig2 = getCurrentFormConfig();
     const fieldId = sanitizeId(newField.id);
     if (currentConfig2.fields.some((f) => f.id === fieldId)) {
-      alert("A field with this ID already exists. Please use a different ID.");
+      window.alert("A field with this ID already exists. Please use a different ID.");
       return;
     }
     const newFieldConfig = {
@@ -80357,6 +80396,642 @@ const DynamicPricingRuleForm = () => {
     )
   ] });
 };
+const License = () => {
+  var _a, _b, _c, _d, _e, _f, _g;
+  const [licenseKey, setLicenseKey] = reactExports.useState("");
+  const [showKey, setShowKey] = reactExports.useState(false);
+  const [debugMode, setDebugMode] = reactExports.useState(false);
+  const [debugData, setDebugData] = reactExports.useState(null);
+  const [showDeactivateConfirm, setShowDeactivateConfirm] = reactExports.useState(false);
+  const queryClient2 = useQueryClient();
+  const { showToast } = useToast();
+  const yatraAdmin = window == null ? void 0 : window.yatraAdmin;
+  const isPro = (yatraAdmin == null ? void 0 : yatraAdmin.isPro) || false;
+  const { data: licenseData, isLoading } = useQuery({
+    queryKey: ["license"],
+    queryFn: async () => {
+      var _a2;
+      const response = await apiClient.get("/license");
+      console.log("License API Response:", response);
+      console.log("License Data:", response);
+      console.log("License Info:", response == null ? void 0 : response.license_info);
+      console.log("License Key:", (_a2 = response == null ? void 0 : response.license_info) == null ? void 0 : _a2.key);
+      return response;
+    }
+  });
+  reactExports.useEffect(() => {
+    var _a2, _b2;
+    console.log("useEffect - licenseData:", licenseData);
+    console.log("useEffect - license_info:", licenseData == null ? void 0 : licenseData.license_info);
+    console.log("useEffect - key:", (_a2 = licenseData == null ? void 0 : licenseData.license_info) == null ? void 0 : _a2.key);
+    if ((_b2 = licenseData == null ? void 0 : licenseData.license_info) == null ? void 0 : _b2.key) {
+      console.log("Setting license key to:", licenseData.license_info.key);
+      setLicenseKey(licenseData.license_info.key);
+    } else {
+      console.log("No license key found in data");
+    }
+  }, [licenseData]);
+  const activateMutation = useMutation({
+    mutationFn: async (key) => {
+      try {
+        console.log("Sending license activation request:", { license_key: key });
+        const response = await apiClient.post("/license/activate", { license_key: key });
+        console.log("Raw API response:", response);
+        console.log("Response type:", typeof response);
+        console.log("Response is null?", response === null);
+        console.log("Response is undefined?", response === void 0);
+        return response;
+      } catch (error) {
+        console.error("License activation error:", error);
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      console.log("License activation response:", data);
+      console.log("Has edd_api_request?", !!(data == null ? void 0 : data.edd_api_request));
+      console.log("Has edd_api_response?", !!(data == null ? void 0 : data.edd_api_response));
+      console.log("Response keys:", Object.keys(data || {}));
+      const debugInfo = {
+        type: "activate",
+        request: { license_key: licenseKey },
+        response: data,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      };
+      console.log("Setting debug data:", debugInfo);
+      console.log("Debug data response keys:", Object.keys(debugInfo.response || {}));
+      setDebugData(debugInfo);
+      if ((data == null ? void 0 : data.status) === "valid") {
+        showToast(data.notice || "License activated successfully!", "success");
+        queryClient2.invalidateQueries({ queryKey: ["license"] });
+        window.dispatchEvent(new CustomEvent("yatra-license-status-updated", {
+          detail: { status: "active" }
+        }));
+      } else {
+        showToast((data == null ? void 0 : data.notice) || "License activation failed.", "error");
+      }
+    },
+    onError: (error) => {
+      var _a2, _b2, _c2, _d2;
+      const errorMsg = ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) || "Failed to activate license. Please try again.";
+      showToast(errorMsg, "error");
+      setDebugData({
+        type: "activate",
+        request: { license_key: licenseKey },
+        response: (_c2 = error.response) == null ? void 0 : _c2.data,
+        error: ((_d2 = error.response) == null ? void 0 : _d2.data) || error.message,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+    }
+  });
+  const deactivateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.post("/license/deactivate");
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setDebugData({
+        type: "deactivate",
+        request: {},
+        response: data,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      setLicenseKey("");
+      showToast((data == null ? void 0 : data.notice) || "License deactivated successfully!", "success");
+      queryClient2.invalidateQueries({ queryKey: ["license"] });
+      window.dispatchEvent(new CustomEvent("yatra-license-status-updated", {
+        detail: { status: "inactive" }
+      }));
+    },
+    onError: (error) => {
+      var _a2, _b2, _c2, _d2;
+      const errorMsg = ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) || "Failed to deactivate license. Please try again.";
+      showToast(errorMsg, "error");
+      setDebugData({
+        type: "deactivate",
+        request: {},
+        response: (_c2 = error.response) == null ? void 0 : _c2.data,
+        error: ((_d2 = error.response) == null ? void 0 : _d2.data) || error.message,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+    }
+  });
+  const saveMutation = useMutation({
+    mutationFn: async (key) => {
+      const response = await apiClient.post("/license/save", { license_key: key });
+      return response;
+    },
+    onSuccess: (data) => {
+      showToast((data == null ? void 0 : data.notice) || "License key saved successfully!", "success");
+      queryClient2.invalidateQueries({ queryKey: ["license"] });
+    },
+    onError: (error) => {
+      var _a2, _b2;
+      const errorMsg = ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) || "Failed to save license key.";
+      showToast(errorMsg, "error");
+    }
+  });
+  const checkMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiClient.post("/license/check");
+      return response;
+    },
+    onSuccess: (data) => {
+      var _a2;
+      setDebugData({
+        type: "check",
+        request: {},
+        response: data,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+      showToast((data == null ? void 0 : data.notice) || "License status updated.", "success");
+      queryClient2.invalidateQueries({ queryKey: ["license"] });
+      if ((_a2 = data == null ? void 0 : data.license_info) == null ? void 0 : _a2.status) {
+        window.dispatchEvent(new CustomEvent("yatra-license-status-updated", {
+          detail: { status: data.license_info.status }
+        }));
+      }
+    },
+    onError: (error) => {
+      var _a2, _b2, _c2, _d2;
+      const errorMsg = ((_b2 = (_a2 = error.response) == null ? void 0 : _a2.data) == null ? void 0 : _b2.message) || "Failed to check license status.";
+      showToast(errorMsg, "error");
+      setDebugData({
+        type: "check",
+        request: {},
+        response: (_c2 = error.response) == null ? void 0 : _c2.data,
+        error: ((_d2 = error.response) == null ? void 0 : _d2.data) || error.message,
+        timestamp: (/* @__PURE__ */ new Date()).toISOString()
+      });
+    }
+  });
+  const handleActivate = (e) => {
+    e.preventDefault();
+    if (!licenseKey.trim()) {
+      showToast("Please enter a license key.", "error");
+      return;
+    }
+    activateMutation.mutate(licenseKey);
+  };
+  const handleDeactivate = () => {
+    setShowDeactivateConfirm(true);
+  };
+  const confirmDeactivate = () => {
+    setShowDeactivateConfirm(false);
+    deactivateMutation.mutate();
+  };
+  const handleCheckStatus = () => {
+    checkMutation.mutate();
+  };
+  const maskLicenseKey = (key) => {
+    if (!key || key.length < 8) return key;
+    return key.substring(0, 4) + "••••••••••••" + key.substring(key.length - 4);
+  };
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      active: { bg: "bg-green-100 dark:bg-green-900/20", text: "text-green-800 dark:text-green-400", label: "Active" },
+      valid: { bg: "bg-green-100 dark:bg-green-900/20", text: "text-green-800 dark:text-green-400", label: "Active" },
+      inactive: { bg: "bg-gray-100 dark:bg-gray-800", text: "text-gray-800 dark:text-gray-300", label: "Inactive" },
+      expired: { bg: "bg-red-100 dark:bg-red-900/20", text: "text-red-800 dark:text-red-400", label: "Expired" },
+      disabled: { bg: "bg-red-100 dark:bg-red-900/20", text: "text-red-800 dark:text-red-400", label: "Disabled" },
+      invalid: { bg: "bg-yellow-100 dark:bg-yellow-900/20", text: "text-yellow-800 dark:text-yellow-400", label: "Invalid" }
+    };
+    const config2 = statusConfig[status] || statusConfig.inactive;
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: `inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config2.bg} ${config2.text}`, children: config2.label });
+  };
+  const SkeletonLoader = () => /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-4xl mx-auto p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-gray-200 dark:border-gray-700 px-6 py-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-6 h-6 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+    ] }) }),
+    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6 space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-4" }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse mt-4" })
+      ] })
+    ] }) })
+  ] }) });
+  if (isLoading) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx(SkeletonLoader, {});
+  }
+  if (!isPro) {
+    return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "max-w-4xl mx-auto p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-gray-200 dark:border-gray-700 px-6 py-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx(Key, { className: "w-6 h-6 text-gray-600 dark:text-gray-400" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold text-gray-900 dark:text-white", children: "License" })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Key, { className: "w-8 h-8 text-blue-600 dark:text-blue-400" }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-xl font-semibold text-gray-900 dark:text-white mb-2", children: "Yatra Free Version" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto", children: "You're using the free version of Yatra. No license is required for the free version." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6 max-w-2xl mx-auto", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-3", children: "Upgrade to Yatra Pro" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400 mb-4", children: "Unlock premium features with Yatra Pro:" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("ul", { className: "text-left space-y-2 mb-6", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: "Dynamic Pricing & Revenue Management" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: "Advanced Booking Management" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: "Premium Payment Gateways" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("li", { className: "flex items-start gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: "Priority Support & Updates" })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "a",
+            {
+              href: "https://wpyatra.com/pricing",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              className: "inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors",
+              children: [
+                "Upgrade to Pro",
+                /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" })
+              ]
+            }
+          )
+        ] })
+      ] }) })
+    ] }) });
+  }
+  const licenseInfo = licenseData == null ? void 0 : licenseData.license_info;
+  const isActive = (licenseInfo == null ? void 0 : licenseInfo.status) === "active" || (licenseInfo == null ? void 0 : licenseInfo.status) === "valid";
+  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "max-w-4xl mx-auto p-6", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "border-b border-gray-200 dark:border-gray-700 px-6 py-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Key, { className: "w-6 h-6 text-gray-600 dark:text-gray-400" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-semibold text-gray-900 dark:text-white", children: "License Management" })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+          (licenseInfo == null ? void 0 : licenseInfo.status) && getStatusBadge(licenseInfo.status),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            "button",
+            {
+              onClick: () => setDebugMode(!debugMode),
+              className: `flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${debugMode ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"}`,
+              title: "Toggle debug mode to see API requests and responses",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Bug, { className: "w-4 h-4" }),
+                "Debug"
+              ]
+            }
+          )
+        ] })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "p-6 space-y-6", children: [
+        !isActive && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h2", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-4", children: "Activate Your License" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("form", { onSubmit: handleActivate, className: "space-y-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "license-key", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: "License Key" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "input",
+                {
+                  type: "text",
+                  id: "license-key",
+                  value: licenseKey,
+                  onChange: (e) => setLicenseKey(e.target.value),
+                  placeholder: "Enter your license key",
+                  className: "w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent",
+                  disabled: activateMutation.isPending
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: (e) => {
+                    e.preventDefault();
+                    if (!licenseKey.trim()) {
+                      showToast("Please enter a license key.", "error");
+                      return;
+                    }
+                    saveMutation.mutate(licenseKey);
+                  },
+                  disabled: activateMutation.isPending || saveMutation.isPending,
+                  className: "inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-900 hover:bg-black dark:bg-gray-800 dark:hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg border border-gray-800 dark:border-gray-700",
+                  children: saveMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-white" }),
+                    "Saving..."
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Key, { className: "w-4 h-4" }),
+                    "Save"
+                  ] })
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "submit",
+                  disabled: activateMutation.isPending,
+                  className: "inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:bg-gray-400 dark:disabled:bg-gray-500 text-white font-medium rounded-lg transition-colors shadow-sm",
+                  children: activateMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-white" }),
+                    "Activating..."
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Check, { className: "w-4 h-4" }),
+                    "Save & Activate"
+                  ] })
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-4 text-sm text-gray-600 dark:text-gray-400", children: [
+            "Don't have a license key?",
+            " ",
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "a",
+              {
+                href: "https://store.mantrabrain.com/account/",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                className: "text-blue-600 dark:text-blue-400 hover:underline",
+                children: "Get it from your account"
+              }
+            )
+          ] })
+        ] }),
+        isActive && licenseInfo && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: "License Key" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  onClick: () => setShowKey(!showKey),
+                  className: "text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1",
+                  children: showKey ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(EyeOff, { className: "w-4 h-4" }),
+                    "Hide"
+                  ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Eye, { className: "w-4 h-4" }),
+                    "Show"
+                  ] })
+                }
+              )
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-mono text-sm bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-4 py-3 text-gray-900 dark:text-white", children: showKey ? licenseInfo.key : maskLicenseKey(licenseInfo.key) })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [
+            ((_a = licenseInfo.server_response) == null ? void 0 : _a.customer_name) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: "Licensed To" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: licenseInfo.server_response.customer_name })
+            ] }),
+            ((_b = licenseInfo.server_response) == null ? void 0 : _b.customer_email) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: "Email" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: licenseInfo.server_response.customer_email })
+            ] }),
+            ((_c = licenseInfo.server_response) == null ? void 0 : _c.expires) && licenseInfo.server_response.expires !== "lifetime" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: "Expires" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-gray-900 dark:text-white", children: (() => {
+                try {
+                  const date2 = new Date(licenseInfo.server_response.expires);
+                  return isNaN(date2.getTime()) ? licenseInfo.server_response.expires : date2.toLocaleDateString(void 0, { year: "numeric", month: "long", day: "numeric" });
+                } catch {
+                  return licenseInfo.server_response.expires;
+                }
+              })() })
+            ] }),
+            ((_d = licenseInfo.server_response) == null ? void 0 : _d.expires) === "lifetime" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: "Expires" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "font-medium text-green-600 dark:text-green-400", children: "Lifetime License" })
+            ] }),
+            ((_e = licenseInfo.server_response) == null ? void 0 : _e.site_count) !== void 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-sm text-gray-600 dark:text-gray-400 mb-1", children: "Active Sites" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "font-medium text-gray-900 dark:text-white", children: [
+                licenseInfo.server_response.site_count,
+                " / ",
+                licenseInfo.server_response.license_limit || "∞"
+              ] })
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: handleCheckStatus,
+                disabled: checkMutation.isPending,
+                className: "px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium rounded-lg transition-colors flex items-center gap-2",
+                children: checkMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 dark:border-white" }),
+                  "Checking..."
+                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4" }),
+                  "Check Status"
+                ] })
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: handleDeactivate,
+                disabled: deactivateMutation.isPending,
+                className: "px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium rounded-lg transition-colors flex items-center gap-2",
+                children: deactivateMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-white" }),
+                  "Deactivating..."
+                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4" }),
+                  "Deactivate License"
+                ] })
+              }
+            )
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-sm font-semibold text-gray-900 dark:text-white mb-2", children: "Need Help?" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-3", children: "If you're having trouble with your license, please contact our support team." }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex flex-wrap gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "a",
+              {
+                href: "https://store.mantrabrain.com/account/",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                className: "text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1",
+                children: [
+                  "Manage License",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" })
+                ]
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              "a",
+              {
+                href: "https://mantrabrain.com/contact/",
+                target: "_blank",
+                rel: "noopener noreferrer",
+                className: "text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1",
+                children: [
+                  "Contact Support",
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-3 h-3" })
+                ]
+              }
+            )
+          ] })
+        ] }),
+        debugMode && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-purple-50 dark:bg-purple-900/10 border border-purple-200 dark:border-purple-800 rounded-lg p-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h3", { className: "text-sm font-semibold text-purple-900 dark:text-purple-300 flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Bug, { className: "w-4 h-4" }),
+              "Debug Information"
+            ] }),
+            debugData && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              "button",
+              {
+                onClick: () => setDebugData(null),
+                className: "text-xs text-purple-600 dark:text-purple-400 hover:underline",
+                children: "Clear"
+              }
+            )
+          ] }),
+          debugData ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase", children: [
+                "Operation: ",
+                debugData.type
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "ml-3 text-xs text-gray-500 dark:text-gray-400", children: debugData.timestamp })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-3 h-3 text-blue-600 dark:text-blue-400" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-blue-700 dark:text-blue-300", children: "Full Response Body:" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "button",
+                  {
+                    onClick: () => {
+                      navigator.clipboard.writeText(JSON.stringify(debugData.response, null, 2));
+                      showToast("Response copied to clipboard!", "success");
+                    },
+                    className: "text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" }) }),
+                      "Copy"
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "bg-white dark:bg-gray-900 border border-blue-200 dark:border-blue-800 rounded p-3 text-xs overflow-x-auto max-h-96 overflow-y-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-gray-800 dark:text-gray-200", children: JSON.stringify(debugData.response, null, 2) }) })
+            ] }),
+            ((_f = debugData.response) == null ? void 0 : _f.edd_api_request) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-3 h-3 text-purple-600 dark:text-purple-400" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-purple-700 dark:text-purple-300", children: "EDD API Request (to store.mantrabrain.com):" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "button",
+                  {
+                    onClick: () => {
+                      navigator.clipboard.writeText(JSON.stringify(debugData.response.edd_api_request, null, 2));
+                      showToast("Request copied to clipboard!", "success");
+                    },
+                    className: "text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" }) }),
+                      "Copy"
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "bg-white dark:bg-gray-900 border border-purple-200 dark:border-purple-800 rounded p-3 text-xs overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-gray-800 dark:text-gray-200", children: JSON.stringify(debugData.response.edd_api_request, null, 2) }) })
+            ] }),
+            ((_g = debugData.response) == null ? void 0 : _g.edd_api_response) && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-3 h-3 text-green-600 dark:text-green-400" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-green-700 dark:text-green-300", children: "EDD API Response (from store.mantrabrain.com):" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "button",
+                  {
+                    onClick: () => {
+                      navigator.clipboard.writeText(JSON.stringify(debugData.response.edd_api_response, null, 2));
+                      showToast("Response copied to clipboard!", "success");
+                    },
+                    className: "text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" }) }),
+                      "Copy"
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "bg-white dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded p-3 text-xs overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-gray-800 dark:text-gray-200", children: JSON.stringify(debugData.response.edd_api_response, null, 2) }) })
+            ] }),
+            debugData.error && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(ChevronDown, { className: "w-3 h-3 text-red-600 dark:text-red-400" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-xs font-semibold text-red-700 dark:text-red-300", children: "Error Data:" })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                  "button",
+                  {
+                    onClick: () => {
+                      navigator.clipboard.writeText(JSON.stringify(debugData.error, null, 2));
+                      showToast("Error copied to clipboard!", "success");
+                    },
+                    className: "text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1",
+                    children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsx("svg", { className: "w-3 h-3", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24", children: /* @__PURE__ */ jsxRuntimeExports.jsx("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" }) }),
+                      "Copy"
+                    ]
+                  }
+                )
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "bg-white dark:bg-gray-900 border border-red-200 dark:border-red-800 rounded p-3 text-xs overflow-x-auto", children: /* @__PURE__ */ jsxRuntimeExports.jsx("code", { className: "text-gray-800 dark:text-gray-200", children: JSON.stringify(debugData.error, null, 2) }) })
+            ] })
+          ] }) : /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-purple-600 dark:text-purple-400", children: "Perform a license operation (activate, deactivate, or check status) to see debug information here." })
+        ] })
+      ] })
+    ] }),
+    showDeactivateConfirm && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-4", children: [
+      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex-shrink-0", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-6 h-6 text-red-600 dark:text-red-400" }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white mb-2", children: "Deactivate License" }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mb-6", children: "Are you sure you want to deactivate this license? You will lose support and updates for Yatra Pro." }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3 justify-end", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setShowDeactivateConfirm(false),
+              className: "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors",
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: confirmDeactivate,
+              disabled: deactivateMutation.isPending,
+              className: "px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:bg-gray-400 rounded-lg transition-colors flex items-center gap-2",
+              children: deactivateMutation.isPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "animate-spin rounded-full h-4 w-4 border-b-2 border-white" }),
+                "Deactivating..."
+              ] }) : "Deactivate"
+            }
+          )
+        ] })
+      ] })
+    ] }) }) })
+  ] });
+};
 const App = () => {
   const [urlKey, setUrlKey] = reactExports.useState(0);
   reactExports.useEffect(() => {
@@ -80571,6 +81246,8 @@ const App = () => {
         }
         console.log("Rendering DynamicPricing main page");
         return /* @__PURE__ */ jsxRuntimeExports.jsx(DynamicPricingPage, {});
+      case "license":
+        return /* @__PURE__ */ jsxRuntimeExports.jsx(License, {});
       case "dashboard":
       default:
         return /* @__PURE__ */ jsxRuntimeExports.jsx(Dashboard, {});

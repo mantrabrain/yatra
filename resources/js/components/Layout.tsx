@@ -32,7 +32,8 @@ import {
   ArrowLeft,
   Package,
   FileSignature,
-  Mail
+  Mail,
+  Key
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -71,6 +72,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isModulesPanelOpen, setIsModulesPanelOpen] = useState(false);
   const modulesPanelRef = useRef<HTMLDivElement | null>(null);
+  
+  // License status state for real-time updates
+  const [licenseStatus, setLicenseStatus] = useState<string | null>(
+    (window as any).yatraAdmin?.licenseStatus || null
+  );
   const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen,
   });
@@ -135,13 +141,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       setNavRefreshKey(prev => prev + 1);
       setUrlKey(prev => prev + 1);
     };
+    
+    const handleLicenseStatusUpdate = (event: any) => {
+      const newStatus = event.detail?.status;
+      if (newStatus) {
+        setLicenseStatus(newStatus);
+      }
+    };
 
     window.addEventListener('yatra-modules-updated', handleModuleUpdate);
     window.addEventListener('yatra-force-nav-refresh', handleForceRefresh);
+    window.addEventListener('yatra-license-status-updated', handleLicenseStatusUpdate);
 
     return () => {
       window.removeEventListener('yatra-modules-updated', handleModuleUpdate);
       window.removeEventListener('yatra-force-nav-refresh', handleForceRefresh);
+      window.removeEventListener('yatra-license-status-updated', handleLicenseStatusUpdate);
     };
   }, []);
 
@@ -277,6 +292,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // Dynamic Pricing - only show if module is enabled
     ...((window as any).yatraAdmin?.dynamicPricingEnabled ? [{ subpage: 'yatra-dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
+    { subpage: 'license', label: 'License', icon: Key },
     { subpage: 'settings', label: 'Settings', icon: Settings },
   ], [navRefreshKey]); // Re-calculate when navRefreshKey changes
 
@@ -409,14 +425,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   ) : (
                     <a
                       href={getUrl(item.subpage)}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                         active
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.label}</span>
+                      <div className="flex items-center gap-3">
+                        <Icon className="w-5 h-5" />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.subpage === 'license' && (window as any).yatraAdmin?.isPro && licenseStatus && (
+                        <Badge 
+                          variant={
+                            licenseStatus === 'active' ? 'success' :
+                            licenseStatus === 'expired' ? 'error' :
+                            licenseStatus === 'invalid' ? 'error' :
+                            'error'
+                          }
+                          className="text-[10px] px-2 py-0.5"
+                        >
+                          {licenseStatus === 'active' ? 'Active' :
+                           licenseStatus === 'expired' ? 'Expired' :
+                           licenseStatus === 'invalid' ? 'Invalid' :
+                           'Inactive'}
+                        </Badge>
+                      )}
                     </a>
                   )}
                 </div>
@@ -628,6 +662,41 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
             </div>
           </header>
+
+          {/* License Warning Banner */}
+          {(window as any).yatraAdmin?.isPro && licenseStatus && licenseStatus !== 'active' && (
+            <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-b-2 border-red-500">
+              <div className="px-6 py-3">
+                <div className="flex items-center gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                      <span className="font-semibold">
+                        {licenseStatus === 'expired' ? 'License Expired: ' : licenseStatus === 'invalid' ? 'Invalid License: ' : 'License Not Activated: '}
+                      </span>
+                      {licenseStatus === 'expired' 
+                        ? 'Renew your license to continue receiving updates and support.'
+                        : licenseStatus === 'invalid'
+                        ? 'Please check your license key.'
+                        : 'Activate your license to receive updates and support.'}
+                    </p>
+                  </div>
+                  <a
+                    href={getUrl('license')}
+                    className="flex-shrink-0 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                  >
+                    {licenseStatus === 'expired' ? 'Renew Now' : 'Activate Now'}
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Page Content */}
           <main className={`flex-1 ${isTripFormPage ? 'p-0 h-full min-h-0' : 'p-6 overflow-y-auto'}`}>

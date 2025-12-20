@@ -58,6 +58,7 @@ import EmailSequenceForm from './pages/EmailSequenceForm';
 import AbandonedRecovery from './pages/AbandonedRecovery';
 import DynamicPricing from './pages/DynamicPricing';
 import DynamicPricingRuleForm from './pages/DynamicPricingRuleForm';
+import License from './pages/License';
 
 const App: React.FC = () => {
   // Force re-render on URL change
@@ -313,6 +314,8 @@ const App: React.FC = () => {
         }
         console.log('Rendering DynamicPricing main page');
         return <DynamicPricing />;
+      case 'license':
+        return <License />;
       case 'dashboard':
       default:
         return <Dashboard />;

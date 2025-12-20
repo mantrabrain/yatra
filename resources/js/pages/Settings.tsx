@@ -921,7 +921,8 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
     
     // Check if ID already exists
     if (currentConfig.fields.some(f => f.id === fieldId)) {
-      alert('A field with this ID already exists. Please use a different ID.');
+      // TODO: Replace with toast notification when refactoring this nested component
+      window.alert('A field with this ID already exists. Please use a different ID.');
       return;
     }
     

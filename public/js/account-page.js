@@ -1,5 +1,5 @@
-import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, Q as ArrowRight, e as MapPin, U as User, w as ChevronRight, aH as Sparkles, P as Package, k as CreditCard, bi as LifeBuoy, D as Bell, ab as AlertCircle, ay as CheckCircle2, N as Clock, a0 as ExternalLink, K as Users, O as DollarSign, o as Mail, aO as Phone, aC as Download, r as reactExports, u as useQuery, I as React, W as CheckCircle, al as Eye, a2 as PenSquare, ac as XCircle, bj as ShieldCheck, af as Heart, Z as AlertTriangle, L as LayoutDashboard, bk as LogOut, bf as QueryClient, bg as client, bh as QueryClientProvider } from "./react-vendor-BKl5nxb-.js";
-import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, T as ToastProvider } from "./index-BbqMnhnK.js";
+import { j as jsxRuntimeExports, i as Calendar, h as FileText, l as Plane, V as ArrowRight, e as MapPin, U as User, w as ChevronRight, aI as Sparkles, P as Package, k as CreditCard, bk as LifeBuoy, D as Bell, ac as AlertCircle, az as CheckCircle2, O as Clock, a1 as ExternalLink, N as Users, Q as DollarSign, o as Mail, aP as Phone, aD as Download, r as reactExports, u as useQuery, I as React, X as CheckCircle, am as Eye, a3 as PenSquare, ad as XCircle, bl as ShieldCheck, ag as Heart, _ as AlertTriangle, L as LayoutDashboard, bm as LogOut, bh as QueryClient, bi as client, bj as QueryClientProvider } from "./react-vendor-CP-I3kRS.js";
+import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, u as useToast, T as ToastProvider } from "./index-Bln5Mynq.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");
@@ -2160,13 +2160,14 @@ const Support = ({ tickets }) => {
   ] });
 };
 const SavedTrips = ({ savedTrips, isLoading }) => {
+  const { showToast } = useToast();
   const handleRemoveTrip = async (tripId) => {
     try {
       await apiClient.delete(`/saved-trips/${tripId}`);
       window.location.reload();
     } catch (error) {
       console.error("Error removing trip:", error);
-      alert(__("Failed to remove trip from wishlist.", "Failed to remove trip from wishlist."));
+      showToast(__("Failed to remove trip from wishlist.", "Failed to remove trip from wishlist."), "error");
     }
   };
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [

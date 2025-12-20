@@ -6,6 +6,7 @@ import {
 import { __ } from '../../lib/i18n';
 import { formatPrice } from './utils';
 import { apiClient } from '../../lib/api';
+import { useToast } from '../../components/ui/toast';
 
 interface SavedTripsProps {
   savedTrips: any[];
@@ -13,6 +14,8 @@ interface SavedTripsProps {
 }
 
 const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
+  const { showToast } = useToast();
+  
   const handleRemoveTrip = async (tripId: number) => {
     try {
       await apiClient.delete(`/saved-trips/${tripId}`);
@@ -20,7 +23,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
       window.location.reload();
     } catch (error) {
       console.error('Error removing trip:', error);
-      alert(__('Failed to remove trip from wishlist.', 'Failed to remove trip from wishlist.'));
+      showToast(__('Failed to remove trip from wishlist.', 'Failed to remove trip from wishlist.'), 'error');
     }
   };
 

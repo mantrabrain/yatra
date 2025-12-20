@@ -105,7 +105,7 @@ const RecurringRulesPage: React.FC = () => {
       }
 
       const datesList = dates.map((d: any) => formatDate(d.date)).join(', ');
-      alert(__('Next 10 generated dates:', 'Next 10 generated dates:') + '\n\n' + datesList);
+      showToast(__('Next 10 generated dates:', 'Next 10 generated dates:') + ': ' + datesList, 'success');
     } catch (error: any) {
       showToast(error?.message || __('Failed to preview dates', 'Failed to preview dates'), 'error');
     }

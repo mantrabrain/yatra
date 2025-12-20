@@ -128,6 +128,15 @@ class AppServiceProvider extends ServiceProvider
             $bookingsController = new \Yatra\Controllers\BookingsController();
             $bookingsController->register_routes();
         });
+        
+        // License management (shows upgrade message in free, full functionality in Pro)
+        // Only register Free version routes if Pro is not active
+        add_action('rest_api_init', function() {
+            if (!defined('YATRA_PRO_VERSION')) {
+                $licenseController = new \Yatra\Controllers\LicenseController();
+                $licenseController->register_routes();
+            }
+        });
         add_filter('authenticate', [\Yatra\Controllers\AuthController::class, 'blockUnverifiedUserLogin'], 30, 3);
         add_action('init', [\Yatra\Controllers\AuthController::class, 'registerCustomerRole'], 5);
         add_action('init', [\Yatra\Controllers\AuthController::class, 'handleWpLoginResendVerification'], 1);
