@@ -110,6 +110,54 @@ try {
     
     $yatra = new \Yatra\Bootstrap();
     $yatra->init();
+    
+    // Enable dynamic pricing module
+    add_filter('yatra_dynamic_pricing_enabled', '__return_true');
+    
+    // Basic dynamic pricing filters (simplified version)
+    add_filter('yatra_availability_price', function($price, $trip_id, $context) {
+        // Debug logging
+        error_log('[Yatra Dynamic Pricing] Filter called');
+        error_log('[Yatra Dynamic Pricing] Original price: ' . $price);
+        error_log('[Yatra Dynamic Pricing] Trip ID: ' . $trip_id);
+        error_log('[Yatra Dynamic Pricing] Context: ' . json_encode($context));
+        
+        // Apply basic dynamic pricing logic
+        $departure_date = $context['departure_date'] ?? null;
+        $spots_remaining = $context['spots_remaining'] ?? null;
+        
+        $original_price = $price;
+        
+        // Example: Increase price if less than 5 spots remaining (high demand)
+        if ($spots_remaining !== null && $spots_remaining <= 5 && $spots_remaining > 0) {
+            $price = $price * 1.15; // 15% increase for high demand
+            error_log('[Yatra Dynamic Pricing] Applied high demand pricing: ' . $original_price . ' -> ' . $price);
+        }
+        
+        // Example: Early bird discount (more than 30 days in advance)
+        if ($departure_date) {
+            $days_until = (strtotime($departure_date) - time()) / (60 * 60 * 24);
+            error_log('[Yatra Dynamic Pricing] Days until departure: ' . $days_until);
+            if ($days_until > 30) {
+                $price = $price * 0.9; // 10% early bird discount
+                error_log('[Yatra Dynamic Pricing] Applied early bird discount: ' . $original_price . ' -> ' . $price);
+            }
+        }
+        
+        error_log('[Yatra Dynamic Pricing] Final price: ' . $price);
+        return $price;
+    }, 10, 3);
+    
+    add_filter('yatra_trip_display_price', function($price, $trip_id, $context) {
+        // Apply same logic for trip display pages
+        return apply_filters('yatra_availability_price', $price, $trip_id, $context);
+    }, 10, 3);
+    
+    add_filter('yatra_booking_trip_price', function($price, $trip_id, $context) {
+        // Apply same logic for booking calculations
+        return apply_filters('yatra_availability_price', $price, $trip_id, $context);
+    }, 10, 3);
+    
 } catch (Throwable $e) {
     // Use plain strings instead of translation functions to avoid early loading
     wp_die(

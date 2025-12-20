@@ -5,11 +5,12 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw, Eye } from 'lucide-react';
+import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw, Eye, MapPin, CalendarDays } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
+import { SearchableSelect } from '../components/ui/searchable-select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
@@ -73,6 +74,9 @@ interface Departure {
 interface Trip {
   id: number;
   title: string;
+  trip_type?: 'single_day' | 'multi_day';
+  starting_location?: string;
+  ending_location?: string;
 }
 
 const formatCurrency = (value?: number | null) => {
@@ -741,33 +745,72 @@ const Departures: React.FC = () => {
         }
       />
 
-      {/* Trip Selector */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex gap-4 items-end">
-            <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      {/* Trip Selector - Clean Design */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6">
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {__('Select Trip', 'Select Trip')}
-              </label>
-              <Select
-                value={selectedTripId?.toString() || ''}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setSelectedTripId(value ? parseInt(value) : null);
-                  setPage(1);
-                }}
-              >
-                <option value="">{__('-- Select a trip --', '-- Select a trip --')}</option>
-                {tripsData?.map((trip: Trip) => (
-                  <option key={trip.id} value={trip.id.toString()}>
-                    {trip.title}
-                  </option>
-                ))}
-              </Select>
+              </h3>
             </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {__('Choose a trip to manage its departures and capacity', 'Choose a trip to manage its departures and capacity')}
+            </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+            </label>
+            <SearchableSelect
+              value={selectedTripId?.toString() || ''}
+              onChange={(value) => {
+                const tripId = value ? parseInt(value) : null;
+                setSelectedTripId(tripId);
+                setPage(1);
+              }}
+              options={[
+                { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                ...(tripsData?.map((trip: Trip) => ({
+                  value: trip.id.toString(),
+                  label: `${trip.title}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`
+                })) || [])
+              ]}
+              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
+              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              className="w-full"
+              required
+            />
+          </div>
+
+          {selectedTripId && (() => {
+            const selectedTripData = tripsData?.find((trip: Trip) => trip.id === selectedTripId);
+            return selectedTripData ? (
+              <div className="flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                  <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                  <span className="font-medium">{selectedTripData.starting_location}</span>
+                  <span className="text-gray-400">→</span>
+                  <span className="font-medium">{selectedTripData.ending_location}</span>
+                </div>
+                {selectedTripData.trip_type && (
+                  <Badge className={
+                    selectedTripData.trip_type === 'single_day'
+                      ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
+                      : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                  }>
+                    {selectedTripData.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                  </Badge>
+                )}
+              </div>
+            ) : null;
+          })()}
+        </div>
+      </div>
 
       {/* Filters */}
           <Card>

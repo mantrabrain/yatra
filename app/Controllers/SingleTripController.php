@@ -145,7 +145,16 @@ class SingleTripController
         if (empty($trip->pricing_type)) {
             $trip->pricing_type = !empty($trip->price_types) ? 'traveler_based' : 'regular';
         }
-        $trip->itinerary_days = $this->decodeJson($trip->itinerary_days ?? '');
+        
+        // Load itinerary from new database tables (preferred) or fallback to JSON field
+        $itinerary_from_db = $this->getItineraryDays((int) $trip->id);
+        if (!empty($itinerary_from_db)) {
+            $trip->itinerary_days = $itinerary_from_db;
+        } else {
+            // Fallback to old JSON field if new tables are empty
+            $trip->itinerary_days = $this->decodeJson($trip->itinerary_days ?? '');
+        }
+        
         $trip->faqs = $this->decodeJson($trip->faqs ?? '');
         $trip->frontend_tabs = $this->decodeJson($trip->frontend_tabs ?? '');
         
@@ -158,6 +167,8 @@ class SingleTripController
         }
         $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
 
+        
+         
         // Set default values for numeric fields
         $trip->duration_days = (int) ($trip->duration_days ?? 1);
         $trip->duration_nights = (int) ($trip->duration_nights ?? 0);
@@ -168,8 +179,8 @@ class SingleTripController
 
         // Set default values for price fields
         $trip->original_price = (float) ($trip->original_price ?? 0);
-        $trip->sale_price = (float) ($trip->sale_price ?? $trip->original_price);
-        $trip->discounted_price = (float) ($trip->discounted_price ?? 0);
+        $trip->sale_price = !empty($trip->sale_price) ? (float) $trip->sale_price : 0;
+        $trip->discounted_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : 0;
         $trip->deposit_amount = (float) ($trip->deposit_amount ?? 0);
 
         // Get currency
@@ -249,6 +260,7 @@ class SingleTripController
         // Format featured image
         $trip->featured_image_url = $this->getFeaturedImageUrl($trip->featured_image ?? '');
 
+       
         return $trip;
     }
 
@@ -673,6 +685,78 @@ class SingleTripController
         }
 
         return '';
+    }
+
+    /**
+     * Get itinerary days from database tables
+     *
+     * @param int $trip_id Trip ID
+     * @return array Itinerary days with entries
+     */
+    private function getItineraryDays(int $trip_id): array
+    {
+        $table_days = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
+        $table_entries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
+        $table_items = $this->wpdb->prefix . 'yatra_items';
+        $table_item_types = $this->wpdb->prefix . 'yatra_item_types';
+
+        // Get all days for this trip
+        $days = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$table_days}
+                 WHERE trip_id = %d
+                 ORDER BY day_number ASC",
+                $trip_id
+            )
+        );
+
+        if (empty($days)) {
+            return [];
+        }
+
+        $itinerary = [];
+        foreach ($days as $day) {
+            // Get entries for this day
+            $entries = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT e.*, 
+                            i.name as item_name,
+                            it.name as item_type_name,
+                            it.icon as item_type_icon
+                     FROM {$table_entries} e
+                     LEFT JOIN {$table_items} i ON e.item_id = i.id
+                     LEFT JOIN {$table_item_types} it ON e.item_type_id = it.id
+                     WHERE e.day_id = %d
+                     ORDER BY e.order ASC, e.id ASC",
+                    $day->id
+                )
+            );
+
+            $formatted_entries = [];
+            foreach ($entries as $entry) {
+                $formatted_entries[] = [
+                    'title' => $entry->title ?: $entry->item_name,
+                    'description' => $entry->description ?: '',
+                    'item_type' => $entry->item_type_name ?: 'Activity',
+                    'icon' => $entry->item_type_icon ?: 'hiking',
+                    'start_time' => $entry->start_time ?: '',
+                    'end_time' => $entry->end_time ?: '',
+                    'location' => $entry->location ?: '',
+                    'duration' => $entry->duration ?: '',
+                    'cost' => !empty($entry->cost) ? (float) $entry->cost : null,
+                    'cost_per_person' => !empty($entry->cost_per_person) ? true : false,
+                    'included' => !empty($entry->included_items) ? json_decode($entry->included_items, true) : [],
+                ];
+            }
+
+            $itinerary[] = [
+                'day' => (int) $day->day_number,
+                'day_title' => $day->title ?: sprintf(__('Day %d', 'yatra'), $day->day_number),
+                'entries' => $formatted_entries,
+            ];
+        }
+
+        return $itinerary;
     }
 
     /**

@@ -1176,6 +1176,7 @@ class TripController extends BaseController
                 'starting_location' => $trip->starting_location ?? '',
                 'ending_location' => $trip->ending_location ?? '',
                 'original_price' => isset($trip->original_price) ? (float) $trip->original_price : 0,
+                'discounted_price' => isset($trip->discounted_price) ? (float) $trip->discounted_price : 0,
                 'sale_price' => isset($trip->sale_price) ? (float) $trip->sale_price : 0,
                 'currency' => $trip->currency ?? 'USD',
                 'duration_days' => isset($trip->duration_days) ? (int) $trip->duration_days : 1,
@@ -1347,13 +1348,40 @@ class TripController extends BaseController
                               (!empty($avail->return_date) ? strtotime($avail->return_date) : 
                               strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days'));
                 
-                $original_price = !empty($avail->original_price) ? (float) $avail->original_price : (float) ($trip_data->original_price ?? 0);
-                $sale_price = !empty($avail->discounted_price) ? (float) $avail->discounted_price : $original_price;
+                $original_price = !empty($avail->original_price) ? (float) $avail->original_price : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
+                $sale_price = !empty($avail->discounted_price) ? (float) $avail->discounted_price : (float) ($trip_data->discounted_price ?? $original_price);
                 
-                // Calculate discount
+                // Store base prices before dynamic pricing
+                $base_original_price = $original_price;
+                $base_sale_price = $sale_price;
+                
+                // Apply dynamic pricing if enabled
+                if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                    $original_price = apply_filters('yatra_availability_price', $original_price, $trip_data->id, [
+                        'departure_date' => $avail->departure_date ?? null,
+                        'spots_remaining' => $seats,
+                        'availability_id' => $avail->id ?? null,
+                    ]);
+                    $sale_price = apply_filters('yatra_availability_price', $sale_price, $trip_data->id, [
+                        'departure_date' => $avail->departure_date ?? null,
+                        'spots_remaining' => $seats,
+                        'availability_id' => $avail->id ?? null,
+                    ]);
+                }
+                
+                // Calculate discount/surge pricing badge
                 $discount_percent = 0;
-                if ($original_price > 0 && $sale_price < $original_price) {
-                    $discount_percent = round((($original_price - $sale_price) / $original_price) * 100);
+                $discount_text = '';
+                
+                // First check if there's a base discount (discounted_price < original_price)
+                if ($base_original_price > 0 && $base_sale_price < $base_original_price) {
+                    $discount_percent = round((($base_original_price - $base_sale_price) / $base_original_price) * 100);
+                    $discount_text = $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '';
+                }
+                // Then check if dynamic pricing increased the price
+                elseif ($base_sale_price > 0 && $sale_price > $base_sale_price) {
+                    $surge_percent = round((($sale_price - $base_sale_price) / $base_sale_price) * 100);
+                    $discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
                 }
                 
                 // For day trips, use day-based filters; for multi-day trips, use month-based filters
@@ -1440,7 +1468,7 @@ class TripController extends BaseController
                     'spots_remaining' => $seats, // For dynamic pricing
                     'seats' => $seats > 10 ? '10+' : (string) $seats,
                     'seats_available' => $seats,
-                    'discount_text' => $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '',
+                    'discount_text' => $discount_text,
                     'original_price' => $original_price,
                     'sale_price' => $sale_price,
                     'title' => $trip_data->title,
@@ -1468,6 +1496,40 @@ class TripController extends BaseController
         
         // Use sample data only if no real availability
         if (empty($availability_cards)) {
+            $sample_original = $trip_data->original_price ?? $trip_data->price ?? 0;
+            $sample_sale = $trip_data->discounted_price ?? $trip_data->original_price ?? $trip_data->price ?? 0;
+            $sample_date = date('Y-m-d', strtotime('+7 days'));
+            $sample_seats = 15;
+            
+            // Store base prices before dynamic pricing
+            $base_sample_original = $sample_original;
+            $base_sample_sale = $sample_sale;
+            
+            // Apply dynamic pricing to sample card
+            if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
+                $sample_original = apply_filters('yatra_availability_price', $sample_original, $trip_data->id, [
+                    'departure_date' => $sample_date,
+                    'spots_remaining' => $sample_seats,
+                    'availability_id' => 'sample-1',
+                ]);
+                $sample_sale = apply_filters('yatra_availability_price', $sample_sale, $trip_data->id, [
+                    'departure_date' => $sample_date,
+                    'spots_remaining' => $sample_seats,
+                    'availability_id' => 'sample-1',
+                ]);
+            }
+            
+            // Calculate discount/surge pricing badge for sample card
+            $sample_discount_text = '';
+            if ($base_sample_original > 0 && $base_sample_sale < $base_sample_original) {
+                $discount_percent = round((($base_sample_original - $base_sample_sale) / $base_sample_original) * 100);
+                $sample_discount_text = $discount_percent > 0 ? sprintf(__('%d%% OFF', 'yatra'), $discount_percent) : '';
+            }
+            elseif ($base_sample_sale > 0 && $sample_sale > $base_sample_sale) {
+                $surge_percent = round((($sample_sale - $base_sample_sale) / $base_sample_sale) * 100);
+                $sample_discount_text = $surge_percent > 0 ? sprintf(__('+%d%%', 'yatra'), $surge_percent) : '';
+            }
+            
             $availability_cards = [
                 [
                     'id' => 'sample-1',
@@ -1478,10 +1540,10 @@ class TripController extends BaseController
                     'to_date' => date_i18n('j M Y', strtotime('+' . (7 + ($trip_data->duration_days ?? 5) - 1) . ' days')),
                     'to_location' => $trip_data->ending_location ?: ($trip_data->starting_location ?: __('Ending Point', 'yatra')),
                     'seats' => '10+',
-                    'seats_available' => 15,
-                    'discount_text' => '',
-                    'original_price' => $trip_data->original_price ?? 0,
-                    'sale_price' => $trip_data->sale_price ?? $trip_data->original_price ?? 0,
+                    'seats_available' => $sample_seats,
+                    'discount_text' => $sample_discount_text,
+                    'original_price' => $sample_original,
+                    'sale_price' => $sample_sale,
                     'title' => $trip_data->title,
                     'type' => __('Group Departure', 'yatra'),
                     'start_date' => date_i18n('j M Y', strtotime('+7 days')),
@@ -1504,6 +1566,16 @@ class TripController extends BaseController
 
         $availability_cards = $this->sortAvailabilityCards($availability_cards, $sort_key);
 
+        // DEBUG: Output all trip data
+        echo '<!-- TRIP DATA DEBUG -->';
+        echo '<!-- Trip ID: ' . ($trip_data->id ?? 'NO ID') . ' -->';
+        echo '<!-- Trip original_price: ' . var_export($trip_data->original_price ?? null, true) . ' -->';
+        echo '<!-- Trip sale_price: ' . var_export($trip_data->sale_price ?? null, true) . ' -->';
+        echo '<!-- Trip discounted_price: ' . var_export($trip_data->discounted_price ?? null, true) . ' -->';
+        echo '<!-- Trip price: ' . var_export($trip_data->price ?? null, true) . ' -->';
+        echo '<!-- Trip pricing_type: ' . ($trip_data->pricing_type ?? 'regular') . ' -->';
+        echo '<!-- All Trip Data: ' . var_export($trip_data, true) . ' -->';
+        
         // Prepare additional data for the template
         $pricing_type = $trip_data->pricing_type ?? 'regular';
         $price_types = $trip_data->price_types ?? [];

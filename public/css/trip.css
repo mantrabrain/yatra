@@ -1298,6 +1298,34 @@ button.yatra-booking-button svg path {
     margin: 0 0 12px 0;
 }
 
+.yatra-entry-cost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.yatra-entry-cost svg {
+    flex-shrink: 0;
+    color: white;
+}
+
+.yatra-entry-cost .yatra-cost-amount {
+    font-weight: 700;
+}
+
+.yatra-entry-cost .yatra-cost-label {
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
 .yatra-entry-meta {
     display: flex;
     flex-wrap: wrap;
@@ -6904,5 +6932,196 @@ a.yatra-card-book-btn:hover {
     .yatra-availability-price-sale {
         font-size: 24px;
     }
+}
+
+/* Price Section Styling */
+.yatra-price-section {
+    margin: 16px 0;
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+}
+
+.yatra-price-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.dark .yatra-price-section-title {
+    color: #d1d5db;
+}
+
+/* Itinerary Costs Styling */
+.yatra-price-itinerary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.yatra-price-itinerary span:first-child {
+    font-weight: 500;
+    color: #374151;
+}
+
+.yatra-price-itinerary span:last-child {
+    font-weight: 600;
+    color: #059669;
+}
+
+.dark .yatra-price-itinerary {
+    color: #9ca3af;
+}
+
+.dark .yatra-price-itinerary span:first-child {
+    color: #d1d5db;
+}
+
+.dark .yatra-price-itinerary span:last-child {
+    color: #10b981;
+}
+
+/* Availability Fallback Styling */
+.yatra-availability-empty-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.yatra-availability-empty-actions .yatra-btn {
+    min-width: 140px;
+}
+
+.yatra-availability-empty .yatra-icon-xl {
+    color: #10b981;
+    margin-bottom: 16px;
+}
+
+.dark .yatra-availability-empty .yatra-icon-xl {
+    color: #34d399;
+}
+
+/* Date Picker Customization */
+.flatpickr-calendar {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+}
+
+.flatpickr-day.selected {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.flatpickr-day:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.flatpickr-day.today {
+    border-color: #3b82f6;
+}
+
+.flatpickr-day.disabled {
+    color: #d1d5db;
+}
+
+/* Dark mode date picker */
+.dark .flatpickr-calendar {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.dark .flatpickr-months {
+    background: #1f2937;
+}
+
+.dark .flatpickr-current-month .flatpickr-monthDropdown-months,
+.dark .flatpickr-current-month input.cur-year {
+    color: #f9fafb;
+}
+
+.dark .flatpickr-weekday {
+    color: #9ca3af;
+}
+
+.dark .flatpickr-day {
+    color: #f9fafb;
+}
+
+.dark .flatpickr-day:hover {
+    background: #374151;
+    border-color: #4b5563;
+}
+
+.dark .flatpickr-day.disabled {
+    color: #4b5563;
+}
+
+/* Availability Empty Info */
+.yatra-availability-empty-info {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 24px 0;
+    padding: 20px;
+    background: #f9fafb;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.dark .yatra-availability-empty-info {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.yatra-availability-empty-info-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.yatra-availability-empty-info-icon {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #10b981;
+    color: white;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.yatra-availability-empty-info-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.yatra-availability-empty-info-label {
+    font-size: 12px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.yatra-availability-empty-info-value {
+    font-size: 16px;
+    color: #111827;
+    font-weight: 600;
+}
+
+.dark .yatra-availability-empty-info-label {
+    color: #9ca3af;
+}
+
+.dark .yatra-availability-empty-info-value {
+    color: #f9fafb;
 }
 

@@ -338,7 +338,7 @@ class BookingSessionController extends BaseController
         // 3. Trip pricing
         
         $pricing_type = !empty($data['pricing_type']) ? sanitize_text_field($data['pricing_type']) : ($trip->pricing_type ?? 'regular');
-        $trip_price = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+        $trip_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
         
         // Apply dynamic pricing if module is enabled
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
@@ -421,7 +421,7 @@ class BookingSessionController extends BaseController
                         }
                         // Ensure effective price is set
                         if (!isset($pt['effective_price'])) {
-                            $pt['effective_price'] = $pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0;
+                            $pt['effective_price'] = $pt['discounted_price'] ?? $pt['sale_price'] ?? $pt['original_price'] ?? 0;
                         }
                     }
                 }
@@ -569,7 +569,7 @@ class BookingSessionController extends BaseController
             'max_travelers' => (int) ($trip->max_travelers ?: 20),
             'original_price' => (float) $trip->original_price,
             'sale_price' => (float) $trip->sale_price,
-            'price' => !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price,
+            'price' => !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price,
             'currency' => $trip->currency ?: 'USD',
             'starting_location' => $trip->starting_location,
             'ending_location' => $trip->ending_location,
@@ -758,7 +758,7 @@ class BookingSessionController extends BaseController
                 $pt = (object) $pt;
                 $catId = $pt->category_id ?? null;
                 if ($catId) {
-                    $priceByCategory[$catId] = $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0;
+                    $priceByCategory[$catId] = $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0;
                 }
             }
             
@@ -770,7 +770,7 @@ class BookingSessionController extends BaseController
                 } else {
                     // Fallback to first category price or trip price
                     $firstPrice = !empty($priceByCategory) ? reset($priceByCategory) : 0;
-                    $total_amount += $firstPrice > 0 ? (float) $firstPrice : ((float) ($trip->sale_price ?? $trip->original_price));
+                    $total_amount += $firstPrice > 0 ? (float) $firstPrice : ((float) ($trip->discounted_price ?? $trip->original_price));
                 }
             }
             
@@ -782,7 +782,7 @@ class BookingSessionController extends BaseController
             } elseif ($availability && !empty($availability->original_price)) {
                 $price_per_person = (float) $availability->original_price;
             } else {
-                $price_per_person = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+                $price_per_person = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
             }
             $total_amount = $price_per_person * $travelers_count;
         }
@@ -852,7 +852,7 @@ class BookingSessionController extends BaseController
                 $pt = (object) $pt;
                 $priceTypesForDiscount[] = [
                     'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0,
+                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
                 ];
             }
         }
@@ -862,7 +862,7 @@ class BookingSessionController extends BaseController
                 $pt = (object) $pt;
                 $priceTypesForDiscount[] = [
                     'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0,
+                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
                 ];
             }
         }
@@ -2258,6 +2258,11 @@ class BookingSessionController extends BaseController
                 'message' => __('Trip not found.', 'yatra'),
             ], 404);
         }
+        
+        // Ensure pricing fields are properly set
+        $trip->original_price = (float) ($trip->original_price ?? 0);
+        $trip->discounted_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : 0;
+        $trip->sale_price = !empty($trip->sale_price) ? (float) $trip->sale_price : 0;
 
         yatra_start_session();
         $existing_session = yatra_get_booking_session();
@@ -2362,7 +2367,7 @@ class BookingSessionController extends BaseController
         }
 
         foreach ($price_types as $pt) {
-            $pt->effective_price = $pt->effective_price ?? ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+            $pt->effective_price = $pt->effective_price ?? ($pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0);
         }
 
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
@@ -2387,7 +2392,7 @@ class BookingSessionController extends BaseController
 
         $is_traveler_based = $resolved_pricing_type === 'traveler_based' && !empty($price_types);
 
-        $base_trip_price = !empty($trip->sale_price) ? (float) $trip->sale_price : (float) $trip->original_price;
+        $base_trip_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
         if ($availability && !empty($availability->discounted_price)) {
             $base_trip_price = (float) $availability->discounted_price;
         } elseif ($availability && !empty($availability->original_price)) {
@@ -2459,7 +2464,7 @@ class BookingSessionController extends BaseController
                 $pt = (object) $pt;
                 $priceTypesForDiscount[] = [
                     'category_id' => $pt->category_id ?? null,
-                    'effective_price' => $pt->effective_price ?? $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0,
+                    'effective_price' => $pt->effective_price ?? $pt->discounted_price ?? $pt->sale_price ?? $pt->original_price ?? 0,
                 ];
             }
         } else {
@@ -2580,8 +2585,32 @@ class BookingSessionController extends BaseController
          */
         $services_total = apply_filters('yatra_booking_services_total', (float) $default_services_total, $additional_services, $trip_id, $total_travelers, (int) ($trip->duration_days ?? 1));
         
-        // Add services total to the booking total
-        $total_amount = $total_amount + $services_total;
+        // Get itinerary costs (separate from additional services)
+        $itinerary_costs = apply_filters('yatra_booking_itinerary_costs', [], $trip_id, $total_travelers, $traveler_counts, $travel_date);
+        $itinerary_costs_total = 0.0;
+        
+        foreach ($itinerary_costs as $cost) {
+            $basePrice = (float) ($cost['price'] ?? 0);
+            $pricePer = $cost['price_per'] ?? 'person';
+            
+            switch ($pricePer) {
+                case 'person':
+                    $calculatedPrice = $basePrice * $total_travelers;
+                    break;
+                case 'day':
+                    $calculatedPrice = $basePrice * $duration_days;
+                    break;
+                case 'booking':
+                default:
+                    $calculatedPrice = $basePrice;
+                    break;
+            }
+            
+            $itinerary_costs_total += $calculatedPrice;
+        }
+        
+        // Add services and itinerary costs total to the booking total
+        $total_amount = $total_amount + $services_total + $itinerary_costs_total;
         
         // Calculate due amount based on payment method
         // Use filters for flexible payment settings (Pro feature)
@@ -2610,6 +2639,8 @@ class BookingSessionController extends BaseController
             'coupon_code' => $coupon_code,
             'additional_services' => $additional_services,
             'services_total' => $services_total,
+            'itinerary_costs' => $itinerary_costs,
+            'itinerary_costs_total' => $itinerary_costs_total,
             'total_amount' => $total_amount,
             'amount_due' => $amount_due,
             'payment_method' => $payment_method,
@@ -2646,6 +2677,10 @@ class BookingSessionController extends BaseController
                 'additional_services' => $additional_services,
                 'services_total' => round($services_total, 2),
                 'services_total_formatted' => yatra_format_price($services_total),
+                // Itinerary costs (separate from services)
+                'itinerary_costs' => $itinerary_costs,
+                'itinerary_costs_total' => round($itinerary_costs_total, 2),
+                'itinerary_costs_total_formatted' => yatra_format_price($itinerary_costs_total),
                 'total_amount' => round($total_amount, 2),
                 'total_amount_formatted' => yatra_format_price($total_amount),
                 'amount_due' => round($amount_due, 2),
@@ -2825,7 +2860,7 @@ class BookingSessionController extends BaseController
             foreach ($session['price_types'] as $index => $pt) {
                 $pt = (array) $pt;
                 $category_id = $pt['category_id'] ?? $index;
-                $price = (float) ($pt['effective_price'] ?? $pt['sale_price'] ?? $pt['discounted_price'] ?? $pt['original_price'] ?? 0);
+                $price = (float) ($pt['effective_price'] ?? $pt['discounted_price'] ?? $pt['sale_price'] ?? $pt['original_price'] ?? 0);
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
                 $total += $price * $count;
             }

@@ -86,6 +86,29 @@ defined('ABSPATH') || exit;
 </div>
 <?php endif; ?>
 
+<?php if (!empty($itinerary_costs)) : ?>
+<!-- Itinerary Costs -->
+<div class="yatra-price-section">
+    <div class="yatra-price-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <?php esc_html_e('Itinerary Costs', 'yatra'); ?>
+    </div>
+    <?php foreach ($itinerary_costs as $cost) : ?>
+        <?php 
+        $cost_price = $cost['price'] ?? 0;
+        $price_per = $cost['price_per'] ?? 'person';
+        ?>
+        <div class="yatra-price-row yatra-price-itinerary">
+            <span><?php echo esc_html($cost['name']); ?></span>
+            <span><?php echo esc_html(yatra_format_price($cost_price)); ?></span>
+        </div>
+    <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
 <?php if (!empty($additional_services)) : ?>
 <!-- Additional Services -->
 <?php foreach ($additional_services as $service) : ?>

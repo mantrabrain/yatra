@@ -27391,7 +27391,6 @@ const TripForm = () => {
         { category_id: 2, original_price: "625", discounted_price: "" },
         { category_id: 3, original_price: "0", discounted_price: "" }
       ],
-      sale_price: "",
       deposit_amount: "300",
       deposit_percentage: "",
       payment_terms: "50% deposit required at booking, remaining 50% due 30 days before departure",
@@ -27494,7 +27493,6 @@ const TripForm = () => {
       pricing_type: "regular",
       original_price: "1899",
       discounted_price: "1699",
-      sale_price: "",
       deposit_amount: "500",
       deposit_percentage: "",
       payment_terms: "50% deposit required at booking, remaining 50% due 60 days before departure",
@@ -27598,7 +27596,6 @@ const TripForm = () => {
       pricing_type: "regular",
       original_price: "2499",
       discounted_price: "",
-      sale_price: "2199",
       deposit_amount: "600",
       deposit_percentage: "",
       payment_terms: "40% deposit required at booking, remaining 60% due 45 days before departure",
@@ -27704,7 +27701,6 @@ const TripForm = () => {
     original_price: "",
     discounted_price: "",
     price_types: [],
-    sale_price: "",
     deposit_amount: "",
     deposit_percentage: "",
     payment_terms: "",
@@ -27927,7 +27923,7 @@ const TripForm = () => {
     enabled: isEditMode && can("yatra_view_trips")
   });
   reactExports.useEffect(() => {
-    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
     if (tripData && isEditMode) {
       const extractIds = (items) => {
         if (!Array.isArray(items)) return [];
@@ -28118,16 +28114,15 @@ const TripForm = () => {
             discounted_price: ((_b3 = pt.discounted_price) == null ? void 0 : _b3.toString()) || ""
           };
         }) : [],
-        sale_price: ((_j = tripData.sale_price) == null ? void 0 : _j.toString()) || "",
-        deposit_amount: ((_k = tripData.deposit_amount) == null ? void 0 : _k.toString()) || "",
-        deposit_percentage: ((_l = tripData.deposit_percentage) == null ? void 0 : _l.toString()) || "",
+        deposit_amount: ((_j = tripData.deposit_amount) == null ? void 0 : _j.toString()) || "",
+        deposit_percentage: ((_k = tripData.deposit_percentage) == null ? void 0 : _k.toString()) || "",
         payment_terms: tripData.payment_terms || "",
-        max_travelers: ((_m = tripData.max_travelers) == null ? void 0 : _m.toString()) || "",
-        min_travelers: ((_n = tripData.min_travelers) == null ? void 0 : _n.toString()) || "",
+        max_travelers: ((_l = tripData.max_travelers) == null ? void 0 : _l.toString()) || "",
+        min_travelers: ((_m = tripData.min_travelers) == null ? void 0 : _m.toString()) || "",
         booking_deadline: tripData.booking_deadline || "",
         cancellation_policy: tripData.cancellation_policy || "",
-        age_min: ((_o = tripData.age_min) == null ? void 0 : _o.toString()) || "",
-        age_max: ((_p = tripData.age_max) == null ? void 0 : _p.toString()) || "",
+        age_min: ((_n = tripData.age_min) == null ? void 0 : _n.toString()) || "",
+        age_max: ((_o = tripData.age_max) == null ? void 0 : _o.toString()) || "",
         physical_requirements: tripData.physical_requirements || "",
         visa_requirements: tripData.visa_requirements || "",
         vaccination_requirements: tripData.vaccination_requirements || "",
@@ -28778,7 +28773,6 @@ const TripForm = () => {
           original_price: pt.original_price ? parseFloat(pt.original_price) : 0,
           discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null
         })) : [],
-        sale_price: data.sale_price ? parseFloat(data.sale_price) : null,
         deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
         deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
         payment_terms: data.payment_terms.trim(),
@@ -30527,31 +30521,6 @@ const TripForm = () => {
               errors.price_types && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4" }),
                 errors.price_types
-              ] })
-            ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { htmlFor: "sale_price", className: "block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5", children: [
-                __("Sale Price", "Sale Price"),
-                " (",
-                __("Optional", "Optional"),
-                ")"
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mb-2", children: __("Apply a sale price discount to all price types", "Apply a sale price discount to all price types") }),
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500", children: getCurrencySymbol(globalCurrency) }),
-                /* @__PURE__ */ jsxRuntimeExports.jsx(
-                  Input,
-                  {
-                    id: "sale_price",
-                    type: "number",
-                    step: "0.01",
-                    min: "0",
-                    value: formData.sale_price,
-                    onChange: (e) => handleFieldChange("sale_price", e.target.value),
-                    placeholder: "0.00",
-                    className: "pl-7"
-                  }
-                )
               ] })
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border-t border-gray-200 dark:border-gray-700 pt-4", children: [
@@ -68010,24 +67979,58 @@ const Departures = () => {
           ] }) })
         }
       ),
-      /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex gap-4 items-end", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Select Trip", "Select Trip") }),
-        /* @__PURE__ */ jsxRuntimeExports.jsxs(
-          Select,
-          {
-            value: (selectedTripId == null ? void 0 : selectedTripId.toString()) || "",
-            onChange: (e) => {
-              const value = e.target.value;
-              setSelectedTripId(value ? parseInt(value) : null);
-              setPage(1);
-            },
-            children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: "", children: __("-- Select a trip --", "-- Select a trip --") }),
-              tripsData == null ? void 0 : tripsData.map((trip) => /* @__PURE__ */ jsxRuntimeExports.jsx("option", { value: trip.id.toString(), children: trip.title }, trip.id))
-            ]
-          }
-        )
-      ] }) }) }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900 rounded-lg border border-blue-200 dark:border-gray-700 p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-start justify-between gap-4 mb-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 mb-1", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CalendarDays, { className: "w-5 h-5 text-blue-600 dark:text-blue-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: __("Select Trip", "Select Trip") })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: __("Choose a trip to manage its departures and capacity", "Choose a trip to manage its departures and capacity") })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: [
+              __("Trip", "Trip"),
+              " ",
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-red-500", children: "*" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx(
+              SearchableSelect,
+              {
+                value: (selectedTripId == null ? void 0 : selectedTripId.toString()) || "",
+                onChange: (value) => {
+                  const tripId = value ? parseInt(value) : null;
+                  setSelectedTripId(tripId);
+                  setPage(1);
+                },
+                options: [
+                  { value: "", label: __("-- Select a Trip --", "-- Select a Trip --") },
+                  ...(tripsData == null ? void 0 : tripsData.map((trip) => ({
+                    value: trip.id.toString(),
+                    label: `${trip.title}${trip.trip_type === "single_day" ? " (Single Day)" : trip.trip_type === "multi_day" ? " (Multi-Day)" : ""}`
+                  }))) || []
+                ],
+                placeholder: __("Search or select a trip...", "Search or select a trip..."),
+                searchPlaceholder: __("Search by trip name or ID...", "Search by trip name or ID..."),
+                className: "w-full",
+                required: true
+              }
+            )
+          ] }),
+          selectedTripId && (() => {
+            const selectedTripData = tripsData == null ? void 0 : tripsData.find((trip) => trip.id === selectedTripId);
+            return selectedTripData ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 pt-2 border-t border-blue-200 dark:border-gray-700", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(MapPin, { className: "w-4 h-4 text-blue-600 dark:text-blue-400" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: selectedTripData.starting_location }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-400", children: "→" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium", children: selectedTripData.ending_location })
+              ] }),
+              selectedTripData.trip_type && /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { className: selectedTripData.trip_type === "single_day" ? "bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400" : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400", children: selectedTripData.trip_type === "single_day" ? __("Single Day", "Single Day") : __("Multi-Day", "Multi-Day") })
+            ] }) : null;
+          })()
+        ] })
+      ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsx(Card, { children: /* @__PURE__ */ jsxRuntimeExports.jsx(CardContent, { className: "pt-6", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-4 items-end flex-wrap", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 min-w-[200px]", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("label", { className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2", children: __("Search", "Search") }),

@@ -849,9 +849,11 @@ class Trip
                     // Handle both object and array formats
                     if (is_object($category)) {
                         $regular_price = (float) ($category->regular_price ?? $category->original_price ?? $category->price ?? 0);
+                        // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
                     } elseif (is_array($category)) {
                         $regular_price = (float) ($category['regular_price'] ?? $category['original_price'] ?? $category['price'] ?? 0);
+                        // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
                     } else {
                         continue;
@@ -906,11 +908,13 @@ class Trip
                 $original_price_raw = (float) $this->base_price;
             }
             
+            // Get discounted price (we only use discounted_price now, sale_price is deprecated)
             $sale_price_raw = 0;
-            if (!empty($this->sale_price)) {
-                $sale_price_raw = (float) $this->sale_price;
-            } elseif (!empty($this->discounted_price)) {
+            if (!empty($this->discounted_price)) {
                 $sale_price_raw = (float) $this->discounted_price;
+            } elseif (!empty($this->sale_price)) {
+                // Fallback for legacy data that might still have sale_price
+                $sale_price_raw = (float) $this->sale_price;
             }
             
             $has_discount = $sale_price_raw > 0 && $sale_price_raw < $original_price_raw;

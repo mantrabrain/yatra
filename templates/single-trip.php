@@ -141,6 +141,59 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <!-- Flatpickr JS -->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+// Initialize date pickers when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Main booking form date picker
+    const bookingDateInput = document.getElementById('travel_date');
+    if (bookingDateInput) {
+        const form = bookingDateInput.closest('.yatra-booking-form');
+        const bookingMode = form ? form.getAttribute('data-booking-mode') : 'regular';
+        
+        if (bookingMode === 'availability') {
+            // Availability-based: Only specific dates
+            const availabilityDates = <?php echo json_encode(array_map(function($avail) {
+                return $avail->departure_date ?? $avail->date;
+            }, $trip->availability_dates ?? [])); ?>;
+            
+            if (availabilityDates.length > 0) {
+                flatpickr(bookingDateInput, {
+                    dateFormat: 'Y-m-d',
+                    minDate: 'today',
+                    enable: availabilityDates,
+                    disableMobile: false
+                });
+            }
+        } else {
+            // Flexible booking: Any future date with constraints
+            const minDate = bookingDateInput.getAttribute('data-min-date') || 'today';
+            const maxDate = bookingDateInput.getAttribute('data-max-date');
+            
+            const config = {
+                dateFormat: 'Y-m-d',
+                minDate: minDate,
+                disableMobile: false
+            };
+            
+            if (maxDate) {
+                config.maxDate = maxDate;
+            }
+            
+            flatpickr(bookingDateInput, config);
+        }
+    }
+    
+    // Enquiry modal date picker (always flexible)
+    const enquiryDateInput = document.getElementById('enquiry-travel-date');
+    if (enquiryDateInput) {
+        flatpickr(enquiryDateInput, {
+            dateFormat: 'Y-m-d',
+            minDate: 'today',
+            disableMobile: false
+        });
+    }
+});
+</script>
 
 <div class="yatra-single-trip">
     <!-- Hero Section -->
@@ -969,6 +1022,19 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
                                         
                                         <p class="yatra-entry-description"><?php echo esc_html($entry['description']); ?></p>
                                         
+                                        <?php if (!empty($entry['cost']) && $entry['cost'] > 0): ?>
+                                        <div class="yatra-entry-cost">
+                                            <span class="yatra-cost-amount">
+                                                <?php echo yatra_format_price($entry['cost']); ?>
+                                            </span>
+                                            <?php if ($entry['cost_per_person']): ?>
+                                            <span class="yatra-cost-label"><?php esc_html_e('per person', 'yatra'); ?></span>
+                                            <?php else: ?>
+                                            <span class="yatra-cost-label"><?php esc_html_e('per booking', 'yatra'); ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <?php endif; ?>
+                                        
                                         <div class="yatra-entry-meta">
                                             <?php if ($entry['location']): ?>
                                             <div class="yatra-entry-meta-item">
@@ -1009,36 +1075,6 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
                         </div>
                     </div>
                     <?php endforeach; ?>
-                    
-                    <!-- Days 5-13 Summary -->
-                    <div class="yatra-itinerary-day yatra-itinerary-summary">
-                        <div class="yatra-itinerary-day-header">
-                            <div class="yatra-day-badge">Days 5-13</div>
-                            <h3 class="yatra-day-title">Trek to Everest Base Camp & Return</h3>
-                            <button type="button" class="yatra-day-toggle" aria-expanded="false">
-                                <svg class="yatra-chevron-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="yatra-itinerary-day-content" style="display: none;">
-                            <div class="yatra-summary-content">
-                                <p>Continue your trek through the stunning Khumbu region:</p>
-                                <ul class="yatra-summary-list">
-                                    <li><strong>Day 5:</strong> Trek to Tengboche (3,860m) - Visit the famous Tengboche Monastery</li>
-                                    <li><strong>Day 6:</strong> Trek to Dingboche (4,410m) - Enter the high altitude zone</li>
-                                    <li><strong>Day 7:</strong> Acclimatization day in Dingboche - Hike to Nagarjun Hill</li>
-                                    <li><strong>Day 8:</strong> Trek to Lobuche (4,940m) - Pass memorial cairns</li>
-                                    <li><strong>Day 9:</strong> Trek to Gorak Shep (5,170m) - Visit Everest Base Camp (5,364m)</li>
-                                    <li><strong>Day 10:</strong> Sunrise at Kala Patthar (5,545m) - Best Everest views</li>
-                                    <li><strong>Day 11:</strong> Trek back to Pheriche (4,280m)</li>
-                                    <li><strong>Day 12:</strong> Trek to Namche Bazaar (3,440m)</li>
-                                    <li><strong>Day 13:</strong> Trek to Lukla (2,860m) - Celebration dinner</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -1352,7 +1388,12 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
             $original_min = (float) ($trip->min_category_original_price ?? 0);
             $max_discount_pct = (int) ($trip->max_discount_percentage ?? 0);
             
+            // DEBUG: Check effective_price_min first
+            echo '<!-- DEBUG: Effective Price Min: ' . var_export($trip->effective_price_min, true) . ' -->';
+            echo '<!-- DEBUG: Effective Min (float): ' . $effective_min . ' -->';
+            
             if ($effective_min > 0) {
+                echo '<!-- DEBUG: Using effective_price_min path -->';
                 $pricing['has_price'] = true;
                 $pricing['raw_current_price'] = $effective_min;
                 $pricing['current_price'] = yatra_format_price($effective_min);
@@ -1371,13 +1412,37 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
                     $discount['discount_percentage'] = $max_discount_pct;
                     $discount['discount_text'] = sprintf(__('Up to %d%%', 'yatra'), $max_discount_pct);
                 }
-            } elseif (!$has_traveler_pricing) {
-                // Fallback for regular pricing without effective_price_min
+            } else {
+                // Fallback for regular pricing when effective_price_min is 0
+                // This runs for both regular pricing AND traveler pricing scenarios
                 $original = (float) ($trip->original_price ?? 0);
-                $sale = (float) ($trip->sale_price ?? 0);
                 $discounted = (float) ($trip->discounted_price ?? 0);
                 
-                $current = ($sale > 0 && $sale < $original) ? $sale : (($discounted > 0 && $discounted < $original) ? $discounted : $original);
+                // DEBUG: Output all pricing fields
+                echo '<!-- DEBUG: Trip ID: ' . ($trip->id ?? 'NO ID') . ' -->';
+                echo '<!-- DEBUG: Original Price: ' . var_export($trip->original_price, true) . ' -->';
+                echo '<!-- DEBUG: Discounted Price: ' . var_export($trip->discounted_price, true) . ' -->';
+                echo '<!-- DEBUG: Price: ' . var_export($trip->price, true) . ' -->';
+                echo '<!-- DEBUG: Effective Price Min: ' . var_export($trip->effective_price_min, true) . ' -->';
+                
+                // Determine current price: Priority: discounted_price > original_price > price field
+                if ($discounted > 0) {
+                    $current = $discounted;
+                    echo '<!-- DEBUG: Using discounted price: ' . $current . ' -->';
+                } elseif ($original > 0) {
+                    $current = $original;
+                    echo '<!-- DEBUG: Using original price: ' . $current . ' -->';
+                } elseif (!empty($trip->price) && (float)$trip->price > 0) {
+                    $current = (float) $trip->price;
+                    echo '<!-- DEBUG: Using price field: ' . $current . ' -->';
+                } else {
+                    $current = 0;
+                    echo '<!-- DEBUG: No price found, current = 0 -->';
+                }
+                
+                echo '<!-- DEBUG: Final current price: ' . $current . ' -->';
+                echo '<!-- DEBUG: Has Traveler Pricing: ' . ($has_traveler_pricing ? 'YES' : 'NO') . ' -->';
+                echo '<!-- DEBUG: Has Availability: ' . ($has_availability ? 'YES' : 'NO') . ' -->';
                 
                 if ($current > 0) {
                     $pricing['has_price'] = true;

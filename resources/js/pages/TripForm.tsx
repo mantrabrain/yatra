@@ -256,7 +256,6 @@ interface TripFormData {
   original_price: string;
   discounted_price: string;
   price_types: PriceType[];
-  sale_price: string;
   deposit_amount: string;
   deposit_percentage: string;
   payment_terms: string;
@@ -472,7 +471,6 @@ const TripForm: React.FC = () => {
         { category_id: 2, original_price: '625', discounted_price: '' },
         { category_id: 3, original_price: '0', discounted_price: '' },
       ],
-      sale_price: '',
       deposit_amount: '300',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 30 days before departure',
@@ -574,7 +572,6 @@ const TripForm: React.FC = () => {
       pricing_type: 'regular',
       original_price: '1899',
       discounted_price: '1699',
-      sale_price: '',
       deposit_amount: '500',
       deposit_percentage: '',
       payment_terms: '50% deposit required at booking, remaining 50% due 60 days before departure',
@@ -678,7 +675,6 @@ const TripForm: React.FC = () => {
       pricing_type: 'regular',
       original_price: '2499',
       discounted_price: '',
-      sale_price: '2199',
       deposit_amount: '600',
       deposit_percentage: '',
       payment_terms: '40% deposit required at booking, remaining 60% due 45 days before departure',
@@ -783,7 +779,6 @@ const TripForm: React.FC = () => {
     original_price: '',
     discounted_price: '',
     price_types: [],
-    sale_price: '',
     deposit_amount: '',
     deposit_percentage: '',
     payment_terms: '',
@@ -1237,7 +1232,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           original_price: pt.original_price?.toString() || '',
           discounted_price: pt.discounted_price?.toString() || '',
         })) : [],
-        sale_price: tripData.sale_price?.toString() || '',
         deposit_amount: tripData.deposit_amount?.toString() || '',
         deposit_percentage: tripData.deposit_percentage?.toString() || '',
         payment_terms: tripData.payment_terms || '',
@@ -2011,7 +2005,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           original_price: pt.original_price ? parseFloat(pt.original_price) : 0,
           discounted_price: pt.discounted_price ? parseFloat(pt.discounted_price) : null,
         })) : [],
-        sale_price: data.sale_price ? parseFloat(data.sale_price) : null,
         deposit_amount: data.deposit_amount ? parseFloat(data.deposit_amount) : null,
         deposit_percentage: data.deposit_percentage ? parseFloat(data.deposit_percentage) : null,
         payment_terms: data.payment_terms.trim(),
@@ -4199,28 +4192,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               </div>
               )}
 
-              {/* Sale Price */}
-              <div>
-                <label htmlFor="sale_price" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Sale Price', 'Sale Price')} ({__('Optional', 'Optional')})
-                </label>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                  {__('Apply a sale price discount to all price types', 'Apply a sale price discount to all price types')}
-                </p>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{getCurrencySymbol(globalCurrency)}</span>
-                  <Input
-                    id="sale_price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.sale_price}
-                    onChange={(e) => handleFieldChange('sale_price', e.target.value)}
-                    placeholder="0.00"
-                    className="pl-7"
-                  />
-                </div>
-              </div>
 
               {/* Deposit */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
