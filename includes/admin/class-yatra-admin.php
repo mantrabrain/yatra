@@ -8,6 +8,8 @@
 
 defined('ABSPATH') || exit;
 
+use Yatra\Core\Admin\Notices;
+
 /**
  * Main Yatra_Admin Class.
  *
@@ -42,6 +44,54 @@ final class Yatra_Admin
         return self::$_instance;
     }
 
+    /**
+     * Display dismissible Yatra 3.0 announcement notice.
+     */
+    public function yatra_three_notice()
+    {
+        if (!current_user_can('manage_yatra')) {
+            return;
+        }
+
+        global $current_screen;
+
+        $yatra_screens = array(
+            'edit-tour',
+            'toplevel_page_yatra-dashboard',
+            'tour',
+            'edit-activity',
+            'edit-attributes',
+            'yatra_page_enquiries',
+            'edit-destination',
+        );
+
+        $is_yatra_screen = isset($current_screen->id) && (in_array($current_screen->id, $yatra_screens, true) || strpos($current_screen->id, 'yatra') !== false);
+
+        if (!$is_yatra_screen) {
+            return;
+        }
+
+        $link = 'https://wpyatra.com/yatra-3-0/';
+
+        $message = sprintf(
+            '<p><strong>%1$s</strong></p><p>%2$s <a href="%3$s" target="_blank" rel="noopener noreferrer">%4$s</a>.</p>',
+            esc_html__('Yatra 3.0 is coming soon!', 'yatra'),
+            esc_html__('Stay ahead and grab a first glimpse today.', 'yatra'),
+            esc_url($link),
+            esc_html__('Discover Yatra 3.0', 'yatra')
+        );
+
+        Notices::info(
+            $message,
+            array(
+                'dismiss' => Notices::DISMISS_USER,
+                'slug' => 'yatra_three_launch_notice',
+                'autop' => false,
+                'class' => 'yatra-announcement-notice',
+            )
+        );
+    }
+
 
     /**
      * Yatra Constructor.
@@ -66,6 +116,7 @@ final class Yatra_Admin
         add_action('admin_menu', array($this, 'yatra_submenu'));
         add_action('admin_menu', array($this, 'yatra_tour_submenu'));
         add_action('admin_notices', array($this, 'promotional_offer'));
+        add_action('admin_notices', array($this, 'yatra_three_notice'));
         add_filter('plugin_action_links_' . plugin_basename(YATRA_PLUGIN_DIR . 'yatra.php'), [$this, 'settings_link'], 10, 4);
 
         add_filter('parent_file', array($this, 'menu_parent_fix'));
