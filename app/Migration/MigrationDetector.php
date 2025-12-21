@@ -55,13 +55,19 @@ class MigrationDetector
                 'label' => 'Bookings',
                 'count' => $this->countOldBookings(),
                 'description' => 'Customer bookings and reservations',
-                'table' => "{$prefix}yatra_booking",
+                'table' => 'posts (post_type=yatra-booking)',
             ],
             'customers' => [
                 'label' => 'Customers',
                 'count' => $this->countOldCustomers(),
                 'description' => 'Customer profiles',
-                'table' => "{$prefix}yatra_customer",
+                'table' => 'posts (post_type=yatra-customers)',
+            ],
+            'coupons' => [
+                'label' => 'Coupons',
+                'count' => $this->countOldCoupons(),
+                'description' => 'Discount coupons',
+                'table' => 'posts (post_type=yatra-coupons)',
             ],
             'destinations' => [
                 'label' => 'Destinations',
@@ -81,12 +87,6 @@ class MigrationDetector
                 'description' => 'Trip categorization',
                 'table' => 'terms (taxonomy=tour_category)',
             ],
-            'difficulty_levels' => [
-                'label' => 'Difficulty Levels',
-                'count' => $this->countOldDifficultyLevels(),
-                'description' => 'Trip difficulty classifications',
-                'table' => 'terms (taxonomy=difficulty)',
-            ],
             'reviews' => [
                 'label' => 'Reviews',
                 'count' => $this->countOldReviews(),
@@ -97,19 +97,25 @@ class MigrationDetector
                 'label' => 'Enquiries',
                 'count' => $this->countOldEnquiries(),
                 'description' => 'Customer enquiries',
-                'table' => "{$prefix}yatra_enquiry",
+                'table' => "{$prefix}yatra_tour_enquiries",
+            ],
+            'tour_dates' => [
+                'label' => 'Tour Dates',
+                'count' => $this->countOldTourDates(),
+                'description' => 'Tour availability dates',
+                'table' => "{$prefix}yatra_tour_dates",
             ],
         ];
     }
     
     /**
-     * Count old trips (stored as custom post type 'tour')
+     * Count old trips from custom post type
      */
     private function countOldTrips(): int
     {
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
-             WHERE post_type = 'tour' AND post_status != 'trash'"
+             WHERE post_type = 'tour' AND post_status IN ('publish', 'draft', 'pending', 'private')"
         );
         
         return (int) $count;
@@ -120,13 +126,10 @@ class MigrationDetector
      */
     private function countOldBookings(): int
     {
-        $table = $this->wpdb->prefix . 'yatra_booking';
-        
-        if (!$this->tableExists($table)) {
-            return 0;
-        }
-        
-        $count = $this->wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->posts} 
+             WHERE post_type = 'yatra-booking' AND post_status NOT IN ('trash', 'auto-draft')"
+        );
         
         return (int) $count;
     }
@@ -136,13 +139,10 @@ class MigrationDetector
      */
     private function countOldCustomers(): int
     {
-        $table = $this->wpdb->prefix . 'yatra_customer';
-        
-        if (!$this->tableExists($table)) {
-            return 0;
-        }
-        
-        $count = $this->wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->posts} 
+             WHERE post_type = 'yatra-customers' AND post_status NOT IN ('trash', 'auto-draft')"
+        );
         
         return (int) $count;
     }
@@ -186,18 +186,6 @@ class MigrationDetector
         return (int) $count;
     }
     
-    /**
-     * Count old difficulty levels
-     */
-    private function countOldDifficultyLevels(): int
-    {
-        $count = $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->wpdb->term_taxonomy} 
-             WHERE taxonomy = 'difficulty'"
-        );
-        
-        return (int) $count;
-    }
     
     /**
      * Count old reviews (stored as comments)
@@ -217,13 +205,44 @@ class MigrationDetector
      */
     private function countOldEnquiries(): int
     {
-        $table = $this->wpdb->prefix . 'yatra_enquiry';
+        $table = $this->wpdb->prefix . 'yatra_tour_enquiries';
+        $tableExists = $this->wpdb->get_var("SHOW TABLES LIKE '{$table}'");
         
-        if (!$this->tableExists($table)) {
+        if (!$tableExists) {
             return 0;
         }
         
         $count = $this->wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old tour dates
+     */
+    private function countOldTourDates(): int
+    {
+        $table = $this->wpdb->prefix . 'yatra_tour_dates';
+        $tableExists = $this->wpdb->get_var("SHOW TABLES LIKE '{$table}'");
+        
+        if (!$tableExists) {
+            return 0;
+        }
+        
+        $count = $this->wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old coupons
+     */
+    private function countOldCoupons(): int
+    {
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->posts} 
+             WHERE post_type = 'yatra-coupons' AND post_status NOT IN ('trash', 'auto-draft')"
+        );
         
         return (int) $count;
     }

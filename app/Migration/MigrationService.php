@@ -101,14 +101,17 @@ class MigrationService
                 case 'trip_categories':
                     $result = $this->migrateCategories();
                     break;
-                case 'difficulty_levels':
-                    $result = $this->migrateDifficultyLevels();
-                    break;
                 case 'reviews':
                     $result = $this->migrateReviews();
                     break;
                 case 'enquiries':
                     $result = $this->migrateEnquiries();
+                    break;
+                case 'coupons':
+                    $result = $this->migrateCoupons();
+                    break;
+                case 'tour_dates':
+                    $result = $this->migrateTourDates();
                     break;
                 default:
                     throw new \Exception("Unknown data type: {$dataType}");
@@ -200,7 +203,7 @@ class MigrationService
                 throw new \Exception('WooCommerce Action Scheduler is not available');
             }
             
-            $dataTypes = ['trips', 'destinations', 'activities', 'trip_categories', 'difficulty_levels', 'customers', 'bookings', 'reviews', 'enquiries'];
+            $dataTypes = ['trips', 'destinations', 'activities', 'trip_categories', 'customers', 'bookings', 'coupons', 'reviews', 'enquiries', 'tour_dates'];
             
             // Initialize migration progress tracking
             $progress = [];
@@ -613,5 +616,166 @@ class MigrationService
     private function getMigrationLog(): array
     {
         return get_option('yatra_migration_log', []);
+    }
+    
+    /**
+     * Migrate coupons from old custom post type
+     */
+    private function migrateCoupons(): array
+    {
+        global $wpdb;
+        
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+        
+        // Get all old coupons
+        $oldCoupons = $wpdb->get_results(
+            "SELECT * FROM {$wpdb->posts} 
+             WHERE post_type = 'yatra-coupons' 
+             AND post_status IN ('publish', 'draft')"
+        );
+        
+        foreach ($oldCoupons as $oldCoupon) {
+            try {
+                // Check if already migrated
+                if (get_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', true)) {
+                    $skipped++;
+                    continue;
+                }
+                
+                // Get all coupon meta data
+                $meta = $this->getPostMeta($oldCoupon->ID);
+                
+                // Create new coupon in yatra_coupons table
+                $couponData = [
+                    'code' => $oldCoupon->post_title,
+                    'description' => $oldCoupon->post_content,
+                    'discount_type' => $meta['yatra_coupon_discount_type'] ?? 'percentage',
+                    'discount_amount' => floatval($meta['yatra_coupon_discount_amount'] ?? 0),
+                    'minimum_amount' => floatval($meta['yatra_coupon_minimum_amount'] ?? 0),
+                    'maximum_amount' => floatval($meta['yatra_coupon_maximum_amount'] ?? 0),
+                    'usage_limit' => intval($meta['yatra_coupon_usage_limit'] ?? 0),
+                    'usage_count' => intval($meta['yatra_coupon_usage_count'] ?? 0),
+                    'start_date' => $meta['yatra_coupon_start_date'] ?? null,
+                    'end_date' => $meta['yatra_coupon_end_date'] ?? null,
+                    'status' => $oldCoupon->post_status === 'publish' ? 'active' : 'inactive',
+                    'created_at' => $oldCoupon->post_date,
+                    'updated_at' => $oldCoupon->post_modified,
+                ];
+                
+                $wpdb->insert(
+                    $wpdb->prefix . 'yatra_coupons',
+                    $couponData
+                );
+                
+                $newCouponId = $wpdb->insert_id;
+                
+                if ($newCouponId) {
+                    // Mark as migrated
+                    update_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', $newCouponId);
+                    $migrated++;
+                } else {
+                    $failed++;
+                }
+                
+            } catch (\Exception $e) {
+                $failed++;
+                error_log("Coupon migration failed for ID {$oldCoupon->ID}: " . $e->getMessage());
+            }
+        }
+        
+        return [
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+            'failed' => $failed,
+        ];
+    }
+    
+    /**
+     * Migrate tour dates from old table structure
+     */
+    private function migrateTourDates(): array
+    {
+        global $wpdb;
+        
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+        
+        $oldTable = $wpdb->prefix . 'yatra_tour_dates';
+        
+        // Check if old table exists
+        if ($wpdb->get_var("SHOW TABLES LIKE '{$oldTable}'") !== $oldTable) {
+            return [
+                'migrated' => 0,
+                'skipped' => 0,
+                'failed' => 0,
+            ];
+        }
+        
+        // Get all old tour dates
+        $oldTourDates = $wpdb->get_results("SELECT * FROM {$oldTable}");
+        
+        foreach ($oldTourDates as $oldDate) {
+            try {
+                // Check if already migrated
+                $exists = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$wpdb->prefix}yatra_departures 
+                     WHERE old_tour_date_id = %d",
+                    $oldDate->id
+                ));
+                
+                if ($exists) {
+                    $skipped++;
+                    continue;
+                }
+                
+                // Get the migrated trip ID
+                $newTripId = $this->getMigratedTripId($oldDate->tour_id);
+                
+                if (!$newTripId) {
+                    $failed++;
+                    continue;
+                }
+                
+                // Create new departure
+                $departureData = [
+                    'trip_id' => $newTripId,
+                    'start_date' => $oldDate->start_date,
+                    'end_date' => $oldDate->end_date,
+                    'max_travelers' => $oldDate->max_travellers ?? 0,
+                    'available_seats' => $oldDate->max_travellers ?? 0,
+                    'price_override' => !empty($oldDate->pricing) ? maybe_unserialize($oldDate->pricing) : null,
+                    'status' => $oldDate->active ? 'confirmed' : 'cancelled',
+                    'notes' => $oldDate->note_to_customer ?? '',
+                    'admin_notes' => $oldDate->note_to_admin ?? '',
+                    'old_tour_date_id' => $oldDate->id,
+                    'created_at' => $oldDate->created_at,
+                    'updated_at' => $oldDate->updated_at,
+                ];
+                
+                $wpdb->insert(
+                    $wpdb->prefix . 'yatra_departures',
+                    $departureData
+                );
+                
+                if ($wpdb->insert_id) {
+                    $migrated++;
+                } else {
+                    $failed++;
+                }
+                
+            } catch (\Exception $e) {
+                $failed++;
+                error_log("Tour date migration failed for ID {$oldDate->id}: " . $e->getMessage());
+            }
+        }
+        
+        return [
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+            'failed' => $failed,
+        ];
     }
 }
