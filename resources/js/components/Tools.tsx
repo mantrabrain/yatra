@@ -3,6 +3,7 @@ import { useToast } from '../components/ui/toast';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
+import { ConfirmationDialog } from './ui/confirmation-dialog';
 import { 
   Download, 
   Upload, 
@@ -29,7 +30,9 @@ import {
   BarChart3,
   List,
   Settings,
-  Database
+  Database,
+  Play,
+  Copy
 } from 'lucide-react';
 
 interface SystemStatus {
@@ -126,6 +129,7 @@ const Tools: React.FC = () => {
   const [showExportModal, setShowExportModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showClearLogsModal, setShowClearLogsModal] = useState(false);
   const [pendingImportFile, setPendingImportFile] = useState<File | null>(null);
   const [systemStatus, setSystemStatus] = useState<SystemStatus | null>(null);
   const [logs, setLogs] = useState<Record<string, LogsResponse>>({});
@@ -144,6 +148,7 @@ const Tools: React.FC = () => {
   const [migrationProgress, setMigrationProgress] = useState<any>(null);
   const [isMigrating, setIsMigrating] = useState(false);
   const migrationPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [showMigrationConfirm, setShowMigrationConfirm] = useState(false);
   const { showToast } = useToast();
   
   // Background job states
@@ -261,8 +266,11 @@ const Tools: React.FC = () => {
         },
       });
       const data = await response.json();
-      if (data.success) {
-        setLogs(prev => ({ ...prev, [type]: data.data }));
+      if (data.logs && Array.isArray(data.logs)) {
+        // The API returns: { logs: [...], total: number, page: number, per_page: number, pages: number }
+        const logsData = data; // Use the full response, not data.data
+        
+        setLogs(prev => ({ ...prev, [type]: logsData }));
       }
     } catch (error) {
       console.error('Failed to load logs:', error);
@@ -486,12 +494,12 @@ const Tools: React.FC = () => {
     }
   };
 
-  // Cleanup polling on unmount
+  // Load logs when logs tab becomes active
   useEffect(() => {
-    return () => {
-      stopPolling();
-    };
-  }, []);
+    if (activeTab === 'logs') {
+      loadLogs(selectedLogType);
+    }
+  }, [activeTab, selectedLogType]);
 
   // Handle file processing (for both input and drop) - uses background job
   const processFile = async (file: File) => {
@@ -582,22 +590,99 @@ const Tools: React.FC = () => {
   };
 
   // Clear logs
-  const handleClearLogs = async (type: string) => {
-    if (!confirm(`Are you sure you want to clear all ${type} logs?`)) return;
+  const handleClearLogs = () => {
+    setShowClearLogsModal(true);
+  };
 
+  // Confirm clear logs
+  const confirmClearLogs = async () => {
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/logs/${type}/clear`, {
+      console.log('Attempting to clear logs for:', selectedLogType);
+      
+      // Get the correct API URL - use yatraAdmin.restUrl instead of apiUrl for REST endpoints
+      const restUrl = (window as any).yatraAdmin?.restUrl || (window as any).yatraAdmin?.apiUrl || '/wp-json';
+      const apiUrl = `${restUrl}/yatra/v1/tools/logs/${selectedLogType}/clear`;
+      
+      console.log('API URL:', apiUrl);
+      console.log('Nonce:', (window as any).yatraAdmin?.nonce ? 'exists' : 'missing');
+      
+      const response = await fetch(apiUrl, {
         method: 'DELETE',
         headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+          'X-WP-Nonce': (window as any).yatraAdmin?.nonce || '',
+          'Content-Type': 'application/json',
         },
       });
+      
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response not ok:', errorText);
+        alert(`Failed to clear logs: ${response.status} ${response.statusText}\n\nDetails: ${errorText}`);
+        return;
+      }
+      
       const data = await response.json();
+      console.log('Response data:', data);
+      
       if (data.success) {
-        loadLogs(type); // Reload logs
+        console.log('Logs cleared successfully');
+        loadLogs(selectedLogType); // Reload logs
+        setShowClearLogsModal(false);
+        alert('Logs cleared successfully!');
+      } else {
+        console.error('Clear logs failed:', data);
+        alert(`Failed to clear logs: ${data.message || data.data?.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to clear logs:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Network error. Please check your connection.';
+      alert(`Failed to clear logs: ${errorMessage}`);
+    }
+  };
+
+  // Copy individual log to clipboard
+  const copyLogToClipboard = async (log: any) => {
+    const logText = `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}${log.context ? '\nContext: ' + JSON.stringify(log.context, null, 2) : ''}`;
+    
+    try {
+      await navigator.clipboard.writeText(logText);
+      // You could add a toast notification here if you have one
+    } catch (error) {
+      console.error('Failed to copy log:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = logText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+    }
+  };
+
+  // Copy all logs to clipboard
+  const copyAllLogsToClipboard = async () => {
+    const currentLogs = logs[selectedLogType];
+    if (!currentLogs?.logs || currentLogs.logs.length === 0) return;
+
+    const allLogsText = currentLogs.logs.map((log: any) => 
+      `[${log.timestamp}] ${log.level.toUpperCase()}: ${log.message}${log.context ? '\nContext: ' + JSON.stringify(log.context, null, 2) : ''}`
+    ).join('\n\n');
+
+    try {
+      await navigator.clipboard.writeText(allLogsText);
+      // You could add a toast notification here if you have one
+    } catch (error) {
+      console.error('Failed to copy all logs:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = allLogsText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
     }
   };
 
@@ -782,12 +867,23 @@ const Tools: React.FC = () => {
         },
       });
       const data = await response.json();
+      
+      // Debug logging
+      console.log('[Yatra Migration] Progress data received:', data);
+      console.log('[Yatra Migration] Progress details:', data.progress);
+      console.log('[Yatra Migration] Any running:', data.any_running);
+      console.log('[Yatra Migration] All complete:', data.all_complete);
+      
       setMigrationProgress(data);
       
       // If migration is still running, keep polling
       if (data.any_running && !data.all_complete) {
         setIsMigrating(true);
-      } else if (data.all_complete) {
+        // Start polling if not already polling
+        if (!migrationPollingRef.current) {
+          migrationPollingRef.current = setInterval(loadMigrationProgress, 3000);
+        }
+      } else if (data.all_complete && data.started_at) {
         setIsMigrating(false);
         stopMigrationPolling();
       }
@@ -803,7 +899,8 @@ const Tools: React.FC = () => {
     }
     
     loadMigrationProgress();
-    migrationPollingRef.current = setInterval(loadMigrationProgress, 3000);
+    // Poll every 1 second for more frequent progress updates
+    migrationPollingRef.current = setInterval(loadMigrationProgress, 1000);
   };
 
   // Stop polling migration progress
@@ -816,10 +913,6 @@ const Tools: React.FC = () => {
 
   // Migrate all data types
   const handleMigrateAll = async () => {
-    if (!confirm('Are you sure you want to migrate all data? This process will run in the background and may take several minutes.')) {
-      return;
-    }
-
     setIsMigrating(true);
     try {
       const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/migrate-all`, {
@@ -832,17 +925,52 @@ const Tools: React.FC = () => {
       
       const data = await response.json();
       
+      console.log('[Yatra Migration] Migrate all response:', data);
+      
       if (data.success) {
         showToast('Migration started for all data types. Processing in background...', 'success');
+        // Immediately load progress to initialize the display
+        await loadMigrationProgress();
         startMigrationPolling();
       } else {
-        showToast(data.error || 'Migration failed', 'error');
+        showToast(data.error || data.message || 'Migration failed', 'error');
         setIsMigrating(false);
       }
     } catch (error) {
       console.error('Migration error:', error);
       showToast('Migration failed. Please try again.', 'error');
       setIsMigrating(false);
+    }
+  };
+
+  // Cancel migration
+  const handleCancelMigration = async () => {
+    if (!confirm('Are you sure you want to cancel the migration? This will stop all ongoing migrations.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/cancel`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+        },
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showToast('Migration cancelled successfully', 'success');
+        setIsMigrating(false);
+        stopMigrationPolling();
+        loadMigrationStatus();
+      } else {
+        showToast(data.error || 'Failed to cancel migration', 'error');
+      }
+    } catch (error) {
+      console.error('Cancel migration error:', error);
+      showToast('Failed to cancel migration', 'error');
     }
   };
 
@@ -1639,20 +1767,7 @@ const Tools: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div>
-                    <h4 className="font-medium text-blue-900 dark:text-blue-300 mb-1">Migration Information</h4>
-                    <p className="text-sm text-blue-800 dark:text-blue-400">
-                      This tool will migrate your data from previous Yatra versions to the new 3.0 structure. 
-                      Migration runs in the background using WooCommerce Action Scheduler. Please backup your database before proceeding.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-{isLoadingMigration ? (
+              {isLoadingMigration ? (
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
@@ -1678,15 +1793,13 @@ const Tools: React.FC = () => {
                   </div>
                 </div>
               ) : migrationStatus && migrationStatus.has_old_data ? (
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between">
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                  <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h4 className="font-medium text-gray-900 dark:text-white">Old Data Found</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                        {isMigrating ? 'Migration in progress...' : 'Ready to migrate'}
-                      </p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Old Data Found</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Ready to migrate</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-3">
                       <Button
                         variant="outline"
                         size="sm"
@@ -1699,9 +1812,36 @@ const Tools: React.FC = () => {
                         <RefreshCw className={`w-4 h-4 mr-2 ${isMigrating ? 'animate-spin' : ''}`} />
                         Refresh
                       </Button>
-                      {!isMigrating && (
+                      {isMigrating && migrationProgress && !migrationProgress.any_running && (
                         <Button
-                          onClick={handleMigrateAll}
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            // Trigger WP-Cron by opening it in a new window
+                            window.open(window.location.origin + '/wp-cron.php?doing_wp_cron', '_blank');
+                            // Refresh progress after a short delay
+                            setTimeout(() => {
+                              loadMigrationProgress();
+                            }, 2000);
+                          }}
+                          className="bg-orange-600 hover:bg-orange-700 text-white"
+                        >
+                          <Play className="w-4 h-4 mr-2" />
+                          Trigger Processing
+                        </Button>
+                      )}
+                      {isMigrating ? (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={handleCancelMigration}
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Cancel Migration
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={() => setShowMigrationConfirm(true)}
                           className="bg-purple-600 hover:bg-purple-700"
                         >
                           <Database className="w-4 h-4 mr-2" />
@@ -1711,87 +1851,196 @@ const Tools: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(migrationStatus.old_data || {}).map(([key, data]: [string, any]) => {
-                      const progress = migrationProgress?.progress?.[key];
-                      const status = progress?.status || 'pending';
-                      
-                      return data.count > 0 && (
-                        <div key={key} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <h5 className="font-medium text-gray-900 dark:text-white">{data.label}</h5>
-                                {status === 'running' && (
-                                  <RefreshCw className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" />
-                                )}
-                                {status === 'completed' && (
-                                  <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
-                                )}
-                                {status === 'failed' && (
-                                  <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{data.description}</p>
-                            </div>
-                            <Badge variant="default" className="bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400">
-                              {data.count}
-                            </Badge>
-                          </div>
-                          
-                          {progress && status !== 'pending' && (
-                            <div className="mt-3 space-y-2">
-                              <div className="flex items-center justify-between text-xs">
-                                <span className="text-gray-600 dark:text-gray-400 capitalize">{status}</span>
-                                {progress.total > 0 && (
-                                  <span className="text-gray-600 dark:text-gray-400">
-                                    {progress.migrated + progress.skipped + progress.failed} / {progress.total}
-                                  </span>
-                                )}
-                              </div>
-                              {status === 'completed' && (
-                                <div className="flex items-center gap-3 text-xs">
-                                  <span className="text-green-600 dark:text-green-400">✓ {progress.migrated}</span>
-                                  <span className="text-yellow-600 dark:text-yellow-400">⊘ {progress.skipped}</span>
-                                  <span className="text-red-600 dark:text-red-400">✗ {progress.failed}</span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                          
-                          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                            {data.table}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  {migrationProgress?.all_complete && migrationProgress?.started_at && (
-                    <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                      <div className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                        <div className="flex-1">
-                          <h4 className="font-medium text-green-900 dark:text-green-300">Migration Complete!</h4>
-                          <p className="text-sm text-green-800 dark:text-green-400 mt-1">
-                            All data has been successfully migrated to Yatra 3.0.
-                          </p>
-                          {migrationProgress.started_at && (
-                            <p className="text-xs text-green-700 dark:text-green-500 mt-2">
-                              Completed on: {new Date(migrationProgress.started_at).toLocaleString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                second: '2-digit'
-                              })}
+                  {/* Migration Completion Notice */}
+                  {migrationProgress?.all_complete && migrationProgress?.started_at && (() => {
+                    const totalMigrated = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.migrated || 0), 0);
+                    const totalSkipped = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.skipped || 0), 0);
+                    const totalFailed = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.failed || 0), 0);
+                    const dataTypesWithData = Object.entries(migrationProgress.progress || {}).filter(([key, progress]: [string, any]) => {
+                      const dataInfo = migrationStatus.old_data?.[key];
+                      return dataInfo && progress.total > 0;
+                    });
+                    
+                    return (
+                      <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-green-900 dark:text-green-300">Migration Complete!</h4>
+                            <p className="text-sm text-green-800 dark:text-green-400 mt-1">
+                              Successfully migrated {totalMigrated} items across {dataTypesWithData.length} data types.
+                              {totalSkipped > 0 && ` ${totalSkipped} items were skipped (already existed).`}
+                              {totalFailed > 0 && ` ${totalFailed} items failed.`}
                             </p>
-                          )}
+                            
+                            {/* Migration Summary */}
+                            <div className="mt-3 pt-3 border-t border-green-200 dark:border-green-700">
+                              <div className="space-y-1 text-sm">
+                                {dataTypesWithData.map(([key, progress]: [string, any]) => {
+                                  const dataInfo = migrationStatus.old_data?.[key];
+                                  return (
+                                    <div key={key} className="flex items-center justify-between">
+                                      <span className="text-gray-700 dark:text-gray-300">{dataInfo.label}</span>
+                                      <div className="flex items-center gap-3">
+                                        <span className="text-green-600 dark:text-green-400">✓ {progress.migrated || 0} migrated</span>
+                                        {progress.skipped > 0 && (
+                                          <span className="text-yellow-600 dark:text-yellow-400">⊘ {progress.skipped} skipped</span>
+                                        )}
+                                        {progress.failed > 0 && (
+                                          <span className="text-red-600 dark:text-red-400">✗ {progress.failed} failed</span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    );
+                  })()}
+
+                  {/* Inline Migration Progress - Shows during migration */}
+                  {isMigrating && migrationProgress && !migrationProgress.all_complete && (() => {
+                    const totalItems = Object.values(migrationProgress?.progress || {}).reduce((sum: number, p: any) => sum + (p.total || 0), 0);
+                    const processedItems = Object.values(migrationProgress?.progress || {}).reduce((sum: number, p: any) => sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0), 0);
+                    const overallProgress = totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
+                    const allPending = Object.values(migrationProgress?.progress || {}).every((p: any) => p.status === 'pending');
+                    
+                    return (
+                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
+                        <div className="flex items-start gap-3">
+                          <Database className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 animate-pulse" />
+                          <div className="flex-1">
+                            <h4 className="font-medium text-blue-900 dark:text-blue-300">
+                              {allPending ? 'Migration Queued - Waiting to Start...' : 'Migration in Progress...'}
+                            </h4>
+                            <p className="text-sm text-blue-800 dark:text-blue-400 mt-1">
+                              {allPending ? (
+                                <>Found {totalItems} items to migrate. Processing will begin shortly...</>
+                              ) : (
+                                <>{processedItems} of {totalItems} items processed ({overallProgress}%)</>
+                              )}
+                            </p>
+                            
+                            {/* Help message when all pending */}
+                            {allPending && (
+                              <div className="mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md">
+                                <div className="flex items-start gap-2">
+                                  <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
+                                  <div className="text-xs text-yellow-800 dark:text-yellow-300">
+                                    <p className="font-medium mb-1">Migrations are queued and waiting for WordPress cron to process them.</p>
+                                    <p>If processing doesn't start automatically, you can manually trigger it by visiting:</p>
+                                    <code className="block mt-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded text-yellow-900 dark:text-yellow-200">
+                                      {window.location.origin}/wp-cron.php
+                                    </code>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Overall Progress Bar */}
+                            <div className="mt-3">
+                              <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2.5 overflow-hidden">
+                                <div 
+                                  className="h-full bg-blue-600 dark:bg-blue-400 transition-all duration-500 ease-out"
+                                  style={{ width: `${overallProgress}%` }}
+                                />
+                              </div>
+                            </div>
+                            
+                            {/* Detailed Progress by Data Type */}
+                            <div className="mt-4 space-y-2">
+                              {Object.entries(migrationProgress?.progress || {}).map(([key, progress]: [string, any]) => {
+                                const dataInfo = migrationStatus?.old_data?.[key];
+                                if (!dataInfo || progress.total === 0) return null;
+                                
+                                const status = progress.status || 'pending';
+                                const itemsProcessed = (progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0);
+                                const percentage = progress.total > 0 ? Math.round((itemsProcessed / progress.total) * 100) : 0;
+                                
+                                return (
+                                  <div key={key} className="text-sm">
+                                    <div className="flex items-center justify-between mb-1">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium text-gray-900 dark:text-white">{dataInfo.label}</span>
+                                        {status === 'running' && (
+                                          <RefreshCw className="w-3 h-3 text-blue-600 dark:text-blue-400 animate-spin" />
+                                        )}
+                                        {status === 'completed' && (
+                                          <CheckCircle className="w-3 h-3 text-green-600 dark:text-green-400" />
+                                        )}
+                                      </div>
+                                      <span className="text-xs text-gray-600 dark:text-gray-400">
+                                        {itemsProcessed}/{progress.total} ({percentage}%)
+                                      </span>
+                                    </div>
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                                      <div 
+                                        className={`h-full transition-all duration-300 ${
+                                          status === 'completed' ? 'bg-green-500' : 
+                                          status === 'running' ? 'bg-blue-500' : 
+                                          'bg-gray-400'
+                                        }`}
+                                        style={{ width: `${percentage}%` }}
+                                      />
+                                    </div>
+                                    {itemsProcessed > 0 && (
+                                      <div className="flex items-center gap-3 mt-1 text-xs">
+                                        {progress.migrated > 0 && (
+                                          <span className="text-green-600 dark:text-green-400">✓ {progress.migrated} migrated</span>
+                                        )}
+                                        {progress.skipped > 0 && (
+                                          <span className="text-yellow-600 dark:text-yellow-400">⊘ {progress.skipped} skipped</span>
+                                        )}
+                                        {progress.failed > 0 && (
+                                          <span className="text-red-600 dark:text-red-400">✗ {progress.failed} failed</span>
+                                        )}
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Old Data Detection Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {Object.entries(migrationStatus.old_data || {}).map(([key, data]: [string, any]) => (
+                      <div key={key} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h5 className="font-medium text-gray-900 dark:text-white">{data.label}</h5>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{data.description}</p>
+                          </div>
+                          <Badge variant="default" className="bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400">
+                            {data.count}
+                          </Badge>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                          {data.table}
+                        </div>
+                        
+                        {/* Show migration result for this data type if completed */}
+                        {migrationProgress?.all_complete && migrationProgress?.progress?.[key] && (
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center gap-3 text-xs">
+                              <span className="text-green-600 dark:text-green-400">✓ {migrationProgress.progress[key].migrated || 0}</span>
+                              <span className="text-yellow-600 dark:text-yellow-400">⊘ {migrationProgress.progress[key].skipped || 0}</span>
+                              {migrationProgress.progress[key].failed > 0 && (
+                                <span className="text-red-600 dark:text-red-400">✗ {migrationProgress.progress[key].failed}</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ) : (
                 <div className="text-center py-12">
@@ -1837,14 +2086,25 @@ const Tools: React.FC = () => {
                     size="sm"
                     onClick={() => loadLogs(selectedLogType)}
                     disabled={isLoadingLogs}
+                    className="flex items-center gap-2"
                   >
-                    <RefreshCw className={`w-4 h-4 mr-2 ${isLoadingLogs ? 'animate-spin' : ''}`} />
+                    <RefreshCw className={`w-4 h-4 ${isLoadingLogs ? 'animate-spin' : ''}`} />
                     Refresh
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={copyAllLogsToClipboard}
+                    disabled={!logs[selectedLogType]?.logs || logs[selectedLogType].logs.length === 0}
+                    className="flex items-center gap-2"
+                  >
+                    <Copy className="w-4 h-4" />
+                    Copy All
                   </Button>
                   <Button
                     variant="destructive"
                     size="sm"
-                    onClick={() => handleClearLogs(selectedLogType)}
+                    onClick={() => handleClearLogs()}
                   >
                     <Trash2 className="w-4 h-4 mr-2" />
                     Clear Logs
@@ -1868,9 +2128,9 @@ const Tools: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              ) : logs[selectedLogType]?.logs?.length > 0 ? (
-                <div className="space-y-3">
-                  {logs[selectedLogType].logs.map((log) => (
+              ) : (
+                logs[selectedLogType]?.logs?.length > 0 ? (
+                  logs[selectedLogType].logs.map((log) => (
                     <div key={log.id} className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -1879,6 +2139,14 @@ const Tools: React.FC = () => {
                             {new Date(log.timestamp).toLocaleString()}
                           </span>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyLogToClipboard(log)}
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 h-6 w-6"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </Button>
                       </div>
                       <p className="text-sm font-medium mb-2">{log.message}</p>
                       {log.context && Object.keys(log.context).length > 0 && (
@@ -1886,19 +2154,19 @@ const Tools: React.FC = () => {
                           <summary className="cursor-pointer text-gray-600 dark:text-gray-400">
                             View Context
                           </summary>
-                          <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-x-auto">
+                          <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-auto">
                             {JSON.stringify(log.context, null, 2)}
                           </pre>
                         </details>
                       )}
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-400">No {selectedLogType} logs found</p>
-                </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                    <p>No logs found for this type</p>
+                  </div>
+                )
               )}
             </Card>
           </div>
@@ -2033,6 +2301,55 @@ const Tools: React.FC = () => {
           </div>
         )}
         
+        {/* Clear Logs Confirmation Modal */}
+        {showClearLogsModal && (
+          <div className="fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50" style={{ margin: 0, padding: 0 }}>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-md overflow-hidden mx-4">
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Clear Logs</h3>
+                <button
+                  onClick={() => setShowClearLogsModal(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="p-6">
+                <div className="flex items-start gap-3 mb-4">
+                  <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full">
+                    <AlertTriangle className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-1">Clear {selectedLogType} logs?</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      This action cannot be undone. All {selectedLogType} logs will be permanently deleted from the server.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+                <div className="flex gap-3">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowClearLogsModal(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={confirmClearLogs}
+                    className="bg-orange-600 hover:bg-orange-700 text-white"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Clear Logs
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {/* Import Modal */}
         {showImportModal && pendingImportFile && (
           <div className="fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50" style={{ margin: 0, padding: 0 }}>
@@ -2103,6 +2420,21 @@ const Tools: React.FC = () => {
             </div>
           </div>
         )}
+
+      {/* Migration Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showMigrationConfirm}
+        onClose={() => setShowMigrationConfirm(false)}
+        onConfirm={() => {
+          setShowMigrationConfirm(false);
+          handleMigrateAll();
+        }}
+        title="Migrate All Data"
+        message="Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding."
+        confirmText="Start Migration"
+        cancelText="Cancel"
+      />
+
       </div>
     </div>
   );

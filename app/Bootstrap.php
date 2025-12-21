@@ -61,6 +61,9 @@ class Bootstrap
                 \Yatra\Services\SetupWizardService::init();
             }
             
+            // Initialize Action Scheduler
+            $this->initializeActionScheduler();
+            
             // Initialize core components
             $this->initializeCore();
             
@@ -138,12 +141,33 @@ class Bootstrap
     }
 
     /**
+     * Initialize Action Scheduler
+     */
+    private function initializeActionScheduler(): void
+    {
+        $actionSchedulerPath = YATRA_PLUGIN_PATH . 'vendor/woocommerce/action-scheduler/action-scheduler.php';
+        if (file_exists($actionSchedulerPath)) {
+            require_once $actionSchedulerPath;
+        }
+    }
+
+    /**
      * Initialize core components
      */
     private function initializeCore(): void
     {
         // Check and create database tables if they don't exist
         $this->ensureDatabaseTables();
+    }
+
+    /**
+     * Setup WordPress hooks
+     */
+    private function setupWordPressHooks(): void
+    {
+        // Register activation/deactivation hooks
+        register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
+        register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
     }
 
     /**
@@ -256,22 +280,9 @@ class Bootstrap
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log('Yatra: Database tables created automatically');
             }
-        } elseif ($trips_exists) {
-            // If trips table exists, update it to add any missing columns
-            Database::updateTables();
         }
-    }
-
-    /**
-     * Set up WordPress hooks
-     */
-    private function setupWordPressHooks(): void
-    {
-        // Activation and deactivation hooks
-        register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
-        register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
         
-        // Register Migration REST API routes
+        // Register migration routes
         add_action('rest_api_init', function() {
             if (class_exists('\Yatra\Migration\MigrationController')) {
                 $migrationController = new \Yatra\Migration\MigrationController();
@@ -281,9 +292,14 @@ class Bootstrap
         
         // Register Action Scheduler hook for background migration processing
         add_action('yatra_migrate_data_type', function($dataType) {
+            error_log("[Yatra Migration] Action Scheduler hook called for: {$dataType}");
+            
             if (class_exists('\Yatra\Migration\MigrationService')) {
                 $migrationService = new \Yatra\Migration\MigrationService();
-                $migrationService->processMigration($dataType);
+                $result = $migrationService->processMigration($dataType);
+                error_log("[Yatra Migration] Migration result for {$dataType}: " . json_encode($result));
+            } else {
+                error_log("[Yatra Migration] ERROR: MigrationService class not found!");
             }
         }, 10, 1);
     }

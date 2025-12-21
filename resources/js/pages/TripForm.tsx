@@ -3,7 +3,7 @@
  * Multi-step form for creating/editing trips with sidebar navigation
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Save, 
@@ -278,7 +278,7 @@ interface TripFormData {
   
   // Gallery
   gallery_images: Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }>;
-  featured_image: string;
+  featured_image: number | null;
 
   // Downloads
   downloadable_items: DownloadableItem[];
@@ -371,6 +371,14 @@ const TripForm: React.FC = () => {
   const { showToast } = useToast();
   // Downloads is now a FREE feature - always show the UI
   const showDownloadsUI = true;
+
+  const [featuredImagePreview, setFeaturedImagePreview] = useState<string>('');
+  const [isResolvingFeaturedImage, setIsResolvingFeaturedImage] = useState<boolean>(false);
+  const featuredImageCache = useRef<Record<number, string>>({});
+  const mediaBaseUrl = useMemo(() => {
+    const apiUrl = (window as any)?.yatraAdmin?.apiUrl;
+    return apiUrl ? apiUrl.replace(/\/yatra\/v1\/?$/, '') : '';
+  }, []);
   
   // Get section from URL on initial load
   const getInitialSection = (): SectionId => {
@@ -499,7 +507,7 @@ const TripForm: React.FC = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: '',
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: 'What is the best time to visit Bali?', answer: 'The best time to visit Bali is during the dry season from April to October, when you can expect sunny days and minimal rainfall.' },
@@ -601,7 +609,7 @@ const TripForm: React.FC = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: '',
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: 'How difficult is the trek?', answer: 'This is a challenging trek requiring excellent physical fitness. You\'ll be walking 6-8 hours daily at high altitude. Previous trekking experience is recommended.' },
@@ -703,7 +711,7 @@ const TripForm: React.FC = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: '',
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: 'Do I need a visa?', answer: 'Most non-EU nationals need a Schengen visa. Apply at the embassy of your first entry country (France) well in advance.' },
@@ -795,7 +803,7 @@ const TripForm: React.FC = () => {
     excluded_items: [],
     itinerary_days: [],
     gallery_images: [],
-    featured_image: '',
+    featured_image: null,
     downloadable_items: [],
     faqs: [],
     frontend_tabs: [
@@ -1017,172 +1025,172 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         throw error;
       }
     },
-    enabled: isEditMode && can('yatra_view_trips'),
+    enabled: !!tripId && isEditMode,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-
-  // Load trip data into form when editing
-  useEffect(() => {
-    if (tripData && isEditMode) {
-      // Helper to extract IDs from relationship objects
-      const extractIds = (items: any[]): number[] => {
-        if (!Array.isArray(items)) return [];
-        return items
-          .map((item: any) => {
-            if (typeof item === 'number') return item;
-            if (typeof item === 'string') return parseInt(item) || 0;
-            if (item && typeof item === 'object') {
-              return item.id || item.destination_id || item.activity_id || item.category_id || 0;
-            }
-            return 0;
-          })
-          .filter((id: number) => !isNaN(id) && id > 0);
-      };
-
-      // Helper to normalize highlights (can be array of strings or objects)
-      const normalizeHighlights = (highlights: any): string[] => {
-        if (!highlights) return [];
-        if (Array.isArray(highlights)) {
-          return highlights.map((h: any) => {
-            if (typeof h === 'string') return h;
-            if (h && typeof h === 'object') {
-              return h.highlight_text || h.text || h.title || String(h);
-            }
-            return String(h);
-          }).filter((h: string) => h.trim().length > 0);
-        }
-        if (typeof highlights === 'string') {
-          try {
-            const parsed = JSON.parse(highlights);
-            return normalizeHighlights(parsed);
-          } catch {
-            return [highlights];
+  // Helper function to normalize array of items to IDs
+  // Helper to normalize highlights (can be array of strings or objects)
+  const normalizeHighlights = (highlights: any): string[] => {
+    if (!highlights) return [];
+    if (Array.isArray(highlights)) {
+      return highlights
+        .map((h: any) => {
+          if (typeof h === 'string') return h;
+          if (h && typeof h === 'object') {
+            return h.highlight_text || h.text || h.title || String(h);
           }
+          return String(h);
+        })
+        .filter((h: string) => h.trim().length > 0);
+    }
+    if (typeof highlights === 'string') {
+      try {
+        const parsed = JSON.parse(highlights);
+        return normalizeHighlights(parsed);
+      } catch {
+        return [highlights];
+      }
+    }
+    return [];
+  };
+
+  const normalizeDownloadableItems = (items: any): DownloadableItem[] => {
+    if (!items || !Array.isArray(items)) return [];
+
+    return items
+      .filter((row: any) => row && typeof row === 'object')
+      .map((row: any, idx: number) => {
+        const rawVisibility = (row.visibility ?? 'booked_only') as any;
+        const mappedVisibility = rawVisibility === 'paid_only' ? 'booked_only' : rawVisibility;
+        const safeVisibility: DownloadableItem['visibility'] = ['public', 'logged_in', 'booked_only'].includes(mappedVisibility)
+          ? mappedVisibility
+          : 'booked_only';
+
+        const title = (row.title ?? row.download_title ?? row.downlaod_title ?? '').toString();
+        const description = (row.description ?? row.download_description ?? row.downlaod_description ?? '').toString();
+        const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
+        const attachmentUrl = (row.attachment_url ?? '').toString();
+        const attachmentTitle = (row.attachment_title ?? '').toString();
+        const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
+
+        return {
+          id: row.id != null ? Number(row.id) : null,
+          title,
+          description,
+          attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
+          attachment_url: attachmentUrl,
+          attachment_title: attachmentTitle,
+          visibility: safeVisibility,
+          enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
+          sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1,
+        };
+      });
+  };
+
+  // Helper to extract IDs from mixed arrays
+  const extractIds = (items: any): number[] => {
+    if (!items || !Array.isArray(items)) return [];
+    return items
+      .map((item: any) => {
+        if (typeof item === 'number') return item;
+        if (typeof item === 'string') return parseInt(item) || 0;
+        if (item && typeof item === 'object') {
+          return item.id || item.destination_id || item.activity_id || item.category_id || 0;
         }
+        return 0;
+      })
+      .filter((id: number) => !isNaN(id) && id > 0);
+  };
+
+  // Helper to normalize itinerary days
+  const normalizeItineraryDays = (days: any): any[] => {
+    if (!days) return [];
+    if (Array.isArray(days)) return days;
+    if (typeof days === 'string') {
+      try {
+        const parsed = JSON.parse(days);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
         return [];
-      };
+      }
+    }
+    return [];
+  };
 
-      const normalizeDownloadableItems = (items: any): DownloadableItem[] => {
-        if (!items) return [];
-        if (!Array.isArray(items)) return [];
+  // Helper to normalize availability dates
+  const normalizeAvailabilityDates = (dates: any): any[] => {
+    if (!dates) return [];
+    if (Array.isArray(dates)) return dates;
+    if (typeof dates === 'string') {
+      try {
+        const parsed = JSON.parse(dates);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
 
-        return items
-          .filter((row: any) => row && typeof row === 'object')
-          .map((row: any, idx: number) => {
-            const rawVisibility = (row.visibility ?? 'booked_only') as any;
-            const mappedVisibility = rawVisibility === 'paid_only' ? 'booked_only' : rawVisibility;
-            const safeVisibility: DownloadableItem['visibility'] = ['public', 'logged_in', 'booked_only'].includes(mappedVisibility)
-              ? mappedVisibility
-              : 'booked_only';
-
-            const title = (row.title ?? row.download_title ?? row.downlaod_title ?? '').toString();
-            const description = (row.description ?? row.download_description ?? row.downlaod_description ?? '').toString();
-            const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
-            const attachmentUrl = (row.attachment_url ?? '').toString();
-            const attachmentTitle = (row.attachment_title ?? '').toString();
-            const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
-
+  // Utility function to normalize gallery images
+  const normalizeGalleryImages = (
+    images: any
+  ): Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }> => {
+    if (!images) return [];
+    if (Array.isArray(images)) {
+      return images
+        .map((img: any) => {
+          if (typeof img === 'string') {
+            return { id: 0, url: img };
+          }
+          if (img && typeof img === 'object') {
             return {
-              id: row.id != null ? Number(row.id) : null,
-              title,
-              description,
-              attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
-              attachment_url: attachmentUrl,
-              attachment_title: attachmentTitle,
-              visibility: safeVisibility,
-              enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
-              sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1,
+              id: img.id || img.image_id || 0,
+              url: img.url || img.image_url || img.src || '',
+              thumbnail_url: img.thumbnail_url || img.thumb_url || '',
+              alt_text: img.alt_text || img.alt || '',
+              caption: img.caption || img.title || '',
             };
-          });
-      };
-
-      // Helper to normalize gallery images
-      const normalizeGalleryImages = (images: any): Array<{ id: number; url: string; thumbnail_url?: string; alt_text?: string; caption?: string }> => {
-        if (!images) return [];
-        if (Array.isArray(images)) {
-          return images.map((img: any) => {
-            if (typeof img === 'string') {
-              return { id: 0, url: img };
-            }
-            if (img && typeof img === 'object') {
-              return {
-                id: img.id || img.image_id || 0,
-                url: img.url || img.image_url || img.src || '',
-                thumbnail_url: img.thumbnail_url || '',
-                alt_text: img.alt_text || '',
-                caption: img.caption || '',
-              };
-            }
-            return { id: 0, url: String(img) };
-          }).filter((img) => img.url.trim().length > 0);
-        }
-        if (typeof images === 'string') {
-          try {
-            const parsed = JSON.parse(images);
-            return normalizeGalleryImages(parsed);
-          } catch {
-            return [{ id: 0, url: images }];
           }
-        }
-        return [];
-      };
+          return { id: 0, url: '' };
+        })
+        .filter((item: any) => item.url);
+    }
+    if (typeof images === 'string') {
+      try {
+        const parsed = JSON.parse(images);
+        return normalizeGalleryImages(parsed);
+      } catch {
+        return [{ id: 0, url: images }];
+      }
+    }
+    return [];
+  };
 
-      // Helper to normalize FAQs
-      const normalizeFaqs = (faqs: any): FAQ[] => {
-        if (!faqs) return [];
-        if (Array.isArray(faqs)) {
-          return faqs.map((faq: any) => {
-            if (faq && typeof faq === 'object') {
-              return {
-                question: faq.question || faq.q || '',
-                answer: faq.answer || faq.a || '',
-              };
-            }
-            return { question: String(faq), answer: '' };
-          }).filter((faq: FAQ) => faq.question.trim().length > 0);
+  // Helper to normalize FAQs
+  const normalizeFaqs = (faqs: any): FAQ[] => {
+    if (!faqs || !Array.isArray(faqs)) return [];
+    return faqs
+      .map((faq: any) => {
+        if (faq && typeof faq === 'object') {
+          return {
+            question: faq.question || '',
+            answer: faq.answer || '',
+          };
         }
-        if (typeof faqs === 'string') {
-          try {
-            const parsed = JSON.parse(faqs);
-            return normalizeFaqs(parsed);
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
+        return { question: '', answer: '' };
+      })
+      .filter((faq: any) => faq.question && faq.answer);
+  };
 
-      // Helper to normalize itinerary days
-      const normalizeItineraryDays = (days: any): any[] => {
-        if (!days) return [];
-        if (Array.isArray(days)) return days;
-        if (typeof days === 'string') {
-          try {
-            const parsed = JSON.parse(days);
-            return Array.isArray(parsed) ? parsed : [];
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
+  useEffect(() => {
+    if (!tripData || !isEditMode) {
+      console.log('Not loading data - tripData:', tripData, 'isEditMode:', isEditMode);
+      return;
+    }
 
-      // Helper to normalize availability dates
-      const normalizeAvailabilityDates = (dates: any): any[] => {
-        if (!dates) return [];
-        if (Array.isArray(dates)) return dates;
-        if (typeof dates === 'string') {
-          try {
-            const parsed = JSON.parse(dates);
-            return Array.isArray(parsed) ? parsed : [];
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
-
-      setFormData({
+    setFormData({
         title: tripData.title || '',
         slug: tripData.slug || '',
         description: tripData.description || '',
@@ -1248,7 +1256,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         excluded_items: normalizeAmenityItems(tripData.excluded_items),
         itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
         gallery_images: normalizeGalleryImages(tripData.gallery_images),
-        featured_image: tripData.featured_image || tripData.featured_image_url || '',
+        featured_image: tripData.featured_image ? Number(tripData.featured_image) : null,
         downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
         faqs: normalizeFaqs(tripData.faqs),
         frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
@@ -1271,10 +1279,78 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_description: tripData.meta_description || '',
         meta_keywords: tripData.meta_keywords || '',
       });
-    } else {
-      console.log('Not loading data - tripData:', tripData, 'isEditMode:', isEditMode);
+
+    if (tripData.featured_image_url && tripData.featured_image) {
+      const numericId = Number(tripData.featured_image) || 0;
+      setFeaturedImagePreview(tripData.featured_image_url);
+      if (numericId > 0) {
+        featuredImageCache.current[numericId] = tripData.featured_image_url;
+      }
+    } else if (!tripData.featured_image) {
+      setFeaturedImagePreview('');
     }
   }, [tripData, isEditMode, tripId]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const resolveFeaturedImage = async () => {
+      const attachmentId = formData.featured_image;
+
+      if (!attachmentId) {
+        setFeaturedImagePreview('');
+        return;
+      }
+
+      const cachedUrl = featuredImageCache.current[attachmentId];
+      if (cachedUrl) {
+        setFeaturedImagePreview(cachedUrl);
+        return;
+      }
+
+      if (!mediaBaseUrl) {
+        setFeaturedImagePreview('');
+        return;
+      }
+
+      setIsResolvingFeaturedImage(true);
+      try {
+        const base = mediaBaseUrl.replace(/\/$/, '');
+        const response = await fetch(`${base}/wp/v2/media/${attachmentId}`, {
+          credentials: 'same-origin',
+          headers: {
+            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch attachment ${attachmentId}: ${response.status}`);
+        }
+        const data = await response.json();
+        const url = data?.source_url || '';
+        if (url && isMounted) {
+          featuredImageCache.current[attachmentId] = url;
+          setFeaturedImagePreview(url);
+        } else if (isMounted) {
+          setFeaturedImagePreview('');
+        }
+      } catch (error) {
+        console.error('Failed to resolve featured image URL:', error);
+        if (isMounted) {
+          setFeaturedImagePreview('');
+        }
+      } finally {
+        if (isMounted) {
+          setIsResolvingFeaturedImage(false);
+        }
+      }
+    };
+
+    resolveFeaturedImage();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [formData.featured_image, mediaBaseUrl]);
 
   // Map errors to sections - also check for price_type errors
   const getSectionErrors = (sectionId: SectionId): string[] => {
@@ -1486,6 +1562,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+
+    if (field === 'featured_image') {
+      const numericValue = typeof value === 'number' ? value : Number(value);
+      if (!numericValue) {
+        setFeaturedImagePreview('');
+      } else if (featuredImageCache.current[numericValue]) {
+        setFeaturedImagePreview(featuredImageCache.current[numericValue]);
+      }
     }
   };
 
@@ -2031,7 +2116,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           .filter(item => item.title),
         itinerary_days: data.itinerary_days || [],
         gallery_images: data.gallery_images || [],
-        featured_image: data.featured_image || '',
+        featured_image: data.featured_image || null,
         faqs: data.faqs || [],
         frontend_tabs: data.frontend_tabs.map(tab => ({
           id: tab.id,
@@ -2348,7 +2433,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         </Button>
       </div>
     );
-  }
+  };
 
   const renderSectionContent = () => {
     switch (currentSection) {
@@ -2626,11 +2711,21 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         <div className={`aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${
                           errors.featured_image ? 'border-red-500 dark:border-red-600' : 'border-gray-200 dark:border-gray-700'
                         }`}>
-                          <img src={formData.featured_image} alt={__('Featured Image', 'Featured Image')} className="w-full h-full object-cover" />
+                          {featuredImagePreview ? (
+                            <img
+                              src={featuredImagePreview}
+                              alt={__('Featured Image', 'Featured Image')}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center w-full h-full text-sm text-gray-500 dark:text-gray-400">
+                              {isResolvingFeaturedImage ? __('Loading image...', 'Loading image...') : __('Preview unavailable', 'Preview unavailable')}
+                            </div>
+                          )}
                         </div>
                         <button
                           type="button"
-                          onClick={() => handleFieldChange('featured_image', '')}
+                          onClick={() => handleFieldChange('featured_image', null)}
                           className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
                           title={__('Remove image', 'Remove image')}
                         >
@@ -2650,7 +2745,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             });
                             mediaUploader.on('select', () => {
                               const attachment = mediaUploader.state().get('selection').first().toJSON();
-                              handleFieldChange('featured_image', attachment.url);
+                              handleFieldChange('featured_image', attachment.id);
                             });
                             mediaUploader.open();
                           }

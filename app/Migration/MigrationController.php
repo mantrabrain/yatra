@@ -54,6 +54,12 @@ class MigrationController
             'callback' => [$this, 'getProgress'],
             'permission_callback' => [$this, 'checkPermission'],
         ]);
+        
+        register_rest_route('yatra/v1', '/migration/cancel', [
+            'methods' => 'POST',
+            'callback' => [$this, 'cancel'],
+            'permission_callback' => [$this, 'checkPermission'],
+        ]);
     }
     
     /**
@@ -102,15 +108,13 @@ class MigrationController
         try {
             $results = $this->service->migrateAll();
             
-            return new WP_REST_Response([
-                'success' => true,
-                'results' => $results,
-            ], 200);
+            // Return results directly - service already returns proper structure
+            return new WP_REST_Response($results, 200);
             
         } catch (\Exception $e) {
             return new WP_REST_Response([
                 'success' => false,
-                'message' => $e->getMessage(),
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -129,6 +133,24 @@ class MigrationController
             return new WP_REST_Response([
                 'success' => false,
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
+    /**
+     * Cancel migration
+     */
+    public function cancel(WP_REST_Request $request): WP_REST_Response
+    {
+        try {
+            $result = $this->service->cancelMigration();
+            
+            return new WP_REST_Response($result, 200);
+            
+        } catch (\Exception $e) {
+            return new WP_REST_Response([
+                'success' => false,
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

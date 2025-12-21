@@ -81,12 +81,6 @@ class MigrationDetector
                 'description' => 'Trip activities',
                 'table' => 'terms (taxonomy=activity)',
             ],
-            'trip_categories' => [
-                'label' => 'Trip Categories',
-                'count' => $this->countOldCategories(),
-                'description' => 'Trip categorization',
-                'table' => 'terms (taxonomy=tour_category)',
-            ],
             'reviews' => [
                 'label' => 'Reviews',
                 'count' => $this->countOldReviews(),
@@ -173,18 +167,6 @@ class MigrationDetector
         return (int) $count;
     }
     
-    /**
-     * Count old trip categories
-     */
-    private function countOldCategories(): int
-    {
-        $count = $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->wpdb->term_taxonomy} 
-             WHERE taxonomy = 'tour_category'"
-        );
-        
-        return (int) $count;
-    }
     
     
     /**

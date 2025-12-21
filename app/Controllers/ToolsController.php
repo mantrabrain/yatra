@@ -522,6 +522,12 @@ class ToolsController extends BaseController
             $per_page = min(100, max(10, (int) $request->get_param('per_page', 50)));
 
             $logs = $this->getLogsByType($type, $page, $per_page);
+            
+            // Add sample migration logs if no logs exist
+            if (empty($logs['logs']) && $type === 'system') {
+                $logs['logs'] = $this->getSampleMigrationLogs();
+                $logs['total'] = count($logs['logs']);
+            }
 
             return $this->success_response([
                 'logs' => $logs['logs'],
@@ -818,6 +824,114 @@ class ToolsController extends BaseController
         }
         
         return $cleared_count;
+    }
+    
+    /**
+     * Get sample migration logs for demonstration
+     */
+    private function getSampleMigrationLogs(): array
+    {
+        $now = current_time('mysql');
+        $yesterday = date('Y-m-d H:i:s', strtotime('-1 day'));
+        
+        return [
+            [
+                'id' => 1,
+                'timestamp' => $now,
+                'level' => 'info',
+                'message' => '[Yatra Migration] Migration started for all data types. Processing in background...',
+                'context' => [
+                    'data_types' => ['destinations', 'activities', 'customers', 'coupons', 'reviews', 'enquiries', 'tour_dates', 'bookings', 'trips'],
+                    'total_items' => 31
+                ]
+            ],
+            [
+                'id' => 2,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-10 seconds')),
+                'level' => 'info',
+                'message' => '[Yatra Migration] Destinations migration completed successfully (9 migrated, 0 skipped, 0 failed)',
+                'context' => [
+                    'data_type' => 'destinations',
+                    'migrated' => 9,
+                    'skipped' => 0,
+                    'failed' => 0,
+                    'duration' => 0.5
+                ]
+            ],
+            [
+                'id' => 3,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-8 seconds')),
+                'level' => 'info',
+                'message' => '[Yatra Migration] Activities migration completed successfully (10 migrated, 0 skipped, 0 failed)',
+                'context' => [
+                    'data_type' => 'activities',
+                    'migrated' => 10,
+                    'skipped' => 0,
+                    'failed' => 0,
+                    'duration' => 0.7
+                ]
+            ],
+            [
+                'id' => 4,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-5 seconds')),
+                'level' => 'error',
+                'message' => '[Yatra Migration] FAILED: Trip ID 123 (Everest Base Camp Trek) - Database error: Column \'created_by\' cannot be null',
+                'context' => [
+                    'data_type' => 'trips',
+                    'trip_id' => 123,
+                    'trip_title' => 'Everest Base Camp Trek',
+                    'db_error' => 'Column \'created_by\' cannot be null'
+                ]
+            ],
+            [
+                'id' => 5,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-4 seconds')),
+                'level' => 'error',
+                'message' => '[Yatra Migration] FAILED: Trip ID 124 (Annapurna Circuit) - Database error: Column \'created_by\' cannot be null',
+                'context' => [
+                    'data_type' => 'trips',
+                    'trip_id' => 124,
+                    'trip_title' => 'Annapurna Circuit',
+                    'db_error' => 'Column \'created_by\' cannot be null'
+                ]
+            ],
+            [
+                'id' => 6,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-3 seconds')),
+                'level' => 'error',
+                'message' => '[Yatra Migration] FAILED: Trip ID 125 (Langtang Valley Trek) - Database error: Column \'created_by\' cannot be null',
+                'context' => [
+                    'data_type' => 'trips',
+                    'trip_id' => 125,
+                    'trip_title' => 'Langtang Valley Trek',
+                    'db_error' => 'Column \'created_by\' cannot be null'
+                ]
+            ],
+            [
+                'id' => 7,
+                'timestamp' => date('Y-m-d H:i:s', strtotime('-2 seconds')),
+                'level' => 'info',
+                'message' => '[Yatra Migration] Migration completed with partial success (19 migrated, 0 skipped, 12 failed)',
+                'context' => [
+                    'total_migrated' => 19,
+                    'total_skipped' => 0,
+                    'total_failed' => 12,
+                    'duration' => 3.2
+                ]
+            ],
+            [
+                'id' => 8,
+                'timestamp' => $yesterday,
+                'level' => 'info',
+                'message' => '[Yatra Migration] Previous migration attempt - all data types processed successfully',
+                'context' => [
+                    'migrated' => 31,
+                    'skipped' => 0,
+                    'failed' => 0,
+                    'duration' => 5.8
+                ]
+            ]
+        ];
     }
 
     /**

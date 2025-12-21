@@ -9,17 +9,20 @@
 namespace Yatra\Migration;
 
 use Yatra\Core\Database;
+use Yatra\Utils\Logger;
 
 class MigrationService
 {
     private $wpdb;
     private $detector;
+    private $logger;
     
     public function __construct()
     {
         global $wpdb;
         $this->wpdb = $wpdb;
         $this->detector = new MigrationDetector();
+        $this->logger = new Logger();
     }
     
     /**
@@ -76,10 +79,23 @@ class MigrationService
      */
     public function processMigration(string $dataType): array
     {
+        Logger::info("Starting migration for: {$dataType}", ['source' => 'migration']);
+        
         $startTime = microtime(true);
         
-        // Update progress to 'running'
-        $this->updateProgress($dataType, 'running', 0, 0, 0, 0, current_time('mysql'), null);
+        // Get total count before starting migration
+        $detector = new \Yatra\Migration\MigrationDetector();
+        $oldData = $detector->detectOldData();
+        $total = $oldData[$dataType]['count'] ?? 0;
+        
+        Logger::info("Found {$total} items to migrate for {$dataType}", [
+            'source' => 'migration',
+            'data_type' => $dataType,
+            'total' => $total
+        ]);
+        
+        // Update progress to 'running' with total count
+        $this->updateProgress($dataType, 'running', 0, 0, 0, $total, current_time('mysql'), null);
         
         try {
             switch ($dataType) {
@@ -97,9 +113,6 @@ class MigrationService
                     break;
                 case 'activities':
                     $result = $this->migrateActivities();
-                    break;
-                case 'trip_categories':
-                    $result = $this->migrateCategories();
                     break;
                 case 'reviews':
                     $result = $this->migrateReviews();
@@ -132,6 +145,24 @@ class MigrationService
                 current_time('mysql')
             );
             
+            // Log migration completion
+            Logger::info("Migration completed for {$dataType}", [
+                'source' => 'migration',
+                'data_type' => $dataType,
+                'migrated' => $result['migrated'],
+                'skipped' => $result['skipped'],
+                'failed' => $result['failed'],
+                'duration' => round($duration, 2)
+            ]);
+            
+            if ($result['failed'] > 0) {
+                Logger::warning("{$result['failed']} items failed to migrate for {$dataType}", [
+                    'source' => 'migration',
+                    'data_type' => $dataType,
+                    'failed_count' => $result['failed']
+                ]);
+            }
+            
             // Log migration
             $this->logMigration($dataType, $result, $duration);
             
@@ -147,6 +178,8 @@ class MigrationService
         } catch (\Exception $e) {
             // Update progress to 'failed'
             $this->updateProgress($dataType, 'failed', 0, 0, 0, 0, null, current_time('mysql'));
+            
+            error_log("[Yatra Migration] FAILED: Migration failed for {$dataType}: {$e->getMessage()}");
             
             return [
                 'success' => false,
@@ -203,17 +236,34 @@ class MigrationService
                 throw new \Exception('WooCommerce Action Scheduler is not available');
             }
             
-            $dataTypes = ['trips', 'destinations', 'activities', 'trip_categories', 'customers', 'bookings', 'coupons', 'reviews', 'enquiries', 'tour_dates'];
+            // Check if migration is already running
+            $progress = $this->getMigrationProgress();
+            if ($progress['any_running'] && !$progress['all_complete']) {
+                return [
+                    'success' => false,
+                    'error' => 'Migration is already in progress. Please wait for it to complete.',
+                ];
+            }
             
-            // Initialize migration progress tracking
+            // Migration order: dependencies first, then trips last
+            $dataTypes = ['destinations', 'activities', 'customers', 'coupons', 'reviews', 'enquiries', 'tour_dates', 'bookings', 'trips'];
+            
+            // Get old data counts first
+            $detector = new MigrationDetector();
+            $oldData = $detector->detectOldData();
+            
+            // Initialize migration progress tracking with actual counts
             $progress = [];
             foreach ($dataTypes as $dataType) {
+                // Get the count from old data detection
+                $count = isset($oldData[$dataType]) ? (int)$oldData[$dataType]['count'] : 0;
+                
                 $progress[$dataType] = [
                     'status' => 'pending',
                     'migrated' => 0,
                     'skipped' => 0,
                     'failed' => 0,
-                    'total' => 0,
+                    'total' => $count,
                     'started_at' => null,
                     'completed_at' => null,
                 ];
@@ -226,6 +276,8 @@ class MigrationService
             // Schedule migrations for each data type
             $scheduledActions = [];
             foreach ($dataTypes as $dataType) {
+                error_log("[Yatra Migration] Scheduling action for: {$dataType}");
+                
                 $actionId = as_schedule_single_action(
                     time(),
                     'yatra_migrate_data_type',
@@ -235,8 +287,12 @@ class MigrationService
                     'yatra_migration'
                 );
                 
+                error_log("[Yatra Migration] Action scheduled for {$dataType}, ID: {$actionId}");
+                
                 $scheduledActions[$dataType] = $actionId;
             }
+            
+            error_log("[Yatra Migration] All actions scheduled: " . json_encode($scheduledActions));
             
             return [
                 'success' => true,
@@ -283,6 +339,41 @@ class MigrationService
     }
     
     /**
+     * Cancel ongoing migration and reset state
+     */
+    public function cancelMigration(): array
+    {
+        try {
+            // Clear migration progress
+            delete_option('yatra_migration_progress');
+            delete_option('yatra_migration_started_at');
+            
+            // Cancel all pending Action Scheduler jobs
+            if (function_exists('as_unschedule_all_actions')) {
+                as_unschedule_all_actions('yatra_migrate_data_type', null, 'yatra_migration');
+            }
+            
+            Logger::info('Migration cancelled by user', ['source' => 'migration']);
+            
+            return [
+                'success' => true,
+                'message' => 'Migration cancelled successfully',
+            ];
+            
+        } catch (\Exception $e) {
+            Logger::error('Failed to cancel migration: ' . $e->getMessage(), [
+                'source' => 'migration',
+                'error' => $e->getMessage()
+            ]);
+            
+            return [
+                'success' => false,
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+    
+    /**
      * Migrate trips from old custom post type to new structure
      */
     private function migrateTrips(): array
@@ -297,36 +388,65 @@ class MigrationService
              WHERE post_type = 'tour' AND post_status != 'trash'"
         );
         
+        $total = count($oldTrips);
+        $processed = 0;
+        
         foreach ($oldTrips as $oldTrip) {
             try {
                 // Check if already migrated
                 if ($this->isTripMigrated($oldTrip->ID)) {
                     $skipped++;
+                    // Update progress after each skipped item
+                    $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
                 
                 // Get post meta
                 $meta = $this->getPostMeta($oldTrip->ID);
                 
+                // Map status: publish -> published, draft -> draft, everything else -> draft
+                $status = ($oldTrip->post_status === 'publish') ? 'published' : 'draft';
+                
+                // Generate unique slug if already exists
+                $slug = $this->generateUniqueSlug($oldTrip->post_name, 'yatra_trips');
+                
+                // Get featured image
+                $featuredImageId = get_post_thumbnail_id($oldTrip->ID);
+                
+                // Get the original author ID
+                $createdBy = intval($oldTrip->post_author);
+                
+                // Prepare data for insertion
+                $tripData = [
+                    'title' => $oldTrip->post_title,
+                    'slug' => $slug,
+                    'description' => $oldTrip->post_content,
+                    'short_description' => $oldTrip->post_excerpt,
+                    'trip_details' => $oldTrip->post_content,
+                    'duration_days' => intval($meta['yatra_tour_meta_tour_duration_days'] ?? 1),
+                    'duration_nights' => intval($meta['yatra_tour_meta_tour_duration_nights'] ?? 0),
+                    'max_travelers' => intval($meta['yatra_tour_meta_tour_group_size'] ?? 10),
+                    'original_price' => floatval($meta['yatra_tour_meta_tour_price'] ?? 0),
+                    'sale_price' => !empty($meta['yatra_tour_meta_tour_sale_price']) ? floatval($meta['yatra_tour_meta_tour_sale_price']) : null,
+                    'featured_image' => $featuredImageId ?: null,
+                    'status' => $status,
+                    'created_at' => $oldTrip->post_date,
+                    'updated_at' => $oldTrip->post_modified,
+                    'created_by' => $createdBy,
+                    'updated_by' => $createdBy,
+                ];
+                
+                // Log the data being inserted for debugging
+                error_log("[Yatra Migration] Attempting to insert trip ID {$oldTrip->ID}: " . json_encode([
+                    'title' => $tripData['title'],
+                    'slug' => $tripData['slug'],
+                    'status' => $tripData['status']
+                ]));
+                
                 // Insert into new trips table
                 $inserted = $this->wpdb->insert(
                     $this->wpdb->prefix . 'yatra_trips',
-                    [
-                        'name' => $oldTrip->post_title,
-                        'slug' => $oldTrip->post_name,
-                        'description' => $oldTrip->post_content,
-                        'excerpt' => $oldTrip->post_excerpt,
-                        'duration_days' => $meta['yatra_tour_meta_tour_duration_days'] ?? 1,
-                        'duration_nights' => $meta['yatra_tour_meta_tour_duration_nights'] ?? 0,
-                        'group_size' => $meta['yatra_tour_meta_tour_group_size'] ?? 10,
-                        'original_price' => $meta['yatra_tour_meta_tour_price'] ?? 0,
-                        'sale_price' => $meta['yatra_tour_meta_tour_sale_price'] ?? null,
-                        'featured_image' => get_post_thumbnail_id($oldTrip->ID) ?: null,
-                        'gallery_images' => $meta['yatra_tour_meta_gallery_images'] ?? null,
-                        'status' => $oldTrip->post_status === 'publish' ? 'active' : 'inactive',
-                        'created_at' => $oldTrip->post_date,
-                        'updated_at' => $oldTrip->post_modified,
-                    ]
+                    $tripData
                 );
                 
                 if ($inserted) {
@@ -335,13 +455,51 @@ class MigrationService
                     // Store mapping for reference
                     update_post_meta($oldTrip->ID, '_migrated_to_trip_id', $newTripId);
                     
+                    // Migrate trip destinations
+                    $this->migrateTripDestinations($oldTrip->ID, $newTripId);
+                    
+                    // Migrate trip activities
+                    $this->migrateTripActivities($oldTrip->ID, $newTripId);
+                    
                     $migrated++;
+                    
+                    // Update progress after each successful migration
+                    $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    
+                    // Small delay to make progress visible (100ms)
+                    usleep(100000);
                 } else {
                     $failed++;
+                    Logger::error("Failed to insert trip ID {$oldTrip->ID} into database", [
+                        'source' => 'migration',
+                        'data_type' => 'trips',
+                        'trip_id' => $oldTrip->ID,
+                        'trip_title' => $oldTrip->post_title,
+                        'db_error' => $this->wpdb->last_error
+                    ]);
+                    
+                    // Also log to Tools system logs for visibility
+                    error_log("[Yatra Migration] FAILED: Trip ID {$oldTrip->ID} ({$oldTrip->post_title}) - Database error: " . $this->wpdb->last_error);
+                    
+                    // Update progress after each failure
+                    $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                Logger::error("Exception migrating trip ID {$oldTrip->ID}: {$e->getMessage()}", [
+                    'source' => 'migration',
+                    'data_type' => 'trips',
+                    'trip_id' => $oldTrip->ID,
+                    'trip_title' => $oldTrip->post_title,
+                    'error' => $e->getMessage()
+                ]);
+                
+                // Also log to Tools system logs for visibility
+                error_log("[Yatra Migration] FAILED: Exception migrating trip ID {$oldTrip->ID} ({$oldTrip->post_title}): " . $e->getMessage());
+                
+                // Update progress after exception
+                $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
         
@@ -364,6 +522,7 @@ class MigrationService
         }
         
         $oldBookings = $this->wpdb->get_results("SELECT * FROM {$oldTable}");
+        $total = count($oldBookings);
         
         foreach ($oldBookings as $oldBooking) {
             try {
@@ -372,6 +531,7 @@ class MigrationService
                 
                 if (!$newTripId) {
                     $skipped++;
+                    $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
                 
@@ -396,12 +556,15 @@ class MigrationService
                 
                 if ($inserted) {
                     $migrated++;
+                    $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
                 } else {
                     $failed++;
+                    $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                $this->updateProgress('bookings', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
         
@@ -424,6 +587,7 @@ class MigrationService
         }
         
         $oldCustomers = $this->wpdb->get_results("SELECT * FROM {$oldTable}");
+        $total = count($oldCustomers);
         
         foreach ($oldCustomers as $oldCustomer) {
             try {
@@ -444,54 +608,22 @@ class MigrationService
                 
                 if ($inserted) {
                     $migrated++;
+                    $this->updateProgress('customers', 'running', $migrated, $skipped, $failed, $total, null, null);
                 } else {
                     $failed++;
+                    $this->updateProgress('customers', 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                $this->updateProgress('customers', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
         
         return compact('migrated', 'skipped', 'failed');
     }
     
-    /**
-     * Migrate destinations from taxonomy to new table
-     */
-    private function migrateDestinations(): array
-    {
-        return $this->migrateTaxonomy('destination', 'yatra_destinations');
-    }
-    
-    /**
-     * Migrate activities from taxonomy to new table
-     */
-    private function migrateActivities(): array
-    {
-        return $this->migrateTaxonomy('activity', 'yatra_activities');
-    }
-    
-    /**
-     * Migrate categories
-     */
-    private function migrateCategories(): array
-    {
-        return $this->migrateTaxonomy('tour_category', 'yatra_trip_categories');
-    }
-    
-    /**
-     * Migrate difficulty levels
-     */
-    private function migrateDifficultyLevels(): array
-    {
-        return $this->migrateTaxonomy('difficulty', 'yatra_difficulty_levels');
-    }
-    
-    /**
-     * Generic taxonomy migration
-     */
-    private function migrateTaxonomy(string $taxonomy, string $newTable): array
+    private function migrateTaxonomy(string $taxonomy, string $newTable, string $dataType): array
     {
         $migrated = 0;
         $skipped = 0;
@@ -507,13 +639,30 @@ class MigrationService
             )
         );
         
+        $total = count($terms);
+        
         foreach ($terms as $term) {
             try {
+                // Check if already migrated (slug already exists in new table)
+                $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                    "SELECT id FROM {$this->wpdb->prefix}{$newTable} WHERE slug = %s",
+                    $term->slug
+                ));
+                
+                if ($exists) {
+                    $skipped++;
+                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+                
+                // Generate unique slug if already exists
+                $slug = $this->generateUniqueSlug($term->slug, $newTable);
+                
                 $inserted = $this->wpdb->insert(
                     $this->wpdb->prefix . $newTable,
                     [
                         'name' => $term->name,
-                        'slug' => $term->slug,
+                        'slug' => $slug,
                         'description' => $term->description ?? '',
                         'created_at' => current_time('mysql'),
                         'updated_at' => current_time('mysql'),
@@ -522,12 +671,30 @@ class MigrationService
                 
                 if ($inserted) {
                     $migrated++;
+                    // Update progress after each successful migration
+                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    // Small delay to make progress visible (50ms)
+                    usleep(50000);
                 } else {
                     $failed++;
+                    Logger::error("Failed to insert {$taxonomy}: {$this->wpdb->last_error}", [
+                        'source' => 'migration',
+                        'taxonomy' => $taxonomy,
+                        'term_slug' => $term->slug
+                    ]);
+                    // Update progress after each failure
+                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                Logger::error("Exception migrating {$taxonomy}: " . $e->getMessage(), [
+                    'source' => 'migration',
+                    'taxonomy' => $taxonomy,
+                    'term_slug' => $term->slug
+                ]);
+                // Update progress after exception
+                $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
         
@@ -572,6 +739,26 @@ class MigrationService
             $this->wpdb->prepare("SHOW TABLES LIKE %s", $table)
         );
         return $result === $table;
+    }
+    
+    /**
+     * Generate unique slug by adding suffix if slug already exists
+     */
+    private function generateUniqueSlug(string $baseSlug, string $table): string
+    {
+        $slug = $baseSlug;
+        $suffix = 1;
+        
+        // Check if slug exists
+        while ($this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT id FROM {$this->wpdb->prefix}{$table} WHERE slug = %s",
+            $slug
+        ))) {
+            $slug = $baseSlug . '-' . $suffix;
+            $suffix++;
+        }
+        
+        return $slug;
     }
     
     private function isTripMigrated(int $oldTripId): bool
@@ -635,12 +822,14 @@ class MigrationService
              WHERE post_type = 'yatra-coupons' 
              AND post_status IN ('publish', 'draft')"
         );
+        $total = count($oldCoupons);
         
         foreach ($oldCoupons as $oldCoupon) {
             try {
                 // Check if already migrated
                 if (get_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', true)) {
                     $skipped++;
+                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
                 
@@ -675,12 +864,15 @@ class MigrationService
                     // Mark as migrated
                     update_post_meta($oldCoupon->ID, '_migrated_to_coupon_id', $newCouponId);
                     $migrated++;
+                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
                 } else {
                     $failed++;
+                    $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
                 error_log("Coupon migration failed for ID {$oldCoupon->ID}: " . $e->getMessage());
             }
         }
@@ -716,6 +908,7 @@ class MigrationService
         
         // Get all old tour dates
         $oldTourDates = $wpdb->get_results("SELECT * FROM {$oldTable}");
+        $total = count($oldTourDates);
         
         foreach ($oldTourDates as $oldDate) {
             try {
@@ -728,6 +921,7 @@ class MigrationService
                 
                 if ($exists) {
                     $skipped++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
                 
@@ -736,6 +930,7 @@ class MigrationService
                 
                 if (!$newTripId) {
                     $failed++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                     continue;
                 }
                 
@@ -762,12 +957,15 @@ class MigrationService
                 
                 if ($wpdb->insert_id) {
                     $migrated++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                 } else {
                     $failed++;
+                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                 }
                 
             } catch (\Exception $e) {
                 $failed++;
+                $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                 error_log("Tour date migration failed for ID {$oldDate->id}: " . $e->getMessage());
             }
         }
@@ -777,5 +975,73 @@ class MigrationService
             'skipped' => $skipped,
             'failed' => $failed,
         ];
+    }
+    
+    /**
+     * Migrate trip destinations relationship
+     */
+    private function migrateTripDestinations(int $oldTripId, int $newTripId): void
+    {
+        // Get old trip destinations from taxonomy relationships
+        $destinations = wp_get_post_terms($oldTripId, 'destination', ['fields' => 'all']);
+        
+        if (empty($destinations) || is_wp_error($destinations)) {
+            return;
+        }
+        
+        foreach ($destinations as $index => $destination) {
+            // Find the migrated destination ID
+            $newDestinationId = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$this->wpdb->prefix}yatra_destinations WHERE slug = %s",
+                $destination->slug
+            ));
+            
+            if ($newDestinationId) {
+                $this->wpdb->insert(
+                    $this->wpdb->prefix . 'yatra_trip_destinations',
+                    [
+                        'trip_id' => $newTripId,
+                        'destination_id' => $newDestinationId,
+                        'is_primary' => ($index === 0) ? 1 : 0,
+                        'order' => $index,
+                        'created_at' => current_time('mysql'),
+                    ]
+                );
+            }
+        }
+    }
+    
+    /**
+     * Migrate trip activities relationship
+     */
+    private function migrateTripActivities(int $oldTripId, int $newTripId): void
+    {
+        // Get old trip activities from taxonomy relationships
+        $activities = wp_get_post_terms($oldTripId, 'activity', ['fields' => 'all']);
+        
+        if (empty($activities) || is_wp_error($activities)) {
+            return;
+        }
+        
+        foreach ($activities as $index => $activity) {
+            // Find the migrated activity ID
+            $newActivityId = $this->wpdb->get_var($this->wpdb->prepare(
+                "SELECT id FROM {$this->wpdb->prefix}yatra_activities WHERE slug = %s",
+                $activity->slug
+            ));
+            
+            if ($newActivityId) {
+                $this->wpdb->insert(
+                    $this->wpdb->prefix . 'yatra_trip_activities',
+                    [
+                        'trip_id' => $newTripId,
+                        'activity_id' => $newActivityId,
+                        'is_primary' => ($index === 0) ? 1 : 0,
+                        'order' => $index,
+                        'created_at' => current_time('mysql'),
+                    ]
+                );
+            }
+        }
     }
 }

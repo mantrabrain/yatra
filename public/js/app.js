@@ -1,8 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
 var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
-import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as RefreshCw, q as Puzzle, K as Key, s as Settings$1, t as ArrowLeft, v as ChevronDown, w as ChevronRight, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, N as Users, O as Clock, Q as DollarSign, V as ArrowRight, W as Info, X as CheckCircle, Y as HelpCircle, Z as MoreVertical, _ as AlertTriangle, $ as X, a0 as Columns, a1 as ExternalLink, a2 as Mountain, a3 as PenSquare, a4 as Copy, a5 as ArrowUp, a6 as ArrowDown, a7 as Archive, a8 as Trash2, a9 as Plus, aa as Search, ab as ArrowUpDown, ac as AlertCircle, ad as XCircle, ae as Flame, af as Zap, ag as Heart, ah as ShoppingBag, ai as BookOpen, aj as Gamepad2, ak as Music, al as Image, am as Eye, an as Footprints, ao as Bed, ap as Coffee, aq as Hotel, ar as Car, as as Palette, at as Waves, au as Camera, av as Target, aw as Bus, ax as Building2, ay as UtensilsCrossed, az as CheckCircle2, aA as GripVertical, aB as Pencil, aC as Check, aD as Download, aE as Lightbulb, aF as Database, aG as History, aH as Save, aI as Sparkles, aJ as ChevronLeft, aK as Box, aL as ChevronUp, aM as Upload, aN as RotateCcw, aO as Pen, aP as Phone, aQ as Send, aR as Globe, aS as Award, aT as Server, aU as Folder, aV as UserCheck, aW as ClipboardList, aX as Receipt, aY as Plug, aZ as Shield, a_ as Lock, a$ as EyeOff, b0 as Crown, b1 as reactDomExports, b2 as Ban, b3 as Filter, b4 as ClipboardCheck, b5 as PenTool, b6 as Hash$2, b7 as CheckSquare, b8 as AlignLeft, b9 as Type, ba as GitBranch, bb as Megaphone, bc as Pause, bd as Play, be as Code, bf as BarChart$1, bg as Bug, bh as QueryClient, bi as client, bj as QueryClientProvider } from "./react-vendor-CP-I3kRS.js";
-import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-Bln5Mynq.js";
+import { r as reactExports, j as jsxRuntimeExports, u as useQuery, a as useQueryClient, b as useMutation, L as LayoutDashboard, c as List, A as Activity, M as Map$5, F as FolderTree, T as TrendingUp, C as CalendarDays, P as Package, d as FileSignature, e as MapPin, f as CircleUser, g as Tag, R as Route, h as FileText, i as Calendar$1, B as BadgePercent, k as CreditCard, l as Plane, m as MessageSquare, S as Star, n as BarChart3, o as Mail, p as RefreshCw, q as Puzzle, K as Key, s as Settings$1, t as ArrowLeft, v as ChevronDown, w as ChevronRight, x as Loader2, y as Sun, z as Moon, D as Bell, U as User, E as commonjsGlobal, G as getDefaultExportFromCjs, H as reactIsExports, I as React, J as Animate, N as Users, O as Clock, Q as DollarSign, V as ArrowRight, W as Info, X as CheckCircle, Y as HelpCircle, Z as MoreVertical, _ as AlertTriangle, $ as X, a0 as Columns, a1 as ExternalLink, a2 as Mountain, a3 as PenSquare, a4 as Copy, a5 as ArrowUp, a6 as ArrowDown, a7 as Archive, a8 as Trash2, a9 as Plus, aa as Search, ab as ArrowUpDown, ac as AlertCircle, ad as XCircle, ae as Flame, af as Zap, ag as Heart, ah as ShoppingBag, ai as BookOpen, aj as Gamepad2, ak as Music, al as Image, am as Eye, an as Footprints, ao as Bed, ap as Coffee, aq as Hotel, ar as Car, as as Palette, at as Waves, au as Camera, av as Target, aw as Bus, ax as Building2, ay as UtensilsCrossed, az as CheckCircle2, aA as GripVertical, aB as Pencil, aC as Check, aD as Download, aE as Lightbulb, aF as Database, aG as History, aH as Save, aI as Sparkles, aJ as ChevronLeft, aK as Box, aL as ChevronUp, aM as Upload, aN as RotateCcw, aO as Pen, aP as Phone, aQ as Send, aR as Globe, aS as Award, aT as Server, aU as Folder, aV as UserCheck, aW as Play, aX as ClipboardList, aY as Receipt, aZ as Plug, a_ as Shield, a$ as Lock, b0 as EyeOff, b1 as Crown, b2 as reactDomExports, b3 as Ban, b4 as Filter, b5 as ClipboardCheck, b6 as PenTool, b7 as Hash$2, b8 as CheckSquare, b9 as AlignLeft, ba as Type, bb as GitBranch, bc as Megaphone, bd as Pause, be as Code, bf as BarChart$1, bg as Bug, bh as QueryClient, bi as client, bj as QueryClientProvider } from "./react-vendor-DnTFzlkr.js";
+import { u as useToast, _ as __, a as apiClient, g as getCurrencySymbol, b as getCurrency, c as getCurrencyOptions, T as ToastProvider } from "./index-DdwkpysX.js";
 const Button = reactExports.forwardRef(
   ({ className = "", variant = "default", size = "default", ...props }, ref) => {
     const baseClasses = "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
@@ -27343,6 +27343,14 @@ const TripForm = () => {
   const queryClient2 = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const [featuredImagePreview, setFeaturedImagePreview] = reactExports.useState("");
+  const [isResolvingFeaturedImage, setIsResolvingFeaturedImage] = reactExports.useState(false);
+  const featuredImageCache = reactExports.useRef({});
+  const mediaBaseUrl = reactExports.useMemo(() => {
+    var _a2;
+    const apiUrl = (_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.apiUrl;
+    return apiUrl ? apiUrl.replace(/\/yatra\/v1\/?$/, "") : "";
+  }, []);
   const getInitialSection = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const sectionFromUrl = urlParams.get("section");
@@ -27458,7 +27466,7 @@ const TripForm = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: "",
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: "What is the best time to visit Bali?", answer: "The best time to visit Bali is during the dry season from April to October, when you can expect sunny days and minimal rainfall." },
@@ -27561,7 +27569,7 @@ const TripForm = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: "",
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: "How difficult is the trek?", answer: "This is a challenging trek requiring excellent physical fitness. You'll be walking 6-8 hours daily at high altitude. Previous trekking experience is recommended." },
@@ -27663,7 +27671,7 @@ const TripForm = () => {
       ],
       itinerary_days: [],
       gallery_images: [],
-      featured_image: "",
+      featured_image: null,
       downloadable_items: [],
       faqs: [
         { question: "Do I need a visa?", answer: "Most non-EU nationals need a Schengen visa. Apply at the embassy of your first entry country (France) well in advance." },
@@ -27756,7 +27764,7 @@ const TripForm = () => {
     excluded_items: [],
     itinerary_days: [],
     gallery_images: [],
-    featured_image: "",
+    featured_image: null,
     downloadable_items: [],
     faqs: [],
     frontend_tabs: [
@@ -27959,243 +27967,296 @@ const TripForm = () => {
         throw error;
       }
     },
-    enabled: isEditMode && can("yatra_view_trips")
+    enabled: !!tripId && isEditMode,
+    staleTime: 5 * 60 * 1e3
+    // Cache for 5 minutes
   });
+  const normalizeHighlights = (highlights) => {
+    if (!highlights) return [];
+    if (Array.isArray(highlights)) {
+      return highlights.map((h) => {
+        if (typeof h === "string") return h;
+        if (h && typeof h === "object") {
+          return h.highlight_text || h.text || h.title || String(h);
+        }
+        return String(h);
+      }).filter((h) => h.trim().length > 0);
+    }
+    if (typeof highlights === "string") {
+      try {
+        const parsed = JSON.parse(highlights);
+        return normalizeHighlights(parsed);
+      } catch {
+        return [highlights];
+      }
+    }
+    return [];
+  };
+  const normalizeDownloadableItems = (items) => {
+    if (!items || !Array.isArray(items)) return [];
+    return items.filter((row) => row && typeof row === "object").map((row, idx) => {
+      const rawVisibility = row.visibility ?? "booked_only";
+      const mappedVisibility = rawVisibility === "paid_only" ? "booked_only" : rawVisibility;
+      const safeVisibility = ["public", "logged_in", "booked_only"].includes(mappedVisibility) ? mappedVisibility : "booked_only";
+      const title2 = (row.title ?? row.download_title ?? row.downlaod_title ?? "").toString();
+      const description = (row.description ?? row.download_description ?? row.downlaod_description ?? "").toString();
+      const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
+      const attachmentUrl = (row.attachment_url ?? "").toString();
+      const attachmentTitle = (row.attachment_title ?? "").toString();
+      const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
+      return {
+        id: row.id != null ? Number(row.id) : null,
+        title: title2,
+        description,
+        attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
+        attachment_url: attachmentUrl,
+        attachment_title: attachmentTitle,
+        visibility: safeVisibility,
+        enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
+        sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1
+      };
+    });
+  };
+  const extractIds = (items) => {
+    if (!items || !Array.isArray(items)) return [];
+    return items.map((item) => {
+      if (typeof item === "number") return item;
+      if (typeof item === "string") return parseInt(item) || 0;
+      if (item && typeof item === "object") {
+        return item.id || item.destination_id || item.activity_id || item.category_id || 0;
+      }
+      return 0;
+    }).filter((id) => !isNaN(id) && id > 0);
+  };
+  const normalizeItineraryDays = (days) => {
+    if (!days) return [];
+    if (Array.isArray(days)) return days;
+    if (typeof days === "string") {
+      try {
+        const parsed = JSON.parse(days);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+  const normalizeAvailabilityDates = (dates) => {
+    if (!dates) return [];
+    if (Array.isArray(dates)) return dates;
+    if (typeof dates === "string") {
+      try {
+        const parsed = JSON.parse(dates);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+  const normalizeGalleryImages = (images) => {
+    if (!images) return [];
+    if (Array.isArray(images)) {
+      return images.map((img) => {
+        if (typeof img === "string") {
+          return { id: 0, url: img };
+        }
+        if (img && typeof img === "object") {
+          return {
+            id: img.id || img.image_id || 0,
+            url: img.url || img.image_url || img.src || "",
+            thumbnail_url: img.thumbnail_url || img.thumb_url || "",
+            alt_text: img.alt_text || img.alt || "",
+            caption: img.caption || img.title || ""
+          };
+        }
+        return { id: 0, url: "" };
+      }).filter((item) => item.url);
+    }
+    if (typeof images === "string") {
+      try {
+        const parsed = JSON.parse(images);
+        return normalizeGalleryImages(parsed);
+      } catch {
+        return [{ id: 0, url: images }];
+      }
+    }
+    return [];
+  };
+  const normalizeFaqs = (faqs) => {
+    if (!faqs || !Array.isArray(faqs)) return [];
+    return faqs.map((faq) => {
+      if (faq && typeof faq === "object") {
+        return {
+          question: faq.question || "",
+          answer: faq.answer || ""
+        };
+      }
+      return { question: "", answer: "" };
+    }).filter((faq) => faq.question && faq.answer);
+  };
   reactExports.useEffect(() => {
     var _a2, _b2, _c2, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o;
-    if (tripData && isEditMode) {
-      const extractIds = (items) => {
-        if (!Array.isArray(items)) return [];
-        return items.map((item) => {
-          if (typeof item === "number") return item;
-          if (typeof item === "string") return parseInt(item) || 0;
-          if (item && typeof item === "object") {
-            return item.id || item.destination_id || item.activity_id || item.category_id || 0;
-          }
-          return 0;
-        }).filter((id) => !isNaN(id) && id > 0);
-      };
-      const normalizeHighlights = (highlights) => {
-        if (!highlights) return [];
-        if (Array.isArray(highlights)) {
-          return highlights.map((h) => {
-            if (typeof h === "string") return h;
-            if (h && typeof h === "object") {
-              return h.highlight_text || h.text || h.title || String(h);
-            }
-            return String(h);
-          }).filter((h) => h.trim().length > 0);
-        }
-        if (typeof highlights === "string") {
-          try {
-            const parsed = JSON.parse(highlights);
-            return normalizeHighlights(parsed);
-          } catch {
-            return [highlights];
-          }
-        }
-        return [];
-      };
-      const normalizeDownloadableItems = (items) => {
-        if (!items) return [];
-        if (!Array.isArray(items)) return [];
-        return items.filter((row) => row && typeof row === "object").map((row, idx) => {
-          const rawVisibility = row.visibility ?? "booked_only";
-          const mappedVisibility = rawVisibility === "paid_only" ? "booked_only" : rawVisibility;
-          const safeVisibility = ["public", "logged_in", "booked_only"].includes(mappedVisibility) ? mappedVisibility : "booked_only";
-          const title2 = (row.title ?? row.download_title ?? row.downlaod_title ?? "").toString();
-          const description = (row.description ?? row.download_description ?? row.downlaod_description ?? "").toString();
-          const attachmentIdRaw = row.attachment_id ?? row.download_file ?? row.downlaod_file;
-          const attachmentUrl = (row.attachment_url ?? "").toString();
-          const attachmentTitle = (row.attachment_title ?? "").toString();
-          const enabledRaw = row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
-          return {
-            id: row.id != null ? Number(row.id) : null,
-            title: title2,
-            description,
-            attachment_id: attachmentIdRaw != null ? Number(attachmentIdRaw) : null,
-            attachment_url: attachmentUrl,
-            attachment_title: attachmentTitle,
-            visibility: safeVisibility,
-            enabled: enabledRaw != null ? Boolean(enabledRaw) : true,
-            sort_order: row.sort_order != null ? Number(row.sort_order) : idx + 1
-          };
-        });
-      };
-      const normalizeGalleryImages = (images) => {
-        if (!images) return [];
-        if (Array.isArray(images)) {
-          return images.map((img) => {
-            if (typeof img === "string") {
-              return { id: 0, url: img };
-            }
-            if (img && typeof img === "object") {
-              return {
-                id: img.id || img.image_id || 0,
-                url: img.url || img.image_url || img.src || "",
-                thumbnail_url: img.thumbnail_url || "",
-                alt_text: img.alt_text || "",
-                caption: img.caption || ""
-              };
-            }
-            return { id: 0, url: String(img) };
-          }).filter((img) => img.url.trim().length > 0);
-        }
-        if (typeof images === "string") {
-          try {
-            const parsed = JSON.parse(images);
-            return normalizeGalleryImages(parsed);
-          } catch {
-            return [{ id: 0, url: images }];
-          }
-        }
-        return [];
-      };
-      const normalizeFaqs = (faqs) => {
-        if (!faqs) return [];
-        if (Array.isArray(faqs)) {
-          return faqs.map((faq) => {
-            if (faq && typeof faq === "object") {
-              return {
-                question: faq.question || faq.q || "",
-                answer: faq.answer || faq.a || ""
-              };
-            }
-            return { question: String(faq), answer: "" };
-          }).filter((faq) => faq.question.trim().length > 0);
-        }
-        if (typeof faqs === "string") {
-          try {
-            const parsed = JSON.parse(faqs);
-            return normalizeFaqs(parsed);
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
-      const normalizeItineraryDays = (days) => {
-        if (!days) return [];
-        if (Array.isArray(days)) return days;
-        if (typeof days === "string") {
-          try {
-            const parsed = JSON.parse(days);
-            return Array.isArray(parsed) ? parsed : [];
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
-      const normalizeAvailabilityDates = (dates) => {
-        if (!dates) return [];
-        if (Array.isArray(dates)) return dates;
-        if (typeof dates === "string") {
-          try {
-            const parsed = JSON.parse(dates);
-            return Array.isArray(parsed) ? parsed : [];
-          } catch {
-            return [];
-          }
-        }
-        return [];
-      };
-      setFormData({
-        title: tripData.title || "",
-        slug: tripData.slug || "",
-        description: tripData.description || "",
-        highlights: normalizeHighlights(tripData.highlights),
-        trip_details: tripData.trip_details || "",
-        short_description: tripData.short_description || "",
-        what_makes_special: tripData.what_makes_special || "",
-        trip_story: tripData.trip_story || "",
-        video_url: tripData.video_url || "",
-        virtual_tour_url: tripData.virtual_tour_url || "",
-        testimonials: Array.isArray(tripData.testimonials) ? tripData.testimonials : [],
-        destinations: extractIds(tripData.destinations || []),
-        starting_location: tripData.starting_location || "",
-        ending_location: tripData.ending_location || "",
-        countries: Array.isArray(tripData.countries) ? tripData.countries : [],
-        regions: Array.isArray(tripData.regions) ? tripData.regions : [],
-        latitude: ((_a2 = tripData.latitude) == null ? void 0 : _a2.toString()) || "",
-        longitude: ((_b2 = tripData.longitude) == null ? void 0 : _b2.toString()) || "",
-        landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
-        trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_c2 = tripData.duration_days) == null ? void 0 : _c2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
-        duration_days: ((_d = tripData.duration_days) == null ? void 0 : _d.toString()) || "",
-        duration_nights: ((_e = tripData.duration_nights) == null ? void 0 : _e.toString()) || "",
-        available_from: tripData.available_from || "",
-        available_to: tripData.available_to || "",
-        booking_window_days: ((_f = tripData.booking_window_days) == null ? void 0 : _f.toString()) || "",
-        seasonal_availability: tripData.seasonal_availability || "",
-        best_season: tripData.best_season || "",
-        peak_season: tripData.peak_season || "",
-        off_season: tripData.off_season || "",
-        activity_types: extractIds(tripData.activity_types || []),
-        difficulty_level: ((_g = tripData.difficulty_level) == null ? void 0 : _g.toString()) || "",
-        trip_category: extractIds(tripData.trip_category || []),
-        tags: Array.isArray(tripData.tags) ? tripData.tags : [],
-        featured_priority: tripData.featured_priority || "none",
-        accommodation_type: tripData.accommodation_type || "",
-        meal_plan: tripData.meal_plan || "",
-        accommodation_details: tripData.accommodation_details || "",
-        transportation_included: tripData.transportation_included || false,
-        pickup_location: tripData.pickup_location || "",
-        dropoff_location: tripData.dropoff_location || "",
-        transportation_details: tripData.transportation_details || "",
-        pricing_type: tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? "traveler_based" : "regular"),
-        original_price: ((_h = tripData.original_price) == null ? void 0 : _h.toString()) || "",
-        discounted_price: ((_i = tripData.discounted_price) == null ? void 0 : _i.toString()) || "",
-        price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
-          var _a3, _b3;
-          return {
-            category_id: Number(pt.category_id) || 0,
-            original_price: ((_a3 = pt.original_price) == null ? void 0 : _a3.toString()) || "",
-            discounted_price: ((_b3 = pt.discounted_price) == null ? void 0 : _b3.toString()) || ""
-          };
-        }) : [],
-        deposit_amount: ((_j = tripData.deposit_amount) == null ? void 0 : _j.toString()) || "",
-        deposit_percentage: ((_k = tripData.deposit_percentage) == null ? void 0 : _k.toString()) || "",
-        payment_terms: tripData.payment_terms || "",
-        max_travelers: ((_l = tripData.max_travelers) == null ? void 0 : _l.toString()) || "",
-        min_travelers: ((_m = tripData.min_travelers) == null ? void 0 : _m.toString()) || "",
-        booking_deadline: tripData.booking_deadline || "",
-        cancellation_policy: tripData.cancellation_policy || "",
-        age_min: ((_n = tripData.age_min) == null ? void 0 : _n.toString()) || "",
-        age_max: ((_o = tripData.age_max) == null ? void 0 : _o.toString()) || "",
-        physical_requirements: tripData.physical_requirements || "",
-        visa_requirements: tripData.visa_requirements || "",
-        vaccination_requirements: tripData.vaccination_requirements || "",
-        included_items: normalizeAmenityItems(tripData.included_items),
-        excluded_items: normalizeAmenityItems(tripData.excluded_items),
-        itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
-        gallery_images: normalizeGalleryImages(tripData.gallery_images),
-        featured_image: tripData.featured_image || tripData.featured_image_url || "",
-        downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
-        faqs: normalizeFaqs(tripData.faqs),
-        frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
-          { id: "general", label: "General", enabled: true, order: 1, content_type: "general" },
-          { id: "pricing", label: "Pricing", enabled: true, order: 2, content_type: "pricing" },
-          { id: "itinerary", label: "Itinerary", enabled: true, order: 3, content_type: "itinerary" },
-          { id: "included_excluded", label: "Included/Excluded", enabled: true, order: 4, content_type: "included_excluded" },
-          { id: "gallery", label: "Gallery", enabled: true, order: 5, content_type: "gallery" },
-          { id: "faqs", label: "FAQs", enabled: true, order: 6, content_type: "faqs" }
-        ],
-        availability_dates: normalizeAvailabilityDates(tripData.availability_dates),
-        status: tripData.status || "draft",
-        scheduled_publish_date: tripData.scheduled_publish_date || "",
-        scheduled_unpublish_date: tripData.scheduled_unpublish_date || "",
-        version: tripData.version || 1,
-        seasonal_auto_enable: tripData.seasonal_auto_enable || false,
-        seasonal_enable_date: tripData.seasonal_enable_date || "",
-        seasonal_disable_date: tripData.seasonal_disable_date || "",
-        meta_title: tripData.meta_title || "",
-        meta_description: tripData.meta_description || "",
-        meta_keywords: tripData.meta_keywords || ""
-      });
-    } else {
+    if (!tripData || !isEditMode) {
       console.log("Not loading data - tripData:", tripData, "isEditMode:", isEditMode);
+      return;
+    }
+    setFormData({
+      title: tripData.title || "",
+      slug: tripData.slug || "",
+      description: tripData.description || "",
+      highlights: normalizeHighlights(tripData.highlights),
+      trip_details: tripData.trip_details || "",
+      short_description: tripData.short_description || "",
+      what_makes_special: tripData.what_makes_special || "",
+      trip_story: tripData.trip_story || "",
+      video_url: tripData.video_url || "",
+      virtual_tour_url: tripData.virtual_tour_url || "",
+      testimonials: Array.isArray(tripData.testimonials) ? tripData.testimonials : [],
+      destinations: extractIds(tripData.destinations || []),
+      starting_location: tripData.starting_location || "",
+      ending_location: tripData.ending_location || "",
+      countries: Array.isArray(tripData.countries) ? tripData.countries : [],
+      regions: Array.isArray(tripData.regions) ? tripData.regions : [],
+      latitude: ((_a2 = tripData.latitude) == null ? void 0 : _a2.toString()) || "",
+      longitude: ((_b2 = tripData.longitude) == null ? void 0 : _b2.toString()) || "",
+      landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
+      trip_type: tripData.trip_type || (tripData.duration_days && parseInt(((_c2 = tripData.duration_days) == null ? void 0 : _c2.toString()) || "0") === 1 ? "single_day" : "multi_day"),
+      duration_days: ((_d = tripData.duration_days) == null ? void 0 : _d.toString()) || "",
+      duration_nights: ((_e = tripData.duration_nights) == null ? void 0 : _e.toString()) || "",
+      available_from: tripData.available_from || "",
+      available_to: tripData.available_to || "",
+      booking_window_days: ((_f = tripData.booking_window_days) == null ? void 0 : _f.toString()) || "",
+      seasonal_availability: tripData.seasonal_availability || "",
+      best_season: tripData.best_season || "",
+      peak_season: tripData.peak_season || "",
+      off_season: tripData.off_season || "",
+      activity_types: extractIds(tripData.activity_types || []),
+      difficulty_level: ((_g = tripData.difficulty_level) == null ? void 0 : _g.toString()) || "",
+      trip_category: extractIds(tripData.trip_category || []),
+      tags: Array.isArray(tripData.tags) ? tripData.tags : [],
+      featured_priority: tripData.featured_priority || "none",
+      accommodation_type: tripData.accommodation_type || "",
+      meal_plan: tripData.meal_plan || "",
+      accommodation_details: tripData.accommodation_details || "",
+      transportation_included: tripData.transportation_included || false,
+      pickup_location: tripData.pickup_location || "",
+      dropoff_location: tripData.dropoff_location || "",
+      transportation_details: tripData.transportation_details || "",
+      pricing_type: tripData.pricing_type || (tripData.price_types && Array.isArray(tripData.price_types) && tripData.price_types.length > 0 ? "traveler_based" : "regular"),
+      original_price: ((_h = tripData.original_price) == null ? void 0 : _h.toString()) || "",
+      discounted_price: ((_i = tripData.discounted_price) == null ? void 0 : _i.toString()) || "",
+      price_types: Array.isArray(tripData.price_types) ? tripData.price_types.map((pt) => {
+        var _a3, _b3;
+        return {
+          category_id: Number(pt.category_id) || 0,
+          original_price: ((_a3 = pt.original_price) == null ? void 0 : _a3.toString()) || "",
+          discounted_price: ((_b3 = pt.discounted_price) == null ? void 0 : _b3.toString()) || ""
+        };
+      }) : [],
+      deposit_amount: ((_j = tripData.deposit_amount) == null ? void 0 : _j.toString()) || "",
+      deposit_percentage: ((_k = tripData.deposit_percentage) == null ? void 0 : _k.toString()) || "",
+      payment_terms: tripData.payment_terms || "",
+      max_travelers: ((_l = tripData.max_travelers) == null ? void 0 : _l.toString()) || "",
+      min_travelers: ((_m = tripData.min_travelers) == null ? void 0 : _m.toString()) || "",
+      booking_deadline: tripData.booking_deadline || "",
+      cancellation_policy: tripData.cancellation_policy || "",
+      age_min: ((_n = tripData.age_min) == null ? void 0 : _n.toString()) || "",
+      age_max: ((_o = tripData.age_max) == null ? void 0 : _o.toString()) || "",
+      physical_requirements: tripData.physical_requirements || "",
+      visa_requirements: tripData.visa_requirements || "",
+      vaccination_requirements: tripData.vaccination_requirements || "",
+      included_items: normalizeAmenityItems(tripData.included_items),
+      excluded_items: normalizeAmenityItems(tripData.excluded_items),
+      itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
+      gallery_images: normalizeGalleryImages(tripData.gallery_images),
+      featured_image: tripData.featured_image ? Number(tripData.featured_image) : null,
+      downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
+      faqs: normalizeFaqs(tripData.faqs),
+      frontend_tabs: Array.isArray(tripData.frontend_tabs) ? tripData.frontend_tabs : [
+        { id: "general", label: "General", enabled: true, order: 1, content_type: "general" },
+        { id: "pricing", label: "Pricing", enabled: true, order: 2, content_type: "pricing" },
+        { id: "itinerary", label: "Itinerary", enabled: true, order: 3, content_type: "itinerary" },
+        { id: "included_excluded", label: "Included/Excluded", enabled: true, order: 4, content_type: "included_excluded" },
+        { id: "gallery", label: "Gallery", enabled: true, order: 5, content_type: "gallery" },
+        { id: "faqs", label: "FAQs", enabled: true, order: 6, content_type: "faqs" }
+      ],
+      availability_dates: normalizeAvailabilityDates(tripData.availability_dates),
+      status: tripData.status || "draft",
+      scheduled_publish_date: tripData.scheduled_publish_date || "",
+      scheduled_unpublish_date: tripData.scheduled_unpublish_date || "",
+      version: tripData.version || 1,
+      seasonal_auto_enable: tripData.seasonal_auto_enable || false,
+      seasonal_enable_date: tripData.seasonal_enable_date || "",
+      seasonal_disable_date: tripData.seasonal_disable_date || "",
+      meta_title: tripData.meta_title || "",
+      meta_description: tripData.meta_description || "",
+      meta_keywords: tripData.meta_keywords || ""
+    });
+    if (tripData.featured_image_url && tripData.featured_image) {
+      const numericId = Number(tripData.featured_image) || 0;
+      setFeaturedImagePreview(tripData.featured_image_url);
+      if (numericId > 0) {
+        featuredImageCache.current[numericId] = tripData.featured_image_url;
+      }
+    } else if (!tripData.featured_image) {
+      setFeaturedImagePreview("");
     }
   }, [tripData, isEditMode, tripId]);
+  reactExports.useEffect(() => {
+    let isMounted = true;
+    const resolveFeaturedImage = async () => {
+      var _a2;
+      const attachmentId = formData.featured_image;
+      if (!attachmentId) {
+        setFeaturedImagePreview("");
+        return;
+      }
+      const cachedUrl = featuredImageCache.current[attachmentId];
+      if (cachedUrl) {
+        setFeaturedImagePreview(cachedUrl);
+        return;
+      }
+      if (!mediaBaseUrl) {
+        setFeaturedImagePreview("");
+        return;
+      }
+      setIsResolvingFeaturedImage(true);
+      try {
+        const base = mediaBaseUrl.replace(/\/$/, "");
+        const response = await fetch(`${base}/wp/v2/media/${attachmentId}`, {
+          credentials: "same-origin",
+          headers: {
+            "X-WP-Nonce": ((_a2 = window == null ? void 0 : window.yatraAdmin) == null ? void 0 : _a2.nonce) || ""
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch attachment ${attachmentId}: ${response.status}`);
+        }
+        const data = await response.json();
+        const url = (data == null ? void 0 : data.source_url) || "";
+        if (url && isMounted) {
+          featuredImageCache.current[attachmentId] = url;
+          setFeaturedImagePreview(url);
+        } else if (isMounted) {
+          setFeaturedImagePreview("");
+        }
+      } catch (error) {
+        console.error("Failed to resolve featured image URL:", error);
+        if (isMounted) {
+          setFeaturedImagePreview("");
+        }
+      } finally {
+        if (isMounted) {
+          setIsResolvingFeaturedImage(false);
+        }
+      }
+    };
+    resolveFeaturedImage();
+    return () => {
+      isMounted = false;
+    };
+  }, [formData.featured_image, mediaBaseUrl]);
   const getSectionErrors = (sectionId) => {
     const errorMap = {
       "basic": ["title", "slug", "description", "featured_image", "trip_type", "duration_days", "duration_nights"],
@@ -28371,6 +28432,14 @@ const TripForm = () => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+    if (field === "featured_image") {
+      const numericValue = typeof value === "number" ? value : Number(value);
+      if (!numericValue) {
+        setFeaturedImagePreview("");
+      } else if (featuredImageCache.current[numericValue]) {
+        setFeaturedImagePreview(featuredImageCache.current[numericValue]);
+      }
     }
   };
   const handleHighlightAdd = () => {
@@ -28840,7 +28909,7 @@ const TripForm = () => {
         }).filter((item) => item.title),
         itinerary_days: data.itinerary_days || [],
         gallery_images: data.gallery_images || [],
-        featured_image: data.featured_image || "",
+        featured_image: data.featured_image || null,
         faqs: data.faqs || [],
         frontend_tabs: data.frontend_tabs.map((tab) => ({
           id: tab.id,
@@ -29327,12 +29396,19 @@ const TripForm = () => {
                 }
               ),
               formData.featured_image ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "relative group", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${errors.featured_image ? "border-red-500 dark:border-red-600" : "border-gray-200 dark:border-gray-700"}`, children: /* @__PURE__ */ jsxRuntimeExports.jsx("img", { src: formData.featured_image, alt: __("Featured Image", "Featured Image"), className: "w-full h-full object-cover" }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: `aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${errors.featured_image ? "border-red-500 dark:border-red-600" : "border-gray-200 dark:border-gray-700"}`, children: featuredImagePreview ? /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "img",
+                  {
+                    src: featuredImagePreview,
+                    alt: __("Featured Image", "Featured Image"),
+                    className: "w-full h-full object-cover"
+                  }
+                ) : /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-center w-full h-full text-sm text-gray-500 dark:text-gray-400", children: isResolvingFeaturedImage ? __("Loading image...", "Loading image...") : __("Preview unavailable", "Preview unavailable") }) }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(
                   "button",
                   {
                     type: "button",
-                    onClick: () => handleFieldChange("featured_image", ""),
+                    onClick: () => handleFieldChange("featured_image", null),
                     className: "absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity",
                     title: __("Remove image", "Remove image"),
                     children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
@@ -29351,7 +29427,7 @@ const TripForm = () => {
                       });
                       mediaUploader.on("select", () => {
                         const attachment = mediaUploader.state().get("selection").first().toJSON();
-                        handleFieldChange("featured_image", attachment.url);
+                        handleFieldChange("featured_image", attachment.id);
                       });
                       mediaUploader.open();
                     }
@@ -42655,7 +42731,7 @@ const TravelBookingReports = () => {
   ] });
 };
 const Tools = () => {
-  var _a, _b;
+  var _a, _b, _c;
   const [activeTab, setActiveTab] = reactExports.useState("export-import");
   const [isExporting, setIsExporting] = reactExports.useState(false);
   const [isImporting, setIsImporting] = reactExports.useState(false);
@@ -42671,6 +42747,7 @@ const Tools = () => {
   const [showExportModal, setShowExportModal] = reactExports.useState(false);
   const [showImportModal, setShowImportModal] = reactExports.useState(false);
   const [showDeleteModal, setShowDeleteModal] = reactExports.useState(false);
+  const [showClearLogsModal, setShowClearLogsModal] = reactExports.useState(false);
   const [pendingImportFile, setPendingImportFile] = reactExports.useState(null);
   const [systemStatus, setSystemStatus] = reactExports.useState(null);
   const [logs, setLogs] = reactExports.useState({});
@@ -42689,6 +42766,7 @@ const Tools = () => {
   const [migrationProgress, setMigrationProgress] = reactExports.useState(null);
   const [isMigrating, setIsMigrating] = reactExports.useState(false);
   const migrationPollingRef = reactExports.useRef(null);
+  const [showMigrationConfirm, setShowMigrationConfirm] = reactExports.useState(false);
   const { showToast } = useToast();
   const [exportJob, setExportJob] = reactExports.useState(null);
   const [importJob, setImportJob] = reactExports.useState(null);
@@ -42779,8 +42857,9 @@ const Tools = () => {
         }
       });
       const data = await response.json();
-      if (data.success) {
-        setLogs((prev) => ({ ...prev, [type]: data.data }));
+      if (data.logs && Array.isArray(data.logs)) {
+        const logsData = data;
+        setLogs((prev) => ({ ...prev, [type]: logsData }));
       }
     } catch (error) {
       console.error("Failed to load logs:", error);
@@ -42944,10 +43023,10 @@ const Tools = () => {
     }
   };
   reactExports.useEffect(() => {
-    return () => {
-      stopPolling();
-    };
-  }, []);
+    if (activeTab === "logs") {
+      loadLogs(selectedLogType);
+    }
+  }, [activeTab, selectedLogType]);
   const processFile = async (file) => {
     if (selectedImportData.length === 0) {
       alert("Please select at least one data type to import.");
@@ -43013,21 +43092,81 @@ const Tools = () => {
     setPendingImportFile(null);
     setSelectedImportData([]);
   };
-  const handleClearLogs = async (type) => {
-    if (!confirm(`Are you sure you want to clear all ${type} logs?`)) return;
+  const handleClearLogs = () => {
+    setShowClearLogsModal(true);
+  };
+  const confirmClearLogs = async () => {
+    var _a2, _b2, _c2, _d, _e;
     try {
-      const response = await fetch(`${window.yatraAdmin.apiUrl}/tools/logs/${type}/clear`, {
+      console.log("Attempting to clear logs for:", selectedLogType);
+      const restUrl = ((_a2 = window.yatraAdmin) == null ? void 0 : _a2.restUrl) || ((_b2 = window.yatraAdmin) == null ? void 0 : _b2.apiUrl) || "/wp-json";
+      const apiUrl = `${restUrl}/yatra/v1/tools/logs/${selectedLogType}/clear`;
+      console.log("API URL:", apiUrl);
+      console.log("Nonce:", ((_c2 = window.yatraAdmin) == null ? void 0 : _c2.nonce) ? "exists" : "missing");
+      const response = await fetch(apiUrl, {
         method: "DELETE",
         headers: {
-          "X-WP-Nonce": window.yatraAdmin.nonce
+          "X-WP-Nonce": ((_d = window.yatraAdmin) == null ? void 0 : _d.nonce) || "",
+          "Content-Type": "application/json"
         }
       });
+      console.log("Response status:", response.status);
+      console.log("Response ok:", response.ok);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Response not ok:", errorText);
+        alert(`Failed to clear logs: ${response.status} ${response.statusText}
+
+Details: ${errorText}`);
+        return;
+      }
       const data = await response.json();
+      console.log("Response data:", data);
       if (data.success) {
-        loadLogs(type);
+        console.log("Logs cleared successfully");
+        loadLogs(selectedLogType);
+        setShowClearLogsModal(false);
+        alert("Logs cleared successfully!");
+      } else {
+        console.error("Clear logs failed:", data);
+        alert(`Failed to clear logs: ${data.message || ((_e = data.data) == null ? void 0 : _e.message) || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Failed to clear logs:", error);
+      const errorMessage = error instanceof Error ? error.message : "Network error. Please check your connection.";
+      alert(`Failed to clear logs: ${errorMessage}`);
+    }
+  };
+  const copyLogToClipboard = async (log2) => {
+    const logText = `[${log2.timestamp}] ${log2.level.toUpperCase()}: ${log2.message}${log2.context ? "\nContext: " + JSON.stringify(log2.context, null, 2) : ""}`;
+    try {
+      await navigator.clipboard.writeText(logText);
+    } catch (error) {
+      console.error("Failed to copy log:", error);
+      const textArea = document.createElement("textarea");
+      textArea.value = logText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+  };
+  const copyAllLogsToClipboard = async () => {
+    const currentLogs = logs[selectedLogType];
+    if (!(currentLogs == null ? void 0 : currentLogs.logs) || currentLogs.logs.length === 0) return;
+    const allLogsText = currentLogs.logs.map(
+      (log2) => `[${log2.timestamp}] ${log2.level.toUpperCase()}: ${log2.message}${log2.context ? "\nContext: " + JSON.stringify(log2.context, null, 2) : ""}`
+    ).join("\n\n");
+    try {
+      await navigator.clipboard.writeText(allLogsText);
+    } catch (error) {
+      console.error("Failed to copy all logs:", error);
+      const textArea = document.createElement("textarea");
+      textArea.value = allLogsText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
     }
   };
   const getStatusBadge = (status) => {
@@ -43187,10 +43326,17 @@ const Tools = () => {
         }
       });
       const data = await response.json();
+      console.log("[Yatra Migration] Progress data received:", data);
+      console.log("[Yatra Migration] Progress details:", data.progress);
+      console.log("[Yatra Migration] Any running:", data.any_running);
+      console.log("[Yatra Migration] All complete:", data.all_complete);
       setMigrationProgress(data);
       if (data.any_running && !data.all_complete) {
         setIsMigrating(true);
-      } else if (data.all_complete) {
+        if (!migrationPollingRef.current) {
+          migrationPollingRef.current = setInterval(loadMigrationProgress, 3e3);
+        }
+      } else if (data.all_complete && data.started_at) {
         setIsMigrating(false);
         stopMigrationPolling();
       }
@@ -43203,7 +43349,7 @@ const Tools = () => {
       clearInterval(migrationPollingRef.current);
     }
     loadMigrationProgress();
-    migrationPollingRef.current = setInterval(loadMigrationProgress, 3e3);
+    migrationPollingRef.current = setInterval(loadMigrationProgress, 1e3);
   };
   const stopMigrationPolling = () => {
     if (migrationPollingRef.current) {
@@ -43212,9 +43358,6 @@ const Tools = () => {
     }
   };
   const handleMigrateAll = async () => {
-    if (!confirm("Are you sure you want to migrate all data? This process will run in the background and may take several minutes.")) {
-      return;
-    }
     setIsMigrating(true);
     try {
       const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/migrate-all`, {
@@ -43225,17 +43368,45 @@ const Tools = () => {
         }
       });
       const data = await response.json();
+      console.log("[Yatra Migration] Migrate all response:", data);
       if (data.success) {
         showToast("Migration started for all data types. Processing in background...", "success");
+        await loadMigrationProgress();
         startMigrationPolling();
       } else {
-        showToast(data.error || "Migration failed", "error");
+        showToast(data.error || data.message || "Migration failed", "error");
         setIsMigrating(false);
       }
     } catch (error) {
       console.error("Migration error:", error);
       showToast("Migration failed. Please try again.", "error");
       setIsMigrating(false);
+    }
+  };
+  const handleCancelMigration = async () => {
+    if (!confirm("Are you sure you want to cancel the migration? This will stop all ongoing migrations.")) {
+      return;
+    }
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/cancel`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast("Migration cancelled successfully", "success");
+        setIsMigrating(false);
+        stopMigrationPolling();
+        loadMigrationStatus();
+      } else {
+        showToast(data.error || "Failed to cancel migration", "error");
+      }
+    } catch (error) {
+      console.error("Cancel migration error:", error);
+      showToast("Failed to cancel migration", "error");
     }
   };
   reactExports.useEffect(() => {
@@ -43854,13 +44025,6 @@ const Tools = () => {
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Migrate data from old Yatra version to 3.0" })
           ] })
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-blue-900 dark:text-blue-300 mb-1", children: "Migration Information" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800 dark:text-blue-400", children: "This tool will migrate your data from previous Yatra versions to the new 3.0 structure. Migration runs in the background using WooCommerce Action Scheduler. Please backup your database before proceeding." })
-          ] })
-        ] }) }),
         isLoadingMigration ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
@@ -43879,13 +44043,13 @@ const Tools = () => {
             ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
           ] }, i)) })
-        ] }) : migrationStatus && migrationStatus.has_old_data ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+        ] }) : migrationStatus && migrationStatus.has_old_data ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-gray-900 dark:text-white", children: "Old Data Found" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: isMigrating ? "Migration in progress..." : "Ready to migrate" })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-semibold text-gray-900 dark:text-white", children: "Old Data Found" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400 mt-1", children: "Ready to migrate" })
             ] }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 Button,
                 {
@@ -43902,10 +44066,39 @@ const Tools = () => {
                   ]
                 }
               ),
-              !isMigrating && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+              isMigrating && migrationProgress && !migrationProgress.any_running && /* @__PURE__ */ jsxRuntimeExports.jsxs(
                 Button,
                 {
-                  onClick: handleMigrateAll,
+                  variant: "outline",
+                  size: "sm",
+                  onClick: () => {
+                    window.open(window.location.origin + "/wp-cron.php?doing_wp_cron", "_blank");
+                    setTimeout(() => {
+                      loadMigrationProgress();
+                    }, 2e3);
+                  },
+                  className: "bg-orange-600 hover:bg-orange-700 text-white",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Play, { className: "w-4 h-4 mr-2" }),
+                    "Trigger Processing"
+                  ]
+                }
+              ),
+              isMigrating ? /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "destructive",
+                  size: "sm",
+                  onClick: handleCancelMigration,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 mr-2" }),
+                    "Cancel Migration"
+                  ]
+                }
+              ) : /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  onClick: () => setShowMigrationConfirm(true),
                   className: "bg-purple-600 hover:bg-purple-700",
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-4 h-4 mr-2" }),
@@ -43915,68 +44108,173 @@ const Tools = () => {
               )
             ] })
           ] }),
-          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: Object.entries(migrationStatus.old_data || {}).map(([key, data]) => {
+          (migrationProgress == null ? void 0 : migrationProgress.all_complete) && (migrationProgress == null ? void 0 : migrationProgress.started_at) && (() => {
+            const totalMigrated = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.migrated || 0), 0);
+            const totalSkipped = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.skipped || 0), 0);
+            const totalFailed = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.failed || 0), 0);
+            const dataTypesWithData = Object.entries(migrationProgress.progress || {}).filter(([key, progress]) => {
+              var _a2;
+              const dataInfo = (_a2 = migrationStatus.old_data) == null ? void 0 : _a2[key];
+              return dataInfo && progress.total > 0;
+            });
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-green-900 dark:text-green-300", children: "Migration Complete!" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-green-800 dark:text-green-400 mt-1", children: [
+                  "Successfully migrated ",
+                  totalMigrated,
+                  " items across ",
+                  dataTypesWithData.length,
+                  " data types.",
+                  totalSkipped > 0 && ` ${totalSkipped} items were skipped (already existed).`,
+                  totalFailed > 0 && ` ${totalFailed} items failed.`
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-green-200 dark:border-green-700", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-1 text-sm", children: dataTypesWithData.map(([key, progress]) => {
+                  var _a2;
+                  const dataInfo = (_a2 = migrationStatus.old_data) == null ? void 0 : _a2[key];
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-700 dark:text-gray-300", children: dataInfo.label }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600 dark:text-green-400", children: [
+                        "✓ ",
+                        progress.migrated || 0,
+                        " migrated"
+                      ] }),
+                      progress.skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-yellow-600 dark:text-yellow-400", children: [
+                        "⊘ ",
+                        progress.skipped,
+                        " skipped"
+                      ] }),
+                      progress.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400", children: [
+                        "✗ ",
+                        progress.failed,
+                        " failed"
+                      ] })
+                    ] })
+                  ] }, key);
+                }) }) })
+              ] })
+            ] }) });
+          })(),
+          isMigrating && migrationProgress && !migrationProgress.all_complete && (() => {
+            const totalItems = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).reduce((sum, p) => sum + (p.total || 0), 0);
+            const processedItems = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).reduce((sum, p) => sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0), 0);
+            const overallProgress = totalItems > 0 ? Math.round(processedItems / totalItems * 100) : 0;
+            const allPending = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).every((p) => p.status === "pending");
+            return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 animate-pulse" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-blue-900 dark:text-blue-300", children: allPending ? "Migration Queued - Waiting to Start..." : "Migration in Progress..." }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800 dark:text-blue-400 mt-1", children: allPending ? /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  "Found ",
+                  totalItems,
+                  " items to migrate. Processing will begin shortly..."
+                ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs(jsxRuntimeExports.Fragment, { children: [
+                  processedItems,
+                  " of ",
+                  totalItems,
+                  " items processed (",
+                  overallProgress,
+                  "%)"
+                ] }) }),
+                allPending && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-2", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-4 h-4 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-xs text-yellow-800 dark:text-yellow-300", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "font-medium mb-1", children: "Migrations are queued and waiting for WordPress cron to process them." }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "If processing doesn't start automatically, you can manually trigger it by visiting:" }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("code", { className: "block mt-1 px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 rounded text-yellow-900 dark:text-yellow-200", children: [
+                      window.location.origin,
+                      "/wp-cron.php"
+                    ] })
+                  ] })
+                ] }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3", children: /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2.5 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                  "div",
+                  {
+                    className: "h-full bg-blue-600 dark:bg-blue-400 transition-all duration-500 ease-out",
+                    style: { width: `${overallProgress}%` }
+                  }
+                ) }) }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-4 space-y-2", children: Object.entries((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).map(([key, progress]) => {
+                  var _a2;
+                  const dataInfo = (_a2 = migrationStatus == null ? void 0 : migrationStatus.old_data) == null ? void 0 : _a2[key];
+                  if (!dataInfo || progress.total === 0) return null;
+                  const status = progress.status || "pending";
+                  const itemsProcessed = (progress.migrated || 0) + (progress.skipped || 0) + (progress.failed || 0);
+                  const percentage = progress.total > 0 ? Math.round(itemsProcessed / progress.total * 100) : 0;
+                  return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-sm", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-1", children: [
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                        /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "font-medium text-gray-900 dark:text-white", children: dataInfo.label }),
+                        status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-3 h-3 text-blue-600 dark:text-blue-400 animate-spin" }),
+                        status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-3 h-3 text-green-600 dark:text-green-400" })
+                      ] }),
+                      /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-xs text-gray-600 dark:text-gray-400", children: [
+                        itemsProcessed,
+                        "/",
+                        progress.total,
+                        " (",
+                        percentage,
+                        "%)"
+                      ] })
+                    ] }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden", children: /* @__PURE__ */ jsxRuntimeExports.jsx(
+                      "div",
+                      {
+                        className: `h-full transition-all duration-300 ${status === "completed" ? "bg-green-500" : status === "running" ? "bg-blue-500" : "bg-gray-400"}`,
+                        style: { width: `${percentage}%` }
+                      }
+                    ) }),
+                    itemsProcessed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 mt-1 text-xs", children: [
+                      progress.migrated > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600 dark:text-green-400", children: [
+                        "✓ ",
+                        progress.migrated,
+                        " migrated"
+                      ] }),
+                      progress.skipped > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-yellow-600 dark:text-yellow-400", children: [
+                        "⊘ ",
+                        progress.skipped,
+                        " skipped"
+                      ] }),
+                      progress.failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400", children: [
+                        "✗ ",
+                        progress.failed,
+                        " failed"
+                      ] })
+                    ] })
+                  ] }, key);
+                }) })
+              ] })
+            ] }) });
+          })(),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4", children: Object.entries(migrationStatus.old_data || {}).map(([key, data]) => {
             var _a2;
-            const progress = (_a2 = migrationProgress == null ? void 0 : migrationProgress.progress) == null ? void 0 : _a2[key];
-            const status = (progress == null ? void 0 : progress.status) || "pending";
-            return data.count > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+            return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
                 /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-medium text-gray-900 dark:text-white", children: data.label }),
-                    status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" }),
-                    status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-600 dark:text-green-400" }),
-                    status === "failed" && /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 text-red-600 dark:text-red-400" })
-                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-medium text-gray-900 dark:text-white", children: data.label }),
                   /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: data.description })
                 ] }),
                 /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "default", className: "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400", children: data.count })
               ] }),
-              progress && status !== "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 space-y-2", children: [
-                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-xs", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 capitalize", children: status }),
-                  progress.total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600 dark:text-gray-400", children: [
-                    progress.migrated + progress.skipped + progress.failed,
-                    " / ",
-                    progress.total
-                  ] })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 text-xs text-gray-500 dark:text-gray-400", children: data.table }),
+              (migrationProgress == null ? void 0 : migrationProgress.all_complete) && ((_a2 = migrationProgress == null ? void 0 : migrationProgress.progress) == null ? void 0 : _a2[key]) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-3 pt-3 border-t border-gray-200 dark:border-gray-700", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 text-xs", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600 dark:text-green-400", children: [
+                  "✓ ",
+                  migrationProgress.progress[key].migrated || 0
                 ] }),
-                status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 text-xs", children: [
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600 dark:text-green-400", children: [
-                    "✓ ",
-                    progress.migrated
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-yellow-600 dark:text-yellow-400", children: [
-                    "⊘ ",
-                    progress.skipped
-                  ] }),
-                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400", children: [
-                    "✗ ",
-                    progress.failed
-                  ] })
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-yellow-600 dark:text-yellow-400", children: [
+                  "⊘ ",
+                  migrationProgress.progress[key].skipped || 0
+                ] }),
+                migrationProgress.progress[key].failed > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400", children: [
+                  "✗ ",
+                  migrationProgress.progress[key].failed
                 ] })
-              ] }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 text-xs text-gray-500 dark:text-gray-400", children: data.table })
+              ] }) })
             ] }, key);
-          }) }),
-          (migrationProgress == null ? void 0 : migrationProgress.all_complete) && (migrationProgress == null ? void 0 : migrationProgress.started_at) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
-              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-green-900 dark:text-green-300", children: "Migration Complete!" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-800 dark:text-green-400 mt-1", children: "All data has been successfully migrated to Yatra 3.0." }),
-              migrationProgress.started_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-green-700 dark:text-green-500 mt-2", children: [
-                "Completed on: ",
-                new Date(migrationProgress.started_at).toLocaleString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit"
-                })
-              ] })
-            ] })
-          ] }) })
+          }) })
         ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-16 h-16 text-green-500 mx-auto mb-4" }),
           /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: "No Old Data Found" }),
@@ -44014,9 +44312,24 @@ const Tools = () => {
                   size: "sm",
                   onClick: () => loadLogs(selectedLogType),
                   disabled: isLoadingLogs,
+                  className: "flex items-center gap-2",
                   children: [
-                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isLoadingLogs ? "animate-spin" : ""}` }),
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isLoadingLogs ? "animate-spin" : ""}` }),
                     "Refresh"
+                  ]
+                }
+              ),
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "outline",
+                  size: "sm",
+                  onClick: copyAllLogsToClipboard,
+                  disabled: !((_a = logs[selectedLogType]) == null ? void 0 : _a.logs) || logs[selectedLogType].logs.length === 0,
+                  className: "flex items-center gap-2",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-4 h-4" }),
+                    "Copy All"
                   ]
                 }
               ),
@@ -44025,7 +44338,7 @@ const Tools = () => {
                 {
                   variant: "destructive",
                   size: "sm",
-                  onClick: () => handleClearLogs(selectedLogType),
+                  onClick: () => handleClearLogs(),
                   children: [
                     /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4 mr-2" }),
                     "Clear Logs"
@@ -44041,23 +44354,31 @@ const Tools = () => {
             ] }) }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-3/4 h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "w-1/2 h-3 bg-gray-200 dark:bg-gray-700 rounded" })
-          ] }, index)) }) : ((_b = (_a = logs[selectedLogType]) == null ? void 0 : _a.logs) == null ? void 0 : _b.length) > 0 ? /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-3", children: logs[selectedLogType].logs.map((log2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-start justify-between mb-2", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
-              getLogLevelBadge(log2.level),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: new Date(log2.timestamp).toLocaleString() })
-            ] }) }),
+          ] }, index)) }) : ((_c = (_b = logs[selectedLogType]) == null ? void 0 : _b.logs) == null ? void 0 : _c.length) > 0 ? logs[selectedLogType].logs.map((log2) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "border rounded-lg p-4 bg-gray-50 dark:bg-gray-800", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start justify-between mb-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                getLogLevelBadge(log2.level),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-sm text-gray-600 dark:text-gray-400", children: new Date(log2.timestamp).toLocaleString() })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                Button,
+                {
+                  variant: "ghost",
+                  size: "sm",
+                  onClick: () => copyLogToClipboard(log2),
+                  className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 h-6 w-6",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(Copy, { className: "w-3 h-3" })
+                }
+              )
+            ] }),
             /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm font-medium mb-2", children: log2.message }),
             log2.context && Object.keys(log2.context).length > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("details", { className: "text-xs", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx("summary", { className: "cursor-pointer text-gray-600 dark:text-gray-400", children: "View Context" }),
-              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-x-auto", children: JSON.stringify(log2.context, null, 2) })
+              /* @__PURE__ */ jsxRuntimeExports.jsx("pre", { className: "mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-auto", children: JSON.stringify(log2.context, null, 2) })
             ] })
-          ] }, log2.id)) }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-12 h-12 text-gray-400 mx-auto mb-4" }),
-            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-gray-600 dark:text-gray-400", children: [
-              "No ",
-              selectedLogType,
-              " logs found"
-            ] })
+          ] }, log2.id)) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-8 text-gray-500 dark:text-gray-400", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-12 h-12 mx-auto mb-2 opacity-50" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { children: "No logs found for this type" })
           ] })
         ] })
       ] }),
@@ -44181,6 +44502,55 @@ const Tools = () => {
           )
         ] }) })
       ] }) }),
+      showClearLogsModal && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50", style: { margin: 0, padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-md overflow-hidden mx-4", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Clear Logs" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            "button",
+            {
+              onClick: () => setShowClearLogsModal(false),
+              className: "text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700",
+              children: /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-5 h-5" })
+            }
+          )
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3 mb-4", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full", children: /* @__PURE__ */ jsxRuntimeExports.jsx(AlertTriangle, { className: "w-6 h-6 text-orange-600 dark:text-orange-400" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("h4", { className: "text-lg font-medium text-gray-900 dark:text-white mb-1", children: [
+              "Clear ",
+              selectedLogType,
+              " logs?"
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: [
+              "This action cannot be undone. All ",
+              selectedLogType,
+              " logs will be permanently deleted from the server."
+            ] })
+          ] })
+        ] }) }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex items-center justify-end p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(
+            Button,
+            {
+              variant: "outline",
+              onClick: () => setShowClearLogsModal(false),
+              children: "Cancel"
+            }
+          ),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs(
+            Button,
+            {
+              onClick: confirmClearLogs,
+              className: "bg-orange-600 hover:bg-orange-700 text-white",
+              children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4 mr-2" }),
+                "Clear Logs"
+              ]
+            }
+          )
+        ] }) })
+      ] }) }),
       showImportModal && pendingImportFile && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "fixed top-0 left-0 right-0 bottom-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-50", style: { margin: 0, padding: 0 }, children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 w-full max-w-2xl max-h-[85vh] overflow-hidden mx-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
@@ -44250,7 +44620,22 @@ const Tools = () => {
             )
           ] })
         ] })
-      ] }) })
+      ] }) }),
+      /* @__PURE__ */ jsxRuntimeExports.jsx(
+        ConfirmationDialog,
+        {
+          isOpen: showMigrationConfirm,
+          onClose: () => setShowMigrationConfirm(false),
+          onConfirm: () => {
+            setShowMigrationConfirm(false);
+            handleMigrateAll();
+          },
+          title: "Migrate All Data",
+          message: "Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding.",
+          confirmText: "Start Migration",
+          cancelText: "Cancel"
+        }
+      )
     ] })
   ] });
 };
