@@ -28,6 +28,8 @@ define('YATRA_PLUGIN_FILE', __FILE__);
 define('YATRA_PLUGIN_PATH', plugin_dir_path(__FILE__));
 define('YATRA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
+define('YATRA_ABSPATH', plugin_dir_path(__FILE__));
+define('YATRA_PLUGIN_URI', plugin_dir_url(__FILE__));
 define('YATRA_VERSION', '2.0.0');
 define('YATRA_MIN_PHP_VERSION', '8.0');
 define('YATRA_MIN_WP_VERSION', '6.0');
@@ -169,4 +171,13 @@ try {
         ['back_link' => true]
     );
 }
+
+/**
+ * Plugin activation hook
+ */
+register_activation_hook(__FILE__, function() {
+    if (class_exists('\Yatra\Services\SetupWizardService')) {
+        \Yatra\Services\SetupWizardService::triggerWizardOnActivation();
+    }
+});
 

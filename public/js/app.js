@@ -43173,19 +43173,33 @@ const Tools = () => {
         /* @__PURE__ */ jsxRuntimeExports.jsx("h1", { className: "text-2xl font-bold text-gray-900 dark:text-white", children: "Tools" }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Export/Import data, check system status, and view logs" })
       ] }),
-      /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsxs(
-        Button,
-        {
-          onClick: clearAllCache,
-          variant: "outline",
-          className: "flex items-center gap-2",
-          disabled: isClearingCache,
-          children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isClearingCache ? "animate-spin" : ""}` }),
-            isClearingCache ? "Clearing..." : "Clear Cache"
-          ]
-        }
-      ) })
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: () => window.open("/wp-admin/tools.php?page=yatra-setup", "_blank"),
+            variant: "outline",
+            className: "flex items-center gap-2",
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Settings$1, { className: "w-4 h-4" }),
+              "Setup Wizard"
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          Button,
+          {
+            onClick: clearAllCache,
+            variant: "outline",
+            className: "flex items-center gap-2",
+            disabled: isClearingCache,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 ${isClearingCache ? "animate-spin" : ""}` }),
+              isClearingCache ? "Clearing..." : "Clear Cache"
+            ]
+          }
+        )
+      ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 mb-8", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("nav", { className: "flex space-x-1", children: [

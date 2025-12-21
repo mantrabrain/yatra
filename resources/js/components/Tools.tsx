@@ -768,7 +768,15 @@ const Tools: React.FC = () => {
             Export/Import data, check system status, and view logs
           </p>
         </div>
-        <div>
+        <div className="flex items-center gap-3">
+          <Button 
+            onClick={() => window.open('/wp-admin/tools.php?page=yatra-setup', '_blank')}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Settings className="w-4 h-4" />
+            Setup Wizard
+          </Button>
           <Button 
             onClick={clearAllCache} 
             variant="outline"

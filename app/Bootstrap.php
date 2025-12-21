@@ -56,6 +56,11 @@ class Bootstrap
                 \Yatra\Hooks\AvailabilityInventoryHooks::init();
             }
             
+            // Initialize Setup Wizard Service
+            if (class_exists('\Yatra\Services\SetupWizardService')) {
+                \Yatra\Services\SetupWizardService::init();
+            }
+            
             // Initialize core components
             $this->initializeCore();
             
