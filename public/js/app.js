@@ -42684,6 +42684,11 @@ const Tools = () => {
   const [cronInfo, setCronInfo] = reactExports.useState(null);
   const [isLoadingCronJobs, setIsLoadingCronJobs] = reactExports.useState(false);
   const [runningCronJob, setRunningCronJob] = reactExports.useState(null);
+  const [migrationStatus, setMigrationStatus] = reactExports.useState(null);
+  const [isLoadingMigration, setIsLoadingMigration] = reactExports.useState(false);
+  const [migrationProgress, setMigrationProgress] = reactExports.useState(null);
+  const [isMigrating, setIsMigrating] = reactExports.useState(false);
+  const migrationPollingRef = reactExports.useRef(null);
   const { showToast } = useToast();
   const [exportJob, setExportJob] = reactExports.useState(null);
   const [importJob, setImportJob] = reactExports.useState(null);
@@ -43157,6 +43162,82 @@ const Tools = () => {
       setIsClearingCache(false);
     }
   };
+  const loadMigrationStatus = async () => {
+    setIsLoadingMigration(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/status`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      setMigrationStatus(data);
+    } catch (error) {
+      console.error("Failed to load migration status:", error);
+      showToast("Failed to load migration status", "error");
+    } finally {
+      setIsLoadingMigration(false);
+    }
+  };
+  const loadMigrationProgress = async () => {
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/progress`, {
+        headers: {
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      setMigrationProgress(data);
+      if (data.any_running && !data.all_complete) {
+        setIsMigrating(true);
+      } else if (data.all_complete) {
+        setIsMigrating(false);
+        stopMigrationPolling();
+      }
+    } catch (error) {
+      console.error("Failed to load migration progress:", error);
+    }
+  };
+  const startMigrationPolling = () => {
+    if (migrationPollingRef.current) {
+      clearInterval(migrationPollingRef.current);
+    }
+    loadMigrationProgress();
+    migrationPollingRef.current = setInterval(loadMigrationProgress, 3e3);
+  };
+  const stopMigrationPolling = () => {
+    if (migrationPollingRef.current) {
+      clearInterval(migrationPollingRef.current);
+      migrationPollingRef.current = null;
+    }
+  };
+  const handleMigrateAll = async () => {
+    if (!confirm("Are you sure you want to migrate all data? This process will run in the background and may take several minutes.")) {
+      return;
+    }
+    setIsMigrating(true);
+    try {
+      const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/migrate-all`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        showToast("Migration started for all data types. Processing in background...", "success");
+        startMigrationPolling();
+      } else {
+        showToast(data.error || "Migration failed", "error");
+        setIsMigrating(false);
+      }
+    } catch (error) {
+      console.error("Migration error:", error);
+      showToast("Migration failed. Please try again.", "error");
+      setIsMigrating(false);
+    }
+  };
   reactExports.useEffect(() => {
     if (activeTab === "system-status") {
       loadSystemStatus();
@@ -43165,7 +43246,15 @@ const Tools = () => {
     } else if (activeTab === "jobs") {
       loadAllJobs();
       loadCronJobs();
+    } else if (activeTab === "migration") {
+      loadMigrationStatus();
+      loadMigrationProgress();
     }
+    return () => {
+      if (activeTab === "migration") {
+        stopMigrationPolling();
+      }
+    };
   }, [activeTab, selectedLogType]);
   return /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
     /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-6", children: [
@@ -43244,6 +43333,17 @@ const Tools = () => {
             children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(FileText, { className: "w-5 h-5" }),
               /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Logs" })
+            ]
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(
+          "button",
+          {
+            onClick: () => setActiveTab("migration"),
+            className: `flex-1 py-3 px-6 rounded-md font-medium text-sm flex items-center justify-center gap-3 transition-all duration-200 ${activeTab === "migration" ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 shadow-sm" : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50"}`,
+            children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-5 h-5" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("span", { children: "Migration" })
             ]
           }
         )
@@ -43746,6 +43846,143 @@ const Tools = () => {
           ] })
         ] })
       ] }),
+      activeTab === "migration" && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "space-y-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "p-6", children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-4 mb-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-6 h-6 text-purple-600 dark:text-purple-400" }) }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-xl font-semibold text-gray-900 dark:text-white", children: "Data Migration" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400", children: "Migrate data from old Yatra version to 3.0" })
+          ] })
+        ] }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(AlertCircle, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-blue-900 dark:text-blue-300 mb-1", children: "Migration Information" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-blue-800 dark:text-blue-400", children: "This tool will migrate your data from previous Yatra versions to the new 3.0 structure. Migration runs in the background using WooCommerce Action Scheduler. Please backup your database before proceeding." })
+          ] })
+        ] }) }),
+        isLoadingMigration ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-4 w-48 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: [1, 2, 3, 4, 5, 6].map((i) => /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1 space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-5 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-6 w-12 bg-gray-200 dark:bg-gray-700 rounded-full animate-pulse" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "h-3 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" })
+          ] }, i)) })
+        ] }) : migrationStatus && migrationStatus.has_old_data ? /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-gray-900 dark:text-white", children: "Old Data Found" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-500 dark:text-gray-400 mt-1", children: isMigrating ? "Migration in progress..." : "Ready to migrate" })
+            ] }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  variant: "outline",
+                  size: "sm",
+                  onClick: () => {
+                    loadMigrationStatus();
+                    if (isMigrating) loadMigrationProgress();
+                  },
+                  disabled: isMigrating,
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: `w-4 h-4 mr-2 ${isMigrating ? "animate-spin" : ""}` }),
+                    "Refresh"
+                  ]
+                }
+              ),
+              !isMigrating && /* @__PURE__ */ jsxRuntimeExports.jsxs(
+                Button,
+                {
+                  onClick: handleMigrateAll,
+                  className: "bg-purple-600 hover:bg-purple-700",
+                  children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-4 h-4 mr-2" }),
+                    "Migrate All Data"
+                  ]
+                }
+              )
+            ] })
+          ] }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "grid grid-cols-1 md:grid-cols-2 gap-4", children: Object.entries(migrationStatus.old_data || {}).map(([key, data]) => {
+            var _a2;
+            const progress = (_a2 = migrationProgress == null ? void 0 : migrationProgress.progress) == null ? void 0 : _a2[key];
+            const status = (progress == null ? void 0 : progress.status) || "pending";
+            return data.count > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between mb-3", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+                    /* @__PURE__ */ jsxRuntimeExports.jsx("h5", { className: "font-medium text-gray-900 dark:text-white", children: data.label }),
+                    status === "running" && /* @__PURE__ */ jsxRuntimeExports.jsx(RefreshCw, { className: "w-4 h-4 text-blue-600 dark:text-blue-400 animate-spin" }),
+                    status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-4 h-4 text-green-600 dark:text-green-400" }),
+                    status === "failed" && /* @__PURE__ */ jsxRuntimeExports.jsx(XCircle, { className: "w-4 h-4 text-red-600 dark:text-red-400" })
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-xs text-gray-500 dark:text-gray-400 mt-1", children: data.description })
+                ] }),
+                /* @__PURE__ */ jsxRuntimeExports.jsx(Badge, { variant: "default", className: "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400", children: data.count })
+              ] }),
+              progress && status !== "pending" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "mt-3 space-y-2", children: [
+                /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center justify-between text-xs", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-gray-600 dark:text-gray-400 capitalize", children: status }),
+                  progress.total > 0 && /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-gray-600 dark:text-gray-400", children: [
+                    progress.migrated + progress.skipped + progress.failed,
+                    " / ",
+                    progress.total
+                  ] })
+                ] }),
+                status === "completed" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3 text-xs", children: [
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-green-600 dark:text-green-400", children: [
+                    "✓ ",
+                    progress.migrated
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-yellow-600 dark:text-yellow-400", children: [
+                    "⊘ ",
+                    progress.skipped
+                  ] }),
+                  /* @__PURE__ */ jsxRuntimeExports.jsxs("span", { className: "text-red-600 dark:text-red-400", children: [
+                    "✗ ",
+                    progress.failed
+                  ] })
+                ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "mt-2 text-xs text-gray-500 dark:text-gray-400", children: data.table })
+            ] }, key);
+          }) }),
+          (migrationProgress == null ? void 0 : migrationProgress.all_complete) && (migrationProgress == null ? void 0 : migrationProgress.started_at) && /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-3", children: [
+            /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-5 h-5 text-green-600 dark:text-green-400" }),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx("h4", { className: "font-medium text-green-900 dark:text-green-300", children: "Migration Complete!" }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-green-800 dark:text-green-400 mt-1", children: "All data has been successfully migrated to Yatra 3.0." }),
+              migrationProgress.started_at && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "text-xs text-green-700 dark:text-green-500 mt-2", children: [
+                "Completed on: ",
+                new Date(migrationProgress.started_at).toLocaleString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit"
+                })
+              ] })
+            ] })
+          ] }) })
+        ] }) : /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "text-center py-12", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(CheckCircle, { className: "w-16 h-16 text-green-500 mx-auto mb-4" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("h3", { className: "text-lg font-medium text-gray-900 dark:text-white mb-2", children: "No Old Data Found" }),
+          /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-gray-600 dark:text-gray-400", children: "Your database is up to date. No migration needed." })
+        ] })
+      ] }) }),
       activeTab === "logs" && /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "space-y-6", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "flex flex-wrap gap-2", children: logTypes.map((type) => {
           const Icon = type.icon;

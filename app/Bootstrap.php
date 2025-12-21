@@ -270,6 +270,22 @@ class Bootstrap
         // Activation and deactivation hooks
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
+        
+        // Register Migration REST API routes
+        add_action('rest_api_init', function() {
+            if (class_exists('\Yatra\Migration\MigrationController')) {
+                $migrationController = new \Yatra\Migration\MigrationController();
+                $migrationController->registerRoutes();
+            }
+        });
+        
+        // Register Action Scheduler hook for background migration processing
+        add_action('yatra_migrate_data_type', function($dataType) {
+            if (class_exists('\Yatra\Migration\MigrationService')) {
+                $migrationService = new \Yatra\Migration\MigrationService();
+                $migrationService->processMigration($dataType);
+            }
+        }, 10, 1);
     }
 
     /**

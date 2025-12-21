@@ -3,7 +3,7 @@
  * Plugin Name: Yatra - Travel Booking & Management
  * Plugin URI: https://yatra.com
  * Description: Professional travel booking and management system for WordPress with modern React admin interface
- * Version: 2.0.0
+ * Version: 3.0.0
  * Requires at least: 6.0
  * Requires PHP: 8.0
  * Author: Yatra Development Team
@@ -30,7 +30,7 @@ define('YATRA_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('YATRA_PLUGIN_BASENAME', plugin_basename(__FILE__));
 define('YATRA_ABSPATH', plugin_dir_path(__FILE__));
 define('YATRA_PLUGIN_URI', plugin_dir_url(__FILE__));
-define('YATRA_VERSION', '2.0.0');
+define('YATRA_VERSION', '3.0.0');
 define('YATRA_MIN_PHP_VERSION', '8.0');
 define('YATRA_MIN_WP_VERSION', '6.0');
 
