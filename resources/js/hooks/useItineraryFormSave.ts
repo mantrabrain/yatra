@@ -50,6 +50,7 @@ export const useItineraryFormSave = ({
             trip_id: tripId,
             day: day,
             day_title: dayTitle,
+            day_description: data.day_description?.trim() || null,
             title: dayTitle || `Day ${day}`, // Backend requires title field
             item_type_id: null,
             item_id: null,
@@ -227,6 +228,7 @@ export const useItineraryFormSave = ({
             trip_id: tripId,
             day: day,
             day_title: dayTitle,
+            day_description: data.day_description?.trim() || null,
             item_type_id: null,
             item_id: null,
             title: dayTitle || `Day ${day}`,

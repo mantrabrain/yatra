@@ -158,8 +158,12 @@ class ItineraryService
      */
     public function create(array $data): int
     {
+        error_log("[YATRA DEBUG] ItineraryService::create - Input data: " . print_r($data, true));
+        error_log("[YATRA DEBUG] ItineraryService::create - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
         $this->validate($data);
-        return $this->repository->createEntry($data);
+        $result = $this->repository->createEntry($data);
+        error_log("[YATRA DEBUG] ItineraryService::create - Repository result: $result");
+        return $result;
     }
 
     /**
@@ -167,8 +171,12 @@ class ItineraryService
      */
     public function update(int $id, array $data): bool
     {
+        error_log("[YATRA DEBUG] ItineraryService::update - ID: $id, Input data: " . print_r($data, true));
+        error_log("[YATRA DEBUG] ItineraryService::update - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
         $this->validate($data, $id);
-        return $this->repository->updateEntry($id, $data);
+        $result = $this->repository->updateEntry($id, $data);
+        error_log("[YATRA DEBUG] ItineraryService::update - Repository result: " . ($result ? 'TRUE' : 'FALSE'));
+        return $result;
     }
 
     /**
@@ -176,7 +184,10 @@ class ItineraryService
      */
     public function find(int $id): ?\stdClass
     {
-        return $this->repository->getEntryWithRelations($id);
+        error_log("[YATRA DEBUG] ItineraryService::find - Called with ID: $id");
+        $result = $this->repository->getEntryWithRelations($id);
+        error_log("[YATRA DEBUG] ItineraryService::find - Result day_description: " . ($result->day_description ?? 'NULL_OR_EMPTY是社会'));
+        return $result;
     }
 
     /**

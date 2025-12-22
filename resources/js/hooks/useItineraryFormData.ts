@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { apiClient } from '../lib/api';
 import { usePermissions } from './usePermissions';
-import { useToast } from '../components/ui/toast';
 import { __ } from '../lib/i18n';
 
 interface UseItineraryFormDataParams {
@@ -31,10 +30,6 @@ export const useItineraryFormData = ({
   formDataTripId,
 }: UseItineraryFormDataParams) => {
   const { can } = usePermissions();
-  const { showToast } = useToast();
-
-  // Extract stable primitive values for entry data
-  const entryIdStable = useMemo(() => entryId, [entryId]);
 
   // Fetch trips
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
@@ -124,22 +119,23 @@ export const useItineraryFormData = ({
     gcTime: 10 * 60 * 1000,
   });
 
-  // Fetch existing entry for edit mode
-  const { data: entryData, isLoading: isLoadingEntry } = useQuery({
-    queryKey: ['itinerary-entry', entryIdStable],
+  // Fetch entry data when editing
+  const { data: entryData, isLoading: isLoadingEntryData } = useQuery({
+    queryKey: ['itinerary-entry', entryId],
     queryFn: async () => {
-      if (!entryIdStable) return null;
+      if (!entryId) return null;
       try {
-        const response = await apiClient.get(`/itinerary/${entryIdStable}`);
-        const data = response?.data?.data || response?.data || response;
-        return data;
+        const response = await apiClient.get(`/itinerary/${entryId}`);
+        const result = response?.data?.data || response?.data || response;
+        console.log('[YATRA DEBUG] useItineraryFormData - API response:', result);
+        console.log('[YATRA DEBUG] useItineraryFormData - day_description in API response:', result?.day_description);
+        return result;
       } catch (error: any) {
         console.error('Failed to load itinerary entry:', error);
-        showToast(error?.message || __('Failed to load itinerary entry', 'Failed to load itinerary entry'), 'error');
         return null;
       }
     },
-    enabled: isEditMode && can('yatra_view_trips'),
+    enabled: isEditMode && !!entryId && can('yatra_view_trips'),
   });
 
   // Extract identifiers from the initially loaded entry (could be activity)
@@ -237,7 +233,7 @@ export const useItineraryFormData = ({
     typesData: typesData || [],
     itemsData: itemsData || [],
     entryData: effectiveEntryData,
-    isLoadingEntry,
+    isLoadingEntry: isLoadingEntryData,
     dayTripData,
     tripDataForDay,
     effectiveTripData,

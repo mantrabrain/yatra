@@ -72,6 +72,7 @@ const ItineraryForm: React.FC = () => {
     trip_id: '',
     day: '',
     day_title: '',
+    day_description: '',
     item_type_id: '',
     item_id: '',
     title: '',
@@ -205,9 +206,13 @@ const ItineraryForm: React.FC = () => {
     }
   }, [itemParam, itemsData]);
 
-  // Load entry data into form when editing
+  // Load entry data when editing
   useEffect(() => {
-    if (!isEditMode) return;
+    if (!entryData || !isEditMode || isLoadingInitialDataRef.current) return;
+    
+    // Debug logging to see what data we received
+    console.log('[YATRA DEBUG] ItineraryForm - entryData received:', entryData);
+    console.log('[YATRA DEBUG] ItineraryForm - day_description from entryData:', entryData.day_description);
     if (!entryData || !entryData.id) return;
     
     // In edit day mode, if entryData is an activity (has item_type_id and item_id), 
@@ -241,6 +246,7 @@ const ItineraryForm: React.FC = () => {
         trip_id: entryData.trip_id?.toString() || '',
         day: entryData.day?.toString() || '',
         day_title: entryData.day_title || '',
+        day_description: entryData.day_description || '',
         item_type_id: entryData.item_type_id?.toString() || '',
         item_id: entryData.item_id?.toString() || '',
         title: entryData.title || '',
@@ -268,6 +274,7 @@ const ItineraryForm: React.FC = () => {
         trip_id: entryData.trip_id?.toString() || tripIdParam || prev.trip_id,
         day: entryData.day?.toString() || dayParam || prev.day,
         day_title: entryData.day_title || prev.day_title,
+        day_description: entryData.day_description || prev.day_description,
         status: entryData.status || prev.status,
       }));
     }
@@ -760,6 +767,7 @@ const ItineraryForm: React.FC = () => {
                       trip_id: formData.trip_id,
                       day: formData.day,
                       day_title: formData.day_title || '',
+                      day_description: formData.day_description || '',
                     }}
                     errors={errors}
                     tripsData={tripsData}

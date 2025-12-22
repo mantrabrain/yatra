@@ -16,6 +16,7 @@ interface DayFormFieldsProps {
     trip_id: string;
     day: string;
     day_title: string;
+    day_description: string;
   };
   errors: Record<string, string>;
   tripsData: any[];
@@ -158,6 +159,30 @@ export const DayFormFields: React.FC<DayFormFieldsProps> = ({
             onChange={(e) => onFieldChange('day_title', e.target.value)}
             placeholder={__('e.g., Arrival & Welcome to Paradise', 'e.g., Arrival & Welcome to Paradise')}
           />
+        </div>
+
+        <div>
+          <label htmlFor="day_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+            {__('Day Description (Optional)', 'Day Description (Optional)')}
+          </label>
+          <HelpText 
+            text={__('A detailed description of what happens on this day, activities, highlights, etc.', 'A detailed description of what happens on this day, activities, highlights, etc.')}
+            className="mb-2"
+          />
+          <textarea
+            id="day_description"
+            value={formData.day_description}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onFieldChange('day_description', e.target.value)}
+            placeholder={__('Describe the activities, highlights, and details for this day...', 'Describe the activities, highlights, and details for this day...')}
+            rows={4}
+            className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.day_description ? 'border-red-500' : ''}`}
+          />
+          {errors.day_description && (
+            <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+              <Info className="w-4 h-4" />
+              {errors.day_description}
+            </p>
+          )}
         </div>
       </CardContent>
     </Card>

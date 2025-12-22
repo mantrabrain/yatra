@@ -8,6 +8,7 @@ export interface ItineraryFormData {
   trip_id: string;
   day: string;
   day_title?: string;
+  day_description?: string;
   item_type_id: string;
   item_id: string;
   title: string;

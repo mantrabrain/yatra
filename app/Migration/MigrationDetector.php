@@ -99,6 +99,12 @@ class MigrationDetector
                 'description' => 'Tour availability dates',
                 'table' => "{$prefix}yatra_tour_dates",
             ],
+            'itinerary' => [
+                'label' => 'Itinerary',
+                'count' => $this->countOldItinerary(),
+                'description' => 'Trip itineraries and schedules',
+                'table' => 'postmeta (tour posts)',
+            ],
         ];
     }
     
@@ -224,6 +230,46 @@ class MigrationDetector
         $count = $this->wpdb->get_var(
             "SELECT COUNT(*) FROM {$this->wpdb->posts} 
              WHERE post_type = 'yatra-coupons' AND post_status NOT IN ('trash', 'auto-draft')"
+        );
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old tours with itinerary data
+     */
+    private function countOldItinerary(): int
+    {
+        // Count tours that have itinerary-related meta data
+        $itineraryKeys = [
+            'itinerary_repeator',  // This is the actual key found in the database
+            'itinerary_label',
+            'yatra_tour_itinerary',
+            'yatra_tour_meta_itinerary',
+            'yatra_itinerary',
+            'tour_itinerary',
+            'yatra_tour_days',
+            'yatra_tour_meta_days',
+            'yatra_days',
+            'tour_days',
+            'yatra_tour_schedule',
+            'yatra_tour_meta_schedule',
+            'yatra_schedule',
+            'tour_schedule'
+        ];
+
+        $placeholders = implode(',', array_fill(0, count($itineraryKeys), '%s'));
+        
+        $count = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT COUNT(DISTINCT p.ID) 
+                 FROM {$this->wpdb->posts} p
+                 INNER JOIN {$this->wpdb->postmeta} pm ON p.ID = pm.post_id
+                 WHERE p.post_type = 'tour' 
+                 AND p.post_status IN ('publish', 'draft', 'pending', 'private')
+                 AND pm.meta_key IN ({$placeholders})",
+                ...$itineraryKeys
+            )
         );
         
         return (int) $count;

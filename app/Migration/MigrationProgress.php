@@ -19,6 +19,7 @@ use Yatra\Migration\ReviewMigration;
 use Yatra\Migration\EnquiryMigration;
 use Yatra\Migration\CouponMigration;
 use Yatra\Migration\TourDateMigration;
+use Yatra\Migration\TravelerCategoriesMigration;
 
 class MigrationProgress
 {
@@ -52,6 +53,8 @@ class MigrationProgress
         'trips',
         'tour_dates',
         'bookings',
+        'traveler_categories',
+        'itinerary',
     ];
     
     public function __construct()
@@ -190,6 +193,12 @@ class MigrationProgress
                     break;
                 case 'tour_dates':
                     $result = (new TourDateMigration($this))->run();
+                    break;
+                case 'traveler_categories':
+                    $result = (new TravelerCategoriesMigration($this))->run();
+                    break;
+                case 'itinerary':
+                    $result = (new ItineraryMigration($this))->run();
                     break;
                 default:
                     throw new \Exception("Unknown data type: {$dataType}");

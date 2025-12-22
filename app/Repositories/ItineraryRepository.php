@@ -27,12 +27,20 @@ class ItineraryRepository extends BaseRepository
      * @param int $tripId Trip ID
      * @param int $dayNumber Day number
      * @param string|null $dayTitle Day title (optional)
+     * @param string|null $dayDescription Day description (optional)
      * @param bool $allowExisting If false, throws exception if day already exists (for new day creation)
      * @return int Day ID
      * @throws \InvalidArgumentException If day exists and $allowExisting is false
      */
-    public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null, bool $allowExisting = true): int
+    public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null, ?string $dayDescription = null, bool $allowExisting = true): int
     {
+        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Called with:");
+        error_log("[YATRA DEBUG]   trip_id: $tripId");
+        error_log("[YATRA DEBUG]   day_number: $dayNumber");
+        error_log("[YATRA DEBUG]   day_title: " . ($dayTitle ?? 'NULL'));
+        error_log("[YATRA DEBUG]   day_description: " . ($dayDescription ?? 'NULL'));
+        error_log("[YATRA DEBUG]   allowExisting: " . ($allowExisting ? 'TRUE' : 'FALSE'));
+        
         global $wpdb;
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
@@ -81,30 +89,51 @@ class ItineraryRepository extends BaseRepository
                 );
             }
             
-            // Update day title if provided
+            // Update day title and description if provided
+            $updateData = [];
+            $updateFormat = [];
+            
             if ($dayTitle !== null) {
-                $wpdb->update(
+                $updateData['title'] = sanitize_text_field($dayTitle);
+                $updateFormat[] = '%s';
+            }
+            
+            if ($dayDescription !== null) {
+                $updateData['description'] = wp_kses_post($dayDescription);
+                $updateFormat[] = '%s';
+            }
+            
+            if (!empty($updateData)) {
+                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Updating existing day with data: " . print_r($updateData, true));
+                $result = $wpdb->update(
                     $tableDays,
-                    ['title' => sanitize_text_field($dayTitle)],
+                    $updateData,
                     ['id' => (int) $existingDay->id],
-                    ['%s'],
+                    $updateFormat,
                     ['%d']
                 );
+                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Update result: $result");
+                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - WPDB last_error: " . $wpdb->last_error);
             }
             return (int) $existingDay->id;
         }
 
         // Create new day
+        $insertData = [
+            'trip_id' => $tripId,
+            'day_number' => $dayNumber,
+            'title' => $dayTitle ? sanitize_text_field($dayTitle) : null,
+            'description' => $dayDescription ? wp_kses_post($dayDescription) : null,
+            'order' => $dayNumber - 1,
+        ];
+        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Creating new day with data: " . print_r($insertData, true));
         $wpdb->insert(
             $tableDays,
-            [
-                'trip_id' => $tripId,
-                'day_number' => $dayNumber,
-                'title' => $dayTitle ? sanitize_text_field($dayTitle) : null,
-                'order' => $dayNumber - 1,
-            ],
-            ['%d', '%d', '%s', '%d']
+            $insertData,
+            ['%d', '%d', '%s', '%s', '%d']
         );
+        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Insert result: " . $wpdb->insert_id);
+        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - WPDB last_error: " . $wpdb->last_error);
 
         return (int) $wpdb->insert_id;
     }
@@ -114,6 +143,8 @@ class ItineraryRepository extends BaseRepository
      */
     public function createEntry(array $data): int
     {
+        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - Input data: " . print_r($data, true));
+        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
         
         global $wpdb;
         $tableEntries = $this->getTableName();
@@ -126,10 +157,17 @@ class ItineraryRepository extends BaseRepository
         // For day entries, we allow existing days (because we might be updating)
         // For activities, we also allow existing days
         $isDayCreation = empty($data['item_type_id']) && empty($data['item_id']);
+        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - Calling getOrCreateDay with:");
+        error_log("[YATRA DEBUG]   trip_id: " . (int) $data['trip_id']);
+        error_log("[YATRA DEBUG]   day: " . (int) $data['day']);
+        error_log("[YATRA DEBUG]   day_title: " . ($data['day_title'] ?? null));
+        error_log("[YATRA DEBUG]   day_description: " . ($data['day_description'] ?? null));
+        
         $dayId = $this->getOrCreateDay(
             (int) $data['trip_id'],
             (int) $data['day'],
             $data['day_title'] ?? null,
+            $data['day_description'] ?? null,
             true // Always allow existing days - we'll check for duplicate day entries separately
         );
 
@@ -256,9 +294,10 @@ class ItineraryRepository extends BaseRepository
         $tripId = (int) $existingEntry->trip_id;
 
         // Update day if day_number or day_title changed
-        if (isset($data['day']) || isset($data['day_title'])) {
+        if (isset($data['day']) || isset($data['day_title']) || isset($data['day_description'])) {
             $newDayNumber = isset($data['day']) ? (int) $data['day'] : null;
             $newDayTitle = $data['day_title'] ?? null;
+            $newDayDescription = $data['day_description'] ?? null;
             
             if ($newDayNumber !== null) {
                 // Get current day number from existing entry's day
@@ -268,31 +307,59 @@ class ItineraryRepository extends BaseRepository
                 );
                 $currentDayNumber = $currentDay ? (int) $currentDay->day_number : null;
                 
-                // If day number hasn't changed, just update the title if needed
+                // If day number hasn't changed, just update the title and description if needed
                 if ($currentDayNumber !== null && $newDayNumber === $currentDayNumber) {
+                    $updateData = [];
+                    $updateFormat = [];
+                    
                     if ($newDayTitle !== null) {
+                        $updateData['title'] = sanitize_text_field($newDayTitle);
+                        $updateFormat[] = '%s';
+                    }
+                    
+                    if ($newDayDescription !== null) {
+                        $updateData['description'] = wp_kses_post($newDayDescription);
+                        $updateFormat[] = '%s';
+                    }
+                    
+                    if (!empty($updateData)) {
                         $wpdb->update(
                             $tableDays,
-                            ['title' => sanitize_text_field($newDayTitle)],
+                            $updateData,
                             ['id' => $dayId],
-                            ['%s'],
+                            $updateFormat,
                             ['%d']
                         );
                     }
                     // Keep using the same dayId, no need to call getOrCreateDay
                 } else {
                     // Day number changed - allow using existing days (activities can be moved to existing days)
-                    $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, true);
+                    $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, $newDayDescription, true);
                 }
-            } elseif ($newDayTitle !== null) {
+            } elseif ($newDayTitle !== null || $newDayDescription !== null) {
                 $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
-                $wpdb->update(
-                    $tableDays,
-                    ['title' => sanitize_text_field($newDayTitle)],
-                    ['id' => $dayId],
-                    ['%s'],
-                    ['%d']
-                );
+                $updateData = [];
+                $updateFormat = [];
+                
+                if ($newDayTitle !== null) {
+                    $updateData['title'] = sanitize_text_field($newDayTitle);
+                    $updateFormat[] = '%s';
+                }
+                
+                if ($newDayDescription !== null) {
+                    $updateData['description'] = wp_kses_post($newDayDescription);
+                    $updateFormat[] = '%s';
+                }
+                
+                if (!empty($updateData)) {
+                    $wpdb->update(
+                        $tableDays,
+                        $updateData,
+                        ['id' => $dayId],
+                        $updateFormat,
+                        ['%d']
+                    );
+                }
             }
         }
 
@@ -554,8 +621,19 @@ class ItineraryRepository extends BaseRepository
         );
 
         if ($day) {
+            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - Day data found:");
+            error_log("[YATRA DEBUG]   day_id: " . $day->id);
+            error_log("[YATRA DEBUG]   day_number: " . $day->day_number);
+            error_log("[YATRA DEBUG]   day_title: '" . ($day->title ?? 'NULL') . "'");
+            error_log("[YATRA DEBUG]   day_description: '" . ($day->description ?? 'NULL') . "'");
+            
             $entry->day_number = (int) $day->day_number;
             $entry->day_title = $day->title;
+            $entry->day_description = $day->description;
+            
+            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - Set entry->day_description: '" . ($entry->day_description ?? 'NULL') . "'");
+        } else {
+            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - No day data found for day_id: " . (int) $entry->day_id);
         }
 
         // Decode included/excluded items JSON columns (stored directly on the entry)

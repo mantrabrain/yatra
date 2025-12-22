@@ -53063,8 +53063,6 @@ const useItineraryFormData = ({
   formDataTripId
 }) => {
   const { can } = usePermissions();
-  const { showToast } = useToast();
-  const entryIdStable = reactExports.useMemo(() => entryId, [entryId]);
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
     queryKey: ["trips-simple"],
     queryFn: async () => {
@@ -53145,22 +53143,23 @@ const useItineraryFormData = ({
     staleTime: 5 * 60 * 1e3,
     gcTime: 10 * 60 * 1e3
   });
-  const { data: entryData, isLoading: isLoadingEntry } = useQuery({
-    queryKey: ["itinerary-entry", entryIdStable],
+  const { data: entryData, isLoading: isLoadingEntryData } = useQuery({
+    queryKey: ["itinerary-entry", entryId],
     queryFn: async () => {
       var _a;
-      if (!entryIdStable) return null;
+      if (!entryId) return null;
       try {
-        const response = await apiClient.get(`/itinerary/${entryIdStable}`);
-        const data = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response;
-        return data;
+        const response = await apiClient.get(`/itinerary/${entryId}`);
+        const result = ((_a = response == null ? void 0 : response.data) == null ? void 0 : _a.data) || (response == null ? void 0 : response.data) || response;
+        console.log("[YATRA DEBUG] useItineraryFormData - API response:", result);
+        console.log("[YATRA DEBUG] useItineraryFormData - day_description in API response:", result == null ? void 0 : result.day_description);
+        return result;
       } catch (error) {
         console.error("Failed to load itinerary entry:", error);
-        showToast((error == null ? void 0 : error.message) || __("Failed to load itinerary entry", "Failed to load itinerary entry"), "error");
         return null;
       }
     },
-    enabled: isEditMode && can("yatra_view_trips")
+    enabled: isEditMode && !!entryId && can("yatra_view_trips")
   });
   const entryDayId = reactExports.useMemo(() => entryData == null ? void 0 : entryData.day_id, [entryData == null ? void 0 : entryData.day_id]);
   const isActivityEntry = reactExports.useMemo(() => {
@@ -53234,7 +53233,7 @@ const useItineraryFormData = ({
     typesData: typesData || [],
     itemsData: itemsData || [],
     entryData: effectiveEntryData,
-    isLoadingEntry,
+    isLoadingEntry: isLoadingEntryData,
     dayTripData,
     tripDataForDay,
     effectiveTripData,
@@ -53303,7 +53302,7 @@ const useItineraryFormSave = ({
   const { showToast } = useToast();
   const saveMutation = useMutation({
     mutationFn: async (data) => {
-      var _a, _b, _c, _d;
+      var _a, _b, _c, _d, _e, _f;
       if (isAddDayMode) {
         const tripId = parseInt(data.trip_id);
         const day = parseInt(data.day);
@@ -53313,6 +53312,7 @@ const useItineraryFormSave = ({
             trip_id: tripId,
             day,
             day_title: dayTitle,
+            day_description: ((_b = data.day_description) == null ? void 0 : _b.trim()) || null,
             title: dayTitle || `Day ${day}`,
             // Backend requires title field
             item_type_id: null,
@@ -53392,7 +53392,7 @@ const useItineraryFormSave = ({
           for (let index = 0; index < existingActivities.length; index++) {
             const activityForm = existingActivities[index];
             const activityData = activityForm.data;
-            if (!activityData.item_type_id || !activityData.item_id || !((_b = activityData.title) == null ? void 0 : _b.trim())) {
+            if (!activityData.item_type_id || !activityData.item_id || !((_c = activityData.title) == null ? void 0 : _c.trim())) {
               throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
             }
             const payload2 = buildActivityPayload(activityData);
@@ -53412,7 +53412,7 @@ const useItineraryFormSave = ({
             for (let index = 0; index < newActivities.length; index++) {
               const activityForm = newActivities[index];
               const activityData = activityForm.data;
-              if (!activityData.item_type_id || !activityData.item_id || !((_c = activityData.title) == null ? void 0 : _c.trim())) {
+              if (!activityData.item_type_id || !activityData.item_id || !((_d = activityData.title) == null ? void 0 : _d.trim())) {
                 throw new Error(`Activity ${index + 1} is missing required fields (item type, item, or title)`);
               }
               const payload2 = buildActivityPayload(activityData);
@@ -53437,6 +53437,7 @@ const useItineraryFormSave = ({
             trip_id: tripId,
             day,
             day_title: dayTitle,
+            day_description: ((_e = data.day_description) == null ? void 0 : _e.trim()) || null,
             item_type_id: null,
             item_id: null,
             title: dayTitle || `Day ${day}`,
@@ -53492,7 +53493,7 @@ const useItineraryFormSave = ({
       const payload = {
         trip_id: parseInt(data.trip_id),
         day: parseInt(data.day),
-        day_title: ((_d = data.day_title) == null ? void 0 : _d.trim()) || null,
+        day_title: ((_f = data.day_title) == null ? void 0 : _f.trim()) || null,
         item_type_id: parseInt(data.item_type_id),
         item_id: parseInt(data.item_id),
         title: data.title.trim(),
@@ -53742,6 +53743,31 @@ const DayFormFields = ({
             placeholder: __("e.g., Arrival & Welcome to Paradise", "e.g., Arrival & Welcome to Paradise")
           }
         )
+      ] }),
+      /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { children: [
+        /* @__PURE__ */ jsxRuntimeExports.jsx("label", { htmlFor: "day_description", className: "block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5", children: __("Day Description (Optional)", "Day Description (Optional)") }),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          HelpText,
+          {
+            text: __("A detailed description of what happens on this day, activities, highlights, etc.", "A detailed description of what happens on this day, activities, highlights, etc."),
+            className: "mb-2"
+          }
+        ),
+        /* @__PURE__ */ jsxRuntimeExports.jsx(
+          "textarea",
+          {
+            id: "day_description",
+            value: formData.day_description,
+            onChange: (e) => onFieldChange("day_description", e.target.value),
+            placeholder: __("Describe the activities, highlights, and details for this day...", "Describe the activities, highlights, and details for this day..."),
+            rows: 4,
+            className: `w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.day_description ? "border-red-500" : ""}`
+          }
+        ),
+        errors.day_description && /* @__PURE__ */ jsxRuntimeExports.jsxs("p", { className: "mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsx(Info, { className: "w-4 h-4" }),
+          errors.day_description
+        ] })
       ] })
     ] })
   ] });
@@ -54008,6 +54034,7 @@ const ItineraryForm = () => {
     trip_id: "",
     day: "",
     day_title: "",
+    day_description: "",
     item_type_id: "",
     item_id: "",
     title: "",
@@ -54125,7 +54152,9 @@ const ItineraryForm = () => {
   }, [itemParam, itemsData]);
   reactExports.useEffect(() => {
     var _a2, _b, _c, _d;
-    if (!isEditMode) return;
+    if (!entryData || !isEditMode || isLoadingInitialDataRef.current) return;
+    console.log("[YATRA DEBUG] ItineraryForm - entryData received:", entryData);
+    console.log("[YATRA DEBUG] ItineraryForm - day_description from entryData:", entryData.day_description);
     if (!entryData || !entryData.id) return;
     if (isEditDayMode) {
       const isActivityEntry = entryData.item_type_id !== null && entryData.item_type_id !== void 0 && entryData.item_id !== null && entryData.item_id !== void 0;
@@ -54142,6 +54171,7 @@ const ItineraryForm = () => {
         trip_id: ((_a2 = entryData.trip_id) == null ? void 0 : _a2.toString()) || "",
         day: ((_b = entryData.day) == null ? void 0 : _b.toString()) || "",
         day_title: entryData.day_title || "",
+        day_description: entryData.day_description || "",
         item_type_id: ((_c = entryData.item_type_id) == null ? void 0 : _c.toString()) || "",
         item_id: ((_d = entryData.item_id) == null ? void 0 : _d.toString()) || "",
         title: entryData.title || "",
@@ -54168,6 +54198,7 @@ const ItineraryForm = () => {
           trip_id: ((_a3 = entryData.trip_id) == null ? void 0 : _a3.toString()) || tripIdParam || prev.trip_id,
           day: ((_b2 = entryData.day) == null ? void 0 : _b2.toString()) || dayParam || prev.day,
           day_title: entryData.day_title || prev.day_title,
+          day_description: entryData.day_description || prev.day_description,
           status: entryData.status || prev.status
         };
       });
@@ -54541,7 +54572,8 @@ const ItineraryForm = () => {
               formData: {
                 trip_id: formData.trip_id,
                 day: formData.day,
-                day_title: formData.day_title || ""
+                day_title: formData.day_title || "",
+                day_description: formData.day_description || ""
               },
               errors,
               tripsData,

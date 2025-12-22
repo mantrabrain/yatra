@@ -100,6 +100,8 @@ class ItineraryController extends BaseController
     {
         try {
             $data = $request->get_json_params();
+            error_log("[YATRA DEBUG] ItineraryController::create_item - Received data: " . print_r($data, true));
+            error_log("[YATRA DEBUG] ItineraryController::create_item - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
             $id = $this->service->create($data);
 
             return $this->success_response([
@@ -121,6 +123,8 @@ class ItineraryController extends BaseController
         try {
             $id = (int) $request->get_param('id');
             $data = $request->get_json_params();
+            error_log("[YATRA DEBUG] ItineraryController::update_item - ID: $id, Received data: " . print_r($data, true));
+            error_log("[YATRA DEBUG] ItineraryController::update_item - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
 
             $result = $this->service->update($id, $data);
 
@@ -230,6 +234,7 @@ class ItineraryController extends BaseController
             'day_id' => (int) $item->day_id,
             'day' => isset($item->day_number) ? (int) $item->day_number : null,
             'day_title' => $item->day_title ?? null,
+            'day_description' => $item->day_description ?? null,
             'title' => $item->title ?? '',
             'description' => $item->description ?? '',
             'time' => $item->time ?? null,
