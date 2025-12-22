@@ -21,6 +21,11 @@ interface ConfirmationDialogProps {
   variant?: 'danger' | 'warning' | 'info';
   isLoading?: boolean;
   icon?: React.ReactNode;
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+    variant?: 'default' | 'outline' | 'ghost' | 'destructive';
+  };
 }
 
 export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
@@ -35,6 +40,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   variant = 'danger',
   isLoading = false,
   icon,
+  secondaryAction,
 }) => {
   // Use description if provided, otherwise fall back to message
   const displayMessage = description || message || '';
@@ -104,7 +110,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {displayMessage}
           </p>
-          <div className="flex gap-2 justify-end pt-2">
+          <div className="flex gap-2 justify-end pt-2 flex-wrap">
             <Button
               variant="outline"
               onClick={onClose}
@@ -112,6 +118,15 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             >
               {cancelText || __('Cancel', 'Cancel')}
             </Button>
+            {secondaryAction && (
+              <Button
+                variant={secondaryAction.variant || 'outline'}
+                onClick={secondaryAction.onClick}
+                disabled={isLoading}
+              >
+                {secondaryAction.label}
+              </Button>
+            )}
             <Button
               variant={getButtonVariant()}
               onClick={onConfirm}

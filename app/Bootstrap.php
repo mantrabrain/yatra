@@ -291,17 +291,17 @@ class Bootstrap
         });
         
         // Register Action Scheduler hook for background migration processing
-        add_action('yatra_migrate_data_type', function($dataType) {
-            error_log("[Yatra Migration] Action Scheduler hook called for: {$dataType}");
+        add_action('yatra_migrate_data_type', function($dataType, $force = false) {
+            error_log("[Yatra Migration] Action Scheduler hook called for: {$dataType} (force=" . ($force ? 'true' : 'false') . ')');
             
-            if (class_exists('\Yatra\Migration\MigrationService')) {
-                $migrationService = new \Yatra\Migration\MigrationService();
-                $result = $migrationService->processMigration($dataType);
+            if (class_exists('\Yatra\Migration\MigrationProgress')) {
+                $migrationService = new \Yatra\Migration\MigrationProgress();
+                $result = $migrationService->processMigration($dataType, (bool) $force);
                 error_log("[Yatra Migration] Migration result for {$dataType}: " . json_encode($result));
             } else {
-                error_log("[Yatra Migration] ERROR: MigrationService class not found!");
+                error_log("[Yatra Migration] ERROR: MigrationProgress class not found!");
             }
-        }, 10, 1);
+        }, 10, 2);
     }
 
     /**

@@ -24012,7 +24012,8 @@ const ConfirmationDialog = ({
   cancelText,
   variant = "danger",
   isLoading = false,
-  icon
+  icon,
+  secondaryAction
 }) => {
   const displayMessage = description || message2 || "";
   if (!isOpen) return null;
@@ -24069,7 +24070,7 @@ const ConfirmationDialog = ({
         ] }) }),
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-gray-600 dark:text-gray-400", children: displayMessage }),
-          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2", children: [
+          /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex gap-2 justify-end pt-2 flex-wrap", children: [
             /* @__PURE__ */ jsxRuntimeExports.jsx(
               Button,
               {
@@ -24077,6 +24078,15 @@ const ConfirmationDialog = ({
                 onClick: onClose,
                 disabled: isLoading,
                 children: cancelText || __("Cancel", "Cancel")
+              }
+            ),
+            secondaryAction && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                variant: secondaryAction.variant || "outline",
+                onClick: secondaryAction.onClick,
+                disabled: isLoading,
+                children: secondaryAction.label
               }
             ),
             /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -42730,6 +42740,7 @@ const TravelBookingReports = () => {
     ] })
   ] });
 };
+const MIGRATION_NOTICE_KEY = "yatra_migration_notice_dismissed_at";
 const Tools = () => {
   var _a, _b, _c;
   const [activeTab, setActiveTab] = reactExports.useState("export-import");
@@ -42767,7 +42778,27 @@ const Tools = () => {
   const [isMigrating, setIsMigrating] = reactExports.useState(false);
   const migrationPollingRef = reactExports.useRef(null);
   const [showMigrationConfirm, setShowMigrationConfirm] = reactExports.useState(false);
+  const [showMigrationCompleteNotice, setShowMigrationCompleteNotice] = reactExports.useState(true);
   const { showToast } = useToast();
+  reactExports.useEffect(() => {
+    if (!(migrationProgress == null ? void 0 : migrationProgress.started_at) || !(migrationProgress == null ? void 0 : migrationProgress.all_complete)) {
+      setShowMigrationCompleteNotice(false);
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(MIGRATION_NOTICE_KEY);
+      }
+      return;
+    }
+    if (typeof window === "undefined") {
+      setShowMigrationCompleteNotice(true);
+      return;
+    }
+    const dismissedAt = window.localStorage.getItem(MIGRATION_NOTICE_KEY);
+    if (dismissedAt && dismissedAt === migrationProgress.started_at) {
+      setShowMigrationCompleteNotice(false);
+    } else {
+      setShowMigrationCompleteNotice(true);
+    }
+  }, [migrationProgress == null ? void 0 : migrationProgress.started_at, migrationProgress == null ? void 0 : migrationProgress.all_complete]);
   const [exportJob, setExportJob] = reactExports.useState(null);
   const [importJob, setImportJob] = reactExports.useState(null);
   const pollingIntervalRef = reactExports.useRef(null);
@@ -43318,6 +43349,24 @@ Details: ${errorText}`);
       setIsLoadingMigration(false);
     }
   };
+  const handleDismissMigrationNotice = async () => {
+    try {
+      await fetch(`${window.yatraAdmin.apiUrl}/migration/clear`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": window.yatraAdmin.nonce
+        }
+      });
+      setShowMigrationCompleteNotice(false);
+      await loadMigrationProgress();
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem(MIGRATION_NOTICE_KEY);
+      }
+    } catch (error) {
+      showToast("Failed to clear migration data.", "error");
+    }
+  };
   const loadMigrationProgress = async () => {
     try {
       const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/progress`, {
@@ -43357,7 +43406,7 @@ Details: ${errorText}`);
       migrationPollingRef.current = null;
     }
   };
-  const handleMigrateAll = async () => {
+  const handleMigrateAll = async (force = false) => {
     setIsMigrating(true);
     try {
       const response = await fetch(`${window.yatraAdmin.apiUrl}/migration/migrate-all`, {
@@ -43365,7 +43414,8 @@ Details: ${errorText}`);
         headers: {
           "Content-Type": "application/json",
           "X-WP-Nonce": window.yatraAdmin.nonce
-        }
+        },
+        body: JSON.stringify({ force })
       });
       const data = await response.json();
       console.log("[Yatra Migration] Migrate all response:", data);
@@ -44108,7 +44158,7 @@ Details: ${errorText}`);
               )
             ] })
           ] }),
-          (migrationProgress == null ? void 0 : migrationProgress.all_complete) && (migrationProgress == null ? void 0 : migrationProgress.started_at) && (() => {
+          (migrationProgress == null ? void 0 : migrationProgress.all_complete) && (migrationProgress == null ? void 0 : migrationProgress.started_at) && showMigrationCompleteNotice && (() => {
             const totalMigrated = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.migrated || 0), 0);
             const totalSkipped = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.skipped || 0), 0);
             const totalFailed = Object.values(migrationProgress.progress || {}).reduce((sum, p) => sum + (p.failed || 0), 0);
@@ -44154,14 +44204,24 @@ Details: ${errorText}`);
                     ] })
                   ] }, key);
                 }) }) })
-              ] })
+              ] }),
+              /* @__PURE__ */ jsxRuntimeExports.jsx(
+                "button",
+                {
+                  type: "button",
+                  onClick: handleDismissMigrationNotice,
+                  className: "text-green-700 hover:text-green-900 dark:text-green-300 dark:hover:text-green-100",
+                  "aria-label": "Dismiss migration complete notice",
+                  children: /* @__PURE__ */ jsxRuntimeExports.jsx(X, { className: "w-4 h-4" })
+                }
+              )
             ] }) });
           })(),
-          isMigrating && migrationProgress && !migrationProgress.all_complete && (() => {
+          isMigrating && (!migrationProgress || !migrationProgress.all_complete) && (() => {
             const totalItems = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).reduce((sum, p) => sum + (p.total || 0), 0);
             const processedItems = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).reduce((sum, p) => sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0), 0);
             const overallProgress = totalItems > 0 ? Math.round(processedItems / totalItems * 100) : 0;
-            const allPending = Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).every((p) => p.status === "pending");
+            const allPending = migrationProgress ? Object.values((migrationProgress == null ? void 0 : migrationProgress.progress) || {}).every((p) => p.status === "pending") : true;
             return /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6", children: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-start gap-3", children: [
               /* @__PURE__ */ jsxRuntimeExports.jsx(Database, { className: "w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 animate-pulse" }),
               /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex-1", children: [
@@ -44628,12 +44688,20 @@ Details: ${errorText}`);
           onClose: () => setShowMigrationConfirm(false),
           onConfirm: () => {
             setShowMigrationConfirm(false);
-            handleMigrateAll();
+            handleMigrateAll(false);
           },
           title: "Migrate All Data",
-          message: "Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding.",
+          message: "Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding. Use “Re-migrate All” if you need to reprocess records that were already migrated.",
           confirmText: "Start Migration",
-          cancelText: "Cancel"
+          cancelText: "Cancel",
+          secondaryAction: {
+            label: "Re-migrate All",
+            variant: "destructive",
+            onClick: () => {
+              setShowMigrationConfirm(false);
+              handleMigrateAll(true);
+            }
+          }
         }
       )
     ] })

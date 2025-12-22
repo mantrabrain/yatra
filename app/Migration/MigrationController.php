@@ -10,6 +10,7 @@ namespace Yatra\Migration;
 
 use WP_REST_Request;
 use WP_REST_Response;
+use Yatra\Migration\MigrationProgress;
 
 class MigrationController
 {
@@ -17,7 +18,25 @@ class MigrationController
     
     public function __construct()
     {
-        $this->service = new MigrationService();
+        $this->service = new MigrationProgress();
+    }
+
+    /**
+     * Clear migration data (progress/logs)
+     */
+    public function clear(WP_REST_Request $request): WP_REST_Response
+    {
+        try {
+            $result = $this->service->clearMigrationData();
+
+            return new WP_REST_Response($result, 200);
+
+        } catch (\Exception $e) {
+            return new WP_REST_Response([
+                'success' => false,
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
     
     /**
@@ -40,6 +59,10 @@ class MigrationController
                     'required' => true,
                     'type' => 'string',
                 ],
+                'force' => [
+                    'type' => 'boolean',
+                    'default' => false,
+                ],
             ],
         ]);
         
@@ -47,6 +70,12 @@ class MigrationController
             'methods' => 'POST',
             'callback' => [$this, 'migrateAll'],
             'permission_callback' => [$this, 'checkPermission'],
+            'args' => [
+                'force' => [
+                    'type' => 'boolean',
+                    'default' => false,
+                ],
+            ],
         ]);
         
         register_rest_route('yatra/v1', '/migration/progress', [
@@ -58,6 +87,12 @@ class MigrationController
         register_rest_route('yatra/v1', '/migration/cancel', [
             'methods' => 'POST',
             'callback' => [$this, 'cancel'],
+            'permission_callback' => [$this, 'checkPermission'],
+        ]);
+
+        register_rest_route('yatra/v1', '/migration/clear', [
+            'methods' => 'POST',
+            'callback' => [$this, 'clear'],
             'permission_callback' => [$this, 'checkPermission'],
         ]);
     }
@@ -87,8 +122,9 @@ class MigrationController
     {
         try {
             $dataType = $request->get_param('data_type');
+            $force = (bool) $request->get_param('force');
             
-            $result = $this->service->migrate($dataType);
+            $result = $this->service->migrate($dataType, $force);
             
             return new WP_REST_Response($result, 200);
             
@@ -106,7 +142,8 @@ class MigrationController
     public function migrateAll(WP_REST_Request $request): WP_REST_Response
     {
         try {
-            $results = $this->service->migrateAll();
+            $force = (bool) $request->get_param('force');
+            $results = $this->service->migrateAll($force);
             
             // Return results directly - service already returns proper structure
             return new WP_REST_Response($results, 200);

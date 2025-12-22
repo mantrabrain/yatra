@@ -3,16 +3,6 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-Bln5Mynq.js": {
-    "file": "js/index-Bln5Mynq.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-CP-I3kRS.js"
-    ],
-    "css": [
-      "css/index.css"
-    ]
-  },
   "_index-DdwkpysX.js": {
     "file": "js/index-DdwkpysX.js",
     "name": "index",
@@ -22,10 +12,6 @@
     "css": [
       "css/index.css"
     ]
-  },
-  "_react-vendor-CP-I3kRS.js": {
-    "file": "js/react-vendor-CP-I3kRS.js",
-    "name": "react-vendor"
   },
   "_react-vendor-DnTFzlkr.js": {
     "file": "js/react-vendor-DnTFzlkr.js",

@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   CheckCircle, 
   XCircle, 
+  X,
   Trash2,
   RefreshCw,
   MapPin,
@@ -117,6 +118,8 @@ interface CronJob {
 }
 
 
+const MIGRATION_NOTICE_KEY = 'yatra_migration_notice_dismissed_at';
+
 const Tools: React.FC = () => {
   const [activeTab, setActiveTab] = useState('export-import');
   const [isExporting, setIsExporting] = useState(false);
@@ -149,7 +152,30 @@ const Tools: React.FC = () => {
   const [isMigrating, setIsMigrating] = useState(false);
   const migrationPollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [showMigrationConfirm, setShowMigrationConfirm] = useState(false);
+  const [showMigrationCompleteNotice, setShowMigrationCompleteNotice] = useState(true);
   const { showToast } = useToast();
+  
+  useEffect(() => {
+    if (!migrationProgress?.started_at || !migrationProgress?.all_complete) {
+      setShowMigrationCompleteNotice(false);
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(MIGRATION_NOTICE_KEY);
+      }
+      return;
+    }
+
+    if (typeof window === 'undefined') {
+      setShowMigrationCompleteNotice(true);
+      return;
+    }
+
+    const dismissedAt = window.localStorage.getItem(MIGRATION_NOTICE_KEY);
+    if (dismissedAt && dismissedAt === migrationProgress.started_at) {
+      setShowMigrationCompleteNotice(false);
+    } else {
+      setShowMigrationCompleteNotice(true);
+    }
+  }, [migrationProgress?.started_at, migrationProgress?.all_complete]);
   
   // Background job states
   const [exportJob, setExportJob] = useState<JobStatus | null>(null);
@@ -858,6 +884,25 @@ const Tools: React.FC = () => {
     }
   };
 
+  const handleDismissMigrationNotice = async () => {
+    try {
+      await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/clear`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
+        },
+      });
+      setShowMigrationCompleteNotice(false);
+      await loadMigrationProgress();
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem(MIGRATION_NOTICE_KEY);
+      }
+    } catch (error) {
+      showToast('Failed to clear migration data.', 'error');
+    }
+  };
+
   // Load migration progress
   const loadMigrationProgress = async () => {
     try {
@@ -912,7 +957,7 @@ const Tools: React.FC = () => {
   };
 
   // Migrate all data types
-  const handleMigrateAll = async () => {
+  const handleMigrateAll = async (force = false) => {
     setIsMigrating(true);
     try {
       const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/migrate-all`, {
@@ -921,6 +966,7 @@ const Tools: React.FC = () => {
           'Content-Type': 'application/json',
           'X-WP-Nonce': (window as any).yatraAdmin.nonce,
         },
+        body: JSON.stringify({ force }),
       });
       
       const data = await response.json();
@@ -1852,7 +1898,7 @@ const Tools: React.FC = () => {
                   </div>
 
                   {/* Migration Completion Notice */}
-                  {migrationProgress?.all_complete && migrationProgress?.started_at && (() => {
+                  {migrationProgress?.all_complete && migrationProgress?.started_at && showMigrationCompleteNotice && (() => {
                     const totalMigrated = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.migrated || 0), 0);
                     const totalSkipped = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.skipped || 0), 0);
                     const totalFailed = Object.values(migrationProgress.progress || {}).reduce((sum: number, p: any) => sum + (p.failed || 0), 0);
@@ -1896,17 +1942,27 @@ const Tools: React.FC = () => {
                               </div>
                             </div>
                           </div>
+                          <button
+                            type="button"
+                            onClick={handleDismissMigrationNotice}
+                            className="text-green-700 hover:text-green-900 dark:text-green-300 dark:hover:text-green-100"
+                            aria-label="Dismiss migration complete notice"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
                       </div>
                     );
                   })()}
 
                   {/* Inline Migration Progress - Shows during migration */}
-                  {isMigrating && migrationProgress && !migrationProgress.all_complete && (() => {
+                  {isMigrating && (!migrationProgress || !migrationProgress.all_complete) && (() => {
                     const totalItems = Object.values(migrationProgress?.progress || {}).reduce((sum: number, p: any) => sum + (p.total || 0), 0);
                     const processedItems = Object.values(migrationProgress?.progress || {}).reduce((sum: number, p: any) => sum + (p.migrated || 0) + (p.skipped || 0) + (p.failed || 0), 0);
                     const overallProgress = totalItems > 0 ? Math.round((processedItems / totalItems) * 100) : 0;
-                    const allPending = Object.values(migrationProgress?.progress || {}).every((p: any) => p.status === 'pending');
+                    const allPending = migrationProgress
+                      ? Object.values(migrationProgress?.progress || {}).every((p: any) => p.status === 'pending')
+                      : true;
                     
                     return (
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
@@ -2427,12 +2483,20 @@ const Tools: React.FC = () => {
         onClose={() => setShowMigrationConfirm(false)}
         onConfirm={() => {
           setShowMigrationConfirm(false);
-          handleMigrateAll();
+          handleMigrateAll(false);
         }}
         title="Migrate All Data"
-        message="Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding."
+        message="Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding. Use “Re-migrate All” if you need to reprocess records that were already migrated."
         confirmText="Start Migration"
         cancelText="Cancel"
+        secondaryAction={{
+          label: 'Re-migrate All',
+          variant: 'destructive',
+          onClick: () => {
+            setShowMigrationConfirm(false);
+            handleMigrateAll(true);
+          },
+        }}
       />
 
       </div>
