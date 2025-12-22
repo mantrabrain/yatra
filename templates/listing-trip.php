@@ -146,6 +146,22 @@ if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
 } elseif (!empty($yatra_taxonomy_context['trips'])) {
     $trips_source = $yatra_taxonomy_context['trips'];
     $trip_total   = count($trips_source);
+} else {
+    // No data from new system - ensure empty state to prevent fallback to old tour posts
+    $trips_source = [];
+    $trip_total = 0;
+    $trip_total_pages = 1;
+    $trip_current_page = 1;
+    $trip_dest_options = [];
+    $trip_act_options = [];
+    
+    // Debug logging for troubleshooting
+    if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
+        error_log('[YATRA DEBUG] Trip listing: No data from new system');
+        error_log('[YATRA DEBUG] yatra_trip_list: ' . print_r($yatra_trip_list, true));
+        error_log('[YATRA DEBUG] yatra_taxonomy_context: ' . print_r($yatra_taxonomy_context, true));
+        error_log('[YATRA DEBUG] Final trips_source count: ' . count($trips_source));
+    }
 }
 
 get_header();

@@ -32,7 +32,19 @@ abstract class BaseService implements ServiceInterface
     {
         $startTime = microtime(true);
         
-        // Create cache key from filters
+        // TEMPORARILY DISABLE CACHING FOR DEBUGGING TRIP SERVICE
+        if (defined('WP_DEBUG') && WP_DEBUG && static::class === 'Yatra\\Services\\TripService') {
+            error_log('[YATRA DEBUG] TripService getAll - CACHE DISABLED FOR DEBUGGING');
+            $result = $this->getRepository()->all($filters);
+            
+            $executionTime = microtime(true) - $startTime;
+            error_log('[YATRA DEBUG] TripService getAll - Direct DB query result count: ' . count($result));
+            error_log('[YATRA DEBUG] TripService getAll - Execution time: ' . round($executionTime * 1000, 2) . 'ms');
+            
+            return $result;
+        }
+        
+        // Normal caching for other services
         $cacheKey = $this->getCacheKey('all', $filters);
         
         $result = $this->getCachedResult($cacheKey, function() use ($filters) {

@@ -23,15 +23,12 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
     error_log('Destination object: ' . print_r($destination, true));
 }
 
-// Bail if no destination data
+// Bail if no destination data - return proper 404
 if (!$destination) {
-    get_header();
-    echo '<div class="yatra-error" style="max-width: 1200px; margin: 80px auto; padding: 40px; text-align: center;">';
-    echo '<h1>' . esc_html__('Destination Not Found', 'yatra') . '</h1>';
-    echo '<p>' . esc_html__('The destination you are looking for does not exist or has been removed.', 'yatra') . '</p>';
-    echo '<a href="' . esc_url(home_url('/destination/')) . '" class="yatra-btn">' . esc_html__('Browse All Destinations', 'yatra') . '</a>';
-    echo '</div>';
-    get_footer();
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    get_template_part(404);
     exit;
 }
 

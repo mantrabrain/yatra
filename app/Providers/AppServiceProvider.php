@@ -1234,11 +1234,14 @@ class AppServiceProvider extends ServiceProvider
         // Use SingleTripController to get prepared trip data
         $controller = new SingleTripController();
         $trip_data = $controller->getBySlug($trip_slug);
-
+        
         if (!$trip_data) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log(sprintf('Yatra: Trip not found for slug: %s', $trip_slug));
             }
+            // Set proper 404 status
+            $wp_query->set_404();
+            status_header(404);
             return; // Let WordPress handle 404
         }
 
@@ -1432,7 +1435,9 @@ class AppServiceProvider extends ServiceProvider
                     $trips = $wpdb->get_results($wpdb->prepare(
                         "SELECT t.* FROM {$trips_table} t
                          INNER JOIN {$relation_table} td ON t.id = td.trip_id
-                         WHERE td.destination_id = %d AND t.status IN ('publish', 'published')
+                         WHERE td.destination_id = %d 
+                         AND t.status IN ('publish', 'published')
+                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
                          ORDER BY t.created_at DESC",
                         $entity->id
                     ));
@@ -1454,6 +1459,7 @@ class AppServiceProvider extends ServiceProvider
                         "SELECT t.* FROM {$trips_table} t
                          INNER JOIN {$relation_table} ta ON t.id = ta.trip_id
                          WHERE ta.activity_id = %d AND t.status IN ('publish', 'published')
+                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
                          ORDER BY t.created_at DESC",
                         $entity->id
                     ));
@@ -1474,6 +1480,7 @@ class AppServiceProvider extends ServiceProvider
                         "SELECT t.* FROM {$trips_table} t
                          INNER JOIN {$relation_table} tc ON t.id = tc.trip_id
                          WHERE tc.category_id = %d AND t.status IN ('publish', 'published')
+                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
                          ORDER BY t.created_at DESC",
                         $entity->id
                     ));

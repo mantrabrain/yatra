@@ -161,19 +161,23 @@ const Trips: React.FC = () => {
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
   // Fetch trips from API
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['trips', queryParams],
     queryFn: async () => {
+      console.log('[YATRA DEBUG] React Query: Fetching trips with params:', queryParams);
       const response = await apiClient.get('/trips', { params: queryParams });
+      console.log('[YATRA DEBUG] React Query: API response:', response);
       return response;
     },
     enabled: can('yatra_view_trips'),
+    staleTime: 0, // Force fresh data
+    gcTime: 0, // Don't cache (new name for cacheTime)
   });
 
-  // Delete mutation
+  // Delete mutation (permanent delete)
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      return await apiClient.delete(`/trips/${id}`);
+      return await apiClient.delete(`/trips/${id}/permanent-delete`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trips'] });
@@ -222,9 +226,10 @@ const Trips: React.FC = () => {
     },
   });
 
-  const trips = data?.data || [];
-  const total = data?.total || 0;
-  const totalPages = Math.ceil(total / 10);
+  const trips = (data as any)?.data || [];
+  const total = (data as any)?.total || 0;
+  const itemsPerPage = (data as any)?.per_page || 10;
+  const totalPages = Math.ceil(total / itemsPerPage);
 
   // Get difficulty level data for lookup
   const { data: difficultyLevelsData } = useQuery({
@@ -723,8 +728,8 @@ const Trips: React.FC = () => {
 
     try {
       if (bulkAction === 'delete') {
-        await Promise.all(selectedIds.map(id => apiClient.delete(`/trips/${id}`)));
-        showToast(__('Trips deleted successfully', 'Trips deleted successfully'), 'success');
+        await Promise.all(selectedIds.map(id => apiClient.delete(`/trips/${id}/permanent-delete`)));
+        showToast(__('Trips deleted permanently', 'Trips deleted permanently'), 'success');
       } else if (bulkAction.startsWith('mark_')) {
         const status = bulkAction.replace('mark_', '');
         // Only update trips that are currently loaded in this page
@@ -768,7 +773,7 @@ const Trips: React.FC = () => {
                 >
                   {trip.title}
                 </a>
-                {can('yatra_view_trips') && (
+                {can('yatra_view_trips') && trip.status !== 'trash' && (
                   <button
                     type="button"
                     onClick={(e) => {
@@ -933,13 +938,14 @@ const Trips: React.FC = () => {
   const tableActions = useMemo(() => {
     const actions: any[] = [];
 
-    // View is always available (if capability allows)
+    // View is available except for trash trips
     if (can('yatra_view_trips')) {
       actions.push({
         key: 'view',
         label: __('View (frontend)', 'View (frontend)'),
         icon: <ExternalLink className="w-4 h-4" />,
         onClick: (trip: Trip) => handleView(trip),
+        condition: (trip: Trip) => trip.status !== 'trash', // Hide for trash trips
       });
     }
 
@@ -1037,7 +1043,7 @@ const Trips: React.FC = () => {
       });
     }
 
-    // Permanent delete only for items in Trash
+    // Permanent delete for all trips (admin should be able to delete any trip)
     if (can('yatra_delete_trips')) {
       actions.push({
         key: 'delete',
@@ -1045,7 +1051,7 @@ const Trips: React.FC = () => {
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (trip: Trip) => handleDelete(trip),
         variant: 'destructive' as const,
-        condition: (trip: Trip) => trip.status === 'trash',
+        condition: () => true, // Show for all trips
       });
     }
 
@@ -1060,10 +1066,25 @@ const Trips: React.FC = () => {
         description={__('Manage your travel packages and tours. Create, edit, and organize all your trips in one place.', 'Manage your travel packages and tours. Create, edit, and organize all your trips in one place.')}
         actionCapability="yatra_edit_trips"
         actions={
-          <Button onClick={handleCreateTrip} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            {__('Add New Trip', 'Add New Trip')}
-          </Button>
+          <div className="flex items-center gap-2">
+            {/* DEBUG: Refresh button */}
+            {(window as any).WP_DEBUG && (
+              <Button 
+                onClick={() => {
+                  console.log('[YATRA DEBUG] Manual refresh triggered');
+                  refetch();
+                }} 
+                variant="outline" 
+                className="text-xs"
+              >
+                Refresh Data
+              </Button>
+            )}
+            <Button onClick={handleCreateTrip} className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              {__('Add New Trip', 'Add New Trip')}
+            </Button>
+          </div>
         }
       />
 
@@ -1210,7 +1231,7 @@ const Trips: React.FC = () => {
               currentPage={page}
               totalPages={totalPages}
               totalItems={total}
-              itemsPerPage={10}
+              itemsPerPage={itemsPerPage}
               onPageChange={setPage}
               itemName={__('trips', 'trips')}
             />

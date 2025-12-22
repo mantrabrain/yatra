@@ -42,7 +42,7 @@ class TripRepository extends BaseRepository
     public function findPublished(int $id): ?\stdClass
     {
         $table = esc_sql($this->table);
-        $query = "SELECT * FROM `{$table}` WHERE id = %d AND status IN ('publish', 'published', 'active')";
+        $query = "SELECT * FROM `{$table}` WHERE id = %d AND status IN ('publish', 'published')";
 
         if ($this->hasSoftDelete()) {
             $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
@@ -75,7 +75,7 @@ class TripRepository extends BaseRepository
         $act_table = $wpdb->prefix . 'yatra_activities';
         
         // Build WHERE conditions and parameters
-        $wheres = ["t.status IN ('publish', 'published')"];
+        $wheres = ["t.status IN ('publish', 'published')", "(t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')"];
         $params = [];
         $joins = [];
         $having_clauses = [];
@@ -565,9 +565,9 @@ class TripRepository extends BaseRepository
     /**
      * Find by ID with relationships
      */
-    public function findWithRelations(int $id): ?\stdClass
+    public function findWithRelations(int $id, bool $includeDeleted = false): ?\stdClass
     {
-        $trip = $this->find($id);
+        $trip = $this->find($id, $includeDeleted);
         
         if (!$trip) {
             return null;
@@ -1463,7 +1463,7 @@ class TripRepository extends BaseRepository
         // Base query to get all active trips
         $args['where']['deleted_at'] = null;
         if (!isset($args['where']['status'])) {
-            $args['where']['status'] = ['publish', 'published', 'active'];
+            $args['where']['status'] = ['publish', 'published'];
         }
         
         // DEBUG: Log query args

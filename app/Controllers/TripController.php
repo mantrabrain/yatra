@@ -90,6 +90,15 @@ class TripController extends BaseController
             ],
         ]);
 
+        // Permanent delete endpoint
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/permanent-delete', [
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'permanent_delete_item'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
         // Search endpoint
         register_rest_route($namespace, '/' . $base . '/search', [
             [
@@ -136,6 +145,15 @@ class TripController extends BaseController
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_date_pricing'],
+                'permission_callback' => '__return_true', // Public endpoint
+            ],
+        ]);
+
+        // Public endpoint for frontend trip listings
+        register_rest_route($namespace, '/' . $base . '/public', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_public_trips'],
                 'permission_callback' => '__return_true', // Public endpoint
             ],
         ]);
@@ -196,17 +214,32 @@ class TripController extends BaseController
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
+            // For admin listing, show more items by default to see all trips
+            $default_limit = 20; // Increased from 10 to show all trips
             $args = [
-                'limit' => (int) ($request->get_param('per_page') ?: 10),
-                'offset' => ((int) ($request->get_param('page') ?: 1) - 1) * (int) ($request->get_param('per_page') ?: 10),
+                'limit' => (int) ($request->get_param('per_page') ?: $default_limit),
+                'offset' => ((int) ($request->get_param('page') ?: 1) - 1) * (int) ($request->get_param('per_page') ?: $default_limit),
                 'order_by' => $request->get_param('orderby') ?: 'id',
                 'order' => strtoupper($request->get_param('order') ?: 'DESC'),
             ];
+
+            // DEBUG: Log request parameters
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[YATRA DEBUG] TripController get_items - Request params:');
+                error_log('[YATRA DEBUG] - per_page: ' . $args['limit']);
+                error_log('[YATRA DEBUG] - page: ' . ((int) ($request->get_param('page') ?: 1)));
+                error_log('[YATRA DEBUG] - offset: ' . $args['offset']);
+                error_log('[YATRA DEBUG] - status filter: ' . ($request->get_param('status') ?: 'none'));
+                error_log('[YATRA DEBUG] - search: ' . ($request->get_param('search') ?: 'none'));
+            }
 
             // Add status filter
             $status = $request->get_param('status');
             if ($status && $status !== 'all') {
                 $args['where']['status'] = $status;
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[YATRA DEBUG] TripController - Applied status filter: ' . $status);
+                }
             }
 
             // Add search
@@ -214,9 +247,30 @@ class TripController extends BaseController
             if ($search) {
                 $items = $this->service->search($search, $args);
                 $total = count($items);
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[YATRA DEBUG] TripController - Search results: ' . count($items));
+                }
             } else {
+                // DEBUG: Add direct SQL count to verify database state
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    global $wpdb;
+                    $trip_table = $wpdb->prefix . 'yatra_trips';
+                    $direct_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM `{$trip_table}`");
+                    error_log('[YATRA DEBUG] TripController - Direct SQL count: ' . $direct_count);
+                    
+                    // Check status distribution
+                    $status_counts = $wpdb->get_results("SELECT status, COUNT(*) as count FROM `{$trip_table}` GROUP BY status");
+                    error_log('[YATRA DEBUG] TripController - Status distribution: ' . print_r($status_counts, true));
+                }
+                
+                // For admin listing, include all trips regardless of status or soft delete
+                $args['include_deleted'] = true;
                 $items = $this->service->getAll($args);
                 $total = $this->service->count($args);
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[YATRA DEBUG] TripController - getAll results (with include_deleted): ' . count($items));
+                    error_log('[YATRA DEBUG] TripController - Total count (with include_deleted): ' . $total);
+                }
             }
 
             // Ensure traveler-based pricing trips have a usable base price in list view
@@ -420,8 +474,17 @@ class TripController extends BaseController
                 'data' => $this->prepare_collection_for_response($items, $request),
                 'total' => $total,
                 'page' => (int) ($request->get_param('page') ?: 1),
-                'per_page' => (int) ($request->get_param('per_page') ?: 10),
+                'per_page' => $args['limit'], // Use the actual limit from args
             ];
+
+            // DEBUG: Log final response
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[YATRA DEBUG] TripController - Final response:');
+                error_log('[YATRA DEBUG] - data count: ' . count($response['data']));
+                error_log('[YATRA DEBUG] - total: ' . $response['total']);
+                error_log('[YATRA DEBUG] - page: ' . $response['page']);
+                error_log('[YATRA DEBUG] - per_page: ' . $response['per_page']);
+            }
 
             if (!empty($meta)) {
                 $response['meta'] = $meta;
@@ -445,10 +508,11 @@ class TripController extends BaseController
                 throw new ValidationException('Invalid trip ID', ['id' => ['Trip ID must be a positive integer']]);
             }
             
-            $item = $this->service->getWithRelations($id);
+            // For editing, include deleted items so admins can edit trips in trash
+            $item = $this->service->getWithRelations($id, true);
 
             if (!$item) {
-                throw new TripNotFoundException($id);
+                return $this->error_response('Trip not found', 404);
             }
 
             return $this->success_response($this->prepare_item_for_response($item, $request));
@@ -617,6 +681,40 @@ class TripController extends BaseController
                 'message' => __('Trip deleted successfully', 'yatra'),
             ]);
         } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Permanent delete item (hard delete)
+     */
+    public function permanent_delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $id = (int) $request->get_param('id');
+            
+            // DEBUG: Log permanent delete attempt
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[YATRA DEBUG] TripController - Attempting permanent delete for trip ID: ' . $id);
+            }
+            
+            $result = $this->service->permanentDelete($id);
+
+            if (!$result) {
+                error_log('[YATRA DEBUG] TripController - Permanent delete failed for trip ID: ' . $id);
+                return $this->error_response(__('Failed to permanently delete trip', 'yatra'), 500);
+            }
+
+            // DEBUG: Log successful delete
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[YATRA DEBUG] TripController - Successfully permanently deleted trip ID: ' . $id);
+            }
+
+            return $this->success_response([
+                'message' => __('Trip permanently deleted', 'yatra'),
+            ]);
+        } catch (\Exception $e) {
+            error_log('[YATRA DEBUG] TripController - Exception during permanent delete: ' . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }
@@ -1749,6 +1847,45 @@ class TripController extends BaseController
                 'departures_count' => (int) $departures_count,
                 'travelers_html' => $travelers_html,
                 'pricing_type' => $pricing_type,
+            ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get public trips for frontend display
+     * Only returns published trips, excludes soft-deleted trips
+     */
+    public function get_public_trips(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $args = [
+                'limit' => (int) ($request->get_param('per_page') ?: 20),
+                'offset' => ((int) ($request->get_param('page') ?: 1) - 1) * (int) ($request->get_param('per_page') ?: 20),
+                'order_by' => $request->get_param('orderby') ?: 'created_at',
+                'order' => strtoupper($request->get_param('order') ?: 'DESC'),
+                // Only return published trips for public endpoint
+                'where' => ['status' => ['publish', 'published']],
+                // Never include deleted trips for public endpoint
+                'include_deleted' => false,
+            ];
+
+            // Add search if provided
+            $search = $request->get_param('search');
+            if ($search) {
+                $items = $this->service->search($search, $args);
+                $total = count($items);
+            } else {
+                $items = $this->service->getAll($args);
+                $total = $this->service->count($args);
+            }
+
+            return $this->success_response([
+                'data' => $items,
+                'total' => $total,
+                'per_page' => (int) ($request->get_param('per_page') ?: 20),
+                'page' => (int) ($request->get_param('page') ?: 1),
             ]);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);

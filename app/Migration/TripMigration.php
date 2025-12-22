@@ -160,6 +160,9 @@ class TripMigration extends BaseMigration
 
                 $this->migrateTripDestinations($oldTrip->ID, $newTripId);
                 $this->migrateTripActivities($oldTrip->ID, $newTripId);
+                $this->migrateTripGallery($oldTrip->ID, $newTripId, $meta);
+                $this->migrateTripHighlights($oldTrip->ID, $newTripId, $meta);
+                $this->migrateTripFAQs($oldTrip->ID, $newTripId, $meta);
 
                 $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
 
@@ -181,5 +184,269 @@ class TripMigration extends BaseMigration
         }
 
         return compact('migrated', 'skipped', 'failed');
+    }
+
+    /**
+     * Migrate trip gallery images from old tour system
+     */
+    private function migrateTripGallery(int $oldTourId, int $newTripId, array $meta): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_gallery_images';
+        
+        // Clear existing gallery for this trip
+        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        
+        $galleryImages = [];
+        
+        // Try different possible gallery meta keys
+        $galleryKeys = [
+            'yatra_tour_gallery',
+            'yatra_tour_meta_gallery',
+            'yatra_gallery',
+            'tour_gallery',
+            'yatra_tour_images',
+            'yatra_tour_meta_images',
+            'yatra_images',
+            'tour_images',
+            'yatra_tour_photos',
+            'yatra_tour_meta_photos',
+            'yatra_photos',
+            'tour_photos'
+        ];
+        
+        foreach ($galleryKeys as $key) {
+            if (!empty($meta[$key])) {
+                $galleryData = $meta[$key];
+                if (is_string($galleryData)) {
+                    $galleryData = maybe_unserialize($galleryData);
+                }
+                
+                if (is_array($galleryData) && !empty($galleryData)) {
+                    $galleryImages = $galleryData;
+                    break;
+                }
+            }
+        }
+        
+        // If no gallery meta found, try to get attached images to the tour post
+        if (empty($galleryImages)) {
+            $attachedImages = get_attached_media('image', $oldTourId);
+            if (!empty($attachedImages)) {
+                foreach ($attachedImages as $attachment) {
+                    $galleryImages[] = [
+                        'id' => $attachment->ID,
+                        'url' => wp_get_attachment_url($attachment->ID),
+                        'thumbnail_url' => wp_get_attachment_thumb_url($attachment->ID),
+                        'alt_text' => get_post_meta($attachment->ID, '_wp_attachment_image_alt', true),
+                        'caption' => $attachment->post_excerpt
+                    ];
+                }
+            }
+        }
+        
+        // Migrate gallery images to new format
+        if (!empty($galleryImages)) {
+            $order = 0;
+            foreach ($galleryImages as $index => $image) {
+                $imageUrl = '';
+                $thumbnailUrl = '';
+                $altText = '';
+                $caption = '';
+                $imageId = null;
+                
+                // Handle different image data formats
+                if (is_numeric($image)) {
+                    // Simple attachment ID
+                    $imageId = (int) $image;
+                    $imageUrl = wp_get_attachment_url($imageId);
+                    $thumbnailUrl = wp_get_attachment_thumb_url($imageId);
+                    $altText = get_post_meta($imageId, '_wp_attachment_image_alt', true);
+                } elseif (is_string($image)) {
+                    // URL string
+                    $imageUrl = $image;
+                    $thumbnailUrl = $imageUrl;
+                } elseif (is_array($image)) {
+                    // Array format
+                    $imageId = !empty($image['id']) ? (int) $image['id'] : null;
+                    $imageUrl = $image['url'] ?? $image['image_url'] ?? $image['src'] ?? '';
+                    $thumbnailUrl = $image['thumbnail_url'] ?? $image['thumb'] ?? $imageUrl;
+                    $altText = $image['alt_text'] ?? $image['alt'] ?? '';
+                    $caption = $image['caption'] ?? $image['description'] ?? '';
+                }
+                
+                if (!empty($imageUrl)) {
+                    $wpdb->insert(
+                        $table,
+                        [
+                            'trip_id' => $newTripId,
+                            'image_id' => $imageId ?: null,
+                            'image_url' => $imageUrl,
+                            'thumbnail_url' => $thumbnailUrl,
+                            'alt_text' => $altText,
+                            'caption' => $caption,
+                            'order' => $order,
+                            'is_featured' => $order === 0 ? 1 : 0, // First image is featured
+                            'image_type' => 'gallery',
+                            'created_at' => current_time('mysql')
+                        ],
+                        ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s']
+                    );
+                    $order++;
+                }
+            }
+            
+            error_log("[Yatra Migration] Migrated " . $order . " gallery images for tour ID {$oldTourId} to trip ID {$newTripId}");
+        }
+    }
+
+    /**
+     * Migrate trip highlights from old tour system
+     */
+    private function migrateTripHighlights(int $oldTourId, int $newTripId, array $meta): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_highlights';
+        
+        // Clear existing highlights for this trip
+        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        
+        $highlights = [];
+        
+        // Try different possible highlights meta keys
+        $highlightsKeys = [
+            'yatra_tour_highlights',
+            'yatra_tour_meta_highlights',
+            'yatra_highlights',
+            'tour_highlights',
+            'yatra_tour_features',
+            'yatra_tour_meta_features',
+            'yatra_features',
+            'tour_features'
+        ];
+        
+        foreach ($highlightsKeys as $key) {
+            if (!empty($meta[$key])) {
+                $highlightsData = $meta[$key];
+                if (is_string($highlightsData)) {
+                    $highlightsData = maybe_unserialize($highlightsData);
+                }
+                
+                if (is_array($highlightsData) && !empty($highlightsData)) {
+                    $highlights = $highlightsData;
+                    break;
+                }
+            }
+        }
+        
+        // Migrate highlights
+        if (!empty($highlights)) {
+            $order = 0;
+            foreach ($highlights as $highlight) {
+                $title = '';
+                $description = '';
+                $icon = '';
+                
+                if (is_string($highlight)) {
+                    // Simple string - treat as title
+                    $title = $highlight;
+                } elseif (is_array($highlight)) {
+                    $title = $highlight['title'] ?? $highlight['name'] ?? $highlight['text'] ?? '';
+                    $description = $highlight['description'] ?? $highlight['content'] ?? '';
+                    $icon = $highlight['icon'] ?? $highlight['icon_class'] ?? '';
+                }
+                
+                if (!empty($title)) {
+                    $wpdb->insert(
+                        $table,
+                        [
+                            'trip_id' => $newTripId,
+                            'title' => $title,
+                            'description' => $description,
+                            'icon' => $icon,
+                            'order' => $order,
+                            'status' => 'active',
+                            'created_at' => current_time('mysql')
+                        ],
+                        ['%d', '%s', '%s', '%s', '%d', '%s', '%s']
+                    );
+                    $order++;
+                }
+            }
+            
+            error_log("[Yatra Migration] Migrated " . $order . " highlights for tour ID {$oldTourId} to trip ID {$newTripId}");
+        }
+    }
+
+    /**
+     * Migrate trip FAQs from old tour system
+     */
+    private function migrateTripFAQs(int $oldTourId, int $newTripId, array $meta): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_faqs';
+        
+        // Clear existing FAQs for this trip
+        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        
+        $faqs = [];
+        
+        // Try different possible FAQ meta keys
+        $faqKeys = [
+            'yatra_tour_faqs',
+            'yatra_tour_meta_faqs',
+            'yatra_faqs',
+            'tour_faqs',
+            'yatra_tour_faq',
+            'yatra_tour_meta_faq',
+            'yatra_faq',
+            'tour_faq'
+        ];
+        
+        foreach ($faqKeys as $key) {
+            if (!empty($meta[$key])) {
+                $faqData = $meta[$key];
+                if (is_string($faqData)) {
+                    $faqData = maybe_unserialize($faqData);
+                }
+                
+                if (is_array($faqData) && !empty($faqData)) {
+                    $faqs = $faqData;
+                    break;
+                }
+            }
+        }
+        
+        // Migrate FAQs
+        if (!empty($faqs)) {
+            $order = 0;
+            foreach ($faqs as $faq) {
+                $question = '';
+                $answer = '';
+                
+                if (is_array($faq)) {
+                    $question = $faq['question'] ?? $faq['q'] ?? $faq['title'] ?? '';
+                    $answer = $faq['answer'] ?? $faq['a'] ?? $faq['content'] ?? $faq['description'] ?? '';
+                }
+                
+                if (!empty($question) && !empty($answer)) {
+                    $wpdb->insert(
+                        $table,
+                        [
+                            'trip_id' => $newTripId,
+                            'question' => $question,
+                            'answer' => $answer,
+                            'order' => $order,
+                            'status' => 'active',
+                            'created_at' => current_time('mysql')
+                        ],
+                        ['%d', '%s', '%s', '%d', '%s', '%s']
+                    );
+                    $order++;
+                }
+            }
+            
+            error_log("[Yatra Migration] Migrated " . $order . " FAQs for tour ID {$oldTourId} to trip ID {$newTripId}");
+        }
     }
 }

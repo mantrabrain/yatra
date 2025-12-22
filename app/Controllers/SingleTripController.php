@@ -64,26 +64,31 @@ class SingleTripController
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_trips} 
                  WHERE slug = %s 
-                 AND status IN ('publish', 'published', 'active') 
-                 AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') 
+                 AND status IN ('publish', 'published', 'draft') 
                  LIMIT 1",
                 $slug
             )
         );
 
-        // Allow draft trips during development
-        if (!$trip && defined('WP_DEBUG') && WP_DEBUG) {
-            $trip = $this->wpdb->get_row(
+        // Check if trip exists but has other status - return null to show "not found"
+        if (!$trip) {
+            // Try to find trip regardless of status to check if it exists
+            $existingTrip = $this->wpdb->get_row(
                 $this->wpdb->prepare(
-                    "SELECT * FROM {$this->table_trips} 
+                    "SELECT status FROM {$this->table_trips} 
                      WHERE slug = %s 
-                     AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') 
                      LIMIT 1",
                     $slug
                 )
             );
+            
+            // If trip exists but admin is not logged in, return null to show "not found"
+            if ($existingTrip && !current_user_can('yatra_edit_trips')) {
+                return null;
+            }
         }
 
+        // Return null if no trip found or if trip has other status
         if (!$trip) {
             return null;
         }
@@ -103,7 +108,6 @@ class SingleTripController
             $this->wpdb->prepare(
                 "SELECT * FROM {$this->table_trips} 
                  WHERE id = %d 
-                 AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00') 
                  LIMIT 1",
                 $id
             )
@@ -592,7 +596,7 @@ class SingleTripController
                         short_description
                  FROM {$this->table_trips} 
                  WHERE id != %d 
-                 AND status IN ('publish', 'published', 'active') 
+                 AND status IN ('publish', 'published') 
                  AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
                  AND (trip_category = %s OR difficulty_level = %s)
                  ORDER BY RAND() 
@@ -612,7 +616,7 @@ class SingleTripController
                             short_description
                      FROM {$this->table_trips} 
                      WHERE id != %d 
-                     AND status IN ('publish', 'published', 'active') 
+                     AND status IN ('publish', 'published') 
                      AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
                      ORDER BY RAND() 
                      LIMIT 4",

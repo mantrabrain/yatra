@@ -584,9 +584,9 @@ class TripService extends BaseService
     /**
      * Get trip with relationships
      */
-    public function getWithRelations(int $id): ?\stdClass
+    public function getWithRelations(int $id, bool $includeDeleted = false): ?\stdClass
     {
-        return $this->repository->findWithRelations($id);
+        return $this->repository->findWithRelations($id, $includeDeleted);
     }
 
     /**
@@ -855,6 +855,26 @@ class TripService extends BaseService
     }
 
     /**
+     * Permanent delete (hard delete)
+     */
+    public function permanentDelete(int $id): bool
+    {
+        // DEBUG: Log service method call
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] TripService - Calling permanentDelete for trip ID: ' . $id);
+        }
+        
+        $result = $this->repository->delete($id);
+        
+        // DEBUG: Log repository result
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] TripService - Repository delete result: ' . ($result ? 'SUCCESS' : 'FAILED'));
+        }
+        
+        return $result;
+    }
+
+    /**
      * Get status counts for admin list views
      *
      * Returns a stable set of counts that do not change with filters
@@ -862,6 +882,9 @@ class TripService extends BaseService
      */
     public function getStatusCounts(): array
     {
+        // For admin stats, include all trips regardless of soft delete status
+        $args = ['include_deleted' => true];
+        
         $statuses = [
             'published',
             'draft',
@@ -873,10 +896,12 @@ class TripService extends BaseService
 
         $counts = [];
         foreach ($statuses as $status) {
-            $counts[$status] = $this->countByStatus($status);
+            $statusArgs = array_merge($args, ['where' => ['status' => $status]]);
+            $counts[$status] = $this->repository->count($statusArgs);
         }
 
-        $all = array_sum(array_values($counts));
+        // Get total count without status filter
+        $all = $this->repository->count($args);
 
         return [
             'all' => (int) $all,

@@ -24385,17 +24385,23 @@ const Trips = () => {
     }
     return params;
   }, [searchTerm, statusFilter, sortBy2, sortOrder, page]);
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["trips", queryParams],
     queryFn: async () => {
+      console.log("[YATRA DEBUG] React Query: Fetching trips with params:", queryParams);
       const response = await apiClient.get("/trips", { params: queryParams });
+      console.log("[YATRA DEBUG] React Query: API response:", response);
       return response;
     },
-    enabled: can("yatra_view_trips")
+    enabled: can("yatra_view_trips"),
+    staleTime: 0,
+    // Force fresh data
+    gcTime: 0
+    // Don't cache (new name for cacheTime)
   });
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      return await apiClient.delete(`/trips/${id}`);
+      return await apiClient.delete(`/trips/${id}/permanent-delete`);
     },
     onSuccess: () => {
       queryClient2.invalidateQueries({ queryKey: ["trips"] });
@@ -24446,7 +24452,8 @@ const Trips = () => {
   });
   const trips = (data == null ? void 0 : data.data) || [];
   const total = (data == null ? void 0 : data.total) || 0;
-  const totalPages = Math.ceil(total / 10);
+  const itemsPerPage = (data == null ? void 0 : data.per_page) || 10;
+  const totalPages = Math.ceil(total / itemsPerPage);
   const { data: difficultyLevelsData } = useQuery({
     queryKey: ["difficulty-levels-lookup"],
     queryFn: async () => {
@@ -24849,8 +24856,8 @@ const Trips = () => {
     if (message2 && !window.confirm(message2)) return;
     try {
       if (bulkAction === "delete") {
-        await Promise.all(selectedIds.map((id) => apiClient.delete(`/trips/${id}`)));
-        showToast(__("Trips deleted successfully", "Trips deleted successfully"), "success");
+        await Promise.all(selectedIds.map((id) => apiClient.delete(`/trips/${id}/permanent-delete`)));
+        showToast(__("Trips deleted permanently", "Trips deleted permanently"), "success");
       } else if (bulkAction.startsWith("mark_")) {
         const status = bulkAction.replace("mark_", "");
         const selectedTrips = trips.filter((trip) => selectedIds.includes(trip.id));
@@ -24892,7 +24899,7 @@ const Trips = () => {
                   children: trip.title
                 }
               ),
-              can("yatra_view_trips") && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              can("yatra_view_trips") && trip.status !== "trash" && /* @__PURE__ */ jsxRuntimeExports.jsx(
                 "button",
                 {
                   type: "button",
@@ -25030,7 +25037,9 @@ const Trips = () => {
         key: "view",
         label: __("View (frontend)", "View (frontend)"),
         icon: /* @__PURE__ */ jsxRuntimeExports.jsx(ExternalLink, { className: "w-4 h-4" }),
-        onClick: (trip) => handleView(trip)
+        onClick: (trip) => handleView(trip),
+        condition: (trip) => trip.status !== "trash"
+        // Hide for trash trips
       });
     }
     if (can("yatra_edit_trips")) {
@@ -25124,7 +25133,8 @@ const Trips = () => {
         icon: /* @__PURE__ */ jsxRuntimeExports.jsx(Trash2, { className: "w-4 h-4" }),
         onClick: (trip) => handleDelete(trip),
         variant: "destructive",
-        condition: (trip) => trip.status === "trash"
+        condition: () => true
+        // Show for all trips
       });
     }
     return actions;
@@ -25137,9 +25147,23 @@ const Trips = () => {
           title: __("All Trips", "All Trips"),
           description: __("Manage your travel packages and tours. Create, edit, and organize all your trips in one place.", "Manage your travel packages and tours. Create, edit, and organize all your trips in one place."),
           actionCapability: "yatra_edit_trips",
-          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateTrip, className: "flex items-center gap-2", children: [
-            /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
-            __("Add New Trip", "Add New Trip")
+          actions: /* @__PURE__ */ jsxRuntimeExports.jsxs("div", { className: "flex items-center gap-2", children: [
+            window.WP_DEBUG && /* @__PURE__ */ jsxRuntimeExports.jsx(
+              Button,
+              {
+                onClick: () => {
+                  console.log("[YATRA DEBUG] Manual refresh triggered");
+                  refetch();
+                },
+                variant: "outline",
+                className: "text-xs",
+                children: "Refresh Data"
+              }
+            ),
+            /* @__PURE__ */ jsxRuntimeExports.jsxs(Button, { onClick: handleCreateTrip, className: "flex items-center gap-2", children: [
+              /* @__PURE__ */ jsxRuntimeExports.jsx(Plus, { className: "w-4 h-4" }),
+              __("Add New Trip", "Add New Trip")
+            ] })
           ] })
         }
       ),
@@ -25271,7 +25295,7 @@ const Trips = () => {
             currentPage: page,
             totalPages,
             totalItems: total,
-            itemsPerPage: 10,
+            itemsPerPage,
             onPageChange: setPage,
             itemName: __("trips", "trips")
           }

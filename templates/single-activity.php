@@ -23,15 +23,12 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
     error_log('Activity object: ' . print_r($activity, true));
 }
 
-// Bail if no activity data
+// Bail if no activity data - return proper 404
 if (!$activity) {
-    get_header();
-    echo '<div class="yatra-error" style="max-width: 1200px; margin: 80px auto; padding: 40px; text-align: center;">';
-    echo '<h1>' . esc_html__('Activity Not Found', 'yatra') . '</h1>';
-    echo '<p>' . esc_html__('The activity you are looking for does not exist or has been removed.', 'yatra') . '</p>';
-    echo '<a href="' . esc_url(home_url('/activity/')) . '" class="yatra-btn">' . esc_html__('Browse All Activities', 'yatra') . '</a>';
-    echo '</div>';
-    get_footer();
+    global $wp_query;
+    $wp_query->set_404();
+    status_header(404);
+    get_template_part(404);
     exit;
 }
 
