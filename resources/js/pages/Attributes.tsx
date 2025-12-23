@@ -150,18 +150,23 @@ const Attributes: React.FC = () => {
     return params;
   }, [searchTerm, statusFilter, sortBy, sortOrder, page]);
 
-  // Fetch status counts from API
+  // Fetch status counts from API (no caching to ensure fresh counts)
   const { data: statsData } = useQuery({
-    queryKey: ['attributes-stats'],
+    queryKey: ['attributes-stats', searchTerm, statusFilter, page],
     queryFn: async () => {
       try {
         const response = await apiClient.get('/attributes/stats');
-        return response;
+        console.log('Attributes Stats Response:', response);
+        return response || { all: 0, publish: 0, draft: 0, trash: 0 };
       } catch (error: any) {
+        console.error('Attributes Stats Error:', error);
         return { all: 0, publish: 0, draft: 0, trash: 0 };
       }
     },
     enabled: can('yatra_view_trips'),
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the results (formerly cacheTime)
+    refetchOnMount: 'always' as const, // Always refetch when component mounts
   });
 
   // Fetch attributes from API
@@ -201,12 +206,13 @@ const Attributes: React.FC = () => {
   // Status counts from stats API
   const statusCounts = useMemo(() => {
     if (statsData) {
-      return {
-        all: statsData.all ?? 0,
-        publish: statsData.publish ?? 0,
-        draft: statsData.draft ?? 0,
-        trash: statsData.trash ?? 0,
+      const statusCounts = {
+        all: (statsData?.all ?? 0) as number,
+        publish: (statsData?.publish ?? 0) as number,
+        draft: (statsData?.draft ?? 0) as number,
+        trash: (statsData?.trash ?? 0) as number,
       };
+      return statusCounts;
     }
     return {
       all: 0,

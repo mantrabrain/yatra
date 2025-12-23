@@ -15,10 +15,77 @@ class AttributeRepository extends BaseRepository
      */
     public function paginate(int $page = 1, int $perPage = 10, array $args = []): array
     {
+        // Convert filter keys to WHERE clause format
+        $where = [];
+        
+        // Handle status filter
+        if (isset($args['status'])) {
+            $where['status'] = $args['status'];
+            unset($args['status']);
+        }
+        
+        // Handle field_type filter
+        if (isset($args['field_type'])) {
+            $where['field_type'] = $args['field_type'];
+            unset($args['field_type']);
+        }
+        
+        // Handle show_on_frontend filter
+        if (isset($args['show_on_frontend'])) {
+            $where['show_on_frontend'] = $args['show_on_frontend'];
+            unset($args['show_on_frontend']);
+        }
+        
+        // Handle show_in_filters filter
+        if (isset($args['show_in_filters'])) {
+            $where['show_in_filters'] = $args['show_in_filters'];
+            unset($args['show_in_filters']);
+        }
+        
+        // Add WHERE conditions if any
+        if (!empty($where)) {
+            $args['where'] = $where;
+        }
+        
         $args['limit'] = $perPage;
         $args['offset'] = ($page - 1) * $perPage;
         
         return $this->all($args);
+    }
+
+    /**
+     * Count records with filters
+     */
+    public function count(array $args = []): int
+    {
+        // Convert filter keys to WHERE clause format (same as paginate)
+        $where = [];
+        
+        if (isset($args['status'])) {
+            $where['status'] = $args['status'];
+            unset($args['status']);
+        }
+        
+        if (isset($args['field_type'])) {
+            $where['field_type'] = $args['field_type'];
+            unset($args['field_type']);
+        }
+        
+        if (isset($args['show_on_frontend'])) {
+            $where['show_on_frontend'] = $args['show_on_frontend'];
+            unset($args['show_on_frontend']);
+        }
+        
+        if (isset($args['show_in_filters'])) {
+            $where['show_in_filters'] = $args['show_in_filters'];
+            unset($args['show_in_filters']);
+        }
+        
+        if (!empty($where)) {
+            $args['where'] = $where;
+        }
+        
+        return parent::count($args);
     }
 
     /**
@@ -412,19 +479,32 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         
+        // Clear any query cache
+        wp_cache_flush();
+        
         // Get counts for each status
-        $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE 1=1 GROUP BY status";
-        $results = $this->wpdb->get_results($query, ARRAY_A) ?: [];
+        $query = "SELECT status, COUNT(*) as count FROM `{$table}` GROUP BY status";
+        $results = $this->wpdb->get_results($query, ARRAY_A);
+        
+        // Debug logging
+        error_log('Yatra Attributes Status Count Query: ' . $query);
+        error_log('Yatra Attributes Status Count Results: ' . print_r($results, true));
 
         $counts = [];
-        foreach ($results as $row) {
-            $counts[$row['status']] = (int) $row['count'];
+        if (!empty($results) && is_array($results)) {
+            foreach ($results as $row) {
+                if (isset($row['status']) && isset($row['count'])) {
+                    $counts[$row['status']] = (int) $row['count'];
+                }
+            }
         }
 
         // Ensure we have entries for all main statuses even if count is 0
         $counts['publish'] = $counts['publish'] ?? 0;
         $counts['draft'] = $counts['draft'] ?? 0;
         $counts['trash'] = $counts['trash'] ?? 0;
+        
+        error_log('Yatra Attributes Final Counts: ' . print_r($counts, true));
 
         return $counts;
     }
