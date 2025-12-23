@@ -111,6 +111,12 @@ class MigrationDetector
                 'description' => 'Trip itineraries and schedules',
                 'table' => 'postmeta (tour posts)',
             ],
+            'settings' => [
+                'label' => 'Settings',
+                'count' => $this->countOldSettings(),
+                'description' => 'Plugin configuration and settings',
+                'table' => 'options (yatra_* keys)',
+            ],
         ];
     }
     
@@ -298,6 +304,23 @@ class MigrationDetector
                  AND pm.meta_key IN ({$placeholders})",
                 ...$itineraryKeys
             )
+        );
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old settings from options table
+     */
+    private function countOldSettings(): int
+    {
+        // Count old Yatra settings in wp_options
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->options} 
+             WHERE option_name LIKE 'yatra_%' 
+             AND option_name NOT LIKE 'yatra\\_version%'
+             AND option_name NOT LIKE 'yatra\\_db\\_version%'
+             AND option_name NOT LIKE 'yatra\\_migration%'"
         );
         
         return (int) $count;

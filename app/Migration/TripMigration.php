@@ -239,8 +239,33 @@ class TripMigration extends BaseMigration
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_trip_gallery_images';
         
-        // Clear existing gallery for this trip
-        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        error_log("[Yatra Migration] Starting gallery migration for tour ID {$oldTourId}, trip ID {$newTripId}");
+        
+        // Clear existing gallery for this trip (unless force migration)
+        if (!$this->isForceMigration()) {
+            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+            if ($deleted) {
+                error_log("[Yatra Migration] Cleared {$deleted} existing gallery images for trip {$newTripId}");
+            }
+        }
+        
+        // Direct database query to find ALL gallery-related meta
+        $allGalleryMeta = $wpdb->get_results($wpdb->prepare(
+            "SELECT meta_key, meta_value FROM {$wpdb->postmeta} 
+             WHERE post_id = %d 
+             AND (meta_key LIKE '%%gallery%%' OR meta_key LIKE '%%image%%' OR meta_key LIKE '%%photo%%')
+             ORDER BY meta_key",
+            $oldTourId
+        ));
+        
+        if (!empty($allGalleryMeta)) {
+            error_log("[Yatra Migration] Found " . count($allGalleryMeta) . " gallery-related meta keys in database:");
+            foreach ($allGalleryMeta as $metaRow) {
+                error_log("[Yatra Migration]   - {$metaRow->meta_key}: " . substr($metaRow->meta_value, 0, 100));
+            }
+        } else {
+            error_log("[Yatra Migration] No gallery-related meta found in database for tour {$oldTourId}");
+        }
         
         $galleryImages = [];
         
@@ -248,6 +273,7 @@ class TripMigration extends BaseMigration
         $galleryKeys = [
             'yatra_tour_gallery',
             'yatra_tour_meta_gallery',
+            'yatra_tour_meta_gallery_images',
             'yatra_gallery',
             'tour_gallery',
             'yatra_tour_images',
@@ -257,27 +283,45 @@ class TripMigration extends BaseMigration
             'yatra_tour_photos',
             'yatra_tour_meta_photos',
             'yatra_photos',
-            'tour_photos'
+            'tour_photos',
+            '_yatra_gallery',
+            '_tour_gallery'
         ];
         
         foreach ($galleryKeys as $key) {
-            if (!empty($meta[$key])) {
+            if (isset($meta[$key])) {
                 $galleryData = $meta[$key];
+                error_log("[Yatra Migration] Found gallery meta key '{$key}' with type: " . gettype($galleryData));
+                error_log("[Yatra Migration] Raw value (first 200 chars): " . substr(print_r($galleryData, true), 0, 200));
+                
                 if (is_string($galleryData)) {
                     $galleryData = maybe_unserialize($galleryData);
+                    error_log("[Yatra Migration] After unserialize, type: " . gettype($galleryData));
+                    if (is_array($galleryData)) {
+                        error_log("[Yatra Migration] Unserialized array content: " . substr(print_r($galleryData, true), 0, 300));
+                    }
                 }
                 
                 if (is_array($galleryData) && !empty($galleryData)) {
                     $galleryImages = $galleryData;
+                    error_log("[Yatra Migration] Using gallery from meta key '{$key}' with " . count($galleryImages) . " images");
                     break;
+                } elseif (!empty($galleryData)) {
+                    error_log("[Yatra Migration] Gallery data in '{$key}' is not an array or is empty: " . print_r($galleryData, true));
                 }
             }
         }
         
+        // Log what keys were checked
+        error_log("[Yatra Migration] Checked meta keys: " . implode(', ', $galleryKeys));
+        error_log("[Yatra Migration] Available meta keys in array: " . implode(', ', array_keys($meta)));
+        
         // If no gallery meta found, try to get attached images to the tour post
         if (empty($galleryImages)) {
+            error_log("[Yatra Migration] No gallery meta found, checking for attached images to post {$oldTourId}");
             $attachedImages = get_attached_media('image', $oldTourId);
             if (!empty($attachedImages)) {
+                error_log("[Yatra Migration] Found " . count($attachedImages) . " attached images");
                 foreach ($attachedImages as $attachment) {
                     $galleryImages[] = [
                         'id' => $attachment->ID,
@@ -287,13 +331,23 @@ class TripMigration extends BaseMigration
                         'caption' => $attachment->post_excerpt
                     ];
                 }
+            } else {
+                error_log("[Yatra Migration] No attached images found for tour {$oldTourId}");
             }
         }
         
         // Migrate gallery images to new format
-        if (!empty($galleryImages)) {
-            $order = 0;
-            foreach ($galleryImages as $index => $image) {
+        if (empty($galleryImages)) {
+            error_log("[Yatra Migration] No gallery images to migrate for tour {$oldTourId}");
+            return;
+        }
+        
+        error_log("[Yatra Migration] Migrating " . count($galleryImages) . " gallery images");
+        $order = 0;
+        $migrated = 0;
+        $failed = 0;
+        
+        foreach ($galleryImages as $index => $image) {
                 $imageUrl = '';
                 $thumbnailUrl = '';
                 $altText = '';
@@ -321,7 +375,7 @@ class TripMigration extends BaseMigration
                 }
                 
                 if (!empty($imageUrl)) {
-                    $wpdb->insert(
+                    $result = $wpdb->insert(
                         $table,
                         [
                             'trip_id' => $newTripId,
@@ -337,12 +391,21 @@ class TripMigration extends BaseMigration
                         ],
                         ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%s', '%s']
                     );
-                    $order++;
+                    
+                    if ($result) {
+                        $migrated++;
+                        $order++;
+                        error_log("[Yatra Migration] Inserted gallery image {$order}: {$imageUrl}");
+                    } else {
+                        $failed++;
+                        error_log("[Yatra Migration] Failed to insert gallery image: {$imageUrl} - Error: " . $wpdb->last_error);
+                    }
+                } else {
+                    error_log("[Yatra Migration] Skipping gallery item at index {$index} - no valid image URL");
                 }
-            }
-            
-            error_log("[Yatra Migration] Migrated " . $order . " gallery images for tour ID {$oldTourId} to trip ID {$newTripId}");
         }
+        
+        error_log("[Yatra Migration] Gallery migration complete for tour {$oldTourId}: {$migrated} migrated, {$failed} failed");
     }
 
     /**

@@ -21,6 +21,7 @@ use Yatra\Migration\CouponMigration;
 use Yatra\Migration\TourDateMigration;
 use Yatra\Migration\TravelerCategoriesMigration;
 use Yatra\Migration\AttributeMigration;
+use Yatra\Migration\SettingsMigration;
 
 class MigrationProgress
 {
@@ -204,6 +205,9 @@ class MigrationProgress
                     break;
                 case 'itinerary':
                     $result = (new ItineraryMigration($this))->run();
+                    break;
+                case 'settings':
+                    $result = (new SettingsMigration($this))->run();
                     break;
                 default:
                     throw new \Exception("Unknown data type: {$dataType}");

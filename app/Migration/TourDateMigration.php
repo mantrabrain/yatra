@@ -91,13 +91,94 @@ class TourDateMigration extends BaseMigration
                 $pricing = !empty($oldDate->pricing) ? maybe_unserialize($oldDate->pricing) : null;
                 $originalPrice = null;
                 $discountedPrice = null;
+                $pricingType = 'regular';
+                $priceTypes = null;
+                
+                error_log("[Yatra Migration] Raw pricing data for tour date {$oldDate->id}: " . print_r($pricing, true));
                 
                 if (is_array($pricing)) {
-                    $originalPrice = $pricing['regular_price'] ?? $pricing['price'] ?? null;
-                    $discountedPrice = $pricing['sale_price'] ?? $pricing['discounted_price'] ?? null;
+                    // Check various formats for traveler-based pricing
+                    $hasTravelerPricing = false;
+                    
+                    // Format 1: pricing_per = 'person' with price_per_person array
+                    if (isset($pricing['pricing_per']) && $pricing['pricing_per'] === 'person' && isset($pricing['price_per_person'])) {
+                        $pricingType = 'traveler_based';
+                        $priceTypesArray = [];
+                        $pricePerPerson = is_array($pricing['price_per_person']) ? $pricing['price_per_person'] : [];
+                        
+                        foreach ($pricePerPerson as $categoryId => $categoryPricing) {
+                            if (is_array($categoryPricing)) {
+                                $origPrice = floatval($categoryPricing['regular_price'] ?? $categoryPricing['price'] ?? 0);
+                                $discPrice = floatval($categoryPricing['sale_price'] ?? $categoryPricing['discounted_price'] ?? 0);
+                                
+                                // Only add if has valid price
+                                if ($origPrice > 0) {
+                                    $priceTypesArray[] = [
+                                        'category_id' => $categoryId,
+                                        'original_price' => $origPrice,
+                                        'discounted_price' => ($discPrice > 0 && $discPrice < $origPrice) ? $discPrice : null,
+                                    ];
+                                }
+                            }
+                        }
+                        
+                        if (!empty($priceTypesArray)) {
+                            $priceTypes = json_encode($priceTypesArray);
+                            $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
+                            $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
+                            $hasTravelerPricing = true;
+                            error_log("[Yatra Migration] Traveler-based pricing (format 1) with " . count($priceTypesArray) . " categories");
+                        }
+                    }
+                    
+                    // Format 2: Direct traveler_categories array
+                    if (!$hasTravelerPricing && isset($pricing['traveler_categories']) && is_array($pricing['traveler_categories'])) {
+                        $pricingType = 'traveler_based';
+                        $priceTypesArray = [];
+                        
+                        foreach ($pricing['traveler_categories'] as $category) {
+                            if (is_array($category)) {
+                                $origPrice = floatval($category['regular_price'] ?? $category['price'] ?? 0);
+                                $discPrice = floatval($category['sale_price'] ?? $category['discounted_price'] ?? 0);
+                                
+                                if ($origPrice > 0) {
+                                    $priceTypesArray[] = [
+                                        'category_id' => $category['category_id'] ?? $category['id'] ?? 0,
+                                        'original_price' => $origPrice,
+                                        'discounted_price' => ($discPrice > 0 && $discPrice < $origPrice) ? $discPrice : null,
+                                    ];
+                                }
+                            }
+                        }
+                        
+                        if (!empty($priceTypesArray)) {
+                            $priceTypes = json_encode($priceTypesArray);
+                            $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
+                            $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
+                            $hasTravelerPricing = true;
+                            error_log("[Yatra Migration] Traveler-based pricing (format 2) with " . count($priceTypesArray) . " categories");
+                        }
+                    }
+                    
+                    // Format 3: Regular pricing (single price for all)
+                    if (!$hasTravelerPricing) {
+                        $pricingType = 'regular';
+                        $originalPrice = floatval($pricing['regular_price'] ?? $pricing['price'] ?? 0);
+                        $discountedPrice = floatval($pricing['sale_price'] ?? $pricing['discounted_price'] ?? 0);
+                        
+                        // If discounted price is 0 or >= original, set to null
+                        if ($discountedPrice <= 0 || ($originalPrice > 0 && $discountedPrice >= $originalPrice)) {
+                            $discountedPrice = null;
+                        }
+                        
+                        error_log("[Yatra Migration] Regular pricing - original: {$originalPrice}, discounted: {$discountedPrice}");
+                    }
                 }
                 
-                error_log("[Yatra Migration] Pricing data: original={$originalPrice}, discounted={$discountedPrice}");
+                error_log("[Yatra Migration] Parsed pricing - Type: {$pricingType}, Original: {$originalPrice}, Discounted: {$discountedPrice}");
+                if ($priceTypes) {
+                    error_log("[Yatra Migration] Price types JSON: {$priceTypes}");
+                }
 
                 // Migrate to yatra_trip_availability_dates
                 if (!$existsInAvailability || $this->isForceMigration()) {
@@ -120,14 +201,17 @@ class TourDateMigration extends BaseMigration
                         'seats_available' => $maxTravelers,
                         'seats_reserved' => 0,
                         'seats_waitlist' => 0,
-                        'pricing_type' => 'regular',
+                        'pricing_type' => $pricingType,
                         'original_price' => $originalPrice,
                         'discounted_price' => $discountedPrice,
+                        'price_types' => $priceTypes,
                         'status' => $availabilityStatus,
                         'special_notes' => $oldDate->note_to_customer ?? null,
                         'created_at' => $oldDate->created_at ?? current_time('mysql'),
                         'updated_at' => $oldDate->updated_at ?? current_time('mysql'),
                     ];
+                    
+                    error_log("[Yatra Migration] Inserting availability with pricing_type={$pricingType}, price_types=" . ($priceTypes ? 'YES' : 'NO'));
 
                     $wpdb->insert(
                         $wpdb->prefix . 'yatra_trip_availability_dates',
@@ -147,7 +231,7 @@ class TourDateMigration extends BaseMigration
                         $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
-                    error_log("[Yatra Migration] Inserted availability ID {$insertedId} for tour date {$oldDate->id} (departure: {$oldDate->start_date}, return: {$oldDate->end_date})");
+                    error_log("[Yatra Migration] Inserted availability ID {$insertedId} for tour date {$oldDate->id} (departure: {$oldDate->start_date}, return: {$oldDate->end_date}, pricing: {$pricingType})");
                 }
 
                 $migrated++;
