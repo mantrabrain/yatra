@@ -22,6 +22,8 @@ use Yatra\Migration\TourDateMigration;
 use Yatra\Migration\TravelerCategoriesMigration;
 use Yatra\Migration\AttributeMigration;
 use Yatra\Migration\SettingsMigration;
+use Yatra\Migration\ServicesMigration;
+use Yatra\Migration\AvailabilityConditionsMigration;
 
 class MigrationProgress
 {
@@ -208,6 +210,12 @@ class MigrationProgress
                     break;
                 case 'settings':
                     $result = (new SettingsMigration($this))->run();
+                    break;
+                case 'services':
+                    $result = (new ServicesMigration($this))->run();
+                    break;
+                case 'availability_conditions':
+                    $result = (new AvailabilityConditionsMigration($this))->run();
                     break;
                 default:
                     throw new \Exception("Unknown data type: {$dataType}");

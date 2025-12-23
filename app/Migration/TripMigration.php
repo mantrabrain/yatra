@@ -269,10 +269,11 @@ class TripMigration extends BaseMigration
         
         $galleryImages = [];
         
-        // Try different possible gallery meta keys
+        // The primary gallery meta key from old Yatra system
         $galleryKeys = [
+            'yatra_tour_meta_gallery',  // Primary: comma-separated attachment IDs
+            'yatra_tour_slider_items',  // Slider items: comma-separated attachment IDs
             'yatra_tour_gallery',
-            'yatra_tour_meta_gallery',
             'yatra_tour_meta_gallery_images',
             'yatra_gallery',
             'tour_gallery',
@@ -289,25 +290,40 @@ class TripMigration extends BaseMigration
         ];
         
         foreach ($galleryKeys as $key) {
-            if (isset($meta[$key])) {
+            if (isset($meta[$key]) && !empty($meta[$key])) {
                 $galleryData = $meta[$key];
                 error_log("[Yatra Migration] Found gallery meta key '{$key}' with type: " . gettype($galleryData));
-                error_log("[Yatra Migration] Raw value (first 200 chars): " . substr(print_r($galleryData, true), 0, 200));
+                error_log("[Yatra Migration] Raw value: " . $galleryData);
                 
-                if (is_string($galleryData)) {
-                    $galleryData = maybe_unserialize($galleryData);
-                    error_log("[Yatra Migration] After unserialize, type: " . gettype($galleryData));
-                    if (is_array($galleryData)) {
-                        error_log("[Yatra Migration] Unserialized array content: " . substr(print_r($galleryData, true), 0, 300));
+                // Handle comma-separated attachment IDs (e.g., "0,27,26,25,24,23,22,19,18")
+                if (is_string($galleryData) && strpos($galleryData, ',') !== false) {
+                    $attachmentIds = array_filter(array_map('intval', explode(',', $galleryData)));
+                    if (!empty($attachmentIds)) {
+                        $galleryImages = $attachmentIds;
+                        error_log("[Yatra Migration] Parsed comma-separated IDs from '{$key}': " . count($attachmentIds) . " images");
+                        break;
                     }
                 }
-                
-                if (is_array($galleryData) && !empty($galleryData)) {
-                    $galleryImages = $galleryData;
-                    error_log("[Yatra Migration] Using gallery from meta key '{$key}' with " . count($galleryImages) . " images");
+                // Handle single attachment ID
+                elseif (is_numeric($galleryData) && intval($galleryData) > 0) {
+                    $galleryImages = [intval($galleryData)];
+                    error_log("[Yatra Migration] Single attachment ID from '{$key}'");
                     break;
-                } elseif (!empty($galleryData)) {
-                    error_log("[Yatra Migration] Gallery data in '{$key}' is not an array or is empty: " . print_r($galleryData, true));
+                }
+                // Handle serialized data
+                elseif (is_string($galleryData)) {
+                    $unserialized = maybe_unserialize($galleryData);
+                    if (is_array($unserialized) && !empty($unserialized)) {
+                        $galleryImages = $unserialized;
+                        error_log("[Yatra Migration] Unserialized array from '{$key}' with " . count($unserialized) . " images");
+                        break;
+                    }
+                }
+                // Handle array data
+                elseif (is_array($galleryData) && !empty($galleryData)) {
+                    $galleryImages = $galleryData;
+                    error_log("[Yatra Migration] Array data from '{$key}' with " . count($galleryData) . " images");
+                    break;
                 }
             }
         }
@@ -356,11 +372,30 @@ class TripMigration extends BaseMigration
                 
                 // Handle different image data formats
                 if (is_numeric($image)) {
-                    // Simple attachment ID
+                    // Simple attachment ID (most common format from old Yatra)
                     $imageId = (int) $image;
+                    
+                    // Skip invalid IDs (like 0)
+                    if ($imageId <= 0) {
+                        error_log("[Yatra Migration] Skipping invalid attachment ID: {$imageId}");
+                        continue;
+                    }
+                    
                     $imageUrl = wp_get_attachment_url($imageId);
-                    $thumbnailUrl = wp_get_attachment_thumb_url($imageId);
-                    $altText = get_post_meta($imageId, '_wp_attachment_image_alt', true);
+                    if (!$imageUrl) {
+                        error_log("[Yatra Migration] Attachment ID {$imageId} has no URL, skipping");
+                        continue;
+                    }
+                    
+                    $thumbnailUrl = wp_get_attachment_thumb_url($imageId) ?: $imageUrl;
+                    $altText = get_post_meta($imageId, '_wp_attachment_image_alt', true) ?: '';
+                    $attachment = get_post($imageId);
+                    if ($attachment) {
+                        $caption = $attachment->post_excerpt ?: '';
+                    }
+                    
+                    error_log("[Yatra Migration] Processing attachment ID {$imageId}: {$imageUrl}");
+                    
                 } elseif (is_string($image)) {
                     // URL string
                     $imageUrl = $image;
@@ -494,13 +529,21 @@ class TripMigration extends BaseMigration
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_trip_faqs';
         
-        // Clear existing FAQs for this trip
-        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        error_log("[Yatra Migration] Starting FAQ migration for tour ID {$oldTourId}, trip ID {$newTripId}");
+        
+        // Clear existing FAQs for this trip (unless force migration)
+        if (!$this->isForceMigration()) {
+            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+            if ($deleted) {
+                error_log("[Yatra Migration] Cleared {$deleted} existing FAQs for trip {$newTripId}");
+            }
+        }
         
         $faqs = [];
         
-        // Try different possible FAQ meta keys
+        // The primary FAQ meta key from old Yatra system
         $faqKeys = [
+            'faq_repeator',  // Primary: serialized array with faq_heading and faq_description
             'yatra_tour_faqs',
             'yatra_tour_meta_faqs',
             'yatra_faqs',
@@ -512,50 +555,95 @@ class TripMigration extends BaseMigration
         ];
         
         foreach ($faqKeys as $key) {
-            if (!empty($meta[$key])) {
+            if (isset($meta[$key]) && !empty($meta[$key])) {
                 $faqData = $meta[$key];
+                error_log("[Yatra Migration] Found FAQ meta key '{$key}' with type: " . gettype($faqData));
+                
                 if (is_string($faqData)) {
                     $faqData = maybe_unserialize($faqData);
+                    error_log("[Yatra Migration] After unserialize, type: " . gettype($faqData));
                 }
                 
                 if (is_array($faqData) && !empty($faqData)) {
-                    $faqs = $faqData;
-                    break;
+                    // Check if this is the faq_repeator format with faq_heading and faq_description
+                    if (isset($faqData['faq_heading']) && isset($faqData['faq_description'])) {
+                        $headings = $faqData['faq_heading'];
+                        $descriptions = $faqData['faq_description'];
+                        
+                        if (is_array($headings) && is_array($descriptions)) {
+                            error_log("[Yatra Migration] Found faq_repeator format with " . count($headings) . " FAQs");
+                            
+                            // Convert to standard format
+                            $faqs = [];
+                            $count = min(count($headings), count($descriptions));
+                            for ($i = 0; $i < $count; $i++) {
+                                if (!empty($headings[$i]) && !empty($descriptions[$i])) {
+                                    $faqs[] = [
+                                        'question' => $headings[$i],
+                                        'answer' => $descriptions[$i]
+                                    ];
+                                }
+                            }
+                            break;
+                        }
+                    } else {
+                        // Standard array format
+                        $faqs = $faqData;
+                        error_log("[Yatra Migration] Using standard FAQ format from '{$key}' with " . count($faqs) . " FAQs");
+                        break;
+                    }
                 }
             }
         }
         
         // Migrate FAQs
-        if (!empty($faqs)) {
-            $order = 0;
-            foreach ($faqs as $faq) {
-                $question = '';
-                $answer = '';
-                
-                if (is_array($faq)) {
-                    $question = $faq['question'] ?? $faq['q'] ?? $faq['title'] ?? '';
-                    $answer = $faq['answer'] ?? $faq['a'] ?? $faq['content'] ?? $faq['description'] ?? '';
-                }
-                
-                if (!empty($question) && !empty($answer)) {
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'trip_id' => $newTripId,
-                            'question' => $question,
-                            'answer' => $answer,
-                            'order' => $order,
-                            'status' => 'active',
-                            'created_at' => current_time('mysql')
-                        ],
-                        ['%d', '%s', '%s', '%d', '%s', '%s']
-                    );
-                    $order++;
-                }
+        if (empty($faqs)) {
+            error_log("[Yatra Migration] No FAQs to migrate for tour {$oldTourId}");
+            return;
+        }
+        
+        error_log("[Yatra Migration] Migrating " . count($faqs) . " FAQs");
+        $order = 0;
+        $migrated = 0;
+        $failed = 0;
+        
+        foreach ($faqs as $faq) {
+            $question = '';
+            $answer = '';
+            
+            if (is_array($faq)) {
+                $question = $faq['question'] ?? $faq['q'] ?? $faq['title'] ?? '';
+                $answer = $faq['answer'] ?? $faq['a'] ?? $faq['content'] ?? $faq['description'] ?? '';
             }
             
-            error_log("[Yatra Migration] Migrated " . $order . " FAQs for tour ID {$oldTourId} to trip ID {$newTripId}");
+            if (!empty($question) && !empty($answer)) {
+                $result = $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $newTripId,
+                        'question' => wp_kses_post($question),
+                        'answer' => wp_kses_post($answer),
+                        'order' => $order,
+                        'status' => 'active',
+                        'created_at' => current_time('mysql')
+                    ],
+                    ['%d', '%s', '%s', '%d', '%s', '%s']
+                );
+                
+                if ($result) {
+                    $migrated++;
+                    $order++;
+                    error_log("[Yatra Migration] Inserted FAQ {$order}: " . substr($question, 0, 50));
+                } else {
+                    $failed++;
+                    error_log("[Yatra Migration] Failed to insert FAQ: " . $wpdb->last_error);
+                }
+            } else {
+                error_log("[Yatra Migration] Skipping FAQ with empty question or answer");
+            }
         }
+        
+        error_log("[Yatra Migration] FAQ migration complete for tour {$oldTourId}: {$migrated} migrated, {$failed} failed");
     }
 
     /**

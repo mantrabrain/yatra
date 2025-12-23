@@ -117,6 +117,18 @@ class MigrationDetector
                 'description' => 'Plugin configuration and settings',
                 'table' => 'options (yatra_* keys)',
             ],
+            'services' => [
+                'label' => 'Additional Services',
+                'count' => $this->countOldServices(),
+                'description' => 'Extra services and add-ons (Premium)',
+                'table' => 'term_taxonomy (services)',
+            ],
+            'availability_conditions' => [
+                'label' => 'Availability Conditions',
+                'count' => $this->countOldAvailabilityConditions(),
+                'description' => 'Availability rules and conditions (Premium)',
+                'table' => 'term_taxonomy (availability_conditions)',
+            ],
         ];
     }
     
@@ -321,6 +333,34 @@ class MigrationDetector
              AND option_name NOT LIKE 'yatra\\_version%'
              AND option_name NOT LIKE 'yatra\\_db\\_version%'
              AND option_name NOT LIKE 'yatra\\_migration%'"
+        );
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old services from taxonomy (checks database directly)
+     */
+    private function countOldServices(): int
+    {
+        // Check database directly, regardless of plugin/module activation
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->term_taxonomy} 
+             WHERE taxonomy = 'services'"
+        );
+        
+        return (int) $count;
+    }
+    
+    /**
+     * Count old availability conditions from taxonomy (checks database directly)
+     */
+    private function countOldAvailabilityConditions(): int
+    {
+        // Check database directly, regardless of plugin/module activation
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->term_taxonomy} 
+             WHERE taxonomy = 'availability_conditions'"
         );
         
         return (int) $count;
