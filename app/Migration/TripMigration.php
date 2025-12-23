@@ -18,21 +18,33 @@ class TripMigration extends BaseMigration
         $skipped = 0;
         $failed = 0;
 
+        // Get all tours from old system (including all statuses except trash)
         $oldTrips = $this->wpdb->get_results(
             "SELECT * FROM {$this->wpdb->posts} 
              WHERE post_type = 'tour' AND post_status != 'trash'"
         );
 
         $total = count($oldTrips);
+        
+        // Count existing trips in new system
+        $existingTripsCount = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->prefix}yatra_trips"
+        );
+        
+        error_log("[Yatra Migration] ========================================");
+        error_log("[Yatra Migration] Starting Trip Migration");
+        error_log("[Yatra Migration] Found {$total} tours in wp_posts (old system)");
+        error_log("[Yatra Migration] Found {$existingTripsCount} trips in yatra_trips (new system)");
+        error_log("[Yatra Migration] ========================================");
+        
+        // List all tour IDs and titles for debugging
+        foreach ($oldTrips as $idx => $trip) {
+            error_log("[Yatra Migration] Tour " . ($idx + 1) . ": ID={$trip->ID}, Title={$trip->post_title}, Slug={$trip->post_name}, Status={$trip->post_status}");
+        }
 
         foreach ($oldTrips as $oldTrip) {
             try {
-                if (!$this->isForceMigration() && $this->isTripMigrated($oldTrip->ID)) {
-                    $skipped++;
-                    $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
-                    continue;
-                }
-
+                // Always re-migrate trips on every run - no skip logic
                 $meta = $this->getPostMeta($oldTrip->ID);
 
                 $status = ($oldTrip->post_status === 'publish') ? 'published' : 'draft';
@@ -40,16 +52,22 @@ class TripMigration extends BaseMigration
                 $baseSlug = $oldTrip->post_name ?: sanitize_title($oldTrip->post_title);
                 $slug = $baseSlug;
                 $existingTripId = null;
-
-                if ($this->isForceMigration() && !empty($baseSlug)) {
+                
+                if ($this->isForceMigration()) {
+                    // Force migration: Always insert new (create duplicates)
+                    $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
+                    error_log("[Yatra Migration] Force mode: Will insert new trip with unique slug: {$slug}");
+                } else {
+                    // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
                         "SELECT id FROM {$this->wpdb->prefix}yatra_trips WHERE slug = %s",
                         $baseSlug
                     ));
-                }
-
-                if (!$existingTripId) {
-                    $slug = $this->generateUniqueSlug($slug, 'yatra_trips');
+                    
+                    if (!$existingTripId) {
+                        // Generate unique slug for new insert
+                        $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
+                    }
                 }
 
                 $featuredImageId = get_post_thumbnail_id($oldTrip->ID);
@@ -117,22 +135,42 @@ class TripMigration extends BaseMigration
                     'updated_by' => $createdBy,
                 ];
 
-                error_log("[Yatra Migration] Attempting to insert trip ID {$oldTrip->ID}: " . json_encode([
-                    'title' => $tripData['title'],
-                    'slug' => $tripData['slug'],
-                    'status' => $tripData['status']
-                ]));
-
-                if ($existingTripId) {
-                    $this->wpdb->update(
+                if ($existingTripId && !$this->isForceMigration()) {
+                    // Regular migration: Update existing trip
+                    error_log("[Yatra Migration] Regular mode: Updating existing trip ID {$existingTripId} from old tour ID {$oldTrip->ID}");
+                    
+                    $updateData = $tripData;
+                    unset($updateData['created_at']); // Don't update created_at
+                    
+                    $updated = $this->wpdb->update(
                         $this->wpdb->prefix . 'yatra_trips',
-                        $tripData,
+                        $updateData,
                         ['id' => $existingTripId]
                     );
-                    $newTripId = $existingTripId;
-                    $this->deleteTripRelationships($newTripId);
-                    $migrated++;
+                    
+                    if ($updated !== false) {
+                        $newTripId = $existingTripId;
+                        $this->deleteTripRelationships($newTripId);
+                        $migrated++;
+                        error_log("[Yatra Migration] Successfully updated trip ID {$existingTripId}");
+                    } else {
+                        $failed++;
+                        Logger::error("Failed to update trip ID {$oldTrip->ID}: {$this->wpdb->last_error}", [
+                            'source' => 'migration',
+                            'data_type' => 'trips',
+                            'trip_id' => $oldTrip->ID,
+                            'trip_title' => $oldTrip->post_title,
+                            'db_error' => $this->wpdb->last_error
+                        ]);
+                        error_log("[Yatra Migration] FAILED to update trip: {$this->wpdb->last_error}");
+                        $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
+                        continue;
+                    }
                 } else {
+                    // Force migration OR new trip: Insert new
+                    $mode = $this->isForceMigration() ? 'Force mode' : 'Regular mode (new trip)';
+                    error_log("[Yatra Migration] {$mode}: Inserting new trip from old tour ID {$oldTrip->ID}: {$tripData['title']} (slug: {$tripData['slug']})");
+                    
                     $inserted = $this->wpdb->insert(
                         $this->wpdb->prefix . 'yatra_trips',
                         $tripData
@@ -141,6 +179,7 @@ class TripMigration extends BaseMigration
                     if ($inserted) {
                         $newTripId = $this->wpdb->insert_id;
                         $migrated++;
+                        error_log("[Yatra Migration] Successfully inserted new trip ID {$newTripId}");
                     } else {
                         $failed++;
                         Logger::error("Failed to insert trip ID {$oldTrip->ID} into database", [
@@ -150,7 +189,7 @@ class TripMigration extends BaseMigration
                             'trip_title' => $oldTrip->post_title,
                             'db_error' => $this->wpdb->last_error
                         ]);
-
+                        error_log("[Yatra Migration] FAILED to insert trip: {$this->wpdb->last_error}");
                         $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
@@ -163,6 +202,7 @@ class TripMigration extends BaseMigration
                 $this->migrateTripGallery($oldTrip->ID, $newTripId, $meta);
                 $this->migrateTripHighlights($oldTrip->ID, $newTripId, $meta);
                 $this->migrateTripFAQs($oldTrip->ID, $newTripId, $meta);
+                $this->migrateTripAvailabilityDates($oldTrip->ID, $newTripId, $meta, $tripData);
 
                 $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
 
@@ -183,6 +223,11 @@ class TripMigration extends BaseMigration
             }
         }
 
+        error_log("[Yatra Migration] ========================================");
+        error_log("[Yatra Migration] Trip Migration Complete");
+        error_log("[Yatra Migration] Migrated: {$migrated}, Skipped: {$skipped}, Failed: {$failed}");
+        error_log("[Yatra Migration] ========================================");
+        
         return compact('migrated', 'skipped', 'failed');
     }
 
@@ -447,6 +492,211 @@ class TripMigration extends BaseMigration
             }
             
             error_log("[Yatra Migration] Migrated " . $order . " FAQs for tour ID {$oldTourId} to trip ID {$newTripId}");
+        }
+    }
+
+    /**
+     * Migrate availability date ranges from old tour system
+     */
+    private function migrateTripAvailabilityDates(int $oldTourId, int $newTripId, array $meta, array $tripData): void
+    {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        
+        // Clear existing availability dates for this trip (for re-migration)
+        if ($this->isForceMigration()) {
+            // In force mode, don't delete - allow duplicates
+        } else {
+            // In regular mode, clear existing to avoid duplicates
+            $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        }
+        
+        // Try different possible availability date meta keys from old Yatra
+        $availabilityKeys = [
+            'yatra_tour_meta_availability_date_ranges',  // Most common format from old system
+            'yatra_tour_availability_date_ranges',
+            'yatra_tour_meta_availability_dates',
+            'yatra_tour_availability_dates',
+            'yatra_availability_dates',
+            'tour_availability_dates',
+            'yatra_tour_fixed_departure_dates',
+            'yatra_tour_meta_fixed_departure',
+            'yatra_fixed_departure_dates',
+        ];
+        
+        $availabilityData = null;
+        $foundKey = null;
+        
+        error_log("[Yatra Migration] Checking availability for tour ID {$oldTourId}, trip ID {$newTripId}");
+        error_log("[Yatra Migration] Available meta keys: " . implode(', ', array_keys($meta)));
+        
+        // Also try direct database query to ensure we're not missing data
+        $directMetaQuery = $wpdb->get_results($wpdb->prepare(
+            "SELECT meta_key, meta_value FROM {$wpdb->prefix}postmeta WHERE post_id = %d AND meta_key LIKE %s",
+            $oldTourId,
+            '%availability%'
+        ));
+        
+        if (!empty($directMetaQuery)) {
+            error_log("[Yatra Migration] Direct DB query found " . count($directMetaQuery) . " availability meta entries");
+            foreach ($directMetaQuery as $metaRow) {
+                error_log("[Yatra Migration] DB Meta: {$metaRow->meta_key} = " . substr($metaRow->meta_value, 0, 150));
+            }
+        }
+        
+        foreach ($availabilityKeys as $key) {
+            if (isset($meta[$key])) {
+                $availabilityData = $meta[$key];
+                error_log("[Yatra Migration] Found meta key '{$key}' with value type: " . gettype($availabilityData));
+                error_log("[Yatra Migration] Raw value: " . substr(print_r($availabilityData, true), 0, 300));
+                
+                if (is_string($availabilityData)) {
+                    $availabilityData = maybe_unserialize($availabilityData);
+                    error_log("[Yatra Migration] After unserialize, type: " . gettype($availabilityData));
+                    if (is_array($availabilityData) || is_object($availabilityData)) {
+                        error_log("[Yatra Migration] Unserialized value: " . substr(print_r($availabilityData, true), 0, 300));
+                    }
+                }
+                
+                // Check if it's an empty array string like '[]'
+                if (is_string($availabilityData) && trim($availabilityData) === '[]') {
+                    error_log("[Yatra Migration] Meta key '{$key}' contains empty array string");
+                    continue;
+                }
+                
+                if (!empty($availabilityData)) {
+                    $foundKey = $key;
+                    error_log("[Yatra Migration] Using availability dates from meta key: {$key}");
+                    break;
+                }
+            }
+        }
+        
+        if (empty($availabilityData)) {
+            error_log("[Yatra Migration] No availability dates found for tour ID {$oldTourId} - checked keys: " . implode(', ', $availabilityKeys));
+            return;
+        }
+        
+        // Parse availability date ranges
+        $dateRanges = [];
+        
+        // First, try to decode as JSON if it's a string (common format in database)
+        if (is_string($availabilityData)) {
+            $jsonDecoded = json_decode($availabilityData, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($jsonDecoded)) {
+                $availabilityData = $jsonDecoded;
+                error_log("[Yatra Migration] Decoded JSON availability data for tour ID {$oldTourId}");
+            }
+        }
+        
+        if (is_array($availabilityData)) {
+            // Handle array format
+            foreach ($availabilityData as $dateRange) {
+                if (is_array($dateRange) || is_object($dateRange)) {
+                    // Convert object to array if needed
+                    $dateRange = (array) $dateRange;
+                    
+                    // Format: ['start' => '2025-12-25', 'end' => '2026-01-18']
+                    $start = $dateRange['start'] ?? $dateRange['start_date'] ?? $dateRange['from'] ?? null;
+                    $end = $dateRange['end'] ?? $dateRange['end_date'] ?? $dateRange['to'] ?? null;
+                    
+                    if ($start && $end) {
+                        $dateRanges[] = ['start' => $start, 'end' => $end];
+                        error_log("[Yatra Migration] Parsed date range: {$start} to {$end}");
+                    }
+                } elseif (is_string($dateRange)) {
+                    // Format: "2025-12-25 - 2026-01-18"
+                    $parts = preg_split('/\s*[-–—]\s*/', $dateRange, 2);
+                    if (count($parts) === 2) {
+                        $dateRanges[] = ['start' => trim($parts[0]), 'end' => trim($parts[1])];
+                        error_log("[Yatra Migration] Parsed string date range: {$parts[0]} to {$parts[1]}");
+                    }
+                }
+            }
+        } elseif (is_string($availabilityData)) {
+            // Handle plain string format with multiple ranges separated by comma or newline
+            $lines = preg_split('/[,\n\r]+/', $availabilityData);
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if (empty($line)) continue;
+                
+                // Format: "2025-12-25 - 2026-01-18"
+                $parts = preg_split('/\s*[-–—]\s*/', $line, 2);
+                if (count($parts) === 2) {
+                    $dateRanges[] = ['start' => trim($parts[0]), 'end' => trim($parts[1])];
+                    error_log("[Yatra Migration] Parsed plain string date range: {$parts[0]} to {$parts[1]}");
+                }
+            }
+        }
+        
+        if (empty($dateRanges)) {
+            error_log("[Yatra Migration] Could not parse availability dates for tour ID {$oldTourId}");
+            return;
+        }
+        
+        // Create availability dates for each range
+        $created = 0;
+        foreach ($dateRanges as $range) {
+            $startDate = $range['start'];
+            $endDate = $range['end'];
+            
+            // Validate dates
+            if (!strtotime($startDate) || !strtotime($endDate)) {
+                error_log("[Yatra Migration] Invalid date range: {$startDate} - {$endDate}");
+                continue;
+            }
+            
+            // Calculate duration
+            $start = new \DateTime($startDate);
+            $end = new \DateTime($endDate);
+            $duration = $start->diff($end)->days;
+            
+            // Determine if single day or multi-day trip
+            $isSingleDay = $duration === 0 || ($tripData['duration_days'] ?? 1) === 1;
+            
+            // Create availability date entry
+            $availabilityEntry = [
+                'trip_id' => $newTripId,
+                'departure_date' => $startDate,
+                'arrival_date' => $isSingleDay ? $startDate : $endDate,
+                'return_date' => $endDate,
+                'departure_time' => null,
+                'arrival_time' => null,
+                'seats_total' => $tripData['max_travelers'] ?? 10,
+                'seats_available' => $tripData['max_travelers'] ?? 10,
+                'seats_reserved' => 0,
+                'seats_waitlist' => 0,
+                'pricing_type' => 'regular',
+                'original_price' => $tripData['original_price'] ?? null,
+                'discounted_price' => $tripData['sale_price'] ?? null,
+                'discount_percentage' => null,
+                'price_types' => null,
+                'status' => 'available',
+                'from_location' => null,
+                'to_location' => null,
+                'special_notes' => null,
+                'cutoff_date' => null,
+                'cutoff_hours' => 24,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ];
+            
+            $inserted = $wpdb->insert(
+                $table,
+                $availabilityEntry,
+                ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%s', '%f', '%f', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%s']
+            );
+            
+            if ($inserted) {
+                $created++;
+                error_log("[Yatra Migration] Created availability date: {$startDate} to {$endDate} for trip ID {$newTripId}");
+            } else {
+                error_log("[Yatra Migration] Failed to create availability date: {$wpdb->last_error}");
+            }
+        }
+        
+        if ($created > 0) {
+            error_log("[Yatra Migration] Migrated {$created} availability date ranges for tour ID {$oldTourId} to trip ID {$newTripId}");
         }
     }
 }

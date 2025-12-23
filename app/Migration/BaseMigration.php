@@ -133,19 +133,6 @@ abstract class BaseMigration
 
         foreach ($terms as $term) {
             try {
-                // Check if this term already migrated
-                $existingMappedId = null;
-                if (function_exists('get_term_meta')) {
-                    $existingMappedId = get_term_meta($term->term_id, $metaKey, true);
-                }
-                
-                // If already migrated and not force mode, skip
-                if (!$this->isForceMigration() && !empty($existingMappedId)) {
-                    $skipped++;
-                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
-                    continue;
-                }
-
                 // Prepare slug
                 $baseSlug = $term->slug;
                 if (empty($baseSlug)) {
@@ -154,37 +141,83 @@ abstract class BaseMigration
                         : preg_replace('/[^a-z0-9\-]+/i', '-', strtolower($term->name ?: uniqid($taxonomy . '-')));
                 }
 
-                // Ensure unique slug by appending suffix when conflicts occur
-                $slug = $this->generateUniqueSlug($baseSlug, $newTable);
-
-                $inserted = $this->wpdb->insert(
-                    $this->wpdb->prefix . $newTable,
-                    [
-                        'name' => $term->name,
-                        'slug' => $slug,
-                        'description' => $term->description ?? '',
-                        'status' => 'publish',
-                        'created_at' => current_time('mysql'),
-                        'updated_at' => current_time('mysql'),
-                    ]
-                );
-
-                if ($inserted) {
-                    $newId = (int) $this->wpdb->insert_id;
-                    if (function_exists('update_term_meta')) {
-                        update_term_meta($term->term_id, $metaKey, $newId);
-                    }
-                    $migrated++;
-                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
-                    usleep(50000);
+                $slug = $baseSlug;
+                $existingId = null;
+                
+                if ($this->isForceMigration()) {
+                    // Force migration: Always insert new (create duplicates)
+                    $slug = $this->generateUniqueSlug($baseSlug, $newTable);
                 } else {
-                    $failed++;
-                    Logger::error("Failed to insert {$taxonomy}: {$this->wpdb->last_error}", [
-                        'source' => 'migration',
-                        'taxonomy' => $taxonomy,
-                        'term_slug' => $term->slug
-                    ]);
-                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    // Regular migration: Check if already exists
+                    $existingId = $this->wpdb->get_var($this->wpdb->prepare(
+                        "SELECT id FROM {$this->wpdb->prefix}{$newTable} WHERE slug = %s",
+                        $baseSlug
+                    ));
+                    
+                    if (!$existingId) {
+                        // Generate unique slug for new insert
+                        $slug = $this->generateUniqueSlug($baseSlug, $newTable);
+                    }
+                }
+
+                $data = [
+                    'name' => $term->name,
+                    'slug' => $slug,
+                    'description' => $term->description ?? '',
+                    'status' => 'publish',
+                    'updated_at' => current_time('mysql'),
+                ];
+
+                if ($existingId && !$this->isForceMigration()) {
+                    // Regular migration: Update existing record
+                    $updated = $this->wpdb->update(
+                        $this->wpdb->prefix . $newTable,
+                        $data,
+                        ['id' => $existingId]
+                    );
+                    
+                    if ($updated !== false) {
+                        $newId = $existingId;
+                        if (function_exists('update_term_meta')) {
+                            update_term_meta($term->term_id, $metaKey, $newId);
+                        }
+                        $migrated++;
+                        $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                        usleep(50000);
+                    } else {
+                        $failed++;
+                        Logger::error("Failed to update {$taxonomy}: {$this->wpdb->last_error}", [
+                            'source' => 'migration',
+                            'taxonomy' => $taxonomy,
+                            'term_slug' => $term->slug
+                        ]);
+                        $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    }
+                } else {
+                    // Force migration OR new record: Insert new
+                    $data['created_at'] = current_time('mysql');
+                    $inserted = $this->wpdb->insert(
+                        $this->wpdb->prefix . $newTable,
+                        $data
+                    );
+
+                    if ($inserted) {
+                        $newId = (int) $this->wpdb->insert_id;
+                        if (function_exists('update_term_meta')) {
+                            update_term_meta($term->term_id, $metaKey, $newId);
+                        }
+                        $migrated++;
+                        $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                        usleep(50000);
+                    } else {
+                        $failed++;
+                        Logger::error("Failed to insert {$taxonomy}: {$this->wpdb->last_error}", [
+                            'source' => 'migration',
+                            'taxonomy' => $taxonomy,
+                            'term_slug' => $term->slug
+                        ]);
+                        $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    }
                 }
             } catch (\Exception $e) {
                 $failed++;
