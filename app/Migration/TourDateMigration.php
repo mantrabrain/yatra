@@ -39,27 +39,39 @@ class TourDateMigration extends BaseMigration
             'count' => $total
         ]);
 
+        error_log("[Yatra Migration] ========================================");
+        error_log("[Yatra Migration] Starting Tour Dates Migration");
+        error_log("[Yatra Migration] Found {$total} tour dates in old system");
+        error_log("[Yatra Migration] Force migration: " . ($this->isForceMigration() ? 'YES' : 'NO'));
+        error_log("[Yatra Migration] ========================================");
+
         foreach ($oldTourDates as $oldDate) {
             try {
-                // Check if already migrated
-                $existsInDepartures = $wpdb->get_var($wpdb->prepare(
-                    "SELECT id FROM {$wpdb->prefix}yatra_departures 
-                     WHERE old_tour_date_id = %d",
-                    $oldDate->id
-                ));
+                error_log("[Yatra Migration] Processing tour date ID {$oldDate->id} for tour {$oldDate->tour_id}");
                 
-                $existsInAvailability = $wpdb->get_var($wpdb->prepare(
-                    "SELECT id FROM {$wpdb->prefix}yatra_trip_availability_dates 
-                     WHERE trip_id = (SELECT trip_id FROM {$wpdb->prefix}yatra_departures WHERE old_tour_date_id = %d LIMIT 1)
-                     AND departure_date = %s",
-                    $oldDate->id,
-                    $oldDate->start_date
-                ));
+                // Check if already migrated (only for regular migration)
+                $existsInAvailability = null;
+                
+                if (!$this->isForceMigration()) {
+                    $existsInAvailability = $wpdb->get_var($wpdb->prepare(
+                        "SELECT id FROM {$wpdb->prefix}yatra_trip_availability_dates 
+                         WHERE trip_id IN (
+                             SELECT meta_value FROM {$wpdb->prefix}postmeta 
+                             WHERE post_id = %d AND meta_key = '_migrated_to_trip_id'
+                         )
+                         AND departure_date = %s",
+                        $oldDate->tour_id,
+                        $oldDate->start_date
+                    ));
 
-                if (!$this->isForceMigration() && $existsInDepartures && $existsInAvailability) {
-                    $skipped++;
-                    $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                    continue;
+                    if ($existsInAvailability) {
+                        error_log("[Yatra Migration] Tour date {$oldDate->id} already migrated, skipping...");
+                        $skipped++;
+                        $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
+                        continue;
+                    }
+                } else {
+                    error_log("[Yatra Migration] Force mode: Will insert new tour date records");
                 }
 
                 $newTripId = $this->getMigratedTripId($oldDate->tour_id);
@@ -84,43 +96,11 @@ class TourDateMigration extends BaseMigration
                     $originalPrice = $pricing['regular_price'] ?? $pricing['price'] ?? null;
                     $discountedPrice = $pricing['sale_price'] ?? $pricing['discounted_price'] ?? null;
                 }
+                
+                error_log("[Yatra Migration] Pricing data: original={$originalPrice}, discounted={$discountedPrice}");
 
-                // 1. Migrate to yatra_departures (for tracking actual departures)
-                if (!$existsInDepartures) {
-                    $departureData = [
-                        'trip_id' => $newTripId,
-                        'start_date' => $oldDate->start_date,
-                        'end_date' => $oldDate->end_date,
-                        'max_travelers' => $oldDate->max_travellers ?? 0,
-                        'available_seats' => $oldDate->max_travellers ?? 0,
-                        'price_override' => !empty($pricing) ? json_encode($pricing) : null,
-                        'status' => $oldDate->active ? 'confirmed' : 'cancelled',
-                        'notes' => $oldDate->note_to_customer ?? '',
-                        'admin_notes' => $oldDate->note_to_admin ?? '',
-                        'old_tour_date_id' => $oldDate->id,
-                        'created_at' => $oldDate->created_at ?? current_time('mysql'),
-                        'updated_at' => $oldDate->updated_at ?? current_time('mysql'),
-                    ];
-
-                    $wpdb->insert(
-                        $wpdb->prefix . 'yatra_departures',
-                        $departureData
-                    );
-                    
-                    if (!$wpdb->insert_id) {
-                        $failed++;
-                        Logger::error("Failed to insert departure", [
-                            'source' => 'migration',
-                            'tour_date_id' => $oldDate->id,
-                            'error' => $wpdb->last_error
-                        ]);
-                        $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                        continue;
-                    }
-                }
-
-                // 2. Migrate to yatra_trip_availability_dates (for customer booking)
-                if (!$existsInAvailability) {
+                // Migrate to yatra_trip_availability_dates
+                if (!$existsInAvailability || $this->isForceMigration()) {
                     $maxTravelers = intval($oldDate->max_travellers ?? 0);
                     if ($maxTravelers <= 0) {
                         $maxTravelers = 10; // Default
@@ -154,8 +134,11 @@ class TourDateMigration extends BaseMigration
                         $availabilityData
                     );
                     
-                    if (!$wpdb->insert_id) {
+                    $insertedId = $wpdb->insert_id;
+                    
+                    if (!$insertedId) {
                         $failed++;
+                        error_log("[Yatra Migration] Failed to insert availability for tour date {$oldDate->id}: " . $wpdb->last_error);
                         Logger::error("Failed to insert availability date", [
                             'source' => 'migration',
                             'tour_date_id' => $oldDate->id,
@@ -164,10 +147,12 @@ class TourDateMigration extends BaseMigration
                         $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
+                    error_log("[Yatra Migration] Inserted availability ID {$insertedId} for tour date {$oldDate->id} (departure: {$oldDate->start_date}, return: {$oldDate->end_date})");
                 }
 
                 $migrated++;
-                Logger::info("Migrated tour date to both departures and availability", [
+                error_log("[Yatra Migration] Successfully migrated tour date {$oldDate->id} to trip {$newTripId}");
+                Logger::info("Migrated tour date to availability", [
                     'source' => 'migration',
                     'old_tour_date_id' => $oldDate->id,
                     'new_trip_id' => $newTripId,
@@ -178,6 +163,7 @@ class TourDateMigration extends BaseMigration
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
             } catch (\Exception $e) {
                 $failed++;
+                error_log("[Yatra Migration] Exception migrating tour date {$oldDate->id}: " . $e->getMessage());
                 Logger::error("Tour date migration exception", [
                     'source' => 'migration',
                     'tour_date_id' => $oldDate->id,
@@ -186,6 +172,11 @@ class TourDateMigration extends BaseMigration
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
+
+        error_log("[Yatra Migration] ========================================");
+        error_log("[Yatra Migration] Tour Dates Migration Complete");
+        error_log("[Yatra Migration] Migrated: {$migrated}, Skipped: {$skipped}, Failed: {$failed}");
+        error_log("[Yatra Migration] ========================================");
 
         return [
             'migrated' => $migrated,
