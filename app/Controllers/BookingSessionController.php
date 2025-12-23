@@ -741,13 +741,14 @@ class BookingSessionController extends BaseController
             // Traveler-based pricing: Calculate based on each traveler's category
             $price_types = [];
             
-            if ($availability && !empty($availability->price_types)) {
+            // Priority 1: Check availability pricing override
+            if ($availability && isset($availability->price_types) && !empty($availability->price_types)) {
                 $price_types = is_string($availability->price_types) 
                     ? (json_decode($availability->price_types, true) ?: []) 
                     : $availability->price_types;
             }
             
-            // If no availability pricing, use trip price types
+            // Priority 2: If no availability pricing (NULL or empty), use trip default
             if (empty($price_types) && !empty($trip->price_types)) {
                 $price_types = is_array($trip->price_types) ? $trip->price_types : [];
             }
@@ -776,12 +777,17 @@ class BookingSessionController extends BaseController
             
             $price_per_person = $travelers_count > 0 ? $total_amount / $travelers_count : 0;
         } else {
-            // Regular pricing
-            if ($availability && !empty($availability->discounted_price)) {
+            // Regular pricing with proper fallback: availability → trip default
+            // Priority 1: Check availability discounted price override
+            if ($availability && isset($availability->discounted_price) && $availability->discounted_price !== null && $availability->discounted_price > 0) {
                 $price_per_person = (float) $availability->discounted_price;
-            } elseif ($availability && !empty($availability->original_price)) {
+            } 
+            // Priority 2: Check availability original price override
+            elseif ($availability && isset($availability->original_price) && $availability->original_price !== null && $availability->original_price > 0) {
                 $price_per_person = (float) $availability->original_price;
-            } else {
+            } 
+            // Priority 3: Fall back to trip default pricing
+            else {
                 $price_per_person = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
             }
             $total_amount = $price_per_person * $travelers_count;
@@ -2392,10 +2398,13 @@ class BookingSessionController extends BaseController
 
         $is_traveler_based = $resolved_pricing_type === 'traveler_based' && !empty($price_types);
 
+        // Base trip price with proper fallback: availability → trip default
         $base_trip_price = !empty($trip->discounted_price) ? (float) $trip->discounted_price : (float) $trip->original_price;
-        if ($availability && !empty($availability->discounted_price)) {
+        
+        // Override with availability pricing if set (not NULL)
+        if ($availability && isset($availability->discounted_price) && $availability->discounted_price !== null && $availability->discounted_price > 0) {
             $base_trip_price = (float) $availability->discounted_price;
-        } elseif ($availability && !empty($availability->original_price)) {
+        } elseif ($availability && isset($availability->original_price) && $availability->original_price !== null && $availability->original_price > 0) {
             $base_trip_price = (float) $availability->original_price;
         }
 

@@ -251,6 +251,40 @@ class AttributeController extends BaseController
             $result = $this->attributeService->paginate($page, $perPage, $filters);
             $total = $this->attributeService->count($filters);
             
+            // Process icon fields for all attributes
+            foreach ($result as $attribute) {
+                if (!empty($attribute->icon)) {
+                    $icon_data = maybe_unserialize($attribute->icon);
+                    if (is_array($icon_data)) {
+                        // Resolve image URLs for image type icons
+                        if ($icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                            $value = $icon_data['value'];
+                            $image_url = '';
+                            
+                            if (is_numeric($value)) {
+                                $maybe_url = wp_get_attachment_image_url((int) $value, 'large');
+                                if (!empty($maybe_url)) {
+                                    $image_url = $maybe_url;
+                                }
+                            } elseif (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+                                $image_url = $value;
+                            }
+                            
+                            $icon_data['value'] = $image_url;
+                        }
+                        $attribute->icon = $icon_data;
+                    } else {
+                        // Handle legacy string format
+                        $attribute->icon = [
+                            'type' => 'icon',
+                            'value' => $attribute->icon
+                        ];
+                    }
+                } else {
+                    $attribute->icon = null;
+                }
+            }
+            
             return $this->paginated_response($result, $total, $page, $perPage);
             
         } catch (\Exception $e) {
@@ -265,6 +299,9 @@ class AttributeController extends BaseController
     {
         try {
             $data = $this->prepare_item_for_database($request);
+            
+            // Debug logging for icon data
+            error_log('DEBUG: Create attribute - Icon data in prepared data: ' . var_export(isset($data['icon']) ? $data['icon'] : 'NOT SET', true));
             
             // Handle slug conflicts by generating unique slug if needed
             $originalSlug = $data['slug'];
@@ -313,6 +350,39 @@ class AttributeController extends BaseController
             error_log('DEBUG: show_on_frontend: ' . var_export($attribute->show_on_frontend, true));
             error_log('DEBUG: show_in_filters: ' . var_export($attribute->show_in_filters, true));
             error_log('DEBUG: searchable: ' . var_export($attribute->searchable, true));
+            error_log('DEBUG: icon field: ' . var_export($attribute->icon, true));
+            
+            // Process icon field - unserialize if it's serialized
+            if (!empty($attribute->icon)) {
+                $icon_data = maybe_unserialize($attribute->icon);
+                if (is_array($icon_data)) {
+                    // Resolve image URLs for image type icons
+                    if ($icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                        $value = $icon_data['value'];
+                        $image_url = '';
+                        
+                        if (is_numeric($value)) {
+                            $maybe_url = wp_get_attachment_image_url((int) $value, 'large');
+                            if (!empty($maybe_url)) {
+                                $image_url = $maybe_url;
+                            }
+                        } elseif (is_string($value) && filter_var($value, FILTER_VALIDATE_URL)) {
+                            $image_url = $value;
+                        }
+                        
+                        $icon_data['value'] = $image_url;
+                    }
+                    $attribute->icon = $icon_data;
+                } else {
+                    // Handle legacy string format
+                    $attribute->icon = [
+                        'type' => 'icon',
+                        'value' => $attribute->icon
+                    ];
+                }
+            } else {
+                $attribute->icon = null;
+            }
             
             return $this->success_response($attribute);
             
@@ -329,6 +399,9 @@ class AttributeController extends BaseController
         try {
             $id = (int) $request->get_param('id');
             $data = $this->prepare_item_for_database($request);
+            
+            // Debug logging for icon data
+            error_log('DEBUG: Update attribute - Icon data in prepared data: ' . var_export(isset($data['icon']) ? $data['icon'] : 'NOT SET', true));
             
             $result = $this->attributeService->updateAttribute($id, $data);
             
@@ -598,6 +671,25 @@ class AttributeController extends BaseController
         
         if ($request->has_param('description')) {
             $data['description'] = wp_kses_post($request->get_param('description'));
+        }
+        
+        // Handle icon field
+        if ($request->has_param('icon')) {
+            $icon = $request->get_param('icon');
+            if (is_array($icon)) {
+                // Sanitize icon array
+                $data['icon'] = [
+                    'type' => isset($icon['type']) && in_array($icon['type'], ['icon', 'image'], true)
+                        ? $icon['type']
+                        : 'icon',
+                    'value' => isset($icon['value']) 
+                        ? sanitize_text_field($icon['value'])
+                        : '',
+                ];
+            } elseif (is_string($icon)) {
+                // Handle legacy string format
+                $data['icon'] = sanitize_text_field($icon);
+            }
         }
         
         if ($request->has_param('field_type')) {

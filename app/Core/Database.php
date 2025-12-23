@@ -1124,6 +1124,7 @@ class Database
             `name` varchar(200) NOT NULL COMMENT 'Attribute display name',
             `slug` varchar(200) NOT NULL COMMENT 'URL-friendly identifier',
             `description` text DEFAULT NULL COMMENT 'Attribute description',
+            `icon` text DEFAULT NULL COMMENT 'Icon or image for the attribute (JSON serialized)',
             `field_type` enum('text_field','number','email','url','textarea','select','radio','checkbox','date','time','color') DEFAULT 'text_field' COMMENT 'Form field type',
             `field_options` text DEFAULT NULL COMMENT 'JSON options for select/radio/checkbox fields',
             `default_value` varchar(255) DEFAULT NULL COMMENT 'Default value for new trips',
@@ -1943,6 +1944,39 @@ class Database
                         "ALTER TABLE `{$table_availability_rules}` ADD COLUMN `{$column['name']}` {$column['def']}"
                     );
                 }
+            }
+        }
+        
+        // Update attributes table to add icon column for existing installations
+        $table_attributes = $wpdb->prefix . 'yatra_attributes';
+        $attributesTableExists = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT COUNT(*) FROM information_schema.tables 
+                 WHERE table_schema = DATABASE() 
+                 AND table_name = %s",
+                $table_attributes
+            )
+        ) > 0;
+        
+        if ($attributesTableExists) {
+            $attributesColumnExists = function($column) use ($wpdb, $table_attributes) {
+                return (int) $wpdb->get_var(
+                    $wpdb->prepare(
+                        "SELECT COUNT(*) FROM information_schema.columns 
+                         WHERE table_schema = DATABASE() 
+                         AND table_name = %s 
+                         AND column_name = %s",
+                        $table_attributes,
+                        $column
+                    )
+                ) > 0;
+            };
+            
+            // Add icon column if it doesn't exist
+            if (!$attributesColumnExists('icon')) {
+                $wpdb->query(
+                    "ALTER TABLE `{$table_attributes}` ADD COLUMN `icon` text DEFAULT NULL COMMENT 'Icon or image for the attribute (JSON serialized)' AFTER `description`"
+                );
             }
         }
     }

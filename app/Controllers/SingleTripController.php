@@ -170,6 +170,9 @@ class SingleTripController
             error_log('Yatra Debug: Trip ID ' . $trip->id . ' - Loaded ' . count($trip->availability_dates) . ' availability dates');
         }
         $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
+        
+        // Get trip attributes with their values
+        $trip->attributes = $this->getTripAttributes((int) $trip->id);
 
         
          
@@ -643,6 +646,82 @@ class SingleTripController
         }
 
         return $similar ?: [];
+    }
+
+    /**
+     * Get trip attributes with their values
+     *
+     * @param int $trip_id Trip ID
+     * @return array Trip attributes with values
+     */
+    private function getTripAttributes(int $trip_id): array
+    {
+        $table_trip_attributes = $this->wpdb->prefix . 'yatra_trip_attributes';
+        $table_attributes = $this->wpdb->prefix . 'yatra_attributes';
+        
+        // Check if trip attributes table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $table_trip_attributes
+            )
+        ) === $table_trip_attributes;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $attributes = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT ta.value, ta.value_serialized, a.id, a.name, a.field_type, a.field_options, a.icon, a.description
+                 FROM {$table_trip_attributes} ta 
+                 LEFT JOIN {$table_attributes} a ON ta.attribute_id = a.id 
+                 WHERE ta.trip_id = %d AND a.status = 'publish'
+                 ORDER BY a.display_order ASC, a.name ASC",
+                $trip_id
+            )
+        );
+        
+        $formatted_attributes = [];
+        foreach ($attributes as $attr) {
+            $value = $attr->value;
+            if ($attr->value_serialized) {
+                $value = unserialize($value);
+            }
+            
+            // Resolve image URLs for image type icons
+            $icon_data = null;
+            if (!empty($attr->icon)) {
+                $icon_data = maybe_unserialize($attr->icon);
+                if (is_array($icon_data) && $icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                    $icon_value = $icon_data['value'];
+                    $image_url = '';
+                    
+                    if (is_numeric($icon_value)) {
+                        $maybe_url = wp_get_attachment_image_url((int) $icon_value, 'large');
+                        if (!empty($maybe_url)) {
+                            $image_url = $maybe_url;
+                        }
+                    } elseif (is_string($icon_value) && filter_var($icon_value, FILTER_VALIDATE_URL)) {
+                        $image_url = $icon_value;
+                    }
+                    
+                    $icon_data['value'] = $image_url;
+                }
+            }
+            
+            $formatted_attributes[] = [
+                'id' => $attr->id,
+                'name' => $attr->name,
+                'field_type' => $attr->field_type,
+                'field_options' => $attr->field_options,
+                'value' => $value,
+                'icon' => $icon_data,
+                'description' => $attr->description
+            ];
+        }
+        
+        return $formatted_attributes;
     }
 
     /**

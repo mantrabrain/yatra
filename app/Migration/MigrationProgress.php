@@ -20,6 +20,7 @@ use Yatra\Migration\EnquiryMigration;
 use Yatra\Migration\CouponMigration;
 use Yatra\Migration\TourDateMigration;
 use Yatra\Migration\TravelerCategoriesMigration;
+use Yatra\Migration\AttributeMigration;
 
 class MigrationProgress
 {
@@ -46,6 +47,7 @@ class MigrationProgress
     private array $dataTypesOrder = [
         'destinations',
         'activities',
+        'attributes',
         'customers',
         'coupons',
         'reviews',
@@ -181,6 +183,9 @@ class MigrationProgress
                     break;
                 case 'activities':
                     $result = (new ActivityMigration($this))->run();
+                    break;
+                case 'attributes':
+                    $result = (new AttributeMigration($this))->run();
                     break;
                 case 'reviews':
                     $result = (new ReviewMigration($this))->run();

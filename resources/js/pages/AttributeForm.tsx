@@ -17,11 +17,16 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Switch } from '../components/ui/switch';
+import { IconPicker } from '../components/ui/icon-picker';
 
 interface AttributeFormData {
   name: string;
   slug: string;
   description: string;
+  icon: {
+    type: 'icon' | 'image';
+    value: string;
+  } | null;
   field_type: string;
   field_options: string;
   default_value: string;
@@ -43,6 +48,7 @@ const AttributeForm: React.FC = () => {
     name: '',
     slug: '',
     description: '',
+    icon: null,
     field_type: 'text_field',
     field_options: '',
     default_value: '',
@@ -52,9 +58,9 @@ const AttributeForm: React.FC = () => {
     display_order: 0,
     show_on_frontend: true,
     show_in_filters: false,
-    filter_type: 'text',
+    filter_type: 'dropdown',
     searchable: false,
-    status: 'draft',
+    status: 'publish'
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -142,6 +148,11 @@ const AttributeForm: React.FC = () => {
 
   // Toggle slug editability
   const toggleSlugEdit = () => {
+    if (isSlugEditable) {
+      // If disabling edit, regenerate slug from name
+      const newSlug = generateSlug(formData.name);
+      setFormData(prev => ({ ...prev, slug: newSlug }));
+    }
     setIsSlugEditable(!isSlugEditable);
   };
 
@@ -228,14 +239,24 @@ const AttributeForm: React.FC = () => {
 
   useEffect(() => {
     if (attribute) {
+      // Debug: Log the raw attribute data from API
+      console.log('AttributeForm - Raw attribute data from API:', attribute);
+      
       // Try direct database query as fallback for caching issues
       fetchDirectDatabaseValues(Number(attributeId) || 0).then(directData => {
         const finalAttribute = directData || attribute;
+        
+        // Debug: Log the final attribute data being used
+        console.log('AttributeForm - Final attribute data:', finalAttribute);
         
         const convertedData = {
           name: finalAttribute.name || '',
           slug: finalAttribute.slug || '',
           description: finalAttribute.description || '',
+          icon: finalAttribute.icon ? {
+            type: finalAttribute.icon.type || 'icon',
+            value: finalAttribute.icon.value || ''
+          } : null,
           field_type: finalAttribute.field_type || 'text_field',
           field_options: finalAttribute.field_options || '',
           default_value: finalAttribute.default_value || '',
@@ -249,6 +270,9 @@ const AttributeForm: React.FC = () => {
           searchable: finalAttribute.searchable === '1' || finalAttribute.searchable === 1 || finalAttribute.searchable === true,
           status: finalAttribute.status || 'draft'
         };
+        
+        // Debug: Log the converted data being set to form
+        console.log('AttributeForm - Converted data for form:', convertedData);
         
         setFormData(convertedData);
       });
@@ -276,6 +300,7 @@ const AttributeForm: React.FC = () => {
         name: data.name.trim(),
         slug: slug,
         description: data.description.trim(),
+        icon: data.icon,
         field_type: data.field_type,
         field_options: data.field_options.trim(),
         default_value: data.default_value.trim(),
@@ -290,6 +315,9 @@ const AttributeForm: React.FC = () => {
         status: data.status,
       };
 
+      // Debug: Log the payload being sent
+      console.log('AttributeForm - Payload being sent:', payload);
+
       // If slug was manually edited, add flag to preserve it
       if (isEditMode && isSlugEditable) {
         payload.preserve_slug = true;
@@ -297,9 +325,13 @@ const AttributeForm: React.FC = () => {
 
       try {
         if (isEditMode && attributeId) {
-          return await apiClient.put(`/attributes/${attributeId}`, payload);
+          const response = await apiClient.put(`/attributes/${attributeId}`, payload);
+          console.log('AttributeForm - Update response:', response);
+          return response;
         } else {
-          return await apiClient.post('/attributes', payload);
+          const response = await apiClient.post('/attributes', payload);
+          console.log('AttributeForm - Create response:', response);
+          return response;
         }
       } catch (error: any) {
         // Handle specific API errors
@@ -633,6 +665,24 @@ const AttributeForm: React.FC = () => {
 
             {/* Sidebar */}
             <div className="space-y-3">
+              {/* Icon/Image Picker */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Attribute Icon', 'Attribute Icon')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={__('Icon or Image', 'Icon or Image')}
+                    helpText={__('Select an icon from the library or upload a custom image for this attribute.', 'Select an icon from the library or upload a custom image for this attribute.')}
+                    allowImageUpload={true}
+                    allowIconSelection={true}
+                    size="md"
+                  />
+                </CardContent>
+              </Card>
+
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">

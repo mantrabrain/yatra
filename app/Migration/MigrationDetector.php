@@ -81,6 +81,12 @@ class MigrationDetector
                 'description' => 'Trip activities',
                 'table' => 'terms (taxonomy=activity)',
             ],
+            'attributes' => [
+                'label' => 'Attributes',
+                'count' => $this->countOldAttributes(),
+                'description' => 'Trip attributes and characteristics',
+                'table' => 'terms (taxonomy=attributes) or yatra_tour_attributes',
+            ],
             'reviews' => [
                 'label' => 'Reviews',
                 'count' => $this->countOldReviews(),
@@ -173,7 +179,29 @@ class MigrationDetector
         return (int) $count;
     }
     
-    
+    /**
+     * Count old attributes (stored as taxonomy or custom table)
+     * Old system uses 'attributes' taxonomy
+     */
+    private function countOldAttributes(): int
+    {
+        // Check for old yatra_tour_attributes table
+        $table = $this->wpdb->prefix . 'yatra_tour_attributes';
+        $tableExists = $this->wpdb->get_var("SHOW TABLES LIKE '{$table}'");
+        
+        if ($tableExists) {
+            $count = $this->wpdb->get_var("SELECT COUNT(*) FROM {$table}");
+            return (int) $count;
+        }
+        
+        // Check for taxonomy-based attributes (old system uses 'attributes' taxonomy)
+        $count = $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$this->wpdb->term_taxonomy} 
+             WHERE taxonomy = 'attributes'"
+        );
+        
+        return (int) $count;
+    }
     
     /**
      * Count old reviews (stored as comments)

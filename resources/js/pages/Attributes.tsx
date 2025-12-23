@@ -18,12 +18,17 @@ import { Card, CardContent } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Badge } from '../components/ui/badge';
+import { IconSelector } from '../components/ui/icon-selector';
 
 interface Attribute {
   id: number;
   name: string;
   slug: string;
   description: string;
+  icon: {
+    type: 'icon' | 'image';
+    value: string;
+  } | null;
   field_type: string;
   field_options: any;
   default_value: string;
@@ -160,11 +165,16 @@ const Attributes: React.FC = () => {
   });
 
   // Fetch attributes from API
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['attributes', queryParams],
+  const { data: attributesData, isLoading, error } = useQuery({
+    queryKey: ['attributes', searchTerm, statusFilter, sortBy, sortOrder, page],
     queryFn: async () => {
       try {
         const response = await apiClient.get('/attributes', { params: queryParams });
+        
+        // Debug: Log the raw response from API
+        console.log('Attributes page - Raw API response:', response);
+        console.log('Attributes page - Response data:', response?.data);
+        
         return response;
       } catch (error: any) {
         showToast(error?.message || __('Failed to load attributes', 'Failed to load attributes'), 'error');
@@ -174,13 +184,13 @@ const Attributes: React.FC = () => {
     enabled: can('yatra_view_trips'),
   });
 
-  const attributes = data?.data || [];
-  const total = data?.total || 0;
+  const attributes = attributesData?.data || [];
+  const total = attributesData?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
   // Debug logging
   console.log('Attributes Debug:', {
-    data,
+    attributesData,
     attributes,
     total,
     isLoading,
@@ -460,11 +470,27 @@ const Attributes: React.FC = () => {
                       visible: visibleColumns.name,
                       render: (attribute: Attribute) => (
                         <div className="flex items-center gap-3">
-                          {/* Icon placeholder */}
+                          {/* Icon/Image */}
                           <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-                            <div className="w-5 h-5 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs font-semibold">
-                              {attribute.name.charAt(0).toUpperCase()}
-                            </div>
+                            {attribute.icon ? (
+                              attribute.icon.type === 'image' ? (
+                                <img 
+                                  src={attribute.icon.value} 
+                                  alt={attribute.name}
+                                  className="w-6 h-6 object-cover rounded"
+                                />
+                              ) : (
+                                <IconSelector 
+                                  iconName={attribute.icon.value} 
+                                  size={16} 
+                                  className="text-purple-600 dark:text-purple-400"
+                                />
+                              )
+                            ) : (
+                              <div className="w-5 h-5 text-purple-600 dark:text-purple-400 flex items-center justify-center text-xs font-semibold">
+                                {attribute.name.charAt(0).toUpperCase()}
+                              </div>
+                            )}
                           </div>
                           {/* Text */}
                           <div>

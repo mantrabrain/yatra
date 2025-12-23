@@ -17,11 +17,16 @@ use Yatra\Utils\Logger;
  * and data enrichment. Follows single responsibility principle by separating
  * business logic from data access and presentation layers.
  */
-class TripListingService
+class TripListingService extends BaseService
 {
     private TripRepository $tripRepository;
     private DestinationRepository $destinationRepository;
     private ActivityRepository $activityRepository;
+
+    protected function getRepository(): TripRepository
+    {
+        return $this->tripRepository;
+    }
 
     public function __construct(
         ?TripRepository $tripRepository = null,
@@ -136,6 +141,30 @@ class TripListingService
             }
         }
 
+        // Attribute filters
+        if (isset($params['attributes']) && is_array($params['attributes'])) {
+            $filters['attributes'] = [];
+            foreach ($params['attributes'] as $attributeId => $attributeValue) {
+                if (is_numeric($attributeId) && $attributeId > 0) {
+                    // Sanitize attribute values based on type
+                    if (is_array($attributeValue)) {
+                        // For multi-select attributes
+                        $filters['attributes'][$attributeId] = array_map('sanitize_text_field', 
+                            array_filter($attributeValue, function($value) {
+                                return !empty($value);
+                            })
+                        );
+                    } else {
+                        // For single value attributes
+                        $sanitizedValue = sanitize_text_field($attributeValue);
+                        if (!empty($sanitizedValue)) {
+                            $filters['attributes'][$attributeId] = $sanitizedValue;
+                        }
+                    }
+                }
+            }
+        }
+
         // Sort parameter
         if (!empty($params['sort'])) {
             $allowedSorts = ['most_popular', 'price_low', 'price_high', 'rating_high', 'duration_short', 'duration_long'];
@@ -167,6 +196,15 @@ class TripListingService
      */
     private function buildTripListingResult(array $filters, int $page, int $perPage): array
     {
+        // Apply attribute filtering if present
+        if (!empty($filters['attributes'])) {
+            $attributeFilters = $filters['attributes'];
+            unset($filters['attributes']); // Remove from regular filters
+            
+            // Apply attribute filtering to repository
+            $filters = $this->tripRepository->filterByAttributes($filters, $attributeFilters);
+        }
+        
         // Get filtered trips from repository
         $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
         
@@ -181,7 +219,8 @@ class TripListingService
             'per_page' => $tripResult['per_page'],
             'filters' => $filters,
             'destinations' => $filterOptions['destinations'],
-            'activities' => $filterOptions['activities']
+            'activities' => $filterOptions['activities'],
+            'attributes' => $filterOptions['attributes']
         ];
     }
 
@@ -194,7 +233,8 @@ class TripListingService
             return Cache::remember('trip_listing_filter_options', function() {
                 return [
                     'destinations' => $this->destinationRepository->getPublished(),
-                    'activities' => $this->activityRepository->getPublished()
+                    'activities' => $this->activityRepository->getPublished(),
+                    'attributes' => $this->getAvailableAttributes()
                 ];
             }, Cache::DURATION_DESTINATION_DATA); // Cache for 1 hour since destinations/activities don't change often
         } else {
@@ -202,9 +242,50 @@ class TripListingService
             Logger::debug("Cache disabled, getting fresh filter options");
             return [
                 'destinations' => $this->destinationRepository->getPublished(),
-                'activities' => $this->activityRepository->getPublished()
+                'activities' => $this->activityRepository->getPublished(),
+                'attributes' => $this->getAvailableAttributes()
             ];
         }
+    }
+
+    /**
+     * Get available attributes for filtering
+     */
+    private function getAvailableAttributes(): array
+    {
+        global $wpdb;
+        
+        $attributesTable = $wpdb->prefix . 'yatra_attributes';
+        
+        // Check if attributes table exists
+        $tableExists = $wpdb->get_var(
+            $wpdb->prepare("SHOW TABLES LIKE %s", $attributesTable)
+        ) === $attributesTable;
+        
+        if (!$tableExists) {
+            return [];
+        }
+        
+        $attributes = $wpdb->get_results(
+            "SELECT id, name, field_type, field_options, icon, description 
+             FROM {$attributesTable} 
+             WHERE status = 'publish' 
+             ORDER BY display_order ASC, name ASC"
+        );
+        
+        $formattedAttributes = [];
+        foreach ($attributes as $attribute) {
+            $formattedAttributes[] = [
+                'id' => $attribute->id,
+                'name' => $attribute->name,
+                'field_type' => $attribute->field_type,
+                'field_options' => $attribute->field_options,
+                'icon' => $attribute->icon,
+                'description' => $attribute->description
+            ];
+        }
+        
+        return $formattedAttributes;
     }
 
     /**

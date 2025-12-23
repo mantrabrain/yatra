@@ -88,6 +88,28 @@ abstract class BaseMigration
     }
 
     /**
+     * Fix existing draft records to publish status
+     * This ensures all destinations/activities are published
+     */
+    protected function fixDraftRecordsToPublish(string $table): void
+    {
+        $fullTable = $this->wpdb->prefix . $table;
+        
+        // Update all draft records to publish
+        $updated = $this->wpdb->query(
+            "UPDATE {$fullTable} SET status = 'publish' WHERE status = 'draft'"
+        );
+        
+        if ($updated > 0) {
+            Logger::info("Fixed {$updated} draft records to publish status in {$table}", [
+                'source' => 'migration',
+                'table' => $table,
+                'updated_count' => $updated
+            ]);
+        }
+    }
+
+    /**
      * Shared taxonomy migration handler.
      */
     protected function migrateTaxonomy(string $taxonomy, string $newTable, string $dataType): array
@@ -111,16 +133,20 @@ abstract class BaseMigration
 
         foreach ($terms as $term) {
             try {
-                // Skip if this specific term already migrated (tracked via term meta)
-                if (!$this->isForceMigration() && function_exists('get_term_meta')) {
+                // Check if this term already migrated
+                $existingMappedId = null;
+                if (function_exists('get_term_meta')) {
                     $existingMappedId = get_term_meta($term->term_id, $metaKey, true);
-                    if (!empty($existingMappedId)) {
-                        $skipped++;
-                        $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
-                        continue;
-                    }
+                }
+                
+                // If already migrated and not force mode, skip
+                if (!$this->isForceMigration() && !empty($existingMappedId)) {
+                    $skipped++;
+                    $this->updateProgress($dataType, 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
                 }
 
+                // Prepare slug
                 $baseSlug = $term->slug;
                 if (empty($baseSlug)) {
                     $baseSlug = function_exists('sanitize_title')
@@ -137,6 +163,7 @@ abstract class BaseMigration
                         'name' => $term->name,
                         'slug' => $slug,
                         'description' => $term->description ?? '',
+                        'status' => 'publish',
                         'created_at' => current_time('mysql'),
                         'updated_at' => current_time('mysql'),
                     ]

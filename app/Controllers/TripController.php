@@ -1494,8 +1494,14 @@ class TripController extends BaseController
                               (!empty($avail->return_date) ? strtotime($avail->return_date) : 
                               strtotime($avail->departure_date . ' + ' . (($trip_data->duration_days ?? 1) - 1) . ' days'));
                 
-                $original_price = !empty($avail->original_price) ? (float) $avail->original_price : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
-                $sale_price = !empty($avail->discounted_price) ? (float) $avail->discounted_price : (float) ($trip_data->discounted_price ?? $original_price);
+                // Pricing fallback: Use availability pricing if set, otherwise use trip default
+                $original_price = isset($avail->original_price) && $avail->original_price !== null && $avail->original_price > 0
+                    ? (float) $avail->original_price 
+                    : (float) ($trip_data->original_price ?? $trip_data->price ?? 0);
+                
+                $sale_price = isset($avail->discounted_price) && $avail->discounted_price !== null && $avail->discounted_price > 0
+                    ? (float) $avail->discounted_price 
+                    : (float) ($trip_data->discounted_price ?? $original_price);
                 
                 // Store base prices before dynamic pricing
                 $base_original_price = $original_price;

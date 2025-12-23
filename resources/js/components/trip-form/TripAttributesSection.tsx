@@ -224,6 +224,26 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           />
         );
 
+      case 'time':
+        return (
+          <Input
+            type="time"
+            value={value}
+            onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
+            className="mt-2"
+          />
+        );
+
+      case 'color':
+        return (
+          <Input
+            type="color"
+            value={value}
+            onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
+            className="mt-2 h-10 w-20"
+          />
+        );
+
       default:
         return (
           <Input

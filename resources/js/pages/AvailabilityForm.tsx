@@ -304,21 +304,20 @@ const AvailabilityForm: React.FC = () => {
       }
     }
 
-    // Validate pricing based on pricing type
+    // Validate pricing based on pricing type (OPTIONAL - only validate if provided)
     if (formData.pricing_type === 'regular') {
-      if (!formData.original_price || parseFloat(formData.original_price) <= 0) {
-        newErrors.original_price = __('Original price is required and must be greater than 0', 'Original price is required and must be greater than 0');
+      // Only validate if user has entered a price (optional override)
+      if (formData.original_price && parseFloat(formData.original_price) <= 0) {
+        newErrors.original_price = __('Original price must be greater than 0', 'Original price must be greater than 0');
       }
-      if (formData.discounted_price && parseFloat(formData.discounted_price) >= parseFloat(formData.original_price)) {
+      if (formData.discounted_price && formData.original_price && parseFloat(formData.discounted_price) >= parseFloat(formData.original_price)) {
         newErrors.discounted_price = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
       }
     } else {
-      // Validate price types
-      if (formData.price_types.length === 0) {
-        newErrors.price_types = __('At least one traveler category pricing is required', 'At least one traveler category pricing is required');
-      } else {
+      // Validate price types only if provided (optional override)
+      if (formData.price_types.length > 0) {
         formData.price_types.forEach((priceType, index) => {
-          if (!priceType.original_price || isNaN(parseFloat(priceType.original_price)) || parseFloat(priceType.original_price) < 0) {
+          if (priceType.original_price && (isNaN(parseFloat(priceType.original_price)) || parseFloat(priceType.original_price) < 0)) {
             newErrors[`price_type_${index}_original`] = __('Original price must be a valid number', 'Original price must be a valid number');
           }
           if (priceType.discounted_price && (isNaN(parseFloat(priceType.discounted_price)) || parseFloat(priceType.discounted_price) < 0)) {
@@ -637,6 +636,25 @@ const AvailabilityForm: React.FC = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Pricing Override Info */}
+            <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg mb-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-full bg-amber-100 dark:bg-amber-900/30">
+                  <svg className="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
+                    {__('Pricing Override (Optional)', 'Pricing Override (Optional)')}
+                  </p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {__('Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for this specific date.', 'Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for this specific date.')}
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Pricing Type Info - Inherited from Trip */}
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
               <div className="flex items-center gap-3">
@@ -674,7 +692,7 @@ const AvailabilityForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                      {__('Original Price', 'Original Price')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -692,6 +710,11 @@ const AvailabilityForm: React.FC = () => {
                     </div>
                     {errors.original_price && (
                       <p className="mt-1 text-xs text-red-600">{errors.original_price}</p>
+                    )}
+                    {!formData.original_price && tripData && (
+                      <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
+                        {__('Using trip default', 'Using trip default')}: {getCurrencySymbol(tripData?.currency || 'USD')}{tripData.original_price || '0.00'}
+                      </p>
                     )}
                   </div>
 
@@ -726,10 +749,10 @@ const AvailabilityForm: React.FC = () => {
               <div className="space-y-4">
               <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
+                    {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
                   </label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                  {__('Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing.', 'Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing.')}
                 </p>
                 </div>
                 
@@ -879,7 +902,7 @@ const AvailabilityForm: React.FC = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                                    {__('Original Price', 'Original Price')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">

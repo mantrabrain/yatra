@@ -101,6 +101,12 @@ $active_filters = [
     'special_offers'     => yatra_get_filter_array('special_offers', 'sanitize_text_field'),
     'booking_options'    => yatra_get_filter_array('booking_options', 'sanitize_text_field'),
     'age_suitability'    => yatra_get_filter_array('age_suitability', 'sanitize_text_field'),
+    'attributes'         => isset($_GET['attributes']) && is_array($_GET['attributes']) ? array_map(function($attr_data) {
+        if (is_array($attr_data)) {
+            return array_map('sanitize_text_field', $attr_data);
+        }
+        return sanitize_text_field($attr_data);
+    }, $_GET['attributes']) : [],
 ];
 
 // DEBUG: Check processed active filters (only in debug mode)
@@ -1147,6 +1153,136 @@ get_header();
                         </div>
                     </div>
                     <?php endif; ?>
+
+                    <!-- Trip Attributes Filter -->
+                    <?php if (is_array($yatra_trip_list) && !empty($yatra_trip_list['attributes'])) : ?>
+                    <div class="yatra-filter-section">
+                        <div class="yatra-filter-title" data-toggle="trip-attributes">
+                            <div class="yatra-filter-title-content">
+                                <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                                </svg>
+                                <span><?php _e('Trip Attributes', 'yatra'); ?></span>
+                            </div>
+                            <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="yatra-filter-content">
+                            <?php foreach ($yatra_trip_list['attributes'] as $attribute) : ?>
+                                <?php
+                                $attribute_filter_name = 'attributes[' . $attribute['id'] . ']';
+                                $current_values = $active_filters['attributes'][$attribute['id']] ?? [];
+
+                                $field_options = [];
+                                if (!empty($attribute['field_options'])) {
+                                    $field_options = is_array($attribute['field_options']) ?
+                                        $attribute['field_options'] :
+                                        (json_decode($attribute['field_options'], true) ?: []);
+                                }
+                                ?>
+
+                                <div class="yatra-attribute-item">
+                                    <div class="yatra-attribute-label">
+                                        <?php if (!empty($attribute['icon'])) : ?>
+                                            <?php
+                                            $icon_data = maybe_unserialize($attribute['icon']);
+                                            if (is_array($icon_data) && $icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                                                $image_url = '';
+                                                if (is_numeric($icon_data['value'])) {
+                                                    $image_url = wp_get_attachment_image_url((int) $icon_data['value'], 'thumbnail');
+                                                } elseif (is_string($icon_data['value']) && filter_var($icon_data['value'], FILTER_VALIDATE_URL)) {
+                                                    $image_url = $icon_data['value'];
+                                                }
+                                                if (!empty($image_url)) {
+                                                    echo '<img class="yatra-attribute-icon" src="' . esc_url($image_url) . '" alt="' . esc_attr($attribute['name']) . '" width="16" height="16">';
+                                                }
+                                            } elseif (is_array($icon_data) && $icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                                                echo '<span class="yatra-attribute-icon">' . yatra_svg_icon($icon_data['value'], '') . '</span>';
+                                            }
+                                            ?>
+                                        <?php endif; ?>
+                                        <span class="yatra-attribute-name"><?php echo esc_html($attribute['name']); ?></span>
+                                    </div>
+                                    <div class="yatra-attribute-content">
+                                        <?php if (($attribute['field_type'] === 'select' || $attribute['field_type'] === 'radio') && !empty($field_options)) : ?>
+                                            <div class="yatra-checkbox-group">
+                                                <?php foreach ($field_options as $option) : ?>
+                                                    <label class="yatra-checkbox-label">
+                                                        <input
+                                                            type="checkbox"
+                                                            name="<?php echo esc_attr($attribute_filter_name); ?>[]"
+                                                            value="<?php echo esc_attr($option['value']); ?>"
+                                                            <?php echo in_array($option['value'], $current_values) ? 'checked' : ''; ?>
+                                                        >
+                                                        <span><?php echo esc_html($option['label']); ?></span>
+                                                    </label>
+                                                <?php endforeach; ?>
+                                            </div>
+
+                                        <?php elseif ($attribute['field_type'] === 'checkbox') : ?>
+                                            <div class="yatra-checkbox-group">
+                                                <label class="yatra-checkbox-label">
+                                                    <input
+                                                        type="checkbox"
+                                                        name="<?php echo esc_attr($attribute_filter_name); ?>"
+                                                        value="1"
+                                                        <?php echo in_array('1', $current_values) ? 'checked' : ''; ?>
+                                                    >
+                                                    <span><?php _e('Yes', 'yatra'); ?></span>
+                                                </label>
+                                            </div>
+
+                                        <?php elseif ($attribute['field_type'] === 'number') : ?>
+                                            <div class="yatra-input-group">
+                                                <input
+                                                    type="number"
+                                                    name="<?php echo esc_attr($attribute_filter_name); ?>[min]"
+                                                    placeholder="<?php esc_attr_e('Min', 'yatra'); ?>"
+                                                    value="<?php echo esc_attr($current_values['min'] ?? ''); ?>"
+                                                    class="yatra-filter-input"
+                                                >
+                                                <input
+                                                    type="number"
+                                                    name="<?php echo esc_attr($attribute_filter_name); ?>[max]"
+                                                    placeholder="<?php esc_attr_e('Max', 'yatra'); ?>"
+                                                    value="<?php echo esc_attr($current_values['max'] ?? ''); ?>"
+                                                    class="yatra-filter-input"
+                                                >
+                                            </div>
+
+                                        <?php elseif ($attribute['field_type'] === 'date') : ?>
+                                            <div class="yatra-input-group">
+                                                <input
+                                                    type="date"
+                                                    name="<?php echo esc_attr($attribute_filter_name); ?>[from]"
+                                                    value="<?php echo esc_attr($current_values['from'] ?? ''); ?>"
+                                                    class="yatra-filter-input"
+                                                >
+                                                <input
+                                                    type="date"
+                                                    name="<?php echo esc_attr($attribute_filter_name); ?>[to]"
+                                                    value="<?php echo esc_attr($current_values['to'] ?? ''); ?>"
+                                                    class="yatra-filter-input"
+                                                >
+                                            </div>
+
+                                        <?php else : ?>
+                                            <input
+                                                type="text"
+                                                name="<?php echo esc_attr($attribute_filter_name); ?>"
+                                                placeholder="<?php esc_attr_e('Type to filter…', 'yatra'); ?>"
+                                                value="<?php echo esc_attr(implode(', ', $current_values)); ?>"
+                                                class="yatra-filter-input"
+                                            >
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
                 </aside>
 
                 <!-- Main Content Area -->

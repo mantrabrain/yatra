@@ -354,6 +354,31 @@ class AttributeService extends BaseService
                 $data['validation_rules'] = wp_json_encode($data['validation_rules']);
             }
 
+            // Process icon field
+            if (isset($data['icon'])) {
+                error_log('DEBUG: AttributeService create - Icon data before processing: ' . var_export($data['icon'], true));
+                
+                if (is_array($data['icon'])) {
+                    // Sanitize icon array
+                    $icon = [
+                        'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
+                            ? $data['icon']['type']
+                            : 'icon',
+                        'value' => isset($data['icon']['value']) 
+                            ? sanitize_text_field($data['icon']['value'])
+                            : '',
+                    ];
+                    $data['icon'] = maybe_serialize($icon);
+                    error_log('DEBUG: AttributeService create - Icon data after processing: ' . var_export($data['icon'], true));
+                } elseif (is_string($data['icon'])) {
+                    // If it's already a string, sanitize it
+                    $data['icon'] = sanitize_text_field($data['icon']);
+                    error_log('DEBUG: AttributeService create - Icon as string: ' . var_export($data['icon'], true));
+                }
+            } else {
+                error_log('DEBUG: AttributeService create - Icon data not set');
+            }
+
             $attributeId = $this->repository->create($data);
             
             if ($attributeId) {
@@ -409,6 +434,31 @@ class AttributeService extends BaseService
             // Process validation rules
             if (isset($data['validation_rules']) && is_array($data['validation_rules'])) {
                 $data['validation_rules'] = wp_json_encode($data['validation_rules']);
+            }
+
+            // Process icon field
+            if (isset($data['icon'])) {
+                error_log('DEBUG: AttributeService update - Icon data before processing: ' . var_export($data['icon'], true));
+                
+                if (is_array($data['icon'])) {
+                    // Sanitize icon array
+                    $icon = [
+                        'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
+                            ? $data['icon']['type']
+                            : 'icon',
+                        'value' => isset($data['icon']['value']) 
+                            ? sanitize_text_field($data['icon']['value'])
+                            : '',
+                    ];
+                    $data['icon'] = maybe_serialize($icon);
+                    error_log('DEBUG: AttributeService update - Icon data after processing: ' . var_export($data['icon'], true));
+                } elseif (is_string($data['icon'])) {
+                    // If it's already a string, sanitize it
+                    $data['icon'] = sanitize_text_field($data['icon']);
+                    error_log('DEBUG: AttributeService update - Icon as string: ' . var_export($data['icon'], true));
+                }
+            } else {
+                error_log('DEBUG: AttributeService update - Icon data not set');
             }
 
             $result = $this->repository->update($id, $data);
