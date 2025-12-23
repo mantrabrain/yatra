@@ -158,16 +158,16 @@ export const Table: React.FC<TableProps> = ({
 
   // Render empty state
   const renderEmpty = () => (
-    <div className="relative flex flex-col items-center justify-center text-center py-16 px-6 my-6 min-h-[400px]">
+    <div className="relative flex flex-col items-center justify-center text-center py-12 px-6 my-4 min-h-[350px]">
       {/* Background decoration */}
-      <div className="absolute inset-8 bg-gradient-to-br from-gray-50/50 to-white dark:from-gray-900/50 dark:to-gray-800/50 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-700"></div>
+      <div className="absolute inset-4 bg-gradient-to-br from-gray-50/80 via-blue-50/30 to-white dark:from-gray-900/80 dark:via-blue-900/20 dark:to-gray-800/80 rounded-2xl border-2 border-dashed border-gray-300/50 dark:border-gray-600/50 shadow-sm"></div>
       
       {/* Content */}
-      <div className="relative z-10 max-w-md mx-auto space-y-6">
+      <div className="relative z-10 max-w-lg mx-auto space-y-8">
         {/* Icon */}
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 ring-8 ring-blue-50/50 dark:ring-blue-900/20">
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-100 via-blue-50 to-indigo-100 dark:from-blue-900/40 dark:via-blue-800/20 dark:to-indigo-900/40 ring-8 ring-blue-100/60 dark:ring-blue-900/30 shadow-lg">
           <svg 
-            className="w-10 h-10 text-blue-600 dark:text-blue-400" 
+            className="w-12 h-12 text-blue-600 dark:text-blue-400" 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24"
@@ -176,27 +176,32 @@ export const Table: React.FC<TableProps> = ({
             <path 
               strokeLinecap="round" 
               strokeLinejoin="round" 
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              d="M7 7h10v10H7zM5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"
+            />
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              d="M9 9h6M9 12h6M9 15h4"
             />
           </svg>
         </div>
 
         {/* Text content */}
-        <div className="space-y-3">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="space-y-4">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
             {emptyText}
           </h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed max-w-md mx-auto">
             {emptyDescription}
           </p>
         </div>
 
         {/* Action button */}
         {onCreateClick && (
-          <div className="pt-2">
+          <div className="pt-4">
             <Button 
               onClick={onCreateClick} 
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              className="inline-flex items-center gap-3 px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transform hover:scale-[1.02]"
             >
               <svg 
                 className="w-4 h-4" 

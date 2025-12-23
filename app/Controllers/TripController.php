@@ -166,6 +166,28 @@ class TripController extends BaseController
                 'permission_callback' => [$this, 'check_permission'],
             ],
         ]);
+
+        // Trip attributes endpoints
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/attributes', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_trip_attributes'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+            [
+                'methods' => \WP_REST_Server::CREATABLE,
+                'callback' => [$this, 'update_trip_attributes'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
+
+        register_rest_route($namespace, '/' . $base . '/(?P<id>[\d]+)/attributes/(?P<attribute_id>[\d]+)', [
+            [
+                'methods' => \WP_REST_Server::DELETABLE,
+                'callback' => [$this, 'delete_trip_attribute'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
+        ]);
     }
 
     /**
@@ -621,6 +643,9 @@ class TripController extends BaseController
             if (isset($data['availability_dates'])) {
                 $relationships['availability_dates'] = $data['availability_dates'];
             }
+            if (isset($data['attributes'])) {
+                $relationships['attributes'] = $data['attributes'];
+            }
 
             $relationships = apply_filters('yatra_trip_update_relationships', $relationships, $data, $request);
 
@@ -645,7 +670,8 @@ class TripController extends BaseController
                 $data['gallery_images'],
                 $data['faqs'],
                 $data['itinerary_days'],
-                $data['availability_dates']
+                $data['availability_dates'],
+                $data['attributes']
             );
 
             $result = $this->service->updateWithRelations($id, $data, $relationships);
@@ -1189,6 +1215,28 @@ class TripController extends BaseController
                     'status' => $date->status ?? 'available',
                 ];
             }, $item->availability_dates);
+        }
+
+        // Handle attributes relationship
+        if (isset($item->attributes)) {
+            $attributes = [];
+            foreach ($item->attributes as $attribute) {
+                $attributeId = isset($attribute->attribute_id) ? (int) $attribute->attribute_id : ((isset($attribute->id) ? (int) $attribute->id : null));
+
+                if (!$attributeId) {
+                    continue;
+                }
+
+                $value = $attribute->value ?? null;
+                if (!empty($attribute->value_serialized) && is_string($value)) {
+                    $unserialized = maybe_unserialize($value);
+                    $value = $unserialized !== false ? $unserialized : $value;
+                }
+
+                $attributes[$attributeId] = $value;
+            }
+
+            $data['attributes'] = $attributes;
         }
 
         // Add user information
@@ -1887,6 +1935,145 @@ class TripController extends BaseController
                 'per_page' => (int) ($request->get_param('per_page') ?: 20),
                 'page' => (int) ($request->get_param('page') ?: 1),
             ]);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Get trip attributes
+     */
+    public function get_trip_attributes(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $trip_id = (int) $request->get_param('id');
+            
+            if (!$trip_id) {
+                return $this->error_response('Trip ID is required', 400);
+            }
+
+            global $wpdb;
+            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+            
+            $attributes = $wpdb->get_results($wpdb->prepare(
+                "SELECT ta.*, a.name, a.field_type, a.field_options 
+                 FROM {$table_trip_attributes} ta 
+                 LEFT JOIN {$wpdb->prefix}yatra_attributes a ON ta.attribute_id = a.id 
+                 WHERE ta.trip_id = %d",
+                $trip_id
+            ));
+
+            $formatted_attributes = [];
+            foreach ($attributes as $attr) {
+                $value = $attr->value;
+                if ($attr->value_serialized) {
+                    $value = unserialize($value);
+                }
+                
+                $formatted_attributes[] = [
+                    'id' => $attr->id,
+                    'attribute_id' => $attr->attribute_id,
+                    'name' => $attr->name,
+                    'field_type' => $attr->field_type,
+                    'field_options' => $attr->field_options,
+                    'value' => $value,
+                    'created_at' => $attr->created_at,
+                    'updated_at' => $attr->updated_at
+                ];
+            }
+
+            return $this->success_response($formatted_attributes);
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Update trip attributes
+     */
+    public function update_trip_attributes(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $trip_id = (int) $request->get_param('id');
+            $attributes = $request->get_param('attributes') ?? [];
+            
+            if (!$trip_id) {
+                return $this->error_response('Trip ID is required', 400);
+            }
+
+            if (!is_array($attributes)) {
+                return $this->error_response('Attributes must be an array', 400);
+            }
+
+            global $wpdb;
+            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+            
+            // Start transaction
+            $wpdb->query('START TRANSACTION');
+            
+            try {
+                // Delete existing attributes for this trip
+                $wpdb->delete($table_trip_attributes, ['trip_id' => $trip_id]);
+                
+                // Insert new attributes
+                foreach ($attributes as $attribute_id => $value) {
+                    $value_serialized = 0;
+                    $final_value = $value;
+                    
+                    // Serialize complex values
+                    if (is_array($value) || is_object($value)) {
+                        $final_value = serialize($value);
+                        $value_serialized = 1;
+                    }
+                    
+                    $wpdb->insert($table_trip_attributes, [
+                        'trip_id' => $trip_id,
+                        'attribute_id' => $attribute_id,
+                        'value' => $final_value,
+                        'value_serialized' => $value_serialized,
+                        'created_at' => current_time('mysql'),
+                        'updated_at' => current_time('mysql')
+                    ]);
+                }
+                
+                $wpdb->query('COMMIT');
+                
+                return $this->success_response(['message' => 'Trip attributes updated successfully']);
+            } catch (\Exception $e) {
+                $wpdb->query('ROLLBACK');
+                throw $e;
+            }
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * Delete trip attribute
+     */
+    public function delete_trip_attribute(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $trip_id = (int) $request->get_param('id');
+            $attribute_id = (int) $request->get_param('attribute_id');
+            
+            if (!$trip_id || !$attribute_id) {
+                return $this->error_response('Trip ID and Attribute ID are required', 400);
+            }
+
+            global $wpdb;
+            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+            
+            $result = $wpdb->delete($table_trip_attributes, [
+                'trip_id' => $trip_id,
+                'attribute_id' => $attribute_id
+            ]);
+            
+            if ($result === false) {
+                return $this->error_response('Failed to delete trip attribute', 500);
+            }
+            
+            return $this->success_response(['message' => 'Trip attribute deleted successfully']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }

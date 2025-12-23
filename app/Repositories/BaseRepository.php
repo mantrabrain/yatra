@@ -51,6 +51,7 @@ abstract class BaseRepository
             $this->wpdb->prepare($query, $id)
         );
 
+
         return $result ?: null;
     }
 

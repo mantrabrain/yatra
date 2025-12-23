@@ -53,6 +53,7 @@ $controllers = [
     \Yatra\Controllers\RecurringAvailabilityController::class,
     \Yatra\Controllers\TripAvailabilityController::class, // Departures System (FREE)
     \Yatra\Controllers\TripDownloadController::class, // Downloads System (FREE)
+    \Yatra\Controllers\AttributeController::class, // Attributes System (FREE)
     \Yatra\Controllers\ItineraryController::class,
     \Yatra\Controllers\DiscountController::class,
 

@@ -58,6 +58,8 @@ import EmailSequenceForm from './pages/EmailSequenceForm';
 import AbandonedRecovery from './pages/AbandonedRecovery';
 import DynamicPricing from './pages/DynamicPricing';
 import DynamicPricingRuleForm from './pages/DynamicPricingRuleForm';
+import Attributes from './pages/Attributes';
+import AttributeForm from './pages/AttributeForm';
 import License from './pages/License';
 
 const App: React.FC = () => {
@@ -157,6 +159,12 @@ const App: React.FC = () => {
               return <TripConsentForm />;
             }
             return <TripConsent />;
+          case 'attributes':
+            // Check if we're creating or editing an attribute
+            if (action === 'create' || action === 'edit') {
+              return <AttributeForm />;
+            }
+            return <Attributes />;
           case 'all':
           default:
             // Check if we're creating or editing a trip

@@ -32,24 +32,18 @@ abstract class BaseService implements ServiceInterface
     {
         $startTime = microtime(true);
         
-        // TEMPORARILY DISABLE CACHING FOR DEBUGGING TRIP SERVICE
-        if (defined('WP_DEBUG') && WP_DEBUG && static::class === 'Yatra\\Services\\TripService') {
-            error_log('[YATRA DEBUG] TripService getAll - CACHE DISABLED FOR DEBUGGING');
+        // Check if caching is enabled
+        if ($this->isCacheEnabled()) {
+            $cacheKey = $this->getCacheKey('all', $filters);
+            
+            $result = $this->getCachedResult($cacheKey, function() use ($filters) {
+                return $this->getRepository()->all($filters);
+            });
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh data", ['service' => static::class, 'filters' => $filters]);
             $result = $this->getRepository()->all($filters);
-            
-            $executionTime = microtime(true) - $startTime;
-            error_log('[YATRA DEBUG] TripService getAll - Direct DB query result count: ' . count($result));
-            error_log('[YATRA DEBUG] TripService getAll - Execution time: ' . round($executionTime * 1000, 2) . 'ms');
-            
-            return $result;
         }
-        
-        // Normal caching for other services
-        $cacheKey = $this->getCacheKey('all', $filters);
-        
-        $result = $this->getCachedResult($cacheKey, function() use ($filters) {
-            return $this->getRepository()->all($filters);
-        });
         
         $executionTime = microtime(true) - $startTime;
         Logger::debug("Service getAll executed", [
@@ -73,18 +67,27 @@ abstract class BaseService implements ServiceInterface
         }
         
         $startTime = microtime(true);
-        $cacheKey = $this->getCacheKey('entity', ['id' => $id]);
         
-        $result = $this->getCachedResult($cacheKey, function() use ($id) {
-            return $this->getRepository()->find($id);
-        });
+        // Check if caching is enabled
+        if ($this->isCacheEnabled()) {
+            $cacheKey = $this->getCacheKey('entity', ['id' => $id]);
+            
+            $result = $this->getCachedResult($cacheKey, function() use ($id) {
+                return $this->getRepository()->find($id);
+            });
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh data", ['service' => static::class, 'id' => $id]);
+            $result = $this->getRepository()->find($id);
+        }
         
         $executionTime = microtime(true) - $startTime;
         Logger::debug("Service getById executed", [
             'service' => static::class,
             'id' => $id,
             'execution_time' => $executionTime,
-            'found' => $result !== null
+            'found' => $result !== null,
+            'cache_enabled' => $this->isCacheEnabled()
         ]);
         
         return $result;
@@ -299,11 +302,17 @@ abstract class BaseService implements ServiceInterface
      */
     public function count(array $filters = []): int
     {
-        $cacheKey = $this->getCacheKey('count', $filters);
-        
-        return (int) $this->getCachedResult($cacheKey, function() use ($filters) {
+        if ($this->isCacheEnabled()) {
+            $cacheKey = $this->getCacheKey('count', $filters);
+            
+            return (int) $this->getCachedResult($cacheKey, function() use ($filters) {
+                return $this->getRepository()->count($filters);
+            }, 300); // 5 minute cache for counts
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh count", ['service' => static::class, 'filters' => $filters]);
             return $this->getRepository()->count($filters);
-        }, 300); // 5 minute cache for counts
+        }
     }
 
     /**
@@ -315,11 +324,17 @@ abstract class BaseService implements ServiceInterface
             return false;
         }
         
-        $cacheKey = $this->getCacheKey('exists', ['id' => $id]);
-        
-        return (bool) $this->getCachedResult($cacheKey, function() use ($id) {
+        if ($this->isCacheEnabled()) {
+            $cacheKey = $this->getCacheKey('exists', ['id' => $id]);
+            
+            return (bool) $this->getCachedResult($cacheKey, function() use ($id) {
+                return $this->getRepository()->exists($id);
+            }, 600); // 10 minute cache for existence checks
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, checking existence directly", ['service' => static::class, 'id' => $id]);
             return $this->getRepository()->exists($id);
-        }, 600); // 10 minute cache for existence checks
+        }
     }
 
     /**
@@ -327,23 +342,258 @@ abstract class BaseService implements ServiceInterface
      */
     public function paginate(int $page = 1, int $perPage = 10, array $filters = []): array
     {
-        $cacheKey = $this->getCacheKey('paginate', [
-            'page' => $page,
-            'per_page' => $perPage,
-            'filters' => $filters
-        ]);
-        
-        return $this->getCachedResult($cacheKey, function() use ($page, $perPage, $filters) {
-            return $this->getRepository()->paginate($page, $perPage, $filters);
-        });
+        if ($this->isCacheEnabled()) {
+            $cacheKey = $this->getCacheKey('paginate', [
+                'page' => $page,
+                'per_page' => $perPage,
+                'filters' => $filters
+            ]);
+            
+            return $this->getCachedResult($cacheKey, function() use ($page, $perPage, $filters) {
+                return $this->executePaginateQuery($page, $perPage, $filters);
+            });
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh pagination", ['service' => static::class, 'page' => $page, 'per_page' => $perPage]);
+            return $this->executePaginateQuery($page, $perPage, $filters);
+        }
     }
 
     /**
-     * Get cached result or execute callback
+     * Execute pagination query
+     */
+    private function executePaginateQuery(int $page, int $perPage, array $filters): array
+    {
+        $repository = $this->getRepository();
+        
+        // Handle different paginate method signatures
+        if (method_exists($repository, 'paginate')) {
+            // Try the new signature first: paginate(int $page, int $perPage, array $filters)
+            try {
+                return $repository->paginate($page, $perPage, $filters);
+            } catch (ArgumentCountError $e) {
+                // Fall back to old signature: paginate(array $filters)
+                $filters['page'] = $page;
+                $filters['per_page'] = $perPage;
+                return $repository->paginate($filters);
+            }
+        } else {
+            // Fallback to all method with pagination parameters
+            $filters['limit'] = $perPage;
+            $filters['offset'] = ($page - 1) * $perPage;
+            return $repository->all($filters);
+        }
+    }
+
+    /**
+     * Check if caching is enabled
+     */
+    protected function isCacheEnabled(): bool
+    {
+        try {
+            // Check WordPress option for cache status
+            $cacheEnabled = get_option('yatra_cache_enabled', true);
+            
+            // Also check if we're in debug mode (disable cache in debug)
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                $cacheEnabled = false;
+            }
+            
+            // Check if cache backend is available
+            if ($cacheEnabled && !$this->isCacheBackendAvailable()) {
+                Logger::warning("Cache enabled but backend not available, disabling cache");
+                $cacheEnabled = false;
+            }
+            
+            return (bool) $cacheEnabled;
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to check cache enabled status", [
+                'error' => $e->getMessage()
+            ]);
+            return false; // Fail safe - disable cache on error
+        }
+    }
+
+    /**
+     * Check if cache backend is available
+     */
+    private function isCacheBackendAvailable(): bool
+    {
+        try {
+            // Test basic cache operation
+            $testKey = 'yatra_cache_test_' . time();
+            $testValue = 'test_value';
+            
+            Cache::set($testKey, $testValue, 1);
+            $retrieved = Cache::get($testKey);
+            
+            // Clean up test key
+            Cache::delete($testKey);
+            
+            return $retrieved === $testValue;
+            
+        } catch (\Exception $e) {
+            Logger::warning("Cache backend availability check failed", [
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Clear cache for entity
+     */
+    protected function clearEntityCache(int $id): void
+    {
+        if (!$this->isCacheEnabled()) {
+            return; // No cache to clear
+        }
+
+        $entityType = strtolower(str_replace(['\\', 'Service'], ['_', ''], static::class));
+        
+        // Clear specific entity cache
+        $this->clearCacheByPattern("{$entityType}_entity_{$id}");
+        
+        // Clear related list caches
+        $this->clearCacheByPattern("{$entityType}_all");
+        $this->clearCacheByPattern("{$entityType}_count");
+        $this->clearCacheByPattern("{$entityType}_exists_{$id}");
+        $this->clearCacheByPattern("{$entityType}_paginate");
+        
+        // Clear query result caches
+        $this->clearCacheByPattern(Cache::PREFIX_QUERY_RESULT);
+        
+        Logger::info("Entity cache cleared", [
+            'service' => static::class,
+            'entity_id' => $id,
+            'entity_type' => $entityType
+        ]);
+    }
+
+    /**
+     * Clear all cache for this service
+     */
+    protected function clearAllServiceCache(): void
+    {
+        if (!$this->isCacheEnabled()) {
+            return; // No cache to clear
+        }
+
+        $entityType = strtolower(str_replace(['\\', 'Service'], ['_', ''], static::class));
+        
+        // Clear all caches related to this service
+        $this->clearCacheByPattern($entityType);
+        
+        Logger::info("All service cache cleared", [
+            'service' => static::class,
+            'entity_type' => $entityType
+        ]);
+    }
+
+    /**
+     * Clear cache by pattern
+     */
+    private function clearCacheByPattern(string $pattern): void
+    {
+        try {
+            Cache::clearByPrefix($pattern);
+        } catch (\Exception $e) {
+            Logger::warning("Failed to clear cache pattern", [
+                'pattern' => $pattern,
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Get cached result or execute callback with performance monitoring
      */
     protected function getCachedResult(string $cacheKey, callable $callback, int $duration = 1800): mixed
     {
-        return CacheService::remember($cacheKey, $callback, $duration);
+        $startTime = microtime(true);
+        
+        try {
+            if ($this->isCacheEnabled()) {
+                $result = CacheService::remember($cacheKey, $callback, $duration);
+                
+                // Record cache performance metrics
+                $this->recordCacheMetrics($cacheKey, $startTime, true);
+                
+                return $result;
+            } else {
+                // Bypass cache and execute callback directly
+                $result = $callback();
+                
+                // Record non-cache performance metrics
+                $this->recordCacheMetrics($cacheKey, $startTime, false);
+                
+                return $result;
+            }
+            
+        } catch (\Exception $e) {
+            // Fallback to direct execution on cache failure
+            Logger::warning("Cache operation failed, falling back to direct execution", [
+                'cache_key' => $cacheKey,
+                'error' => $e->getMessage()
+            ]);
+            
+            $result = $callback();
+            $this->recordCacheMetrics($cacheKey, $startTime, false, $e);
+            
+            return $result;
+        }
+    }
+
+    /**
+     * Record cache performance metrics
+     */
+    private function recordCacheMetrics(string $cacheKey, float $startTime, bool $cacheUsed, ?\Exception $error = null): void
+    {
+        $executionTime = microtime(true) - $startTime;
+        
+        $metrics = [
+            'cache_key' => substr($cacheKey, 0, 50) . '...',
+            'cache_used' => $cacheUsed,
+            'execution_time' => round($executionTime * 1000, 2), // in milliseconds
+            'service' => static::class,
+            'timestamp' => time()
+        ];
+        
+        if ($error) {
+            $metrics['error'] = $error->getMessage();
+            Logger::warning("Cache performance recorded with error", $metrics);
+        } else {
+            Logger::debug("Cache performance recorded", $metrics);
+        }
+        
+        // Store metrics for analytics (optional - can be extended)
+        $this->storeCacheMetrics($metrics);
+    }
+
+    /**
+     * Store cache metrics for analytics
+     */
+    private function storeCacheMetrics(array $metrics): void
+    {
+        try {
+            // Store metrics in WordPress options for analytics
+            $existingMetrics = get_option('yatra_cache_metrics', []);
+            $existingMetrics[] = $metrics;
+            
+            // Keep only last 1000 entries to prevent bloat
+            if (count($existingMetrics) > 1000) {
+                $existingMetrics = array_slice($existingMetrics, -1000);
+            }
+            
+            update_option('yatra_cache_metrics', $existingMetrics);
+            
+        } catch (\Exception $e) {
+            // Don't let metrics storage failures break the main functionality
+            Logger::debug("Failed to store cache metrics", [
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -378,20 +628,30 @@ abstract class BaseService implements ServiceInterface
      */
     protected function invalidateRelatedCaches(int $id, string $operation): void
     {
-        $serviceClass = strtolower(str_replace(['\\', 'Service'], ['_', ''], static::class));
+        // Clear entity cache
+        $this->clearEntityCache($id);
         
-        // Clear entity-specific caches
-        CacheService::invalidateEntity($serviceClass, $id);
+        // Clear all service cache for list operations
+        $this->clearAllServiceCache();
         
-        // Clear service-level caches
-        $prefix = "service_{$serviceClass}_";
-        CacheService::clearByPrefix($prefix);
+        // Clear related entity caches based on operation type
+        $this->clearRelatedEntityCaches($id, $operation);
         
-        Logger::debug("Service caches invalidated", [
-            'service' => $serviceClass,
-            'id' => $id,
+        Logger::debug("Related caches invalidated", [
+            'service' => static::class,
+            'entity_id' => $id,
             'operation' => $operation
         ]);
+    }
+
+    /**
+     * Clear related entity caches
+     */
+    protected function clearRelatedEntityCaches(int $id, string $operation): void
+    {
+        // Override in child classes to clear specific related caches
+        // For example: TripService would clear destination, activity caches
+        // AttributeService would clear trip-related caches, etc.
     }
 
     /**

@@ -8,6 +8,7 @@ use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Models\Trip;
 use Yatra\Services\CacheService;
+use Yatra\Services\AttributeService;
 use Yatra\Utils\Cache;
 use Yatra\Utils\Logger;
 
@@ -35,12 +36,18 @@ class TripService extends BaseService
     private TripRevisionRepository $revisionRepository;
 
     /**
+     * @var AttributeService
+     */
+    private AttributeService $attributeService;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->repository = new TripRepository();
         $this->revisionRepository = new TripRevisionRepository();
+        $this->attributeService = new AttributeService();
     }
 
     /**
@@ -82,17 +89,31 @@ class TripService extends BaseService
     {
         $cacheKey = "trip_with_relations_{$id}";
         
-        return Cache::remember($cacheKey, function() use ($id) {
-            $trip = $this->repository->find($id);
-            
-            if ($trip) {
-                // Load relationships
-                $this->repository->loadTripRelationships($trip);
-                Logger::debug("Trip with relationships loaded", ['trip_id' => $id]);
-            }
-            
-            return $trip;
-        }, Cache::DURATION_TRIP_DATA);
+        if ($this->isCacheEnabled()) {
+            return Cache::remember($cacheKey, function() use ($id) {
+                return $this->loadTripWithRelations($id);
+            }, Cache::DURATION_TRIP_DATA);
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh trip with relations", ['trip_id' => $id]);
+            return $this->loadTripWithRelations($id);
+        }
+    }
+
+    /**
+     * Load trip with relationships
+     */
+    private function loadTripWithRelations(int $id): ?\stdClass
+    {
+        $trip = $this->repository->find($id);
+        
+        if ($trip) {
+            // Load relationships
+            $this->repository->loadTripRelationships($trip);
+            Logger::debug("Trip with relationships loaded", ['trip_id' => $id]);
+        }
+        
+        return $trip;
     }
 
     /**
@@ -100,6 +121,9 @@ class TripService extends BaseService
      */
     public function create(array $data): int
     {
+        $attributes = $data['attributes'] ?? null;
+        unset($data['attributes']);
+
         // Validate data
         $this->validate($data);
         $this->validatePricing($data);
@@ -110,6 +134,11 @@ class TripService extends BaseService
 
         // Create trip
         $id = $this->repository->create($processedData);
+
+        // Save trip attributes if provided
+        if (is_array($attributes)) {
+            $this->saveTripAttributes($id, $attributes);
+        }
 
         // Clear related caches
         Cache::clearByPrefix(Cache::PREFIX_QUERY_RESULT);
@@ -124,6 +153,9 @@ class TripService extends BaseService
      */
     public function update(int $id, array $data): bool
     {
+        $attributes = $data['attributes'] ?? null;
+        unset($data['attributes']);
+
         // Validate data
         $this->validate($data, $id);
         if (isset($data['pricing_type']) || isset($data['original_price']) || isset($data['price_types'])) {
@@ -135,6 +167,11 @@ class TripService extends BaseService
 
         // Update trip
         $result = $this->repository->update($id, $data);
+
+        // Save trip attributes if provided
+        if ($result && is_array($attributes)) {
+            $this->saveTripAttributes($id, $attributes);
+        }
 
         if ($result) {
             // Invalidate caches
@@ -418,6 +455,7 @@ class TripService extends BaseService
             'trip_category',
             'price_types', // Include price_types in relationship fields
             'downloadable_items', // Managed in separate yatra_trip_downloads table
+            'attributes',
         ];
         
         foreach ($relationshipFields as $field) {
@@ -484,7 +522,14 @@ class TripService extends BaseService
         
         $data = $this->processBeforeUpdate($id, $data);
         
+        $attributesRelationship = $relationships['attributes'] ?? null;
+        unset($relationships['attributes']);
+
         $result = $this->repository->updateWithRelations($id, $data, $relationships);
+
+        if ($result && is_array($attributesRelationship)) {
+            $this->saveTripAttributes($id, $attributesRelationship);
+        }
         
         // Always sync pricing_type to availability dates and recurring rules when saving
         if (isset($data['pricing_type'])) {
@@ -586,7 +631,13 @@ class TripService extends BaseService
      */
     public function getWithRelations(int $id, bool $includeDeleted = false): ?\stdClass
     {
-        return $this->repository->findWithRelations($id, $includeDeleted);
+        $trip = $this->repository->findWithRelations($id, $includeDeleted);
+
+        if ($trip) {
+            $trip->attributes = $this->attributeService->getTripAttributes($id);
+        }
+
+        return $trip;
     }
 
     /**
@@ -1001,5 +1052,232 @@ class TripService extends BaseService
         }
 
         return $result;
+    }
+
+    /**
+     * Get trip with attributes
+     */
+    public function getWithAttributes(int $id): ?\stdClass
+    {
+        $trip = $this->getById($id);
+        
+        if ($trip) {
+            $trip->attributes = $this->attributeService->getTripAttributes($id);
+        }
+        
+        return $trip;
+    }
+
+    /**
+     * Set attribute for a trip
+     */
+    public function setAttribute(int $tripId, int $attributeId, $value): bool
+    {
+        try {
+            // Validate trip exists
+            $trip = $this->getById($tripId);
+            if (!$trip) {
+                throw new \InvalidArgumentException('Trip not found');
+            }
+
+            $result = $this->attributeService->setTripAttribute($tripId, $attributeId, $value);
+            
+            if ($result) {
+                // Clear trip cache since attributes changed
+                CacheService::clearTripCache($tripId);
+                
+                // Log action
+                Logger::info("Attribute set for trip", [
+                    'trip_id' => $tripId,
+                    'attribute_id' => $attributeId,
+                    'value' => $value
+                ]);
+            }
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to set trip attribute", [
+                'trip_id' => $tripId,
+                'attribute_id' => $attributeId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Remove attribute from a trip
+     */
+    public function removeAttribute(int $tripId, int $attributeId): bool
+    {
+        try {
+            // Validate trip exists
+            $trip = $this->getById($tripId);
+            if (!$trip) {
+                throw new \InvalidArgumentException('Trip not found');
+            }
+
+            $result = $this->attributeService->removeTripAttribute($tripId, $attributeId);
+            
+            if ($result) {
+                // Clear trip cache since attributes changed
+                CacheService::clearTripCache($tripId);
+                
+                // Log action
+                Logger::info("Attribute removed from trip", [
+                    'trip_id' => $tripId,
+                    'attribute_id' => $attributeId
+                ]);
+            }
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to remove trip attribute", [
+                'trip_id' => $tripId,
+                'attribute_id' => $attributeId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Get all attributes for a trip
+     */
+    public function getAttributes(int $tripId): array
+    {
+        try {
+            return $this->attributeService->getTripAttributes($tripId);
+        } catch (\Exception $e) {
+            Logger::error("Failed to get trip attributes", [
+                'trip_id' => $tripId,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Bulk update trip attributes
+     */
+    public function bulkUpdateAttributes(int $tripId, array $attributes): bool
+    {
+        try {
+            // Validate trip exists
+            $trip = $this->getById($tripId);
+            if (!$trip) {
+                throw new \InvalidArgumentException('Trip not found');
+            }
+
+            $result = $this->attributeService->bulkUpdateTripAttributes($tripId, $attributes);
+            
+            if ($result) {
+                // Clear trip cache since attributes changed
+                CacheService::clearTripCache($tripId);
+                
+                // Log action
+                Logger::info("Bulk attributes updated for trip", [
+                    'trip_id' => $tripId,
+                    'attribute_count' => count($attributes)
+                ]);
+            }
+            
+            return $result;
+            
+        } catch (\Exception $e) {
+            Logger::error("Failed to bulk update trip attributes", [
+                'trip_id' => $tripId,
+                'error' => $e->getMessage()
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Get trips filtered by attribute value
+     */
+    public function getByAttributeValue(int $attributeId, string $value): array
+    {
+        try {
+            return $this->attributeService->getTripsByAttributeValue($attributeId, $value);
+        } catch (\Exception $e) {
+            Logger::error("Failed to get trips by attribute value", [
+                'attribute_id' => $attributeId,
+                'value' => $value,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Get available attribute values for filtering
+     */
+    public function getAttributeFilterValues(int $attributeId): array
+    {
+        try {
+            return $this->attributeService->getAttributeValues($attributeId);
+        } catch (\Exception $e) {
+            Logger::error("Failed to get attribute filter values", [
+                'attribute_id' => $attributeId,
+                'error' => $e->getMessage()
+            ]);
+            return [];
+        }
+    }
+
+    /**
+     * Save trip attributes
+     */
+    private function saveTripAttributes(int $tripId, array $attributes): void
+    {
+        global $wpdb;
+        $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+        
+        // Start transaction
+        $wpdb->query('START TRANSACTION');
+        
+        try {
+            // Delete existing attributes for this trip
+            $wpdb->delete($table_trip_attributes, ['trip_id' => $tripId]);
+            
+            // Insert new attributes
+            foreach ($attributes as $attributeId => $value) {
+                $value_serialized = 0;
+                $final_value = $value;
+                
+                // Serialize complex values
+                if (is_array($value) || is_object($value)) {
+                    $final_value = serialize($value);
+                    $value_serialized = 1;
+                }
+                
+                $wpdb->insert($table_trip_attributes, [
+                    'trip_id' => $tripId,
+                    'attribute_id' => $attributeId,
+                    'value' => $final_value,
+                    'value_serialized' => $value_serialized,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                ]);
+            }
+            
+            $wpdb->query('COMMIT');
+            
+            Logger::info("Trip attributes saved", [
+                'trip_id' => $tripId,
+                'attribute_count' => count($attributes)
+            ]);
+            
+        } catch (\Exception $e) {
+            $wpdb->query('ROLLBACK');
+            Logger::error("Failed to save trip attributes", [
+                'trip_id' => $tripId,
+                'error' => $e->getMessage()
+            ]);
+            throw $e;
+        }
     }
 }

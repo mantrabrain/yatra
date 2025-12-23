@@ -172,6 +172,132 @@ try {
     );
 }
 
+// Register direct database query AJAX handler
+add_action('wp_ajax_yatra_get_attribute_direct', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    $attributeId = intval($_POST['attribute_id'] ?? 0);
+    
+    if (!$attributeId) {
+        wp_send_json_error('Invalid attribute ID');
+    }
+
+    try {
+        global $wpdb;
+        $table = $wpdb->prefix . 'yatra_attributes';
+        
+        $query = $wpdb->prepare("SELECT * FROM `{$table}` WHERE id = %d", $attributeId);
+        $result = $wpdb->get_row($query);
+        
+        if ($result) {
+            wp_send_json_success([
+                'id' => $result->id,
+                'name' => $result->name,
+                'slug' => $result->slug,
+                'description' => $result->description,
+                'field_type' => $result->field_type,
+                'field_options' => $result->field_options,
+                'default_value' => $result->default_value,
+                'validation_rules' => $result->validation_rules,
+                'display_order' => $result->display_order,
+                'show_on_frontend' => $result->show_on_frontend,
+                'show_in_filters' => $result->show_in_filters,
+                'filter_type' => $result->filter_type,
+                'searchable' => $result->searchable,
+                'status' => $result->status,
+                'created_at' => $result->created_at,
+                'updated_at' => $result->updated_at
+            ]);
+        } else {
+            wp_send_json_error('Attribute not found');
+        }
+    } catch (\Exception $e) {
+        error_log('Direct attribute query error: ' . $e->getMessage());
+        wp_send_json_error('Database query failed: ' . $e->getMessage());
+    }
+});
+
+// Register cache management AJAX handlers
+add_action('wp_ajax_yatra_cache_stats', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    $controller = new \Yatra\Controllers\CacheController();
+    $result = $controller->getStats();
+    wp_send_json($result);
+});
+
+add_action('wp_ajax_yatra_cache_clear_all', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    // Check capabilities
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
+    $controller = new \Yatra\Controllers\CacheController();
+    $result = $controller->clearAll();
+    wp_send_json($result);
+});
+
+add_action('wp_ajax_yatra_cache_clear_pattern', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    // Check capabilities
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
+    $pattern = sanitize_text_field($_POST['pattern'] ?? '');
+    $controller = new \Yatra\Controllers\CacheController();
+    $result = $controller->clearPattern(['pattern' => $pattern]);
+    wp_send_json($result);
+});
+
+add_action('wp_ajax_yatra_cache_toggle', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    // Check capabilities
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
+    $enabled = isset($_POST['enabled']) ? (bool) $_POST['enabled'] : false;
+    $controller = new \Yatra\Controllers\CacheController();
+    $result = $controller->toggleCache(['enabled' => $enabled]);
+    wp_send_json($result);
+});
+
+add_action('wp_ajax_yatra_cache_warm', function() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+        wp_send_json_error('Invalid nonce');
+    }
+
+    // Check capabilities
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Insufficient permissions');
+    }
+
+    $controller = new \Yatra\Controllers\CacheController();
+    $result = $controller->warmCache();
+    wp_send_json($result);
+});
+
 /**
  * Plugin activation hook
  */

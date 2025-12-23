@@ -168,6 +168,9 @@ class Bootstrap
         // Register activation/deactivation hooks
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
         register_deactivation_hook(YATRA_PLUGIN_FILE, [$this, 'deactivate']);
+        
+        // Check for plugin upgrades
+        add_action('admin_init', [$this, 'upgrade']);
     }
 
     /**
@@ -247,6 +250,13 @@ class Bootstrap
             $table_trip_trip_categories
         )) === $table_trip_trip_categories;
 
+        // Check if attributes table exists
+        $table_attributes = $wpdb->prefix . 'yatra_attributes';
+        $attributes_exists = $wpdb->get_var($wpdb->prepare(
+            "SHOW TABLES LIKE %s",
+            $table_attributes
+        )) === $table_attributes;
+
         // If any table doesn't exist, create all tables
         if (
             !$activities_exists ||
@@ -258,7 +268,8 @@ class Bootstrap
             !$discounts_exists ||
             !$trip_categories_exists ||
             !$difficulty_levels_exists ||
-            !$trip_trip_categories_exists
+            !$trip_trip_categories_exists ||
+            !$attributes_exists
         ) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 $missing = [];
@@ -272,6 +283,7 @@ class Bootstrap
                 if (!$trip_categories_exists) $missing[] = 'trip_categories';
                 if (!$difficulty_levels_exists) $missing[] = 'difficulty_levels';
                 if (!$trip_trip_categories_exists) $missing[] = 'trip_trip_categories';
+                if (!$attributes_exists) $missing[] = 'attributes';
                 error_log('Yatra: Missing tables - ' . implode(', ', $missing));
             }
             
@@ -319,6 +331,22 @@ class Bootstrap
         
         // Flush rewrite rules
         flush_rewrite_rules();
+    }
+
+    /**
+     * Plugin upgrade logic
+     */
+    public function upgrade(): void
+    {
+        $current_version = get_option('yatra_version', '1.0.0');
+        
+        if (version_compare($current_version, '3.0.0', '<')) {
+            // Create any new tables added in v3.0.0
+            Database::createTables();
+            
+            // Update version
+            update_option('yatra_version', YATRA_VERSION);
+        }
     }
 
     /**

@@ -4,7 +4,7 @@ A modern WordPress plugin built with Laravel-style architecture and React + Type
 
 ## 🏗️ Architecture
 
-This plugin follows Laravel-style separation of concerns:
+This repo is for testing Cascade's ability to read and understand very large files.
 
 - **Controllers**: Handle REST API requests
 - **Repositories**: Abstract database operations

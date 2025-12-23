@@ -48,6 +48,7 @@ import { Select } from '../components/ui/select';
 import { Alert } from '../components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import TripAttributesSection from '../components/trip-form/TripAttributesSection';
 import { HelpText } from '../components/ui/help-text';
 import { getCurrencySymbol } from '../data/currencies';
 import { ItinerarySection } from '../components/trip-form/sections/ItinerarySection';
@@ -61,14 +62,15 @@ type SectionId =
   | 'duration'          // 3. Schedule & Availability (renamed)
   | 'pricing'           // 4. Pricing & Payment
   | 'booking'           // 5. Booking Requirements
-  | 'itinerary'         // 6. Itinerary Builder (includes Included/Excluded)
-  | 'included'          // 7. What's Included/Excluded (deprecated - merged into itinerary)
-  | 'media'             // 8. Media & Content (gallery, video, story, testimonials)
-  | 'downloads'         // 8b. Downloads (Pro module)
-  | 'categorization'    // 9. Categorization & Tags (category, activities, difficulty, tags)
-  | 'faqs'              // 10. FAQs
-  | 'seo'               // 11. SEO Settings
-  | 'advanced';         // 12. Advanced Settings (status, scheduling, frontend tabs)
+  | 'attributes'        // 6. Trip Attributes
+  | 'itinerary'         // 7. Itinerary Builder (includes Included/Excluded)
+  | 'included'          // 8. What's Included/Excluded (deprecated - merged into itinerary)
+  | 'media'             // 9. Media & Content (gallery, video, story, testimonials)
+  | 'downloads'         // 9b. Downloads (Pro module)
+  | 'categorization'    // 10. Categorization & Tags (category, activities, difficulty, tags)
+  | 'faqs'              // 11. FAQs
+  | 'seo'               // 12. SEO Settings
+  | 'advanced';         // 13. Advanced Settings (status, scheduling, frontend tabs)
 
 interface Section {
   id: SectionId;
@@ -272,6 +274,9 @@ interface TripFormData {
   // Included/Excluded
   included_items: TripAmenityItem[];
   excluded_items: TripAmenityItem[];
+  
+  // Attributes & Properties
+  attributes: Record<number, any>; // attribute_id -> value mapping
   
   // Itinerary
   itinerary_days: ItineraryDay[];
@@ -533,6 +538,7 @@ const TripForm: React.FC = () => {
       meta_title: '7-Day Bali Beach Adventure | Luxury Beach Resort Experience',
       meta_description: 'Experience the best of Bali with our 7-day beach adventure. Pristine beaches, ancient temples, cultural immersion, and world-class spa treatments await.',
       meta_keywords: 'Bali, beach vacation, cultural tour, spa retreat, Indonesia travel',
+      attributes: {},
     },
     {
       // Trip 2: Mountain Trekking Adventure
@@ -635,6 +641,7 @@ const TripForm: React.FC = () => {
       meta_title: 'Everest Base Camp Trek - 14 Days | Ultimate Himalayan Adventure',
       meta_description: 'Embark on the adventure of a lifetime with our 14-day Everest Base Camp trek. Experience Sherpa culture, ancient monasteries, and breathtaking mountain views.',
       meta_keywords: 'Everest Base Camp, trekking, Nepal, Himalayas, adventure travel, mountain trek',
+      attributes: {},
       price_types: [],
     },
     {
@@ -737,6 +744,7 @@ const TripForm: React.FC = () => {
       meta_title: 'European Grand Tour - 10 Days | Paris, Rome & Barcelona',
       meta_description: 'Discover the best of Europe with our 10-day grand tour covering Paris, Rome, and Barcelona. Experience iconic landmarks, world-class cuisine, and rich history.',
       meta_keywords: 'Europe tour, Paris, Rome, Barcelona, European travel, cultural tour',
+      attributes: {},
       price_types: [],
     },
   ];
@@ -801,6 +809,7 @@ const TripForm: React.FC = () => {
     vaccination_requirements: '',
     included_items: [],
     excluded_items: [],
+    attributes: {}, // attribute_id -> value mapping
     itinerary_days: [],
     gallery_images: [],
     featured_image: null,
@@ -1029,6 +1038,49 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
+  // Fetch trip attributes if editing
+  const { data: tripAttributesData } = useQuery({
+    queryKey: ['trip-attributes', tripId],
+    queryFn: async () => {
+      if (!tripId) return {};
+      try {
+        const response = await apiClient.get(`/trips/${tripId}/attributes`);
+        
+        // Try different ways to extract the data
+        let payload = response?.data;
+        if (!payload || !Array.isArray(payload)) {
+          payload = response;
+        }
+        if (!payload || !Array.isArray(payload)) {
+          payload = response?.data?.data;
+        }
+        
+        const attributes = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+
+        // Convert to attributeId => value mapping for form
+        const attributesMap: Record<number, any> = {};
+        attributes.forEach((attr: any) => {
+          const attributeId = Number(attr.attribute_id || attr.id);
+          if (attributeId) {
+            let value = attr.value || '';
+            attributesMap[attributeId] = value;
+          }
+        });
+
+        return attributesMap;
+      } catch (error) {
+        console.error('Failed to fetch trip attributes:', error);
+        return {};
+      }
+    },
+    enabled: !!tripId && isEditMode,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
   // Helper function to normalize array of items to IDs
   // Helper to normalize highlights (can be array of strings or objects)
   const normalizeHighlights = (highlights: any): string[] => {
@@ -1190,6 +1242,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       return;
     }
 
+    console.log('Loading trip data into form:', tripData);
+
     setFormData({
         title: tripData.title || '',
         slug: tripData.slug || '',
@@ -1278,6 +1332,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_title: tripData.meta_title || '',
         meta_description: tripData.meta_description || '',
         meta_keywords: tripData.meta_keywords || '',
+        attributes: tripAttributesData || {},
       });
 
     if (tripData.featured_image_url && tripData.featured_image) {
@@ -1289,7 +1344,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     } else if (!tripData.featured_image) {
       setFeaturedImagePreview('');
     }
-  }, [tripData, isEditMode, tripId]);
+  }, [tripData, tripAttributesData, isEditMode, tripId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -1360,6 +1415,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       'duration': ['available_from', 'available_to', 'booking_window_days'],
       'pricing': ['original_price', 'discounted_price', 'price_types'],
       'booking': ['min_travelers', 'max_travelers', 'age_min', 'age_max'],
+      'attributes': ['attributes'],
       'itinerary': ['itinerary_days'],
       'included': ['included_items', 'excluded_items'],
       'media': ['gallery_images', 'video_url', 'virtual_tour_url'], // Removed featured_image - it's in basic section
@@ -1434,7 +1490,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       hasErrors: getSectionErrors('booking').length > 0,
     },
     
-    // Step 6: Itinerary Builder (includes Included/Excluded, now optional)
+    // Step 6: Attributes & Properties
+    { 
+      id: 'attributes', 
+      label: __('Attributes & Properties', 'Attributes & Properties'), 
+      icon: Tag, 
+      required: false, 
+      completed: formData.attributes && Object.keys(formData.attributes).length > 0,
+      hasErrors: getSectionErrors('attributes').length > 0,
+    },
+    
+    // Step 7: Itinerary Builder (includes Included/Excluded, now optional)
     { 
       id: 'itinerary', 
       label: __('Itinerary Builder', 'Itinerary Builder'), 
@@ -2148,6 +2214,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_title: data.meta_title || '',
         meta_description: data.meta_description || '',
         meta_keywords: data.meta_keywords || '',
+        attributes: data.attributes || {},
       };
 
       if (showDownloadsUI) {
@@ -4545,6 +4612,33 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 </div>
               </div>
             </div>
+          </div>
+        );
+
+      case 'attributes':
+        return (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <Tag className="w-5 h-5 text-gray-500" />
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Attributes & Properties', 'Attributes & Properties')}</h2>
+              <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-300 border-green-200 dark:border-green-800">
+                {__('Optional', 'Optional')}
+              </Badge>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              {__('Add custom attributes and properties to describe your trip', 'Add custom attributes and properties to describe your trip')}
+              <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {__('These attributes can be used for filtering and search on the frontend', 'These attributes can be used for filtering and search on the frontend')}
+              </span>
+            </p>
+
+            <TripAttributesSection
+              formData={formData}
+              handleFieldChange={handleFieldChange}
+              tripId={tripId || undefined}
+              isEditMode={isEditMode}
+              tripAttributesData={tripAttributesData}
+            />
           </div>
         );
 

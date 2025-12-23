@@ -258,6 +258,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
         // Availability - FREE feature, always show
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
+        // Attributes - FREE feature, always show
+        { tab: 'attributes', label: 'Attributes', icon: Tag },
         // Additional Services - only show if module is enabled
         ...((window as any).yatraAdmin?.additionalServicesEnabled ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
         // Trip Consent - only show if module is enabled

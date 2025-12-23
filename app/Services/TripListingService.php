@@ -60,25 +60,17 @@ class TripListingService
             'cache_key' => substr($cacheKey, 0, 50) . '...'
         ]);
         
-        // Try to get cached result
-        $result = Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
-            // Get filtered trips from repository
-            $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
-            
-            // Get filter options for UI (cached separately)
-            $filterOptions = $this->getFilterOptions();
-            
-            return [
-                'trips' => $tripResult['trips'],
-                'total' => $tripResult['total'],
-                'pages' => $tripResult['pages'],
-                'page' => $tripResult['page'],
-                'per_page' => $tripResult['per_page'],
-                'filters' => $filters,
-                'destinations' => $filterOptions['destinations'],
-                'activities' => $filterOptions['activities']
-            ];
-        }, Cache::DURATION_QUERY_RESULT);
+        // Check if cache is enabled before using it
+        if ($this->isCacheEnabled()) {
+            // Try to get cached result
+            $result = Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
+                return $this->buildTripListingResult($filters, $page, $perPage);
+            }, Cache::DURATION_QUERY_RESULT);
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh trip listing", ['filters' => $filters, 'page' => $page]);
+            $result = $this->buildTripListingResult($filters, $page, $perPage);
+        }
         
         $executionTime = microtime(true) - $startTime;
         Logger::debug("Trip listing request completed", [
@@ -171,18 +163,48 @@ class TripListingService
     }
 
     /**
-     * Get available filter options for the UI with caching
-     *
-     * @return array Filter options
+     * Build trip listing result
+     */
+    private function buildTripListingResult(array $filters, int $page, int $perPage): array
+    {
+        // Get filtered trips from repository
+        $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
+        
+        // Get filter options for UI (cached separately)
+        $filterOptions = $this->getFilterOptions();
+        
+        return [
+            'trips' => $tripResult['trips'],
+            'total' => $tripResult['total'],
+            'pages' => $tripResult['pages'],
+            'page' => $tripResult['page'],
+            'per_page' => $tripResult['per_page'],
+            'filters' => $filters,
+            'destinations' => $filterOptions['destinations'],
+            'activities' => $filterOptions['activities']
+        ];
+    }
+
+    /**
+     * Get filter options for UI
      */
     private function getFilterOptions(): array
     {
-        return Cache::remember('trip_listing_filter_options', function() {
+        if ($this->isCacheEnabled()) {
+            return Cache::remember('trip_listing_filter_options', function() {
+                return [
+                    'destinations' => $this->destinationRepository->getPublished(),
+                    'activities' => $this->activityRepository->getPublished()
+                ];
+            }, Cache::DURATION_DESTINATION_DATA); // Cache for 1 hour since destinations/activities don't change often
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, getting fresh filter options");
             return [
                 'destinations' => $this->destinationRepository->getPublished(),
                 'activities' => $this->activityRepository->getPublished()
             ];
-        }, Cache::DURATION_DESTINATION_DATA); // Cache for 1 hour since destinations/activities don't change often
+        }
     }
 
     /**
@@ -190,25 +212,39 @@ class TripListingService
      */
     public function getTripStatistics(): array
     {
-        return Cache::remember('trip_listing_statistics', function() {
-            $startTime = microtime(true);
-            
-            $stats = [
-                'total_published_trips' => $this->tripRepository->count(['status' => 'publish']),
-                'total_destinations' => $this->destinationRepository->count(['status' => 'publish']),
-                'total_activities' => $this->activityRepository->count(['status' => 'publish']),
-                'price_range' => $this->tripRepository->getPriceRange(),
-                'duration_range' => $this->tripRepository->getDurationRange()
-            ];
-            
-            $executionTime = microtime(true) - $startTime;
-            Logger::debug("Trip statistics calculated", [
-                'execution_time' => $executionTime,
-                'stats' => $stats
-            ]);
-            
-            return $stats;
-        }, Cache::DURATION_STATS);
+        if ($this->isCacheEnabled()) {
+            return Cache::remember('trip_listing_statistics', function() {
+                return $this->calculateTripStatistics();
+            }, Cache::DURATION_STATS);
+        } else {
+            // Bypass cache and get fresh data
+            Logger::debug("Cache disabled, calculating fresh trip statistics");
+            return $this->calculateTripStatistics();
+        }
+    }
+
+    /**
+     * Calculate trip statistics
+     */
+    private function calculateTripStatistics(): array
+    {
+        $startTime = microtime(true);
+        
+        $stats = [
+            'total_published_trips' => $this->tripRepository->count(['status' => 'publish']),
+            'total_destinations' => $this->destinationRepository->count(['status' => 'publish']),
+            'total_activities' => $this->activityRepository->count(['status' => 'publish']),
+            'price_range' => $this->tripRepository->getPriceRange(),
+            'duration_range' => $this->tripRepository->getDurationRange()
+        ];
+        
+        $executionTime = microtime(true) - $startTime;
+        Logger::debug("Trip statistics calculated", [
+            'execution_time' => $executionTime,
+            'stats' => $stats
+        ]);
+        
+        return $stats;
     }
 
     /**
