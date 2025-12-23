@@ -950,8 +950,10 @@ const Availability: React.FC = () => {
           {tabMode === 'recurring' && (
             <RecurringRules
               tripId={selectedTripId}
+              tripName={selectedTrip?.title}
+              tripType={selectedTrip?.trip_type}
               onAddRule={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create-rule', trip_id: selectedTripId.toString() })}
-              onEditRule={(id) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit-rule', id: id.toString() })}
+              onEditRule={(id: number) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit-rule', id: id.toString() })}
             />
           )}
 

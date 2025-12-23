@@ -300,8 +300,19 @@ export const Table: React.FC<TableProps> = ({
                     e.stopPropagation();
                     const button = e.currentTarget;
                     const rect = button.getBoundingClientRect();
+                    
+                    // Calculate dropdown height (estimate based on number of actions)
+                    const dropdownHeight = actions.filter(a => !a.condition || a.condition(item)).length * 40 + 16;
+                    const spaceBelow = window.innerHeight - rect.bottom;
+                    const spaceAbove = rect.top;
+                    
+                    // Position dropdown above if not enough space below
+                    const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
+                    
                     setDropdownPosition({
-                      top: rect.bottom + window.scrollY,
+                      top: shouldPositionAbove 
+                        ? rect.top + window.scrollY - dropdownHeight
+                        : rect.bottom + window.scrollY,
                       right: window.innerWidth - rect.right + window.scrollX
                     });
                     setOpenDropdownId(openDropdownId === itemId ? null : itemId);
@@ -405,8 +416,19 @@ export const Table: React.FC<TableProps> = ({
                   e.stopPropagation();
                   const button = e.currentTarget;
                   const rect = button.getBoundingClientRect();
+                  
+                  // Calculate dropdown height (estimate based on number of actions)
+                  const dropdownHeight = actions.filter(a => !a.condition || a.condition(item)).length * 40 + 16;
+                  const spaceBelow = window.innerHeight - rect.bottom;
+                  const spaceAbove = rect.top;
+                  
+                  // Position dropdown above if not enough space below
+                  const shouldPositionAbove = spaceBelow < dropdownHeight && spaceAbove > dropdownHeight;
+                  
                   setDropdownPosition({
-                    top: rect.bottom + window.scrollY,
+                    top: shouldPositionAbove 
+                      ? rect.top + window.scrollY - dropdownHeight
+                      : rect.bottom + window.scrollY,
                     right: window.innerWidth - rect.right + window.scrollX
                   });
                   setOpenDropdownId(openDropdownId === itemId ? null : itemId);

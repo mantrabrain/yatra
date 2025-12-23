@@ -29,6 +29,21 @@ class RecurringAvailabilityService
      */
     public function validate(array $data, ?int $id = null): void
     {
+        // For updates (when $id is provided), allow partial updates
+        $isUpdate = $id !== null;
+        
+        // If this is just a status update or other partial update, skip full validation
+        $isPartialUpdate = $isUpdate && count($data) <= 2; // status, or status + one other field
+        
+        if ($isPartialUpdate) {
+            // For partial updates, only validate what's provided
+            if (isset($data['status']) && !in_array($data['status'], ['active', 'inactive'], true)) {
+                throw new \InvalidArgumentException('Invalid status. Must be active or inactive');
+            }
+            return; // Skip full validation for partial updates
+        }
+        
+        // Full validation for create or complete updates
         // Required fields
         if (empty($data['trip_id'])) {
             throw new \InvalidArgumentException('Trip ID is required');
@@ -164,6 +179,14 @@ class RecurringAvailabilityService
     }
 
     /**
+     * Get status counts for recurring rules by trip ID
+     */
+    public function getStatusCounts(int $tripId): array
+    {
+        return $this->repository->getStatusCounts($tripId);
+    }
+
+    /**
      * Find rule by ID
      */
     public function find(int $id): ?object
@@ -246,6 +269,7 @@ class RecurringAvailabilityService
         $dates = [];
         $targetDays = $rule->days_of_week_array;
         $excludedDates = $rule->excluded_dates;
+        $selectedMonths = !empty($rule->months) ? $rule->months : [];
         
         $current = strtotime($fromDate);
         $end = strtotime($toDate);
@@ -254,6 +278,13 @@ class RecurringAvailabilityService
         while ($current <= $end) {
             $dayOfWeek = (int) date('w', $current);
             $dateStr = date('Y-m-d', $current);
+            $month = (int) date('n', $current); // 1-12
+            
+            // Check if month is allowed (if months filter is set)
+            if (!empty($selectedMonths) && !in_array($month, $selectedMonths, true)) {
+                $current = strtotime('+1 day', $current);
+                continue;
+            }
             
             if (in_array($dayOfWeek, $targetDays, true)) {
                 // Check if not excluded
@@ -281,6 +312,7 @@ class RecurringAvailabilityService
         $weekOfMonth = $rule->week_of_month;
         $dayOfWeek = (int) $rule->day_of_week;
         $excludedDates = $rule->excluded_dates;
+        $selectedMonths = !empty($rule->months) ? $rule->months : [];
         
         // Start from the first day of the starting month
         $current = strtotime(date('Y-m-01', strtotime($fromDate)));
@@ -289,6 +321,12 @@ class RecurringAvailabilityService
         while ($current <= $end) {
             $year = (int) date('Y', $current);
             $month = (int) date('n', $current);
+            
+            // Check if month is allowed (if months filter is set)
+            if (!empty($selectedMonths) && !in_array($month, $selectedMonths, true)) {
+                $current = strtotime('first day of next month', $current);
+                continue;
+            }
             
             $targetDate = $this->getNthWeekdayOfMonth($year, $month, $weekOfMonth, $dayOfWeek);
             
@@ -323,6 +361,7 @@ class RecurringAvailabilityService
         $dates = [];
         $intervalDays = (int) $rule->interval_days;
         $excludedDates = $rule->excluded_dates;
+        $selectedMonths = !empty($rule->months) ? $rule->months : [];
         
         // Start from interval_start_date or rule start_date
         $referenceDate = $rule->interval_start_date ?? $rule->start_date;
@@ -343,13 +382,17 @@ class RecurringAvailabilityService
             if ($current >= $from) {
                 $dateStr = date('Y-m-d', $current);
                 $dayOfWeek = (int) date('w', $current);
+                $month = (int) date('n', $current); // 1-12
                 
-                // Check if not excluded
-                if (!in_array($dateStr, $excludedDates, true)) {
-                    // Check cutoff
-                    if ($this->isBookable($current, $rule)) {
-                        $generatedDates = $this->createAvailabilityFromRule($rule, $dateStr, $dayOfWeek);
-                        $dates = array_merge($dates, $generatedDates);
+                // Check if month is allowed (if months filter is set)
+                if (empty($selectedMonths) || in_array($month, $selectedMonths, true)) {
+                    // Check if not excluded
+                    if (!in_array($dateStr, $excludedDates, true)) {
+                        // Check cutoff
+                        if ($this->isBookable($current, $rule)) {
+                            $generatedDates = $this->createAvailabilityFromRule($rule, $dateStr, $dayOfWeek);
+                            $dates = array_merge($dates, $generatedDates);
+                        }
                     }
                 }
             }

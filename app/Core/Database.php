@@ -494,6 +494,9 @@ class Database
             -- Excluded Dates (JSON array of YYYY-MM-DD strings)
             `excluded_dates` text DEFAULT NULL,
             
+            -- Specific Months Filter (JSON array of month numbers 1-12)
+            `months` text DEFAULT NULL COMMENT 'JSON: [1,3,12] for Jan,Mar,Dec. Empty = all months',
+            
             -- Multiple time slots per day (JSON array)
             `time_slots` text DEFAULT NULL COMMENT 'JSON: [{departure_time, arrival_time, seats, price}]',
             

@@ -183,10 +183,14 @@ class AvailabilityConditionsMigration extends BaseMigration
             return intval($m) + 1;
         }, $months);
 
-        // Convert weekday indices (0-6, Sunday=0) to ISO weekdays (1-7, Monday=1)
-        $iso_weekdays = array_map(function($w) {
-            return $w == 0 ? 7 : intval($w); // Sunday (0) becomes 7, others stay same
-        }, $week_days);
+        // Convert weekday indices (0-6, Sunday=0) to our format (0-6, Sunday=0)
+        $days_of_week = array_map('intval', $week_days);
+
+        // Prepare months as JSON array for the new system
+        $months_json = !empty($month_numbers) ? wp_json_encode($month_numbers) : null;
+        
+        // Prepare days_of_week as comma-separated string
+        $days_of_week_string = !empty($days_of_week) ? implode(',', $days_of_week) : null;
 
         $ruleData = [
             'name' => $condition->name,
@@ -194,17 +198,18 @@ class AvailabilityConditionsMigration extends BaseMigration
             'status' => $availability === 'available' ? 'active' : 'inactive',
             'start_date' => !empty($start_date) ? $start_date : null,
             'end_date' => !empty($end_date) ? $end_date : null,
-            'months' => !empty($month_numbers) ? implode(',', $month_numbers) : null,
-            'weekdays' => !empty($iso_weekdays) ? implode(',', $iso_weekdays) : null,
+            'months' => $months_json, // JSON array for months filter
+            'days_of_week' => $days_of_week_string, // Comma-separated for weekly rules
             'interval_days' => null,
             'interval_type' => null,
             'seats_total' => null,
             'original_price' => null,
-            'discounted_price' => null,
+            'sale_price' => null,
+            'traveler_pricing' => null,
             'created_at' => current_time('mysql'),
         ];
 
-        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, months=" . ($ruleData['months'] ?: 'none') . ", weekdays=" . ($ruleData['weekdays'] ?: 'none'));
+        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, months=" . ($months_json ?: 'none') . ", days_of_week=" . ($days_of_week_string ?: 'none'));
 
         return $ruleData;
     }
@@ -224,13 +229,13 @@ class AvailabilityConditionsMigration extends BaseMigration
             'status' => $ruleData['status'],
             'start_date' => $ruleData['start_date'],
             'end_date' => $ruleData['end_date'],
-            'months' => $ruleData['months'],
-            'weekdays' => $ruleData['weekdays'],
+            'months' => $ruleData['months'], // JSON array
+            'days_of_week' => $ruleData['days_of_week'], // Comma-separated string
             'interval_days' => $ruleData['interval_days'],
-            'interval_type' => $ruleData['interval_type'],
             'seats_total' => $ruleData['seats_total'],
             'original_price' => $ruleData['original_price'],
-            'discounted_price' => $ruleData['discounted_price'],
+            'sale_price' => $ruleData['sale_price'],
+            'traveler_pricing' => $ruleData['traveler_pricing'],
             'created_at' => $ruleData['created_at'],
         ];
 

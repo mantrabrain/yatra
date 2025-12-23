@@ -92,6 +92,32 @@ class RecurringAvailabilityRepository extends BaseRepository
     }
 
     /**
+     * Get status counts for recurring rules by trip ID
+     */
+    public function getStatusCounts(int $tripId): array
+    {
+        $table = esc_sql($this->table);
+        
+        $query = $this->wpdb->prepare(
+            "SELECT 
+                COUNT(*) as all_count,
+                SUM(CASE WHEN status = 'active' THEN 1 ELSE 0 END) as active,
+                SUM(CASE WHEN status = 'inactive' THEN 1 ELSE 0 END) as inactive
+             FROM `{$table}` 
+             WHERE trip_id = %d",
+            $tripId
+        );
+        
+        $result = $this->wpdb->get_row($query, ARRAY_A);
+        
+        return [
+            'all' => (int) ($result['all_count'] ?? 0),
+            'active' => (int) ($result['active'] ?? 0),
+            'inactive' => (int) ($result['inactive'] ?? 0),
+        ];
+    }
+
+    /**
      * Get active rules for a trip within a date range
      */
     public function getActiveRulesForDateRange(int $tripId, string $fromDate, string $toDate): array
@@ -207,7 +233,7 @@ class RecurringAvailabilityRepository extends BaseRepository
         $allowed = [
             'trip_id', 'name', 'rule_type', 'days_of_week', 'week_of_month',
             'day_of_week', 'interval_days', 'interval_start_date', 'start_date',
-            'end_date', 'excluded_dates', 'time_slots', 'pricing_type', 'original_price', 
+            'end_date', 'excluded_dates', 'months', 'time_slots', 'pricing_type', 'original_price', 
             'sale_price', 'traveler_pricing', 'seats_total', 'alert_threshold',
             'departure_time', 'arrival_time', 'from_location', 'to_location', 
             'cutoff_hours', 'advance_booking_days', 'day_overrides', 'status', 'priority'
@@ -220,7 +246,7 @@ class RecurringAvailabilityRepository extends BaseRepository
                 $value = $data[$field];
                 
                 // JSON encode array fields
-                if (in_array($field, ['excluded_dates', 'time_slots', 'day_overrides', 'traveler_pricing'], true)) {
+                if (in_array($field, ['excluded_dates', 'months', 'time_slots', 'day_overrides', 'traveler_pricing'], true)) {
                     if (is_array($value)) {
                         $value = wp_json_encode($value);
                     }
@@ -286,6 +312,13 @@ class RecurringAvailabilityRepository extends BaseRepository
             $rule->days_of_week_array = array_map('intval', explode(',', $rule->days_of_week));
         } else {
             $rule->days_of_week_array = [];
+        }
+        
+        // Decode months JSON field
+        if (!empty($rule->months)) {
+            $rule->months = json_decode($rule->months, true) ?: [];
+        } else {
+            $rule->months = [];
         }
         
         return $rule;

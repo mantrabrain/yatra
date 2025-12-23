@@ -97,6 +97,24 @@ class RecurringAvailabilityController extends BaseController
             ],
         ]);
 
+        // Status counts endpoint
+        register_rest_route($namespace, '/' . $base . '/counts', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_counts'],
+                'permission_callback' => [$this, 'check_permission'],
+                'args' => [
+                    'trip_id' => [
+                        'required' => true,
+                        'type' => 'integer',
+                        'validate_callback' => function ($param) {
+                            return is_numeric($param) && $param > 0;
+                        },
+                    ],
+                ],
+            ],
+        ]);
+
         // Preview generated dates
         register_rest_route($namespace, '/' . $base . '/preview', [
             'methods' => \WP_REST_Server::CREATABLE,
@@ -120,6 +138,22 @@ class RecurringAvailabilityController extends BaseController
                 ],
             ],
         ]);
+    }
+
+    /**
+     * Get status counts for recurring rules
+     */
+    public function get_counts(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $tripId = (int) $request->get_param('trip_id');
+            
+            $counts = $this->service->getStatusCounts($tripId);
+            
+            return new WP_REST_Response($counts, 200);
+        } catch (\Exception $e) {
+            return new WP_Error('error', $e->getMessage(), ['status' => 500]);
+        }
     }
 
     /**

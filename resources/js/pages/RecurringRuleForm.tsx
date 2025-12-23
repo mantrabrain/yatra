@@ -81,6 +81,7 @@ interface RecurringRule {
   start_date: string;
   end_date?: string;
   excluded_dates: string[];
+  months: number[]; // Array of month numbers (1-12) to filter by
   time_slots: TimeSlot[]; // For single-day trips with multiple slots
   pricing_type: 'regular' | 'traveler_based'; // Allow override of trip's pricing type
   original_price?: number;
@@ -137,6 +138,7 @@ const RecurringRuleForm: React.FC = () => {
     start_date: new Date().toISOString().split('T')[0],
     end_date: '',
     excluded_dates: [],
+    months: [], // Empty = all months, otherwise specific months (1-12)
     time_slots: [], // For single-day trips with multiple slots
     pricing_type: 'regular', // Will be updated based on trip's pricing type
     original_price: undefined,
@@ -196,30 +198,46 @@ const RecurringRuleForm: React.FC = () => {
     queryFn: async () => {
       if (!ruleId) return null;
       const response = await apiClient.get(`/recurring-availability/${ruleId}`);
-      return response;
+      return response?.data || response; // Unwrap data property from API response
     },
     enabled: !!ruleId,
   });
 
   // Update form when existing rule is loaded
   useEffect(() => {
-    if (existingRule) {
+    if (existingRule && tripsData) {
+      // Parse days_of_week - handle both array and string formats
+      let daysOfWeek = [0]; // Default to Sunday
+      if (existingRule.days_of_week_array && Array.isArray(existingRule.days_of_week_array)) {
+        daysOfWeek = existingRule.days_of_week_array;
+      } else if (existingRule.days_of_week) {
+        if (typeof existingRule.days_of_week === 'string') {
+          daysOfWeek = existingRule.days_of_week.split(',').map(Number).filter((n: number) => !isNaN(n));
+        } else if (Array.isArray(existingRule.days_of_week)) {
+          daysOfWeek = existingRule.days_of_week.map(Number);
+        }
+      }
+      
+      // Ensure rule_type is properly typed
+      const ruleType = (existingRule.rule_type || 'weekly') as 'weekly' | 'monthly' | 'interval';
+      
       setFormData({
-        trip_id: existingRule.trip_id,
+        trip_id: existingRule.trip_id || 0,
         name: existingRule.name || '',
-        rule_type: existingRule.rule_type,
-        days_of_week: existingRule.days_of_week_array || existingRule.days_of_week?.split(',').map(Number) || [0],
+        rule_type: ruleType,
+        days_of_week: daysOfWeek.length > 0 ? daysOfWeek : [0],
         week_of_month: existingRule.week_of_month || 'first',
         day_of_week: existingRule.day_of_week ?? 0,
         interval_days: existingRule.interval_days || 7,
-        start_date: existingRule.start_date,
+        start_date: existingRule.start_date || new Date().toISOString().split('T')[0],
         end_date: existingRule.end_date || '',
-        excluded_dates: existingRule.excluded_dates || [],
-        time_slots: existingRule.time_slots || [],
+        excluded_dates: Array.isArray(existingRule.excluded_dates) ? existingRule.excluded_dates : [],
+        months: Array.isArray(existingRule.months) ? existingRule.months : [],
+        time_slots: Array.isArray(existingRule.time_slots) ? existingRule.time_slots : [],
         pricing_type: existingRule.pricing_type || 'regular',
         original_price: existingRule.original_price,
         sale_price: existingRule.sale_price,
-        traveler_pricing: existingRule.traveler_pricing || [],
+        traveler_pricing: Array.isArray(existingRule.traveler_pricing) ? existingRule.traveler_pricing : [],
         seats_total: existingRule.seats_total || 20,
         departure_time: existingRule.departure_time || '',
         arrival_time: existingRule.arrival_time || '',
@@ -230,7 +248,7 @@ const RecurringRuleForm: React.FC = () => {
         status: existingRule.status || 'active',
       });
     }
-  }, [existingRule]);
+  }, [existingRule, tripsData]);
 
   // Set pricing type based on selected trip when not editing
   useEffect(() => {
@@ -295,8 +313,10 @@ const RecurringRuleForm: React.FC = () => {
         preview_limit: 20,
       });
     },
-    onSuccess: (data) => {
-      setPreviewData(data);
+    onSuccess: (response) => {
+      // Unwrap the data property from API response
+      const previewResult = response?.data || response;
+      setPreviewData(previewResult);
     },
     onError: (error: any) => {
       showToast(error?.message || __('Failed to generate preview', 'Failed to generate preview'), 'error');
@@ -543,6 +563,59 @@ const RecurringRuleForm: React.FC = () => {
                       placeholder={__('Select end date (optional)', 'Select end date (optional)')}
                     />
                   </div>
+                </div>
+
+                {/* Month Filter */}
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {__('Specific Months', 'Specific Months')} <span className="text-gray-400">({__('optional - leave empty for all months', 'optional - leave empty for all months')})</span>
+                  </label>
+                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+                    {[
+                      { value: 1, label: __('January', 'January') },
+                      { value: 2, label: __('February', 'February') },
+                      { value: 3, label: __('March', 'March') },
+                      { value: 4, label: __('April', 'April') },
+                      { value: 5, label: __('May', 'May') },
+                      { value: 6, label: __('June', 'June') },
+                      { value: 7, label: __('July', 'July') },
+                      { value: 8, label: __('August', 'August') },
+                      { value: 9, label: __('September', 'September') },
+                      { value: 10, label: __('October', 'October') },
+                      { value: 11, label: __('November', 'November') },
+                      { value: 12, label: __('December', 'December') },
+                    ].map((month) => (
+                      <label
+                        key={month.value}
+                        className={`flex items-center justify-center px-3 py-2 rounded-md border cursor-pointer transition-colors ${
+                          formData.months.includes(month.value)
+                            ? 'bg-blue-50 border-blue-500 text-blue-700 dark:bg-blue-900/20 dark:border-blue-600 dark:text-blue-300'
+                            : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={formData.months.includes(month.value)}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setFormData(prev => ({
+                              ...prev,
+                              months: checked
+                                ? [...prev.months, month.value].sort((a, b) => a - b)
+                                : prev.months.filter(m => m !== month.value)
+                            }));
+                          }}
+                          className="sr-only"
+                        />
+                        <span className="text-sm font-medium">{month.label.slice(0, 3)}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {formData.months.length > 0 && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      {__('Selected:', 'Selected:')} {formData.months.length} {formData.months.length === 1 ? __('month', 'month') : __('months', 'months')}
+                    </p>
+                  )}
                 </div>
 
                 {/* Excluded Dates */}
@@ -1532,7 +1605,7 @@ const RecurringRuleForm: React.FC = () => {
                       <Badge variant="success">{previewData.total}</Badge>
                     </div>
                     <div className="max-h-48 overflow-y-auto space-y-1">
-                      {previewData.dates.map((date: any, index: number) => (
+                      {previewData.dates && Array.isArray(previewData.dates) && previewData.dates.map((date: any, index: number) => (
                         <div
                           key={index}
                           className="text-xs px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded flex justify-between"

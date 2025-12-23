@@ -1,31 +1,33 @@
 /**
  * Recurring Availability Rules Component
  * Manage recurring patterns for trip availability
+ * Uses the same UI structure as Specific Dates table
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Plus,
   Edit,
   Trash2,
-  Calendar,
-  RefreshCw,
-  Clock,
-  Users,
-  DollarSign,
-  Eye,
-  X,
-  Check,
+  Copy,
+  CheckCircle,
+  XCircle,
   AlertCircle,
-  Ban
+  RefreshCw,
+  Search,
+  X
 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select } from '../ui/select';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { apiClient } from '../../lib/api';
 import { useToast } from '../ui/toast';
+import { BulkActionToolbar, Table as SharedTable } from '../shared';
+import { ConfirmationDialog } from '../ui/confirmation-dialog';
 
 interface RecurringRule {
   id: number;
@@ -57,15 +59,11 @@ interface RecurringRule {
     original_price: number;
     sale_price?: number;
   }>;
-  preview?: {
-    total: number;
-    dates: any[];
-    excluded_count: number;
-  };
 }
 
 interface RecurringRulesProps {
   tripId: number;
+  tripName?: string;
   tripType?: 'single_day' | 'multi_day';
   pricingType?: 'regular' | 'traveler_based';
   onAddRule: () => void;
@@ -82,16 +80,9 @@ const dayNames = [
   { value: 6, label: 'Saturday' },
 ];
 
-const weekPositions = [
-  { value: 'first', label: 'First' },
-  { value: 'second', label: 'Second' },
-  { value: 'third', label: 'Third' },
-  { value: 'fourth', label: 'Fourth' },
-  { value: 'last', label: 'Last' },
-];
-
 export const RecurringRules: React.FC<RecurringRulesProps> = ({
   tripId,
+  tripName,
   tripType = 'multi_day',
   pricingType = 'regular',
   onAddRule,
@@ -101,63 +92,32 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   const isTravelerBased = pricingType === 'traveler_based';
   const queryClient = useQueryClient();
   const { showToast } = useToast();
-  const [previewRuleId, setPreviewRuleId] = useState<number | null>(null);
-
-  // Fetch recurring rules
-  const { data: rulesData, isLoading } = useQuery({
-    queryKey: ['recurring-availability', tripId],
-    queryFn: async () => {
-      const response = await apiClient.get('/recurring-availability', {
-        params: { trip_id: tripId },
-      });
-      return {
-        rules: (response?.data || []) as RecurringRule[],
-        total: response?.total || 0,
-      };
-    },
-    enabled: !!tripId,
+  
+  // State management
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
+  const [bulkAction, setBulkAction] = useState('');
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState({
+    name: true,
+    pattern: true,
+    start_date: true,
+    end_date: true,
+    capacity: true,
+    generated: true,
+    price: true,
+    status: true,
   });
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: async (id: number) => {
-      return await apiClient.delete(`/recurring-availability/${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Recurring rule deleted successfully', 'Recurring rule deleted successfully'), 'success');
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete rule', 'Failed to delete rule'), 'error');
-    },
+  
+  // Confirmation dialogs
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; rule: RecurringRule | null }>({ 
+    isOpen: false, 
+    rule: null 
   });
-
-  // Toggle status mutation
-  const toggleStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: number; status: 'active' | 'inactive' }) => {
-      return await apiClient.put(`/recurring-availability/${id}`, { 
-        trip_id: tripId,
-        status 
-      });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Rule status updated', 'Rule status updated'), 'success');
-    },
-    onError: (error: any) => {
-      showToast(error?.message || __('Failed to update status', 'Failed to update status'), 'error');
-    },
-  });
-
-  // Preview query
-  const { data: previewData } = useQuery({
-    queryKey: ['recurring-preview', previewRuleId],
-    queryFn: async () => {
-      if (!previewRuleId) return null;
-      const response = await apiClient.get(`/recurring-availability/${previewRuleId}`);
-      return response?.preview;
-    },
-    enabled: !!previewRuleId,
+  const [duplicateConfirm, setDuplicateConfirm] = useState<{ isOpen: boolean; rule: RecurringRule | null }>({ 
+    isOpen: false, 
+    rule: null 
   });
 
   // Format rule pattern for display
@@ -170,9 +130,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
           .join(', ');
         return `Every ${days}`;
       case 'monthly':
-        const weekPos = weekPositions.find(w => w.value === rule.week_of_month)?.label || '';
-        const dayName = dayNames.find(d => d.value === rule.day_of_week)?.label || '';
-        return `${weekPos} ${dayName} of each month`;
+        return `${rule.week_of_month || ''} ${dayNames.find(d => d.value === rule.day_of_week)?.label || ''} of month`;
       case 'interval':
         return `Every ${rule.interval_days} days`;
       default:
@@ -180,265 +138,558 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     }
   };
 
-  // Format date range
-  const formatDateRange = (startDate: string, endDate?: string): string => {
-    const start = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    if (!endDate) return `From ${start} (ongoing)`;
-    const end = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    return `${start} - ${end}`;
+  // Fetch status counts from API endpoint
+  const { data: countsData } = useQuery({
+    queryKey: ['recurring-availability-counts', tripId],
+    queryFn: async () => {
+      const response = await apiClient.get('/recurring-availability/counts', {
+        params: { 
+          trip_id: tripId,
+        },
+      });
+      return response || { all: 0, active: 0, inactive: 0 };
+    },
+    enabled: !!tripId,
+    staleTime: 0,
+    gcTime: 0,
+  });
+
+  const statusCounts = countsData || { all: 0, active: 0, inactive: 0 };
+
+  // Fetch recurring rules (no caching, always fresh data)
+  const { data: rulesData, isLoading } = useQuery({
+    queryKey: ['recurring-availability', tripId],
+    queryFn: async () => {
+      const response = await apiClient.get('/recurring-availability', {
+        params: { 
+          trip_id: tripId,
+        },
+      });
+      return {
+        rules: (response?.data || []) as RecurringRule[],
+        total: response?.total || 0,
+      };
+    },
+    enabled: !!tripId,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache the data (replaces cacheTime in newer versions)
+  });
+
+  const allRules = rulesData?.rules || [];
+
+  // Filter rules based on status and search
+  const rules = useMemo(() => {
+    let filtered = allRules;
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((r: RecurringRule) => r.status === statusFilter);
+    }
+
+    // Filter by search term
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter((r: RecurringRule) => 
+        (r.name && r.name.toLowerCase().includes(search)) ||
+        formatRulePattern(r).toLowerCase().includes(search)
+      );
+    }
+
+    return filtered;
+  }, [allRules, statusFilter, searchTerm]);
+
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return await apiClient.delete(`/recurring-availability/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
+      showToast(__('Recurring rule deleted successfully', 'Recurring rule deleted successfully'), 'success');
+      setDeleteConfirm({ isOpen: false, rule: null });
+      setSelectedIds([]);
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete rule', 'Failed to delete rule'), 'error');
+    },
+  });
+  
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: string[]) => {
+      await Promise.all(ids.map(id => apiClient.delete(`/recurring-availability/${id}`)));
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
+      showToast(__('Rules deleted successfully', 'Rules deleted successfully'), 'success');
+      setSelectedIds([]);
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to delete rules', 'Failed to delete rules'), 'error');
+    },
+  });
+  
+  // Duplicate rule mutation
+  const duplicateMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await apiClient.post(`/recurring-availability/${id}/duplicate`);
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
+      showToast(__('Rule duplicated successfully', 'Rule duplicated successfully'), 'success');
+      setDuplicateConfirm({ isOpen: false, rule: null });
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to duplicate rule', 'Failed to duplicate rule'), 'error');
+    },
+  });
+
+  // Handle bulk actions
+  const handleBulkApply = () => {
+    if (!bulkAction || selectedIds.length === 0) {
+      showToast(__('Please select rules and an action', 'Please select rules and an action'), 'warning');
+      return;
+    }
+    
+    switch (bulkAction) {
+      case 'delete':
+        if (confirm(__('Are you sure you want to delete {count} rule(s)?', 'Are you sure you want to delete {count} rule(s)?').replace('{count}', selectedIds.length.toString()))) {
+          bulkDeleteMutation.mutate(selectedIds.map(id => id.toString()));
+        }
+        break;
+    }
+    
+    setBulkAction('');
+  };
+  
+  // Toggle column visibility
+  const toggleColumn = (key: keyof typeof visibleColumns) => {
+    setVisibleColumns(prev => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
-  // Format time
-  const formatTime = (timeString?: string): string => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  // Format date
+  const formatDate = (dateString: string | null | undefined): string => {
+    if (!dateString) return '--';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    } catch {
+      return dateString;
+    }
+  };
+  
+  // Get status badge
+  const getStatusBadge = (status: string) => {
+    const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
+      active: {
+        label: __('Active', 'Active'),
+        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
+        icon: <CheckCircle className="w-3 h-3" />,
+      },
+      inactive: {
+        label: __('Inactive', 'Inactive'),
+        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+        icon: <XCircle className="w-3 h-3" />,
+      },
+    };
+    
+    const config = statusConfig[status] || statusConfig.inactive;
+    return (
+      <Badge className={`${config.className} flex items-center gap-1`}>
+        {config.icon}
+        {config.label}
+      </Badge>
+    );
   };
 
-  const rules = rulesData?.rules || [];
+  // Define table columns (matching Specific Dates structure)
+  const tableColumns = useMemo(() => {
+    const cols = [];
+    
+    if (visibleColumns.name) {
+      cols.push({
+        key: 'name',
+        label: __('Rule Name', 'Rule Name'),
+        visible: visibleColumns.name,
+        render: (rule: RecurringRule) => (
+          <div className="flex flex-col">
+            <button
+              onClick={() => onEditRule(rule.id)}
+              className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-left hover:underline"
+            >
+              {rule.name || formatRulePattern(rule)}
+            </button>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {rule.rule_type === 'weekly' ? __('Weekly', 'Weekly') : 
+               rule.rule_type === 'monthly' ? __('Monthly', 'Monthly') : 
+               __('Interval', 'Interval')}
+            </span>
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.pattern) {
+      cols.push({
+        key: 'pattern',
+        label: __('Pattern', 'Pattern'),
+        visible: visibleColumns.pattern,
+        render: (rule: RecurringRule) => (
+          <div className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
+            <RefreshCw className="w-3 h-3" />
+            <span>{formatRulePattern(rule)}</span>
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.start_date) {
+      cols.push({
+        key: 'start_date',
+        label: __('Start Date', 'Start Date'),
+        visible: visibleColumns.start_date,
+        render: (rule: RecurringRule) => (
+          <div className="text-sm text-gray-900 dark:text-white">
+            {formatDate(rule.start_date)}
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.end_date) {
+      cols.push({
+        key: 'end_date',
+        label: __('End Date', 'End Date'),
+        visible: visibleColumns.end_date,
+        render: (rule: RecurringRule) => (
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {rule.end_date ? formatDate(rule.end_date) : __('Ongoing', 'Ongoing')}
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.capacity) {
+      cols.push({
+        key: 'capacity',
+        label: __('Capacity', 'Capacity'),
+        visible: visibleColumns.capacity,
+        render: (rule: RecurringRule) => (
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-medium text-gray-900 dark:text-white">
+              {rule.seats_total || 0}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.generated) {
+      cols.push({
+        key: 'generated',
+        label: __('Generated', 'Generated'),
+        visible: visibleColumns.generated,
+        render: (rule: RecurringRule) => (
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+              {rule.generated_count || 0}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{__('dates', 'dates')}</span>
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.price) {
+      cols.push({
+        key: 'price',
+        label: __('Price', 'Price'),
+        visible: visibleColumns.price,
+        render: (rule: RecurringRule) => (
+          <div className="text-sm font-semibold text-gray-900 dark:text-white">
+            {rule.sale_price ? `$${rule.sale_price}` : rule.original_price ? `$${rule.original_price}` : '$0'}
+          </div>
+        ),
+      });
+    }
+    
+    if (visibleColumns.status) {
+      cols.push({
+        key: 'status',
+        label: __('Status', 'Status'),
+        visible: visibleColumns.status,
+        render: (rule: RecurringRule) => getStatusBadge(rule.status),
+      });
+    }
+    
+    return cols;
+  }, [visibleColumns, formatRulePattern, formatDate, getStatusBadge]);
+
+  // Status toggle mutation
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: 'active' | 'inactive' }) => {
+      return await apiClient.put(`/recurring-availability/${id}`, { status });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
+      queryClient.invalidateQueries({ queryKey: ['recurring-availability-counts'] });
+      showToast(__('Rule status updated successfully', 'Rule status updated successfully'), 'success');
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __('Failed to update rule status', 'Failed to update rule status'), 'error');
+    },
+  });
+
+  // Table actions (matching Specific Dates structure)
+  const tableActions = useMemo(() => [
+    {
+      key: 'edit',
+      label: __('Edit', 'Edit'),
+      icon: <Edit className="w-4 h-4" />,
+      onClick: (rule: RecurringRule) => onEditRule(rule.id),
+    },
+    {
+      key: 'set-inactive',
+      label: __('Set Inactive', 'Set Inactive'),
+      icon: <XCircle className="w-4 h-4" />,
+      onClick: (rule: RecurringRule) => {
+        toggleStatusMutation.mutate({ id: rule.id, status: 'inactive' });
+      },
+      condition: (rule: RecurringRule) => rule.status === 'active',
+    },
+    {
+      key: 'set-active',
+      label: __('Set Active', 'Set Active'),
+      icon: <CheckCircle className="w-4 h-4" />,
+      onClick: (rule: RecurringRule) => {
+        toggleStatusMutation.mutate({ id: rule.id, status: 'active' });
+      },
+      condition: (rule: RecurringRule) => rule.status === 'inactive',
+    },
+    {
+      key: 'duplicate',
+      label: __('Duplicate', 'Duplicate'),
+      icon: <Copy className="w-4 h-4" />,
+      onClick: (rule: RecurringRule) => setDuplicateConfirm({ isOpen: true, rule }),
+    },
+    {
+      key: 'delete',
+      label: __('Delete', 'Delete'),
+      icon: <Trash2 className="w-4 h-4" />,
+      onClick: (rule: RecurringRule) => setDeleteConfirm({ isOpen: true, rule }),
+      variant: 'destructive' as const,
+    },
+  ], [toggleStatusMutation, onEditRule]);
 
   return (
     <div className="space-y-6">
+      {/* Confirmation Dialogs */}
+      <ConfirmationDialog
+        isOpen={deleteConfirm.isOpen}
+        onClose={() => setDeleteConfirm({ isOpen: false, rule: null })}
+        onConfirm={() => {
+          if (deleteConfirm.rule) {
+            deleteMutation.mutate(deleteConfirm.rule.id);
+          }
+        }}
+        title={__('Delete Recurring Rule', 'Delete Recurring Rule')}
+        message={deleteConfirm.rule
+          ? __('Are you sure you want to delete the rule "{name}"? This action cannot be undone.', 'Are you sure you want to delete the rule "{name}"? This action cannot be undone.')
+              .replace('{name}', deleteConfirm.rule.name || formatRulePattern(deleteConfirm.rule))
+          : __('Are you sure you want to delete this rule? This action cannot be undone.', 'Are you sure you want to delete this rule? This action cannot be undone.')}
+        confirmText={__('Delete', 'Delete')}
+        cancelText={__('Cancel', 'Cancel')}
+        variant="danger"
+        isLoading={deleteMutation.isPending}
+      />
+
+      <ConfirmationDialog
+        isOpen={duplicateConfirm.isOpen}
+        onClose={() => setDuplicateConfirm({ isOpen: false, rule: null })}
+        onConfirm={() => {
+          if (duplicateConfirm.rule) {
+            duplicateMutation.mutate(duplicateConfirm.rule.id);
+          }
+        }}
+        title={__('Duplicate Recurring Rule', 'Duplicate Recurring Rule')}
+        message={__('This will create a copy of this rule. You can edit it after creation.', 'This will create a copy of this rule. You can edit it after creation.')}
+        confirmText={__('Duplicate', 'Duplicate')}
+        cancelText={__('Cancel', 'Cancel')}
+        isLoading={duplicateMutation.isPending}
+      />
+      
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-              {__('Recurring Rules', 'Recurring Rules')}
-            </h3>
-            <Badge className={isSingleDayTrip 
-              ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' 
-              : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-            }>
-              {isSingleDayTrip ? __('Single-Day Trip', 'Single-Day Trip') : __('Multi-Day Trip', 'Multi-Day Trip')}
-            </Badge>
-            <Badge className={isTravelerBased 
-              ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
-              : 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
-            }>
-              {isTravelerBased ? __('Traveler-Based Pricing', 'Traveler-Based Pricing') : __('Regular Pricing', 'Regular Pricing')}
-            </Badge>
-          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+            {__('Recurring Rules', 'Recurring Rules')}
+          </h3>
+          <Badge className={isSingleDayTrip 
+            ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' 
+            : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+          }>
+            {isSingleDayTrip ? __('Single-Day Trip', 'Single-Day Trip') : __('Multi-Day Trip', 'Multi-Day Trip')}
+          </Badge>
+          <Badge className={isTravelerBased 
+            ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
+            : 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
+          }>
+            {isTravelerBased ? __('Traveler-Based Pricing', 'Traveler-Based Pricing') : __('Regular Pricing', 'Regular Pricing')}
+          </Badge>
+        </div>
         <Button variant="outline" onClick={onAddRule}>
           <Plus className="w-4 h-4 mr-2" />
           {isSingleDayTrip ? __('Add Time Slots Rule', 'Add Time Slots Rule') : __('Add Recurring Rule', 'Add Recurring Rule')}
         </Button>
       </div>
-      <div className="mt-2">
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          {isSingleDayTrip 
-            ? __('Create recurring time slots for your single-day trip (supports multiple time slots per day)', 'Create recurring time slots for your single-day trip (supports multiple time slots per day)')
-            : __('Automatically generate availability dates based on patterns', 'Automatically generate availability dates based on patterns')}
-        </p>
+      
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        {isSingleDayTrip 
+          ? __('Create recurring time slots for your single-day trip (supports multiple time slots per day)', 'Create recurring time slots for your single-day trip (supports multiple time slots per day)')
+          : __('Automatically generate availability dates based on patterns', 'Automatically generate availability dates based on patterns')}
       </div>
 
-      {/* Rules List */}
-      {isLoading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="py-4">
-                <div className="animate-pulse">
-                  <div className="h-5 w-48 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-                  <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
-                  <div className="flex gap-4">
-                    <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
-                    <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : rules.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <RefreshCw className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {__('No recurring rules set up yet', 'No recurring rules set up yet')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-              {__('Create recurring patterns to automatically generate availability dates', 'Create recurring patterns to automatically generate availability dates')}
-            </p>
-            <div className="flex justify-end">
-            <Button onClick={onAddRule}>
-              <Plus className="w-4 h-4 mr-2" />
-              {__('Create First Rule', 'Create First Rule')}
-            </Button>
+      {/* Filters - Matching Specific Dates */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {__('Search', 'Search')}
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={__('Search rules...', 'Search rules...')}
+                  className="pl-10"
+                />
+              </div>
             </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-4">
-          {rules.map((rule) => (
-            <Card key={rule.id} className={rule.status === 'inactive' ? 'opacity-60' : ''}>
-              <CardContent className="py-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    {/* Rule Name & Pattern */}
-                    <div className="flex items-center gap-3 mb-2">
-                      <h4 className="font-medium text-gray-900 dark:text-white">
-                        {rule.name || formatRulePattern(rule)}
-                      </h4>
-                      <Badge variant={rule.status === 'active' ? 'success' : 'outline'}>
-                        {rule.status === 'active' ? __('Active', 'Active') : __('Inactive', 'Inactive')}
-                      </Badge>
-                      {rule.generated_count !== undefined && (
-                        <Badge variant="outline" className="text-xs">
-                          <Calendar className="w-3 h-3 mr-1" />
-                          {rule.generated_count} {__('dates', 'dates')}
-                        </Badge>
-                      )}
-                    </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                {__('Status', 'Status')}
+              </label>
+              <Select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="all">{__('All Status', 'All Status')}</option>
+                <option value="active">{__('Active', 'Active')}</option>
+                <option value="inactive">{__('Inactive', 'Inactive')}</option>
+              </Select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('all');
+                }}
+                className="w-full"
+              >
+                <X className="w-4 h-4 mr-2" />
+                {__('Clear Filters', 'Clear Filters')}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-                    {/* Pattern Description */}
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      <RefreshCw className="w-4 h-4 inline mr-1" />
-                      {formatRulePattern(rule)}
-                    </p>
+      {/* Bulk Action Toolbar - Matching Specific Dates */}
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkApply}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        statusOptions={[
+          { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+          { key: 'active', label: __('Active', 'Active'), count: statusCounts.active },
+          { key: 'inactive', label: __('Inactive', 'Inactive'), count: statusCounts.inactive },
+        ]}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={[
+          { key: 'name', label: __('Rule Name', 'Rule Name'), visible: visibleColumns.name },
+          { key: 'pattern', label: __('Pattern', 'Pattern'), visible: visibleColumns.pattern },
+          { key: 'start_date', label: __('Start Date', 'Start Date'), visible: visibleColumns.start_date },
+          { key: 'end_date', label: __('End Date', 'End Date'), visible: visibleColumns.end_date },
+          { key: 'capacity', label: __('Capacity', 'Capacity'), visible: visibleColumns.capacity },
+          { key: 'generated', label: __('Generated', 'Generated'), visible: visibleColumns.generated },
+          { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
+          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+        ]}
+        onToggleColumn={(columnKey: string) => toggleColumn(columnKey as keyof typeof visibleColumns)}
+        bulkMutationPending={bulkDeleteMutation.isPending}
+        totalItems={rules.length}
+        bulkActionOptions={[
+          { value: 'delete', label: __('Delete', 'Delete') },
+        ]}
+      />
 
-                    {/* Details Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Calendar className="w-4 h-4" />
-                        <span>{formatDateRange(rule.start_date, rule.end_date)}</span>
-                      </div>
-                      {rule.departure_time && (
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <Clock className="w-4 h-4" />
-                          <span>{formatTime(rule.departure_time)}</span>
-                          {rule.arrival_time && <span>- {formatTime(rule.arrival_time)}</span>}
-                        </div>
-                      )}
-                      <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                        <Users className="w-4 h-4" />
-                        <span>{rule.seats_total} {__('seats', 'seats')}</span>
-                      </div>
-                      {rule.sale_price && (
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <DollarSign className="w-4 h-4" />
-                          <span>${rule.sale_price}</span>
-                          {rule.original_price && rule.original_price > rule.sale_price && (
-                            <span className="line-through text-gray-400">${rule.original_price}</span>
-                          )}
-                        </div>
-                      )}
-                      
-                      {/* Traveler Pricing Indicator */}
-                      {rule.pricing_type === 'traveler_based' && (
-                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                          <Users className="w-4 h-4" />
-                          <span className="text-xs">
-                            {rule.traveler_pricing && rule.traveler_pricing.length > 0 
-                              ? `${rule.traveler_pricing.length} categories` 
-                              : 'No categories configured'
-                            }
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Excluded Dates */}
-                    {rule.excluded_dates && rule.excluded_dates.length > 0 && (
-                      <div className="mt-3 flex items-center gap-2">
-                        <Ban className="w-4 h-4 text-orange-500" />
-                        <span className="text-xs text-orange-600 dark:text-orange-400">
-                          {rule.excluded_dates.length} {__('excluded dates', 'excluded dates')}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setPreviewRuleId(previewRuleId === rule.id ? null : rule.id)}
-                      title={__('Preview generated dates', 'Preview generated dates')}
-                    >
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => toggleStatusMutation.mutate({
-                        id: rule.id,
-                        status: rule.status === 'active' ? 'inactive' : 'active'
-                      })}
-                      title={rule.status === 'active' ? __('Deactivate', 'Deactivate') : __('Activate', 'Activate')}
-                    >
-                      {rule.status === 'active' ? (
-                        <X className="w-4 h-4 text-orange-500" />
-                      ) : (
-                        <Check className="w-4 h-4 text-green-500" />
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onEditRule(rule.id)}
-                      title={__('Edit', 'Edit')}
-                    >
-                      <Edit className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(__('Are you sure you want to delete this rule?', 'Are you sure you want to delete this rule?'))) {
-                          deleteMutation.mutate(rule.id);
-                        }
-                      }}
-                      title={__('Delete', 'Delete')}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Preview Panel */}
-                {previewRuleId === rule.id && previewData && (
-                  <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center justify-between mb-3">
-                      <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {__('Generated Dates Preview', 'Generated Dates Preview')} ({previewData.total} {__('total', 'total')})
-                      </h5>
-                      {previewData.excluded_count > 0 && (
-                        <span className="text-xs text-orange-600 dark:text-orange-400">
-                          {previewData.excluded_count} {__('excluded', 'excluded')}
-                        </span>
-                      )}
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-                      {previewData.dates.slice(0, 12).map((date: any, index: number) => (
-                        <div
-                          key={index}
-                          className="px-2 py-1 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded"
-                        >
-                          {new Date(date.departure_date).toLocaleDateString('en-US', {
-                            weekday: 'short',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </div>
-                      ))}
-                      {previewData.total > 12 && (
-                        <div className="px-2 py-1 text-xs text-gray-500 dark:text-gray-400 flex items-center">
-                          +{previewData.total - 12} {__('more', 'more')}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      {/* Recurring Rules Section - Matching Specific Dates */}
+      <Card>
+        <CardContent className="pt-6">
+          {/* Section Header */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {__('Recurring Rules', 'Recurring Rules')}
+            </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              {tripName && (
+                <>
+                  {__('Managing availability for', 'Managing availability for')} <strong>{tripName}</strong>
+                  {rules.length > 0 && (
+                    <span className="ml-2">
+                      ({rules.length} {rules.length === 1 ? __('rule', 'rule') : __('rules', 'rules')})
+                    </span>
+                  )}
+                </>
+              )}
+            </p>
+          </div>
+          
+          <SharedTable
+            data={rules}
+            columns={tableColumns}
+            actions={tableActions}
+            isLoading={isLoading}
+            isError={false}
+            selectedItemIds={selectedIds}
+            onSelectItem={(id, checked) => {
+              if (checked) {
+                setSelectedIds([...selectedIds, id]);
+              } else {
+                setSelectedIds(selectedIds.filter(sid => sid !== id));
+              }
+            }}
+            onSelectAll={(checked) => {
+              if (checked) {
+                setSelectedIds(rules.map((r: RecurringRule) => r.id));
+              } else {
+                setSelectedIds([]);
+              }
+            }}
+            isAllSelected={selectedIds.length === rules.length && rules.length > 0}
+            getItemId={(rule) => rule.id}
+            emptyText={__('No recurring rules found', 'No recurring rules found')}
+            emptyDescription={__('Create your first recurring rule to get started', 'Create your first recurring rule to get started')}
+            onCreateClick={onAddRule}
+            skeletonRows={5}
+            capability="yatra_view_trips"
+          />
+        </CardContent>
+      </Card>
 
       {/* Info Box */}
       <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800">
@@ -464,4 +715,3 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
 };
 
 export default RecurringRules;
-
