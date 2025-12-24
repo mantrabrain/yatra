@@ -11,6 +11,16 @@ namespace Yatra\Repositories;
 class ActivityRepository extends BaseRepository
 {
     /**
+     * Rich text fields specific to activities
+     */
+    protected array $richTextFields = ['description'];
+
+    /**
+     * Integer fields specific to activities
+     */
+    protected array $integerFields = ['id', 'created_by', 'updated_by'];
+
+    /**
      * Get table name
      */
     protected function getTableName(): string

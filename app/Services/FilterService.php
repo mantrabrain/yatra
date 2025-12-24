@@ -32,7 +32,7 @@ class FilterService extends BaseService
                 MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
                 MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
              FROM {$wpdb->prefix}yatra_trips 
-             WHERE status = 'published' AND original_price > 0"
+             WHERE status = 'publish' AND original_price > 0"
         );
 
         $min_price = $options['min_price'] ?? ($price_stats->min_price ?? 100);
@@ -194,7 +194,7 @@ class FilterService extends BaseService
                                      SELECT r.trip_id, AVG(r.rating) as avg_rating
                                      FROM {$wpdb->prefix}yatra_reviews r
                                      INNER JOIN {$wpdb->prefix}yatra_trips t ON r.trip_id = t.id
-                                     WHERE t.status = 'published' AND r.status = 'approved' AND r.rating > 0
+                                     WHERE t.status = 'publish' AND r.status = 'approved' AND r.rating > 0
                                      GROUP BY r.trip_id
                                      HAVING avg_rating >= %d
                                  ) as trip_ratings",
@@ -262,7 +262,7 @@ class FilterService extends BaseService
                         $trip_count = $wpdb->get_var($wpdb->prepare(
                             "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                              INNER JOIN {$wpdb->prefix}yatra_trip_trip_categories ttc ON t.id = ttc.trip_id 
-                             WHERE ttc.category_id = %d AND t.status = 'published'",
+                             WHERE ttc.category_id = %d AND t.status = 'publish'",
                             $category->id
                         ));
 
@@ -322,7 +322,7 @@ class FilterService extends BaseService
                         $trip_count = $wpdb->get_var($wpdb->prepare(
                             "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                              INNER JOIN {$wpdb->prefix}yatra_trip_destinations td ON t.id = td.trip_id 
-                             WHERE td.destination_id = %d AND t.status = 'published'",
+                             WHERE td.destination_id = %d AND t.status = 'publish'",
                             $destination->id
                         ));
 
@@ -382,7 +382,7 @@ class FilterService extends BaseService
                         $trip_count = $wpdb->get_var($wpdb->prepare(
                             "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                              INNER JOIN {$wpdb->prefix}yatra_trip_activities ta ON t.id = ta.trip_id 
-                             WHERE ta.activity_id = %d AND t.status = 'published'",
+                             WHERE ta.activity_id = %d AND t.status = 'publish'",
                             $activity->id
                         ));
 

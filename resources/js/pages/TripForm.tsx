@@ -298,7 +298,7 @@ interface TripFormData {
   availability_dates: AvailabilityDate[];
   
   // Status & Lifecycle
-  status: 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended';
+  status: 'draft' | 'review' | 'approved' | 'publish' | 'archived' | 'suspended';
   scheduled_publish_date: string; // Scheduled Publishing
   scheduled_unpublish_date: string; // Scheduled Unpublishing
   version: number; // Version Control
@@ -1322,7 +1322,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           { id: 'faqs', label: 'FAQs', enabled: true, order: 6, content_type: 'faqs' },
         ],
         availability_dates: normalizeAvailabilityDates(tripData.availability_dates),
-        status: (tripData.status || 'draft') as 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended',
+        status: (tripData.status || 'draft') as 'draft' | 'review' | 'approved' | 'publish' | 'archived' | 'suspended',
         scheduled_publish_date: tripData.scheduled_publish_date || '',
         scheduled_unpublish_date: tripData.scheduled_unpublish_date || '',
         version: tripData.version || 1,
@@ -2105,7 +2105,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
   // Save mutation
   const saveMutation = useMutation({
-    mutationFn: async (data: TripFormData & { status?: 'draft' | 'published' }) => {
+    mutationFn: async (data: TripFormData & { status?: 'draft' | 'publish' }) => {
       const payload = {
         title: data.title.trim(),
         slug: data.slug.trim(),
@@ -2204,7 +2204,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           from_location: avail.from_location || null,
           to_location: avail.to_location || null,
         })),
-        status: data.status === 'published' ? 'published' : 'draft',
+        status: data.status === 'publish' ? 'publish' : 'draft',
         scheduled_publish_date: data.scheduled_publish_date || null,
         scheduled_unpublish_date: data.scheduled_unpublish_date || null,
         version: data.version || 1,
@@ -2257,12 +2257,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       let successMessage: string;
       if (isEditMode) {
         // Edit mode: updating existing trip
-        successMessage = variables.status === 'published' 
+        successMessage = variables.status === 'publish' 
           ? __('Trip updated and published successfully', 'Trip updated and published successfully')
           : __('Trip updated successfully', 'Trip updated successfully');
       } else {
         // Create mode: creating new trip
-        successMessage = variables.status === 'published' 
+        successMessage = variables.status === 'publish' 
           ? __('Trip created and published successfully', 'Trip created and published successfully')
           : __('Trip saved as draft successfully', 'Trip saved as draft successfully');
       }
@@ -2314,7 +2314,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       return;
     }
     setIsSubmitting(true);
-    saveMutation.mutate({ ...formData, status: 'published' });
+    saveMutation.mutate({ ...formData, status: 'publish' });
   };
 
   // Using static revisions data for UI only
@@ -5099,7 +5099,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <Badge 
                 variant="outline" 
                 className={`bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 ${
-                  formData.status === 'published' 
+                  formData.status === 'publish' 
                     ? 'text-green-700 dark:text-green-400 border-green-300 dark:border-green-800'
                     : formData.status === 'review'
                     ? 'text-yellow-700 dark:text-yellow-400 border-yellow-300 dark:border-yellow-800'
@@ -5115,7 +5115,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 {formData.status === 'draft' ? __('Draft', 'Draft') 
                   : formData.status === 'review' ? __('Review', 'Review')
                   : formData.status === 'approved' ? __('Approved', 'Approved')
-                  : formData.status === 'published' ? __('Published', 'Published')
+                  : formData.status === 'publish' ? __('Published', 'Published')
                   : formData.status === 'suspended' ? __('Suspended', 'Suspended')
                   : __('Archived', 'Archived')}
               </Badge>

@@ -7,6 +7,7 @@ namespace Yatra\Services;
 use Yatra\Repositories\AttributeRepository;
 use Yatra\Utils\Logger;
 use Yatra\Utils\Cache;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Attribute Service
@@ -354,6 +355,11 @@ class AttributeService extends BaseService
                 $data['validation_rules'] = wp_json_encode($data['validation_rules']);
             }
 
+            // Sanitize description as rich text
+            if (isset($data['description'])) {
+                $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
+            }
+
             // Process icon field
             if (isset($data['icon'])) {
                 error_log('DEBUG: AttributeService create - Icon data before processing: ' . var_export($data['icon'], true));
@@ -434,6 +440,11 @@ class AttributeService extends BaseService
             // Process validation rules
             if (isset($data['validation_rules']) && is_array($data['validation_rules'])) {
                 $data['validation_rules'] = wp_json_encode($data['validation_rules']);
+            }
+
+            // Sanitize description as rich text
+            if (isset($data['description'])) {
+                $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
             }
 
             // Process icon field

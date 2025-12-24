@@ -400,7 +400,7 @@ const Trips: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'published': {
+      'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
         label: __('Published', 'Published'),
       },
@@ -662,7 +662,7 @@ const Trips: React.FC = () => {
     if (statsData) {
       return {
         all: statsData.all ?? 0,
-        published: statsData.published ?? 0,
+        publish: statsData.published ?? 0,
         draft: statsData.draft ?? 0,
         review: statsData.review ?? 0,
         approved: statsData.approved ?? 0,
@@ -673,7 +673,7 @@ const Trips: React.FC = () => {
 
     return {
       all: 0,
-      published: 0,
+      publish: 0,
       draft: 0,
       review: 0,
       approved: 0,
@@ -684,7 +684,7 @@ const Trips: React.FC = () => {
 
   const statusOptions = [
     { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-    { key: 'published', label: __('Published', 'Published'), count: statusCounts.published },
+    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
     { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
     { key: 'review', label: __('Review', 'Review'), count: statusCounts.review },
     { key: 'approved', label: __('Approved', 'Approved'), count: statusCounts.approved },
@@ -704,7 +704,7 @@ const Trips: React.FC = () => {
 
     // Other views: normal status changes + move to trash + delete
     return [
-      { value: 'mark_published', label: __('Mark as Published', 'Mark as Published') },
+      { value: 'mark_publish', label: __('Mark as Published', 'Mark as Published') },
       { value: 'mark_draft', label: __('Mark as Draft', 'Mark as Draft') },
       { value: 'mark_archived', label: __('Archive', 'Archive') },
       { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
@@ -1022,11 +1022,11 @@ const Trips: React.FC = () => {
         label: __('Mark as Published', 'Mark as Published'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
-          await updateTripStatus(trip, 'published');
+          await updateTripStatus(trip, 'publish');
           showToast(__('Trip marked as published.', 'Trip marked as published.'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
-        condition: (trip: Trip) => trip.status !== 'published' && trip.status !== 'trash',
+        condition: (trip: Trip) => trip.status !== 'publish' && trip.status !== 'trash',
       });
 
       actions.push({
@@ -1153,7 +1153,7 @@ const Trips: React.FC = () => {
                 className="w-full"
               >
                 <option value="all">{__('All Status', 'All Status')}</option>
-                <option value="published">{__('Published', 'Published')}</option>
+                <option value="publish">{__('Published', 'Published')}</option>
                 <option value="draft">{__('Draft', 'Draft')}</option>
                 <option value="review">{__('Review', 'Review')}</option>
                 <option value="approved">{__('Approved', 'Approved')}</option>

@@ -299,7 +299,7 @@ const TripConsentForm: React.FC = () => {
         id: existingForm.id,
         name: existingForm.name || '',
         description: existingForm.description || '',
-        status: existingForm.status || 'draft',
+        status: existingForm.status || 'publish',
         require_signature: existingForm.require_signature ?? true,
         require_initials: existingForm.require_initials ?? false,
         applicable_to: existingForm.applicable_to || 'all',

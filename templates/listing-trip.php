@@ -416,7 +416,7 @@ get_header();
                             MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
                             MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
                          FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND original_price > 0"
+                         WHERE status = 'publish' AND original_price > 0"
                     );
                     
                     $min_price = $price_stats ? (int)$price_stats->min_price : 0;
@@ -498,7 +498,7 @@ get_header();
                                     // Get trip count for this type
                                     $trip_count = $wpdb->get_var($wpdb->prepare(
                                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                                         WHERE trip_type = %s AND status = 'published'",
+                                         WHERE trip_type = %s AND status = 'publish'",
                                         $type_value
                                     ));
                                 ?>
@@ -552,7 +552,7 @@ get_header();
                                     $trip_count = $wpdb->get_var($wpdb->prepare(
                                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
                                          WHERE (difficulty_level = %s OR difficulty_level = %s OR difficulty_level = %d) 
-                                         AND status = 'published'",
+                                         AND status = 'publish'",
                                         $level->slug, $level->name, $level->id
                                     ));
                                     
@@ -618,7 +618,7 @@ get_header();
                                                  SELECT r.trip_id, AVG(r.rating) as avg_rating
                                                  FROM {$wpdb->prefix}yatra_reviews r
                                                  INNER JOIN {$wpdb->prefix}yatra_trips t ON r.trip_id = t.id
-                                                 WHERE t.status = 'published' AND r.status = 'approved' AND r.rating > 0
+                                                 WHERE t.status = 'publish' AND r.status = 'approved' AND r.rating > 0
                                                  GROUP BY r.trip_id
                                                  HAVING avg_rating >= %d
                                              ) as trip_ratings",
@@ -677,7 +677,7 @@ get_header();
                                     $trip_count = $wpdb->get_var($wpdb->prepare(
                                         "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                                          INNER JOIN {$wpdb->prefix}yatra_trip_trip_categories ttc ON t.id = ttc.trip_id 
-                                         WHERE ttc.category_id = %d AND t.status = 'published'",
+                                         WHERE ttc.category_id = %d AND t.status = 'publish'",
                                         $category->id
                                     ));
                                 ?>
@@ -725,7 +725,7 @@ get_header();
                                     $trip_count = $wpdb->get_var($wpdb->prepare(
                                         "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                                          INNER JOIN {$wpdb->prefix}yatra_trip_destinations td ON t.id = td.trip_id 
-                                         WHERE td.destination_id = %d AND t.status = 'published'",
+                                         WHERE td.destination_id = %d AND t.status = 'publish'",
                                         $destination->id
                                     ));
                                     
@@ -775,7 +775,7 @@ get_header();
                                     $trip_count = $wpdb->get_var($wpdb->prepare(
                                         "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
                                          INNER JOIN {$wpdb->prefix}yatra_trip_activities ta ON t.id = ta.trip_id 
-                                         WHERE ta.activity_id = %d AND t.status = 'published'",
+                                         WHERE ta.activity_id = %d AND t.status = 'publish'",
                                         $activity->id
                                     ));
                                 ?>
@@ -797,7 +797,7 @@ get_header();
                     $accommodation_types = $wpdb->get_results(
                         "SELECT accommodation_type, COUNT(*) as trip_count 
                          FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND accommodation_type IS NOT NULL AND accommodation_type != '' 
+                         WHERE status = 'publish' AND accommodation_type IS NOT NULL AND accommodation_type != '' 
                          GROUP BY accommodation_type 
                          ORDER BY trip_count DESC, accommodation_type ASC"
                     );
@@ -839,7 +839,7 @@ get_header();
                     // First check if we have any trips with valid JSON in included_items
                     $has_valid_json = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' 
+                         WHERE status = 'publish' 
                            AND included_items IS NOT NULL 
                            AND included_items != '' 
                            AND included_items != '[]' 
@@ -856,7 +856,7 @@ get_header();
                                  SELECT 0 as n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
                                  UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9
                              ) numbers
-                             WHERE status = 'published' 
+                             WHERE status = 'publish' 
                                AND included_items IS NOT NULL 
                                AND JSON_VALID(included_items) = 1
                                AND JSON_LENGTH(included_items) > numbers.n
@@ -906,7 +906,7 @@ get_header();
                     // Check for discounted trips
                     $discount_count = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND (discounted_price IS NOT NULL OR sale_price IS NOT NULL)"
+                         WHERE status = 'publish' AND (discounted_price IS NOT NULL OR sale_price IS NOT NULL)"
                     );
                     if ($discount_count > 0) {
                         $special_offers[] = ['value' => 'discount', 'label' => 'Discount Available', 'count' => $discount_count];
@@ -923,7 +923,7 @@ get_header();
                     if ($column_exists) {
                         $early_bird_count = $wpdb->get_var(
                             "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND early_bird_discount_enabled = 1"
+                             WHERE status = 'publish' AND early_bird_discount_enabled = 1"
                         );
                         if ($early_bird_count > 0) {
                             $special_offers[] = ['value' => 'early-bird', 'label' => 'Early Bird Offer', 'count' => $early_bird_count];
@@ -941,7 +941,7 @@ get_header();
                     if ($column_exists) {
                         $last_minute_count = $wpdb->get_var(
                             "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND last_minute_discount_enabled = 1"
+                             WHERE status = 'publish' AND last_minute_discount_enabled = 1"
                         );
                         if ($last_minute_count > 0) {
                             $special_offers[] = ['value' => 'last-minute', 'label' => 'Last Minute Deal', 'count' => $last_minute_count];
@@ -960,7 +960,7 @@ get_header();
                         if ($column_exists) {
                             $group_discount_count = $wpdb->get_var(
                                 "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                                 WHERE status = 'published' AND group_pricing_enabled = 1"
+                                 WHERE status = 'publish' AND group_pricing_enabled = 1"
                             );
                             if ($group_discount_count > 0) {
                                 $special_offers[] = ['value' => 'group-discount', 'label' => 'Group Discount', 'count' => $group_discount_count];
@@ -1013,7 +1013,7 @@ get_header();
                     if ($column_exists) {
                         $instant_count = $wpdb->get_var(
                             "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND instant_booking = 1"
+                             WHERE status = 'publish' AND instant_booking = 1"
                         );
                         if ($instant_count > 0) {
                             $booking_options[] = ['value' => 'instant', 'label' => 'Instant Confirmation', 'count' => $instant_count];
@@ -1031,7 +1031,7 @@ get_header();
                     if ($column_exists) {
                         $flexible_count = $wpdb->get_var(
                             "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND flexible_dates = 1"
+                             WHERE status = 'publish' AND flexible_dates = 1"
                         );
                         if ($flexible_count > 0) {
                             $booking_options[] = ['value' => 'flexible', 'label' => 'Flexible Dates', 'count' => $flexible_count];
@@ -1049,7 +1049,7 @@ get_header();
                     if ($column_exists) {
                         $deposit_count = $wpdb->get_var(
                             "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                             WHERE status = 'published' AND deposit_required = 1"
+                             WHERE status = 'publish' AND deposit_required = 1"
                         );
                         if ($deposit_count > 0) {
                             $booking_options[] = ['value' => 'pay-later', 'label' => 'Reserve Now, Pay Later', 'count' => $deposit_count];
@@ -1093,7 +1093,7 @@ get_header();
                     // Check for family friendly (no age restrictions or low minimum age)
                     $family_count = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND (age_min IS NULL OR age_min <= 5)"
+                         WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 5)"
                     );
                     if ($family_count > 0) {
                         $age_options[] = ['value' => 'family', 'label' => 'Family Friendly', 'count' => $family_count];
@@ -1102,7 +1102,7 @@ get_header();
                     // Check for kids suitable (age_min <= 12)
                     $kids_count = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND (age_min IS NULL OR age_min <= 12)"
+                         WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 12)"
                     );
                     if ($kids_count > 0) {
                         $age_options[] = ['value' => 'kids', 'label' => 'Suitable for Kids', 'count' => $kids_count];
@@ -1111,7 +1111,7 @@ get_header();
                     // Check for senior friendly (no upper age limit or high limit)
                     $senior_count = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND (age_max IS NULL OR age_max >= 65)"
+                         WHERE status = 'publish' AND (age_max IS NULL OR age_max >= 65)"
                     );
                     if ($senior_count > 0) {
                         $age_options[] = ['value' => 'seniors', 'label' => 'Senior Friendly', 'count' => $senior_count];
@@ -1120,7 +1120,7 @@ get_header();
                     // Check for adults only (minimum age >= 18)
                     $adults_count = $wpdb->get_var(
                         "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips 
-                         WHERE status = 'published' AND age_min >= 18"
+                         WHERE status = 'publish' AND age_min >= 18"
                     );
                     if ($adults_count > 0) {
                         $age_options[] = ['value' => 'adults', 'label' => 'Adults Only', 'count' => $adults_count];

@@ -1435,7 +1435,7 @@ class Database
             ['name' => 'frontend_tabs', 'def' => "text COMMENT 'JSON array'", 'after' => 'excluded_items'],
             
             // Status
-            ['name' => 'status', 'def' => "enum('draft','review','approved','published','archived','suspended') DEFAULT 'draft'", 'after' => 'frontend_tabs'],
+            ['name' => 'status', 'def' => "enum('draft','review','approved','publish','archived','suspended') DEFAULT 'draft'", 'after' => 'frontend_tabs'],
             ['name' => 'scheduled_publish_date', 'def' => "datetime DEFAULT NULL", 'after' => 'status'],
             ['name' => 'scheduled_unpublish_date', 'def' => "datetime DEFAULT NULL", 'after' => 'scheduled_publish_date'],
             ['name' => 'version', 'def' => "int(11) UNSIGNED DEFAULT 1", 'after' => 'scheduled_unpublish_date'],

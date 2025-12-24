@@ -202,7 +202,7 @@ class BookingService
                 return ['success' => false, 'message' => __('Trip not found.', 'yatra')];
             }
 
-            if ($trip->status !== 'published') {
+            if ($trip->status !== 'publish') {
                 Logger::warning("Trip not available for booking", [
                     'trip_id' => $data['trip_id'],
                     'status' => $trip->status

@@ -19,6 +19,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Modal } from '../components/ui/modal';
 
 interface GroupDiscountRange {
   id: string;
@@ -755,102 +756,94 @@ const Discounts: React.FC = () => {
   return (
     <div className="space-y-3">
       {/* Discount Type Selection Modal */}
-      {showDiscountTypeModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div 
-            className="absolute inset-0 bg-black/50" 
-            onClick={() => setShowDiscountTypeModal(false)}
-          />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl mx-4 overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {__('What type of discount do you want to create?', 'What type of discount do you want to create?')}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {__('Choose the discount type that best fits your needs', 'Choose the discount type that best fits your needs')}
-              </p>
-            </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Promo Code Option */}
-              <button
-                onClick={() => handleSelectDiscountType('promo')}
-                className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group text-left"
-              >
-                <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
-                  <Tag className="w-7 h-7 text-blue-600 dark:text-blue-400" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  {__('Promo Code', 'Promo Code')}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  {__('Customer enters a code to get a percentage or fixed discount', 'Customer enters a code to get a percentage or fixed discount')}
-                </p>
-              </button>
-
-              {/* Group Discount Option */}
-              <button
-                onClick={() => handleSelectDiscountType('group')}
-                className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left"
-              >
-                {!isAdvancedDiscountEnabled && (
-                  <div 
-                    className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
-                    style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
-                  >
-                    <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
-                    <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
-                  </div>
-                )}
-                <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
-                  <Users className="w-7 h-7 text-green-600 dark:text-green-400" />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  {__('Group Discount', 'Group Discount')}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  {__('Auto-applies when booking multiple travelers. No code needed.', 'Auto-applies when booking multiple travelers. No code needed.')}
-                </p>
-              </button>
-
-              {/* Both Option */}
-              <button
-                onClick={() => handleSelectDiscountType('both')}
-                className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left"
-              >
-                {!isAdvancedDiscountEnabled && (
-                  <div 
-                    className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
-                    style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
-                  >
-                    <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
-                    <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
-                  </div>
-                )}
-                <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
-                  <div className="flex -space-x-1">
-                    <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                  {__('Promo + Group', 'Promo + Group')}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-                  {__('Promo code gives base discount + extra savings for groups', 'Promo code gives base discount + extra savings for groups')}
-                </p>
-              </button>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowDiscountTypeModal(false)}
-              >
-                {__('Cancel', 'Cancel')}
-              </Button>
-            </div>
+      <Modal
+        isOpen={showDiscountTypeModal}
+        onClose={() => setShowDiscountTypeModal(false)}
+        title={__('What type of discount do you want to create?', 'What type of discount do you want to create?')}
+        description={__('Choose the discount type that best fits your needs', 'Choose the discount type that best fits your needs')}
+        size="lg"
+        footer={
+          <div className="flex justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setShowDiscountTypeModal(false)}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
           </div>
+        }
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Promo Code Option */}
+          <button
+            onClick={() => handleSelectDiscountType('promo')}
+            className="flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group text-left"
+          >
+            <div className="w-14 h-14 bg-blue-100 dark:bg-blue-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-blue-200 dark:group-hover:bg-blue-800 transition-colors">
+              <Tag className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+              {__('Promo Code', 'Promo Code')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              {__('Customer enters a code to get a percentage or fixed discount', 'Customer enters a code to get a percentage or fixed discount')}
+            </p>
+          </button>
+
+          {/* Group Discount Option */}
+          <button
+            onClick={() => handleSelectDiscountType('group')}
+            className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group text-left"
+          >
+            {!isAdvancedDiscountEnabled && (
+              <div 
+                className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
+                style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
+              >
+                <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
+                <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+              </div>
+            )}
+            <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
+              <Users className="w-7 h-7 text-green-600 dark:text-green-400" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+              {__('Group Discount', 'Group Discount')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              {__('Auto-applies when booking multiple travelers. No code needed.', 'Auto-applies when booking multiple travelers. No code needed.')}
+            </p>
+          </button>
+
+          {/* Both Option */}
+          <button
+            onClick={() => handleSelectDiscountType('both')}
+            className="relative flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group text-left"
+          >
+            {!isAdvancedDiscountEnabled && (
+              <div 
+                className="absolute top-2 right-2 z-10 flex items-center gap-1 px-2 py-1 text-[10px] font-semibold rounded-full shadow-md"
+                style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
+              >
+                <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
+                <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+              </div>
+            )}
+            <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+              <div className="flex -space-x-1">
+                <Tag className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <Users className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
+              {__('Promo + Group', 'Promo + Group')}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+              {__('Promo code gives base discount + extra savings for groups', 'Promo code gives base discount + extra savings for groups')}
+            </p>
+          </button>
         </div>
-      )}
+      </Modal>
 
       <ConfirmationDialog
         isOpen={deleteConfirm.isOpen}

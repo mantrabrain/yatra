@@ -906,7 +906,7 @@ const Itinerary: React.FC = () => {
     let label = '';
     let className = '';
 
-    if (explicitStatus === 'publish' || explicitStatus === 'published') {
+    if (explicitStatus === 'publish') {
       label = __('Published', 'Published');
       className = 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
     } else if (explicitStatus === 'draft') {
@@ -919,7 +919,7 @@ const Itinerary: React.FC = () => {
       // Fallback: infer from activity entries when day_status is not set
       const statuses = dayGroup.entries.map((e) => normalize(e.status));
 
-      const hasPublished = statuses.some((s) => s === 'publish' || s === 'published');
+      const hasPublished = statuses.some((s) => s === 'publish');
       const hasDraft = statuses.some((s) => s === 'draft');
       const hasTrash = statuses.some((s) => s === 'trash');
 
@@ -994,8 +994,8 @@ const Itinerary: React.FC = () => {
 
     const status = (statusValue || '').toLowerCase();
 
-    if (filter === 'publish' || filter === 'published') {
-      return status === 'publish' || status === 'published';
+    if (filter === 'publish') {
+      return status === 'publish';
     }
 
     if (filter === 'draft') {
@@ -1055,7 +1055,7 @@ const Itinerary: React.FC = () => {
   const statusCounts = dayGroups.reduce(
     (acc, dg) => {
       if (matchesStatusFilterForDay(dg, 'publish')) {
-        acc.published += 1;
+        acc.publish += 1;
       }
       if (matchesStatusFilterForDay(dg, 'draft')) {
         acc.draft += 1;
@@ -1066,12 +1066,12 @@ const Itinerary: React.FC = () => {
 
       return acc;
     },
-    { published: 0, draft: 0, trash: 0 }
+    { publish: 0, draft: 0, trash: 0 }
   );
 
   const statusOptions = [
     { key: 'all', label: __('All', 'All'), count: dayGroups.length },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.published },
+    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
     { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
     { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
   ];

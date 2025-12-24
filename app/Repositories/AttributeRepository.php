@@ -11,6 +11,16 @@ namespace Yatra\Repositories;
 class AttributeRepository extends BaseRepository
 {
     /**
+     * Rich text fields
+     */
+    protected array $richTextFields = ['description', 'field_options', 'validation_rules'];
+
+    /**
+     * Integer fields
+     */
+    protected array $integerFields = ['id', 'display_order', 'created_by', 'updated_by'];
+
+    /**
      * Get paginated results
      */
     public function paginate(int $page = 1, int $perPage = 10, array $args = []): array

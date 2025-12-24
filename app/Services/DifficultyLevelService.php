@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\DifficultyLevelRepository;
 use Yatra\Helpers\SlugHelper;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Difficulty Level Service
@@ -80,9 +81,9 @@ class DifficultyLevelService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize description (rich text)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize level_order
@@ -100,9 +101,9 @@ class DifficultyLevelService extends BaseService
             $allowed_statuses = ['draft', 'publish', 'trash'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
-                : 'draft';
+                : 'publish';
         } else {
-            $data['status'] = 'draft';
+            $data['status'] = 'publish';
         }
 
         // Set created_by and updated_by to current user
@@ -167,9 +168,9 @@ class DifficultyLevelService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize description (rich text)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize level_order

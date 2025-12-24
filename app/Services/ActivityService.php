@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\ActivityRepository;
 use Yatra\Helpers\SlugHelper;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Activity Service
@@ -75,11 +76,11 @@ class ActivityService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize Quill HTML description
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
-
+        
         // Sanitize status
         if (isset($data['status'])) {
             $allowed_statuses = ['draft', 'publish', 'trash'];
@@ -143,11 +144,11 @@ class ActivityService extends BaseService
         }
         // If slug is not provided, don't modify it (keep existing slug)
 
-        // Sanitize description
+        // Sanitize Quill HTML description
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
-
+        
         // Sanitize status
         if (isset($data['status'])) {
             $allowed_statuses = ['draft', 'publish', 'trash'];

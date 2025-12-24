@@ -1920,7 +1920,7 @@ class TripController extends BaseController
                 'order_by' => $request->get_param('orderby') ?: 'created_at',
                 'order' => strtoupper($request->get_param('order') ?: 'DESC'),
                 // Only return published trips for public endpoint
-                'where' => ['status' => ['publish', 'published']],
+                'where' => ['status' => ['publish']],
                 // Never include deleted trips for public endpoint
                 'include_deleted' => false,
             ];

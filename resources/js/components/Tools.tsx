@@ -3,7 +3,8 @@ import { useToast } from '../components/ui/toast';
 import { Card } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { ConfirmationDialog } from './ui/confirmation-dialog';
+import { Modal } from './ui/modal';
+import { __ } from '../lib/i18n';
 import { 
   Download, 
   Upload, 
@@ -2477,27 +2478,61 @@ const Tools: React.FC = () => {
           </div>
         )}
 
-      {/* Migration Confirmation Dialog */}
-      <ConfirmationDialog
+      {/* Migration Confirmation Modal */}
+      <Modal
         isOpen={showMigrationConfirm}
         onClose={() => setShowMigrationConfirm(false)}
-        onConfirm={() => {
-          setShowMigrationConfirm(false);
-          handleMigrateAll(false);
-        }}
-        title="Migrate All Data"
-        message="Are you sure you want to migrate all data? This process will run in the background and may take several minutes. Please ensure you have backed up your database before proceeding. Use “Re-migrate All” if you need to reprocess records that were already migrated."
-        confirmText="Start Migration"
-        cancelText="Cancel"
-        secondaryAction={{
-          label: 'Re-migrate All',
-          variant: 'destructive',
-          onClick: () => {
-            setShowMigrationConfirm(false);
-            handleMigrateAll(true);
-          },
-        }}
-      />
+        title={__('Migrate All Data')}
+        description={__('This process runs in the background and may take several minutes. Please back up your database before proceeding.')}
+        size="md"
+        footer={
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+            <Button
+              variant="outline"
+              onClick={() => setShowMigrationConfirm(false)}
+              className="w-full sm:w-auto"
+            >
+              {__('Cancel')}
+            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setShowMigrationConfirm(false);
+                  handleMigrateAll(true);
+                }}
+                className="w-full sm:w-auto"
+              >
+                {__('Re-migrate All')}
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowMigrationConfirm(false);
+                  handleMigrateAll(false);
+                }}
+                className="w-full sm:w-auto"
+              >
+                {__('Start Migration')}
+              </Button>
+            </div>
+          </div>
+        }
+      >
+        <div className="space-y-4 text-sm text-gray-600 dark:text-gray-300">
+          <p>
+            {__('All legacy data types will be migrated to the new Yatra 3.0 database structure. The migration runs asynchronously via WordPress cron.')}
+          </p>
+          <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-md flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            <div>
+              <p className="font-medium text-yellow-800 dark:text-yellow-200">{__('Important')}</p>
+              <p className="mt-1 text-sm">
+                {__('Keep this tab open to monitor progress. Use “Re-migrate All” only if you need to reprocess items that were already migrated.')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
 
       </div>
     </div>

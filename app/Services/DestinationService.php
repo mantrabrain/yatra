@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\DestinationRepository;
 use Yatra\Helpers\SlugHelper;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Destination Service
@@ -75,9 +76,9 @@ class DestinationService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize description (allow safe HTML from rich text editor)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize status
@@ -85,9 +86,9 @@ class DestinationService extends BaseService
             $allowed_statuses = ['draft', 'publish', 'trash'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
-                : 'draft';
+                : 'publish';
         } else {
-            $data['status'] = 'draft';
+            $data['status'] = 'publish';
         }
 
         // Set created_by and updated_by to current user
@@ -143,9 +144,9 @@ class DestinationService extends BaseService
         }
         // If slug is not provided, don't modify it (keep existing slug)
 
-        // Sanitize description
+        // Sanitize description (allow safe HTML from rich text editor)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize status

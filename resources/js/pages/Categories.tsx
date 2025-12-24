@@ -57,15 +57,15 @@ const Categories: React.FC = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    const saved = localStorage.getItem('yatra_categories_columns');
-    return saved ? JSON.parse(saved) : {
+    const defaultColumns = {
       name: true,
-      slug: true,
       description: true,
       trips: true,
       status: true,
       created_at: true,
     };
+    const saved = localStorage.getItem('yatra_categories_columns');
+    return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
   
   const queryClient = useQueryClient();
@@ -474,11 +474,6 @@ const Categories: React.FC = () => {
       ),
     },
     {
-      key: 'slug',
-      label: __('Slug', 'Slug'),
-      visible: visibleColumns.slug,
-    },
-    {
       key: 'description',
       label: __('Description', 'Description'),
       visible: visibleColumns.description,
@@ -593,6 +588,12 @@ const Categories: React.FC = () => {
               {category.name}
             </a>
           </div>
+          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+            <span>{category.slug}</span>
+            <span className="text-[11px] text-gray-400 dark:text-gray-500">
+              ({__('ID:', 'ID:')} {category.id})
+            </span>
+          </div>
           {category.parent_name && (
             <div className="text-xs text-gray-500 dark:text-gray-400">
               {__('Parent:', 'Parent:')} {category.parent_name}
@@ -604,8 +605,6 @@ const Categories: React.FC = () => {
       <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
         {typeof category.trip_count === 'number' ? category.trip_count : 0}
       </span>,
-      // Slug column
-      <code className="text-xs text-gray-600 dark:text-gray-400">{category.slug}</code>,
       // Description column
       <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
         {category.description || '—'}
@@ -651,9 +650,9 @@ const Categories: React.FC = () => {
       {/* Filters */}
       <Card>
         <CardContent className="p-3">
-          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             {/* Shared search + status + sort toolbar - give it more space on large screens */}
-            <div className="min-w-0 w-full lg:flex-[3]">
+            <div className="min-w-0 w-full lg:flex-[4]">
               <SearchFilterToolbar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
@@ -691,7 +690,7 @@ const Categories: React.FC = () => {
             </div>
 
             {/* Parent filter - constrained width on large screens */}
-            <div className="w-full lg:w-24 lg:flex-none">
+            <div className="w-full lg:w-48 xl:w-56 lg:flex-none">
               <Select
                 value={parentFilter}
                 onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
@@ -730,11 +729,10 @@ const Categories: React.FC = () => {
         setShowColumnsDropdown={setShowColumnsDropdown}
         columnOptions={[
           { key: 'name', label: __('Category', 'Category'), visible: visibleColumns.name },
-          { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
           { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
           { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
           { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-          { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
+          { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
         ]}
         onToggleColumn={toggleColumn}
         bulkMutationPending={bulkMutation.isPending}

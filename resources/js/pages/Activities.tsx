@@ -39,8 +39,8 @@ interface Activity {
 const Activities: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [permanentDeleteConfirm, setPermanentDeleteConfirm] = useState<{ isOpen: boolean; activity: Activity | null }>({
     isOpen: false,
@@ -58,8 +58,7 @@ const Activities: React.FC = () => {
   
   // Column visibility state with localStorage
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    const saved = localStorage.getItem('yatra-activities-columns');
-    return saved ? JSON.parse(saved) : {
+    const defaultColumns = {
       name: true,
       description: true,
       trips: true,
@@ -69,6 +68,8 @@ const Activities: React.FC = () => {
       created_by_name: false,
       updated_by_name: false,
     };
+    const saved = localStorage.getItem('yatra-activities-columns');
+    return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
 
   const queryClient = useQueryClient();
@@ -272,7 +273,7 @@ const Activities: React.FC = () => {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(field);
-      setSortOrder('asc');
+      setSortOrder(field === 'id' ? 'desc' : 'asc');
     }
   };
 
@@ -285,7 +286,7 @@ const Activities: React.FC = () => {
       : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc';
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
 
   return (
     <div className="space-y-3">
@@ -422,35 +423,35 @@ const Activities: React.FC = () => {
               <CardContent className="p-0 overflow-visible">
                 <SharedTable
                   data={activities}
-                    columns={[
-                      {
-                        key: 'name',
-                        label: __('Activity', 'Activity'),
-                        sortable: true,
-                        visible: visibleColumns.name,
-                        render: (activity: Activity) => (
-                          <div className="flex items-center gap-3">
-                            {/* Icon/Image */}
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                              {activity.icon ? (
-                                activity.icon.type === 'image' ? (
-                                  <img 
-                                    src={activity.icon.value} 
-                                    alt={activity.name}
-                                    className="w-full h-full object-cover rounded-lg"
-                                  />
-                                ) : (
-                                  <IconSelector 
-                                    iconName={activity.icon.value} 
-                                    className="w-5 h-5 text-blue-600 dark:text-blue-400" 
-                                  />
-                                )
+                  columns={[
+                    {
+                      key: 'name',
+                      label: __('Activity', 'Activity'),
+                      sortable: true,
+                      visible: visibleColumns.name,
+                      render: (activity: Activity) => (
+                        <div className="flex items-center gap-3">
+                          {/* Icon/Image */}
+                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                            {activity.icon ? (
+                              activity.icon.type === 'image' ? (
+                                <img
+                                  src={activity.icon.value}
+                                  alt={activity.name}
+                                  className="w-full h-full object-cover rounded-lg"
+                                />
                               ) : (
-                                <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
-                                  {activity.name.charAt(0).toUpperCase()}
-                                </div>
-                              )}
-                            </div>
+                                <IconSelector
+                                  iconName={activity.icon.value}
+                                  className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                                />
+                              )
+                            ) : (
+                              <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
+                                {activity.name.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                          </div>
                             {/* Text */}
                             <div>
                               <a 
@@ -459,8 +460,11 @@ const Activities: React.FC = () => {
                               >
                                 {activity.name}
                               </a>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {activity.slug}
+                              <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                <span>{activity.slug}</span>
+                                <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                  ({__('ID:', 'ID:')} {activity.id})
+                                </span>
                               </div>
                             </div>
                           </div>

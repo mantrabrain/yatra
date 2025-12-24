@@ -25,6 +25,16 @@ class TripRepository extends BaseRepository
     private static array $tableExistsCache = [];
 
     /**
+     * Rich text fields specific to trips
+     */
+    protected array $richTextFields = ['description'];
+
+    /**
+     * Integer fields specific to trips
+     */
+    protected array $integerFields = ['id', 'created_by', 'updated_by', 'difficulty_level', 'duration', 'group_size'];
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -1430,7 +1440,7 @@ class TripRepository extends BaseRepository
      * @param array $statuses Array of statuses to filter by. Defaults to ['published']
      * @return array
      */
-    public function getActive(array $args = [], array $statuses = ['published']): array
+    public function getActive(array $args = [], array $statuses = ['publish']): array
     {
         $args['where']['deleted_at'] = null;
         
@@ -1463,7 +1473,7 @@ class TripRepository extends BaseRepository
         // Base query to get all active trips
         $args['where']['deleted_at'] = null;
         if (!isset($args['where']['status'])) {
-            $args['where']['status'] = ['publish', 'published'];
+            $args['where']['status'] = ['publish'];
         }
         
         // DEBUG: Log query args

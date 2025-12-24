@@ -48,18 +48,16 @@ const DifficultyLevels: React.FC = () => {
   const [bulkAction, setBulkAction] = useState('');
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
+    const defaultColumns = {
+      level_order: true,
+      name: true,
+      description: true,
+      trips: true,
+      status: true,
+      created_at: false,
+    };
     const saved = localStorage.getItem('yatra_difficulty_levels_columns');
-    return saved
-      ? JSON.parse(saved)
-      : {
-          level_order: true,
-          name: true,
-          slug: true,
-          description: true,
-          trips: true,
-          status: true,
-          created_at: false,
-        };
+    return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
 
   const { can } = usePermissions();
@@ -94,22 +92,20 @@ const DifficultyLevels: React.FC = () => {
       render: (level: DifficultyLevel) => (
         <div className="flex items-center gap-3">
           {renderIcon(level.icon)}
-          <a
-            href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`}
-            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-          >
-            {level.name}
-          </a>
-        </div>
-      ),
-    },
-    {
-      key: 'slug',
-      label: __('Slug', 'Slug'),
-      visible: visibleColumns.slug,
-      render: (level: DifficultyLevel) => (
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {level.slug || '—'}
+          <div>
+            <a
+              href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${level.id}`}
+              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+            >
+              {level.name}
+            </a>
+            <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
+              <span>{level.slug || '—'}</span>
+              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                ({__('ID:', 'ID:')} {level.id})
+              </span>
+            </div>
+          </div>
         </div>
       ),
     },

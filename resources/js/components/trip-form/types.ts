@@ -182,7 +182,7 @@ export interface TripFormData {
   availability_dates: AvailabilityDate[];
   
   // Status & Lifecycle
-  status: 'draft' | 'review' | 'approved' | 'published' | 'archived' | 'suspended';
+  status: 'draft' | 'review' | 'approved' | 'publish' | 'archived' | 'suspended';
   scheduled_publish_date: string;
   scheduled_unpublish_date: string;
   version: number;

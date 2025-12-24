@@ -11,6 +11,7 @@ import React from 'react';
 import { Calendar, Clock, TrendingUp, Package, Sun, Target } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { Button } from '../ui/button';
+import { Modal } from '../ui/modal';
 
 interface RuleTypeSelectionModalProps {
   isOpen: boolean;
@@ -74,78 +75,21 @@ export const RuleTypeSelectionModal: React.FC<RuleTypeSelectionModalProps> = ({
   onClose,
   onSelectType,
 }) => {
-  if (!isOpen) return null;
-
   const handleSelectType = (ruleType: string) => {
     onSelectType(ruleType);
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ marginTop: '-32px' }}>
-      <div 
-        className="absolute inset-0 bg-black/50" 
-        onClick={onClose}
-      />
-      <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden">
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            {__('What type of pricing rule do you want to create?')}
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {__('Choose the rule type that best fits your needs')}
-          </p>
-        </div>
-        <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          {RULE_TYPES.map((ruleType) => {
-            const Icon = ruleType.icon;
-            const iconBgColors = {
-              blue: 'bg-blue-100 dark:bg-blue-900/50 group-hover:bg-blue-200 dark:group-hover:bg-blue-800',
-              orange: 'bg-orange-100 dark:bg-orange-900/50 group-hover:bg-orange-200 dark:group-hover:bg-orange-800',
-              green: 'bg-green-100 dark:bg-green-900/50 group-hover:bg-green-200 dark:group-hover:bg-green-800',
-              purple: 'bg-purple-100 dark:bg-purple-900/50 group-hover:bg-purple-200 dark:group-hover:bg-purple-800',
-              yellow: 'bg-yellow-100 dark:bg-yellow-900/50 group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800',
-              indigo: 'bg-indigo-100 dark:bg-indigo-900/50 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800',
-            };
-            const iconColors = {
-              blue: 'text-blue-600 dark:text-blue-400',
-              orange: 'text-orange-600 dark:text-orange-400',
-              green: 'text-green-600 dark:text-green-400',
-              purple: 'text-purple-600 dark:text-purple-400',
-              yellow: 'text-yellow-600 dark:text-yellow-400',
-              indigo: 'text-indigo-600 dark:text-indigo-400',
-            };
-            const borderColors = {
-              blue: 'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20',
-              orange: 'hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20',
-              green: 'hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20',
-              purple: 'hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20',
-              yellow: 'hover:border-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20',
-              indigo: 'hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
-            };
-            return (
-              <button
-                key={ruleType.id}
-                onClick={() => handleSelectType(ruleType.id)}
-                className={`flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl ${borderColors[ruleType.color as keyof typeof borderColors]} transition-all group text-left`}
-              >
-                <div className={`w-14 h-14 ${iconBgColors[ruleType.color as keyof typeof iconBgColors]} rounded-full flex items-center justify-center mb-4 transition-colors`}>
-                  <Icon className={`w-7 h-7 ${iconColors[ruleType.color as keyof typeof iconColors]}`} />
-                </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-center">
-                  {ruleType.name}
-                </h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
-                  {ruleType.description}
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 text-center italic">
-                  {ruleType.example}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-        <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={__('What type of pricing rule do you want to create?')}
+      description={__('Choose the rule type that best fits your needs')}
+      size="lg"
+      maxWidthClassName="max-w-5xl"
+      footer={
+        <div className="flex justify-end">
           <Button 
             variant="outline" 
             onClick={onClose}
@@ -153,7 +97,57 @@ export const RuleTypeSelectionModal: React.FC<RuleTypeSelectionModalProps> = ({
             {__('Cancel')}
           </Button>
         </div>
+      }
+    >
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {RULE_TYPES.map((ruleType) => {
+          const Icon = ruleType.icon;
+          const iconBgColors = {
+            blue: 'bg-blue-100 dark:bg-blue-900/50 group-hover:bg-blue-200 dark:group-hover:bg-blue-800',
+            orange: 'bg-orange-100 dark:bg-orange-900/50 group-hover:bg-orange-200 dark:group-hover:bg-orange-800',
+            green: 'bg-green-100 dark:bg-green-900/50 group-hover:bg-green-200 dark:group-hover:bg-green-800',
+            purple: 'bg-purple-100 dark:bg-purple-900/50 group-hover:bg-purple-200 dark:group-hover:bg-purple-800',
+            yellow: 'bg-yellow-100 dark:bg-yellow-900/50 group-hover:bg-yellow-200 dark:group-hover:bg-yellow-800',
+            indigo: 'bg-indigo-100 dark:bg-indigo-900/50 group-hover:bg-indigo-200 dark:group-hover:bg-indigo-800',
+          };
+          const iconColors = {
+            blue: 'text-blue-600 dark:text-blue-400',
+            orange: 'text-orange-600 dark:text-orange-400',
+            green: 'text-green-600 dark:text-green-400',
+            purple: 'text-purple-600 dark:text-purple-400',
+            yellow: 'text-yellow-600 dark:text-yellow-400',
+            indigo: 'text-indigo-600 dark:text-indigo-400',
+          };
+          const borderColors = {
+            blue: 'hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20',
+            orange: 'hover:border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20',
+            green: 'hover:border-green-500 hover:bg-green-50 dark:hover:bg-green-900/20',
+            purple: 'hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/20',
+            yellow: 'hover:border-yellow-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/20',
+            indigo: 'hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20',
+          };
+          return (
+            <button
+              key={ruleType.id}
+              onClick={() => handleSelectType(ruleType.id)}
+              className={`flex flex-col items-center p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl ${borderColors[ruleType.color as keyof typeof borderColors]} transition-all group text-left`}
+            >
+              <div className={`w-14 h-14 ${iconBgColors[ruleType.color as keyof typeof iconBgColors]} rounded-full flex items-center justify-center mb-4 transition-colors`}>
+                <Icon className={`w-7 h-7 ${iconColors[ruleType.color as keyof typeof iconColors]}`} />
+              </div>
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 text-center">
+                {ruleType.name}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 text-center mb-2">
+                {ruleType.description}
+              </p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 text-center italic">
+                {ruleType.example}
+              </p>
+            </button>
+          );
+        })}
       </div>
-    </div>
+    </Modal>
   );
 };

@@ -47,7 +47,7 @@ class TripMigration extends BaseMigration
                 // Always re-migrate trips on every run - no skip logic
                 $meta = $this->getPostMeta($oldTrip->ID);
 
-                $status = ($oldTrip->post_status === 'publish') ? 'published' : 'draft';
+                $status = ($oldTrip->post_status === 'publish') ? 'publish' : 'draft';
 
                 $baseSlug = $oldTrip->post_name ?: sanitize_title($oldTrip->post_title);
                 $slug = $baseSlug;

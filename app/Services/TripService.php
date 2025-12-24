@@ -343,7 +343,7 @@ class TripService extends BaseService
             
             // Create revision every time trip is published (status is 'published')
             // This captures the state before each publish, allowing users to revert to any published version
-            if ($newStatus === 'published') {
+            if ($newStatus === 'publish') {
                 // Get latest version number
                 $latestVersion = $this->revisionRepository->getLatestVersion($id);
                 $newVersion = $latestVersion + 1;
@@ -866,7 +866,7 @@ class TripService extends BaseService
     public function publish(int $id): bool
     {
         $data = [
-            'status' => 'published',
+            'status' => 'publish',
             'published_at' => current_time('mysql'),
         ];
 

@@ -48,8 +48,8 @@ interface Attribute {
 const Attributes: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [permanentDeleteConfirm, setPermanentDeleteConfirm] = useState<{ isOpen: boolean; attribute: Attribute | null }>({
     isOpen: false,
@@ -298,8 +298,8 @@ const Attributes: React.FC = () => {
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
-    setSortBy('name');
-    setSortOrder('asc');
+    setSortBy('id');
+    setSortOrder('desc');
     setPage(1);
     setSelectedIds([]);
     setBulkAction('');
@@ -373,7 +373,7 @@ const Attributes: React.FC = () => {
       <PageHeader
         title={__('Attributes', 'Attributes')}
         description={__('Manage your travel attributes and their properties', 'Manage your travel attributes and their properties')}
-        actionCapability="manage_options"
+        actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateAttribute} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
@@ -406,6 +406,7 @@ const Attributes: React.FC = () => {
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
             sortOptions={[
+              { value: "id", label: __('ID', 'ID') },
               { value: "name", label: __('Name', 'Name') },
               { value: "field_type", label: __('Field Type', 'Field Type') },
               { value: "status", label: __('Status', 'Status') },
@@ -506,8 +507,11 @@ const Attributes: React.FC = () => {
                             >
                               {attribute.name}
                             </a>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {attribute.slug}
+                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                              <span>{attribute.slug}</span>
+                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                ({__('ID:', 'ID:')} {attribute.id})
+                              </span>
                             </div>
                           </div>
                         </div>

@@ -230,7 +230,7 @@ class SavedTripRepository extends BaseRepository
             error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId status: $tripStatus");
             
             // Only include published trips (accept both 'publish' and 'published')
-            if ($tripStatus !== 'publish' && $tripStatus !== 'published') {
+            if ($tripStatus !== 'publish') {
                 error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId is not published, skipping");
                 continue; // Trip not published, skip it
             }

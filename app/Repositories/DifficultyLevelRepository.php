@@ -11,6 +11,16 @@ namespace Yatra\Repositories;
 class DifficultyLevelRepository extends BaseRepository
 {
     /**
+     * Rich text fields
+     */
+    protected array $richTextFields = ['description'];
+
+    /**
+     * Integer fields
+     */
+    protected array $integerFields = ['id', 'level_order', 'created_by', 'updated_by'];
+
+    /**
      * Get table name
      */
     protected function getTableName(): string

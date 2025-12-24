@@ -6,6 +6,7 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\TripCategoryRepository;
 use Yatra\Helpers\SlugHelper;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Trip Category Service
@@ -93,9 +94,9 @@ class TripCategoryService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize description (rich text)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize parent_id
@@ -177,9 +178,9 @@ class TripCategoryService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description
+        // Sanitize description (rich text)
         if (isset($data['description'])) {
-            $data['description'] = sanitize_textarea_field($data['description']);
+            $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize parent_id

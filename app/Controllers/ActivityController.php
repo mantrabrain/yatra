@@ -11,6 +11,7 @@ use Yatra\Services\ActivityService;
 use Yatra\Validators\ActivityValidator;
 use Yatra\Exceptions\ValidationException;
 use Yatra\Utils\Logger;
+use Yatra\Helpers\FormatHelper;
 
 /**
  * Activity REST API Controller
@@ -213,6 +214,8 @@ class ActivityController extends BaseController
             ActivityValidator::validateCreate($data);
             $data = ActivityValidator::sanitize($data);
             
+            // Description will be sanitized in the Service layer with FormatHelper::sanitizeQuillHtml()
+            
             Logger::apiRequest('/activities', 'POST', $data);
             
             $id = $this->service->create($data);
@@ -235,7 +238,12 @@ class ActivityController extends BaseController
     public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            $result = $this->service->update($this->getId($request), $this->getBody($request));
+            $id = $this->getId($request);
+            $data = $this->getBody($request);
+            
+            // Description will be sanitized in the Service layer with FormatHelper::sanitizeQuillHtml()
+            
+            $result = $this->service->update($id, $data);
 
             if (!$result) {
                 return $this->error_response(__('Failed to update activity', 'yatra'), 500);

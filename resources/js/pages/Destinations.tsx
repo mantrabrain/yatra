@@ -39,15 +39,14 @@ interface Destination {
 const Destinations: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState('');
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    const saved = localStorage.getItem('yatra_destinations_visible_columns');
-    return saved ? JSON.parse(saved) : {
+    const defaultColumns = {
       name: true,
       description: true,
       trips: true,
@@ -57,6 +56,8 @@ const Destinations: React.FC = () => {
       created_by_name: false,
       updated_by_name: false,
     };
+    const saved = localStorage.getItem('yatra_destinations_visible_columns');
+    return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; destination: Destination | null }>({
     isOpen: false,
@@ -169,8 +170,8 @@ const Destinations: React.FC = () => {
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
-    setSortBy('name');
-    setSortOrder('asc');
+    setSortBy('id');
+    setSortOrder('desc');
     setPage(1);
   };
 
@@ -179,7 +180,7 @@ const Destinations: React.FC = () => {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(field);
-      setSortOrder('asc');
+      setSortOrder(field === 'id' ? 'desc' : 'asc');
     }
   };
 
@@ -259,7 +260,7 @@ const Destinations: React.FC = () => {
     { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
   ];
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc';
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
 
   return (
     <div className="space-y-3">
@@ -410,8 +411,11 @@ const Destinations: React.FC = () => {
                             >
                               {destination.name}
                             </a>
-                            <div className="text-sm text-gray-500 dark:text-gray-400">
-                              {destination.slug}
+                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                              <span>{destination.slug}</span>
+                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                                ({__('ID:', 'ID:')} {destination.id})
+                              </span>
                             </div>
                           </div>
                         </div>

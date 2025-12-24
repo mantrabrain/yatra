@@ -162,7 +162,7 @@ const RecurringRuleForm: React.FC = () => {
   const { data: tripsData } = useQuery({
     queryKey: ['trips', 'all'],
     queryFn: async () => {
-      const response = await apiClient.get('/trips', { params: { per_page: 100, status: 'published' } });
+      const response = await apiClient.get('/trips', { params: { per_page: 100, status: 'publish' } });
       return {
         trips: (response?.data || []).map((trip: any) => ({
           id: Number(trip.id) || 0,

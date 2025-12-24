@@ -18,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import { RichTextEditor } from '../components/ui/rich-text-editor';
 
 interface DifficultyLevelFormData {
   name: string;
@@ -38,7 +39,7 @@ const DifficultyLevelForm: React.FC = () => {
     description: '',
     icon: null,
     level_order: '',
-    status: 'draft',
+    status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -79,7 +80,7 @@ const DifficultyLevelForm: React.FC = () => {
         description: levelData.description || '',
         icon: (levelData.icon as IconPickerValue) || null,
         level_order: typeof levelData.level_order === 'number' ? levelData.level_order : '',
-        status: levelData.status || 'draft',
+        status: levelData.status || 'publish',
       });
     }
   }, [levelData, isEditMode]);
@@ -151,7 +152,7 @@ const DifficultyLevelForm: React.FC = () => {
       const payload: any = {
         name: data.name.trim(),
         slug: data.slug.trim(),
-        description: data.description.trim(),
+        description: data.description,
         icon: data.icon,
         level_order: data.level_order === '' ? null : Number(data.level_order),
         status: data.status,
@@ -166,7 +167,7 @@ const DifficultyLevelForm: React.FC = () => {
       }
       return await apiClient.post('/difficulty-levels', payload);
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
       queryClient.invalidateQueries({ queryKey: ['difficulty-level', levelId] });
       showToast(
@@ -175,9 +176,16 @@ const DifficultyLevelForm: React.FC = () => {
           : __('Difficulty level created successfully', 'Difficulty level created successfully'),
         'success'
       );
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels`;
-      }, 1000);
+      setIsSubmitting(false);
+
+      if (!isEditMode) {
+        const newId = response?.id;
+        if (newId) {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels&action=edit&id=${newId}`;
+        } else {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels`;
+        }
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the difficulty level', 'An error occurred while saving the difficulty level');
@@ -205,11 +213,45 @@ const DifficultyLevelForm: React.FC = () => {
 
   if (isEditMode && isLoadingLevel) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">
-          {__('Loading difficulty level...', 'Loading difficulty level...')}
-        </span>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+        </div>
+
+        {/* Form Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Fields */}
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                {[1, 2, 3].map((_, idx) => (
+                  <div key={idx}>
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                    <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  </div>
+                ))}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-32 mb-2 animate-pulse"></div>
+                  <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-3">
+            {[1, 2, 3].map((_, idx) => (
+              <Card key={idx}>
+                <CardContent className="p-6 space-y-4">
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -284,31 +326,15 @@ const DifficultyLevelForm: React.FC = () => {
                     </p>
                   </div>
 
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
-                    </label>
-                    <textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Describe this difficulty level', 'Describe this difficulty level')}
-                      rows={6}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <IconPicker
-                      value={formData.icon}
-                      onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Difficulty Level Icon or Image', 'Difficulty Level Icon or Image')}
-                      helpText={__('Select an icon or image to visually represent this difficulty level.', 'Select an icon or image to visually represent this difficulty level.')}
-                      allowImageUpload
-                      allowIconSelection
-                      size="md"
-                    />
-                  </div>
+                  <RichTextEditor
+                    label={__('Description', 'Description')}
+                    value={formData.description || ''}
+                    onChange={(value) => handleFieldChange('description', value)}
+                    placeholder={__('Describe this difficulty level (supports formatting, lists, links...)', 'Describe this difficulty level (supports formatting, lists, links...)')}
+                    helperText={__('Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported.', 'Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported.')}
+                    minHeight={260}
+                    maxHeight={600}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -348,6 +374,23 @@ const DifficultyLevelForm: React.FC = () => {
                       <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Difficulty Level Icon or Image', 'Difficulty Level Icon or Image')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
+                    helpText={__('Choose a library icon or upload a custom image for this difficulty level.', 'Choose a library icon or upload a custom image for this difficulty level.')}
+                    allowImageUpload
+                    allowIconSelection
+                    size="md"
+                  />
                 </CardContent>
               </Card>
 

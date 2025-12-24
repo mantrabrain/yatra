@@ -11,6 +11,16 @@ namespace Yatra\Repositories;
 class TripCategoryRepository extends BaseRepository
 {
     /**
+     * Rich text fields
+     */
+    protected array $richTextFields = ['description'];
+
+    /**
+     * Integer fields
+     */
+    protected array $integerFields = ['id', 'parent_id', 'created_by', 'updated_by'];
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -156,7 +166,7 @@ class TripCategoryRepository extends BaseRepository
                    GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
             FROM `{$table}` c
             LEFT JOIN `{$trip_cat_table}` tc ON tc.category_id = c.id
-            LEFT JOIN `{$trip_table}` t ON t.id = tc.trip_id AND t.status = 'published'
+            LEFT JOIN `{$trip_table}` t ON t.id = tc.trip_id AND t.status = 'publish'
             LEFT JOIN `{$reviews_table}` r ON r.trip_id = t.id AND r.status = 'approved'
             WHERE c.status = 'publish'
             GROUP BY c.id

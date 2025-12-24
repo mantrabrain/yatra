@@ -21,6 +21,20 @@ abstract class BaseRepository
     protected string $table;
 
     /**
+     * @var array Fields that contain rich text/HTML content (e.g., from Quill editor)
+     * Child repositories MUST override this to specify their rich text fields
+     * Example: ['description', 'content', 'notes', 'details']
+     */
+    protected array $richTextFields = [];
+
+    /**
+     * @var array Fields that should be treated as integers
+     * Child repositories can override this to add entity-specific integer fields
+     * Common fields like 'id', 'created_by', 'updated_by' should be added by child classes
+     */
+    protected array $integerFields = [];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -285,19 +299,20 @@ abstract class BaseRepository
 
             if (is_string($value)) {
                 // Use appropriate sanitization based on field type
-                if ($key === 'description') {
-                    $sanitized[$key] = sanitize_textarea_field($value);
-                } elseif (in_array($key, ['created_by', 'updated_by', 'id'], true)) {
+                if (in_array($key, $this->richTextFields, true)) {
+                    // Sanitize Quill HTML content (allows safe HTML tags)
+                    $sanitized[$key] = \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($value);
+                } elseif (in_array($key, $this->integerFields, true)) {
                     $sanitized[$key] = absint($value);
                 } else {
-                $sanitized[$key] = sanitize_text_field($value);
+                    $sanitized[$key] = sanitize_text_field($value);
                 }
             } elseif (is_numeric($value)) {
                 // Ensure integers are properly cast
-                if (in_array($key, ['created_by', 'updated_by', 'id'], true)) {
+                if (in_array($key, $this->integerFields, true)) {
                     $sanitized[$key] = absint($value);
                 } else {
-                $sanitized[$key] = $value;
+                    $sanitized[$key] = $value;
                 }
             } elseif (is_array($value)) {
                 // Arrays should already be serialized by service layer

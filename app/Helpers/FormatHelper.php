@@ -407,5 +407,165 @@ class FormatHelper
 
         return implode(' ', $html);
     }
+
+    /**
+     * Sanitize Quill editor HTML output
+     * 
+     * This function sanitizes HTML content from the Quill rich text editor,
+     * allowing only safe HTML tags and attributes that match the Quill toolbar configuration.
+     * 
+     * Allowed features based on Quill toolbar:
+     * - Headers: h1, h2, h3
+     * - Text formatting: bold, italic, underline, strike
+     * - Lists: ordered (ol, li), unordered (ul, li)
+     * - Alignment: text-align attribute on p tags
+     * - Links: a tags with href attribute
+     * - Paragraphs: p tags
+     * 
+     * @param string $html Raw HTML from Quill editor
+     * @return string Sanitized HTML safe for database storage
+     */
+    public static function sanitizeQuillHtml(string $html): string
+    {
+        // Return empty string if input is empty or just whitespace
+        if (empty(trim($html)) || $html === '<p><br></p>') {
+            return '';
+        }
+
+        // Define allowed HTML tags and attributes based on Quill configuration
+        $allowed_tags = [
+            // Headers (from Quill header dropdown: 1, 2, 3)
+            'h1' => [],
+            'h2' => [],
+            'h3' => [],
+            
+            // Paragraphs with alignment support
+            'p' => [
+                'style' => true, // For text-align
+                'class' => true, // Quill may add alignment classes
+            ],
+            
+            // Text formatting (bold, italic, underline, strike)
+            'strong' => [],
+            'b' => [],
+            'em' => [],
+            'i' => [],
+            'u' => [],
+            's' => [],
+            'strike' => [],
+            
+            // Lists (ordered and unordered)
+            'ol' => [],
+            'ul' => [],
+            'li' => [],
+            
+            // Links
+            'a' => [
+                'href' => true,
+                'title' => true,
+                'target' => true,
+                'rel' => true,
+            ],
+            
+            // Line breaks
+            'br' => [],
+        ];
+
+        // Use wp_kses to sanitize with allowed tags
+        $sanitized = wp_kses($html, $allowed_tags);
+
+        // Additional cleanup for alignment styles
+        // Only allow text-align in style attribute
+        $sanitized = preg_replace_callback(
+            '/style="([^"]*)"/i',
+            function ($matches) {
+                $styles = $matches[1];
+                // Extract only text-align property
+                if (preg_match('/text-align:\s*(left|center|right|justify)/i', $styles, $align)) {
+                    return 'style="text-align: ' . esc_attr($align[1]) . '"';
+                }
+                return ''; // Remove style attribute if no valid text-align
+            },
+            $sanitized
+        );
+
+        // Ensure links have proper rel attribute for security
+        $sanitized = preg_replace_callback(
+            '/<a\s+([^>]*?)>/i',
+            function ($matches) {
+                $attrs = $matches[1];
+                // If target="_blank" exists, ensure rel="noopener noreferrer"
+                if (stripos($attrs, 'target="_blank"') !== false) {
+                    if (stripos($attrs, 'rel=') === false) {
+                        $attrs .= ' rel="noopener noreferrer"';
+                    } elseif (stripos($attrs, 'noopener') === false || stripos($attrs, 'noreferrer') === false) {
+                        $attrs = preg_replace(
+                            '/rel="([^"]*)"/i',
+                            'rel="$1 noopener noreferrer"',
+                            $attrs
+                        );
+                    }
+                }
+                return '<a ' . $attrs . '>';
+            },
+            $sanitized
+        );
+
+        // Remove empty paragraphs and normalize whitespace
+        $sanitized = preg_replace('/<p[^>]*>(\s|&nbsp;|<br\s*\/?>)*<\/p>/i', '', $sanitized);
+        
+        // Trim whitespace
+        $sanitized = trim($sanitized);
+
+        return $sanitized;
+    }
+
+    /**
+     * Prepare Quill HTML for display (output escaping)
+     * 
+     * Use this when outputting sanitized Quill content to the frontend.
+     * This assumes the content was already sanitized with sanitizeQuillHtml() before storage.
+     * 
+     * @param string $html Sanitized HTML from database
+     * @return string HTML safe for display
+     */
+    public static function displayQuillHtml(string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        // Apply WordPress content filters (auto-paragraphs, shortcodes, etc.)
+        // But skip wpautop since Quill already handles paragraphs
+        remove_filter('the_content', 'wpautop');
+        $content = apply_filters('the_content', $html);
+        add_filter('the_content', 'wpautop');
+
+        return $content;
+    }
+
+    /**
+     * Strip all HTML tags from Quill content (for excerpts, meta descriptions, etc.)
+     * 
+     * @param string $html Quill HTML content
+     * @return string Plain text
+     */
+    public static function quillToPlainText(string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        // Remove all HTML tags
+        $text = wp_strip_all_tags($html);
+        
+        // Normalize whitespace
+        $text = preg_replace('/\s+/', ' ', $text);
+        
+        // Trim
+        $text = trim($text);
+
+        return $text;
+    }
 }
 

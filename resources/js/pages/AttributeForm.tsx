@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Edit2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { useToast } from '../components/ui/toast';
@@ -42,7 +42,6 @@ interface AttributeFormData {
 }
 
 const AttributeForm: React.FC = () => {
-  const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [formData, setFormData] = useState<AttributeFormData>({
     name: '',
@@ -335,30 +334,37 @@ const AttributeForm: React.FC = () => {
         }
       } catch (error: any) {
         // Handle specific API errors
-        if (error?.response?.status === 409) {
-          throw new Error(__('Attribute slug already exists', 'Attribute slug already exists'));
-        } else if (error?.response?.status === 422) {
-          const validationErrors = error?.response?.data?.errors;
-          if (validationErrors) {
-            throw new Error(__('Validation failed: ') + Object.values(validationErrors).join(', '));
-          }
-        }
         throw error;
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['attributes'] });
-      queryClient.invalidateQueries({ queryKey: ['attribute', attributeId] });
+    onSuccess: (response) => {
+      setIsSubmitting(false);
       showToast(
         isEditMode 
           ? __('Attribute updated successfully', 'Attribute updated successfully')
           : __('Attribute created successfully', 'Attribute created successfully'),
         'success'
       );
-      // Redirect to attributes list after a short delay
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=attributes`;
-      }, 1000);
+      
+      // Redirect logic
+      if (!isEditMode) {
+        // Redirect to edit page after creation
+        console.log('AttributeForm - Full response for redirect:', response);
+        
+        // Try different possible response structures
+        const newId = response?.data?.id || response?.id || response?.data?.data?.id;
+        
+        console.log('AttributeForm - Extracted ID for redirect:', newId);
+        
+        if (newId) {
+          setTimeout(() => {
+            console.log('AttributeForm - Redirecting to edit page with ID:', newId);
+            window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=attributes&action=edit&id=${newId}`;
+          }, 1000);
+        } else {
+          console.error('AttributeForm - Could not extract ID from response for redirect');
+        }
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the attribute', 'An error occurred while saving the attribute');
@@ -562,7 +568,7 @@ const AttributeForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('description', e.target.value)}
                       placeholder={__('Enter attribute description', 'Enter attribute description')}
                       rows={6}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
                   </div>
                 </CardContent>
@@ -665,24 +671,6 @@ const AttributeForm: React.FC = () => {
 
             {/* Sidebar */}
             <div className="space-y-3">
-              {/* Icon/Image Picker */}
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Attribute Icon', 'Attribute Icon')}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <IconPicker
-                    value={formData.icon}
-                    onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Icon or Image', 'Icon or Image')}
-                    helpText={__('Select an icon from the library or upload a custom image for this attribute.', 'Select an icon from the library or upload a custom image for this attribute.')}
-                    allowImageUpload={true}
-                    allowIconSelection={true}
-                    size="md"
-                  />
-                </CardContent>
-              </Card>
-
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
@@ -751,6 +739,24 @@ const AttributeForm: React.FC = () => {
                       onCheckedChange={(checked) => handleFieldChange('required', checked)}
                     />
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Icon/Image Picker */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Attribute Icon', 'Attribute Icon')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={__('Icon or Image', 'Icon or Image')}
+                    helpText={__('Select an icon from the library or upload a custom image for this attribute.', 'Select an icon from the library or upload a custom image for this attribute.')}
+                    allowImageUpload={true}
+                    allowIconSelection={true}
+                    size="md"
+                  />
                 </CardContent>
               </Card>
 

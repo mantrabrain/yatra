@@ -18,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import { RichTextEditor } from '../components/ui/rich-text-editor';
 
 interface CategoryFormData {
   name: string;
@@ -44,7 +45,7 @@ const CategoryForm: React.FC = () => {
     description: '',
     icon: null,
     parent_id: '',
-    status: 'draft',
+    status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -130,7 +131,7 @@ const CategoryForm: React.FC = () => {
         description: categoryData.description || '',
         icon: (categoryData.icon as IconPickerValue) || null,
         parent_id: categoryData.parent_id ?? '',
-        status: categoryData.status || 'draft',
+        status: categoryData.status || 'publish',
       });
     }
   }, [categoryData, isEditMode]);
@@ -217,7 +218,7 @@ const CategoryForm: React.FC = () => {
       }
       return await apiClient.post('/trip-categories', payload);
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
       queryClient.invalidateQueries({ queryKey: ['trip-category', categoryId] });
       showToast(
@@ -226,9 +227,16 @@ const CategoryForm: React.FC = () => {
           : __('Category created successfully', 'Category created successfully'),
         'success'
       );
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories`;
-      }, 1000);
+      setIsSubmitting(false);
+
+      if (!isEditMode) {
+        const newId = response?.id;
+        if (newId) {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${newId}`;
+        } else {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories`;
+        }
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the category', 'An error occurred while saving the category');
@@ -383,31 +391,15 @@ const CategoryForm: React.FC = () => {
                     </p>
                   </div>
 
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
-                    </label>
-                    <textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Enter category description', 'Enter category description')}
-                      rows={6}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                    />
-                  </div>
-
-                  <div>
-                    <IconPicker
-                      value={formData.icon}
-                      onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Category Icon or Image', 'Category Icon or Image')}
-                      helpText={__('Select an icon from the library or upload a custom image for this category.', 'Select an icon from the library or upload a custom image for this category.')}
-                      allowImageUpload={true}
-                      allowIconSelection={true}
-                      size="md"
-                    />
-                  </div>
+                  <RichTextEditor
+                    label={__('Description', 'Description')}
+                    value={formData.description || ''}
+                    onChange={(value) => handleFieldChange('description', value)}
+                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'Write a rich description (supports formatting, lists, links...)')}
+                    helperText={__('Use formatting, bullet lists, and links to describe this category. HTML is supported.', 'Use formatting, bullet lists, and links to describe this category. HTML is supported.')}
+                    minHeight={260}
+                    maxHeight={600}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -458,6 +450,23 @@ const CategoryForm: React.FC = () => {
                     <option value="publish">{__('Publish', 'Publish')}</option>
                     <option value="trash">{__('Trash', 'Trash')}</option>
                   </Select>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Category Icon or Image', 'Category Icon or Image')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
+                    helpText={__('Choose a library icon or upload a custom image for this category.', 'Choose a library icon or upload a custom image for this category.')}
+                    allowImageUpload={true}
+                    allowIconSelection={true}
+                    size="md"
+                  />
                 </CardContent>
               </Card>
 

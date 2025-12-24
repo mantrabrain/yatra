@@ -20,6 +20,7 @@ import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOpti
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { useToast } from '../components/ui/toast';
+import { Modal } from '../components/ui/modal';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
 import { 
@@ -37,11 +38,9 @@ import {
   Send,
   Eye,
   Download,
-  User,
   Mail,
   Calendar,
   ClipboardCheck,
-  X,
   RotateCcw
 } from 'lucide-react';
 
@@ -246,6 +245,7 @@ const ConsentFormsList: React.FC = () => {
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const saved = localStorage.getItem('yatra-consent-forms-columns');
     return saved ? JSON.parse(saved) : {
+      id: true,
       name: true,
       status: true,
       applicable_to: true,
@@ -449,6 +449,7 @@ const ConsentFormsList: React.FC = () => {
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
               columnOptions={[
+                { key: 'id', label: __('Form ID'), visible: visibleColumns.id },
                 { key: 'name', label: __('Form Name'), visible: visibleColumns.name },
                 { key: 'status', label: __('Status'), visible: visibleColumns.status },
                 { key: 'applicable_to', label: __('Applies To'), visible: visibleColumns.applicable_to },
@@ -466,6 +467,15 @@ const ConsentFormsList: React.FC = () => {
                 <SharedTable
                   data={forms}
                   columns={[
+                    {
+                      key: 'id',
+                      label: __('Form ID'),
+                      sortable: true,
+                      visible: visibleColumns.id,
+                      render: (form: ConsentForm) => (
+                        <span className="text-sm font-mono text-gray-500 dark:text-gray-400">#{form.id}</span>
+                      ),
+                    },
                     {
                       key: 'name',
                       label: __('Form Name'),
@@ -634,11 +644,23 @@ const ConsentFormsList: React.FC = () => {
 const SignedConsentsList: React.FC = () => {
   const [page, setPage] = useState(1);
   const [selectedConsent, setSelectedConsent] = useState<SignedConsent | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isDetailLoading, setIsDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('signed_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [statusFilter, setStatusFilter] = useState('all');
   const { showToast } = useToast();
+
+  // Debug modal state changes
+  useEffect(() => {
+    console.log('Modal state changed - isModalOpen:', isModalOpen);
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    console.log('Selected consent changed:', selectedConsent);
+  }, [selectedConsent]);
   
   // Fetch signed consents
   const { data: consentsData, isLoading, error } = useQuery<SignedConsentsResponse>({
@@ -667,8 +689,47 @@ const SignedConsentsList: React.FC = () => {
     });
   };
 
-  const handleView = (consent: SignedConsent) => {
-    setSelectedConsent(consent);
+  const handleView = async (consent: SignedConsent) => {
+    console.log('handleView called with consent:', consent);
+    console.log('Setting isModalOpen to true');
+    setIsModalOpen(true);
+    setIsDetailLoading(true);
+    setDetailError(null);
+    setSelectedConsent(null);
+
+    try {
+      console.log('Fetching consent details for ID:', consent.id);
+      const response = await apiClient.get(`/signed-consents/${consent.id}`);
+      console.log('API Response:', response);
+      
+      // Handle nested data structure from API
+      let consentData = response;
+      if (response?.data) {
+        consentData = response.data;
+      }
+      if (response?.success && response?.data) {
+        consentData = response.data;
+      }
+      
+      console.log('Processed consent data:', consentData);
+      console.log('Setting selectedConsent');
+      setSelectedConsent(consentData as SignedConsent);
+      console.log('Modal should now be visible with data');
+    } catch (error: any) {
+      console.error('Failed to load consent details:', error);
+      const message = error?.message || __('Failed to load consent details');
+      setDetailError(message);
+      showToast(message, 'error');
+    } finally {
+      console.log('Setting isDetailLoading to false');
+      setIsDetailLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setDetailError(null);
+    setSelectedConsent(null);
   };
 
   const handleDownloadPdf = async (consent: SignedConsent) => {
@@ -762,11 +823,15 @@ const SignedConsentsList: React.FC = () => {
                 sortable: true,
                 visible: true,
                 render: (consent: SignedConsent) => (
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                      <User className="w-4 h-4 text-purple-600" />
+                  <button
+                    type="button"
+                    onClick={() => handleView(consent)}
+                    className="flex items-center gap-3 w-full text-left group focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 rounded-lg"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-300 font-semibold">
+                      {consent.signer_name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
-                    <div>
+                    <div className="flex flex-col">
                       <div className="font-medium text-gray-900 dark:text-white">
                         {consent.signer_name}
                       </div>
@@ -774,8 +839,11 @@ const SignedConsentsList: React.FC = () => {
                         <Mail className="w-3 h-3" />
                         {consent.signer_email}
                       </div>
+                      <span className="text-xs text-purple-600 dark:text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {__('View details')}
+                      </span>
                     </div>
-                  </div>
+                  </button>
                 ),
               },
               {
@@ -877,107 +945,149 @@ const SignedConsentsList: React.FC = () => {
       )}
 
       {/* View Consent Modal */}
-      {selectedConsent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white dark:bg-gray-900 rounded-xl shadow-2xl max-w-3xl w-full mx-4 max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Signed Consent Details')}
-              </h2>
-              <Button variant="ghost" size="sm" onClick={() => setSelectedConsent(null)}>
-                <X className="w-5 h-5" />
-              </Button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
-              {/* Signer Info */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="text-xs text-gray-500 uppercase">{__('Signer Name')}</label>
-                  <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.signer_name}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase">{__('Email')}</label>
-                  <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.signer_email}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase">{__('Signed At')}</label>
-                  <p className="font-medium text-gray-900 dark:text-white">{formatDate(selectedConsent.signed_at)}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500 uppercase">{__('IP Address')}</label>
-                  <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.ip_address}</p>
-                </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title={__('Signed Consent Details')}
+        size="xl"
+        loading={isDetailLoading}
+        error={detailError}
+        loadingSkeleton={
+          <div className="space-y-6 animate-pulse">
+            {/* Signer Info Skeleton */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-5 w-32 bg-gray-300 dark:bg-gray-600 rounded"></div>
               </div>
-
-              {/* Form Data */}
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
-                  {__('Form Responses')}
-                </h3>
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
-                  {selectedConsent.form_data && Object.entries(selectedConsent.form_data).map(([key, value]) => (
-                    <div key={key} className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0 last:pb-0">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">{key}</span>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
-                        {typeof value === 'boolean' ? (value ? '✓ Yes' : '✗ No') : String(value)}
-                      </span>
-                    </div>
-                  ))}
-                  {(!selectedConsent.form_data || Object.keys(selectedConsent.form_data).length === 0) && (
-                    <p className="text-sm text-gray-500">{__('No form data recorded')}</p>
-                  )}
-                </div>
+              <div>
+                <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-5 w-40 bg-gray-300 dark:bg-gray-600 rounded"></div>
               </div>
-
-              {/* Signature */}
-              {selectedConsent.signature_data && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
-                    {__('Signature')}
-                  </h3>
-                  <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <img 
-                      src={selectedConsent.signature_data} 
-                      alt="Signature" 
-                      className="max-h-24 mx-auto"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Initials */}
-              {selectedConsent.initials_data && (
-                <div className="mb-6">
-                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
-                    {__('Initials')}
-                  </h3>
-                  <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <img 
-                      src={selectedConsent.initials_data} 
-                      alt="Initials" 
-                      className="max-h-16 mx-auto"
-                    />
-                  </div>
-                </div>
-              )}
+              <div>
+                <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-5 w-36 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              </div>
+              <div>
+                <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                <div className="h-5 w-28 bg-gray-300 dark:bg-gray-600 rounded"></div>
+              </div>
             </div>
 
-            <div className="flex justify-end gap-3 p-4 border-t border-gray-200 dark:border-gray-700">
-              <Button
-                variant="outline"
-                onClick={() => handleDownloadPdf(selectedConsent)}
-              >
+            {/* Form Responses Skeleton */}
+            <div>
+              <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                <div className="flex justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="h-4 w-32 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                </div>
+                <div className="flex justify-between pb-2 border-b border-gray-200 dark:border-gray-700">
+                  <div className="h-4 w-28 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="h-4 w-24 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                </div>
+                <div className="flex justify-between">
+                  <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="h-4 w-36 bg-gray-300 dark:bg-gray-600 rounded"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Signature Skeleton */}
+            <div>
+              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded mb-3"></div>
+              <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <div className="h-24 w-48 bg-gray-200 dark:bg-gray-700 rounded mx-auto"></div>
+              </div>
+            </div>
+          </div>
+        }
+        footer={
+          selectedConsent && !detailError && !isDetailLoading ? (
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => handleDownloadPdf(selectedConsent)}>
                 <Download className="w-4 h-4 mr-2" />
                 {__('Download PDF')}
               </Button>
-              <Button onClick={() => setSelectedConsent(null)}>
+              <Button onClick={handleCloseModal}>
                 {__('Close')}
               </Button>
             </div>
-          </div>
-        </div>
-      )}
+          ) : undefined
+        }
+      >
+        {selectedConsent && (
+          <>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="text-xs text-gray-500 uppercase">{__('Signer Name')}</label>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.signer_name}</p>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 uppercase">{__('Email')}</label>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.signer_email}</p>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 uppercase">{__('Signed At')}</label>
+                <p className="font-medium text-gray-900 dark:text-white">{formatDate(selectedConsent.signed_at)}</p>
+              </div>
+              <div>
+                <label className="text-xs text-gray-500 uppercase">{__('IP Address')}</label>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedConsent.ip_address}</p>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
+                {__('Form Responses')}
+              </h3>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-3">
+                {selectedConsent.form_data && Object.entries(selectedConsent.form_data).map(([key, value]) => (
+                  <div key={key} className="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-2 last:border-0 last:pb-0">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">{key}</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">
+                      {typeof value === 'boolean' ? (value ? '✓ Yes' : '✗ No') : String(value)}
+                    </span>
+                  </div>
+                ))}
+                {(!selectedConsent.form_data || Object.keys(selectedConsent.form_data).length === 0) && (
+                  <p className="text-sm text-gray-500">{__('No form data recorded')}</p>
+                )}
+              </div>
+            </div>
+
+            {selectedConsent.signature_data && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
+                  {__('Signature')}
+                </h3>
+                <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <img 
+                    src={selectedConsent.signature_data} 
+                    alt="Signature" 
+                    className="max-h-24 mx-auto"
+                  />
+                </div>
+              </div>
+            )}
+
+            {selectedConsent.initials_data && (
+              <div className="mb-2">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase">
+                  {__('Initials')}
+                </h3>
+                <div className="bg-white border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                  <img 
+                    src={selectedConsent.initials_data} 
+                    alt="Initials" 
+                    className="max-h-16 mx-auto"
+                  />
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </Modal>
     </div>
   );
 };

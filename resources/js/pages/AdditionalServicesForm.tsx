@@ -525,6 +525,7 @@ const AdditionalServicesForm: React.FC = () => {
                   >
                     <option value="draft">{__('Draft')}</option>
                     <option value="publish">{__('Published')}</option>
+                    <option value="trash">{__('Trash')}</option>
                   </Select>
                 </div>
 

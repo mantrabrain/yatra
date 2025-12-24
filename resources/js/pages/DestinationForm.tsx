@@ -18,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import { RichTextEditor } from '../components/ui/rich-text-editor';
 
 interface DestinationFormData {
   name: string;
@@ -39,7 +40,7 @@ const DestinationForm: React.FC = () => {
     slug: '',
     description: '',
     icon: null,
-    status: 'draft',
+    status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -173,7 +174,7 @@ const DestinationForm: React.FC = () => {
         return await apiClient.post('/destinations', payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
       queryClient.invalidateQueries({ queryKey: ['destination', destinationId] });
       showToast(
@@ -182,10 +183,17 @@ const DestinationForm: React.FC = () => {
           : __('Destination created successfully', 'Destination created successfully'),
         'success'
       );
-      // Redirect to destinations list after a short delay
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
-      }, 1000);
+      setIsSubmitting(false);
+
+      if (!isEditMode) {
+        const newId = response?.id;
+        if (newId) {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${newId}`;
+        } else {
+          // Fallback to list if ID missing
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
+        }
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the destination', 'An error occurred while saving the destination');
@@ -353,33 +361,17 @@ const DestinationForm: React.FC = () => {
                   </div>
 
                   {/* Description */}
-                  <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
-                    </label>
-                    <textarea
-                      id="description"
-                      value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Enter destination description', 'Enter destination description')}
-                      rows={6}
-                      className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                    />
-                  </div>
+                  <RichTextEditor
+                    label={__('Description', 'Description')}
+                    value={formData.description || ''}
+                    onChange={(value) => handleFieldChange('description', value)}
+                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'Write a rich description (supports formatting, lists, links...)')}
+                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'Use formatting, bullet lists, and links to create a compelling description. HTML is supported.')}
+                    minHeight={360}
+                    maxHeight={720}
+                  />
 
-                  {/* Icon/Image Picker */}
-                  <div>
-                    <IconPicker
-                      value={formData.icon}
-                      onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Destination Icon or Image', 'Destination Icon or Image')}
-                      helpText={__('Select an icon from the library or upload a custom image for this destination.', 'Select an icon from the library or upload a custom image for this destination.')}
-                      allowImageUpload={true}
-                      allowIconSelection={true}
-                      size="md"
-                    />
-                  </div>
-                </CardContent>
+                                  </CardContent>
               </Card>
             </div>
 
@@ -406,6 +398,24 @@ const DestinationForm: React.FC = () => {
                       <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>
+                </CardContent>
+              </Card>
+
+              {/* Icon/Image Picker */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Destination Icon or Image', 'Destination Icon or Image')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
+                    helpText={__('Choose a library icon or upload a custom image to visually represent this destination.', 'Choose a library icon or upload a custom image to visually represent this destination.')}
+                    allowImageUpload={true}
+                    allowIconSelection={true}
+                    size="md"
+                  />
                 </CardContent>
               </Card>
 

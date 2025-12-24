@@ -120,16 +120,41 @@ class AdminServiceProvider extends ServiceProvider
         // Enqueue admin app - always load compiled assets
         // For development with auto-rebuild, use: npm run build -- --watch
         {
-            // Enqueue compiled React app
+            // Enqueue compiled React app CSS files
+            $react_vendor_css = YATRA_PLUGIN_PATH . 'public/css/react-vendor.css';
+            $index_css = YATRA_PLUGIN_PATH . 'public/css/index.css';
             $app_css = YATRA_PLUGIN_PATH . 'public/css/app.css';
             $app_js = YATRA_PLUGIN_PATH . 'public/js/app.js';
 
+            // Load react-vendor.css first (contains react-draft-wysiwyg CSS)
+            if (file_exists($react_vendor_css)) {
+                $css_version = YATRA_VERSION . '.' . filemtime($react_vendor_css);
+                wp_enqueue_style(
+                    'yatra-react-vendor',
+                    YATRA_PLUGIN_URL . 'public/css/react-vendor.css',
+                    [],
+                    $css_version
+                );
+            }
+
+            // Load index.css second (contains main component styles)
+            if (file_exists($index_css)) {
+                $css_version = YATRA_VERSION . '.' . filemtime($index_css);
+                wp_enqueue_style(
+                    'yatra-index',
+                    YATRA_PLUGIN_URL . 'public/css/index.css',
+                    ['yatra-react-vendor'],
+                    $css_version
+                );
+            }
+
+            // Load app.css last (if it exists)
             if (file_exists($app_css)) {
                 $css_version = YATRA_VERSION . '.' . filemtime($app_css);
                 wp_enqueue_style(
                     'yatra-admin',
                     YATRA_PLUGIN_URL . 'public/css/app.css',
-                    [],
+                    ['yatra-index'],
                     $css_version
                 );
             }
