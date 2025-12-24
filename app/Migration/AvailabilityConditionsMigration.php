@@ -25,13 +25,42 @@ class AvailabilityConditionsMigration extends BaseMigration
         error_log("[Yatra Migration] ========================================");
 
         try {
+            // Ensure months column exists in the table
+            $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+            $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'months'");
+            
+            if (empty($column_exists)) {
+                error_log("[Yatra Migration] Adding months column to {$table}");
+                $wpdb->query("ALTER TABLE {$table} ADD COLUMN `months` varchar(50) DEFAULT NULL COMMENT 'Comma-separated month numbers 1-12' AFTER `day_of_week`");
+                error_log("[Yatra Migration] Months column added successfully");
+            } else {
+                error_log("[Yatra Migration] Months column already exists");
+            }
+
             // Check if availability conditions data exists in database (regardless of plugin/module status)
             $conditions_count = $wpdb->get_var(
                 "SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'availability_conditions'"
             );
             
+            error_log("[Yatra Migration] Availability conditions taxonomy count: {$conditions_count}");
+            
+            // List all taxonomies for debugging
+            $all_taxonomies = $wpdb->get_results(
+                "SELECT DISTINCT taxonomy, COUNT(*) as count FROM {$wpdb->term_taxonomy} GROUP BY taxonomy"
+            );
+            error_log("[Yatra Migration] All taxonomies in database:");
+            foreach ($all_taxonomies as $tax) {
+                error_log("[Yatra Migration]   - {$tax->taxonomy}: {$tax->count} terms");
+            }
+            
             if ($conditions_count == 0) {
-                error_log("[Yatra Migration] No availability conditions found in database");
+                error_log("[Yatra Migration] ========================================");
+                error_log("[Yatra Migration] NO OLD AVAILABILITY CONDITIONS DATA FOUND");
+                error_log("[Yatra Migration] The old 'availability_conditions' taxonomy has no terms.");
+                error_log("[Yatra Migration] This means:");
+                error_log("[Yatra Migration]   1. The yatra-availability-conditions plugin was never used, OR");
+                error_log("[Yatra Migration]   2. No availability conditions were ever created in the old system");
+                error_log("[Yatra Migration] ========================================");
                 return [
                     'migrated' => 0,
                     'skipped' => 0,
@@ -49,6 +78,57 @@ class AvailabilityConditionsMigration extends BaseMigration
 
             $total = count($conditions);
             error_log("[Yatra Migration] Found {$total} availability conditions to migrate");
+            error_log("[Yatra Migration] ========================================");
+            error_log("[Yatra Migration] OLD AVAILABILITY CONDITIONS DATA DUMP:");
+            
+            if ($total > 0) {
+                foreach ($conditions as $condition) {
+                    error_log("[Yatra Migration] Condition #{$condition->term_id}:");
+                    error_log("[Yatra Migration]   Name: {$condition->name}");
+                    error_log("[Yatra Migration]   Slug: {$condition->slug}");
+                    error_log("[Yatra Migration]   Description: {$condition->description}");
+                    
+                    // Get all meta for this condition
+                    $condition_meta = $wpdb->get_results($wpdb->prepare(
+                        "SELECT meta_key, meta_value FROM {$wpdb->termmeta} WHERE term_id = %d",
+                        $condition->term_id
+                    ));
+                    
+                    if ($condition_meta) {
+                        error_log("[Yatra Migration]   Meta data:");
+                        foreach ($condition_meta as $meta) {
+                            $value = maybe_unserialize($meta->meta_value);
+                            if (is_array($value)) {
+                                $value = implode(',', $value);
+                            }
+                            error_log("[Yatra Migration]     - {$meta->meta_key}: {$value}");
+                        }
+                    }
+                    
+                    // Get tours associated with this condition
+                    $tours = $wpdb->get_results($wpdb->prepare(
+                        "SELECT tr.object_id, p.post_title 
+                         FROM {$wpdb->term_relationships} tr
+                         LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+                         WHERE tr.term_taxonomy_id IN (
+                             SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} 
+                             WHERE term_id = %d AND taxonomy = 'availability_conditions'
+                         )",
+                        $condition->term_id
+                    ));
+                    
+                    if ($tours) {
+                        error_log("[Yatra Migration]   Associated with " . count($tours) . " tours:");
+                        foreach ($tours as $tour) {
+                            error_log("[Yatra Migration]     - Tour #{$tour->object_id}: {$tour->post_title}");
+                        }
+                    } else {
+                        error_log("[Yatra Migration]   No tours associated");
+                    }
+                    error_log("[Yatra Migration]   ---");
+                }
+            }
+            error_log("[Yatra Migration] ========================================");
 
             foreach ($conditions as $condition) {
                 try {
@@ -113,11 +193,27 @@ class AvailabilityConditionsMigration extends BaseMigration
                             continue;
                         }
 
+                        // Check if this condition was already migrated for this trip
+                        if (!$this->isForceMigration()) {
+                            $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+                            $existing = $wpdb->get_var($wpdb->prepare(
+                                "SELECT id FROM {$table} WHERE trip_id = %d AND name = %s",
+                                $newTripId,
+                                $condition->name
+                            ));
+                            
+                            if ($existing) {
+                                error_log("[Yatra Migration] Recurring rule already exists for trip {$newTripId}, skipping");
+                                $skipped++;
+                                continue;
+                            }
+                        }
+
                         // Convert availability condition to recurring rule
                         $ruleData = $this->convertToRecurringRule($condition, $months, $week_days, $start_date, $end_date, $availability);
                         
                         if ($ruleData) {
-                            $result = $this->insertRecurringRule($newTripId, $ruleData);
+                            $result = $this->insertRecurringRule($newTripId, $ruleData, $condition->term_id);
                             
                             if ($result) {
                                 $migrated++;
@@ -167,32 +263,47 @@ class AvailabilityConditionsMigration extends BaseMigration
      */
     private function convertToRecurringRule($condition, array $months, array $week_days, $start_date, $end_date, $availability): ?array
     {
-        // Determine rule type based on what's configured
-        $rule_type = 'weekly'; // Default
-        
-        if (!empty($months) && empty($week_days)) {
-            $rule_type = 'monthly';
-        } elseif (!empty($week_days)) {
-            $rule_type = 'weekly';
-        } elseif (!empty($start_date) || !empty($end_date)) {
-            $rule_type = 'interval';
-        }
+        // Old plugin only had weekly availability rules
+        $rule_type = 'weekly';
 
         // Convert weekday indices (0-6, Sunday=0) to our format (0-6, Sunday=0)
         $days_of_week = array_map('intval', $week_days);
 
-        // Prepare days_of_week as comma-separated string
+        // Prepare days_of_week as comma-separated string for weekly rules
         $days_of_week_string = !empty($days_of_week) ? implode(',', $days_of_week) : null;
+
+        // Normalize months to 1-12 range (old data stored 0-11 where 0 = January)
+        $normalized_months = [];
+        if (!empty($months)) {
+            $normalized_months = array_map(function ($month) {
+                $monthInt = (int) $month;
+                if ($monthInt >= 0 && $monthInt <= 11) {
+                    return $monthInt + 1; // Convert 0-based to 1-based
+                }
+                if ($monthInt < 1) {
+                    return 1;
+                }
+                if ($monthInt > 12) {
+                    return 12;
+                }
+                return $monthInt;
+            }, $months);
+            $normalized_months = array_values(array_unique($normalized_months));
+        }
+
+        // Prepare months as JSON array string (e.g., "[1,12]" not "0,11")
+        $months_string = !empty($normalized_months) ? json_encode($normalized_months) : null;
 
         $ruleData = [
             'name' => $condition->name,
             'rule_type' => $rule_type,
-            'status' => $availability === 'available' ? 'active' : 'inactive',
-            'start_date' => !empty($start_date) ? $start_date : null,
+            'status' => 'active', // Always active for migrated rules
+            'start_date' => !empty($start_date) ? $start_date : current_time('Y-m-d'),
             'end_date' => !empty($end_date) ? $end_date : null,
-            'days_of_week' => $days_of_week_string, // Comma-separated for weekly rules
-            'week_of_month' => !empty($months) ? 'first' : null, // Default to first week if months are specified
-            'day_of_week' => !empty($days_of_week) ? reset($days_of_week) : null, // Use first day for monthly rules
+            'days_of_week' => $days_of_week_string, // Weekly rules use days_of_week
+            'week_of_month' => null, // Not used for weekly rules
+            'day_of_week' => null, // Not used for weekly rules
+            'months' => $months_string, // JSON array string (e.g., "[1,12]")
             'interval_days' => null,
             'interval_start_date' => null,
             'seats_total' => null,
@@ -202,7 +313,7 @@ class AvailabilityConditionsMigration extends BaseMigration
             'created_at' => current_time('mysql'),
         ];
 
-        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, days_of_week=" . ($days_of_week_string ?: 'none') . ", week_of_month=" . ($ruleData['week_of_month'] ?: 'none'));
+        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, days_of_week=" . ($days_of_week_string ?: 'none') . ", months=" . ($months_string ?: 'none'));
 
         return $ruleData;
     }
@@ -210,10 +321,12 @@ class AvailabilityConditionsMigration extends BaseMigration
     /**
      * Insert recurring rule into new system
      */
-    private function insertRecurringRule(int $tripId, array $ruleData): bool
+    private function insertRecurringRule(int $tripId, array $ruleData, int $oldConditionId = null): bool
     {
         global $wpdb;
         $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+        
+        error_log("[Yatra Migration] Inserting recurring rule for trip {$tripId} with months: " . ($ruleData['months'] ?: 'none'));
 
         $insertData = [
             'trip_id' => $tripId,
@@ -225,6 +338,7 @@ class AvailabilityConditionsMigration extends BaseMigration
             'days_of_week' => $ruleData['days_of_week'], // Comma-separated string
             'week_of_month' => $ruleData['week_of_month'],
             'day_of_week' => $ruleData['day_of_week'],
+            'months' => $ruleData['months'], // Comma-separated month numbers
             'interval_days' => $ruleData['interval_days'],
             'interval_start_date' => $ruleData['interval_start_date'],
             'seats_total' => $ruleData['seats_total'],

@@ -60,6 +60,8 @@ class MigrationProgress
         'bookings',
         'traveler_categories',
         'itinerary',
+        'services',
+        'availability_conditions',
     ];
     
     public function __construct()

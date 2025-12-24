@@ -165,7 +165,7 @@ const RecurringRuleForm: React.FC = () => {
       const response = await apiClient.get('/trips', { params: { per_page: 100, status: 'published' } });
       return {
         trips: (response?.data || []).map((trip: any) => ({
-          id: trip.id,
+          id: Number(trip.id) || 0,
           title: trip.title,
           trip_type: trip.trip_type || (trip.duration_days <= 1 ? 'single_day' : 'multi_day'),
           duration_days: trip.duration_days || 1,
@@ -188,6 +188,29 @@ const RecurringRuleForm: React.FC = () => {
 
   // Get selected trip details
   const selectedTrip = tripsData?.trips.find(t => t.id === formData.trip_id);
+  const { data: fallbackTripData } = useQuery({
+    queryKey: ['trip', formData.trip_id, 'recurring-rule-form'],
+    queryFn: async () => {
+      if (!formData.trip_id || selectedTrip) {
+        return null;
+      }
+      const response = await apiClient.get(`/trips/${formData.trip_id}`);
+      return response?.data || response || null;
+    },
+    enabled: !!formData.trip_id && !selectedTrip,
+    staleTime: 5 * 60 * 1000,
+  });
+  const effectiveTrip = selectedTrip || (fallbackTripData ? {
+    id: Number(fallbackTripData.id) || formData.trip_id,
+    title: fallbackTripData.title,
+  } : null);
+  const tripNameLabel = effectiveTrip?.title || __('Unnamed Trip', 'Unnamed Trip');
+  let headerDescription = __('Set up automatic availability patterns for your trips', 'Set up automatic availability patterns for your trips');
+  if (effectiveTrip) {
+    headerDescription = `${isEditing ? __('Edit', 'Edit') : __('Add', 'Add')} ${__('availability rule for', 'availability rule for')} ${tripNameLabel} (Trip ID: ${effectiveTrip.id})`;
+  } else if (formData.trip_id) {
+    headerDescription = `${isEditing ? __('Edit', 'Edit') : __('Add', 'Add')} ${__('availability rule for Trip ID:', 'availability rule for Trip ID:')} ${formData.trip_id}`;
+  }
   const isSingleDayTrip = selectedTrip?.trip_type === 'single_day' || (selectedTrip?.duration_days || 1) <= 1;
   // Use form's pricing_type which defaults to trip's pricing type but can be overridden
   const isTravelerBasedPricing = formData.pricing_type === 'traveler_based';
@@ -383,7 +406,7 @@ const RecurringRuleForm: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title={isEditing ? __('Edit Recurring Rule', 'Edit Recurring Rule') : __('Create Recurring Rule', 'Create Recurring Rule')}
-        description={__('Set up automatic availability patterns for your trips', 'Set up automatic availability patterns for your trips')}
+        description={headerDescription}
         actions={
           <Button
             variant="outline"

@@ -121,23 +121,30 @@ const Availability: React.FC = () => {
   
   // Trip selection - initialize from localStorage or URL if available
   const [selectedTripId, setSelectedTripId] = useState<number | null>(() => {
-    // First try to get from localStorage
     const storedTripId = localStorage.getItem('yatra_selected_trip_id');
     if (storedTripId) {
-      return parseInt(storedTripId);
+      const parsed = parseInt(storedTripId, 10);
+      if (!Number.isNaN(parsed)) {
+        return parsed;
+      }
     }
-    // Fall back to URL if no localStorage value
     return tripIdFromUrl;
   });
 
-  // Update selectedTripId when URL changes or localStorage changes
+  // When URL trip_id changes, prefer it over stored value
   useEffect(() => {
-    const storedTripId = localStorage.getItem('yatra_selected_trip_id');
-    if (selectedTripId !== (storedTripId ? parseInt(storedTripId) : null)) {
-      setSelectedTripId(selectedTripId);
-      if (selectedTripId !== null) {
-        localStorage.setItem('yatra_selected_trip_id', selectedTripId.toString());
-      }
+    if (tripIdFromUrl && tripIdFromUrl !== selectedTripId) {
+      setSelectedTripId(tripIdFromUrl);
+      localStorage.setItem('yatra_selected_trip_id', tripIdFromUrl.toString());
+    }
+  }, [tripIdFromUrl, selectedTripId]);
+
+  // Persist current selection
+  useEffect(() => {
+    if (selectedTripId) {
+      localStorage.setItem('yatra_selected_trip_id', selectedTripId.toString());
+    } else {
+      localStorage.removeItem('yatra_selected_trip_id');
     }
   }, [selectedTripId]);
 
@@ -145,7 +152,19 @@ const Availability: React.FC = () => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   
   // Tab mode: 'specific' or 'recurring'
-  const [tabMode, setTabMode] = useState<'specific' | 'recurring'>('specific');
+  const [tabMode, _setTabMode] = useState<'specific' | 'recurring'>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tabModeParam = params.get('tab_mode');
+    return tabModeParam === 'recurring' ? 'recurring' : 'specific';
+  });
+
+  const setTabMode = (mode: 'specific' | 'recurring') => {
+    _setTabMode(mode);
+    const params = new URLSearchParams(window.location.search);
+    params.set('tab_mode', mode);
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+  };
   
   // Filters
   const [searchTerm, setSearchTerm] = useState('');

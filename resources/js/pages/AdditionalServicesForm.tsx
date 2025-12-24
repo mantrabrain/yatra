@@ -509,7 +509,7 @@ const AdditionalServicesForm: React.FC = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Status & Actions */}
+            {/* Status & Sort Order */}
             <Card>
               <CardHeader>
                 <CardTitle>{__('Publish')}</CardTitle>
@@ -541,26 +541,6 @@ const AdditionalServicesForm: React.FC = () => {
                   <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                     {__('Lower numbers appear first')}
                   </p>
-                </div>
-
-                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    disabled={saveMutation.isPending}
-                  >
-                    {saveMutation.isPending ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        {__('Saving...')}
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" />
-                        {isEditMode ? __('Update Service') : __('Create Service')}
-                      </>
-                    )}
-                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -724,6 +704,29 @@ const AdditionalServicesForm: React.FC = () => {
                   allowIconSelection={true}
                   size="md"
                 />
+              </CardContent>
+            </Card>
+
+            {/* Submit Button */}
+            <Card>
+              <CardContent className="pt-6">
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={saveMutation.isPending}
+                >
+                  {saveMutation.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      {__('Saving...')}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4 mr-2" />
+                      {isEditMode ? __('Update Service') : __('Create Service')}
+                    </>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </div>

@@ -25,13 +25,54 @@ class ServicesMigration extends BaseMigration
         error_log("[Yatra Migration] ========================================");
 
         try {
+            // Check if Yatra Pro tables exist (created by Pro plugin)
+            $services_table = $wpdb->prefix . 'yatra_additional_services';
+            $trip_services_table = $wpdb->prefix . 'yatra_trip_services';
+            
+            $services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$services_table}'");
+            $trip_services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$trip_services_table}'");
+            
+            if (!$services_exists || !$trip_services_exists) {
+                error_log("[Yatra Migration] ========================================");
+                error_log("[Yatra Migration] ERROR: Yatra Pro tables not found!");
+                error_log("[Yatra Migration] Services migration requires Yatra Pro to be activated.");
+                error_log("[Yatra Migration] Required tables:");
+                error_log("[Yatra Migration]   - {$services_table}: " . ($services_exists ? 'EXISTS' : 'MISSING'));
+                error_log("[Yatra Migration]   - {$trip_services_table}: " . ($trip_services_exists ? 'EXISTS' : 'MISSING'));
+                error_log("[Yatra Migration] ========================================");
+                return [
+                    'migrated' => 0,
+                    'skipped' => 0,
+                    'failed' => 0,
+                ];
+            }
+            
+            error_log("[Yatra Migration] Yatra Pro tables verified");
+
             // Check if services data exists in database (regardless of plugin/module status)
             $services_count = $wpdb->get_var(
                 "SELECT COUNT(*) FROM {$wpdb->term_taxonomy} WHERE taxonomy = 'services'"
             );
             
+            error_log("[Yatra Migration] Services taxonomy count: {$services_count}");
+            
+            // List all taxonomies for debugging
+            $all_taxonomies = $wpdb->get_results(
+                "SELECT DISTINCT taxonomy, COUNT(*) as count FROM {$wpdb->term_taxonomy} GROUP BY taxonomy"
+            );
+            error_log("[Yatra Migration] All taxonomies in database:");
+            foreach ($all_taxonomies as $tax) {
+                error_log("[Yatra Migration]   - {$tax->taxonomy}: {$tax->count} terms");
+            }
+            
             if ($services_count == 0) {
-                error_log("[Yatra Migration] No services found in database");
+                error_log("[Yatra Migration] ========================================");
+                error_log("[Yatra Migration] NO OLD SERVICES DATA FOUND");
+                error_log("[Yatra Migration] The old 'services' taxonomy has no terms.");
+                error_log("[Yatra Migration] This means:");
+                error_log("[Yatra Migration]   1. The yatra-services plugin was never used, OR");
+                error_log("[Yatra Migration]   2. No services were ever created in the old system");
+                error_log("[Yatra Migration] ========================================");
                 return [
                     'migrated' => 0,
                     'skipped' => 0,
@@ -49,10 +90,53 @@ class ServicesMigration extends BaseMigration
 
             $total = count($services);
             error_log("[Yatra Migration] Found {$total} services to migrate");
-
-            // Note: We don't register taxonomy or activate modules
-            // The premium Additional Services module will handle that when activated
-            // We just migrate the data so it's ready when the module is enabled
+            error_log("[Yatra Migration] ========================================");
+            error_log("[Yatra Migration] OLD SERVICES DATA DUMP:");
+            
+            if ($total > 0) {
+                foreach ($services as $service) {
+                    error_log("[Yatra Migration] Service #{$service->term_id}:");
+                    error_log("[Yatra Migration]   Name: {$service->name}");
+                    error_log("[Yatra Migration]   Slug: {$service->slug}");
+                    error_log("[Yatra Migration]   Description: {$service->description}");
+                    
+                    // Get all meta for this service
+                    $service_meta = $wpdb->get_results($wpdb->prepare(
+                        "SELECT meta_key, meta_value FROM {$wpdb->termmeta} WHERE term_id = %d",
+                        $service->term_id
+                    ));
+                    
+                    if ($service_meta) {
+                        error_log("[Yatra Migration]   Meta data:");
+                        foreach ($service_meta as $meta) {
+                            error_log("[Yatra Migration]     - {$meta->meta_key}: {$meta->meta_value}");
+                        }
+                    }
+                    
+                    // Get tours associated with this service
+                    $tours = $wpdb->get_results($wpdb->prepare(
+                        "SELECT tr.object_id, p.post_title 
+                         FROM {$wpdb->term_relationships} tr
+                         LEFT JOIN {$wpdb->posts} p ON tr.object_id = p.ID
+                         WHERE tr.term_taxonomy_id IN (
+                             SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy} 
+                             WHERE term_id = %d AND taxonomy = 'services'
+                         )",
+                        $service->term_id
+                    ));
+                    
+                    if ($tours) {
+                        error_log("[Yatra Migration]   Associated with " . count($tours) . " tours:");
+                        foreach ($tours as $tour) {
+                            error_log("[Yatra Migration]     - Tour #{$tour->object_id}: {$tour->post_title}");
+                        }
+                    } else {
+                        error_log("[Yatra Migration]   No tours associated");
+                    }
+                    error_log("[Yatra Migration]   ---");
+                }
+            }
+            error_log("[Yatra Migration] ========================================");
 
             foreach ($services as $service) {
                 try {
@@ -81,82 +165,11 @@ class ServicesMigration extends BaseMigration
 
                     error_log("[Yatra Migration] Service meta - price_type: {$price_type}, price_per: {$price_per}, price: {$service_price}, required: " . ($is_required ? 'yes' : 'no'));
 
-                    // Check if service already exists in new system (check database directly)
-                    $existing_term_id = null;
-                    if (!$this->isForceMigration()) {
-                        $existing_term_id = $wpdb->get_var($wpdb->prepare(
-                            "SELECT t.term_id FROM {$wpdb->terms} t
-                             INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-                             WHERE t.slug = %s AND tt.taxonomy = 'yatra_additional_services'",
-                            $service->slug
-                        ));
-                        
-                        if ($existing_term_id) {
-                            error_log("[Yatra Migration] Service '{$service->name}' already exists, skipping");
-                            $skipped++;
-                            continue;
-                        }
-                    }
+                    // Migrate service associations with tours/trips to custom table
+                    $services_migrated = $this->migrateServiceToTrips($service->term_id, $service->name, $service->slug, $service->description, $price_type, $price_per, $service_price, $is_required);
 
-                    // Insert service term directly into database
-                    $wpdb->insert(
-                        $wpdb->terms,
-                        [
-                            'name' => $service->name,
-                            'slug' => $service->slug,
-                            'term_group' => 0,
-                        ],
-                        ['%s', '%s', '%d']
-                    );
-                    
-                    $new_term_id = $wpdb->insert_id;
-                    
-                    if (!$new_term_id) {
-                        $failed++;
-                        error_log("[Yatra Migration] Failed to insert service term '{$service->name}': " . $wpdb->last_error);
-                        continue;
-                    }
-                    
-                    // Insert term taxonomy
-                    $wpdb->insert(
-                        $wpdb->term_taxonomy,
-                        [
-                            'term_id' => $new_term_id,
-                            'taxonomy' => 'yatra_additional_services',
-                            'description' => $service->description,
-                            'parent' => 0,
-                            'count' => 0,
-                        ],
-                        ['%d', '%s', '%s', '%d', '%d']
-                    );
-                    
-                    $term_taxonomy_id = $wpdb->insert_id;
-                    
-                    if (!$term_taxonomy_id) {
-                        $failed++;
-                        error_log("[Yatra Migration] Failed to insert service taxonomy '{$service->name}': " . $wpdb->last_error);
-                        continue;
-                    }
-
-                    // Add term meta directly to database
-                    $meta_inserts = [
-                        ['term_id' => $new_term_id, 'meta_key' => 'price_type', 'meta_value' => $price_type],
-                        ['term_id' => $new_term_id, 'meta_key' => 'price_per', 'meta_value' => $price_per],
-                        ['term_id' => $new_term_id, 'meta_key' => 'service_price', 'meta_value' => $service_price],
-                        ['term_id' => $new_term_id, 'meta_key' => 'is_required', 'meta_value' => $is_required ? '1' : '0'],
-                        ['term_id' => $new_term_id, 'meta_key' => 'status', 'meta_value' => 'active'],
-                        ['term_id' => $new_term_id, 'meta_key' => 'old_service_id', 'meta_value' => $service->term_id],
-                    ];
-                    
-                    foreach ($meta_inserts as $meta) {
-                        $wpdb->insert($wpdb->termmeta, $meta, ['%d', '%s', '%s']);
-                    }
-
-                    // Migrate service associations with tours/trips
-                    $this->migrateServiceAssociations($service->term_id, $new_term_id);
-
-                    $migrated++;
-                    error_log("[Yatra Migration] Successfully migrated service '{$service->name}' (new ID: {$new_term_id})");
+                    $migrated += $services_migrated;
+                    error_log("[Yatra Migration] Successfully migrated service '{$service->name}' to {$services_migrated} trips");
 
                 } catch (\Exception $e) {
                     $failed++;
@@ -192,11 +205,50 @@ class ServicesMigration extends BaseMigration
     }
 
     /**
-     * Migrate service associations from old tours to new trips
+     * Migrate service from old taxonomy to Yatra Pro additional services tables
      */
-    private function migrateServiceAssociations(int $oldServiceId, int $newServiceId): void
+    private function migrateServiceToTrips(int $oldServiceId, string $serviceName, string $serviceSlug, string $description, string $priceType, string $pricePer, float $servicePrice, bool $isRequired): int
     {
         global $wpdb;
+        $services_table = $wpdb->prefix . 'yatra_additional_services';
+        $trip_services_table = $wpdb->prefix . 'yatra_trip_services';
+        $migrated_count = 0;
+
+        // First, check if service already exists in master table
+        $service_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT id FROM {$services_table} WHERE name = %s",
+            $serviceName
+        ));
+
+        // If service doesn't exist, create it in master table
+        if (!$service_id) {
+            $inserted = $wpdb->insert(
+                $services_table,
+                [
+                    'name' => $serviceName,
+                    'description' => $description,
+                    'price' => $servicePrice,
+                    'price_type' => $priceType,
+                    'price_per' => $pricePer,
+                    'status' => 'publish',
+                    'applicable_to' => 'specific_trips',
+                    'is_required' => $isRequired ? 1 : 0,
+                    'sort_order' => 0,
+                    'created_at' => current_time('mysql'),
+                ],
+                ['%s', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%d', '%s']
+            );
+
+            if ($inserted) {
+                $service_id = $wpdb->insert_id;
+                error_log("[Yatra Migration] Created service '{$serviceName}' in master table (ID: {$service_id})");
+            } else {
+                error_log("[Yatra Migration] Failed to create service '{$serviceName}': " . $wpdb->last_error);
+                return 0;
+            }
+        } else {
+            error_log("[Yatra Migration] Service '{$serviceName}' already exists (ID: {$service_id})");
+        }
 
         // Get all tours that had this service
         $tours = $wpdb->get_results($wpdb->prepare(
@@ -210,7 +262,7 @@ class ServicesMigration extends BaseMigration
 
         if (empty($tours)) {
             error_log("[Yatra Migration] No tours associated with service ID {$oldServiceId}");
-            return;
+            return 0;
         }
 
         error_log("[Yatra Migration] Found " . count($tours) . " tours associated with service ID {$oldServiceId}");
@@ -224,9 +276,38 @@ class ServicesMigration extends BaseMigration
                 continue;
             }
 
-            // Associate service with new trip
-            wp_set_object_terms($newTripId, $newServiceId, 'yatra_additional_services', true);
-            error_log("[Yatra Migration] Associated service {$newServiceId} with trip {$newTripId}");
+            // Check if relationship already exists
+            if (!$this->isForceMigration()) {
+                $existing = $wpdb->get_var($wpdb->prepare(
+                    "SELECT id FROM {$trip_services_table} WHERE trip_id = %d AND service_id = %d",
+                    $newTripId,
+                    $service_id
+                ));
+                
+                if ($existing) {
+                    error_log("[Yatra Migration] Service relationship already exists for trip {$newTripId}, skipping");
+                    continue;
+                }
+            }
+
+            // Insert trip-service relationship (minimal - just IDs)
+            $inserted = $wpdb->insert(
+                $trip_services_table,
+                [
+                    'trip_id' => $newTripId,
+                    'service_id' => $service_id,
+                ],
+                ['%d', '%d']
+            );
+
+            if ($inserted) {
+                $migrated_count++;
+                error_log("[Yatra Migration] Linked service '{$serviceName}' to trip {$newTripId}");
+            } else {
+                error_log("[Yatra Migration] Failed to link service to trip {$newTripId}: " . $wpdb->last_error);
+            }
         }
+
+        return $migrated_count;
     }
 }

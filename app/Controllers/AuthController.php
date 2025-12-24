@@ -112,7 +112,7 @@ class AuthController
 
         // Verify nonce
         if (!isset($_GET['_wpnonce']) || !wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']), 'yatra_resend_verification')) {
-            wp_die(__('Security check failed. Please try again.', 'yatra'));
+            wp_die(__('Your session has expired. Please go back and try again.', 'yatra'));
         }
 
         $email = isset($_GET['email']) ? sanitize_email(urldecode($_GET['email'])) : '';

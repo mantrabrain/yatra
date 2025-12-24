@@ -24,7 +24,7 @@ class DirectAttributeQuery
     {
         // Verify nonce
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
-            wp_send_json_error('Invalid nonce');
+            wp_send_json_error(__('Your session has expired. Please refresh the page and try again.', 'yatra'));
         }
 
         $attributeId = intval($_POST['attribute_id'] ?? 0);

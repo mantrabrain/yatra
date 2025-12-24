@@ -195,8 +195,24 @@ class MigrationController
     /**
      * Check if user has permission
      */
-    public function checkPermission(): bool
+    public function checkPermission()
     {
-        return current_user_can('manage_options');
+        if (!is_user_logged_in()) {
+            return new \WP_Error(
+                'rest_forbidden',
+                __('You must be logged in to perform this action.', 'yatra'),
+                ['status' => 401]
+            );
+        }
+
+        if (!current_user_can('manage_options')) {
+            return new \WP_Error(
+                'rest_forbidden',
+                __('You do not have permission to perform this action.', 'yatra'),
+                ['status' => 403]
+            );
+        }
+
+        return true;
     }
 }

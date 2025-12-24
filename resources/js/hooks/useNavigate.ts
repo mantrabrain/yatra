@@ -6,30 +6,33 @@ export const useNavigate = () => {
     subpage?: string;
     tab?: string;
     action?: string;
+    tabMode?: 'specific' | 'recurring';
     id?: number | string;
     trip_id?: number | string;
     [key: string]: string | number | undefined;
   }) => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    // Handle standard parameters
-    if (params.subpage !== undefined) {
-      urlParams.set('subpage', params.subpage);
-    }
-    if (params.tab !== undefined) {
-      urlParams.set('tab', params.tab);
-    }
-    if (params.action !== undefined) {
-      urlParams.set('action', params.action);
-    }
-    if (params.id !== undefined) {
-      urlParams.set('id', params.id.toString());
-    }
+    const setParam = (key: string, value?: string | number) => {
+      if (value === undefined || value === null) {
+        urlParams.delete(key);
+      } else {
+        urlParams.set(key, value.toString());
+      }
+    };
+
+    const standardKeys = ['subpage', 'tab', 'action', 'id'];
+
+    standardKeys.forEach((key) => {
+      if (Object.prototype.hasOwnProperty.call(params, key)) {
+        setParam(key, params[key]);
+      }
+    });
     
-    // Handle custom parameters (like trip_id)
+    // Handle custom parameters (like trip_id, tab_mode)
     Object.keys(params).forEach(key => {
-      if (!['subpage', 'tab', 'action', 'id'].includes(key) && params[key] !== undefined) {
-        urlParams.set(key, params[key]!.toString());
+      if (!standardKeys.includes(key)) {
+        setParam(key, params[key]);
       }
     });
     

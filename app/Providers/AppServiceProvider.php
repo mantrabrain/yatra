@@ -41,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
         // Load text domain
         add_action('init', [$this, 'loadTextDomain'], 1);
 
+        // Customize REST API authentication error messages
+        add_filter('rest_authentication_errors', [$this, 'customizeRestAuthErrors'], 10, 1);
+
         // Start session early for booking management (both frontend and REST API)
         add_action('init', [$this, 'startSession'], 1);
         add_action('rest_api_init', [$this, 'startSession'], 1);
@@ -178,7 +181,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Verify nonce
         if (!wp_verify_nonce($_POST['yatra_review_nonce'] ?? '', 'yatra_submit_review')) {
-            wp_send_json_error(['message' => __('Security check failed.', 'yatra')]);
+            wp_send_json_error(['message' => __('Your session has expired. Please refresh the page and try again.', 'yatra')]);
         }
 
         $trip_id = (int) ($_POST['trip_id'] ?? 0);
@@ -288,7 +291,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Verify nonce
         if (!wp_verify_nonce($_POST['yatra_enquiry_nonce'] ?? '', 'yatra_submit_enquiry')) {
-            wp_send_json_error(['message' => __('Security check failed. Please refresh the page and try again.', 'yatra')]);
+            wp_send_json_error(['message' => __('Your session has expired. Please refresh the page and try again.', 'yatra')]);
         }
 
         // Get and validate form data
@@ -1810,7 +1813,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Verify nonce
         if (empty($_GET['_wpnonce']) || !wp_verify_nonce($_GET['_wpnonce'], 'wp_rest')) {
-            wp_die(__('Security check failed.', 'yatra'), __('Error', 'yatra'), ['response' => 403]);
+            wp_die(__('Your session has expired. Please refresh the page and try again.', 'yatra'), __('Session Expired', 'yatra'), ['response' => 403]);
         }
 
         // Must be logged in
@@ -2938,6 +2941,42 @@ HTML;
             </div>
         </div>
         <?php
+    }
+
+    /**
+     * Customize REST API authentication error messages
+     * Replaces technical messages with user-friendly ones
+     */
+    public function customizeRestAuthErrors($error)
+    {
+        // If there's already an error, customize it
+        if (is_wp_error($error)) {
+            $error_code = $error->get_error_code();
+            $error_message = $error->get_error_message();
+            
+            // Replace technical cookie/nonce error messages
+            if (strpos($error_message, 'cookie') !== false || 
+                strpos($error_message, 'Cookie') !== false ||
+                strpos($error_code, 'rest_cookie') !== false) {
+                return new \WP_Error(
+                    'rest_authentication_failed',
+                    __('Your session has expired. Please refresh the page and try again.', 'yatra'),
+                    ['status' => 403]
+                );
+            }
+            
+            // Replace nonce verification errors
+            if (strpos($error_message, 'nonce') !== false || 
+                strpos($error_message, 'Nonce') !== false) {
+                return new \WP_Error(
+                    'rest_authentication_failed',
+                    __('Your session has expired. Please refresh the page and try again.', 'yatra'),
+                    ['status' => 403]
+                );
+            }
+        }
+        
+        return $error;
     }
 
     /**

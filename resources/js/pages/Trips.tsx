@@ -20,6 +20,7 @@ import {
   Search,
   X,
   ArrowUpDown,
+  RefreshCw
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
@@ -40,6 +41,7 @@ import { Pagination } from '../components/shared/Pagination';
 import { Table as SharedTable } from '../components/shared/Table';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { useNavigate } from '../hooks/useNavigate';
 
 interface Trip {
   id: number;
@@ -117,6 +119,7 @@ const Trips: React.FC = () => {
   const queryClient = useQueryClient();
   const { can, isPro } = usePermissions();
   const { showToast } = useToast();
+  const { navigate } = useNavigate();
 
   // Fetch global status counts (stable across filters)
   const { data: statsData } = useQuery({
@@ -934,6 +937,23 @@ const Trips: React.FC = () => {
     return cols;
   }, [isPro, visibleColumns, summarizeDestinations, summarizeTravelers, summarizeCategories, formatLabel, formatPrice, getStatusBadge, getTripTypeBadge]);
 
+  const navigateToAvailability = (trip: Trip) => {
+    navigate({
+      subpage: 'trips',
+      tab: 'availability',
+      trip_id: trip.id.toString(),
+    });
+  };
+
+  const navigateToRecurringRules = (trip: Trip) => {
+    navigate({
+      subpage: 'trips',
+      tab: 'availability',
+      trip_id: trip.id.toString(),
+      tab_mode: 'recurring',
+    });
+  };
+
   // Row actions for shared table (3-dot menu)
   const tableActions = useMemo(() => {
     const actions: any[] = [];
@@ -948,6 +968,21 @@ const Trips: React.FC = () => {
         condition: (trip: Trip) => trip.status !== 'trash', // Hide for trash trips
       });
     }
+
+    // Availability / recurring quick links
+    actions.push({
+      key: 'view-availability',
+      label: __('View Availability', 'View Availability'),
+      icon: <Calendar className="w-4 h-4" />,
+      onClick: (trip: Trip) => navigateToAvailability(trip),
+    });
+
+    actions.push({
+      key: 'view-recurring',
+      label: __('View Recurring Rules', 'View Recurring Rules'),
+      icon: <RefreshCw className="w-4 h-4" />,
+      onClick: (trip: Trip) => navigateToRecurringRules(trip),
+    });
 
     // Edit available for all statuses
     if (can('yatra_edit_trips')) {
