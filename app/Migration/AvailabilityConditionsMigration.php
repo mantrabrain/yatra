@@ -178,17 +178,9 @@ class AvailabilityConditionsMigration extends BaseMigration
             $rule_type = 'interval';
         }
 
-        // Convert month indices (0-11) to month numbers (1-12)
-        $month_numbers = array_map(function($m) {
-            return intval($m) + 1;
-        }, $months);
-
         // Convert weekday indices (0-6, Sunday=0) to our format (0-6, Sunday=0)
         $days_of_week = array_map('intval', $week_days);
 
-        // Prepare months as JSON array for the new system
-        $months_json = !empty($month_numbers) ? wp_json_encode($month_numbers) : null;
-        
         // Prepare days_of_week as comma-separated string
         $days_of_week_string = !empty($days_of_week) ? implode(',', $days_of_week) : null;
 
@@ -198,10 +190,11 @@ class AvailabilityConditionsMigration extends BaseMigration
             'status' => $availability === 'available' ? 'active' : 'inactive',
             'start_date' => !empty($start_date) ? $start_date : null,
             'end_date' => !empty($end_date) ? $end_date : null,
-            'months' => $months_json, // JSON array for months filter
             'days_of_week' => $days_of_week_string, // Comma-separated for weekly rules
+            'week_of_month' => !empty($months) ? 'first' : null, // Default to first week if months are specified
+            'day_of_week' => !empty($days_of_week) ? reset($days_of_week) : null, // Use first day for monthly rules
             'interval_days' => null,
-            'interval_type' => null,
+            'interval_start_date' => null,
             'seats_total' => null,
             'original_price' => null,
             'sale_price' => null,
@@ -209,7 +202,7 @@ class AvailabilityConditionsMigration extends BaseMigration
             'created_at' => current_time('mysql'),
         ];
 
-        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, months=" . ($months_json ?: 'none') . ", days_of_week=" . ($days_of_week_string ?: 'none'));
+        error_log("[Yatra Migration] Converted to recurring rule: type={$rule_type}, days_of_week=" . ($days_of_week_string ?: 'none') . ", week_of_month=" . ($ruleData['week_of_month'] ?: 'none'));
 
         return $ruleData;
     }
@@ -229,14 +222,17 @@ class AvailabilityConditionsMigration extends BaseMigration
             'status' => $ruleData['status'],
             'start_date' => $ruleData['start_date'],
             'end_date' => $ruleData['end_date'],
-            'months' => $ruleData['months'], // JSON array
             'days_of_week' => $ruleData['days_of_week'], // Comma-separated string
+            'week_of_month' => $ruleData['week_of_month'],
+            'day_of_week' => $ruleData['day_of_week'],
             'interval_days' => $ruleData['interval_days'],
+            'interval_start_date' => $ruleData['interval_start_date'],
             'seats_total' => $ruleData['seats_total'],
             'original_price' => $ruleData['original_price'],
             'sale_price' => $ruleData['sale_price'],
             'traveler_pricing' => $ruleData['traveler_pricing'],
             'created_at' => $ruleData['created_at'],
+            'updated_at' => current_time('mysql'),
         ];
 
         $result = $wpdb->insert($table, $insertData);

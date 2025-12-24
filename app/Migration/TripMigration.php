@@ -504,14 +504,12 @@ class TripMigration extends BaseMigration
                         $table,
                         [
                             'trip_id' => $newTripId,
-                            'title' => $title,
-                            'description' => $description,
-                            'icon' => $icon,
+                            'highlight_text' => $title,
+                            'highlight_icon' => $icon,
                             'order' => $order,
-                            'status' => 'active',
                             'created_at' => current_time('mysql')
                         ],
-                        ['%d', '%s', '%s', '%s', '%d', '%s', '%s']
+                        ['%d', '%s', '%s', '%d', '%s']
                     );
                     $order++;
                 }
@@ -624,10 +622,9 @@ class TripMigration extends BaseMigration
                         'question' => wp_kses_post($question),
                         'answer' => wp_kses_post($answer),
                         'order' => $order,
-                        'status' => 'active',
                         'created_at' => current_time('mysql')
                     ],
-                    ['%d', '%s', '%s', '%d', '%s', '%s']
+                    ['%d', '%s', '%s', '%d', '%s']
                 );
                 
                 if ($result) {
