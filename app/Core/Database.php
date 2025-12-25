@@ -130,6 +130,14 @@ class Database
     }
 
     /**
+     * Update database tables (alias for createTables for backward compatibility)
+     */
+    public static function updateTables(): void
+    {
+        self::createTables();
+    }
+
+    /**
      * Drop all Yatra database tables
      */
     public static function dropTables(): void

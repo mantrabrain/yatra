@@ -70,6 +70,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `access_level` enum('public','registered','customer','premium') DEFAULT 'public',
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this record',
+    `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this record',
     
     PRIMARY KEY (`id`),
     KEY `trip_id` (`trip_id`),
