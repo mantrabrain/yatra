@@ -27,7 +27,7 @@ class CustomersTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_customers';
+    protected static string $table = 'yatra_new_customers';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement
@@ -91,6 +91,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `notes` text COMMENT 'Internal notes about customer',
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this customer record',
+    `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this customer record',
     `last_login_at` datetime DEFAULT NULL,
     `verified_at` datetime DEFAULT NULL,
     

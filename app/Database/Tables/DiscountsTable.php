@@ -27,7 +27,7 @@ class DiscountsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_discounts';
+    protected static string $table = 'yatra_new_discounts';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

@@ -27,7 +27,7 @@ class ReviewsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_reviews';
+    protected static string $table = 'yatra_new_reviews';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement
@@ -58,6 +58,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `helpful_count` int(11) UNSIGNED DEFAULT 0,
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this review',
+    `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this review',
     
     PRIMARY KEY (`id`),
     KEY `idx_trip_id` (`trip_id`),

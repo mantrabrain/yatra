@@ -33,7 +33,7 @@ class TripPricingTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_trip_pricing';
+    protected static string $table = 'yatra_new_trip_pricing';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

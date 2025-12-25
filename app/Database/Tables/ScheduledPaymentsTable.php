@@ -27,7 +27,7 @@ class ScheduledPaymentsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_scheduled_payments';
+    protected static string $table = 'yatra_new_scheduled_payments';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

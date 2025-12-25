@@ -27,7 +27,7 @@ class PaymentTokensTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_payment_tokens';
+    protected static string $table = 'yatra_new_payment_tokens';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

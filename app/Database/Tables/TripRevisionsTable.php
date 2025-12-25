@@ -27,7 +27,7 @@ class TripRevisionsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_trip_revisions';
+    protected static string $table = 'yatra_new_trip_revisions';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

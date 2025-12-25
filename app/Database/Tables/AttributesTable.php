@@ -35,7 +35,7 @@ class AttributesTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_attributes';
+    protected static string $table = 'yatra_new_attributes';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement

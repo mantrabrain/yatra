@@ -27,7 +27,7 @@ class EnquiriesTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_enquiries';
+    protected static string $table = 'yatra_new_enquiries';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement
@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `source` varchar(50) DEFAULT 'website' COMMENT 'Source of enquiry',
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this enquiry record',
     
     PRIMARY KEY (`id`),
     KEY `idx_trip_id` (`trip_id`),

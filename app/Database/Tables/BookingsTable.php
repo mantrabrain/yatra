@@ -27,7 +27,7 @@ class BookingsTable extends BaseTable
      * 
      * @var string The base table name without WordPress prefix
      */
-    protected static string $table = 'yatra_bookings';
+    protected static string $table = 'yatra_new_bookings';
 
     /**
      * Get the complete table schema as raw SQL CREATE TABLE statement
@@ -89,6 +89,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `reminder_sent_at` datetime DEFAULT NULL,
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this booking',
+    `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this booking',
     `confirmed_at` datetime DEFAULT NULL,
     `completed_at` datetime DEFAULT NULL,
     
