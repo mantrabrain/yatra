@@ -44,8 +44,8 @@ interface TravelerCategory {
 const TravelerCategories: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('label');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; category: TravelerCategory | null }>({
     isOpen: false,
@@ -290,7 +290,7 @@ const TravelerCategories: React.FC = () => {
       : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'label' || sortOrder !== 'asc';
+  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
 
   // Bulk selection & column visibility state
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -419,16 +419,15 @@ const TravelerCategories: React.FC = () => {
         <div className="flex items-center gap-3">
           {renderIcon(category.icon)}
           <div>
-            <div className="font-medium text-gray-900 dark:text-white">
-              <a
-                href={`${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`}
-                className="text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
-              >
-                {category.label}
-              </a>
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {category.slug}
+            <a
+              href={`${baseAdminUrl}?page=yatra&subpage=traveler-categories&action=edit&id=${category.id}`}
+              className="font-medium text-gray-900 dark:text-white text-blue-600 dark:text-blue-400 hover:underline underline-offset-2"
+            >
+              {category.label}
+            </a>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 flex items-center gap-2">
+              <span>{category.slug}</span>
+              <span className="text-gray-400 dark:text-gray-500">(ID: {category.id})</span>
             </div>
           </div>
         </div>
@@ -599,6 +598,7 @@ const TravelerCategories: React.FC = () => {
               setPage(1);
             }}
             sortOptions={[
+              { value: 'id', label: __('ID', 'ID') },
               { value: 'label', label: __('Label', 'Label') },
               { value: 'status', label: __('Status', 'Status') },
               { value: 'created_at', label: __('Created At', 'Created At') },

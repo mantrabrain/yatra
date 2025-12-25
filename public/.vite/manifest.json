@@ -3,16 +3,6 @@
     "file": "css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-CBDkWRJ8.js": {
-    "file": "js/index-CBDkWRJ8.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-B5LcORzk.js"
-    ],
-    "css": [
-      "css/index.css"
-    ]
-  },
   "_index-DcDhh0Hi.js": {
     "file": "js/index-DcDhh0Hi.js",
     "name": "index",
@@ -26,13 +16,6 @@
   "_react-vendor-!~{001}~.js": {
     "file": "css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
-  },
-  "_react-vendor-B5LcORzk.js": {
-    "file": "js/react-vendor-B5LcORzk.js",
-    "name": "react-vendor",
-    "css": [
-      "css/react-vendor.css"
-    ]
   },
   "_react-vendor-CF1z9UuK.js": {
     "file": "js/react-vendor-CF1z9UuK.js",

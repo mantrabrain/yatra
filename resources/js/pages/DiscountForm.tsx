@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { HelpText } from '../components/ui/help-text';
 import { DatePicker } from '../components/ui/date-picker';
+import { ApplicableTripSelector } from '../components/shared/ApplicableTripSelector';
 
 interface DiscountFormData {
   code: string;
@@ -110,17 +111,6 @@ const DiscountForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [tripSearchQuery, setTripSearchQuery] = useState('');
-  const [debouncedTripSearch, setDebouncedTripSearch] = useState('');
-  const [showTripDropdown, setShowTripDropdown] = useState(false);
-
-  // Debounce trip search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedTripSearch(tripSearchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [tripSearchQuery]);
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -313,40 +303,6 @@ const DiscountForm: React.FC = () => {
         pricing_mode: c.pricing_mode || 'per_person'
       }));
   }, [travelerCategoriesQuery.data]);
-
-  // Fetch trips for applicable_to selection - always fetch when specific_trips is selected
-  const tripsQuery = useQuery({
-    queryKey: ['trips-for-discount', debouncedTripSearch],
-    queryFn: async () => {
-      try {
-        const params: any = {
-          per_page: 100,
-          // Don't filter by status - show all non-deleted trips so admin can select any trip
-        };
-        if (debouncedTripSearch.trim()) {
-          params.search = debouncedTripSearch.trim();
-        }
-        const response = await apiClient.get('/trips', { params });
-        const trips = response?.data?.data || response?.data || response || [];
-        return Array.isArray(trips) ? trips : [];
-      } catch (error: any) {
-        console.error('Failed to load trips:', error);
-        return [];
-      }
-    },
-    enabled: formData.applicable_to === 'specific_trips', // Only fetch when specific_trips is selected
-    staleTime: 5 * 60 * 1000,
-  });
-
-  const tripOptions = useMemo(() => {
-    const items = tripsQuery.data || [];
-    return items
-      .filter((t: any) => !!t && (typeof t.id === 'number' || typeof t.id === 'string'))
-      .map((t: any) => ({ 
-        value: Number(t.id), 
-        label: t.title || t.name || `Trip #${t.id}`
-      }));
-  }, [tripsQuery.data]);
 
   const addRange = () => {
     setFormData((prev) => ({
@@ -843,16 +799,6 @@ const DiscountForm: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="h-5 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-              </CardContent>
-            </Card>
-
-            {/* Applicable To Card */}
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="h-5 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
               </CardHeader>
               <CardContent>
                 <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
@@ -1825,136 +1771,15 @@ const DiscountForm: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">{__('Applicable To', 'Applicable To')}</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  <Select
+                <CardContent>
+                  <ApplicableTripSelector
                     value={formData.applicable_to}
-                    onChange={(e) => handleFieldChange('applicable_to', e.target.value as 'all' | 'specific_trips')}
-                  >
-                    <option value="all">{__('All Trips', 'All Trips')}</option>
-                    <option value="specific_trips">{__('Specific Trips', 'Specific Trips')}</option>
-                  </Select>
-                  {formData.applicable_to === 'specific_trips' && (
-                    <div className="mt-3 space-y-2 relative">
-                      {/* Selected trips display / Dropdown trigger */}
-                      <div 
-                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-800"
-                        onClick={() => setShowTripDropdown(!showTripDropdown)}
-                      >
-                        {formData.trip_ids.length > 0 ? (
-                          <div className="flex flex-wrap gap-1.5">
-                            {formData.trip_ids.slice(0, 3).map((tripId) => {
-                              const trip = tripOptions.find(t => t.value === tripId);
-                              return (
-                                <span
-                                  key={tripId}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded"
-                                >
-                                  {trip?.label || `Trip #${tripId}`}
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFieldChange('trip_ids', formData.trip_ids.filter(id => id !== tripId));
-                                    }}
-                                    className="hover:text-blue-600 dark:hover:text-blue-200"
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              );
-                            })}
-                            {formData.trip_ids.length > 3 && (
-                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
-                                +{formData.trip_ids.length - 3} {__('more', 'more')}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {__('Click to select trips...', 'Click to select trips...')}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {/* Dropdown panel */}
-                      {showTripDropdown && (
-                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                          {/* Search Input */}
-                          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
-                            <div className="relative">
-                              <Input
-                                type="text"
-                                placeholder={__('Search trips...', 'Search trips...')}
-                                value={tripSearchQuery}
-                                onChange={(e) => setTripSearchQuery(e.target.value)}
-                                className="w-full text-sm"
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              {tripsQuery.isFetching && (
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Trip list */}
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {tripsQuery.isLoading ? (
-                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-                                {__('Loading trips...', 'Loading trips...')}
-                              </div>
-                            ) : tripOptions.length > 0 ? (
-                              <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                                {tripOptions.map((trip) => (
-                                  <label
-                                    key={trip.value}
-                                    className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={formData.trip_ids.includes(trip.value)}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          handleFieldChange('trip_ids', [...formData.trip_ids, trip.value]);
-                                        } else {
-                                          handleFieldChange('trip_ids', formData.trip_ids.filter(id => id !== trip.value));
-                                        }
-                                      }}
-                                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                    />
-                                    <span className="text-sm text-gray-900 dark:text-white truncate flex-1">{trip.label}</span>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">#{trip.value}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                {tripSearchQuery ? __('No trips found', 'No trips found') : __('No trips available', 'No trips available')}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Footer */}
-                          <div className="p-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {formData.trip_ids.length} {__('selected', 'selected')}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setShowTripDropdown(false)}
-                            >
-                              {__('Done', 'Done')}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                    onValueChange={(val) => handleFieldChange('applicable_to', val)}
+                    selectedTripIds={formData.trip_ids}
+                    onTripIdsChange={(ids) => handleFieldChange('trip_ids', ids)}
+                    description={__('Choose whether this discount applies to all trips or specific ones.')}
+                    helperText={__('Trips shown with ID for quick identification.')}
+                  />
                 </CardContent>
               </Card>
 

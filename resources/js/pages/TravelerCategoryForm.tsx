@@ -18,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import { Skeleton } from '../components/ui/skeleton';
 import { HelpText } from '../components/ui/help-text';
 
 interface TravelerCategoryFormData {
@@ -47,7 +48,7 @@ const TravelerCategoryForm: React.FC = () => {
     age_min: '',
     age_max: '',
     icon: null,
-    status: 'draft',
+    status: 'publish',
     pricing_mode: 'per_person',
     min_pax: '',
     max_pax: '',
@@ -256,7 +257,7 @@ const TravelerCategoryForm: React.FC = () => {
         return await apiClient.post('/traveler-categories', payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (response: any) => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
       queryClient.invalidateQueries({ queryKey: ['traveler-category', categoryId] });
       showToast(
@@ -265,10 +266,16 @@ const TravelerCategoryForm: React.FC = () => {
           : __('Traveler category created successfully', 'Traveler category created successfully'),
         'success'
       );
-      // Redirect to categories list after a short delay
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories`;
-      }, 1000);
+      if (!isEditMode) {
+        const newId = response?.id || response?.data?.id;
+        if (newId) {
+          setTimeout(() => {
+            window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${newId}`;
+          }, 800);
+        }
+      } else {
+        setIsSubmitting(false);
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the traveler category', 'An error occurred while saving the traveler category');
@@ -296,9 +303,49 @@ const TravelerCategoryForm: React.FC = () => {
 
   if (isEditMode && isLoadingCategory) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading traveler category...', 'Loading traveler category...')}</span>
+      <div className="space-y-3">
+        <PageHeader
+          title={__('Edit Category', 'Edit Category')}
+          description={__('Update traveler category information', 'Update traveler category information')}
+          actions={
+            <Skeleton className="w-24 h-9 rounded-md" />
+          }
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardHeader className="pb-2">
+                <Skeleton className="h-5 w-48" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {[1, 2, 3].map((section) => (
+                  <div key={section} className="space-y-2">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-10 w-full" />
+                  </div>
+                ))}
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-32" />
+                  <Skeleton className="h-24 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-3">
+            {[1, 2, 3].map((card) => (
+              <Card key={card}>
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-5 w-36" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-40 w-full" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -552,24 +599,30 @@ const TravelerCategoryForm: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Icon/Image Picker */}
-                  <div>
-                    <IconPicker
-                      value={formData.icon}
-                      onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Category Icon or Image', 'Category Icon or Image')}
-                      helpText={__('Select an icon from the library or upload a custom image for this category.', 'Select an icon from the library or upload a custom image for this category.')}
-                      allowImageUpload={true}
-                      allowIconSelection={true}
-                      size="md"
-                    />
-                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Sidebar */}
             <div className="space-y-3">
+              {/* Icon/Image Picker */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Category Icon or Image', 'Category Icon or Image')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <IconPicker
+                    value={formData.icon}
+                    onChange={(value) => handleFieldChange('icon', value)}
+                    label={undefined}
+                    helpText={__('Select an icon from the library or upload a custom image for this category.', 'Select an icon from the library or upload a custom image for this category.')}
+                    allowImageUpload={true}
+                    allowIconSelection={true}
+                    size="md"
+                  />
+                </CardContent>
+              </Card>
+
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">

@@ -63,9 +63,6 @@ const ItineraryForm: React.FC = () => {
   const isEditMode = action === 'edit' && entryId !== null;
   const isAddDayMode = modeParam === 'day';
   const isEditDayMode = isEditMode && modeParam === 'day';
-  const isAddDayModeInitial = useMemo(() => {
-    return action !== 'edit' && !entryId && modeParam === 'day';
-  }, [action, entryId, modeParam]);
 
   // Form State
   const [formData, setFormData] = useState<ItineraryFormData>({
@@ -87,7 +84,7 @@ const ItineraryForm: React.FC = () => {
     notes: '',
     included_items: [],
     excluded_items: [],
-    status: isAddDayModeInitial ? 'publish' : 'draft',
+    status: 'publish',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -261,7 +258,7 @@ const ItineraryForm: React.FC = () => {
         notes: entryData.notes || '',
         included_items: entryData.included_items || [],
         excluded_items: entryData.excluded_items || [],
-        status: entryData.status || 'draft',
+        status: entryData.status || 'publish',
       });
     } else if (isEditDayMode) {
       // For day editing, entryData should now be the day entry (thanks to effectiveEntryData in useItineraryFormData)
@@ -326,7 +323,7 @@ const ItineraryForm: React.FC = () => {
           notes: entry.notes || '',
           included_items: entry.included_items || [],
           excluded_items: entry.excluded_items || [],
-          status: entry.status || 'draft',
+          status: entry.status || 'publish',
         },
         isExpanded: index === 0,
       }));
@@ -885,8 +882,8 @@ const ItineraryForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                       className="w-full"
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>

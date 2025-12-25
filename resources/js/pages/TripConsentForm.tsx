@@ -15,6 +15,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
+import { ApplicableTripSelector } from '../components/shared/ApplicableTripSelector';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
@@ -234,9 +235,6 @@ const TripConsentForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [activeTab, setActiveTab] = useState<'general' | 'fields' | 'content' | 'settings' | 'preview'>('general');
   const [expandedField, setExpandedField] = useState<string | null>(null);
-  const [showTripDropdown, setShowTripDropdown] = useState(false);
-  const [tripSearchQuery, setTripSearchQuery] = useState('');
-  const [debouncedTripSearch, setDebouncedTripSearch] = useState('');
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -244,32 +242,6 @@ const TripConsentForm: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const formId = urlParams.get('id');
   const isEditMode = !!formId;
-
-  // Debounce trip search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedTripSearch(tripSearchQuery);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [tripSearchQuery]);
-
-  // Fetch trips for applicable_to selection
-  const tripsQuery = useQuery({
-    queryKey: ['trips-for-consent', debouncedTripSearch],
-    queryFn: async () => {
-      try {
-        const params: Record<string, any> = { per_page: 100 };
-        if (debouncedTripSearch.trim()) {
-          params.search = debouncedTripSearch.trim();
-        }
-        const response = await apiClient.get('/trips', { params });
-        return response?.data || [];
-      } catch {
-        return [];
-      }
-    },
-    enabled: isModuleAvailable(),
-  });
 
   // Fetch existing form for edit mode
   const { data: existingFormResponse, isLoading: isLoadingForm } = useQuery({
@@ -362,10 +334,27 @@ const TripConsentForm: React.FC = () => {
       }
       return await apiClient.post('/consent-forms', payload);
     },
-    onSuccess: () => {
+    onSuccess: (response: any) => {
       queryClient.invalidateQueries({ queryKey: ['consent-forms'] });
       showToast(isEditMode ? __('Consent form updated successfully') : __('Consent form created successfully'), 'success');
-      navigateBack();
+
+      if (isEditMode) {
+        return;
+      }
+
+      const newId = response?.data?.id ?? response?.id ?? response?.form?.id;
+      if (!newId) {
+        navigateBack();
+        return;
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      params.set('action', 'edit');
+      params.set('id', String(newId));
+      params.set('subpage', 'trips');
+      params.set('tab', 'trip-consent');
+      window.history.pushState({}, '', `${window.location.pathname}?${params.toString()}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
     },
     onError: (error: any) => {
       showToast(error?.message || __('Failed to save consent form'), 'error');
@@ -730,10 +719,9 @@ const TripConsentForm: React.FC = () => {
             </Card>
             <Card>
               <CardHeader>
-                <div className="h-6 w-28 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
               </CardHeader>
               <CardContent className="space-y-3">
-                <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                 <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
               </CardContent>
             </Card>
@@ -743,8 +731,7 @@ const TripConsentForm: React.FC = () => {
     );
   }
 
-  const trips = tripsQuery.data || [];
-
+  
   return (
     <div className="space-y-6">
       <PageHeader
@@ -845,149 +832,7 @@ const TripConsentForm: React.FC = () => {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>{__('Trip Assignment')}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      {__('Apply to')}
-                    </label>
-                    <Select
-                      value={formData.applicable_to}
-                      onChange={(e) => setFormData({ ...formData, applicable_to: e.target.value as 'all' | 'specific_trips' })}
-                    >
-                      <option value="all">{__('All Trips')}</option>
-                      <option value="specific_trips">{__('Specific Trips')}</option>
-                    </Select>
-                  </div>
-
-                  {formData.applicable_to === 'specific_trips' && (
-                    <div className="mt-3 space-y-2 relative">
-                      {/* Selected trips display / Dropdown trigger */}
-                      <div 
-                        className="border border-gray-300 dark:border-gray-600 rounded-lg p-2 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 bg-white dark:bg-gray-800"
-                        onClick={() => setShowTripDropdown(!showTripDropdown)}
-                      >
-                        {formData.trip_ids.length > 0 ? (
-                          <div className="flex flex-wrap gap-1.5">
-                            {formData.trip_ids.slice(0, 3).map((tripId) => {
-                              const trip = trips.find((t: any) => t.id === tripId);
-                              return (
-                                <span
-                                  key={tripId}
-                                  className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded"
-                                >
-                                  {trip?.title || `Trip #${tripId}`}
-                                  <button
-                                    type="button"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setFormData({ ...formData, trip_ids: formData.trip_ids.filter(id => id !== tripId) });
-                                    }}
-                                    className="hover:text-purple-600 dark:hover:text-purple-200"
-                                  >
-                                    ×
-                                  </button>
-                                </span>
-                              );
-                            })}
-                            {formData.trip_ids.length > 3 && (
-                              <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
-                                +{formData.trip_ids.length - 3} {__('more')}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {__('Click to select trips...')}
-                          </span>
-                        )}
-                      </div>
-                      
-                      {/* Dropdown panel */}
-                      {showTripDropdown && (
-                        <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg">
-                          {/* Search Input */}
-                          <div className="p-2 border-b border-gray-200 dark:border-gray-700">
-                            <div className="relative">
-                              <Input
-                                type="text"
-                                placeholder={__('Search trips...')}
-                                value={tripSearchQuery}
-                                onChange={(e) => setTripSearchQuery(e.target.value)}
-                                className="w-full text-sm"
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              {tripsQuery.isFetching && (
-                                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                  <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {/* Trip list */}
-                          <div className="max-h-[200px] overflow-y-auto">
-                            {tripsQuery.isLoading ? (
-                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                <Loader2 className="w-5 h-5 animate-spin mx-auto mb-2" />
-                                {__('Loading trips...')}
-                              </div>
-                            ) : trips.length > 0 ? (
-                              <div className="divide-y divide-gray-100 dark:divide-gray-700">
-                                {trips.map((trip: any) => (
-                                  <label
-                                    key={trip.id}
-                                    className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      checked={formData.trip_ids.includes(trip.id)}
-                                      onChange={(e) => {
-                                        if (e.target.checked) {
-                                          setFormData({ ...formData, trip_ids: [...formData.trip_ids, trip.id] });
-                                        } else {
-                                          setFormData({ ...formData, trip_ids: formData.trip_ids.filter(id => id !== trip.id) });
-                                        }
-                                      }}
-                                      className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                                    />
-                                    <span className="text-sm text-gray-900 dark:text-white truncate flex-1">{trip.title}</span>
-                                    <span className="text-xs text-gray-400 dark:text-gray-500">#{trip.id}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            ) : (
-                              <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                {tripSearchQuery ? __('No trips found') : __('No trips available')}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Footer */}
-                          <div className="p-2 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {formData.trip_ids.length} {__('selected')}
-                            </span>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setShowTripDropdown(false)}
-                            >
-                              {__('Done')}
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+              </div>
 
             <div className="space-y-6">
               <Card>
@@ -1030,6 +875,22 @@ const TripConsentForm: React.FC = () => {
                     />
                     <span className="text-sm text-gray-700 dark:text-gray-300">{__('Require initials')}</span>
                   </label>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Applicable To', 'Applicable To')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ApplicableTripSelector
+                    value={formData.applicable_to}
+                    onValueChange={(val) => setFormData({ ...formData, applicable_to: val })}
+                    selectedTripIds={formData.trip_ids}
+                    onTripIdsChange={(ids) => setFormData({ ...formData, trip_ids: ids })}
+                    description={__('Choose whether this consent form applies to all trips or specific ones.')}
+                    helperText={__('Trips shown with ID for quick identification.')}
+                  />
                 </CardContent>
               </Card>
             </div>

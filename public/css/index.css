@@ -1014,6 +1014,9 @@ video {
 .max-h-\[60vh\] {
   max-height: 60vh;
 }
+.max-h-\[70vh\] {
+  max-height: 70vh;
+}
 .max-h-\[80vh\] {
   max-height: 80vh;
 }
@@ -1025,12 +1028,6 @@ video {
 }
 .max-h-\[95vh\] {
   max-height: 95vh;
-}
-.max-h-\[calc\(90vh-120px\)\] {
-  max-height: calc(90vh - 120px);
-}
-.max-h-\[70vh\] {
-  max-height: 70vh;
 }
 .min-h-0 {
   min-height: 0px;
@@ -1119,6 +1116,9 @@ video {
 .w-4 {
   width: 1rem;
 }
+.w-4\/5 {
+  width: 80%;
+}
 .w-40 {
   width: 10rem;
 }
@@ -1130,6 +1130,9 @@ video {
 }
 .w-5 {
   width: 1.25rem;
+}
+.w-5\/6 {
+  width: 83.333333%;
 }
 .w-52 {
   width: 13rem;
@@ -1202,12 +1205,6 @@ video {
   width: -moz-max-content;
   width: max-content;
 }
-.w-4\/5 {
-  width: 80%;
-}
-.w-5\/6 {
-  width: 83.333333%;
-}
 .min-w-0 {
   min-width: 0px;
 }
@@ -1225,6 +1222,9 @@ video {
 }
 .min-w-\[200px\] {
   min-width: 200px;
+}
+.min-w-\[24px\] {
+  min-width: 24px;
 }
 .min-w-\[320px\] {
   min-width: 320px;
@@ -1283,11 +1283,11 @@ video {
 .max-w-sm {
   max-width: 24rem;
 }
-.max-w-xs {
-  max-width: 20rem;
-}
 .max-w-xl {
   max-width: 36rem;
+}
+.max-w-xs {
+  max-width: 20rem;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -1977,6 +1977,9 @@ video {
 .bg-gray-50\/50 {
   background-color: rgb(249 250 251 / 0.5);
 }
+.bg-gray-50\/70 {
+  background-color: rgb(249 250 251 / 0.7);
+}
 .bg-gray-900 {
   --tw-bg-opacity: 1;
   background-color: rgb(17 24 39 / var(--tw-bg-opacity, 1));
@@ -2107,9 +2110,6 @@ video {
 .bg-yellow-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1));
-}
-.bg-gray-50\/70 {
-  background-color: rgb(249 250 251 / 0.7);
 }
 .bg-gradient-to-b {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
@@ -2400,6 +2400,10 @@ video {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
+.py-5 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
 .py-6 {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
@@ -2407,10 +2411,6 @@ video {
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
-}
-.py-5 {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
 }
 .pb-1 {
   padding-bottom: 0.25rem;
@@ -2986,6 +2986,9 @@ video {
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
 }
+.duration-150 {
+  transition-duration: 150ms;
+}
 .duration-200 {
   transition-duration: 200ms;
 }
@@ -2994,9 +2997,6 @@ video {
 }
 .duration-500 {
   transition-duration: 500ms;
-}
-.duration-150 {
-  transition-duration: 150ms;
 }
 .ease-out {
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
@@ -3525,11 +3525,6 @@ video {
 .hover\:text-purple-500:hover {
   --tw-text-opacity: 1;
   color: rgb(168 85 247 / var(--tw-text-opacity, 1));
-}
-
-.hover\:text-purple-600:hover {
-  --tw-text-opacity: 1;
-  color: rgb(147 51 234 / var(--tw-text-opacity, 1));
 }
 
 .hover\:text-purple-700:hover {
@@ -4673,6 +4668,10 @@ video {
   background-color: rgb(55 65 81 / var(--tw-bg-opacity, 1));
 }
 
+.dark\:hover\:bg-gray-700\/40:hover:is(.dark *) {
+  background-color: rgb(55 65 81 / 0.4);
+}
+
 .dark\:hover\:bg-gray-700\/50:hover:is(.dark *) {
   background-color: rgb(55 65 81 / 0.5);
 }
@@ -4769,11 +4768,6 @@ video {
 .dark\:hover\:text-green-100:hover:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(220 252 231 / var(--tw-text-opacity, 1));
-}
-
-.dark\:hover\:text-purple-200:hover:is(.dark *) {
-  --tw-text-opacity: 1;
-  color: rgb(233 213 255 / var(--tw-text-opacity, 1));
 }
 
 .dark\:hover\:text-purple-300:hover:is(.dark *) {
@@ -5011,12 +5005,24 @@ video {
     grid-column: span 7 / span 7;
   }
 
-  .lg\:w-12 {
-    width: 3rem;
+  .lg\:col-span-6 {
+    grid-column: span 6 / span 6;
   }
 
-  .lg\:w-24 {
-    width: 6rem;
+  .lg\:col-span-4 {
+    grid-column: span 4 / span 4;
+  }
+
+  .lg\:col-span-8 {
+    grid-column: span 8 / span 8;
+  }
+
+  .lg\:col-span-9 {
+    grid-column: span 9 / span 9;
+  }
+
+  .lg\:w-12 {
+    width: 3rem;
   }
 
   .lg\:w-36 {
@@ -5067,12 +5073,12 @@ video {
     flex: 3;
   }
 
-  .lg\:flex-none {
-    flex: none;
-  }
-
   .lg\:flex-\[4\] {
     flex: 4;
+  }
+
+  .lg\:flex-none {
+    flex: none;
   }
 
   .lg\:flex-shrink-0 {

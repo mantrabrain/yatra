@@ -36,7 +36,7 @@ const ItemForm: React.FC = () => {
     slug: '',
     description: '',
     type_id: '',
-    status: 'draft',
+    status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,14 +96,15 @@ const ItemForm: React.FC = () => {
         slug: itemData.slug || '',
         description: itemData.description || '',
         type_id: itemData.type_id?.toString() || '',
-        status: itemData.status || 'draft',
+        status: itemData.status || 'publish',
       });
     }
   }, [itemData, isEditMode]);
 
   const handleNameChange = (value: string) => {
-    // Auto-generate slug from name (only if slug is not manually edited)
-    if (!isSlugEditable) {
+    // Auto-generate slug from name only in ADD mode (not in EDIT mode)
+    // In EDIT mode, slug only changes if user explicitly edits it
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData(prev => ({
         ...prev,
@@ -374,8 +375,8 @@ const ItemForm: React.FC = () => {
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>

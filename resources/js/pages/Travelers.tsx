@@ -379,36 +379,42 @@ const Travelers: React.FC = () => {
       {/* Filters */}
       <Card>
         <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-            {/* Search */}
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={__('Search by name, email, phone, passport...', 'Search by name, email, phone, passport...')}
-                value={searchTerm}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+            {/* Search Field - Takes most space */}
+            <div className="lg:col-span-8">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder={__('Search by name, email, phone, passport...', 'Search by name, email, phone, passport...')}
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setPage(1);
+                  }}
+                  className="pl-10 w-full"
+                />
+              </div>
+            </div>
+
+            {/* Trip Filter */}
+            <div className="lg:col-span-4">
+              <Select
+                value={tripFilter}
                 onChange={(e) => {
-                  setSearchTerm(e.target.value);
+                  setTripFilter(e.target.value);
                   setPage(1);
                 }}
-                className="pl-10 w-full"
-              />
+                className="w-full"
+              >
+                <option value="all">{__('All Trips', 'All Trips')}</option>
+                {tripsData?.data?.map((trip: any) => (
+                  <option key={trip.id} value={trip.id}>
+                    {trip.title}
+                  </option>
+                ))}
+              </Select>
             </div>
-            <Select
-              value={tripFilter}
-              onChange={(e) => {
-                setTripFilter(e.target.value);
-                setPage(1);
-              }}
-              className="w-full sm:w-64"
-            >
-              <option value="">{__('All Trips', 'All Trips')}</option>
-              {tripsData?.data?.map((trip: any) => (
-                <option key={trip.id} value={trip.id}>
-                  {trip.title}
-                </option>
-              ))}
-            </Select>
           </div>
         </CardContent>
       </Card>

@@ -652,92 +652,146 @@ const Customers: React.FC = () => {
         }
       />
 
-      <Card>
-        <CardContent className="p-3">
-          <div className="flex flex-col md:flex-row gap-2 items-stretch md:items-center">
-            <div className="relative min-w-0 w-full lg:flex-[2]">
-              <SearchFilterToolbar
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                statusFilter={statusFilter}
-                onStatusChange={(value) => {
-                  setStatusFilter(value);
-                  setPage(1);
-                }}
-                statusOptions={statusOptions}
-                sortBy={sortBy}
-                onSortByChange={(field) => {
-                  setSortBy(field);
-                  setPage(1);
-                }}
-                sortOrder={sortOrder}
-                onSortOrderChange={(order) => {
-                  setSortOrder(order);
-                  setPage(1);
-                }}
-                sortOptions={sortOptions}
-                onResetFilters={handleResetFilters}
-                hasFilters={!!hasFilters}
-                placeholder={__('Search customers...', 'Search customers...')}
-              />
+      <div className="space-y-3">
+        {/* Search and Filters Card */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+              {/* Search Field - Takes most space */}
+              <div className="lg:col-span-6">
+                <SearchFilterToolbar
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  statusFilter={statusFilter}
+                  onStatusChange={(value) => {
+                    setStatusFilter(value);
+                    setPage(1);
+                  }}
+                  statusOptions={statusOptions}
+                  sortBy={sortBy}
+                  onSortByChange={(field) => {
+                    setSortBy(field);
+                    setPage(1);
+                  }}
+                  sortOrder={sortOrder}
+                  onSortOrderChange={(order) => {
+                    setSortOrder(order);
+                    setPage(1);
+                  }}
+                  sortOptions={sortOptions}
+                  onResetFilters={handleResetFilters}
+                  hasFilters={!!hasFilters}
+                  placeholder={__('Search customers...', 'Search customers...')}
+                />
+              </div>
+
+              {/* Status Filter */}
+              <div className="lg:col-span-2">
+                <Select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setPage(1);
+                  }}
+                  className="w-full"
+                >
+                  <option value="all">{__('All Status', 'All Status')}</option>
+                  <option value="active">{__('Active', 'Active')}</option>
+                  <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                  <option value="blocked">{__('Blocked', 'Blocked')}</option>
+                </Select>
+              </div>
+
+              {/* Loyalty Filter */}
+              {isPro && (
+                <div className="lg:col-span-2">
+                  <Select
+                    value={loyaltyFilter}
+                    onChange={(e) => {
+                      setLoyaltyFilter(e.target.value);
+                      setPage(1);
+                    }}
+                    className="w-full"
+                  >
+                    <option value="all">{__('All Tiers', 'All Tiers')}</option>
+                    <option value="bronze">{__('Bronze', 'Bronze')}</option>
+                    <option value="silver">{__('Silver', 'Silver')}</option>
+                    <option value="gold">{__('Gold', 'Gold')}</option>
+                    <option value="platinum">{__('Platinum', 'Platinum')}</option>
+                  </Select>
+                </div>
+              )}
+
+              {/* Sort Controls */}
+              <div className="lg:col-span-2">
+                <div className="flex gap-2">
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => {
+                      setSortBy(e.target.value);
+                      setPage(1);
+                    }}
+                    className="flex-1"
+                  >
+                    {sortOptions.map(option => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Select>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="px-3"
+                  >
+                    {sortOrder === 'asc' ? '↑' : '↓'}
+                  </Button>
+                </div>
+              </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Loyalty Filter */}
-            {isPro && (
-              <Select
-                value={loyaltyFilter}
-                onChange={(e) => {
-                  setLoyaltyFilter(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full md:w-36"
-              >
-                <option value="all">{__('All Tiers', 'All Tiers')}</option>
-                <option value="bronze">{__('Bronze', 'Bronze')}</option>
-                <option value="silver">{__('Silver', 'Silver')}</option>
-                <option value="gold">{__('Gold', 'Gold')}</option>
-                <option value="platinum">{__('Platinum', 'Platinum')}</option>
-              </Select>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Bulk Actions Toolbar */}
+        <ConditionalRender capability="yatra_view_bookings">
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+            }}
+            statusOptions={[
+              { key: 'all', label: __('All', 'All'), count: 0 },
+              { key: 'active', label: __('Active', 'Active'), count: 0 },
+              { key: 'inactive', label: __('Inactive', 'Inactive'), count: 0 },
+              { key: 'blocked', label: __('Blocked', 'Blocked'), count: 0 },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={columnOptions}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={isBulkPending}
+            totalItems={total}
+            bulkActionOptions={bulkActionOptions}
+          />
+        </ConditionalRender>
 
-      <ConditionalRender capability="yatra_view_bookings">
-        {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading customers', 'Error loading customers')}
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <BulkActionToolbar
-              selectedIds={selectedIds}
-              bulkAction={bulkAction}
-              setBulkAction={setBulkAction}
-              onApply={handleBulkApply}
-              onClearSelection={() => setSelectedIds([])}
-              statusFilter={statusFilter}
-              setStatusFilter={(value) => {
-                setStatusFilter(value);
-                setPage(1);
-              }}
-              statusOptions={[
-                { key: 'all', label: __('All', 'All'), count: 0 },
-                { key: 'active', label: __('Active', 'Active'), count: 0 },
-                { key: 'inactive', label: __('Inactive', 'Inactive'), count: 0 },
-                { key: 'blocked', label: __('Blocked', 'Blocked'), count: 0 },
-              ]}
-              showColumnsDropdown={showColumnsDropdown}
-              setShowColumnsDropdown={setShowColumnsDropdown}
-              columnOptions={columnOptions}
-              onToggleColumn={toggleColumn}
-              bulkMutationPending={isBulkPending}
-              totalItems={total}
-              bulkActionOptions={bulkActionOptions}
-            />
-
+        {/* Customers Table Card */}
+        <ConditionalRender capability="yatra_view_bookings">
+          {error ? (
+            <Card>
+              <CardContent className="p-8 text-center text-red-500">
+                {__('Error loading customers', 'Error loading customers')}
+              </CardContent>
+            </Card>
+          ) : (
             <Card>
               <CardContent className="p-0">
                 {isLoading ? (
@@ -772,22 +826,23 @@ const Customers: React.FC = () => {
                 )}
               </CardContent>
             </Card>
+          )}
 
-            {total > 0 && (
-              <div className="mt-4">
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  totalItems={total}
-                  itemsPerPage={10}
-                  onPageChange={(newPage) => setPage(newPage)}
-                  itemName={__('customers', 'customers')}
-                />
-              </div>
-            )}
-          </>
-        )}
-      </ConditionalRender>
+          {/* Pagination */}
+          {total > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={10}
+                onPageChange={(newPage) => setPage(newPage)}
+                itemName={__('customers', 'customers')}
+              />
+            </div>
+          )}
+        </ConditionalRender>
+      </div>
 
       {/* Delete Confirmation Dialog */}
       <ConfirmationDialog

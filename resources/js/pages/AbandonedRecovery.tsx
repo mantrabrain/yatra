@@ -18,6 +18,7 @@ import { Label } from '../components/ui/label';
 import { Input } from '../components/ui/input';
 import { Toggle } from '../components/ui/toggle';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { Modal } from '../components/ui/modal';
 import { Skeleton } from '../components/ui/skeleton';
 import { PageHeader } from '../components/common/PageHeader';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
@@ -1360,7 +1361,7 @@ const AbandonedRecoveryPage: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => showEmailPreview('first')}
-                      className="h-8"
+                      className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       {__('Preview')}
@@ -1400,7 +1401,7 @@ const AbandonedRecoveryPage: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => showEmailPreview('second')}
-                      className="h-8"
+                      className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       {__('Preview')}
@@ -1437,7 +1438,7 @@ const AbandonedRecoveryPage: React.FC = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => showEmailPreview('final')}
-                      className="h-8"
+                      className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
                       {__('Preview')}
@@ -1488,92 +1489,70 @@ const AbandonedRecoveryPage: React.FC = () => {
       />
 
       {/* Email Preview Modal */}
-      {emailPreview.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ marginTop: '-32px' }}>
-          <div 
-            className="absolute inset-0 bg-black/50" 
-            onClick={() => setEmailPreview({ ...emailPreview, isOpen: false })}
-          />
-          <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                {emailPreview.type === 'first' && __('First Recovery Email Preview')}
-                {emailPreview.type === 'second' && __('Second Recovery Email Preview')}
-                {emailPreview.type === 'final' && __('Final Recovery Email Preview')}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {__('This is how your email will look to customers. Placeholders are replaced with sample data.')}
-              </p>
-            </div>
-            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto">
-              {/* Email Subject */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Subject:')}</Label>
-                <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {emailPreview.subject || __('(No subject)')}
-                  </p>
-                </div>
-              </div>
-
-              {/* Email Body */}
-              <div>
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Message:')}</Label>
-                <div className="mt-1 rounded-md border border-gray-200 dark:border-gray-700 overflow-hidden">
-                  {/* Email-like container */}
-                  <div className="bg-white dark:bg-gray-900 p-8">
-                    <style dangerouslySetInnerHTML={{ __html: `
-                      .email-preview-content p {
-                        margin-bottom: 1rem;
-                      }
-                      .email-preview-content a {
-                        display: inline-block;
-                        margin-top: 1rem;
-                        margin-bottom: 1rem;
-                      }
-                      .email-preview-content ul,
-                      .email-preview-content ol {
-                        margin-bottom: 1rem;
-                      }
-                    ` }} />
-                    <div 
-                      className="email-preview-content font-sans text-base leading-relaxed text-gray-800 dark:text-gray-200"
-                      style={{ 
-                        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                        lineHeight: '1.6'
-                      }}
-                      dangerouslySetInnerHTML={{ __html: emailPreview.message || __('(No message)') }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Available Placeholders */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                  {__('Available Placeholders:')}
-                </Label>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{customer_name}'}</code>
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{trip_name}'}</code>
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{booking_amount}'}</code>
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{departure_date}'}</code>
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{recovery_link}'}</code>
-                  <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{site_name}'}</code>
-                </div>
-              </div>
-            </div>
-            <div className="p-4 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex justify-end">
-              <Button 
-                variant="outline" 
-                onClick={() => setEmailPreview({ ...emailPreview, isOpen: false })}
-              >
-                {__('Close')}
-              </Button>
+      <Modal
+        isOpen={emailPreview.isOpen}
+        onClose={() => setEmailPreview({ ...emailPreview, isOpen: false })}
+        title={
+          emailPreview.type === 'first' && __('First Recovery Email Preview') ||
+          emailPreview.type === 'second' && __('Second Recovery Email Preview') ||
+          emailPreview.type === 'final' && __('Final Recovery Email Preview')
+        }
+        description={__('This is how your email will look to customers. Placeholders are replaced with sample data.')}
+        size="xl"
+        showCloseButton={true}
+        footer={
+          <div className="flex justify-end">
+            <Button 
+              variant="outline" 
+              onClick={() => setEmailPreview({ ...emailPreview, isOpen: false })}
+            >
+              {__('Close')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          {/* Email Subject */}
+          <div>
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Subject:')}</Label>
+            <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
+              <p className="text-gray-900 dark:text-white">{emailPreview.subject}</p>
             </div>
           </div>
+
+          {/* Email Message */}
+          <div>
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Message:')}</Label>
+            <div className="mt-1 p-4 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
+              <div className="prose prose-sm max-w-none dark:prose-invert">
+                <div dangerouslySetInnerHTML={{ __html: emailPreview.message.replace(/\n/g, '<br>') }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Available Placeholders */}
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+              {__('Available Placeholders:')}
+            </Label>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{customer_name}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{trip_name}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{booking_amount}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{departure_date}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{recovery_link}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{site_name}'}</code>
+            </div>
+          </div>
+
+          {/* Email Footer */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+              {__('Note: This preview uses sample data. Actual emails will contain customer-specific information.')}
+            </p>
+          </div>
         </div>
-      )}
+      </Modal>
 
     </div>
   );

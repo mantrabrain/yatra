@@ -737,7 +737,6 @@ const SignedConsentsList: React.FC = () => {
     const nonce = (window as any).yatraAdmin?.nonce || '';
     
     try {
-      // Use fetch with nonce for authenticated request
       const response = await fetch(`${apiUrl}/signed-consents/${consent.id}/pdf`, {
         headers: {
           'X-WP-Nonce': nonce,
@@ -746,21 +745,19 @@ const SignedConsentsList: React.FC = () => {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData?.message || 'Download failed');
+        throw new Error(errorData?.message || __('Download failed', 'yatra'));
       }
       
       const data = await response.json();
       
-      if (data?.success && data?.data?.pdf_url) {
-        // Open PDF URL in new tab
-        window.open(data.data.pdf_url, '_blank');
+      if (data?.success && data?.data?.download_url) {
+        window.open(data.data.download_url, '_blank');
       } else {
-        // PDF generation not yet implemented - show info message
-        showToast(__('PDF generation is coming soon. You can view the consent details instead.'), 'info');
+        showToast(__('Failed to prepare PDF download. Please try again.', 'yatra'), 'error');
       }
     } catch (err: any) {
       console.error('PDF download error:', err);
-      showToast(err?.message || __('Failed to download PDF'), 'error');
+      showToast(err?.message || __('Failed to download PDF', 'yatra'), 'error');
     }
   };
 

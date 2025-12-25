@@ -41,7 +41,7 @@ const ItemTypeForm: React.FC = () => {
     description: '',
     icon: null,
     color: 'blue',
-    status: 'draft',
+    status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -94,14 +94,15 @@ const ItemTypeForm: React.FC = () => {
         description: typeData.description || '',
         icon: iconValue,
         color: typeData.color || 'blue',
-        status: typeData.status || 'draft',
+        status: typeData.status || 'publish',
       });
     }
   }, [typeData, isEditMode]);
 
   const handleNameChange = (value: string) => {
-    // Auto-generate slug from name (only if slug is not manually edited)
-    if (!isSlugEditable) {
+    // Auto-generate slug from name only in ADD mode (not in EDIT mode)
+    // In EDIT mode, slug only changes if user explicitly edits it
+    if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
       setFormData(prev => ({
         ...prev,
@@ -378,18 +379,25 @@ const ItemTypeForm: React.FC = () => {
                       ))}
                     </Select>
                   </div>
+                </CardContent>
+              </Card>
 
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Item Type Status', 'Item Type Status')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="publish">{__('Publish', 'Publish')}</option>
+                      <option value="draft">{__('Draft', 'Draft')}</option>
                       <option value="trash">{__('Trash', 'Trash')}</option>
                     </Select>
                   </div>

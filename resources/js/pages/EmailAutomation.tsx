@@ -506,81 +506,99 @@ const EmailTemplatesList: React.FC = () => {
   
   return (
     <div className="space-y-4">
-      {/* Filters - Two rows like Activities page */}
+      {/* Create Template Button - Outside Filter Container */}
+      <div className="flex justify-end">
+        <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Plus className="w-4 h-4 mr-2" />
+          {__('Create Template')}
+        </Button>
+      </div>
+      
+      {/* Filters - Grid Layout */}
       <Card>
-        <CardContent className="p-4 space-y-3">
-          {/* Row 1: Search and Create button */}
-          <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
-            <div className="relative min-w-0 w-full lg:flex-[3]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder={__('Search templates...')}
-                className="pl-10 w-full"
-              />
+        <CardContent className="p-4">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+            {/* Search Field - Takes most space */}
+            <div className="lg:col-span-6">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder={__('Search templates...')}
+                  className="pl-10 w-full"
+                />
+              </div>
             </div>
-            <Select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full lg:w-40 lg:flex-none"
-            >
-              <option value="all">{__('All Categories')}</option>
-              {categories.map((cat: string) => (
-                <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
-              ))}
-            </Select>
-            <Select
-              value={recipientFilter}
-              onChange={(e) => setRecipientFilter(e.target.value)}
-              className="w-full lg:w-36 lg:flex-none"
-            >
-              <option value="all">{__('All Recipients')}</option>
-              <option value="customer">{__('Customer')}</option>
-              <option value="admin">{__('Admin')}</option>
-            </Select>
-            <Select
-              value={eventFilter}
-              onChange={(e) => setEventFilter(e.target.value)}
-              className="w-full lg:w-44 lg:flex-none"
-            >
-              <option value="all">{__('All Events')}</option>
-              {events.map((event: any) => (
-                <option key={event.key} value={event.key}>{event.name}</option>
-              ))}
-            </Select>
-            <Button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white h-11 flex-shrink-0">
-              <Plus className="w-4 h-4 mr-2" />
-              {__('Create Template')}
-            </Button>
+
+            {/* Category Filter */}
+            <div className="lg:col-span-2">
+              <Select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full"
+              >
+                <option value="all">{__('All Categories')}</option>
+                {categories.map((cat: string) => (
+                  <option key={cat} value={cat}>{cat.charAt(0).toUpperCase() + cat.slice(1)}</option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Recipient Filter */}
+            <div className="lg:col-span-2">
+              <Select
+                value={recipientFilter}
+                onChange={(e) => setRecipientFilter(e.target.value)}
+                className="w-full"
+              >
+                <option value="all">{__('All Recipients')}</option>
+                <option value="customer">{__('Customer')}</option>
+                <option value="admin">{__('Admin')}</option>
+              </Select>
+            </div>
+
+            {/* Event Filter */}
+            <div className="lg:col-span-2">
+              <Select
+                value={eventFilter}
+                onChange={(e) => setEventFilter(e.target.value)}
+                className="w-full"
+              >
+                <option value="all">{__('All Events')}</option>
+                {events.map((event: any) => (
+                  <option key={event.key} value={event.key}>{event.name}</option>
+                ))}
+              </Select>
+            </div>
           </div>
-          
-          {/* Row 2: Bulk actions, Status tabs and Columns - using shared component */}
-          <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkAction}
-            onClearSelection={() => setSelectedIds([])}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            statusOptions={[
-              { key: 'all', label: __('All'), count: templates.length },
-              { key: 'active', label: __('Active'), count: templates.filter((t: EmailTemplate) => t.is_active).length },
-              { key: 'inactive', label: __('Inactive'), count: templates.filter((t: EmailTemplate) => !t.is_active).length },
-            ]}
-            showColumnsDropdown={showColumnsDropdown}
-            setShowColumnsDropdown={setShowColumnsDropdown}
-            columnOptions={columnOptions}
-            onToggleColumn={toggleColumn}
-            bulkMutationPending={bulkDeleteMutation.isPending}
-            totalItems={filteredTemplates.length}
-            bulkActionOptions={[
-              { value: 'delete', label: __('Delete') },
-            ]}
-          />
         </CardContent>
       </Card>
+
+      {/* Bulk Actions - Outside of filter card */}
+      <BulkActionToolbar
+        selectedIds={selectedIds}
+        bulkAction={bulkAction}
+        setBulkAction={setBulkAction}
+        onApply={handleBulkAction}
+        onClearSelection={() => setSelectedIds([])}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        statusOptions={[
+          { key: 'all', label: __('All'), count: templates.length },
+          { key: 'active', label: __('Active'), count: templates.filter((t: EmailTemplate) => t.is_active).length },
+          { key: 'inactive', label: __('Inactive'), count: templates.filter((t: EmailTemplate) => !t.is_active).length },
+        ]}
+        showColumnsDropdown={showColumnsDropdown}
+        setShowColumnsDropdown={setShowColumnsDropdown}
+        columnOptions={columnOptions}
+        onToggleColumn={toggleColumn}
+        bulkMutationPending={bulkDeleteMutation.isPending}
+        totalItems={filteredTemplates.length}
+        bulkActionOptions={[
+          { value: 'delete', label: __('Delete') },
+        ]}
+      />
       
       {/* Templates Table */}
       <Card>
