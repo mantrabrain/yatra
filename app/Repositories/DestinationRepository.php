@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\ReviewsTable;
+
 /**
  * Destination Repository
- * Handles database operations for destinations
+ * Handles database operations for destinations using the new ClassificationsTable
  */
 class DestinationRepository extends BaseRepository
 {
@@ -21,23 +26,22 @@ class DestinationRepository extends BaseRepository
     protected array $integerFields = ['id', 'created_by', 'updated_by'];
 
     /**
-     * Get table name
+     * Get table name - using the new ClassificationsTable
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_destinations';
+        return ClassificationsTable::getTableName();
     }
 
     /**
-     * Find by slug
+     * Find by slug - for destinations
      */
     public function findBySlug(string $slug): ?\stdClass
     {
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = 'destination' AND slug = %s",
                 $slug
             )
         );
@@ -50,7 +54,8 @@ class DestinationRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
-        $args['where']['status'] = 'publish';
+        $args['where']['type'] = 'destination';
+        $args['where']['status'] = 'active';
         return $this->all($args);
     }
 
@@ -59,6 +64,7 @@ class DestinationRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
+        $args['where']['type'] = 'destination';
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -66,7 +72,7 @@ class DestinationRepository extends BaseRepository
     /**
      * Get published destinations with attached trip counts.
      *
-     * This uses the yatra_trip_destinations relation table to count how many
+     * This uses the new TripClassificationsTable relation table to count how many
      * trips are linked to each destination. It returns each destination row
      * plus a numeric trips_count property.
      */
@@ -75,26 +81,27 @@ class DestinationRepository extends BaseRepository
         global $wpdb;
 
         $destTable    = esc_sql($this->table);
-        $relTable     = esc_sql($wpdb->prefix . 'yatra_trip_destinations');
-        $tripsTable   = esc_sql($wpdb->prefix . 'yatra_trips');
-        $reviewsTable = esc_sql($wpdb->prefix . 'yatra_reviews');
+        $relTable     = TripClassificationsTable::getTableName();
+        $tripsTable   = TripsTable::getTableName();
+        $reviewsTable = ReviewsTable::getTableName();
 
-        // COUNT(DISTINCT td.trip_id) gives real number of trips per destination.
+        // COUNT(DISTINCT tc.trip_id) gives real number of trips per destination.
         // avg_rating is computed from approved reviews across all those trips.
         // starting_price is computed in PHP using both regular trip prices and
         // traveler-based pricing from recurring availability rules.
         $sql = "SELECT d.*, 
-                       COUNT(DISTINCT td.trip_id) AS trips_count,
+                       COUNT(DISTINCT tc.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
-                       GROUP_CONCAT(DISTINCT td.trip_id) AS trip_ids
+                       GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
                 FROM `{$destTable}` d
-                LEFT JOIN `{$relTable}` td
-                  ON td.destination_id = d.id
+                LEFT JOIN `{$relTable}` tc
+                  ON tc.classification_id = d.id 
+                  AND tc.classification_type = 'destination'
                 LEFT JOIN `{$tripsTable}` t
-                  ON t.id = td.trip_id
+                  ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE d.status = 'publish'
+                WHERE d.type = 'destination' AND d.status = 'active'
                 GROUP BY d.id";
 
         $rows = $this->wpdb->get_results($sql) ?: [];
@@ -154,7 +161,7 @@ class DestinationRepository extends BaseRepository
             return 0.0;
         }
 
-        $tripsTable = esc_sql($wpdb->prefix . 'yatra_trips');
+        $tripsTable = TripsTable::getTableName();
 
         $trip = $wpdb->get_row(
             $wpdb->prepare(
@@ -233,7 +240,7 @@ class DestinationRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = 'destination' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -244,28 +251,49 @@ class DestinationRepository extends BaseRepository
         }
 
         $query = "SELECT * FROM `{$table}` {$search_where} {$order} {$limit}";
-
         return $this->wpdb->get_results($query) ?: [];
     }
 
     /**
-     * Get counts per status for admin views
+     * Get status counts for destinations
      */
-    public function getStatusCounts(): array
+    public function getStatusCounts(array $args = []): array
     {
         $table = esc_sql($this->table);
 
-        // Get counts for each status
+        // Get counts for each status - only for destinations
         $results = $this->wpdb->get_results("
             SELECT status, COUNT(*) as count 
             FROM `{$table}` 
-            WHERE 1=1 
+            WHERE type = 'destination'
             GROUP BY status
         ", ARRAY_A) ?: [];
 
-        $counts = [];
+        $counts = [
+            'publish' => 0,
+            'draft' => 0,
+            'trash' => 0,
+            'total' => 0
+        ];
+        
         foreach ($results as $row) {
-            $counts[$row['status']] = (int) $row['count'];
+            $status = $row['status'];
+            $count = (int) $row['count'];
+            
+            // Map old status values to new ones
+            if ($status === 'active') {
+                $status = 'publish';
+            } elseif ($status === 'inactive') {
+                $status = 'trash';
+            }
+            
+            if (isset($counts[$status])) {
+                $counts[$status] += $count;
+                $counts['total'] += $count;
+            } else {
+                // Handle any unexpected statuses
+                $counts['total'] += $count;
+            }
         }
 
         // Ensure we have entries for all main statuses even if count is 0
@@ -273,6 +301,69 @@ class DestinationRepository extends BaseRepository
         $counts['draft'] = $counts['draft'] ?? 0;
         $counts['trash'] = $counts['trash'] ?? 0;
 
+         
         return $counts;
+    }
+
+    /**
+     * Override base all() method to ensure type filtering
+     */
+    public function all(array $args = []): array
+    {
+        // IMPORTANT: Always filter by type = 'destination' for destinations
+        $args['where']['type'] = 'destination';
+        return parent::all($args);
+    }
+
+    /**
+     * Override base count() method to ensure type filtering
+     */
+    public function count(array $args = []): int
+    {
+        // IMPORTANT: Always filter by type = 'destination' for destinations
+        $args['where']['type'] = 'destination';
+        return parent::count($args);
+    }
+
+    /**
+     * Get trip count for a destination
+     * 
+     * @param int $destinationId Destination ID
+     * @return int Number of trips with this destination
+     */
+    public function getTripCount(int $destinationId): int
+    {
+        global $wpdb;
+        $tripsTable = $wpdb->prefix . 'yatra_trips';
+        $tripDestinationsTable = $wpdb->prefix . 'yatra_trip_destinations';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripsTable}` t
+             INNER JOIN `{$tripDestinationsTable}` td ON td.trip_id = t.id
+             WHERE td.destination_id = %d
+               AND t.status != 'trash'",
+            $destinationId
+        ));
+    }
+
+    /**
+     * Get trip count for destination (direct field method)
+     * 
+     * @param int $destinationId Destination ID
+     * @return int Number of trips with this destination
+     */
+    public function getTripCountDirect(int $destinationId): int
+    {
+        global $wpdb;
+        $tripTable = $wpdb->prefix . 'yatra_trips';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM `{$tripTable}` t
+             WHERE t.destination_id = %d
+               AND t.status != 'trash'",
+            $destinationId
+        ));
     }
 }

@@ -253,39 +253,8 @@ class TripListingService extends BaseService
      */
     private function getAvailableAttributes(): array
     {
-        global $wpdb;
-        
-        $attributesTable = $wpdb->prefix . 'yatra_attributes';
-        
-        // Check if attributes table exists
-        $tableExists = $wpdb->get_var(
-            $wpdb->prepare("SHOW TABLES LIKE %s", $attributesTable)
-        ) === $attributesTable;
-        
-        if (!$tableExists) {
-            return [];
-        }
-        
-        $attributes = $wpdb->get_results(
-            "SELECT id, name, field_type, field_options, icon, description 
-             FROM {$attributesTable} 
-             WHERE status = 'publish' 
-             ORDER BY display_order ASC, name ASC"
-        );
-        
-        $formattedAttributes = [];
-        foreach ($attributes as $attribute) {
-            $formattedAttributes[] = [
-                'id' => $attribute->id,
-                'name' => $attribute->name,
-                'field_type' => $attribute->field_type,
-                'field_options' => $attribute->field_options,
-                'icon' => $attribute->icon,
-                'description' => $attribute->description
-            ];
-        }
-        
-        return $formattedAttributes;
+        $attributeRepository = new \Yatra\Repositories\AttributeRepository();
+        return $attributeRepository->getAvailableAttributes();
     }
 
     /**

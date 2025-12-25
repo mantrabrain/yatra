@@ -686,5 +686,40 @@ class CustomerRepository extends BaseRepository
         
         return true;
     }
+
+    /**
+     * Get payments for specific booking IDs with related booking and trip information
+     * 
+     * @param array $bookingIds Array of booking IDs
+     * @param int $limit Maximum number of payments to return
+     * @return array Array of payment objects with booking and trip details
+     */
+    public function getPaymentsForBookingIds(array $bookingIds, int $limit = 50): array
+    {
+        global $wpdb;
+        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $trips_table = $wpdb->prefix . 'yatra_trips';
+
+        $placeholders = implode(',', array_fill(0, count($bookingIds), '%d'));
+
+        $query = $wpdb->prepare(
+            "SELECT p.*, 
+                    b.reference as booking_reference,
+                    b.amount_due as booking_amount_due,
+                    b.amount_paid as booking_amount_paid,
+                    b.total_amount as booking_total_amount,
+                    t.title as trip_title
+             FROM {$payments_table} p
+             LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
+             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+             WHERE p.booking_id IN ($placeholders)
+             ORDER BY p.created_at DESC
+             LIMIT %d",
+            array_merge($bookingIds, [$limit])
+        );
+
+        return $wpdb->get_results($query) ?: [];
+    }
 }
 

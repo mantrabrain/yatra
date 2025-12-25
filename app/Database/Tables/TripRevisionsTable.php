@@ -2,6 +2,8 @@
 
 namespace Yatra\Database\Tables;
 
+use Yatra\Database\Tables\TripsTable;
+
 /**
  * TripRevisions Table Class
  * 
@@ -42,7 +44,7 @@ class TripRevisionsTable extends BaseTable
     {
         $tableName = static::getTableName();
         $charsetCollate = static::getCharsetCollate();
-        $tripsTable = $GLOBALS['wpdb']->prefix . 'yatra_trips';
+        $tripsTable = TripsTable::getTableName();
 
         return <<<SQL
 CREATE TABLE IF NOT EXISTS `{$tableName}` (

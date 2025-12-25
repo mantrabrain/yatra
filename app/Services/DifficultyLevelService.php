@@ -7,10 +7,11 @@ namespace Yatra\Services;
 use Yatra\Repositories\DifficultyLevelRepository;
 use Yatra\Helpers\SlugHelper;
 use Yatra\Helpers\FormatHelper;
+use Yatra\Database\Tables\ClassificationsTable;
 
 /**
  * Difficulty Level Service
- * Contains business logic for difficulty levels
+ * Contains business logic for difficulty levels using ClassificationsTable
  */
 class DifficultyLevelService extends BaseService
 {
@@ -44,18 +45,12 @@ class DifficultyLevelService extends BaseService
             throw new \InvalidArgumentException('Difficulty level name is required');
         }
 
-        // Validate level_order if provided
-        if (isset($data['level_order'])) {
-            $levelOrder = (int) $data['level_order'];
-            if ($levelOrder < 0) {
-                throw new \InvalidArgumentException('Level order must be a positive number');
+        // Validate sorting if provided
+        if (isset($data['sorting'])) {
+            $sorting = (int) $data['sorting'];
+            if ($sorting < 0) {
+                throw new \InvalidArgumentException('Sorting must be a non-negative integer');
             }
-        }
-
-        // Validate status
-        $allowed_statuses = ['draft', 'publish', 'trash'];
-        if (isset($data['status']) && !in_array($data['status'], $allowed_statuses, true)) {
-            throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
         }
     }
 
@@ -64,6 +59,9 @@ class DifficultyLevelService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        // Set the type to 'difficulty' for the ClassificationsTable
+        $data['type'] = 'difficulty';
+
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
@@ -73,7 +71,7 @@ class DifficultyLevelService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_difficulty_levels',
+                ClassificationsTable::getTableName(),
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -86,24 +84,29 @@ class DifficultyLevelService extends BaseService
             $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
-        // Sanitize level_order
-        if (isset($data['level_order'])) {
-            $data['level_order'] = absint($data['level_order']);
+        // Sanitize sorting
+        if (isset($data['sorting'])) {
+            $data['sorting'] = absint($data['sorting']);
         } else {
-            // Auto-assign next available order if not provided
-            $allLevels = $this->repository->all(['order_by' => 'level_order', 'order' => 'DESC', 'limit' => 1]);
-            $maxOrder = !empty($allLevels) && isset($allLevels[0]->level_order) ? (int) $allLevels[0]->level_order : 0;
-            $data['level_order'] = $maxOrder + 1;
+            $data['sorting'] = 0; // Default sorting
+        }
+
+        // Sanitize is_featured
+        if (isset($data['is_featured'])) {
+            $data['is_featured'] = $data['is_featured'] ? 1 : 0;
+        } else {
+            $data['is_featured'] = 0; // Default not featured
         }
 
         // Sanitize status
         if (isset($data['status'])) {
+            // Validate status
             $allowed_statuses = ['draft', 'publish', 'trash'];
-            $data['status'] = in_array($data['status'], $allowed_statuses, true) 
-                ? $data['status'] 
-                : 'publish';
+            $data['status'] = in_array($data['status'], $allowed_statuses, true)
+                ? $data['status']
+                : 'draft';
         } else {
-            $data['status'] = 'publish';
+            $data['status'] = 'draft';
         }
 
         // Set created_by and updated_by to current user
@@ -114,19 +117,34 @@ class DifficultyLevelService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
+            }
+        }
+
+        // Sanitize metadata if it's an array
+        if (isset($data['metadata'])) {
+            if (is_array($data['metadata'])) {
+                $data['metadata'] = maybe_serialize($data['metadata']);
             }
         }
 
@@ -138,51 +156,48 @@ class DifficultyLevelService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
+        // Ensure the type remains 'difficulty' for the ClassificationsTable
+        $data['type'] = 'difficulty';
+
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
         }
 
-        // Handle slug: preserve manually edited slug, otherwise auto-generate from name
-        $preserveSlug = isset($data['preserve_slug']) && $data['preserve_slug'] === true;
-        unset($data['preserve_slug']); // Remove flag from data array
-
-        if ($preserveSlug && isset($data['slug']) && !empty($data['slug'])) {
-            // Slug was manually edited - preserve it but ensure uniqueness
+        // Handle slug in EDIT mode: Only update if explicitly provided
+        // Do NOT auto-generate from name in edit mode
+        if (isset($data['slug']) && !empty($data['slug'])) {
+            // Slug was explicitly provided - ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_difficulty_levels',
+                ClassificationsTable::getTableName(),
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
-        } elseif (!empty($data['name'])) {
-            // Auto-generate slug from name if name is provided and slug not manually edited
-            $data['slug'] = SlugHelper::generateUniqueFromDatabase(
-                $data['name'],
-                'yatra_difficulty_levels',
-                'slug',
-                $id // Exclude current record when checking uniqueness
-            );
-        } elseif (isset($data['slug'])) {
-            // If name is not provided but slug is, sanitize the slug
-            $data['slug'] = SlugHelper::generate($data['slug']);
         }
+        // If slug is not provided, don't modify it (keep existing slug)
 
-        // Sanitize description (rich text)
+        // Sanitize Quill HTML description
         if (isset($data['description'])) {
             $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
-        // Sanitize level_order
-        if (isset($data['level_order'])) {
-            $data['level_order'] = absint($data['level_order']);
+        // Sanitize sorting
+        if (isset($data['sorting'])) {
+            $data['sorting'] = absint($data['sorting']);
+        }
+
+        // Sanitize is_featured
+        if (isset($data['is_featured'])) {
+            $data['is_featured'] = $data['is_featured'] ? 1 : 0;
         }
 
         // Sanitize status
         if (isset($data['status'])) {
+            // Validate status
             $allowed_statuses = ['draft', 'publish', 'trash'];
-            $data['status'] = in_array($data['status'], $allowed_statuses, true) 
-                ? $data['status'] 
+            $data['status'] = in_array($data['status'], $allowed_statuses, true)
+                ? $data['status']
                 : 'draft';
         }
 
@@ -192,23 +207,54 @@ class DifficultyLevelService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
             }
         }
 
+        // Sanitize metadata if it's an array
+        if (isset($data['metadata'])) {
+            if (is_array($data['metadata'])) {
+                $data['metadata'] = maybe_serialize($data['metadata']);
+            }
+        }
+
         return $data;
+    }
+
+    /**
+     * Get published difficulty levels
+     */
+    public function getPublished(): array
+    {
+        return $this->repository->getPublished();
+    }
+
+    /**
+     * Get status counts for difficulty levels
+     */
+    public function getStatusCounts(array $args = []): array
+    {
+        return $this->repository->getStatusCounts($args);
     }
 
     /**
@@ -237,19 +283,13 @@ class DifficultyLevelService extends BaseService
     }
 
     /**
-     * Get ordered difficulty levels (by level_order)
+     * Get ordered difficulty levels (by sorting)
      */
     public function getOrdered(array $args = []): array
     {
-        return $this->repository->getOrdered($args);
-    }
-
-    /**
-     * Get published difficulty levels
-     */
-    public function getPublished(array $args = []): array
-    {
-        return $this->repository->getPublished($args);
+        $args['order_by'] = 'sorting';
+        $args['order'] = 'ASC';
+        return $this->getAll($args);
     }
 
     /**
@@ -260,46 +300,28 @@ class DifficultyLevelService extends BaseService
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
-            $items = $this->repository->search($search, $args);
-            return count($items);
-        }
-
-        // Sanitize and handle status filter
-        if (!empty($args['status']) && $args['status'] !== 'all') {
-            $allowed_statuses = ['draft', 'publish', 'trash'];
-            $status = in_array($args['status'], $allowed_statuses, true) 
-                ? $args['status'] 
-                : null;
-            if ($status) {
-                $args['where']['status'] = $status;
-            }
+            return $this->repository->search($search, $args);
         }
 
         return $this->repository->count($args);
     }
 
     /**
-     * Get status counts for admin list views
-     *
-     * Provides stable counts for All / Published / Draft / Trash that
-     * do not change when filters (status/search) are applied in the UI.
+     * Get trip count for a difficulty level
      */
-    public function getStatusCounts(): array
+    public function getTripCount(int $levelId): int
     {
-        // All statuses combined (no status filter)
-        $all = $this->count([]);
+        $difficultyLevelRepository = new \Yatra\Repositories\DifficultyLevelRepository();
+        return $difficultyLevelRepository->getTripCount($levelId);
+    }
 
-        // Individual statuses
-        $publish = $this->count(['status' => 'publish']);
-        $draft   = $this->count(['status' => 'draft']);
-        $trash   = $this->count(['status' => 'trash']);
-
-        return [
-            'all'     => (int) $all,
-            'publish' => (int) $publish,
-            'draft'   => (int) $draft,
-            'trash'   => (int) $trash,
-        ];
+    /**
+     * Get trip count for difficulty level (direct field method)
+     */
+    public function getTripCountDirect(int $levelId): int
+    {
+        $difficultyLevelRepository = new \Yatra\Repositories\DifficultyLevelRepository();
+        return $difficultyLevelRepository->getTripCountDirect($levelId);
     }
 }
 

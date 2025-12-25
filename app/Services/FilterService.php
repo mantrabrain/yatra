@@ -8,6 +8,7 @@ use Yatra\Services\DifficultyLevelService;
 use Yatra\Services\TripCategoryService;
 use Yatra\Services\DestinationService;
 use Yatra\Services\ActivityService;
+use Yatra\Database\Tables\TripsTable;
 
 /**
  * Filter Service
@@ -24,16 +25,9 @@ class FilterService extends BaseService
      */
     public function renderPriceRangeFilter(array $active_filters = [], array $options = []): string
     {
-        global $wpdb;
-        
-        // Get price range from database
-        $price_stats = $wpdb->get_row(
-            "SELECT 
-                MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
-                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
-             FROM {$wpdb->prefix}yatra_trips 
-             WHERE status = 'publish' AND original_price > 0"
-        );
+        // Get price range from TripRepository
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $price_stats = $tripRepository->getPriceRangeStats();
 
         $min_price = $options['min_price'] ?? ($price_stats->min_price ?? 100);
         $max_price = $options['max_price'] ?? ($price_stats->max_price ?? 5000);
@@ -91,7 +85,7 @@ class FilterService extends BaseService
     public function renderDifficultyFilter(array $active_filters = [], array $options = []): string
     {
         $difficulty_service = new DifficultyLevelService();
-        $difficulty_levels = $difficulty_service->getPublished(['order_by' => 'level_order', 'order' => 'ASC']);
+        $difficulty_levels = $difficulty_service->getPublished(['order_by' => 'sorting', 'order' => 'ASC']);
         
         if (empty($difficulty_levels)) {
             return '';
@@ -118,13 +112,8 @@ class FilterService extends BaseService
                 <div class="yatra-checkbox-group">
                     <?php foreach ($difficulty_levels as $level) : 
                         // Get trip count for this difficulty level
-                        global $wpdb;
-                        $trip_count = $wpdb->get_var($wpdb->prepare(
-                            "SELECT COUNT(*) FROM {$wpdb->prefix}yatra_trips t 
-                             LEFT JOIN {$wpdb->prefix}yatra_difficulty_levels dl ON (t.difficulty_level = dl.id OR t.difficulty_level = dl.slug OR t.difficulty_level = dl.name)
-                             WHERE dl.id = %d AND t.status IN ('publish','published')",
-                            $level->id
-                        ));
+                        $tripRepository = new \Yatra\Repositories\TripRepository();
+                        $trip_count = $tripRepository->countByDifficultyLevel($level->id);
                     ?>
                     <label class="yatra-checkbox-label">
                         <input type="checkbox" name="difficulty[]" value="<?php echo esc_attr($level->id); ?>" <?php echo in_array($level->id, $active_filters['difficulty'] ?? []) ? 'checked' : ''; ?>>
@@ -177,29 +166,15 @@ class FilterService extends BaseService
                         ['stars' => 1, 'label' => 'And Up']
                     ];
 
-                    // Check if reviews table exists
-                    $reviews_table_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES
-                         WHERE TABLE_SCHEMA = DATABASE()
-                           AND TABLE_NAME = '{$wpdb->prefix}yatra_reviews'"
-                    );
+                    // Check if reviews table exists and get trip counts
+                    $tripRepository = new \Yatra\Repositories\TripRepository();
+                    $reviews_table_exists = $tripRepository->reviewsTableExists();
 
                     foreach ($rating_options as $option) :
                         // Get trip count for this rating and above
                         $trip_count = 0;
                         if ($reviews_table_exists) {
-                            $trip_count = $wpdb->get_var($wpdb->prepare(
-                                "SELECT COUNT(DISTINCT trip_id)
-                                 FROM (
-                                     SELECT r.trip_id, AVG(r.rating) as avg_rating
-                                     FROM {$wpdb->prefix}yatra_reviews r
-                                     INNER JOIN {$wpdb->prefix}yatra_trips t ON r.trip_id = t.id
-                                     WHERE t.status = 'publish' AND r.status = 'approved' AND r.rating > 0
-                                     GROUP BY r.trip_id
-                                     HAVING avg_rating >= %d
-                                 ) as trip_ratings",
-                                $option['stars']
-                            ));
+                            $trip_count = $tripRepository->countByMinRating($option['stars']);
                         }
                     ?>
                     <label class="yatra-rating-option">
@@ -258,13 +233,8 @@ class FilterService extends BaseService
                 <div class="yatra-checkbox-group">
                     <?php foreach ($categories as $category) : 
                         // Get trip count for this category
-                        global $wpdb;
-                        $trip_count = $wpdb->get_var($wpdb->prepare(
-                            "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
-                             INNER JOIN {$wpdb->prefix}yatra_trip_trip_categories ttc ON t.id = ttc.trip_id 
-                             WHERE ttc.category_id = %d AND t.status = 'publish'",
-                            $category->id
-                        ));
+                        $tripRepository = new \Yatra\Repositories\TripRepository();
+                        $trip_count = $tripRepository->countByCategory($category->id);
 
                         if ($trip_count > 0) :
                     ?>
@@ -318,13 +288,8 @@ class FilterService extends BaseService
                 <div class="yatra-checkbox-group">
                     <?php foreach ($destinations as $destination) : 
                         // Get trip count for this destination
-                        global $wpdb;
-                        $trip_count = $wpdb->get_var($wpdb->prepare(
-                            "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
-                             INNER JOIN {$wpdb->prefix}yatra_trip_destinations td ON t.id = td.trip_id 
-                             WHERE td.destination_id = %d AND t.status = 'publish'",
-                            $destination->id
-                        ));
+                        $tripRepository = new \Yatra\Repositories\TripRepository();
+                        $trip_count = $tripRepository->countByDestination($destination->id);
 
                         if ($trip_count > 0) :
                     ?>
@@ -378,13 +343,8 @@ class FilterService extends BaseService
                 <div class="yatra-checkbox-group">
                     <?php foreach ($activities as $activity) : 
                         // Get trip count for this activity
-                        global $wpdb;
-                        $trip_count = $wpdb->get_var($wpdb->prepare(
-                            "SELECT COUNT(DISTINCT t.id) FROM {$wpdb->prefix}yatra_trips t 
-                             INNER JOIN {$wpdb->prefix}yatra_trip_activities ta ON t.id = ta.trip_id 
-                             WHERE ta.activity_id = %d AND t.status = 'publish'",
-                            $activity->id
-                        ));
+                        $tripRepository = new \Yatra\Repositories\TripRepository();
+                        $trip_count = $tripRepository->countByActivity($activity->id);
 
                         if ($trip_count > 0) :
                     ?>

@@ -235,5 +235,50 @@ class TripCategoryRepository extends BaseRepository
 
         return $this->wpdb->get_results($query) ?: [];
     }
+
+    /**
+     * Get trip count for a trip category
+     * 
+     * @param int $categoryId Category ID
+     * @return int Number of trips with this category
+     */
+    public function getTripCount(int $categoryId): int
+    {
+        global $wpdb;
+        $tripsTable = $wpdb->prefix . 'yatra_trips';
+        $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripsTable}` t
+             INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
+             WHERE tc.classification_id = %d
+               AND tc.classification_type = 'trip_category'
+               AND t.status != 'trash'",
+            $categoryId
+        ));
+    }
+
+    /**
+     * Get trip count for trip category (direct field method)
+     * 
+     * @param int $categoryId Category ID
+     * @return int Number of trips with this category
+     */
+    public function getTripCountDirect(int $categoryId): int
+    {
+        global $wpdb;
+        $tripTable = $wpdb->prefix . 'yatra_trips';
+        $tripCatTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripTable}` t
+             INNER JOIN `{$tripCatTable}` tc ON tc.trip_id = t.id
+             WHERE tc.trip_category_id = %d
+               AND t.status != 'trash'",
+            $categoryId
+        ));
+    }
 }
 

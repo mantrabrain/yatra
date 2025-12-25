@@ -72,19 +72,10 @@ class ItineraryService
                 return;
             }
 
-            $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
-            $tableEntries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
-            
             // If updating, first check if the current entry is actually a day entry (not an activity)
             if ($id !== null) {
-                $currentEntry = $wpdb->get_row(
-                    $wpdb->prepare(
-                        "SELECT item_type_id, item_id, day_id 
-                         FROM `{$tableEntries}` 
-                         WHERE id = %d",
-                        $id
-                    )
-                );
+                $itineraryRepository = new \Yatra\Repositories\ItineraryRepository();
+                $currentEntry = $itineraryRepository->getEntryWithRelations($id);
                 
                 // If the current entry has item_type_id or item_id, it's an activity, not a day entry
                 // In this case, we're converting an activity to a day entry, which is unusual but allowed
@@ -94,9 +85,7 @@ class ItineraryService
                     // (fall through to day validation below)
                 } else if ($currentEntry && $currentEntry->day_id) {
                     // Get the current day's day_number
-                    $currentDay = $wpdb->get_row(
-                        $wpdb->prepare("SELECT day_number FROM `{$tableDays}` WHERE id = %d", (int) $currentEntry->day_id)
-                    );
+                    $currentDay = $itineraryRepository->getDayById((int) $currentEntry->day_id);
                     
                     if ($currentDay && (int) $currentDay->day_number === $dayNumber) {
                         // Same day number - this is allowed (no change)
@@ -107,19 +96,7 @@ class ItineraryService
             
             // Check if day entry already exists (not just day record)
             // A day record can exist without a day entry (when only activities exist)
-            $existingDayEntry = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT e.id FROM `{$tableEntries}` e
-                     INNER JOIN `{$tableDays}` d ON e.day_id = d.id
-                     WHERE e.trip_id = %d 
-                     AND d.day_number = %d
-                     AND e.item_type_id IS NULL 
-                     AND e.item_id IS NULL
-                     LIMIT 1",
-                    (int) $data['trip_id'],
-                    $dayNumber
-                )
-            );
+            $existingDayEntry = $itineraryRepository->findDayEntryByTripAndDayNumber((int) $data['trip_id'], $dayNumber);
 
             if ($existingDayEntry) {
                 // Day entry already exists - this should be an update, not a create
@@ -135,15 +112,7 @@ class ItineraryService
             
             // Check if day record exists (for informational purposes, but don't block)
             // Day records can exist without day entries, so we allow creating day entries for existing day records
-            $existingDay = $wpdb->get_row(
-                $wpdb->prepare(
-                    "SELECT id FROM `{$tableDays}` 
-                     WHERE trip_id = %d AND day_number = %d
-                     LIMIT 1",
-                    (int) $data['trip_id'],
-                    $dayNumber
-                )
-            );
+            $existingDay = $itineraryRepository->findDayByTripAndDayNumber((int) $data['trip_id'], $dayNumber);
 
             // If day record exists but day entry doesn't, allow creation (this is the normal case)
             // Only block if we're creating a completely new day (both record and entry don't exist)

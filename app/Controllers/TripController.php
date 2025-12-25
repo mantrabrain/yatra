@@ -7,6 +7,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Database\Tables\TripsTable;
 use Yatra\Services\TripService;
 use Yatra\Repositories\TripRevisionRepository;
 use Yatra\Repositories\ItemTypeRepository;
@@ -16,6 +17,7 @@ use Yatra\Models\Trip;
 use Yatra\Validators\TripValidator;
 use Yatra\Exceptions\TripNotFoundException;
 use Yatra\Exceptions\ValidationException;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 /**
  * Trip REST API Controller
@@ -273,15 +275,10 @@ class TripController extends BaseController
                     error_log('[YATRA DEBUG] TripController - Search results: ' . count($items));
                 }
             } else {
-                // DEBUG: Add direct SQL count to verify database state
+                // DEBUG: Use TripService to get trip counts
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    global $wpdb;
-                    $trip_table = $wpdb->prefix . 'yatra_trips';
-                    $direct_count = (int) $wpdb->get_var("SELECT COUNT(*) FROM `{$trip_table}`");
-                    error_log('[YATRA DEBUG] TripController - Direct SQL count: ' . $direct_count);
-                    
-                    // Check status distribution
-                    $status_counts = $wpdb->get_results("SELECT status, COUNT(*) as count FROM `{$trip_table}` GROUP BY status");
+                    $direct_count = $this->service->countAllTrips();
+                    $status_counts = $this->service->getTripStatusCounts();
                     error_log('[YATRA DEBUG] TripController - Status distribution: ' . print_r($status_counts, true));
                 }
                 
@@ -318,28 +315,12 @@ class TripController extends BaseController
                     }
 
                     // Find the lowest and highest non-zero price across discount/original in price types
-                    $row = $wpdb->get_row($wpdb->prepare(
-                        "SELECT
-                            MIN(CASE
-                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
-                                ELSE original_price
-                            END) AS min_price,
-                            MAX(CASE
-                                WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price
-                                ELSE original_price
-                            END) AS max_price
-                        FROM `{$priceTypeTable}`
-                        WHERE trip_id = %d
-                          AND (
-                               (discounted_price IS NOT NULL AND discounted_price > 0)
-                            OR (original_price IS NOT NULL AND original_price > 0)
-                          )",
-                        (int) $item->id
-                    ));
-
-                    if ($row && ($row->min_price !== null || $row->max_price !== null)) {
-                        $minPrice = $row->min_price !== null ? (float) $row->min_price : 0.0;
-                        $maxPrice = $row->max_price !== null ? (float) $row->max_price : 0.0;
+                    $tripService = new \Yatra\Services\TripService();
+                    $priceRange = $tripService->getTripPriceRange((int) $item->id);
+                    
+                    if ($priceRange['min_price'] > 0 || $priceRange['max_price'] > 0) {
+                        $minPrice = $priceRange['min_price'];
+                        $maxPrice = $priceRange['max_price'];
 
                         if ($minPrice > 0) {
                             // Use min price as effective sale_price for list display
@@ -359,26 +340,11 @@ class TripController extends BaseController
                 $tripIds = array_values(array_filter($tripIds));
 
                 if (!empty($tripIds)) {
-                    $inPlaceholders = implode(',', array_fill(0, count($tripIds), '%d'));
-
                     // Destinations
-                    $destTable = $wpdb->prefix . 'yatra_trip_destinations';
-                    $destTaxTable = $wpdb->prefix . 'yatra_destinations';
-                    $destRows = $wpdb->get_results($wpdb->prepare(
-                        "SELECT td.trip_id, d.id, d.name, d.slug
-                         FROM `{$destTable}` td
-                         INNER JOIN `{$destTaxTable}` d ON td.destination_id = d.id
-                         WHERE td.trip_id IN ($inPlaceholders)
-                         ORDER BY td.`order` ASC, d.name ASC",
-                        ...$tripIds
-                    ));
-
                     $destByTrip = [];
-                    foreach ($destRows as $row) {
-                        $tId = (int) $row->trip_id;
-                        if (!isset($destByTrip[$tId])) {
-                            $destByTrip[$tId] = [];
-                        }
+                    foreach ($tripIds as $id) {
+                        $row = $this->service->getTripWithDestinations($id);
+                        $destByTrip[$id] = $row;
                         $destByTrip[$tId][] = (object) [
                             'destination_id' => (int) $row->id,
                             'destination_name' => $row->name,
@@ -389,14 +355,15 @@ class TripController extends BaseController
                     // Activities
                     $actTable = $wpdb->prefix . 'yatra_trip_activities';
                     $actTaxTable = $wpdb->prefix . 'yatra_activities';
-                    $actRows = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ta.trip_id, a.id, a.name, a.slug
-                         FROM `{$actTable}` ta
-                         INNER JOIN `{$actTaxTable}` a ON ta.activity_id = a.id
-                         WHERE ta.trip_id IN ($inPlaceholders)
-                         ORDER BY ta.`order` ASC, a.name ASC",
-                        ...$tripIds
-                    ));
+                    // Use TripService to get destinations
+                    $destRows = $this->service->getTripDestinations($id);
+
+                    // Use TripService to get activities
+                    $actRows = [];
+                    foreach ($tripIds as $id) {
+                        $activities = $this->service->getTripActivities($id);
+                        $actRows = array_merge($actRows, $activities);
+                    }
 
                     $actByTrip = [];
                     foreach ($actRows as $row) {
@@ -414,14 +381,12 @@ class TripController extends BaseController
                     // Trip categories
                     $catRelTable = $wpdb->prefix . 'yatra_trip_trip_categories';
                     $catTaxTable = $wpdb->prefix . 'yatra_trip_categories';
-                    $catRows = $wpdb->get_results($wpdb->prepare(
-                        "SELECT ttc.trip_id, tc.id, tc.name, tc.slug
-                         FROM `{$catRelTable}` ttc
-                         INNER JOIN `{$catTaxTable}` tc ON ttc.category_id = tc.id
-                         WHERE ttc.trip_id IN ($inPlaceholders)
-                         ORDER BY ttc.`order` ASC, tc.name ASC",
-                        ...$tripIds
-                    ));
+                    // Use TripService to get categories
+                    $catRows = [];
+                    foreach ($tripIds as $id) {
+                        $categories = $this->service->getTripCategories($id);
+                        $catRows = array_merge($catRows, $categories);
+                    }
 
                     $catByTrip = [];
                     foreach ($catRows as $row) {
@@ -1284,21 +1249,14 @@ class TripController extends BaseController
             }
 
             // Fetch availability dates from database (specific dates)
-            global $wpdb;
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $specific_dates = $wpdb->get_results($wpdb->prepare(
-                "SELECT *, 0 as is_recurring FROM {$availability_table} 
-                 WHERE trip_id = %d 
-                 ORDER BY departure_date ASC",
-                $id
-            )) ?: [];
-            
-            // Fetch recurring dates
+            // Use TripService to get availability dates
+            $availability = $this->service->getTripWithAvailability($id);
+            $specific_dates = $availability ? [$availability] : [];
+
+            // Generate recurring dates
             $recurring_dates = [];
             try {
-                $recurringService = new \Yatra\Services\RecurringAvailabilityService(
-                    new \Yatra\Repositories\RecurringAvailabilityRepository()
-                );
+                $recurringService = new \Yatra\Services\RecurringAvailabilityService();
                 $fromDate = date('Y-m-d');
                 $toDate = date('Y-m-d', strtotime('+90 days')); // Show next 90 days
                 $generatedDates = $recurringService->generateDatesForTrip($id, $fromDate, $toDate);
@@ -1842,17 +1800,8 @@ class TripController extends BaseController
                 return $this->error_response('Trip not found', 404);
             }
 
-            // Count departures for this date
-            global $wpdb;
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $departures_count = $wpdb->get_var($wpdb->prepare(
-                "SELECT COUNT(*) FROM {$availability_table} 
-                 WHERE trip_id = %d 
-                 AND departure_date = %s
-                 AND status IN ('available', 'limited')",
-                $trip_id,
-                $date
-            ));
+            // Use TripService to count departures for this date
+            $departures_count = $this->service->countDeparturesByDate($trip_id, $date);
 
             // Generate travelers HTML with dynamic pricing
             ob_start();
@@ -1958,16 +1907,8 @@ class TripController extends BaseController
                 return $this->error_response('Trip ID is required', 400);
             }
 
-            global $wpdb;
-            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
-            
-            $attributes = $wpdb->get_results($wpdb->prepare(
-                "SELECT ta.*, a.name, a.field_type, a.field_options 
-                 FROM {$table_trip_attributes} ta 
-                 LEFT JOIN {$wpdb->prefix}yatra_attributes a ON ta.attribute_id = a.id 
-                 WHERE ta.trip_id = %d",
-                $trip_id
-            ));
+            // Use TripService to get trip attributes
+            $attributes = $this->service->getTripAttributes($trip_id);
 
             $formatted_attributes = [];
             foreach ($attributes as $attr) {
@@ -2011,44 +1952,19 @@ class TripController extends BaseController
                 return $this->error_response('Attributes must be an array', 400);
             }
 
-            global $wpdb;
-            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
-            
-            // Start transaction
-            $wpdb->query('START TRANSACTION');
-            
-            try {
-                // Delete existing attributes for this trip
-                $wpdb->delete($table_trip_attributes, ['trip_id' => $trip_id]);
-                
-                // Insert new attributes
-                foreach ($attributes as $attribute_id => $value) {
-                    $value_serialized = 0;
-                    $final_value = $value;
-                    
-                    // Serialize complex values
-                    if (is_array($value) || is_object($value)) {
-                        $final_value = serialize($value);
-                        $value_serialized = 1;
-                    }
-                    
-                    $wpdb->insert($table_trip_attributes, [
-                        'trip_id' => $trip_id,
-                        'attribute_id' => $attribute_id,
-                        'value' => $final_value,
-                        'value_serialized' => $value_serialized,
-                        'created_at' => current_time('mysql'),
-                        'updated_at' => current_time('mysql')
-                    ]);
-                }
-                
-                $wpdb->query('COMMIT');
-                
-                return $this->success_response(['message' => 'Trip attributes updated successfully']);
-            } catch (\Exception $e) {
-                $wpdb->query('ROLLBACK');
-                throw $e;
+            // Prepare attributes for TripService
+            $formattedAttributes = [];
+            foreach ($attributes as $attribute_id => $value) {
+                $formattedAttributes[] = [
+                    'attribute_id' => $attribute_id,
+                    'value' => $value
+                ];
             }
+
+            // Use TripService to update trip attributes
+            $this->service->updateTripAttributes($trip_id, $formattedAttributes);
+            
+            return $this->success_response(['message' => 'Trip attributes updated successfully']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -2067,15 +1983,10 @@ class TripController extends BaseController
                 return $this->error_response('Trip ID and Attribute ID are required', 400);
             }
 
-            global $wpdb;
-            $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+            // Use TripService to delete trip attribute
+            $result = $this->service->deleteTripAttribute($trip_id, $attribute_id);
             
-            $result = $wpdb->delete($table_trip_attributes, [
-                'trip_id' => $trip_id,
-                'attribute_id' => $attribute_id
-            ]);
-            
-            if ($result === false) {
+            if (!$result) {
                 return $this->error_response('Failed to delete trip attribute', 500);
             }
             

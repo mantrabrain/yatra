@@ -302,51 +302,120 @@ class AvailabilityService
     }
 
     /**
-     * Get single availability date
+     * Get availability by trip ID and departure date
      */
-    public function find(int $id): ?Availability
+    public function getByTripAndDate(int $tripId, string $departureDate): ?\stdClass
     {
-        return $this->repository->findModel($id);
+        $repository = new \Yatra\Repositories\AvailabilityRepository();
+        return $repository->findByTripIdAndDate($tripId, $departureDate);
     }
 
     /**
-     * Normalize time format to HH:MM
-     * Accepts: HH:MM, HH:MM:SS, H:MM, H:MM:SS
-     * 
-     * @param string $time
-     * @return string|false Returns normalized HH:MM format or false if invalid
+     * Get availability by ID
      */
-    private function normalizeTimeFormat(string $time): string|false
+    public function getById(int $availabilityId): ?\stdClass
     {
-        $time = trim($time);
+        $repository = new \Yatra\Repositories\AvailabilityRepository();
+        return $repository->find($availabilityId);
+    }
+
+    /**
+     * Check if discount code has been used by customer
+     */
+    public function getDiscountCodeUsage(int $customerId, string $discountCode): int
+    {
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->countDiscountCodeUsage($customerId, $discountCode);
+    }
+
+    /**
+     * Get booked count by availability ID
+     */
+    public function getBookedCountByAvailabilityId(int $availabilityId): int
+    {
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->countBookedTravelersByAvailabilityId($availabilityId);
+    }
+
+    /**
+     * Get booking counts for multiple availability IDs
+     */
+    public function getBookingCountsByAvailabilityIds(array $availabilityIds): array
+    {
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->getBookingCountsByAvailabilityIds($availabilityIds);
+    }
+
+    /**
+     * Update availability status based on booking counts
+     */
+    public function updateAvailabilityStatusBasedOnBookings(int $availabilityId): bool
+    {
+        $availabilityRepository = new \Yatra\Repositories\AvailabilityRepository();
         
-        // Already in HH:MM format
-        if (preg_match('/^\d{2}:\d{2}$/', $time)) {
-            return $time;
+        $bookedCount = $this->getBookedCountByAvailabilityId($availabilityId);
+        
+        // Get availability details
+        $availability = $availabilityRepository->find($availabilityId);
+        
+        if (!$availability) {
+            return false;
         }
         
-        // HH:MM:SS format - strip seconds
-        if (preg_match('/^(\d{2}:\d{2}):\d{2}$/', $time, $matches)) {
-            return $matches[1];
+        $newStatus = ($bookedCount >= $availability->seats_available) ? 'sold_out' : 'available';
+        
+        return $availabilityRepository->update($availabilityId, ['status' => $newStatus]);
+    }
+
+    /**
+     * Update booking availability IDs by trip and date
+     */
+    public function updateBookingAvailabilityIds(int $tripId, array $availabilityIdByDate): int
+    {
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        
+        $updatedCount = 0;
+        
+        foreach ($availabilityIdByDate as $date => $availabilityId) {
+            if ($availabilityId <= 0) {
+                continue;
+            }
+            
+            $result = $bookingRepository->updateAvailabilityIdByTripAndDate($tripId, $date, $availabilityId);
+            
+            if ($result !== false) {
+                $updatedCount += $result;
+            }
         }
         
-        // H:MM format - pad with zero
-        if (preg_match('/^(\d):(\d{2})$/', $time, $matches)) {
-            return sprintf('%02d:%s', $matches[1], $matches[2]);
-        }
-        
-        // H:MM:SS format - pad and strip seconds
-        if (preg_match('/^(\d):(\d{2}):\d{2}$/', $time, $matches)) {
-            return sprintf('%02d:%s', $matches[1], $matches[2]);
-        }
-        
-        // Try to parse with strtotime as fallback
-        $timestamp = strtotime($time);
-        if ($timestamp !== false) {
-            return date('H:i', $timestamp);
-        }
-        
-        return false;
+        return $updatedCount;
+    }
+
+    /**
+     * Get traveler categories by IDs
+     */
+    public function getTravelerCategories(array $categoryIds): array
+    {
+        $travelerCategoryRepository = new \Yatra\Repositories\TravelerCategoryRepository();
+        return $travelerCategoryRepository->getByIds($categoryIds);
+    }
+
+    /**
+     * Get booking by ID
+     */
+    public function getBookingById(int $bookingId): ?\stdClass
+    {
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->find($bookingId);
+    }
+
+    /**
+     * Get trip price types
+     */
+    public function getTripPriceTypes(int $tripId): array
+    {
+        $tripPriceTypeRepository = new \Yatra\Repositories\TripPriceTypeRepository();
+        return $tripPriceTypeRepository->getByTripId($tripId);
     }
 }
 

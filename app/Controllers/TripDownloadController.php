@@ -157,17 +157,11 @@ class TripDownloadController extends BaseController
 
         // Get trip title for custom filename
         $tripTitle = 'Download';
+        // Use TripService to get trip title
         if (isset($download->trip_id) && $download->trip_id > 0) {
-            global $wpdb;
-            $tripTable = $wpdb->prefix . 'yatra_trips';
-            
-            $trip = $wpdb->get_row($wpdb->prepare(
-                "SELECT title FROM {$tripTable} WHERE id = %d",
-                (int) $download->trip_id
-            ));
-            
-            if ($trip && !empty($trip->title)) {
-                $tripTitle = sanitize_text_field($trip->title);
+            $tripTitle = $this->tripService->getTripTitle((int) $download->trip_id);
+            if (!empty($tripTitle)) {
+                $tripTitle = sanitize_text_field($tripTitle);
             }
         }
 

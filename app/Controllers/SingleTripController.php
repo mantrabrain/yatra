@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yatra\Controllers;
 
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Database\Tables\TripsTable;
+
 /**
  * Single Trip Frontend Controller
  * 
@@ -46,10 +50,10 @@ class SingleTripController
     {
         global $wpdb;
         $this->wpdb = $wpdb;
-        $this->table_trips = $wpdb->prefix . 'yatra_trips';
-        $this->table_destinations = $wpdb->prefix . 'yatra_destinations';
-        $this->table_activities = $wpdb->prefix . 'yatra_activities';
-        $this->table_reviews = $wpdb->prefix . 'yatra_reviews';
+        $this->table_trips = TripsTable::getTableName();
+        $this->table_destinations = ClassificationsTable::getTableName();
+        $this->table_activities = ClassificationsTable::getTableName();
+        $this->table_reviews = ReviewsTable::getTableName();
     }
 
     /**

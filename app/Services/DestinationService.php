@@ -47,8 +47,8 @@ class DestinationService extends BaseService
         // Slug will be auto-generated from name, so we don't need to validate it here
         // The SlugHelper will ensure uniqueness
 
-        // Validate status
-        $allowed_statuses = ['draft', 'publish', 'trash'];
+        // Validate status - accept both old and new values for backward compatibility
+        $allowed_statuses = ['draft', 'active', 'inactive', 'publish', 'trash'];
         if (isset($data['status']) && !in_array($data['status'], $allowed_statuses, true)) {
             throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
         }
@@ -68,7 +68,7 @@ class DestinationService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_destinations',
+                ClassificationsTable::getTableName(),
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -76,19 +76,20 @@ class DestinationService extends BaseService
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
-        // Sanitize description (allow safe HTML from rich text editor)
+        // Sanitize Quill HTML description
         if (isset($data['description'])) {
             $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize status
         if (isset($data['status'])) {
+            // Validate status
             $allowed_statuses = ['draft', 'publish', 'trash'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
-                : 'publish';
+                : 'draft';
         } else {
-            $data['status'] = 'publish';
+            $data['status'] = 'draft';
         }
 
         // Set created_by and updated_by to current user
@@ -99,21 +100,32 @@ class DestinationService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
             }
         }
+
+        // IMPORTANT: Force type to 'destination' - this overrides any frontend type
+        $data['type'] = 'destination';
 
         return $data;
     }
@@ -137,20 +149,21 @@ class DestinationService extends BaseService
             // Slug was explicitly provided - ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_destinations',
+                ClassificationsTable::getTableName(),
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
         }
         // If slug is not provided, don't modify it (keep existing slug)
 
-        // Sanitize description (allow safe HTML from rich text editor)
+        // Sanitize Quill HTML description
         if (isset($data['description'])) {
             $data['description'] = FormatHelper::sanitizeQuillHtml($data['description']);
         }
 
         // Sanitize status
         if (isset($data['status'])) {
+            // Validate status
             $allowed_statuses = ['draft', 'publish', 'trash'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
@@ -163,30 +176,44 @@ class DestinationService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
             }
         }
 
+        // IMPORTANT: Ensure type remains 'destination' - prevent frontend from changing type
+        $data['type'] = 'destination';
+
         return $data;
     }
 
     /**
-     * Get all items with search and filters
+     * Get status counts for destinations
      */
     public function getAll(array $args = []): array
     {
+        // IMPORTANT: Always filter by type = 'destination' for destinations
+        $args['where']['type'] = 'destination';
+
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
@@ -231,6 +258,9 @@ class DestinationService extends BaseService
      */
     public function count(array $args = []): int
     {
+        // IMPORTANT: Always filter by type = 'destination' for destinations
+        $args['where']['type'] = 'destination';
+
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
@@ -274,6 +304,24 @@ class DestinationService extends BaseService
     }
 
     /**
+     * Get trip count for a destination
+     */
+    public function getTripCount(int $destinationId): int
+    {
+        $destinationRepository = new \Yatra\Repositories\DestinationRepository();
+        return $destinationRepository->getTripCount($destinationId);
+    }
+
+    /**
+     * Get trip count for destination (direct field method)
+     */
+    public function getTripCountDirect(int $destinationId): int
+    {
+        $destinationRepository = new \Yatra\Repositories\DestinationRepository();
+        return $destinationRepository->getTripCountDirect($destinationId);
+    }
+
+    /**
      * Bulk delete destinations
      */
     public function bulkDelete(array $ids): int
@@ -301,13 +349,19 @@ class DestinationService extends BaseService
         $trash = $counts['trash'] ?? 0;
 
         // Calculate total from all statuses, not just the main three
-        $all = array_sum(array_values($counts));
+        $all = $counts['total']??0;
 
-        return [
+        $result = [
             'all' => (int) $all,
             'publish' => (int) $publish,
             'draft' => (int) $draft,
             'trash' => (int) $trash,
         ];
+
+        // Add legacy status keys for backward compatibility
+        $result['active'] = $result['publish'];
+        $result['inactive'] = $result['trash'];
+
+        return $result;
     }
 }

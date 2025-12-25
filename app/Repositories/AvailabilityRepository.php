@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Models\Availability;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 /**
  * Availability Repository
@@ -17,7 +18,7 @@ class AvailabilityRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_trip_availability_dates';
+        return TripAvailabilityDatesTable::getTableName();
     }
 
     /**
@@ -296,6 +297,63 @@ class AvailabilityRepository extends BaseRepository
     protected function hasSoftDelete(): bool
     {
         return false; // Availability table doesn't have soft delete
+    }
+
+    /**
+     * Update pricing type for all availability dates of a trip
+     * 
+     * @param int $tripId Trip ID
+     * @param string $pricingType Pricing type
+     * @return int Number of rows updated
+     */
+    public function updatePricingTypeByTripId(int $tripId, string $pricingType): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->update(
+            $table,
+            ['pricing_type' => $pricingType],
+            ['trip_id' => $tripId],
+            ['%s'],
+            ['%d']
+        );
+    }
+
+    /**
+     * Clear price types for all availability dates of a trip
+     * 
+     * @param int $tripId Trip ID
+     * @return int Number of rows updated
+     */
+    public function clearPriceTypesByTripId(int $tripId): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table} 
+                 SET price_types = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            )
+        );
+    }
+
+    /**
+     * Clear traveler pricing for all availability dates of a trip
+     * 
+     * @param int $tripId Trip ID
+     * @return int Number of rows updated
+     */
+    public function clearTravelerPricingByTripId(int $tripId): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table} 
+                 SET traveler_pricing = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            )
+        );
     }
 }
 

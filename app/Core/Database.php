@@ -16,17 +16,19 @@ use Yatra\Database\Tables\PaymentTokensTable;
 use Yatra\Database\Tables\BookingTravellersTable;
 use Yatra\Database\Tables\BookingTravellerMetaTable;
 use Yatra\Database\Tables\BookingDeparturesTable;
-use Yatra\Database\Tables\AvailabilityRulesTable;
 use Yatra\Database\Tables\TripRevisionsTable;
 
 // Optimized Tables
 use Yatra\Database\Tables\TripItineraryTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
-use Yatra\Database\Tables\TripAvailabilityTable;
 use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\AttributesTable;
+
+// Traditional Availability Tables
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
 /**
  * Optimized Database Management v2.0.0
@@ -85,8 +87,9 @@ class Database
         // Enquiries and contact
         dbDelta(EnquiriesTable::getSchema());
         
-        // Legacy availability rules (for backward compatibility)
-        dbDelta(AvailabilityRulesTable::getSchema());
+        // Traditional availability tables (2-table system)
+        dbDelta(TripAvailabilityDatesTable::getSchema());
+        dbDelta(TripAvailabilityRulesTable::getSchema());
         
         // Trip revisions
         dbDelta(TripRevisionsTable::getSchema());
@@ -103,9 +106,6 @@ class Database
         
         // Polymorphic trip relationships (consolidates 4 old tables)
         dbDelta(TripClassificationsTable::getSchema());
-        
-        // Unified availability and pricing (consolidates 4 old tables)
-        dbDelta(TripAvailabilityTable::getSchema());
         
         // Comprehensive pricing system (new unified system)
         dbDelta(TripPricingTable::getSchema());
@@ -159,14 +159,14 @@ class Database
             ReviewsTable::getTableName(),
             DiscountsTable::getTableName(),
             EnquiriesTable::getTableName(),
-            AvailabilityRulesTable::getTableName(),
+            TripAvailabilityDatesTable::getTableName(),
+            TripAvailabilityRulesTable::getTableName(),
             TripRevisionsTable::getTableName(),
             
             // Optimized tables
             TripItineraryTable::getTableName(),
             ClassificationsTable::getTableName(),
             TripClassificationsTable::getTableName(),
-            TripAvailabilityTable::getTableName(),
             TripPricingTable::getTableName(),
             TripContentTable::getTableName(),
             AttributesTable::getTableName(),
@@ -196,7 +196,6 @@ class Database
                 'TripItineraryTable' => ['replaced' => 3, 'benefits' => ['JSON structure', '60% faster performance']],
                 'ClassificationsTable' => ['replaced' => 5, 'benefits' => ['Type-based system', 'Hierarchical support']],
                 'TripClassificationsTable' => ['replaced' => 4, 'benefits' => ['Polymorphic relationships', 'Future extensibility']],
-                'TripAvailabilityTable' => ['replaced' => 4, 'benefits' => ['Unified availability', 'Integrated pricing']],
                 'TripPricingTable' => ['replaced' => 'new', 'benefits' => ['Comprehensive pricing', 'Rule-based engine']],
                 'TripContentTable' => ['replaced' => 4, 'benefits' => ['Type-based content', 'Access control']],
                 'AttributesTable' => ['replaced' => 6, 'benefits' => ['EAV pattern', 'Unlimited attributes']]

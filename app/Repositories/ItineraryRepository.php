@@ -918,5 +918,69 @@ class ItineraryRepository extends BaseRepository
         
         return (int) $wpdb->insert_id;
     }
+
+    /**
+     * Get day by ID
+     * 
+     * @param int $dayId Day ID
+     * @return object|null Day object or null if not found
+     */
+    public function getDayById(int $dayId): ?object
+    {
+        global $wpdb;
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT day_number FROM `{$tableDays}` WHERE id = %d",
+            $dayId
+        ));
+    }
+
+    /**
+     * Check if day entry exists for trip and day number
+     * 
+     * @param int $tripId Trip ID
+     * @param int $dayNumber Day number
+     * @return object|null Day entry object or null if not found
+     */
+    public function findDayEntryByTripAndDayNumber(int $tripId, int $dayNumber): ?object
+    {
+        global $wpdb;
+        $tableEntries = $this->getTableName();
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT e.id FROM `{$tableEntries}` e
+             INNER JOIN `{$tableDays}` d ON e.day_id = d.id
+             WHERE e.trip_id = %d 
+             AND d.day_number = %d
+             AND e.item_type_id IS NULL 
+             AND e.item_id IS NULL
+             LIMIT 1",
+            $tripId,
+            $dayNumber
+        ));
+    }
+
+    /**
+     * Check if day record exists for trip and day number
+     * 
+     * @param int $tripId Trip ID
+     * @param int $dayNumber Day number
+     * @return object|null Day record object or null if not found
+     */
+    public function findDayByTripAndDayNumber(int $tripId, int $dayNumber): ?object
+    {
+        global $wpdb;
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT id FROM `{$tableDays}` 
+             WHERE trip_id = %d AND day_number = %d
+             LIMIT 1",
+            $tripId,
+            $dayNumber
+        ));
+    }
 }
 

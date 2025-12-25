@@ -4,6 +4,7 @@ namespace Yatra\Migration;
 
 use Yatra\Utils\Logger;
 use Yatra\Migration\MigrationProgress;
+use Yatra\Database\Tables\TripsTable;
 
 class TripMigration extends BaseMigration
 {
@@ -28,7 +29,7 @@ class TripMigration extends BaseMigration
         
         // Count existing trips in new system
         $existingTripsCount = $this->wpdb->get_var(
-            "SELECT COUNT(*) FROM {$this->wpdb->prefix}yatra_trips"
+            "SELECT COUNT(*) FROM " . TripsTable::getTableName()
         );
         
         error_log("[Yatra Migration] ========================================");
@@ -60,7 +61,7 @@ class TripMigration extends BaseMigration
                 } else {
                     // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
-                        "SELECT id FROM {$this->wpdb->prefix}yatra_trips WHERE slug = %s",
+                        "SELECT id FROM " . TripsTable::getTableName() . " WHERE slug = %s",
                         $baseSlug
                     ));
                     
@@ -143,7 +144,7 @@ class TripMigration extends BaseMigration
                     unset($updateData['created_at']); // Don't update created_at
                     
                     $updated = $this->wpdb->update(
-                        $this->wpdb->prefix . 'yatra_trips',
+                        TripsTable::getTableName(),
                         $updateData,
                         ['id' => $existingTripId]
                     );
@@ -172,7 +173,7 @@ class TripMigration extends BaseMigration
                     error_log("[Yatra Migration] {$mode}: Inserting new trip from old tour ID {$oldTrip->ID}: {$tripData['title']} (slug: {$tripData['slug']})");
                     
                     $inserted = $this->wpdb->insert(
-                        $this->wpdb->prefix . 'yatra_trips',
+                        TripsTable::getTableName(),
                         $tripData
                     );
 

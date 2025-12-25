@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Utils\Logger;
+use Yatra\Repositories\ExportImportRepository;
 
 /**
  * Export/Import Service
@@ -14,10 +15,33 @@ use Yatra\Utils\Logger;
  */
 class ExportImportService
 {
+    private ExportImportRepository $repository;
+    
     private const EXPORT_ACTION = 'yatra_process_export_job';
     private const IMPORT_ACTION = 'yatra_process_import_job';
     private const JOB_OPTION_PREFIX = 'yatra_job_';
     private const BATCH_SIZE = 500;
+
+    public function __construct()
+    {
+        $this->repository = new ExportImportRepository();
+    }
+
+    /**
+     * Get MySQL version
+     */
+    public function getMySQLVersion(): string
+    {
+        return $this->repository->getMySQLVersion();
+    }
+
+    /**
+     * Get job options for user
+     */
+    public function getJobOptionsForUser(int $userId): array
+    {
+        return $this->repository->getJobOptionsForUser($userId);
+    }
 
     /**
      * Register Action Scheduler hooks
@@ -149,6 +173,7 @@ class ExportImportService
      */
     public static function processExportJob(string $jobId): void
     {
+        $repository = new ExportImportRepository();
         global $wpdb;
         
         $jobData = self::getJobStatus($jobId);
@@ -187,25 +212,19 @@ class ExportImportService
                     continue;
                 }
                 
-                $tableName = $wpdb->prefix . $tableMap[$dataType];
-                $tableExists = $wpdb->get_var("SHOW TABLES LIKE '$tableName'");
+                $tableName = $repository->getTableName($tableMap[$dataType]);
+                $tableExists = $repository->tableExists($tableName);
                 
                 if (!$tableExists) {
                     $exportData['data'][$dataType] = [];
                     continue;
                 }
                 
-                $total = (int) $wpdb->get_var("SELECT COUNT(*) FROM $tableName");
+                $total = $repository->getRecordCount($tableName);
                 $records = [];
                 
                 for ($offset = 0; $offset < $total; $offset += self::BATCH_SIZE) {
-                    $batch = $wpdb->get_results(
-                        $wpdb->prepare(
-                            "SELECT * FROM $tableName LIMIT %d OFFSET %d",
-                            self::BATCH_SIZE,
-                            $offset
-                        )
-                    );
+                    $batch = $repository->getBatchRecords($tableName, $offset, self::BATCH_SIZE);
                     $records = array_merge($records, $batch);
                     $processedRecords += count($batch);
                     
@@ -269,6 +288,7 @@ class ExportImportService
      */
     public static function processImportJob(string $jobId): void
     {
+        $repository = new ExportImportRepository();
         global $wpdb;
         
         $jobData = self::getJobStatus($jobId);
@@ -373,7 +393,7 @@ class ExportImportService
                     continue;
                 }
                 
-                $tableName = $wpdb->prefix . $tableMap[$dataType];
+                $tableName = $repository->getTableName($tableMap[$dataType]);
                 $records = $dataContainer[$dataType];
                 
                 // Initialize statistics for this data type
@@ -395,7 +415,7 @@ class ExportImportService
                         
                         try {
                             // Get table columns to ensure we only insert valid fields
-                            $tableColumns = $wpdb->get_col("DESC {$tableName}", 0);
+                            $tableColumns = $repository->getTableColumns($tableName);
                             
                             // Filter record to only include valid columns
                             $filteredRecord = [];
@@ -422,9 +442,8 @@ class ExportImportService
                                     Logger::info("Generated unique slug: {$filteredRecord['slug']} for import into {$tableNameWithoutPrefix}");
                                 }
                                 
-                                $result = $wpdb->insert($tableName, $filteredRecord);
+                                $result = $repository->insertRecord($tableName, $filteredRecord);
                                 if ($result === false) {
-                                    Logger::warning("Failed to insert record into {$tableName}: " . $wpdb->last_error);
                                     $importStats[$dataType]['failed']++;
                                 } else {
                                     $processedRecords++;
@@ -504,7 +523,7 @@ class ExportImportService
      */
     private static function countExportRecords(array $dataTypes): int
     {
-        global $wpdb;
+        $repository = new ExportImportRepository();
         
         $total = 0;
         $tableMap = self::getTableMap();
@@ -518,11 +537,11 @@ class ExportImportService
                 continue;
             }
             
-            $tableName = $wpdb->prefix . $tableMap[$dataType];
-            $tableExists = $wpdb->get_var("SHOW TABLES LIKE '$tableName'");
+            $tableName = $repository->getTableName($tableMap[$dataType]);
+            $tableExists = $repository->tableExists($tableName);
             
             if ($tableExists) {
-                $count = (int) $wpdb->get_var("SELECT COUNT(*) FROM $tableName");
+                $count = $repository->getRecordCount($tableName);
                 $total += $count;
             }
         }
@@ -607,12 +626,9 @@ class ExportImportService
      */
     public static function getActiveJobs(int $userId): array
     {
-        global $wpdb;
+        $repository = new ExportImportRepository();
         
-        $options = $wpdb->get_results(
-            "SELECT option_name, option_value FROM {$wpdb->options} 
-             WHERE option_name LIKE 'yatra_job_%'"
-        );
+        $options = $repository->getAllJobOptions();
         
         $jobs = [];
         $cutoff = strtotime('-1 hour'); // Show jobs from last hour
@@ -651,12 +667,9 @@ class ExportImportService
      */
     public static function cleanupOldJobs(): void
     {
-        global $wpdb;
+        $repository = new ExportImportRepository();
         
-        $options = $wpdb->get_results(
-            "SELECT option_name, option_value FROM {$wpdb->options} 
-             WHERE option_name LIKE 'yatra_job_%'"
-        );
+        $options = $repository->getAllJobOptions();
         
         $cutoff = strtotime('-24 hours');
         
@@ -674,5 +687,83 @@ class ExportImportService
                 self::deleteJob($jobId);
             }
         }
+    }
+
+    /**
+     * Export data from a specific table with batch processing
+     */
+    private static function exportTableData(string $table_name, int $batch_size): array
+    {
+        $repository = new ExportImportRepository();
+        
+        // Check if table exists
+        $table_exists = $repository->tableExists($table_name);
+        if (!$table_exists) {
+            return [];
+        }
+
+        // Get total records
+        $total_records = $repository->getRecordCount($table_name);
+        if ($total_records === 0) {
+            return [];
+        }
+
+        $data = [];
+        
+        // Process in batches to avoid memory issues
+        for ($offset = 0; $offset < $total_records; $offset += $batch_size) {
+            $batch = $repository->getBatchRecords($table_name, $offset, $batch_size);
+            
+            if ($batch) {
+                $data = array_merge($data, $batch);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get available tables for export
+     */
+    public static function getAvailableTables(): array
+    {
+        $repository = new ExportImportRepository();
+        
+        $tables = [
+            'trips' => $repository->getTableName('yatra_trips'),
+            'destinations' => $repository->getTableName('yatra_destinations'),
+            'activities' => $repository->getTableName('yatra_activities'),
+            'bookings' => $repository->getTableName('yatra_bookings'),
+            'customers' => $repository->getTableName('yatra_customers'),
+            'departures' => $repository->getTableName('yatra_departures'),
+            'travelers' => $repository->getTableName('yatra_travelers'),
+        ];
+
+        return $available_tables;
+    }
+
+    /**
+     * Get export summary statistics
+     */
+    public static function getExportSummary(): array
+    {
+        $tables = self::getAvailableTables();
+        
+        $summary = [
+            'total_tables' => 0,
+            'existing_tables' => 0,
+            'total_records' => 0,
+            'tables' => $tables
+        ];
+
+        foreach ($tables as $table) {
+            $summary['total_tables']++;
+            if ($table['exists']) {
+                $summary['existing_tables']++;
+                $summary['total_records'] += $table['record_count'];
+            }
+        }
+
+        return $summary;
     }
 }

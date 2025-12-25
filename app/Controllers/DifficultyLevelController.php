@@ -85,7 +85,7 @@ class DifficultyLevelController extends BaseController
             $params = $this->getPaginationParams($request);
 
             // Override default orderby for difficulty levels
-            $orderby = $request->get_param('orderby') ?: 'level_order';
+            $orderby = $request->get_param('orderby') ?: 'sorting';
             $order = strtoupper($request->get_param('order') ?: 'ASC');
 
             $args = [
@@ -107,25 +107,15 @@ class DifficultyLevelController extends BaseController
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
-            // Attach trip counts for each difficulty level
+            // Attach trip counts to items
             if (!empty($items)) {
-                global $wpdb;
-                $tripTable = $wpdb->prefix . 'yatra_trips';
-
                 foreach ($items as $item) {
                     $levelId = isset($item->id) ? (int) $item->id : 0;
                     if ($levelId <= 0) {
                         continue;
                     }
 
-                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(*)
-                         FROM `{$tripTable}` t
-                         WHERE t.difficulty_level = %d
-                           AND t.status != 'trash'",
-                        $levelId
-                    ));
-
+                    $tripCount = $this->service->getTripCount($levelId);
                     $item->trip_count = $tripCount;
                 }
             }
@@ -148,17 +138,9 @@ class DifficultyLevelController extends BaseController
             }
 
             // Attach trip count for single level
-            global $wpdb;
-            $tripTable = $wpdb->prefix . 'yatra_trips';
             $levelId = isset($item->id) ? (int) $item->id : 0;
             if ($levelId > 0) {
-                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(*)
-                     FROM `{$tripTable}` t
-                     WHERE t.difficulty_level = %d
-                       AND t.status != 'trash'",
-                    $levelId
-                ));
+                $tripCount = $this->service->getTripCountDirect($levelId);
                 $item->trip_count = $tripCount;
             }
 

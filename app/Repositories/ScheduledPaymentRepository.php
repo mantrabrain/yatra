@@ -240,6 +240,22 @@ class ScheduledPaymentRepository extends BaseRepository
     }
 
     /**
+     * Check if table exists
+     * 
+     * @param string $tableName Table name
+     * @return bool True if table exists
+     */
+    public function tableExists(string $tableName): bool
+    {
+        $tableExists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+            DB_NAME,
+            $tableName
+        ));
+        return !empty($tableExists);
+    }
+
+    /**
      * Increment retry count
      *
      * @param int    $id            Payment ID

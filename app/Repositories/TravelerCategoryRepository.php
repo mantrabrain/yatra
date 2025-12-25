@@ -78,5 +78,27 @@ class TravelerCategoryRepository extends BaseRepository
 
         return $this->wpdb->get_results($query) ?: [];
     }
+
+    /**
+     * Get traveler categories by IDs
+     * 
+     * @param array $categoryIds Array of category IDs
+     * @return array Array of category objects
+     */
+    public function getByIds(array $categoryIds): array
+    {
+        $table = $this->getTableName();
+        
+        if (empty($categoryIds)) {
+            return [];
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
+        
+        return $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT id, label, slug, age_min, age_max FROM {$table} WHERE id IN ({$placeholders})",
+            ...$categoryIds
+        ));
+    }
 }
 

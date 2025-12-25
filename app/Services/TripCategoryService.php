@@ -332,5 +332,23 @@ class TripCategoryService extends BaseService
 
         return parent::delete($id);
     }
+
+    /**
+     * Get trip count for a trip category
+     */
+    public function getTripCount(int $categoryId): int
+    {
+        $tripCategoryRepository = new \Yatra\Repositories\TripCategoryRepository();
+        return $tripCategoryRepository->getTripCount($categoryId);
+    }
+
+    /**
+     * Get trip count for trip category (direct field method)
+     */
+    public function getTripCountDirect(int $categoryId): int
+    {
+        $tripCategoryRepository = new \Yatra\Repositories\TripCategoryRepository();
+        return $tripCategoryRepository->getTripCountDirect($categoryId);
+    }
 }
 

@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\TripsTable;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
 /**
  * Trip Repository
@@ -39,8 +42,7 @@ class TripRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_trips';
+     return TripsTable::getTableName();
     }
 
     /**
@@ -786,7 +788,7 @@ class TripRepository extends BaseRepository
     public function getAvailabilityDates(int $tripId): array
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        $table = TripAvailabilityDatesTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
@@ -1225,7 +1227,7 @@ class TripRepository extends BaseRepository
     public function saveAvailabilityDates(int $tripId, array $availabilityDates): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        $table = TripAvailabilityDatesTable::getTableName();
         
         // Delete existing
         $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
@@ -1503,7 +1505,7 @@ class TripRepository extends BaseRepository
         
         // Get minimum prices for each trip from all pricing sources
         $prices_table = $wpdb->prefix . 'yatra_trip_price_types';
-        $availability_table = $wpdb->prefix . 'yatra_recurring_availability';
+        $availability_table = TripAvailabilityRulesTable::getTableName();
         
         // Get minimum prices from price types
         $price_types_sql = "
@@ -1753,5 +1755,267 @@ class TripRepository extends BaseRepository
         }
 
         return [];
+    }
+
+    /**
+     * Get trip title by ID
+     */
+    public function getTripTitle(int $tripId): string
+    {
+        global $wpdb;
+        $trips_table = $this->getTableName();
+        
+        return (string) $wpdb->get_var($wpdb->prepare(
+            "SELECT title FROM {$trips_table} WHERE id = %d",
+            $tripId
+        )) ?: '';
+    }
+
+    /**
+     * Count all trips
+     */
+    public function countAllTrips(): int
+    {
+        global $wpdb;
+        $trips_table = $this->getTableName();
+        
+        return (int) $wpdb->get_var("SELECT COUNT(*) FROM `{$trips_table}`");
+    }
+
+    /**
+     * Get trip status counts
+     */
+    public function getTripStatusCounts(): array
+    {
+        global $wpdb;
+        $trips_table = $this->getTableName();
+        
+        return $wpdb->get_results("SELECT status, COUNT(*) as count FROM `{$trips_table}` GROUP BY status");
+    }
+
+    /**
+     * Get trip with destinations
+     */
+    public function getTripWithDestinations(int $tripId): ?\stdClass
+    {
+        global $wpdb;
+        $trips_table = $this->getTableName();
+        $trip_destinations_table = $wpdb->prefix . 'yatra_trip_destinations';
+        $destinations_table = $wpdb->prefix . 'yatra_destinations';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT t.id, t.title, t.slug, t.status, t.pricing_type, t.original_price, t.sale_price,
+                    td.destination_id, d.name as destination_name, d.slug as destination_slug
+             FROM {$trips_table} t
+             LEFT JOIN {$trip_destinations_table} td ON td.trip_id = t.id
+             LEFT JOIN {$destinations_table} d ON d.id = td.destination_id
+             WHERE t.id = %d",
+            $tripId
+        ));
+    }
+
+    /**
+     * Get trip destinations
+     */
+    public function getTripDestinations(int $tripId): array
+    {
+        global $wpdb;
+        $trip_destinations_table = $wpdb->prefix . 'yatra_trip_destinations';
+        $destinations_table = $wpdb->prefix . 'yatra_destinations';
+        
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT td.trip_id, d.id, d.name, d.slug
+             FROM {$trip_destinations_table} td
+             INNER JOIN {$destinations_table} d ON d.id = td.destination_id
+             WHERE td.trip_id = %d",
+            $tripId
+        ));
+    }
+
+    /**
+     * Get trip activities
+     */
+    public function getTripActivities(int $tripId): array
+    {
+        global $wpdb;
+        $trip_activities_table = $wpdb->prefix . 'yatra_trip_activities';
+        $activities_table = $wpdb->prefix . 'yatra_activities';
+        
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT ta.trip_id, a.id, a.name, a.slug
+             FROM {$trip_activities_table} ta
+             INNER JOIN {$activities_table} a ON a.id = ta.activity_id
+             WHERE ta.trip_id = %d",
+            $tripId
+        ));
+    }
+
+    /**
+     * Get trip with availability
+     */
+    public function getTripWithAvailability(int $tripId): ?\stdClass
+    {
+        global $wpdb;
+        $trips_table = $this->getTableName();
+        $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT t.*, a.departure_date, a.seats_total, a.seats_booked, a.status as availability_status
+             FROM {$trips_table} t
+             LEFT JOIN {$availability_table} a ON a.trip_id = t.id
+             WHERE t.id = %d",
+            $tripId
+        ));
+    }
+
+    /**
+     * Get price range statistics for published trips
+     * 
+     * @return object Object with min_price and max_price properties
+     */
+    public function getPriceRangeStats(): object
+    {
+        $table = $this->getTableName();
+        return $this->wpdb->get_row(
+            "SELECT 
+                MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
+                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
+             FROM {$table} 
+             WHERE status = 'publish' AND original_price > 0"
+        );
+    }
+
+    /**
+     * Count trips by difficulty level
+     * 
+     * @param int $difficultyLevelId Difficulty level ID
+     * @return int Number of trips with this difficulty level
+     */
+    public function countByDifficultyLevel(int $difficultyLevelId): int
+    {
+        $table = $this->getTableName();
+        $difficultyTable = $this->wpdb->prefix . 'yatra_difficulty_levels';
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} t 
+             LEFT JOIN {$difficultyTable} dl ON (t.difficulty_level = dl.id OR t.difficulty_level = dl.slug OR t.difficulty_level = dl.name)
+             WHERE dl.id = %d AND t.status IN ('publish','published')",
+            $difficultyLevelId
+        ));
+    }
+
+    /**
+     * Check if reviews table exists
+     * 
+     * @return bool True if reviews table exists
+     */
+    public function reviewsTableExists(): bool
+    {
+        $reviewsTable = $this->wpdb->prefix . 'yatra_reviews';
+        return (bool) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = '{$reviewsTable}'"
+        );
+    }
+
+    /**
+     * Count trips by minimum rating
+     * 
+     * @param int $minRating Minimum rating
+     * @return int Number of trips with this rating or above
+     */
+    public function countByMinRating(int $minRating): int
+    {
+        $table = $this->getTableName();
+        $reviewsTable = $this->wpdb->prefix . 'yatra_reviews';
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM {$reviewsTable} r
+             INNER JOIN {$table} t ON r.trip_id = t.id
+             WHERE r.rating >= %d AND t.status IN ('publish','published')",
+            $minRating
+        ));
+    }
+
+    /**
+     * Count trips by category
+     * 
+     * @param int $categoryId Category ID
+     * @return int Number of trips in this category
+     */
+    public function countByCategory(int $categoryId): int
+    {
+        $table = $this->getTableName();
+        $categoryTable = $this->wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
+             INNER JOIN {$categoryTable} ttc ON t.id = ttc.trip_id 
+             WHERE ttc.category_id = %d AND t.status = 'publish'",
+            $categoryId
+        ));
+    }
+
+    /**
+     * Count trips by destination
+     * 
+     * @param int $destinationId Destination ID
+     * @return int Number of trips to this destination
+     */
+    public function countByDestination(int $destinationId): int
+    {
+        $table = $this->getTableName();
+        $destinationTable = $this->wpdb->prefix . 'yatra_trip_destinations';
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
+             INNER JOIN {$destinationTable} td ON t.id = td.trip_id 
+             WHERE td.destination_id = %d AND t.status = 'publish'",
+            $destinationId
+        ));
+    }
+
+    /**
+     * Count trips by activity
+     * 
+     * @param int $activityId Activity ID
+     * @return int Number of trips with this activity
+     */
+    public function countByActivity(int $activityId): int
+    {
+        $table = $this->getTableName();
+        $activityTable = $this->wpdb->prefix . 'yatra_trip_activities';
+        
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
+             INNER JOIN {$activityTable} ta ON t.id = ta.trip_id 
+             WHERE ta.activity_id = %d AND t.status = 'publish'",
+            $activityId
+        ));
+    }
+
+    /**
+     * Get popular trips for cache warming
+     * 
+     * @param int $limit Number of trips to return
+     * @return array Array of popular trip IDs
+     */
+    public function getPopularTrips(int $limit = 20): array
+    {
+        global $wpdb;
+        $tripsTable = $this->getTableName();
+        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        
+        return $wpdb->get_results("
+            SELECT t.id 
+            FROM {$tripsTable} t
+            LEFT JOIN {$bookingsTable} b ON b.trip_id = t.id
+            WHERE t.status = 'publish'
+            GROUP BY t.id
+            ORDER BY COUNT(b.id) DESC
+            LIMIT {$limit}
+        ") ?: [];
     }
 }

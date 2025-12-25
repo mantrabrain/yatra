@@ -485,7 +485,7 @@ class AttributeRepository extends BaseRepository
     /**
      * Get status counts for attributes
      */
-    public function getStatusCounts(): array
+    public function getStatusCounts(array $args = []): array
     {
         $table = esc_sql($this->table);
         
@@ -517,5 +517,58 @@ class AttributeRepository extends BaseRepository
         error_log('Yatra Attributes Final Counts: ' . print_r($counts, true));
 
         return $counts;
+    }
+
+    /**
+     * Check if attributes table exists
+     * 
+     * @return bool True if table exists, false otherwise
+     */
+    public function tableExists(): bool
+    {
+        global $wpdb;
+        $attributesTable = $this->getTableName();
+        
+        // Check if attributes table exists
+        $tableExists = $wpdb->get_var(
+            $wpdb->prepare("SHOW TABLES LIKE %s", $attributesTable)
+        ) === $attributesTable;
+        
+        return $tableExists;
+    }
+
+    /**
+     * Get available attributes for filtering
+     * 
+     * @return array Array of available attributes
+     */
+    public function getAvailableAttributes(): array
+    {
+        if (!$this->tableExists()) {
+            return [];
+        }
+        
+        $table = esc_sql($this->getTableName());
+        
+        $attributes = $this->wpdb->get_results(
+            "SELECT id, name, field_type, field_options, icon, description 
+             FROM {$table} 
+             WHERE status = 'publish' 
+             ORDER BY display_order ASC, name ASC"
+        );
+        
+        $formattedAttributes = [];
+        foreach ($attributes as $attribute) {
+            $formattedAttributes[] = [
+                'id' => $attribute->id,
+                'name' => $attribute->name,
+                'field_type' => $attribute->field_type,
+                'field_options' => $attribute->field_options,
+                'icon' => $attribute->icon,
+                'description' => $attribute->description
+            ];
+        }
+        
+        return $formattedAttributes;
     }
 }
