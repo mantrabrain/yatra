@@ -97,14 +97,9 @@ class ItemService extends BaseService
             $data['description'] = sanitize_textarea_field($data['description']);
         }
 
-        // Store type_id in metadata
+        // Store type_id in parent_id column (ClassificationsTable uses parent_id for item type relationship)
         if (isset($data['type_id'])) {
-            $metadata = [];
-            if (isset($data['metadata']) && is_array($data['metadata'])) {
-                $metadata = $data['metadata'];
-            }
-            $metadata['type_id'] = absint($data['type_id']);
-            $data['metadata'] = wp_json_encode($metadata);
+            $data['parent_id'] = absint($data['type_id']);
             unset($data['type_id']); // Remove from main data
         }
 
@@ -169,14 +164,9 @@ class ItemService extends BaseService
             $data['description'] = sanitize_textarea_field($data['description']);
         }
 
-        // Store type_id in metadata
+        // Store type_id in parent_id column (ClassificationsTable uses parent_id for item type relationship)
         if (isset($data['type_id'])) {
-            $metadata = [];
-            if (isset($data['metadata']) && is_array($data['metadata'])) {
-                $metadata = $data['metadata'];
-            }
-            $metadata['type_id'] = absint($data['type_id']);
-            $data['metadata'] = wp_json_encode($metadata);
+            $data['parent_id'] = absint($data['type_id']);
             unset($data['type_id']); // Remove from main data
         }
 
@@ -209,7 +199,7 @@ class ItemService extends BaseService
         if (!empty($args['type_id']) && $args['type_id'] !== 'all') {
             $type_id = absint($args['type_id']);
             if ($type_id > 0) {
-                $args['where']['type_id'] = $type_id;
+                $args['where']['parent_id'] = $type_id;
             }
         }
 
@@ -251,7 +241,7 @@ class ItemService extends BaseService
         if (!empty($args['type_id']) && $args['type_id'] !== 'all') {
             $type_id = absint($args['type_id']);
             if ($type_id > 0) {
-                $args['where']['type_id'] = $type_id;
+                $args['where']['parent_id'] = $type_id;
             }
         }
 

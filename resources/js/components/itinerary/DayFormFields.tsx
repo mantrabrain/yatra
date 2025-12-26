@@ -25,8 +25,7 @@ interface DayFormFieldsProps {
   isSingleDayTrip?: boolean; // If true, hide/disable day number field
   onFieldChange: (field: keyof DayFormFieldsProps['formData'], value: any) => void;
 }
-
-export const DayFormFields: React.FC<DayFormFieldsProps> = ({
+ export const DayFormFields: React.FC<DayFormFieldsProps> = ({
   formData,
   errors,
   tripsData,

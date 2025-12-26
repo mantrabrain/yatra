@@ -43,6 +43,11 @@ class ItineraryController extends BaseController
                 'callback' => [$this, 'bulk_delete_items'],
                 'permission_callback' => [$this, 'check_permission'],
             ],
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'get_items_by_trip'],
+                'permission_callback' => [$this, 'check_permission'],
+            ],
         ]);
 
         // Single item routes
@@ -75,20 +80,64 @@ class ItineraryController extends BaseController
     }
 
     /**
+     * Get items by trip ID
+     */
+    public function get_items_by_trip(WP_REST_Request $request): WP_REST_Response|WP_Error
+    {
+        try {
+            $trip_id = (int) $request->get_param('trip_id');
+            
+            if (!$trip_id) {
+                return $this->error_response('Trip ID is required', 400);
+            }
+
+            $items = $this->service->getByTripId($trip_id);
+            
+            // Debug logging
+            error_log('[ITINERARY CONTROLLER DEBUG] Raw items from service: ' . json_encode($items));
+            error_log('[ITINERARY CONTROLLER DEBUG] Items count: ' . count($items));
+            
+            $prepared_items = array_map(function ($item) use ($request) {
+                $prepared = $this->prepare_item_for_response($item, $request);
+                error_log('[ITINERARY CONTROLLER DEBUG] Prepared item: ' . json_encode($prepared));
+                return $prepared;
+            }, $items);
+
+            error_log('[ITINERARY CONTROLLER DEBUG] Final prepared items: ' . json_encode($prepared_items));
+            
+            $response = $this->success_response($prepared_items);
+            error_log('[ITINER Beautify DEBUG] Final response data: ' . json_encode($response->get_data()));
+            
+            return $response;
+        } catch (\Exception $e) {
+            return $this->error_response($e->getMessage(), 500);
+        }
+    }
+
+    /**
      * Get item
      */
     public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
             $id = (int) $request->get_param('id');
+            error_log("[YATRA DEBUG] ItineraryController::get_item - Called with id: {$id}");
+            
             $item = $this->service->find($id);
-
+            
             if (!$item) {
+                error_log("[YATRA DEBUG] ItineraryController::get_item - Item not found for id: {$id}");
                 return $this->error_response('Itinerary entry not found', 404);
             }
-
-            return $this->success_response($this->prepare_item_for_response($item, $request));
+            
+            error_log("[YATRA DEBUG] ItineraryController::get_item - Raw item from service: " . json_encode($item));
+            
+            $prepared = $this->prepare_item_for_response($item, $request);
+            error_log("[YATRA DEBUG] ItineraryController::get_item - Prepared item: " . json_encode($prepared));
+            
+            return $this->success_response($prepared);
         } catch (\Exception $e) {
+            error_log("[YATRA DEBUG] ItineraryController::get_item - Error: " . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }
@@ -199,13 +248,18 @@ class ItineraryController extends BaseController
     {
         try {
             $dayId = (int) $request->get_param('day_id');
+            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Called with day_id: {$dayId}");
+            
             $repository = new ItineraryRepository();
             $dayEntryId = $repository->getDayEntryIdByDayId($dayId);
+            
+            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Retrieved day_entry_id: " . ($dayEntryId ?? 'NULL'));
 
             return $this->success_response([
                 'day_entry_id' => $dayEntryId,
             ]);
         } catch (\Exception $e) {
+            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Error: " . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }

@@ -184,14 +184,14 @@ const ItineraryForm: React.FC = () => {
       setFormData(prev => ({ ...prev, trip_id: tripIdParam }));
       lastTripIdRef.current = tripIdParam;
     }
-    if (dayParam && !isAddDayMode) {
+    if (dayParam) {
       setFormData(prev => ({ ...prev, day: dayParam }));
       dayManuallyEditedRef.current = true;
     }
     if (typeIdParam) {
       setFormData(prev => ({ ...prev, item_type_id: typeIdParam }));
     }
-  }, [tripIdParam, dayParam, typeIdParam, isAddDayMode]);
+  }, [tripIdParam, dayParam, typeIdParam]); // Remove isAddDayMode dependency
 
   // Auto-select item from URL param
   useEffect(() => {
@@ -205,20 +205,38 @@ const ItineraryForm: React.FC = () => {
 
   // Load entry data when editing
   useEffect(() => {
+    console.log('[YATRA DEBUG] Load entry effect triggered - isEditMode:', isEditMode, 'entryData:', entryData, 'isLoadingInitialDataRef:', isLoadingInitialDataRef.current);
+    
     if (!entryData || !isEditMode || isLoadingInitialDataRef.current) return;
     
     // Debug logging to see what data we received
     console.log('[YATRA DEBUG] ItineraryForm - entryData received:', entryData);
-    console.log('[YATRA DEBUG] ItineraryForm - day_description from entryData:', entryData.day_description);
-    if (!entryData || !entryData.id) return;
+    console.log('[YATRA DEBUG] ItineraryForm - entryData fields:', {
+      id: entryData.id,
+      trip_id: entryData.trip_id,
+      day: entryData.day,
+      day_title: entryData.day_title,
+      day_description: entryData.day_description,
+      item_type_id: entryData.item_type_id,
+      item_id: entryData.item_id
+    });
+    
+    if (!entryData || !entryData.id) {
+      console.log('[YATRA DEBUG] No entryData or no ID, returning');
+      return;
+    }
     
     // In edit day mode, if entryData is an activity (has item_type_id and item_id), 
     // we should wait for the day entry to be loaded (effectiveEntryData will be the day entry)
     if (isEditDayMode) {
+      // Check if this is an activity entry (has non-zero item_type_id and item_id)
+      // Day entries have item_type_id: 0 and item_id: 0
       const isActivityEntry = entryData.item_type_id !== null && 
                              entryData.item_type_id !== undefined && 
+                             entryData.item_type_id !== 0 &&
                              entryData.item_id !== null && 
-                             entryData.item_id !== undefined;
+                             entryData.item_id !== undefined &&
+                             entryData.item_id !== 0;
       // If it's an activity, wait - the hook will fetch the day entry and update entryData
       if (isActivityEntry) {
         // Check if this is the same activity we've already processed

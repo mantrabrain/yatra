@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\CategoryRepository;
+use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Helpers\SlugHelper;
 use Yatra\Helpers\FormatHelper;
 

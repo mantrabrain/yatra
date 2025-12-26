@@ -82,11 +82,11 @@ class TripRepository extends BaseRepository
         // Table references
         $trip_table = $this->getTableName();
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
+        // Use new table classes
         $reviews_table = $wpdb->prefix . 'yatra_reviews';
         $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $dest_table = $wpdb->prefix . 'yatra_destinations';
-        $act_table = $wpdb->prefix . 'yatra_activities';
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         
         // Build WHERE conditions and parameters
         $wheres = ["t.status IN ('publish', 'published')", "(t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')"];
@@ -97,21 +97,17 @@ class TripRepository extends BaseRepository
         
         // Destination filter
         if (!empty($filters['destination'])) {
-            // Using hardcoded table name since there's no dedicated repository for this table
-            $dest_mapping_table = $wpdb->prefix . 'yatra_trip_destination_mapping';
-            $joins[] = "LEFT JOIN {$dest_mapping_table} tdm ON tdm.trip_id = t.id";
-            $joins[] = "LEFT JOIN {$dest_table} dest ON dest.id = tdm.destination_id";
-            $wheres[] = "dest.slug = %s";
+            $joins[] = "LEFT JOIN {$tripClassificationsTable} tcd ON tcd.trip_id = t.id";
+            $joins[] = "LEFT JOIN {$classificationsTable} dest ON dest.id = tcd.classification_id";
+            $wheres[] = "dest.type = 'destination' AND dest.slug = %s";
             $params[] = $filters['destination'];
         }
         
         // Activity filter
         if (!empty($filters['activity'])) {
-            // Using hardcoded table name since there's no dedicated repository for this table
-            $act_mapping_table = $wpdb->prefix . 'yatra_trip_activity_mapping';
-            $joins[] = "LEFT JOIN {$act_mapping_table} tam ON tam.trip_id = t.id";
-            $joins[] = "LEFT JOIN {$act_table} act ON act.id = tam.activity_id";
-            $wheres[] = "act.slug = %s";
+            $joins[] = "LEFT JOIN {$tripClassificationsTable} tca ON tca.trip_id = t.id";
+            $joins[] = "LEFT JOIN {$classificationsTable} act ON act.id = tca.classification_id";
+            $wheres[] = "act.type = 'activity' AND act.slug = %s";
             $params[] = $filters['activity'];
         }
         
@@ -322,19 +318,19 @@ class TripRepository extends BaseRepository
         }
 
         // Batch load destinations
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $dest_rel_table = $wpdb->prefix . 'yatra_trip_destinations';
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         $destinations_data = [];
-        $destTableExists = Cache::tableExists($dest_rel_table, function() use ($wpdb, $dest_rel_table) {
-            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'");
+        $destTableExists = Cache::tableExists($tripClassificationsTable, function() use ($wpdb, $tripClassificationsTable) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$tripClassificationsTable}'");
         });
         
         if ($destTableExists) {
             $destinations_raw = $wpdb->get_results($wpdb->prepare(
-                "SELECT td.trip_id, d.* FROM {$wpdb->prefix}yatra_destinations d
-                 INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
-                 WHERE td.trip_id IN ({$trip_ids_placeholder}) AND d.status = 'publish'
-                 ORDER BY td.trip_id, d.name ASC",
+                "SELECT tc.trip_id, c.* FROM {$classificationsTable} c
+                 INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = 'destination' AND c.status = 'publish'
+                 ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
                 ...$trip_ids
             ));
             
@@ -346,19 +342,17 @@ class TripRepository extends BaseRepository
         }
 
         // Batch load activities
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $act_rel_table = $wpdb->prefix . 'yatra_trip_activities';
         $activities_data = [];
-        $actTableExists = Cache::tableExists($act_rel_table, function() use ($wpdb, $act_rel_table) {
-            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'");
+        $actTableExists = Cache::tableExists($tripClassificationsTable, function() use ($wpdb, $tripClassificationsTable) {
+            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$tripClassificationsTable}'");
         });
         
         if ($actTableExists) {
             $activities_raw = $wpdb->get_results($wpdb->prepare(
-                "SELECT ta.trip_id, a.* FROM {$wpdb->prefix}yatra_activities a
-                 INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id
-                 WHERE ta.trip_id IN ({$trip_ids_placeholder}) AND a.status = 'publish'
-                 ORDER BY ta.trip_id, a.name ASC",
+                "SELECT tc.trip_id, c.* FROM {$classificationsTable} c
+                 INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = 'activity' AND c.status = 'publish'
+                 ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
                 ...$trip_ids
             ));
             
@@ -495,75 +489,52 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $dest_rel_table = $wpdb->prefix . 'yatra_trip_destinations';
-        $destTableExists = Cache::tableExists($dest_rel_table, function() use ($wpdb, $dest_rel_table) {
-            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$dest_rel_table}'");
-        });
+        // Use new Classification tables
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
-        if ($destTableExists) {
-            $destinations = $wpdb->get_results($wpdb->prepare(
-                "SELECT d.* FROM {$wpdb->prefix}yatra_destinations d
-                 INNER JOIN {$dest_rel_table} td ON d.id = td.destination_id
-                 WHERE td.trip_id = %d AND d.status = 'publish'
-                 ORDER BY d.name ASC",
-                $trip->id
-            ));
-            $trip->destinations = $destinations ?: [];
-        } else {
-            $trip->destinations = [];
-        }
+        // Load destinations
+        $destinations = $wpdb->get_results($wpdb->prepare(
+            "SELECT c.* FROM {$classificationsTable} c
+             INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND c.type = 'destination' AND c.status = 'publish'
+             ORDER BY tc.sort_order ASC, c.name ASC",
+            $trip->id
+        ));
+        $trip->destinations = $destinations ?: [];
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $act_rel_table = $wpdb->prefix . 'yatra_trip_activities';
-        $actTableExists = Cache::tableExists($act_rel_table, function() use ($wpdb, $act_rel_table) {
-            return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$act_rel_table}'");
-        });
+        // Load activities
+        $activities = $wpdb->get_results($wpdb->prepare(
+            "SELECT c.* FROM {$classificationsTable} c
+             INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND c.type = 'activity' AND c.status = 'publish'
+             ORDER BY tc.sort_order ASC, c.name ASC",
+            $trip->id
+        ));
+        $trip->activities = $activities ?: [];
         
-        if ($actTableExists) {
-            $activities = $wpdb->get_results($wpdb->prepare(
-                "SELECT a.* FROM {$wpdb->prefix}yatra_activities a
-                 INNER JOIN {$act_rel_table} ta ON a.id = ta.activity_id
-                 WHERE ta.trip_id = %d AND a.status = 'publish'
-                 ORDER BY a.name ASC",
-                $trip->id
-            ));
-            $trip->activities = $activities ?: [];
-        } else {
-            $trip->activities = [];
-        }
-        
-        // Check and load categories using existing table structure
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $cat_rel_table = $wpdb->prefix . 'yatra_trip_trip_categories';
-        if ($wpdb->get_var("SHOW TABLES LIKE '{$cat_rel_table}'")) {
-            $categories = $wpdb->get_results($wpdb->prepare(
-                "SELECT c.* FROM {$wpdb->prefix}yatra_trip_categories c
-                 INNER JOIN {$cat_rel_table} ttc ON c.id = ttc.category_id
-                 WHERE ttc.trip_id = %d AND c.status = 'publish'
-                 ORDER BY c.name ASC",
-                $trip->id
-            ));
-            $trip->categories = $categories ?: [];
-        } else {
-            $trip->categories = [];
-        }
+        // Load categories
+        $categories = $wpdb->get_results($wpdb->prepare(
+            "SELECT c.* FROM {$classificationsTable} c
+             INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND c.type = 'category' AND c.status = 'publish'
+             ORDER BY tc.sort_order ASC, c.name ASC",
+            $trip->id
+        ));
+        $trip->categories = $categories ?: [];
         
         // Load price types for traveler-based pricing
         if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
-            // Using hardcoded table name since there's no dedicated repository for this table
-            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
-            if ($wpdb->get_var("SHOW TABLES LIKE '{$price_types_table}'")) {
-                $price_types = $wpdb->get_results($wpdb->prepare(
-                    "SELECT * FROM {$price_types_table}
-                     WHERE trip_id = %d
-                     ORDER BY original_price ASC",
-                    $trip->id
-                ));
-                $trip->price_types = $price_types ?: [];
-            } else {
-                $trip->price_types = [];
-            }
+            $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
+            $price_types = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM {$tripPricingTable}
+                 WHERE trip_id = %d AND pricing_type = 'traveler_category'
+                 ORDER BY original_price ASC",
+                $trip->id
+            ));
+            $trip->price_types = $price_types ?: [];
+        } else {
+            $trip->price_types = [];
         }
     }
 
@@ -636,16 +607,17 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_destinations';
+        // Use new Classification tables
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT td.*, d.name as destination_name, d.slug as destination_slug 
-                 FROM `{$table}` td
-                 LEFT JOIN `{$wpdb->prefix}yatra_destinations` d ON td.destination_id = d.id
-                 WHERE td.trip_id = %d
-                 ORDER BY td.`order` ASC, td.id ASC",
+                "SELECT tc.*, c.name as destination_name, c.slug as destination_slug 
+                 FROM {$tripClassificationsTable} tc
+                 LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d AND c.type = 'destination'
+                 ORDER BY tc.sort_order ASC, tc.id ASC",
                 $tripId
             )
         ) ?: [];
@@ -658,16 +630,17 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_activities';
+        // Use new Classification tables
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT ta.*, a.name as activity_name, a.slug as activity_slug 
-                 FROM `{$table}` ta
-                 LEFT JOIN `{$wpdb->prefix}yatra_activities` a ON ta.activity_id = a.id
-                 WHERE ta.trip_id = %d
-                 ORDER BY ta.`order` ASC, ta.id ASC",
+                "SELECT tc.*, c.name as activity_name, c.slug as activity_slug 
+                 FROM {$tripClassificationsTable} tc
+                 LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d AND c.type = 'activity'
+                 ORDER BY tc.sort_order ASC, tc.id ASC",
                 $tripId
             )
         ) ?: [];
@@ -680,29 +653,17 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_trip_categories';
-        
-        // Check if table exists first
-        $table_exists = $wpdb->get_var($wpdb->prepare(
-            "SHOW TABLES LIKE %s",
-            $table
-        )) === $table;
-        
-        if (!$table_exists) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: getTripCategories - Table {$table} does not exist");
-            }
-            return [];
-        }
+        // Use TripClassificationsTable for trip-category relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         $results = $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT ttc.*, tc.name as category_name, tc.slug as category_slug 
-                 FROM `{$table}` ttc
-                 LEFT JOIN `{$wpdb->prefix}yatra_trip_categories` tc ON ttc.category_id = tc.id
-                 WHERE ttc.trip_id = %d
-                 ORDER BY ttc.`order` ASC, ttc.id ASC",
+                "SELECT tc.*, c.name as category_name, c.slug as category_slug 
+                 FROM {$tripClassificationsTable} tc
+                 LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d AND c.type = 'category'
+                 ORDER BY tc.sort_order ASC, tc.id ASC",
                 $tripId
             )
         ) ?: [];
@@ -724,14 +685,15 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_price_types';
+        // Use TripPricingTable for pricing data and ClassificationsTable for traveler categories
+        $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         $sql = $wpdb->prepare(
-                "SELECT tpt.*, tc.label as category_label, tc.slug as category_slug 
-                 FROM `{$table}` tpt
-                 LEFT JOIN `{$wpdb->prefix}yatra_traveler_categories` tc ON tpt.category_id = tc.id
-                 WHERE tpt.trip_id = %d
+                "SELECT tpt.*, c.name as category_label, c.slug as category_slug 
+                 FROM {$tripPricingTable} tpt
+                 LEFT JOIN {$classificationsTable} c ON tpt.category_id = c.id
+                 WHERE tpt.trip_id = %d AND tpt.pricing_type = 'traveler_category'
                  ORDER BY tpt.id ASC",
                 $tripId
         );
@@ -755,14 +717,14 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_gallery_images';
+        // Use TripContentTable for gallery images
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM `{$table}` 
-                 WHERE trip_id = %d
-                 ORDER BY `order` ASC, id ASC",
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'image'
+                 ORDER BY sort_order ASC, id ASC",
                 $tripId
             )
         ) ?: [];
@@ -775,14 +737,14 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_highlights';
+        // Use TripContentTable for highlights
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM `{$table}` 
-                 WHERE trip_id = %d
-                 ORDER BY `order` ASC, id ASC",
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'highlight'
+                 ORDER BY sort_order ASC, id ASC",
                 $tripId
             )
         ) ?: [];
@@ -795,14 +757,14 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_faqs';
+        // Use TripContentTable for FAQs
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM `{$table}` 
-                 WHERE trip_id = %d
-                 ORDER BY `order` ASC, id ASC",
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'faq'
+                 ORDER BY sort_order ASC, id ASC",
                 $tripId
             )
         ) ?: [];
@@ -833,10 +795,9 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
-        $tableEntries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
-        $tableEntryImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        // Use new table names for itinerary
+        $tableDays = \Yatra\Database\Tables\TripItineraryDaysTable::getTableName();
+        $tableEntries = \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName();
         
         // Check if tables exist, return empty array if they don't
         $table_exists = $wpdb->get_var($wpdb->prepare(
@@ -875,27 +836,14 @@ class TripRepository extends BaseRepository
                 )
             ) ?: [];
             
-            // For each entry, load images
+            // Process each entry
             foreach ($entries as $entry) {
-                $entryId = (int) $entry->id;
-                
                 // Decode included/excluded items JSON stored directly on the entry
                 $entry->included_items = $this->decodeAmenityItems($entry->included_items ?? null);
                 $entry->excluded_items = $this->decodeAmenityItems($entry->excluded_items ?? null);
                 
-                // Get images for this entry
-                $images = $wpdb->get_results(
-                    $wpdb->prepare(
-                        "SELECT * FROM `{$tableEntryImages}` 
-                         WHERE entry_id = %d
-                         ORDER BY `order` ASC",
-                        $entryId
-                    )
-                ) ?: [];
-                
-                $entry->images = array_map(function ($img) {
-                    return $img->image_url ?? '';
-                }, $images);
+                // Images are stored in metadata in the new structure
+                $entry->images = [];
             }
             
             // Attach entries to day
@@ -1891,15 +1839,15 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $trip_destinations_table = $wpdb->prefix . 'yatra_trip_destinations';
-        $destinations_table = $wpdb->prefix . 'yatra_destinations';
+        // Use new TripClassificationsTable for trip-destination relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT td.trip_id, d.id, d.name, d.slug
-             FROM {$trip_destinations_table} td
-             INNER JOIN {$destinations_table} d ON d.id = td.destination_id
-             WHERE td.trip_id = %d",
+            "SELECT tc.trip_id, c.id, c.name, c.slug
+             FROM {$tripClassificationsTable} tc
+             INNER JOIN {$classificationsTable} c ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND c.type = 'destination'",
             $tripId
         ));
     }
@@ -1911,15 +1859,15 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $trip_activities_table = $wpdb->prefix . 'yatra_trip_activities';
-        $activities_table = $wpdb->prefix . 'yatra_activities';
+        // Use new TripClassificationsTable for trip-activity relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT ta.trip_id, a.id, a.name, a.slug
-             FROM {$trip_activities_table} ta
-             INNER JOIN {$activities_table} a ON a.id = ta.activity_id
-             WHERE ta.trip_id = %d",
+            "SELECT tc.trip_id, c.id, c.name, c.slug
+             FROM {$tripClassificationsTable} tc
+             INNER JOIN {$classificationsTable} c ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND c.type = 'activity'",
             $tripId
         ));
     }
@@ -1932,8 +1880,8 @@ class TripRepository extends BaseRepository
         global $wpdb;
         $trips_table = $this->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        // Use TripAvailabilityDatesTable for availability data
+        $availability_table = \Yatra\Database\Tables\TripAvailabilityDatesTable::getTableName();
         
         return $wpdb->get_row($wpdb->prepare(
             "SELECT t.*, a.departure_date, a.seats_total, a.seats_booked, a.status as availability_status

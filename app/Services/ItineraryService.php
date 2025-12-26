@@ -72,9 +72,10 @@ class ItineraryService
                 return;
             }
 
+            $itineraryRepository = new \Yatra\Repositories\ItineraryRepository();
+
             // If updating, first check if the current entry is actually a day entry (not an activity)
             if ($id !== null) {
-                $itineraryRepository = new \Yatra\Repositories\ItineraryRepository();
                 $currentEntry = $itineraryRepository->getEntryWithRelations($id);
                 
                 // If the current entry has item_type_id or item_id, it's an activity, not a day entry
@@ -96,7 +97,7 @@ class ItineraryService
             
             // Check if day entry already exists (not just day record)
             // A day record can exist without a day entry (when only activities exist)
-            $existingDayEntry = $itineraryRepository->findDayEntryByTripAndDayNumber((int) $data['trip_id'], $dayNumber);
+            $existingDayEntry = $this->repository->findDayEntryByTripAndDayNumber((int) $data['trip_id'], $dayNumber);
 
             if ($existingDayEntry) {
                 // Day entry already exists - this should be an update, not a create
@@ -189,6 +190,14 @@ class ItineraryService
         }
 
         return $this->repository->bulkDelete($ids);
+    }
+
+    /**
+     * Get all itinerary entries for a specific trip
+     */
+    public function getByTripId(int $tripId): array
+    {
+        return $this->repository->getByTripId($tripId);
     }
 }
 

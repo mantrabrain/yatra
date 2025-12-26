@@ -19,11 +19,12 @@ use Yatra\Database\Tables\BookingDeparturesTable;
 use Yatra\Database\Tables\TripRevisionsTable;
 
 // Optimized Tables
-use Yatra\Database\Tables\TripItineraryTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripContentTable;
+use Yatra\Database\Tables\TripItineraryDaysTable;
+use Yatra\Database\Tables\TripItineraryDayEntryTable;
 
 // Traditional Availability Tables
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
@@ -97,8 +98,9 @@ class Database
         // OPTIMIZED CONSOLIDATED TABLES (v2.0.0)
         // ============================================
         
-        // Unified itinerary system (consolidates 3 old tables)
-        dbDelta(TripItineraryTable::getSchema());
+        // New itinerary system (2-table structure)
+        dbDelta(TripItineraryDaysTable::getSchema());
+        dbDelta(TripItineraryDayEntryTable::getSchema());
         
         // Unified classification system (consolidates 5 old tables)
         dbDelta(ClassificationsTable::getSchema());
@@ -162,7 +164,8 @@ class Database
             TripRevisionsTable::getTableName(),
             
             // Optimized tables
-            TripItineraryTable::getTableName(),
+            TripItineraryDaysTable::getTableName(),
+            TripItineraryDayEntryTable::getTableName(),
             ClassificationsTable::getTableName(),
             TripClassificationsTable::getTableName(),
             TripPricingTable::getTableName(),
@@ -190,7 +193,8 @@ class Database
             'tables_after' => 41,
             'reduction_percentage' => 29,
             'optimized_tables' => [
-                'TripItineraryTable' => ['replaced' => 3, 'benefits' => ['JSON structure', '60% faster performance']],
+                'TripItineraryDaysTable' => ['replaced' => 'new', 'benefits' => ['Day-level information', 'Metadata support', 'Better performance']],
+                'TripItineraryDayEntryTable' => ['replaced' => 'new', 'benefits' => ['Individual entries', 'Foreign key relationships', 'Comprehensive indexing']],
                 'ClassificationsTable' => ['replaced' => 8, 'benefits' => ['Unified classification system', 'Attributes/items/types in one table', 'JSON metadata flexibility']],
                 'TripClassificationsTable' => ['replaced' => 4, 'benefits' => ['Polymorphic relationships', 'Future extensibility']],
                 'TripPricingTable' => ['replaced' => 'new', 'benefits' => ['Comprehensive pricing', 'Rule-based engine']],

@@ -319,8 +319,6 @@ class TripController extends BaseController
 
             // Ensure traveler-based pricing trips have a usable base price in list view
             if (!empty($items)) {
-                global $wpdb;
-                $priceTypeTable = $wpdb->prefix . 'yatra_trip_price_types';
 
                 foreach ($items as $item) {
                     // Skip if we already have a flat price set
@@ -382,12 +380,6 @@ class TripController extends BaseController
                         }
                     }
 
-                    // Activities
-                    $actTable = $wpdb->prefix . 'yatra_trip_activities';
-                    $actTaxTable = $wpdb->prefix . 'yatra_activities';
-                    // Use TripService to get destinations
-                    $destRows = $this->service->getTripDestinations($id);
-
                     // Use TripService to get activities
                     $actRows = [];
                     foreach ($tripIds as $id) {
@@ -408,9 +400,6 @@ class TripController extends BaseController
                         ];
                     }
 
-                    // Trip categories
-                    $catRelTable = $wpdb->prefix . 'yatra_trip_trip_categories';
-                    $catTaxTable = $wpdb->prefix . 'yatra_trip_categories';
                     // Use TripService to get categories
                     $catRows = [];
                     foreach ($tripIds as $id) {
@@ -478,13 +467,27 @@ class TripController extends BaseController
                 // Get available items for itinerary mapping
                 $itemRepo = new ItemRepository();
                 $allItems = $itemRepo->all(['where' => ['status' => 'publish']]);
+                
+                error_log('[YATRA DEBUG] TripController - Raw items from repository:');
+                foreach ($allItems as $item) {
+                    error_log('[YATRA DEBUG]   Item: id=' . $item->id . ', name=' . $item->name . ', parent_id=' . ($item->parent_id ?? 'NULL') . ', type=' . ($item->type ?? 'NULL'));
+                }
+                
                 $meta['available_items'] = array_map(function ($item) {
-                    return [
+                    // Items use parent_id to link to their item type (not type_id)
+                    $mappedItem = [
                         'id' => (int) $item->id,
                         'name' => esc_html($item->name),
-                        'type_id' => (int) ($item->type_id ?? 0),
+                        'type_id' => (int) ($item->parent_id ?? 0), // parent_id is the item type ID
                     ];
+                    error_log('[YATRA DEBUG]   Mapped item: ' . json_encode($mappedItem));
+                    return $mappedItem;
                 }, $allItems);
+                
+                error_log('[YATRA DEBUG] TripController - Returning meta data:');
+                error_log('[YATRA DEBUG] - Item types count: ' . count($meta['available_item_types']));
+                error_log('[YATRA DEBUG] - Items count: ' . count($meta['available_items']));
+                error_log('[YATRA DEBUG] - Available items: ' . json_encode($meta['available_items']));
             }
 
             $response = [

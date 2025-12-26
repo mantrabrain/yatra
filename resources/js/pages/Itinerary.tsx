@@ -140,9 +140,11 @@ const Itinerary: React.FC = () => {
         // Extract meta data for item types and items
         const meta = response?.data?.meta || response?.meta || {};
         if (meta.available_item_types) {
+          console.log('[YATRA DEBUG] Setting item types data:', meta.available_item_types);
           setItemTypesData(meta.available_item_types);
         }
         if (meta.available_items) {
+          console.log('[YATRA DEBUG] Setting items data:', meta.available_items);
           setItemsData(meta.available_items);
         }
         
@@ -236,14 +238,107 @@ const Itinerary: React.FC = () => {
 
         for (const trip of tripsToFetch) {
           try {
-            // Add timestamp to prevent caching
-            const tripResponse = await apiClient.get(`/trips/${trip.id}`, {
+            // Fetch itinerary data from the new itinerary endpoint
+            const itineraryResponse = await apiClient.get('/itinerary', {
               params: {
+                trip_id: trip.id,
                 _t: Date.now(), // Cache buster
               }
             });
-            const tripData = tripResponse?.data || tripResponse;
-            const itineraryDays = tripData.itinerary_days || [];
+            
+            // Debug logging
+            console.log('[ITINERARY FRONTEND DEBUG] Raw API response:', itineraryResponse);
+            console.log('[ITINERARY FRONTEND DEBUG] Response data property:', itineraryResponse?.data);
+            console.log('[ITINERARY FRONTEND DEBUG] Response structure:', Object.keys(itineraryResponse || {}));
+            
+            // Extract data - WordPress REST API returns data directly, not nested under 'data'
+            const itineraryEntries = Array.isArray(itineraryResponse) ? itineraryResponse : 
+                                    (Array.isArray(itineraryResponse?.data) ? itineraryResponse.data : []);
+            
+            console.log('[ITINERARY FRONTEND DEBUG] Processed entries:', itineraryEntries);
+            console.log('[ITINERARY FRONTEND DEBUG] Entries count:', itineraryEntries.length);
+            
+            // Group entries by day number
+            const entriesByDay = new Map<number, any[]>();
+            const dayInfo = new Map<number, { title?: string; description?: string; status?: string; day_id?: number }>();
+            
+            // First, group entries by day and collect day info
+            for (const entry of itineraryEntries) {
+              const dayNumber = entry.day || 1;
+              
+              console.log('[ITINERARY FRONTEND DEBUG] Processing entry:', {
+                id: entry.id,
+                day: entry.day,
+                item_type_id: entry.item_type_id,
+                item_id: entry.item_id,
+                day_title: entry.day_title,
+                day_description: entry.day_description
+              });
+              
+              // Store day info from day entries (entries where item_type_id and item_id are 0)
+              if ((!entry.item_type_id || entry.item_type_id === 0) && 
+                  (!entry.item_id || entry.item_id === 0)) {
+                console.log('[ITINERARY FRONTEND DEBUG] Found day entry for day:', dayNumber, 'with id:', entry.id);
+                dayInfo.set(dayNumber, {
+                  title: entry.day_title || entry.title || '',
+                  description: entry.day_description || entry.description || '',
+                  status: entry.status,
+                  day_id: entry.id // Store the day ID from the day entry
+                });
+              } else {
+                console.log('[ITINERARY FRONTEND DEBUG] Found activity entry for day:', dayNumber);
+                // This is an activity entry, add to the day's entries
+                if (!entriesByDay.has(dayNumber)) {
+                  entriesByDay.set(dayNumber, []);
+                }
+                entriesByDay.get(dayNumber)!.push(entry);
+              }
+            }
+            
+            // Create day structures similar to the old format
+            const itineraryDays = [];
+            
+            // First, add all days that have day info (even if no activities)
+            for (const [dayNumber, info] of dayInfo) {
+              const entries = entriesByDay.get(dayNumber) || [];
+              itineraryDays.push({
+                id: info.day_id, // Day ID from the days table
+                day_id: info.day_id, // Day ID for Edit/Delete operations
+                day: dayNumber,
+                day_number: dayNumber,
+                day_title: info.title || `Day ${dayNumber}`,
+                title: info.title || `Day ${dayNumber}`,
+                description: info.description || '',
+                entries: entries,
+                status: info.status
+              });
+            }
+            
+            // Then, add any days that only have activities but no day info
+            for (const [dayNumber, entries] of entriesByDay) {
+              if (!dayInfo.has(dayNumber)) {
+                itineraryDays.push({
+                  id: undefined,
+                  day_id: undefined,
+                  day: dayNumber,
+                  day_number: dayNumber,
+                  day_title: `Day ${dayNumber}`,
+                  title: `Day ${dayNumber}`,
+                  description: '',
+                  entries: entries,
+                  status: 'publish'
+                });
+              }
+            }
+            
+            // Sort days by day_number
+            itineraryDays.sort((a, b) => a.day_number - b.day_number);
+
+            // Debug logging
+            console.log('[ITINERARY FRONTEND DEBUG] Day info collected:', dayInfo);
+            console.log('[ITINERARY FRONTEND DEBUG] Entries by day:', entriesByDay);
+            console.log('[ITINERARY FRONTEND DEBUG] Final itinerary days:', itineraryDays);
+            console.log('[ITINERARY FRONTEND DEBUG] Final days count:', itineraryDays.length);
 
             // Process each day
             for (const day of itineraryDays) {
@@ -307,7 +402,7 @@ const Itinerary: React.FC = () => {
             for (const day of itineraryDays) {
               const dayNumber = day.day_number || day.day || 1;
               const dayTitle = day.title || day.day_title || '';
-              const dayId = day.id || day.day_id || null;
+              const dayId = day.id || day.day_id || undefined;
               const dayKey = `${trip.id}-${dayNumber}`;
               
               // Store day info for grouping later
@@ -583,11 +678,15 @@ const Itinerary: React.FC = () => {
   };
 
   const handleEditDay = async (tripId: number, day: number) => {
+    console.log('[YATRA DEBUG] handleEditDay called - tripId:', tripId, 'day:', day);
+    
     const redirectToCreate = () => {
+      console.log('[YATRA DEBUG] Redirecting to CREATE mode');
       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=create&trip_id=${tripId}&day=${day}&mode=day`;
     };
 
     const redirectToEdit = (entryId: number) => {
+      console.log('[YATRA DEBUG] Redirecting to EDIT mode with entryId:', entryId);
       const params = new URLSearchParams({
         action: 'edit',
         id: entryId.toString(),
@@ -599,17 +698,22 @@ const Itinerary: React.FC = () => {
     };
 
     const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
+    console.log('[YATRA DEBUG] dayGroup found:', dayGroup);
 
     if (!dayGroup) {
+      console.log('[YATRA DEBUG] No dayGroup found, redirecting to create');
       redirectToCreate();
       setDayMenuOpen(null);
       return;
     }
 
+    console.log('[YATRA DEBUG] dayGroup.day_id:', dayGroup.day_id);
     if (dayGroup.day_id) {
       try {
         const response = await apiClient.get(`/itinerary/day-entry-by-day-id/${dayGroup.day_id}`);
+        console.log('[YATRA DEBUG] day-entry-by-day-id response:', response);
         const dayEntryId = response?.data?.day_entry_id || response?.day_entry_id || response?.data?.id || response?.id || null;
+        console.log('[YATRA DEBUG] Extracted dayEntryId:', dayEntryId);
 
         if (dayEntryId) {
           redirectToEdit(dayEntryId);
@@ -617,16 +721,21 @@ const Itinerary: React.FC = () => {
           return;
         }
       } catch (error) {
-        console.error('Failed to fetch day entry for editing:', error);
+        console.error('[YATRA DEBUG] Failed to fetch day entry for editing:', error);
       }
     }
 
+    console.log('[YATRA DEBUG] dayGroup.entries:', dayGroup.entries);
     if (dayGroup.entries.length > 0) {
-      const dayEntry = dayGroup.entries.find((entry: any) => 
-        (entry.item_type_id === null || entry.item_type_id === undefined) && 
-        (entry.item_id === null || entry.item_id === undefined)
-      );
+      // Look for day entry (item_type_id and item_id are 0, null, or undefined)
+      const dayEntry = dayGroup.entries.find((entry: any) => {
+        const isDayEntry = (entry.item_type_id === null || entry.item_type_id === undefined || entry.item_type_id === 0) && 
+                          (entry.item_id === null || entry.item_id === undefined || entry.item_id === 0);
+        console.log('[YATRA DEBUG] Checking entry:', entry.id, 'item_type_id:', entry.item_type_id, 'item_id:', entry.item_id, 'isDayEntry:', isDayEntry);
+        return isDayEntry;
+      });
 
+      console.log('[YATRA DEBUG] Found dayEntry:', dayEntry);
       if (dayEntry && dayEntry.id) {
         redirectToEdit(dayEntry.id);
         setDayMenuOpen(null);
@@ -634,6 +743,7 @@ const Itinerary: React.FC = () => {
       }
 
       const firstEntry = dayGroup.entries[0];
+      console.log('[YATRA DEBUG] Using firstEntry as fallback:', firstEntry);
       if (firstEntry && firstEntry.id) {
         redirectToEdit(firstEntry.id);
         setDayMenuOpen(null);
@@ -641,6 +751,7 @@ const Itinerary: React.FC = () => {
       }
     }
 
+    console.log('[YATRA DEBUG] No valid entry found, redirecting to create');
     redirectToCreate();
     setDayMenuOpen(null);
   };
@@ -1797,6 +1908,21 @@ const Itinerary: React.FC = () => {
                                     }}
                                     options={(() => {
                                       const itemTypeId = entry.item_type_id;
+                                      console.log('[YATRA DEBUG] Filtering items for entry:', {
+                                        entryId: entry.id,
+                                        itemTypeId: itemTypeId,
+                                        totalItemsAvailable: itemsData.length
+                                      });
+                                      
+                                      console.log('[YATRA DEBUG] All items before filtering:');
+                                      itemsData.forEach(item => {
+                                        console.log('  -', {
+                                          id: item.id,
+                                          name: item.name,
+                                          type_id: item.type_id
+                                        });
+                                      });
+                                      
                                       if (!itemTypeId) return [];
                                       
                                       const itemTypeIdNum = typeof itemTypeId === 'string' 
@@ -1805,19 +1931,30 @@ const Itinerary: React.FC = () => {
                                       
                                       if (!itemTypeIdNum || isNaN(itemTypeIdNum)) return [];
                                       
-                                      return itemsData
+                                      const filteredItems = itemsData
                                         .filter((item) => {
                                           const typeId = item.type_id;
                                           if (!typeId) return false;
                                           const typeIdNum = typeof typeId === 'string' 
                                             ? parseInt(typeId, 10) 
                                             : Number(typeId);
-                                          return typeIdNum === itemTypeIdNum;
+                                          const matches = typeIdNum === itemTypeIdNum;
+                                          console.log('[YATRA DEBUG] Item filter check:', {
+                                            itemId: item.id,
+                                            itemName: item.name,
+                                            itemTypeId: typeIdNum,
+                                            entryTypeId: itemTypeIdNum,
+                                            matches: matches
+                                          });
+                                          return matches;
                                         })
                                         .map((item) => ({
                                           value: item.id.toString(),
                                           label: item.name,
                                         }));
+                                      
+                                      console.log('[YATRA DEBUG] Filtered items result:', filteredItems);
+                                      return filteredItems;
                                     })()}
                                     placeholder={__('Select item...', 'Select item...')}
                                     searchPlaceholder={__('Search items...', 'Search items...')}

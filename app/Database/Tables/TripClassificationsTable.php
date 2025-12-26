@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `trip_id` bigint(20) unsigned NOT NULL,
     `classification_id` bigint(20) unsigned NOT NULL,
-    `classification_type` enum('category','activity','destination','difficulty','traveler_type','attribute') NOT NULL,
+    `classification_type` enum('category','activity','destination','difficulty','traveler_type','attribute','item_type','item') NOT NULL,
     `relationship_type` enum('primary','secondary','optional','required') DEFAULT 'primary',
     `metadata` longtext COMMENT 'JSON: Relationship-specific data (emphasis, custom notes, etc.)',
     `sort_order` smallint(5) unsigned DEFAULT 0,

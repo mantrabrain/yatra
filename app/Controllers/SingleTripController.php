@@ -366,17 +366,16 @@ class SingleTripController
      */
     private function getPriceTypes(int $trip_id): array
     {
-        // Using hardcoded table names since there's no dedicated table class for these tables yet
-        $table = $this->wpdb->prefix . 'yatra_trip_price_types';
-        $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
+        // Use TripPricingTable for pricing data and ClassificationsTable for traveler categories
+        $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         $sql = $this->wpdb->prepare(
-                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, 
-                        tc.description as category_description, tc.age_min, tc.age_max,
-                        tc.pricing_mode, tc.min_pax, tc.max_pax
-                 FROM {$table} pt
-                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
-                 WHERE pt.trip_id = %d
+                "SELECT pt.*, tc.name as category_label, tc.slug as category_slug, 
+                        tc.description as category_description
+                 FROM {$tripPricingTable} pt
+                 LEFT JOIN {$classificationsTable} tc ON pt.category_id = tc.id
+                 WHERE pt.trip_id = %d AND pt.pricing_type = 'traveler_category'
              ORDER BY pt.id ASC",
                 $trip_id
         );
@@ -411,11 +410,16 @@ class SingleTripController
      */
     private function getDestinations(int $trip_id): array
     {
-        // Using hardcoded table name since there's no dedicated table class for this table yet
+        // Use TripClassificationsTable for trip-destination relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        
         $destination_ids = $this->wpdb->get_col(
             $this->wpdb->prepare(
-                "SELECT destination_id FROM {$this->wpdb->prefix}yatra_trip_destinations 
-                 WHERE trip_id = %d",
+                "SELECT classification_id FROM {$tripClassificationsTable} 
+                 WHERE trip_id = %d AND classification_id IN (
+                     SELECT id FROM {$classificationsTable} WHERE type = 'destination'
+                 )",
                 $trip_id
             )
         );
@@ -427,18 +431,13 @@ class SingleTripController
         $placeholders = implode(',', array_fill(0, count($destination_ids), '%d'));
         $destinations = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT * FROM {$this->table_destinations} 
-                 WHERE id IN ($placeholders)",
+                "SELECT * FROM {$classificationsTable} 
+                 WHERE id IN ({$placeholders})",
                 ...$destination_ids
             )
-        ) ?: [];
+        );
         
-        // Add permalink to each destination
-        foreach ($destinations as $destination) {
-            $destination->url = home_url('/destination/' . ($destination->slug ?? '') . '/');
-        }
-        
-        return $destinations;
+        return $destinations ?: [];
     }
 
     /**
@@ -449,11 +448,16 @@ class SingleTripController
      */
     private function getActivities(int $trip_id): array
     {
-        // Using hardcoded table name since there's no dedicated table class for this table yet
+        // Use TripClassificationsTable for trip-activity relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        
         $activity_ids = $this->wpdb->get_col(
             $this->wpdb->prepare(
-                "SELECT activity_id FROM {$this->wpdb->prefix}yatra_trip_activities 
-                 WHERE trip_id = %d",
+                "SELECT classification_id FROM {$tripClassificationsTable} 
+                 WHERE trip_id = %d AND classification_id IN (
+                     SELECT id FROM {$classificationsTable} WHERE type = 'activity'
+                 )",
                 $trip_id
             )
         );
@@ -465,8 +469,8 @@ class SingleTripController
         $placeholders = implode(',', array_fill(0, count($activity_ids), '%d'));
         return $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT * FROM {$this->table_activities} 
-                 WHERE id IN ($placeholders)",
+                "SELECT * FROM {$classificationsTable} 
+                 WHERE id IN ({$placeholders})",
                 ...$activity_ids
             )
         ) ?: [];
@@ -480,16 +484,16 @@ class SingleTripController
      */
     private function getGalleryImages(int $trip_id): array
     {
-        // Using hardcoded table name since there's no dedicated table class for this table yet
-        $table = $this->wpdb->prefix . 'yatra_trip_gallery_images';
+        // Use TripContentTable for gallery images
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
         // Check if table exists
         $table_exists = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SHOW TABLES LIKE %s",
-                $table
+                $tripContentTable
             )
-        ) === $table;
+        ) === $tripContentTable;
         
         if (!$table_exists) {
             return [];
@@ -497,9 +501,9 @@ class SingleTripController
         
         $images = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT * FROM {$table} 
-                 WHERE trip_id = %d
-                 ORDER BY `order` ASC, id ASC",
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'image'
+                 ORDER BY sort_order ASC, id ASC",
                 $trip_id
             )
         ) ?: [];
@@ -535,17 +539,17 @@ class SingleTripController
      */
     private function getTripCategories(int $trip_id): array
     {
-        // Using hardcoded table names since there's no dedicated table class for these tables yet
-        $relation_table = $this->wpdb->prefix . 'yatra_trip_trip_categories';
-        $categories_table = $this->wpdb->prefix . 'yatra_trip_categories';
+        // Use new Classification tables
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         // Check if relation table exists
         $table_exists = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SHOW TABLES LIKE %s",
-                $relation_table
+                $tripClassificationsTable
             )
-        ) === $relation_table;
+        ) === $tripClassificationsTable;
         
         if (!$table_exists) {
             return [];
@@ -553,11 +557,11 @@ class SingleTripController
         
         return $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT tc.id, tc.name, tc.slug 
-                 FROM {$relation_table} ttc
-                 LEFT JOIN {$categories_table} tc ON ttc.category_id = tc.id
-                 WHERE ttc.trip_id = %d
-                 ORDER BY ttc.`order` ASC, ttc.id ASC",
+                "SELECT c.id, c.name, c.slug 
+                 FROM {$tripClassificationsTable} tc
+                 LEFT JOIN {$classificationsTable} c ON tc.classification_id = c.id
+                 WHERE tc.trip_id = %d AND c.type = 'category'
+                 ORDER BY tc.sort_order ASC, tc.id ASC",
                 $trip_id
             )
         ) ?: [];
