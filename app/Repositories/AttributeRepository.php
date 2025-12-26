@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\ClassificationsTable;
+
 /**
  * Attribute Repository
  * Handles database operations for trip attributes
@@ -18,7 +20,7 @@ class AttributeRepository extends BaseRepository
     /**
      * Integer fields
      */
-    protected array $integerFields = ['id', 'display_order', 'created_by', 'updated_by'];
+    protected array $integerFields = ['id', 'sorting', 'created_by', 'updated_by'];
 
     /**
      * Get paginated results
@@ -27,6 +29,9 @@ class AttributeRepository extends BaseRepository
     {
         // Convert filter keys to WHERE clause format
         $where = [];
+        
+        // Always filter by type = 'attribute'
+        $where['type'] = 'attribute';
         
         // Handle status filter
         if (isset($args['status'])) {
@@ -71,6 +76,9 @@ class AttributeRepository extends BaseRepository
         // Convert filter keys to WHERE clause format (same as paginate)
         $where = [];
         
+        // Always filter by type = 'attribute'
+        $where['type'] = 'attribute';
+        
         if (isset($args['status'])) {
             $where['status'] = $args['status'];
             unset($args['status']);
@@ -103,15 +111,8 @@ class AttributeRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_attributes';
-    }
-
-    /**
-     * Get trip attributes table name
-     */
-    private function getTripAttributesTableName(): string
-    {
-        return $this->wpdb->prefix . 'yatra_trip_attributes';
+        return ClassificationsTable::getTableName();
+        
     }
 
     /**
@@ -121,8 +122,8 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE status = 'publish' 
-                 ORDER BY display_order ASC, name ASC";
+                 WHERE type = 'attribute' AND status = 'publish' 
+                 ORDER BY sorting ASC, name ASC";
         
         return $this->wpdb->get_results($query) ?: [];
     }
@@ -134,8 +135,8 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE status = 'publish' AND show_on_frontend = 1 
-                 ORDER BY display_order ASC, name ASC";
+                 WHERE type = 'attribute' AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_on_frontend') = 1 
+                 ORDER BY sorting ASC, name ASC";
         
         return $this->wpdb->get_results($query) ?: [];
     }
@@ -147,8 +148,8 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE status = 'publish' AND show_in_filters = 1 
-                 ORDER BY display_order ASC, name ASC";
+                 WHERE type = 'attribute' AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_in_filters') = 1 
+                 ORDER BY sorting ASC, name ASC";
         
         return $this->wpdb->get_results($query) ?: [];
     }
@@ -160,143 +161,9 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE slug = %s AND status = 'publish'";
+                 WHERE type = 'attribute' AND slug = %s AND status = 'publish'";
         
         return $this->wpdb->get_row($this->wpdb->prepare($query, $slug));
-    }
-
-    /**
-     * Get attribute values for a trip
-     */
-    public function getTripAttributes(int $tripId): array
-    {
-        $attrTable = esc_sql($this->table);
-        $tripAttrTable = esc_sql($this->getTripAttributesTableName());
-        
-        $query = "SELECT a.*, ta.value, ta.value_serialized
-                 FROM `{$attrTable}` a
-                 INNER JOIN `{$tripAttrTable}` ta ON a.id = ta.attribute_id
-                 WHERE ta.trip_id = %d AND a.status = 'publish'
-                 ORDER BY a.display_order ASC, a.name ASC";
-        
-        $results = $this->wpdb->get_results(
-            $this->wpdb->prepare($query, $tripId)
-        );
-        
-        // Unserialize values if needed
-        foreach ($results as $result) {
-            if ($result->value_serialized && $result->value) {
-                $result->value = maybe_unserialize($result->value);
-            }
-        }
-        
-        return $results ?: [];
-    }
-
-    /**
-     * Get trips by attribute value
-     */
-    public function getTripsByAttributeValue(int $attributeId, string $value): array
-    {
-        $tripTable = esc_sql($this->wpdb->prefix . 'yatra_trips');
-        $tripAttrTable = esc_sql($this->getTripAttributesTableName());
-        
-        $query = "SELECT DISTINCT t.*
-                 FROM `{$tripTable}` t
-                 INNER JOIN `{$tripAttrTable}` ta ON t.id = ta.trip_id
-                 WHERE ta.attribute_id = %d 
-                 AND ta.value = %s
-                 AND t.status IN ('publish', 'published')
-                 AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')";
-        
-        return $this->wpdb->get_results(
-            $this->wpdb->prepare($query, $attributeId, $value)
-        ) ?: [];
-    }
-
-    /**
-     * Create or update trip attribute value
-     */
-    public function setTripAttribute(int $tripId, int $attributeId, $value): bool
-    {
-        $tripAttrTable = esc_sql($this->getTripAttributesTableName());
-        
-        // Check if attribute value already exists
-        $existing = $this->wpdb->get_row(
-            $this->wpdb->prepare(
-                "SELECT id FROM `{$tripAttrTable}` 
-                 WHERE trip_id = %d AND attribute_id = %d",
-                $tripId,
-                $attributeId
-            )
-        );
-        
-        $valueSerialized = 0;
-        if (is_array($value) || is_object($value)) {
-            $value = maybe_serialize($value);
-            $valueSerialized = 1;
-        }
-        
-        if ($existing) {
-            // Update existing
-            return (bool) $this->wpdb->update(
-                $tripAttrTable,
-                [
-                    'value' => $value,
-                    'value_serialized' => $valueSerialized,
-                    'updated_at' => current_time('mysql')
-                ],
-                ['id' => $existing->id],
-                ['%s', '%d', '%s'],
-                ['%d']
-            );
-        } else {
-            // Insert new
-            return (bool) $this->wpdb->insert(
-                $tripAttrTable,
-                [
-                    'trip_id' => $tripId,
-                    'attribute_id' => $attributeId,
-                    'value' => $value,
-                    'value_serialized' => $valueSerialized,
-                    'created_at' => current_time('mysql'),
-                    'updated_at' => current_time('mysql')
-                ],
-                ['%d', '%d', '%s', '%d', '%s', '%s']
-            );
-        }
-    }
-
-    /**
-     * Delete trip attribute value
-     */
-    public function deleteTripAttribute(int $tripId, int $attributeId): bool
-    {
-        $tripAttrTable = esc_sql($this->getTripAttributesTableName());
-        
-        return (bool) $this->wpdb->delete(
-            $tripAttrTable,
-            ['trip_id' => $tripId, 'attribute_id' => $attributeId],
-            ['%d', '%d']
-        );
-    }
-
-    /**
-     * Get all attribute values for a specific attribute (for filters)
-     */
-    public function getAttributeValues(int $attributeId): array
-    {
-        $tripAttrTable = esc_sql($this->getTripAttributesTableName());
-        
-        $query = "SELECT DISTINCT value, COUNT(*) as count
-                 FROM `{$tripAttrTable}` 
-                 WHERE attribute_id = %d AND value IS NOT NULL AND value != ''
-                 GROUP BY value
-                 ORDER BY count DESC, value ASC";
-        
-        return $this->wpdb->get_results(
-            $this->wpdb->prepare($query, $attributeId)
-        ) ?: [];
     }
 
     /**
@@ -306,9 +173,9 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE status = 'publish' 
+                 WHERE type = 'attribute' AND status = 'publish' 
                  AND (name LIKE %s OR description LIKE %s)
-                 ORDER BY display_order ASC, name ASC
+                 ORDER BY sorting ASC, name ASC
                  LIMIT 50";
         
         $searchTerm = '%' . $this->wpdb->esc_like($term) . '%';
@@ -325,15 +192,38 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         
-        $data['created_at'] = current_time('mysql');
-        $data['updated_at'] = current_time('mysql');
+        // Extract metadata fields
+        $metadata = [];
+        $metadataFields = [
+            'field_type', 'required', 'show_on_frontend', 'show_in_filters', 
+            'filter_type', 'searchable', 'display_order', 'default_value', 
+            'placeholder', 'field_options', 'validation_rules'
+        ];
         
-        // Generate slug if not provided
-        if (empty($data['slug'])) {
-            $data['slug'] = sanitize_title($data['name']);
+        foreach ($metadataFields as $field) {
+            if (isset($data[$field])) {
+                $metadata[$field] = $data[$field];
+                unset($data[$field]);
+            }
         }
         
-        $result = $this->wpdb->insert($table, $data);
+        // Prepare core data
+        $coreData = [
+            'type' => 'attribute',
+            'name' => $data['name'],
+            'slug' => !empty($data['slug']) ? $data['slug'] : sanitize_title($data['name']),
+            'description' => $data['description'] ?? null,
+            'icon' => $data['icon'] ?? null,
+            'metadata' => !empty($metadata) ? json_encode($metadata) : null,
+            'sorting' => $data['sorting'] ?? 0,
+            'status' => $data['status'] ?? 'draft',
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql'),
+            'created_by' => $data['created_by'] ?? null,
+            'updated_by' => $data['updated_by'] ?? null,
+        ];
+        
+        $result = $this->wpdb->insert($table, $coreData);
         
         if ($result === false) {
             throw new \Exception('Failed to create attribute: ' . $this->wpdb->last_error);
@@ -349,31 +239,85 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         
-        $data['updated_at'] = current_time('mysql');
+        // Extract metadata fields
+        $metadata = [];
+        $metadataFields = [
+            'field_type', 'required', 'show_on_frontend', 'show_in_filters', 
+            'filter_type', 'searchable', 'display_order', 'default_value', 
+            'placeholder', 'field_options', 'validation_rules'
+        ];
         
-        // Update slug if name changed and slug not provided
-        if (isset($data['name']) && !isset($data['slug'])) {
-            $data['slug'] = sanitize_title($data['name']);
+        foreach ($metadataFields as $field) {
+            if (isset($data[$field])) {
+                $metadata[$field] = $data[$field];
+                unset($data[$field]);
+            }
         }
         
-        // Prepare format array for different data types
-        $formats = [];
-        foreach ($data as $key => $value) {
-            if (in_array($key, ['required', 'show_on_frontend', 'show_in_filters', 'searchable'])) {
-                $formats[] = '%d'; // Boolean fields as integers
-            } elseif (in_array($key, ['display_order'])) {
-                $formats[] = '%d'; // Integer fields
-            } else {
-                $formats[] = '%s'; // String fields
+        // Prepare core data
+        $coreData = [
+            'updated_at' => current_time('mysql'),
+        ];
+        
+        // Update core fields if provided
+        if (isset($data['name'])) {
+            $coreData['name'] = $data['name'];
+            // Update slug if name changed and slug not provided
+            if (!isset($data['slug'])) {
+                $coreData['slug'] = sanitize_title($data['name']);
             }
+        }
+        
+        if (isset($data['slug'])) {
+            $coreData['slug'] = $data['slug'];
+        }
+        
+        if (isset($data['description'])) {
+            $coreData['description'] = $data['description'];
+        }
+        
+        if (isset($data['icon'])) {
+            $coreData['icon'] = $data['icon'];
+        }
+        
+        if (isset($data['sorting'])) {
+            $coreData['sorting'] = $data['sorting'];
+        }
+        
+        if (isset($data['status'])) {
+            $coreData['status'] = $data['status'];
+        }
+        
+        if (isset($data['updated_by'])) {
+            $coreData['updated_by'] = $data['updated_by'];
+        }
+        
+        // Handle metadata - merge with existing metadata
+        if (!empty($metadata)) {
+            // Get existing metadata
+            $existing = $this->wpdb->get_var(
+                $this->wpdb->prepare(
+                    "SELECT metadata FROM `{$table}` WHERE id = %d AND type = 'attribute'",
+                    $id
+                )
+            );
+            
+            $existingMetadata = !empty($existing) ? json_decode($existing, true) : [];
+            if (!is_array($existingMetadata)) {
+                $existingMetadata = [];
+            }
+            
+            // Merge new metadata with existing
+            $mergedMetadata = array_merge($existingMetadata, $metadata);
+            $coreData['metadata'] = json_encode($mergedMetadata);
         }
         
         $result = $this->wpdb->update(
             $table,
-            $data,
-            ['id' => $id],
-            $formats,
-            ['%d']
+            $coreData,
+            ['id' => $id, 'type' => 'attribute'],
+            ['%s', '%s', '%s', '%s', '%d', '%s', '%d'], // formats
+            ['%d', '%s'] // where formats
         );
         
         return $result !== false;
@@ -409,8 +353,8 @@ class AttributeRepository extends BaseRepository
             // Delete attribute
             $result = $this->wpdb->delete(
                 $table,
-                ['id' => $id],
-                ['%d']
+                ['id' => $id, 'type' => 'attribute'],
+                ['%d', '%s']
             );
             
             $this->wpdb->query('COMMIT');
@@ -428,7 +372,7 @@ class AttributeRepository extends BaseRepository
     public function slugExists(string $slug, ?int $excludeId = null): bool
     {
         $table = esc_sql($this->table);
-        $query = "SELECT COUNT(*) FROM `{$table}` WHERE slug = %s";
+        $query = "SELECT COUNT(*) FROM `{$table}` WHERE type = 'attribute' AND slug = %s";
         
         if ($excludeId) {
             $query .= " AND id != %d";
@@ -443,14 +387,22 @@ class AttributeRepository extends BaseRepository
     }
 
     /**
-     * Get maximum display order
+     * Get trips table name
+     */
+    public function getTripsTableName(): string
+    {
+        return $this->wpdb->prefix . 'yatra_new_trips';
+    }
+
+    /**
+     * Get max display order
      */
     public function getMaxDisplayOrder(): int
     {
         $table = esc_sql($this->table);
         
         return (int) $this->wpdb->get_var(
-            "SELECT MAX(display_order) FROM `{$table}`"
+            "SELECT MAX(sorting) FROM `{$table}` WHERE type = 'attribute'"
         );
     }
 
@@ -467,10 +419,10 @@ class AttributeRepository extends BaseRepository
             foreach ($orders as $id => $order) {
                 $this->wpdb->update(
                     $table,
-                    ['display_order' => $order, 'updated_at' => current_time('mysql')],
-                    ['id' => $id],
+                    ['sorting' => $order, 'updated_at' => current_time('mysql')],
+                    ['id' => $id, 'type' => 'attribute'],
                     ['%d', '%s'],
-                    ['%d']
+                    ['%d', '%s']
                 );
             }
             
@@ -493,7 +445,7 @@ class AttributeRepository extends BaseRepository
         wp_cache_flush();
         
         // Get counts for each status
-        $query = "SELECT status, COUNT(*) as count FROM `{$table}` GROUP BY status";
+        $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE type = 'attribute' GROUP BY status";
         $results = $this->wpdb->get_results($query, ARRAY_A);
         
         // Debug logging
@@ -551,10 +503,10 @@ class AttributeRepository extends BaseRepository
         $table = esc_sql($this->getTableName());
         
         $attributes = $this->wpdb->get_results(
-            "SELECT id, name, field_type, field_options, icon, description 
+            "SELECT id, name, JSON_EXTRACT(metadata, '$.field_type') as field_type, JSON_EXTRACT(metadata, '$.field_options') as field_options, icon, description 
              FROM {$table} 
-             WHERE status = 'publish' 
-             ORDER BY display_order ASC, name ASC"
+             WHERE type = 'attribute' AND status = 'publish' 
+             ORDER BY sorting ASC, name ASC"
         );
         
         $formattedAttributes = [];

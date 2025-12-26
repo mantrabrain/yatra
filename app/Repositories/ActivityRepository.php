@@ -297,7 +297,10 @@ class ActivityRepository extends BaseRepository
     public function getTripCount(int $activityId): int
     {
         global $wpdb;
-        $tripsTable = $wpdb->prefix . 'yatra_trips';
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for trip activities
         $tripActivitiesTable = $wpdb->prefix . 'yatra_trip_activities';
         
         return (int) $wpdb->get_var($wpdb->prepare(
@@ -319,7 +322,8 @@ class ActivityRepository extends BaseRepository
     public function getTripCountDirect(int $activityId): int
     {
         global $wpdb;
-        $tripTable = $wpdb->prefix . 'yatra_trips';
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripTable = $tripRepository->getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*)

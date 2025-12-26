@@ -24,7 +24,6 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripContentTable;
-use Yatra\Database\Tables\AttributesTable;
 
 // Traditional Availability Tables
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
@@ -113,8 +112,10 @@ class Database
         // Unified content management (consolidates 4 old tables)
         dbDelta(TripContentTable::getSchema());
         
-        // EAV attribute system (consolidates 6 old tables)
-        dbDelta(AttributesTable::getSchema());
+        // Unified classification system (consolidates 6 old tables including attributes, items, item types)
+        dbDelta(ClassificationsTable::getSchema());
+        
+        // Trip attributes relationship table
 
         // ============================================
         // DATABASE VERSION TRACKING
@@ -158,9 +159,6 @@ class Database
             BookingDeparturesTable::getTableName(),
             ReviewsTable::getTableName(),
             DiscountsTable::getTableName(),
-            EnquiriesTable::getTableName(),
-            TripAvailabilityDatesTable::getTableName(),
-            TripAvailabilityRulesTable::getTableName(),
             TripRevisionsTable::getTableName(),
             
             // Optimized tables
@@ -169,7 +167,6 @@ class Database
             TripClassificationsTable::getTableName(),
             TripPricingTable::getTableName(),
             TripContentTable::getTableName(),
-            AttributesTable::getTableName(),
         ];
 
         foreach ($tables as $table) {
@@ -194,11 +191,10 @@ class Database
             'reduction_percentage' => 29,
             'optimized_tables' => [
                 'TripItineraryTable' => ['replaced' => 3, 'benefits' => ['JSON structure', '60% faster performance']],
-                'ClassificationsTable' => ['replaced' => 5, 'benefits' => ['Type-based system', 'Hierarchical support']],
+                'ClassificationsTable' => ['replaced' => 8, 'benefits' => ['Unified classification system', 'Attributes/items/types in one table', 'JSON metadata flexibility']],
                 'TripClassificationsTable' => ['replaced' => 4, 'benefits' => ['Polymorphic relationships', 'Future extensibility']],
                 'TripPricingTable' => ['replaced' => 'new', 'benefits' => ['Comprehensive pricing', 'Rule-based engine']],
-                'TripContentTable' => ['replaced' => 4, 'benefits' => ['Type-based content', 'Access control']],
-                'AttributesTable' => ['replaced' => 6, 'benefits' => ['EAV pattern', 'Unlimited attributes']]
+                'TripContentTable' => ['replaced' => 4, 'benefits' => ['Type-based content', 'Access control']]
             ]
         ];
     }

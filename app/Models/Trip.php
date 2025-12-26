@@ -699,10 +699,10 @@ class Trip
                 foreach ($price_categories as $category) {
                     // Handle both object and array formats
                     if (is_object($category)) {
-                        $regular_price = (float) ($category->regular_price ?? $category->original_price ?? $category->price ?? 0);
+                        $regular_price = (float) ($category->original_price ?? $category->price ?? 0);
                         $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
                     } elseif (is_array($category)) {
-                        $regular_price = (float) ($category['regular_price'] ?? $category['original_price'] ?? $category['price'] ?? 0);
+                        $regular_price = (float) ($category['original_price'] ?? $category['price'] ?? 0);
                         $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
                     } else {
                         continue;
@@ -741,8 +741,6 @@ class Trip
             // Check for original price
             if (!empty($this->original_price)) {
                 $original_price = (float) $this->original_price;
-            } elseif (!empty($this->regular_price)) {
-                $original_price = (float) $this->regular_price;
             } elseif (!empty($this->base_price)) {
                 $original_price = (float) $this->base_price;
             }
@@ -848,11 +846,11 @@ class Trip
                 foreach ($price_categories as $category) {
                     // Handle both object and array formats
                     if (is_object($category)) {
-                        $regular_price = (float) ($category->regular_price ?? $category->original_price ?? $category->price ?? 0);
+                        $regular_price = (float) ($category->original_price ?? $category->price ?? 0);
                         // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category->discounted_price ?? $category->sale_price ?? $category->discount_price ?? 0);
                     } elseif (is_array($category)) {
-                        $regular_price = (float) ($category['regular_price'] ?? $category['original_price'] ?? $category['price'] ?? 0);
+                        $regular_price = (float) ($category['original_price'] ?? $category['price'] ?? 0);
                         // Priority: discounted_price > sale_price (legacy) > discount_price (legacy)
                         $discounted_price = (float) ($category['discounted_price'] ?? $category['sale_price'] ?? $category['discount_price'] ?? 0);
                     } else {
@@ -902,8 +900,6 @@ class Trip
             // Regular pricing - NO "From" text
             if (!empty($this->original_price)) {
                 $original_price_raw = (float) $this->original_price;
-            } elseif (!empty($this->regular_price)) {
-                $original_price_raw = (float) $this->regular_price;
             } elseif (!empty($this->base_price)) {
                 $original_price_raw = (float) $this->base_price;
             }

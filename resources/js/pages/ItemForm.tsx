@@ -190,7 +190,7 @@ const ItemForm: React.FC = () => {
         return await apiClient.post('/items', payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['items'] });
       queryClient.invalidateQueries({ queryKey: ['item', itemId] });
       showToast(
@@ -199,9 +199,21 @@ const ItemForm: React.FC = () => {
           : __('Item created successfully', 'Item created successfully'),
         'success'
       );
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items`;
-      }, 1000);
+      
+      // Handle redirect based on backend response
+      if (response?.redirect) {
+        setTimeout(() => {
+          window.location.href = response.redirect_to;
+        }, 1000);
+      } else if (response?.stay_on_page) {
+        // Stay on current page for updates
+        setIsSubmitting(false);
+      } else {
+        // Default fallback - redirect to items list
+        setTimeout(() => {
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=items`;
+        }, 1000);
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the item', 'An error occurred while saving the item');

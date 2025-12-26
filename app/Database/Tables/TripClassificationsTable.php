@@ -61,8 +61,6 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `is_active` tinyint(1) NOT NULL DEFAULT 1,
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `created_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who created this record',
-    `updated_by` bigint(20) unsigned DEFAULT NULL COMMENT 'User ID who last updated this record',
     
     PRIMARY KEY (`id`),
     UNIQUE KEY `trip_classification_unique` (`trip_id`, `classification_id`, `classification_type`),

@@ -2,7 +2,7 @@
 
 namespace Yatra\Services;
 
-use Yatra\Repositories\AvailabilityRecurringRulesRepository;
+use Yatra\Repositories\RecurringAvailabilityRepository;
 use Yatra\Helpers\FormatHelper;
 use Yatra\Helpers\ValidationHelper;
 
@@ -18,7 +18,7 @@ use Yatra\Helpers\ValidationHelper;
 class AvailabilityRecurringRulesService
 {
     /**
-     * @var AvailabilityRecurringRulesRepository Repository instance
+     * @var RecurringAvailabilityRepository Repository instance
      */
     private $repository;
 
@@ -27,7 +27,7 @@ class AvailabilityRecurringRulesService
      */
     public function __construct()
     {
-        $this->repository = new AvailabilityRecurringRulesRepository();
+        $this->repository = new RecurringAvailabilityRepository();
     }
 
     /**

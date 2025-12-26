@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\ClassificationsTable;
+
 /**
  * Traveler Category Repository
- * Handles database operations for traveler categories
+ * Handles database operations for traveler categories using unified ClassificationsTable
  */
 class TravelerCategoryRepository extends BaseRepository
 {
@@ -15,8 +17,20 @@ class TravelerCategoryRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_traveler_categories';
+        return ClassificationsTable::getTableName();
+    }
+
+    /**
+     * Get all traveler categories with automatic type filtering
+     */
+    public function all(array $args = []): array
+    {
+        // Always filter by type = 'traveler_type' for traveler categories
+        if (!isset($args['where']['type'])) {
+            $args['where']['type'] = 'traveler_type';
+        }
+        
+        return parent::all($args);
     }
 
     /**
@@ -27,7 +41,7 @@ class TravelerCategoryRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = 'traveler_type' AND slug = %s",
                 $slug
             )
         );
@@ -40,6 +54,7 @@ class TravelerCategoryRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
+        $args['where']['type'] = 'traveler_type';
         $args['where']['status'] = 'publish';
         return $this->all($args);
     }
@@ -49,6 +64,7 @@ class TravelerCategoryRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
+        $args['where']['type'] = 'traveler_type';
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -64,7 +80,7 @@ class TravelerCategoryRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE (label LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE (name LIKE %s OR slug LIKE %s OR description LIKE %s) AND type = 'traveler_type'",
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -96,7 +112,9 @@ class TravelerCategoryRepository extends BaseRepository
         $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
         
         return $this->wpdb->get_results($this->wpdb->prepare(
-            "SELECT id, label, slug, age_min, age_max FROM {$table} WHERE id IN ({$placeholders})",
+            "SELECT id, name, slug, JSON_EXTRACT(metadata, '$.age_min') as age_min, JSON_EXTRACT(metadata, '$.age_max') as age_max 
+             FROM {$table} 
+             WHERE id IN ({$placeholders}) AND type = 'traveler_type'",
             ...$categoryIds
         ));
     }

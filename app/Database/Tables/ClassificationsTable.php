@@ -53,7 +53,7 @@ class ClassificationsTable extends BaseTable
         return <<<SQL
 CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `type` enum('category','activity','destination','difficulty','traveler_type') NOT NULL,
+    `type` enum('category','activity','destination','difficulty','traveler_type','attribute','item_type','item') NOT NULL,
     `name` varchar(255) NOT NULL,
     `slug` varchar(255) NOT NULL,
     `description` text,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `level` tinyint(3) unsigned DEFAULT 0,
     `icon` text DEFAULT NULL,
     `color` varchar(7) DEFAULT NULL COMMENT 'Hex color code',
-    `metadata` longtext COMMENT 'JSON: Type-specific metadata (coordinates for destinations, requirements for activities, etc.)',
+    `metadata` longtext COMMENT 'JSON: Type-specific metadata (coordinates for destinations, requirements for activities, field config for attributes, item_type_id for items, etc.)',
     `sorting` int(11) DEFAULT 0,
     `is_featured` tinyint(1) DEFAULT 0,
     `status` varchar(20) NOT NULL DEFAULT 'draft',
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `is_featured` (`is_featured`),
     KEY `sorting` (`sorting`),
     FULLTEXT KEY `search_content` (`name`, `description`)
-) {$charsetCollate} COMMENT='Unified classification system for categories, activities, destinations';
+) {$charsetCollate} COMMENT='Unified classification system for categories, activities, destinations, attributes, items, and item types';
 SQL;
     }
 }

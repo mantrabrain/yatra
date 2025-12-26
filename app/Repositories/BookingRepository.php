@@ -173,7 +173,12 @@ class BookingRepository extends BaseRepository
     public function findByReferenceWithTrip(string $reference): ?object
     {
         $table = $this->getTableName();
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
         $tripDestinations = $this->wpdb->prefix . 'yatra_trip_destinations';
         $destinations = $this->wpdb->prefix . 'yatra_destinations';
         $tripActivities = $this->wpdb->prefix . 'yatra_trip_activities';
@@ -573,7 +578,10 @@ class BookingRepository extends BaseRepository
     public function getBookingsForReminder(string $travelDate): array
     {
         $table = $this->getTableName();
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
 
         return $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT b.*, t.title as trip_title, t.currency
@@ -784,7 +792,9 @@ class BookingRepository extends BaseRepository
      */
     public function calculateEndDate(string $startDate, int $tripId): string
     {
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
         
         $durationDays = $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT duration_days FROM {$tripsTable} WHERE id = %d LIMIT 1",
@@ -904,6 +914,8 @@ class BookingRepository extends BaseRepository
     public function findByDepartureId(int $departureId): array
     {
         $table = $this->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for this table
         $relationTable = $this->wpdb->prefix . 'yatra_booking_departures';
         
         $bookings = $this->wpdb->get_results($this->wpdb->prepare(

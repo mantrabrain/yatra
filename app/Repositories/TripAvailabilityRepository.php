@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
-use Yatra\Database\Tables\BaseRepository;
+use Yatra\Database\Tables\TripsTable;
 
 /**
  * Trip Availability Repository

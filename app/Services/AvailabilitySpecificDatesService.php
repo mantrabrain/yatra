@@ -2,7 +2,7 @@
 
 namespace Yatra\Services;
 
-use Yatra\Repositories\AvailabilitySpecificDatesRepository;
+use Yatra\Repositories\AvailabilityRepository;
 use Yatra\Helpers\FormatHelper;
 use Yatra\Helpers\ValidationHelper;
 
@@ -18,7 +18,7 @@ use Yatra\Helpers\ValidationHelper;
 class AvailabilitySpecificDatesService
 {
     /**
-     * @var AvailabilitySpecificDatesRepository Repository instance
+     * @var AvailabilityRepository Repository instance
      */
     private $repository;
 
@@ -27,7 +27,7 @@ class AvailabilitySpecificDatesService
      */
     public function __construct()
     {
-        $this->repository = new AvailabilitySpecificDatesRepository();
+        $this->repository = new AvailabilityRepository();
     }
 
     /**

@@ -72,6 +72,9 @@ class ItemService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        // Set type to item for ClassificationsTable
+        $data['type'] = 'item';
+        
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
@@ -81,7 +84,7 @@ class ItemService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_items',
+                'yatra_new_classifications',
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -94,9 +97,15 @@ class ItemService extends BaseService
             $data['description'] = sanitize_textarea_field($data['description']);
         }
 
-        // Sanitize type_id
+        // Store type_id in metadata
         if (isset($data['type_id'])) {
-            $data['type_id'] = absint($data['type_id']);
+            $metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $metadata = $data['metadata'];
+            }
+            $metadata['type_id'] = absint($data['type_id']);
+            $data['metadata'] = wp_json_encode($metadata);
+            unset($data['type_id']); // Remove from main data
         }
 
         // Sanitize status
@@ -122,6 +131,9 @@ class ItemService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
+        // Ensure type is not changed from item
+        $data['type'] = 'item';
+        
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
@@ -135,7 +147,7 @@ class ItemService extends BaseService
             // Slug was manually edited - preserve it but ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_items',
+                'yatra_new_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
@@ -143,7 +155,7 @@ class ItemService extends BaseService
             // Auto-generate slug from name if name is provided and slug not manually edited
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_items',
+                'yatra_new_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
@@ -157,9 +169,15 @@ class ItemService extends BaseService
             $data['description'] = sanitize_textarea_field($data['description']);
         }
 
-        // Sanitize type_id
+        // Store type_id in metadata
         if (isset($data['type_id'])) {
-            $data['type_id'] = absint($data['type_id']);
+            $metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $metadata = $data['metadata'];
+            }
+            $metadata['type_id'] = absint($data['type_id']);
+            $data['metadata'] = wp_json_encode($metadata);
+            unset($data['type_id']); // Remove from main data
         }
 
         // Sanitize status

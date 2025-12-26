@@ -7,6 +7,10 @@ namespace Yatra\Controllers;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripContentTable;
+use Yatra\Database\Tables\TripItineraryTable;
 
 /**
  * Single Trip Frontend Controller
@@ -299,7 +303,7 @@ class SingleTripController
      */
     private function getAvailabilityDates(int $trip_id): array
     {
-        $table = $this->wpdb->prefix . 'yatra_trip_availability_dates';
+        $table = TripAvailabilityDatesTable::getTableName();
         
         // Get all availability dates for this trip
         $availability = $this->wpdb->get_results(
@@ -362,6 +366,7 @@ class SingleTripController
      */
     private function getPriceTypes(int $trip_id): array
     {
+        // Using hardcoded table names since there's no dedicated table class for these tables yet
         $table = $this->wpdb->prefix . 'yatra_trip_price_types';
         $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
         
@@ -406,6 +411,7 @@ class SingleTripController
      */
     private function getDestinations(int $trip_id): array
     {
+        // Using hardcoded table name since there's no dedicated table class for this table yet
         $destination_ids = $this->wpdb->get_col(
             $this->wpdb->prepare(
                 "SELECT destination_id FROM {$this->wpdb->prefix}yatra_trip_destinations 
@@ -443,6 +449,7 @@ class SingleTripController
      */
     private function getActivities(int $trip_id): array
     {
+        // Using hardcoded table name since there's no dedicated table class for this table yet
         $activity_ids = $this->wpdb->get_col(
             $this->wpdb->prepare(
                 "SELECT activity_id FROM {$this->wpdb->prefix}yatra_trip_activities 
@@ -473,6 +480,7 @@ class SingleTripController
      */
     private function getGalleryImages(int $trip_id): array
     {
+        // Using hardcoded table name since there's no dedicated table class for this table yet
         $table = $this->wpdb->prefix . 'yatra_trip_gallery_images';
         
         // Check if table exists
@@ -527,6 +535,7 @@ class SingleTripController
      */
     private function getTripCategories(int $trip_id): array
     {
+        // Using hardcoded table names since there's no dedicated table class for these tables yet
         $relation_table = $this->wpdb->prefix . 'yatra_trip_trip_categories';
         $categories_table = $this->wpdb->prefix . 'yatra_trip_categories';
         
@@ -660,16 +669,15 @@ class SingleTripController
      */
     private function getTripAttributes(int $trip_id): array
     {
-        $table_trip_attributes = $this->wpdb->prefix . 'yatra_trip_attributes';
-        $table_attributes = $this->wpdb->prefix . 'yatra_attributes';
+        $table_classifications = ClassificationsTable::getTableName();
         
-        // Check if trip attributes table exists
+        // Check if table exists
         $table_exists = $this->wpdb->get_var(
             $this->wpdb->prepare(
                 "SHOW TABLES LIKE %s",
-                $table_trip_attributes
+                $table_classifications
             )
-        ) === $table_trip_attributes;
+        ) === $table_classifications;
         
         if (!$table_exists) {
             return [];
@@ -677,11 +685,16 @@ class SingleTripController
         
         $attributes = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT ta.value, ta.value_serialized, a.id, a.name, a.field_type, a.field_options, a.icon, a.description
-                 FROM {$table_trip_attributes} ta 
-                 LEFT JOIN {$table_attributes} a ON ta.attribute_id = a.id 
-                 WHERE ta.trip_id = %d AND a.status = 'publish'
-                 ORDER BY a.display_order ASC, a.name ASC",
+                "SELECT c.id, c.name, c.slug, c.description, c.icon, c.metadata,
+                        JSON_EXTRACT(c.metadata, '$.field_type') as field_type,
+                        JSON_EXTRACT(c.metadata, '$.field_options') as field_options,
+                        JSON_EXTRACT(c.metadata, '$.value') as value,
+                        JSON_EXTRACT(c.metadata, '$.value_serialized') as value_serialized
+                 FROM {$table_classifications} c
+                 WHERE c.type = 'attribute'
+                 AND JSON_EXTRACT(c.metadata, '$.trip_id') = %d
+                 AND c.status = 'publish'
+                 ORDER BY c.sorting ASC, c.name ASC",
                 $trip_id
             )
         );
@@ -782,10 +795,11 @@ class SingleTripController
      */
     private function getItineraryDays(int $trip_id): array
     {
+        // Using hardcoded table names for legacy itinerary tables since they use a different schema
+        // Note: Items and Item Types now use ClassificationsTable with unified approach
         $table_days = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
         $table_entries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
-        $table_items = $this->wpdb->prefix . 'yatra_items';
-        $table_item_types = $this->wpdb->prefix . 'yatra_item_types';
+        $table_classifications = ClassificationsTable::getTableName();
 
         // Get all days for this trip
         $days = $this->wpdb->get_results(
@@ -811,8 +825,8 @@ class SingleTripController
                             it.name as item_type_name,
                             it.icon as item_type_icon
                      FROM {$table_entries} e
-                     LEFT JOIN {$table_items} i ON e.item_id = i.id
-                     LEFT JOIN {$table_item_types} it ON e.item_type_id = it.id
+                     LEFT JOIN {$table_classifications} i ON e.item_id = i.id AND i.type = 'item'
+                     LEFT JOIN {$table_classifications} it ON e.item_type_id = it.id AND it.type = 'item_type'
                      WHERE e.day_id = %d
                      ORDER BY e.order ASC, e.id ASC",
                     $day->id

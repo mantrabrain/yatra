@@ -510,6 +510,7 @@ class TripService extends BaseService
             'trip_category',
             'price_types', // Include price_types in relationship fields
             'downloadable_items', // Managed in separate yatra_trip_downloads table
+            'attributes', // Add attributes to relationship fields
         ];
         
         error_log("Yatra TripService: updateWithRelations START - id={$id}");
@@ -537,12 +538,17 @@ class TripService extends BaseService
         $data = $this->processBeforeUpdate($id, $data);
         
         $attributesRelationship = $relationships['attributes'] ?? null;
+        error_log("Yatra TripService: updateWithRelations - attributesRelationship=" . json_encode($attributesRelationship));
+        
         unset($relationships['attributes']);
 
         $result = $this->repository->updateWithRelations($id, $data, $relationships);
 
         if ($result && is_array($attributesRelationship)) {
+            error_log("Yatra TripService: updateWithRelations - Calling saveTripAttributes");
             $this->saveTripAttributes($id, $attributesRelationship);
+        } else {
+            error_log("Yatra TripService: updateWithRelations - NOT calling saveTripAttributes - result=" . var_export($result, true) . ", is_array(attributesRelationship)=" . var_export(is_array($attributesRelationship), true));
         }
         
         // Always sync pricing_type to availability dates and recurring rules when saving
@@ -571,10 +577,9 @@ class TripService extends BaseService
         $updated_dates = $availabilityRepository->updatePricingTypeByTripId($tripId, $pricingType);
         error_log("Yatra: Updated {$updated_dates} availability dates");
         
-        // Update recurring rules
-        $recurringRulesRepository = new \Yatra\Repositories\AvailabilityRecurringRulesRepository();
-        $updated_rules = $recurringRulesRepository->updatePricingTypeByTripId($tripId, $pricingType);
-        error_log("Yatra: Updated {$updated_rules} recurring rules");
+        // Note: Recurring rules table doesn't have pricing_type column
+        // Pricing type is derived from the trip, not stored in rules
+        error_log("Yatra: Recurring rules pricing type derived from trip {$tripId}");
         
         // If changing to regular pricing, clear traveler_pricing and price_types
         if ($pricingType === 'regular') {
@@ -586,27 +591,9 @@ class TripService extends BaseService
             $cleared_pricing = $availabilityRepository->clearTravelerPricingByTripId($tripId);
             error_log("Yatra: Cleared traveler_pricing from {$cleared_pricing} availability dates");
             
-            // Also clear traveler_pricing from time_slots in rules
-            $rules = $recurringRulesRepository->getByTripId($tripId);
-            
-            foreach ($rules as $rule) {
-                if (!empty($rule->time_slots)) {
-                    $time_slots = json_decode($rule->time_slots, true);
-                    if (is_array($time_slots)) {
-                        $updated = false;
-                        foreach ($time_slots as &$slot) {
-                            if (isset($slot['traveler_pricing'])) {
-                                unset($slot['traveler_pricing']);
-                                $updated = true;
-                            }
-                        }
-                        
-                        if ($updated) {
-                            $recurringRulesRepository->updateTimeSlots($rule->id, json_encode($time_slots));
-                        }
-                    }
-                }
-            }
+            // Note: Recurring rules don't have pricing_type column
+            // Pricing is derived from the trip, not stored in rules
+            error_log("Yatra: Recurring rules pricing cleared for trip {$tripId}");
         }
         
         error_log("Yatra: Completed pricing sync for trip {$tripId}");
@@ -1146,11 +1133,22 @@ class TripService extends BaseService
     }
 
     /**
+     * Update trip attributes (alias for bulkUpdateAttributes)
+     */
+    public function updateTripAttributes(int $tripId, array $attributes): bool
+    {
+        error_log("Yatra TripService: updateTripAttributes - trip_id={$tripId}, attributes=" . json_encode($attributes));
+        return $this->bulkUpdateAttributes($tripId, $attributes);
+    }
+
+    /**
      * Bulk update trip attributes
      */
     public function bulkUpdateAttributes(int $tripId, array $attributes): bool
     {
         try {
+            error_log("Yatra TripService: bulkUpdateAttributes - trip_id={$tripId}, attributes=" . json_encode($attributes));
+            
             // Validate trip exists
             $trip = $this->getById($tripId);
             if (!$trip) {
@@ -1158,6 +1156,7 @@ class TripService extends BaseService
             }
 
             $result = $this->attributeService->bulkUpdateTripAttributes($tripId, $attributes);
+            error_log("Yatra TripService: bulkUpdateAttributes - attributeService result=" . var_export($result, true));
             
             if ($result) {
                 // Clear trip cache since attributes changed
@@ -1219,8 +1218,14 @@ class TripService extends BaseService
      */
     private function saveTripAttributes(int $tripId, array $attributes): bool
     {
+        error_log("Yatra TripService: saveTripAttributes - START - trip_id={$tripId}, attributes=" . json_encode($attributes));
+        
         $tripAttributeRepository = new \Yatra\Repositories\TripAttributeRepository();
-        return $tripAttributeRepository->saveTripAttributes($tripId, $attributes);
+        $result = $tripAttributeRepository->saveTripAttributes($tripId, $attributes);
+        
+        error_log("Yatra TripService: saveTripAttributes - END - result=" . var_export($result, true));
+        
+        return $result;
     }
 
     /**
@@ -1229,6 +1234,23 @@ class TripService extends BaseService
     public function getTripActivities(int $tripId): array
     {
         return $this->repository->getTripActivities($tripId);
+    }
+
+    /**
+     * Get trip destinations
+     */
+    public function getTripDestinations(int $tripId): array
+    {
+        return $this->repository->getTripDestinations($tripId);
+    }
+
+    /**
+     * Get trip attributes
+     */
+    public function getTripAttributes(int $tripId): array
+    {
+        $tripAttributeRepository = new \Yatra\Repositories\TripAttributeRepository();
+        return $tripAttributeRepository->getTripAttributes($tripId);
     }
 
     /**

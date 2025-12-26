@@ -182,6 +182,20 @@ class TravelerCategoryController extends BaseController
     {
         $prepared = (array) $item;
 
+        // Handle field mapping for backward compatibility - convert name back to label
+        if (isset($prepared['name'])) {
+            $prepared['label'] = $prepared['name'];
+        }
+
+        // Parse metadata JSON and merge into main data for edit form
+        if (!empty($prepared['metadata'])) {
+            $metadata = json_decode($prepared['metadata'], true);
+            if (is_array($metadata)) {
+                // Merge metadata fields into main response for edit form
+                $prepared = array_merge($prepared, $metadata);
+            }
+        }
+
         if (isset($prepared['icon']) && is_string($prepared['icon'])) {
             $prepared['icon'] = maybe_unserialize($prepared['icon']);
         }

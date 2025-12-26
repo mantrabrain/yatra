@@ -52,7 +52,9 @@ class PaymentRepository extends BaseRepository
      */
     protected function getBookingsTable(): string
     {
-        return $this->wpdb->prefix . 'yatra_bookings';
+        // Use BookingRepository for bookings table
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        return $bookingRepository->getTableName();
     }
 
     /**
@@ -60,7 +62,9 @@ class PaymentRepository extends BaseRepository
      */
     protected function getTripsTable(): string
     {
-        return $this->wpdb->prefix . 'yatra_trips';
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        return $tripRepository->getTableName();
     }
 
     /**

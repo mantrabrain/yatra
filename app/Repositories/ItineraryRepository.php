@@ -42,6 +42,7 @@ class ItineraryRepository extends BaseRepository
         error_log("[YATRA DEBUG]   allowExisting: " . ($allowExisting ? 'TRUE' : 'FALSE'));
         
         global $wpdb;
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
         // Check if day exists
@@ -148,8 +149,11 @@ class ItineraryRepository extends BaseRepository
         
         global $wpdb;
         $tableEntries = $this->getTableName();
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableItems = $wpdb->prefix . 'yatra_trip_itinerary_entry_items';
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
 
         // Get or create day
@@ -279,6 +283,7 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
 
         // Get existing entry to get day_id
@@ -301,7 +306,8 @@ class ItineraryRepository extends BaseRepository
             
             if ($newDayNumber !== null) {
                 // Get current day number from existing entry's day
-                $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+                // Using hardcoded table name since there's no dedicated repository for this table
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
                 $currentDay = $wpdb->get_row(
                     $wpdb->prepare("SELECT day_number FROM `{$tableDays}` WHERE id = %d", $dayId)
                 );
@@ -337,7 +343,8 @@ class ItineraryRepository extends BaseRepository
                     $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, $newDayDescription, true);
                 }
             } elseif ($newDayTitle !== null || $newDayDescription !== null) {
-                $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
+                // Using hardcoded table name since there's no dedicated repository for this table
+        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
                 $updateData = [];
                 $updateFormat = [];
                 
@@ -523,8 +530,10 @@ class ItineraryRepository extends BaseRepository
     private function getItemIdsFromActivityType(string $activityType): ?array
     {
         global $wpdb;
-        $tableItems = $wpdb->prefix . 'yatra_items';
-        $tableItemTypes = $wpdb->prefix . 'yatra_item_types';
+        $itemRepository = new \Yatra\Repositories\ItemRepository();
+        $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
+        $tableItems = $itemRepository->getTableName();
+        $tableItemTypes = $itemTypeRepository->getTableName();
 
         // First try to find by item name (exact match)
         $item = $wpdb->get_row(
@@ -576,8 +585,10 @@ class ItineraryRepository extends BaseRepository
         }
 
         global $wpdb;
-        $tableItems = $wpdb->prefix . 'yatra_items';
-        $tableItemTypes = $wpdb->prefix . 'yatra_item_types';
+        $itemRepository = new \Yatra\Repositories\ItemRepository();
+        $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
+        $tableItems = $itemRepository->getTableName();
+        $tableItemTypes = $itemTypeRepository->getTableName();
 
         // Get item name
         $item = $wpdb->get_row(
@@ -603,7 +614,11 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
         // Get entry
@@ -701,7 +716,11 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
         // Get the entry to check if it's a day entry
@@ -763,7 +782,11 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableImages = $wpdb->prefix . 'yatra_trip_itinerary_entry_images';
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
 
         if (empty($ids)) {
@@ -862,6 +885,9 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for this table
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         
         // First, try to find existing day entry
@@ -928,6 +954,9 @@ class ItineraryRepository extends BaseRepository
     public function getDayById(int $dayId): ?object
     {
         global $wpdb;
+        
+        // Using hardcoded table name since there's no dedicated repository for this table
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         
         return $wpdb->get_row($wpdb->prepare(
@@ -947,6 +976,9 @@ class ItineraryRepository extends BaseRepository
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for this table
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         
         return $wpdb->get_row($wpdb->prepare(
@@ -972,6 +1004,7 @@ class ItineraryRepository extends BaseRepository
     public function findDayByTripAndDayNumber(int $tripId, int $dayNumber): ?object
     {
         global $wpdb;
+        // Using hardcoded table name since there's no dedicated repository for this table
         $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
         
         return $wpdb->get_row($wpdb->prepare(

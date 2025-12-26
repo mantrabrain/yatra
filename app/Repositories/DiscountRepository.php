@@ -76,7 +76,7 @@ class DiscountRepository extends BaseRepository
     public function getActiveGroupDiscounts(): array
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_discounts';
+        $table = $this->getTableName();
         $today = date('Y-m-d');
 
         // Query for active group discounts applicable to this trip

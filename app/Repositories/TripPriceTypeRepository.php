@@ -12,6 +12,7 @@ class TripPriceTypeRepository extends BaseRepository
      */
     public function getByTripId(int $tripId): array
     {
+        // Using hardcoded table names since there's no dedicated repository for these tables
         $priceTypesTable = $this->wpdb->prefix . 'yatra_trip_price_types';
         $categoriesTable = $this->wpdb->prefix . 'yatra_traveler_categories';
         

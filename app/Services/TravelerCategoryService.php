@@ -35,15 +35,47 @@ class TravelerCategoryService extends BaseService
     }
 
     /**
+     * Validate data for creation with field mapping
+     */
+    public function validateCreate(array $data): void
+    {
+        // Handle field mapping for backward compatibility BEFORE validation
+        if (isset($data['label']) && !isset($data['name'])) {
+            $data['name'] = $data['label'];
+            // Remove the old label field to prevent database errors
+            unset($data['label']);
+        }
+        
+        // Call parent validation with mapped data
+        parent::validateCreate($data);
+    }
+
+    /**
+     * Validate data for update with field mapping
+     */
+    public function validateUpdate(int $id, array $data): void
+    {
+        // Handle field mapping for backward compatibility BEFORE validation
+        if (isset($data['label']) && !isset($data['name'])) {
+            $data['name'] = $data['label'];
+            // Remove the old label field to prevent database errors
+            unset($data['label']);
+        }
+        
+        // Call parent validation with mapped data
+        parent::validateUpdate($id, $data);
+    }
+
+    /**
      * Validate traveler category data
      */
     protected function validate(array $data, ?int $id = null): void
     {
-        if (empty($data['label'])) {
-            throw new \InvalidArgumentException('Category label is required');
+        if (empty($data['name'])) {
+            throw new \InvalidArgumentException('Category name is required');
         }
 
-        // Slug will be auto-generated from label, so we don't need to validate it here
+        // Slug will be auto-generated from name, so we don't need to validate it here
         // The SlugHelper will ensure uniqueness
 
         // Validate status
@@ -121,20 +153,27 @@ class TravelerCategoryService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
-        // Sanitize label
-        if (isset($data['label'])) {
-            $data['label'] = sanitize_text_field($data['label']);
+        // Handle field mapping for backward compatibility
+        if (isset($data['label']) && !isset($data['name'])) {
+            $data['name'] = $data['label'];
+            // Remove the old label field to prevent database errors
+            unset($data['label']);
+        }
+        
+        // Sanitize name
+        if (isset($data['name'])) {
+            $data['name'] = sanitize_text_field($data['name']);
         }
 
-        // Always auto-generate slug from label (backend ensures uniqueness)
-        if (!empty($data['label'])) {
+        // Always auto-generate slug from name (backend ensures uniqueness)
+        if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
-                $data['label'],
-                'yatra_traveler_categories',
+                $data['name'],
+                'yatra_new_classifications',
                 'slug'
             );
         } elseif (isset($data['slug'])) {
-            // If label is empty but slug is provided, sanitize it
+            // If name is empty but slug is provided, sanitize it
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
@@ -149,52 +188,39 @@ class TravelerCategoryService extends BaseService
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
                 : 'draft';
-        } else {
-            $data['status'] = 'draft';
         }
 
-        // Sanitize pricing mode
-        $allowed_pricing_modes = ['per_person', 'per_group'];
-        if (isset($data['pricing_mode']) && in_array($data['pricing_mode'], $allowed_pricing_modes, true)) {
-            $data['pricing_mode'] = $data['pricing_mode'];
-        } else {
-            $data['pricing_mode'] = 'per_person';
+        // Prepare metadata for traveler type
+        $metadata = [];
+        
+        if (isset($data['age_min']) && $data['age_min'] !== '' && $data['age_min'] !== null) {
+            $metadata['age_min'] = (int) $data['age_min'];
+        }
+        
+        if (isset($data['age_max']) && $data['age_max'] !== '' && $data['age_max'] !== null) {
+            $metadata['age_max'] = (int) $data['age_max'];
+        }
+        
+        if (isset($data['pricing_mode'])) {
+            $metadata['pricing_mode'] = sanitize_text_field($data['pricing_mode']);
+        }
+        
+        if (isset($data['min_pax']) && $data['min_pax'] !== '' && $data['min_pax'] !== null) {
+            $metadata['min_pax'] = (int) $data['min_pax'];
+        }
+        
+        if (isset($data['max_pax']) && $data['max_pax'] !== '' && $data['max_pax'] !== null) {
+            $metadata['max_pax'] = (int) $data['max_pax'];
         }
 
-        // Handle age_min
-        if (isset($data['age_min'])) {
-            if ($data['age_min'] === '' || $data['age_min'] === null) {
-                $data['age_min'] = null;
-            } else {
-                $data['age_min'] = absint($data['age_min']);
-            }
-        }
+        // Set the type for traveler categories
+        $data['type'] = 'traveler_type';
+        
+        // Store metadata as JSON
+        $data['metadata'] = wp_json_encode($metadata);
 
-        // Handle age_max
-        if (isset($data['age_max'])) {
-            if ($data['age_max'] === '' || $data['age_max'] === null) {
-                $data['age_max'] = null;
-            } else {
-                $data['age_max'] = absint($data['age_max']);
-            }
-        }
-
-        // Handle group size (min_pax, max_pax)
-        if (isset($data['min_pax'])) {
-            if ($data['min_pax'] === '' || $data['min_pax'] === null) {
-                $data['min_pax'] = null;
-            } else {
-                $data['min_pax'] = absint($data['min_pax']);
-            }
-        }
-
-        if (isset($data['max_pax'])) {
-            if ($data['max_pax'] === '' || $data['max_pax'] === null) {
-                $data['max_pax'] = null;
-            } else {
-                $data['max_pax'] = absint($data['max_pax']);
-            }
-        }
+        // Remove old field names that don't exist in ClassificationsTable
+        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax']);
 
         // Set created_by and updated_by to current user
         $current_user_id = get_current_user_id();
@@ -228,12 +254,19 @@ class TravelerCategoryService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
-        // Sanitize label
-        if (isset($data['label'])) {
-            $data['label'] = sanitize_text_field($data['label']);
+        // Handle field mapping for backward compatibility
+        if (isset($data['label']) && !isset($data['name'])) {
+            $data['name'] = $data['label'];
+            // Remove the old label field to prevent database errors
+            unset($data['label']);
+        }
+        
+        // Sanitize name
+        if (isset($data['name'])) {
+            $data['name'] = sanitize_text_field($data['name']);
         }
 
-        // Handle slug: preserve manually edited slug, otherwise auto-generate from label
+        // Handle slug: preserve manually edited slug, otherwise auto-generate from name
         $preserveSlug = isset($data['preserve_slug']) && $data['preserve_slug'] === true;
         unset($data['preserve_slug']); // Remove flag from data array
 
@@ -241,20 +274,20 @@ class TravelerCategoryService extends BaseService
             // Slug was manually edited - preserve it but ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_traveler_categories',
+                'yatra_new_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
-        } elseif (!empty($data['label'])) {
-            // Auto-generate slug from label if label is provided and slug not manually edited
+        } elseif (!empty($data['name'])) {
+            // Auto-generate slug from name if name is provided and slug not manually edited
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
-                $data['label'],
-                'yatra_traveler_categories',
+                $data['name'],
+                'yatra_new_classifications',
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
         } elseif (isset($data['slug'])) {
-            // If label is not provided but slug is, sanitize the slug
+            // If name is not provided but slug is, sanitize the slug
             $data['slug'] = SlugHelper::generate($data['slug']);
         }
 
@@ -271,58 +304,89 @@ class TravelerCategoryService extends BaseService
                 : 'draft';
         }
 
-        // Sanitize pricing mode (if provided)
+        // Get existing metadata to merge with new data
+        $existing = $this->repository->find($id);
+        $metadata = [];
+        if ($existing && !empty($existing->metadata)) {
+            $metadata = json_decode($existing->metadata, true) ?: [];
+        }
+
+        // Update metadata fields
+        if (isset($data['age_min'])) {
+            if ($data['age_min'] === '' || $data['age_min'] === null) {
+                unset($metadata['age_min']);
+            } else {
+                $metadata['age_min'] = absint($data['age_min']);
+            }
+        }
+
+        if (isset($data['age_max'])) {
+            if ($data['age_max'] === '' || $data['age_max'] === null) {
+                unset($metadata['age_max']);
+            } else {
+                $metadata['age_max'] = absint($data['age_max']);
+            }
+        }
+
         if (isset($data['pricing_mode'])) {
             $allowed_pricing_modes = ['per_person', 'per_group'];
             if (in_array($data['pricing_mode'], $allowed_pricing_modes, true)) {
-                $data['pricing_mode'] = $data['pricing_mode'];
+                $metadata['pricing_mode'] = $data['pricing_mode'];
             } else {
-                // If invalid, default to per_person to avoid bad data
-                $data['pricing_mode'] = 'per_person';
+                $metadata['pricing_mode'] = 'per_person';
             }
         }
 
-        // Handle age_min
-        if (isset($data['age_min'])) {
-            if ($data['age_min'] === '' || $data['age_min'] === null) {
-                $data['age_min'] = null;
+        if (isset($data['min_pax'])) {
+            if ($data['min_pax'] === '' || $data['min_pax'] === null) {
+                unset($metadata['min_pax']);
             } else {
-                $data['age_min'] = absint($data['age_min']);
+                $metadata['min_pax'] = absint($data['min_pax']);
             }
         }
 
-        // Handle age_max
-        if (isset($data['age_max'])) {
-            if ($data['age_max'] === '' || $data['age_max'] === null) {
-                $data['age_max'] = null;
+        if (isset($data['max_pax'])) {
+            if ($data['max_pax'] === '' || $data['max_pax'] === null) {
+                unset($metadata['max_pax']);
             } else {
-                $data['age_max'] = absint($data['age_max']);
+                $metadata['max_pax'] = absint($data['max_pax']);
             }
         }
+
+        // Store updated metadata as JSON
+        $data['metadata'] = wp_json_encode($metadata);
+
+        // Remove old field names that don't exist in ClassificationsTable
+        unset($data['age_min'], $data['age_max'], $data['pricing_mode'], $data['min_pax'], $data['max_pax']);
 
         // Set updated_by to current user
         $data['updated_by'] = absint(get_current_user_id());
 
-        // Sanitize and serialize icon if it's an array
-        if (isset($data['icon'])) {
-            if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
-            } elseif (is_string($data['icon'])) {
-                // If it's already a string, sanitize it
-                $data['icon'] = sanitize_text_field($data['icon']);
-            }
-        }
-
         return $data;
+    }
+
+    /**
+     * Get status counts for admin list views
+     *
+     * Provides stable counts for All / Published / Draft / Trash that
+     * do not change when filters (status/search) are applied in the UI.
+     */
+    public function getStatusCounts(): array
+    {
+        // All statuses combined (no status filter)
+        $all = $this->count([]);
+
+        // Individual statuses
+        $publish = $this->count(['status' => 'publish']);
+        $draft   = $this->count(['status' => 'draft']);
+        $trash   = $this->count(['status' => 'trash']);
+
+        return [
+            'all'     => (int) $all,
+            'publish' => (int) $publish,
+            'draft'   => (int) $draft,
+            'trash'   => (int) $trash,
+        ];
     }
 
     /**
@@ -383,30 +447,6 @@ class TravelerCategoryService extends BaseService
         }
 
         return $this->repository->count($args);
-    }
-
-    /**
-     * Get status counts for admin list views
-     *
-     * Provides stable counts for All / Published / Draft / Trash that
-     * do not change when filters (status/search) are applied in the UI.
-     */
-    public function getStatusCounts(): array
-    {
-        // All statuses combined (no status filter)
-        $all = $this->count([]);
-
-        // Individual statuses
-        $publish = $this->count(['status' => 'publish']);
-        $draft   = $this->count(['status' => 'draft']);
-        $trash   = $this->count(['status' => 'trash']);
-
-        return [
-            'all'     => (int) $all,
-            'publish' => (int) $publish,
-            'draft'   => (int) $draft,
-            'trash'   => (int) $trash,
-        ];
     }
 }
 

@@ -139,7 +139,10 @@ class DifficultyLevelRepository extends BaseRepository
     public function getTripCount(int $levelId): int
     {
         global $wpdb;
-        $tripsTable = $wpdb->prefix . 'yatra_trips';
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for classifications
         $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
         
         return (int) $wpdb->get_var($wpdb->prepare(
@@ -162,7 +165,8 @@ class DifficultyLevelRepository extends BaseRepository
     public function getTripCountDirect(int $levelId): int
     {
         global $wpdb;
-        $tripTable = $wpdb->prefix . 'yatra_trips';
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripTable = $tripRepository->getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*)

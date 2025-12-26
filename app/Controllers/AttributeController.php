@@ -251,8 +251,27 @@ class AttributeController extends BaseController
             $result = $this->attributeService->paginate($page, $perPage, $filters);
             $total = $this->attributeService->count($filters);
             
-            // Process icon fields for all attributes
+            // Process icon fields and metadata for all attributes
             foreach ($result as $attribute) {
+                // Parse metadata JSON and extract attribute properties
+                if (!empty($attribute->metadata)) {
+                    $metadata = json_decode($attribute->metadata, true);
+                    if (is_array($metadata)) {
+                        // Add metadata fields as properties to the attribute object
+                        $attribute->field_type = $metadata['field_type'] ?? null;
+                        $attribute->required = $metadata['required'] ?? false;
+                        $attribute->show_on_frontend = $metadata['show_on_frontend'] ?? false;
+                        $attribute->show_in_filters = $metadata['show_in_filters'] ?? false;
+                        $attribute->filter_type = $metadata['filter_type'] ?? null;
+                        $attribute->searchable = $metadata['searchable'] ?? false;
+                        $attribute->display_order = $metadata['display_order'] ?? 0;
+                        $attribute->default_value = $metadata['default_value'] ?? null;
+                        $attribute->placeholder = $metadata['placeholder'] ?? null;
+                        $attribute->field_options = $metadata['field_options'] ?? null;
+                        $attribute->validation_rules = $metadata['validation_rules'] ?? null;
+                    }
+                }
+                
                 if (!empty($attribute->icon)) {
                     $icon_data = maybe_unserialize($attribute->icon);
                     if (is_array($icon_data)) {
@@ -319,6 +338,26 @@ class AttributeController extends BaseController
             
             if ($attributeId) {
                 $attribute = $this->attributeService->getById($attributeId);
+                
+                // Parse metadata JSON and extract attribute properties
+                if (!empty($attribute->metadata)) {
+                    $metadata = json_decode($attribute->metadata, true);
+                    if (is_array($metadata)) {
+                        // Add metadata fields as properties to the attribute object
+                        $attribute->field_type = $metadata['field_type'] ?? null;
+                        $attribute->required = $metadata['required'] ?? false;
+                        $attribute->show_on_frontend = $metadata['show_on_frontend'] ?? false;
+                        $attribute->show_in_filters = $metadata['show_in_filters'] ?? false;
+                        $attribute->filter_type = $metadata['filter_type'] ?? null;
+                        $attribute->searchable = $metadata['searchable'] ?? false;
+                        $attribute->display_order = $metadata['display_order'] ?? 0;
+                        $attribute->default_value = $metadata['default_value'] ?? null;
+                        $attribute->placeholder = $metadata['placeholder'] ?? null;
+                        $attribute->field_options = $metadata['field_options'] ?? null;
+                        $attribute->validation_rules = $metadata['validation_rules'] ?? null;
+                    }
+                }
+                
                 return $this->success_response($attribute, 201);
             }
             
@@ -339,18 +378,28 @@ class AttributeController extends BaseController
             
             $attribute = $this->attributeService->getById($id);
             
-             
             if (!$attribute) {
                 return $this->error_response('Attribute not found', 404);
             }
             
-            // Debug logging to check actual database values
-            error_log('DEBUG: Attribute from database - ID: ' . $id);
-            error_log('DEBUG: required: ' . var_export($attribute->required, true));
-            error_log('DEBUG: show_on_frontend: ' . var_export($attribute->show_on_frontend, true));
-            error_log('DEBUG: show_in_filters: ' . var_export($attribute->show_in_filters, true));
-            error_log('DEBUG: searchable: ' . var_export($attribute->searchable, true));
-            error_log('DEBUG: icon field: ' . var_export($attribute->icon, true));
+            // Parse metadata JSON and extract attribute properties
+            if (!empty($attribute->metadata)) {
+                $metadata = json_decode($attribute->metadata, true);
+                if (is_array($metadata)) {
+                    // Add metadata fields as properties to the attribute object
+                    $attribute->field_type = $metadata['field_type'] ?? null;
+                    $attribute->required = $metadata['required'] ?? false;
+                    $attribute->show_on_frontend = $metadata['show_on_frontend'] ?? false;
+                    $attribute->show_in_filters = $metadata['show_in_filters'] ?? false;
+                    $attribute->filter_type = $metadata['filter_type'] ?? null;
+                    $attribute->searchable = $metadata['searchable'] ?? false;
+                    $attribute->display_order = $metadata['display_order'] ?? 0;
+                    $attribute->default_value = $metadata['default_value'] ?? null;
+                    $attribute->placeholder = $metadata['placeholder'] ?? null;
+                    $attribute->field_options = $metadata['field_options'] ?? null;
+                    $attribute->validation_rules = $metadata['validation_rules'] ?? null;
+                }
+            }
             
             // Process icon field - unserialize if it's serialized
             if (!empty($attribute->icon)) {
@@ -400,13 +449,30 @@ class AttributeController extends BaseController
             $id = (int) $request->get_param('id');
             $data = $this->prepare_item_for_database($request);
             
-            // Debug logging for icon data
-            error_log('DEBUG: Update attribute - Icon data in prepared data: ' . var_export(isset($data['icon']) ? $data['icon'] : 'NOT SET', true));
-            
             $result = $this->attributeService->updateAttribute($id, $data);
             
             if ($result) {
                 $attribute = $this->attributeService->getById($id);
+                
+                // Parse metadata JSON and extract attribute properties
+                if (!empty($attribute->metadata)) {
+                    $metadata = json_decode($attribute->metadata, true);
+                    if (is_array($metadata)) {
+                        // Add metadata fields as properties to the attribute object
+                        $attribute->field_type = $metadata['field_type'] ?? null;
+                        $attribute->required = $metadata['required'] ?? false;
+                        $attribute->show_on_frontend = $metadata['show_on_frontend'] ?? false;
+                        $attribute->show_in_filters = $metadata['show_in_filters'] ?? false;
+                        $attribute->filter_type = $metadata['filter_type'] ?? null;
+                        $attribute->searchable = $metadata['searchable'] ?? false;
+                        $attribute->display_order = $metadata['display_order'] ?? 0;
+                        $attribute->default_value = $metadata['default_value'] ?? null;
+                        $attribute->placeholder = $metadata['placeholder'] ?? null;
+                        $attribute->field_options = $metadata['field_options'] ?? null;
+                        $attribute->validation_rules = $metadata['validation_rules'] ?? null;
+                    }
+                }
+                
                 return $this->success_response($attribute);
             }
             
@@ -434,54 +500,7 @@ class AttributeController extends BaseController
             return $this->error_response('Failed to delete attribute', 500);
             
         } catch (\Exception $e) {
-            return $this->error_response('Failed to delete attribute: ' . $e->getMessage(), 500);
-        }
-    }
-
-    /**
-     * Search attributes
-     */
-    public function search(WP_REST_Request $request): WP_REST_Response|WP_Error
-    {
-        try {
-            $query = $request->get_param('q');
-            
-            $attributes = $this->attributeService->search($query);
-            
-            return $this->success_response($attributes);
-            
-        } catch (\Exception $e) {
-            return $this->error_response('Search failed: ' . $e->getMessage(), 500);
-        }
-    }
-
-    /**
-     * Get frontend attributes
-     */
-    public function get_frontend_attributes(WP_REST_Request $request): WP_REST_Response
-    {
-        try {
-            $attributes = $this->attributeService->getFrontendAttributes();
-            
-            return $this->success_response($attributes);
-            
-        } catch (\Exception $e) {
-            return $this->error_response('Failed to retrieve frontend attributes: ' . $e->getMessage(), 500);
-        }
-    }
-
-    /**
-     * Get filterable attributes
-     */
-    public function get_filterable_attributes(WP_REST_Request $request): WP_REST_Response
-    {
-        try {
-            $attributes = $this->attributeService->getFilterableAttributes();
-            
-            return $this->success_response($attributes);
-            
-        } catch (\Exception $e) {
-            return $this->error_response('Failed to retrieve filterable attributes: ' . $e->getMessage(), 500);
+            return $this->error_response($e->getMessage(), 400);
         }
     }
 

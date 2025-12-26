@@ -352,6 +352,7 @@ class RecurringAvailabilityRepository extends BaseRepository
         }
         
         // Fetch category details
+        // Using hardcoded table name since there's no dedicated repository for this table
         $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
         $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
         $sql = $this->wpdb->prepare(

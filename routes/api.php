@@ -105,8 +105,18 @@ foreach ($controllers as $controllerClass) {
     try {
         $controller = new $controllerClass();
         
+        // Debug: Log controller instantiation
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log("Yatra API: Instantiated controller - {$controllerClass}");
+        }
+        
         if (method_exists($controller, 'register_routes')) {
             $controller->register_routes();
+            
+            // Debug: Log successful route registration
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log("Yatra API: Successfully registered routes for - {$controllerClass}");
+            }
         } else {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 error_log("Yatra API: Controller missing register_routes() - {$controllerClass}");

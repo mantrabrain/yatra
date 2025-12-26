@@ -1066,7 +1066,25 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         attributes.forEach((attr: any) => {
           const attributeId = Number(attr.attribute_id || attr.id);
           if (attributeId) {
-            let value = attr.value || '';
+            let value = '';
+            
+            // Read from relationship_metadata (contains complete attribute data)
+            if (attr.relationship_metadata) {
+              try {
+                const metadata = typeof attr.relationship_metadata === 'string' 
+                  ? JSON.parse(attr.relationship_metadata) 
+                  : attr.relationship_metadata;
+                
+                value = metadata.value || '';
+              } catch (e) {
+                console.warn('Failed to parse relationship_metadata:', attr.relationship_metadata, e);
+                value = '';
+              }
+            } else {
+              // Fallback to old format if metadata is not available
+              value = attr.value || '';
+            }
+            
             attributesMap[attributeId] = value;
           }
         });
