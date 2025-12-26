@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Models\Departure;
+use Yatra\Database\Tables\DeparturesTable;
 
 /**
  * Departure Repository
@@ -34,21 +35,7 @@ class DepartureRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_trip_departures';
-    }
-
-    /**
-     * Check if table exists
-     */
-    protected function tableExists(): bool
-    {
-        $table = $this->getTableName();
-        $result = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
-            DB_NAME,
-            $table
-        ));
-        return (bool) $result;
+        return DeparturesTable::getTableName();
     }
 
     /**
@@ -74,10 +61,6 @@ class DepartureRepository extends BaseRepository
      */
     public function findByTripIdAndStartDate(int $tripId, string $date, ?string $time = null): ?Departure
     {
-        if (!$this->tableExists()) {
-            return null;
-        }
-
         $table = esc_sql($this->table);
         $where = ['trip_id = %d'];
         $params = [$tripId];
@@ -114,10 +97,6 @@ class DepartureRepository extends BaseRepository
      */
     public function findAll(array $filters = []): array
     {
-        // Return empty array if table doesn't exist
-        if (!$this->tableExists()) {
-            return [];
-        }
 
         $table = esc_sql($this->table);
         $where = ['1=1']; // Always true for base condition
@@ -193,7 +172,7 @@ class DepartureRepository extends BaseRepository
     }
 
     /**
-     * Find all departures by trip ID
+     * Find departures by trip ID
      * 
      * @param int $tripId Trip ID
      * @param array $filters Filters: status, date_from, date_to, source
@@ -201,10 +180,6 @@ class DepartureRepository extends BaseRepository
      */
     public function findByTripId(int $tripId, array $filters = []): array
     {
-        // Return empty array if table doesn't exist
-        if (!$this->tableExists()) {
-            return [];
-        }
 
         $table = esc_sql($this->table);
         $where = ['trip_id = %d'];
@@ -347,11 +322,6 @@ class DepartureRepository extends BaseRepository
      */
     public function create(array $data): int
     {
-        // Create table if it doesn't exist
-        if (!$this->tableExists()) {
-            $this->createTable();
-        }
-
         $table = esc_sql($this->table);
         
         // Check which columns exist in the table
@@ -654,50 +624,6 @@ class DepartureRepository extends BaseRepository
     protected function hasSoftDelete(): bool
     {
         return false;
-    }
-
-    /**
-     * Create the departures table if it doesn't exist
-     */
-    private function createTable(): void
-    {
-        global $wpdb;
-        $table = $this->getTableName();
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        $sql = "CREATE TABLE IF NOT EXISTS `{$table}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `trip_id` bigint(20) UNSIGNED NOT NULL,
-            `date` date NOT NULL,
-            `start_date` date DEFAULT NULL,
-            `end_date` date DEFAULT NULL,
-            `time` time DEFAULT NULL,
-            `max_capacity` int(11) NOT NULL DEFAULT 0,
-            `booked_count` int(11) NOT NULL DEFAULT 0,
-            `status` varchar(20) NOT NULL DEFAULT 'upcoming',
-            `source` varchar(50) NOT NULL DEFAULT 'booking_created',
-            `price_override` decimal(10,2) DEFAULT NULL,
-            `price_by_traveler_type` longtext DEFAULT NULL,
-            `total_revenue` decimal(10,2) DEFAULT 0.00,
-            `notes` text DEFAULT NULL,
-            `created_at` datetime NOT NULL,
-            `updated_at` datetime NOT NULL,
-            PRIMARY KEY (`id`),
-            KEY `trip_id` (`trip_id`),
-            KEY `date` (`date`),
-            KEY `start_date` (`start_date`),
-            KEY `status` (`status`)
-        ) {$charset_collate};";
-        
-        // Add total_revenue column if table exists but column doesn't
-        $columns = $wpdb->get_col("DESCRIBE {$table}");
-        if (!in_array('total_revenue', $columns, true)) {
-            $wpdb->query("ALTER TABLE `{$table}` ADD COLUMN `total_revenue` decimal(10,2) DEFAULT 0.00 AFTER `price_by_traveler_type`");
-        }
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
     }
 }
 

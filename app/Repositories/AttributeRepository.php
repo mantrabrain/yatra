@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 
 /**
@@ -31,7 +32,7 @@ class AttributeRepository extends BaseRepository
         $where = [];
         
         // Always filter by type = 'attribute'
-        $where['type'] = 'attribute';
+        $where['type'] = ClassificationTypes::ATTRIBUTE;
         
         // Handle status filter
         if (isset($args['status'])) {
@@ -77,7 +78,7 @@ class AttributeRepository extends BaseRepository
         $where = [];
         
         // Always filter by type = 'attribute'
-        $where['type'] = 'attribute';
+        $where['type'] = ClassificationTypes::ATTRIBUTE;
         
         if (isset($args['status'])) {
             $where['status'] = $args['status'];
@@ -161,9 +162,9 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE type = 'attribute' AND slug = %s AND status = 'publish'";
+                 WHERE type = %s AND slug = %s AND status = 'publish'";
         
-        return $this->wpdb->get_row($this->wpdb->prepare($query, $slug));
+        return $this->wpdb->get_row($this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE ,$slug));
     }
 
     /**
@@ -173,7 +174,7 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE type = 'attribute' AND status = 'publish' 
+                 WHERE type = %s AND status = 'publish' 
                  AND (name LIKE %s OR description LIKE %s)
                  ORDER BY sorting ASC, name ASC
                  LIMIT 50";
@@ -181,7 +182,7 @@ class AttributeRepository extends BaseRepository
         $searchTerm = '%' . $this->wpdb->esc_like($term) . '%';
         
         return $this->wpdb->get_results(
-            $this->wpdb->prepare($query, $searchTerm, $searchTerm)
+            $this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE, $searchTerm, $searchTerm)
         ) ?: [];
     }
 
@@ -209,7 +210,7 @@ class AttributeRepository extends BaseRepository
         
         // Prepare core data
         $coreData = [
-            'type' => 'attribute',
+            'type' => ClassificationTypes::ATTRIBUTE,
             'name' => $data['name'],
             'slug' => !empty($data['slug']) ? $data['slug'] : sanitize_title($data['name']),
             'description' => $data['description'] ?? null,
@@ -297,8 +298,9 @@ class AttributeRepository extends BaseRepository
             // Get existing metadata
             $existing = $this->wpdb->get_var(
                 $this->wpdb->prepare(
-                    "SELECT metadata FROM `{$table}` WHERE id = %d AND type = 'attribute'",
-                    $id
+                    "SELECT metadata FROM `{$table}` WHERE id = %d AND type = %s",
+                    $id,
+                    ClassificationTypes::ATTRIBUTE
                 )
             );
             
@@ -315,7 +317,7 @@ class AttributeRepository extends BaseRepository
         $result = $this->wpdb->update(
             $table,
             $coreData,
-            ['id' => $id, 'type' => 'attribute'],
+            ['id' => $id, 'type' => ClassificationTypes::ATTRIBUTE],
             ['%s', '%s', '%s', '%s', '%d', '%s', '%d'], // formats
             ['%d', '%s'] // where formats
         );
@@ -353,7 +355,7 @@ class AttributeRepository extends BaseRepository
             // Delete attribute
             $result = $this->wpdb->delete(
                 $table,
-                ['id' => $id, 'type' => 'attribute'],
+                ['id' => $id, 'type' => ClassificationTypes::ATTRIBUTE],
                 ['%d', '%s']
             );
             
@@ -372,12 +374,12 @@ class AttributeRepository extends BaseRepository
     public function slugExists(string $slug, ?int $excludeId = null): bool
     {
         $table = esc_sql($this->table);
-        $query = "SELECT COUNT(*) FROM `{$table}` WHERE type = 'attribute' AND slug = %s";
+        $query = "SELECT COUNT(*) FROM `{$table}` WHERE type = %s AND slug = %s";
         
         if ($excludeId) {
             $query .= " AND id != %d";
             return (int) $this->wpdb->get_var(
-                $this->wpdb->prepare($query, $slug, $excludeId)
+                $this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE, $slug, $excludeId)
             ) > 0;
         }
         
@@ -391,7 +393,7 @@ class AttributeRepository extends BaseRepository
      */
     public function getTripsTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_new_trips';
+        return ClassificationsTable::getTableName();
     }
 
     /**
@@ -420,7 +422,7 @@ class AttributeRepository extends BaseRepository
                 $this->wpdb->update(
                     $table,
                     ['sorting' => $order, 'updated_at' => current_time('mysql')],
-                    ['id' => $id, 'type' => 'attribute'],
+                    ['id' => $id, 'type' => ClassificationTypes::ATTRIBUTE],
                     ['%d', '%s'],
                     ['%d', '%s']
                 );
@@ -447,10 +449,7 @@ class AttributeRepository extends BaseRepository
         // Get counts for each status
         $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE type = 'attribute' GROUP BY status";
         $results = $this->wpdb->get_results($query, ARRAY_A);
-        
-        // Debug logging
-        error_log('Yatra Attributes Status Count Query: ' . $query);
-        error_log('Yatra Attributes Status Count Results: ' . print_r($results, true));
+
 
         $counts = [];
         if (!empty($results) && is_array($results)) {
@@ -465,8 +464,6 @@ class AttributeRepository extends BaseRepository
         $counts['publish'] = $counts['publish'] ?? 0;
         $counts['draft'] = $counts['draft'] ?? 0;
         $counts['trash'] = $counts['trash'] ?? 0;
-        
-        error_log('Yatra Attributes Final Counts: ' . print_r($counts, true));
 
         return $counts;
     }

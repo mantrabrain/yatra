@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\TripRevisionsTable;
+
 /**
  * Trip Revision Repository
  * Handles database operations for trip revisions
@@ -15,8 +17,7 @@ class TripRevisionRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_trip_revisions';
+       return TripRevisionsTable::getTableName();
     }
 
     /**

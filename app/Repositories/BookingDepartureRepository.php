@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingDeparturesTable;
+
 /**
  * Booking Departure Repository
  * Manages the relationship between bookings and departures
  * 
- * Table: wp_yatra_booking_departures
+ * Table: wp_yatra_new_booking_departures
  */
 class BookingDepartureRepository extends BaseRepository
 {
@@ -17,46 +19,7 @@ class BookingDepartureRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_booking_departures';
-    }
-
-    /**
-     * Check if table exists
-     */
-    protected function tableExists(): bool
-    {
-        $table = $this->getTableName();
-        $result = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
-            DB_NAME,
-            $table
-        ));
-        return (bool) $result;
-    }
-
-    /**
-     * Create the booking_departures table if it doesn't exist
-     */
-    private function createTable(): void
-    {
-        global $wpdb;
-        $table = $this->getTableName();
-        
-        $charset_collate = $wpdb->get_charset_collate();
-        
-        $sql = "CREATE TABLE IF NOT EXISTS `{$table}` (
-            `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-            `booking_id` bigint(20) UNSIGNED NOT NULL,
-            `departure_id` bigint(20) UNSIGNED NOT NULL,
-            `created_at` datetime NOT NULL,
-            PRIMARY KEY (`id`),
-            KEY `booking_id` (`booking_id`),
-            KEY `departure_id` (`departure_id`),
-            UNIQUE KEY `booking_departure` (`booking_id`, `departure_id`)
-        ) {$charset_collate};";
-        
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
+        return BookingDeparturesTable::getTableName();
     }
 
     /**
@@ -68,10 +31,6 @@ class BookingDepartureRepository extends BaseRepository
      */
     public function link(int $bookingId, int $departureId): bool
     {
-        if (!$this->tableExists()) {
-            $this->createTable();
-        }
-
         $table = $this->getTableName();
         
         // Check if relationship already exists
@@ -107,10 +66,6 @@ class BookingDepartureRepository extends BaseRepository
      */
     public function unlink(int $bookingId, ?int $departureId = null): bool
     {
-        if (!$this->tableExists()) {
-            return false; // Table doesn't exist, nothing to unlink
-        }
-
         $table = $this->getTableName();
         
         if ($departureId !== null) {
@@ -139,15 +94,10 @@ class BookingDepartureRepository extends BaseRepository
      * Get departure ID for a booking
      * 
      * @param int $bookingId Booking ID
-     * @return int|null Departure ID or null
+     * @return int|null Departure ID or null if not linked
      */
-    public function getDepartureForBooking(int $bookingId): ?int
+    public function getDepartureIdForBooking(int $bookingId): ?int
     {
-        // Return null if table doesn't exist
-        if (!$this->tableExists()) {
-            return null;
-        }
-
         $table = $this->getTableName();
         
         $departureId = $this->wpdb->get_var($this->wpdb->prepare(
@@ -164,21 +114,14 @@ class BookingDepartureRepository extends BaseRepository
      * @param int $departureId Departure ID
      * @return array Array of booking IDs
      */
-    public function getBookingsForDeparture(int $departureId): array
+    public function getBookingIdsForDeparture(int $departureId): array
     {
-        // Return empty array if table doesn't exist
-        if (!$this->tableExists()) {
-            return [];
-        }
-
         $table = $this->getTableName();
         
-        $results = $this->wpdb->get_col($this->wpdb->prepare(
+        return $this->wpdb->get_col($this->wpdb->prepare(
             "SELECT booking_id FROM `{$table}` WHERE departure_id = %d",
             $departureId
         ));
-        
-        return array_map('intval', $results ?: []);
     }
 
     /**
@@ -189,10 +132,6 @@ class BookingDepartureRepository extends BaseRepository
      */
     public function countBookingsForDeparture(int $departureId): int
     {
-        if (!$this->tableExists()) {
-            return 0;
-        }
-
         $table = $this->getTableName();
         
         $count = $this->wpdb->get_var($this->wpdb->prepare(
@@ -256,17 +195,13 @@ class BookingDepartureRepository extends BaseRepository
     }
 
     /**
-     * Delete all links for a departure (when departure is deleted - should not happen normally)
+     * Delete all booking relationships for a departure
      * 
      * @param int $departureId Departure ID
      * @return bool Success
      */
     public function deleteByDepartureId(int $departureId): bool
     {
-        if (!$this->tableExists()) {
-            return false;
-        }
-
         $table = $this->getTableName();
         
         $result = $this->wpdb->delete(
@@ -278,4 +213,3 @@ class BookingDepartureRepository extends BaseRepository
         return $result !== false;
     }
 }
-

@@ -42,7 +42,8 @@ class ActivityRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = 'activity' AND slug = %s",
+                "SELECT * FROM `{$table}` WHERE type =  %s AND slug = %s",
+                ClassificationTypes::ACTIVITY,
                 $slug
             )
         );
@@ -55,7 +56,7 @@ class ActivityRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
-        $args['where']['type'] = 'activity';
+        $args['where']['type'] = ClassificationTypes::ACTIVITY;
         $args['where']['status'] = 'active';
         return $this->all($args);
     }
@@ -65,7 +66,7 @@ class ActivityRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
-        $args['where']['type'] = 'activity';
+        $args['where']['type'] = ClassificationTypes::ACTIVITY;
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -81,7 +82,8 @@ class ActivityRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE type = 'activity' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = %s AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            ClassificationTypes::ACTIVITY,
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -107,8 +109,8 @@ class ActivityRepository extends BaseRepository
 
         $table = esc_sql($this->table);
         $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-        $sql = "UPDATE `{$table}` SET status = %s, updated_at = %s WHERE type = 'activity' AND id IN ({$placeholders})";
-        $params = array_merge([$status, current_time('mysql')], $ids);
+        $sql = "UPDATE `{$table}` SET status = %s, updated_at = %s WHERE type = %s AND id IN ({$placeholders})";
+        $params = array_merge([$status, current_time('mysql'), ClassificationTypes::ACTIVITY], $ids);
 
         $prepared = $this->wpdb->prepare($sql, $params);
         return $this->wpdb->query($prepared) !== false;
@@ -125,9 +127,9 @@ class ActivityRepository extends BaseRepository
 
         $table = esc_sql($this->table);
         $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-        $sql = "DELETE FROM `{$table}` WHERE type = 'activity' AND id IN ({$placeholders})";
+        $sql = "DELETE FROM `{$table}` WHERE type = %s AND id IN ({$placeholders})";
 
-        $prepared = $this->wpdb->prepare($sql, $ids);
+        $prepared = $this->wpdb->prepare($sql, array_merge([ClassificationTypes::ACTIVITY], $ids));
         return $this->wpdb->query($prepared) !== false;
     }
 
@@ -155,12 +157,12 @@ class ActivityRepository extends BaseRepository
                 FROM `{$actTable}` a
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = a.id 
-                  AND tc.classification_type = 'activity'
+                  AND tc.classification_type = '".ClassificationTypes::ACTIVITY."'
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE a.type = 'activity' AND a.status = 'active'
+                WHERE a.type = '".ClassificationTypes::ACTIVITY."' AND a.status = 'active'
                 GROUP BY a.id";
 
         $rows = $this->wpdb->get_results($sql) ?: [];
@@ -213,32 +215,18 @@ class ActivityRepository extends BaseRepository
     public function getStatusCounts(array $args = []): array
     {
         $table = esc_sql($this->table);
-        
-        // Debug logging
-        error_log('ActivityRepository - Table name: ' . $table);
-        
-        // Debug: First check what's actually in the table
+
         $debug_sql = "SELECT id, type, status, name FROM `{$table}` ORDER BY id";
         $debug_results = $this->wpdb->get_results($debug_sql);
-        error_log('ActivityRepository DEBUG - All records in table: ' . print_r($debug_results, true));
-        
+
         // Get counts for each status - only for activities
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
                 WHERE type = 'activity'
                 GROUP BY status";
-        
-        // Debug: Log the SQL query
-        error_log('ActivityRepository getStatusCounts SQL: ' . $sql);
-        
-        $results = $this->wpdb->get_results($sql);
 
-        
-        
-        // Debug: Log the raw results
-        error_log('ActivityRepository getStatusCounts results: ' . print_r($results, true));
-        
-        $counts = [
+        $results = $this->wpdb->get_results($sql);
+         $counts = [
             'publish' => 0,
             'draft' => 0,
             'trash' => 0,
@@ -264,7 +252,7 @@ class ActivityRepository extends BaseRepository
                 $counts['total'] += $count;
             }
         }
-        
+
          
         return $counts;
     }
@@ -275,7 +263,7 @@ class ActivityRepository extends BaseRepository
     public function all(array $args = []): array
     {
         // IMPORTANT: Always filter by type = 'activity' for activities
-        $args['where']['type'] = 'activity';
+        $args['where']['type'] = ClassificationTypes::ACTIVITY;
         return parent::all($args);
     }
 
@@ -285,7 +273,7 @@ class ActivityRepository extends BaseRepository
     public function count(array $args = []): int
     {
         // IMPORTANT: Always filter by type = 'activity' for activities
-        $args['where']['type'] = 'activity';
+        $args['where']['type'] = ClassificationTypes::ACTIVITY;
         return parent::count($args);
     }
 

@@ -16,6 +16,7 @@ use Yatra\Database\Tables\PaymentTokensTable;
 use Yatra\Database\Tables\BookingTravellersTable;
 use Yatra\Database\Tables\BookingTravellerMetaTable;
 use Yatra\Database\Tables\BookingDeparturesTable;
+use Yatra\Database\Tables\DeparturesTable;
 use Yatra\Database\Tables\TripRevisionsTable;
 
 // Optimized Tables
@@ -95,6 +96,13 @@ class Database
         dbDelta(TripRevisionsTable::getSchema());
 
         // ============================================
+        // DEPARTURES SYSTEM
+        // ============================================
+        
+        // Trip departures table - stores scheduled departure instances
+        dbDelta(DeparturesTable::getSchema());
+
+        // ============================================
         // OPTIMIZED CONSOLIDATED TABLES (v2.0.0)
         // ============================================
         
@@ -124,12 +132,7 @@ class Database
         // ============================================
         
         update_option('yatra_db_version', '2.0.0');
-        
-        // Log optimization completion
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Database v2.0.0: Optimized tables created successfully');
-            error_log('Tables reduced from 58 to 41 (29% reduction)');
-        }
+      
     }
 
     /**
