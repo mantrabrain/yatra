@@ -1639,17 +1639,7 @@ class AppServiceProvider extends ServiceProvider
                 }
             }
 
-            // Traveler-based pricing: compute effective max price from price types when flat prices are empty
-            $has_flat_price = (
-                (!empty($trip->sale_price) && (float) $trip->sale_price > 0) ||
-                (!empty($trip->discounted_price) && (float) $trip->discounted_price > 0) ||
-                (!empty($trip->original_price) && (float) $trip->original_price > 0) ||
-                (!empty($trip->regular_price) && (float) $trip->regular_price > 0)
-            );
-
             if (
-                !$has_flat_price &&
-                !empty($trip->pricing_type) &&
                 $trip->pricing_type === 'traveler_based'
             ) {
                 $priceTypeTable = $wpdb->prefix . 'yatra_trip_price_types';

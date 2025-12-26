@@ -83,7 +83,12 @@ class SlugHelper
             $slug = 'untitled';
         }
 
-        $table = $wpdb->prefix . $tableName;
+        // Check if table name already has prefix to avoid double prefix
+        if (strpos($tableName, $wpdb->prefix) === 0) {
+            $table = $tableName; // Already has prefix
+        } else {
+            $table = $wpdb->prefix . $tableName; // Add prefix
+        }
         $table = esc_sql($table);
         $columnName = esc_sql($columnName);
 

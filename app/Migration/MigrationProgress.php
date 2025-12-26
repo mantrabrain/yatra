@@ -8,7 +8,10 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Core\Database;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Utils\Logger;
 use Yatra\Migration\TripMigration;
 use Yatra\Migration\BookingMigration;
@@ -903,20 +906,22 @@ class MigrationProgress
         }
         
         foreach ($activities as $index => $activity) {
+
+            $classfication_table = ClassificationsTable::getTableName();
             // Find the migrated activity ID
             $newActivityId = $this->wpdb->get_var($this->wpdb->prepare(
-                "SELECT id FROM {$this->wpdb->prefix}yatra_activities WHERE slug = %s",
-                $activity->slug
+                "SELECT id FROM {$classfication_table} WHERE slug = %s and type=%s",
+                $activity->slug,
+                ClassificationTypes::ACTIVITY
             ));
             
             if ($newActivityId) {
                 $this->wpdb->insert(
-                    $this->wpdb->prefix . 'yatra_trip_activities',
+                    TripClassificationsTable::getTableName(),
                     [
                         'trip_id' => $newTripId,
-                        'activity_id' => $newActivityId,
-                        'is_primary' => ($index === 0) ? 1 : 0,
-                        'order' => $index,
+                        'classification_id' => $newActivityId,
+                        'sort_order' => $index,
                         'created_at' => current_time('mysql'),
                     ]
                 );

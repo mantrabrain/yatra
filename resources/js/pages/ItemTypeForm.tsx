@@ -185,7 +185,7 @@ const ItemTypeForm: React.FC = () => {
         return await apiClient.post('/item-types', payload);
       }
     },
-    onSuccess: () => {
+    onSuccess: (response: any) => {
       queryClient.invalidateQueries({ queryKey: ['item-types'] });
       queryClient.invalidateQueries({ queryKey: ['item-type', typeId] });
       showToast(
@@ -194,9 +194,17 @@ const ItemTypeForm: React.FC = () => {
           : __('Item type created successfully', 'Item type created successfully'),
         'success'
       );
-      setTimeout(() => {
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types`;
-      }, 1000);
+      
+      if (isEditMode) {
+        // Don't redirect on update - stay on edit page
+        setIsSubmitting(false);
+      } else {
+        // Redirect to edit page after create
+        setTimeout(() => {
+          const newId = response?.id || typeId;
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${newId}`;
+        }, 1000);
+      }
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving the item type', 'An error occurred while saving the item type');
@@ -234,9 +242,66 @@ const ItemTypeForm: React.FC = () => {
 
   if (isEditMode && isLoadingType) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading...', 'Loading...')}</span>
+      <div className="space-y-3">
+        {/* Header Skeleton */}
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 animate-pulse"></div>
+        </div>
+
+        {/* Form Skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+          {/* Main Fields */}
+          <div className="lg:col-span-2 space-y-3">
+            <Card>
+              <CardContent className="p-6 space-y-4">
+                {/* Name field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Slug field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Description field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-2 animate-pulse"></div>
+                  <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Icon field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Color field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+                {/* Status field */}
+                <div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-2 animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-3">
+            <Card>
+              <CardContent className="p-6">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-4 animate-pulse"></div>
+                <div className="space-y-3">
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                  <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }

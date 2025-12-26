@@ -86,15 +86,11 @@ class ScheduledPaymentService
      */
     public static function syncScheduledPaymentStatus(): void
     {
-        global $wpdb;
+        $repository = new \Yatra\Repositories\ScheduledPaymentRepository();
         
-        // Check if table exists before querying
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $tableExists = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
-            DB_NAME,
-            $table
-        ));
+        // Check if table exists - use repository method or create one if needed
+        $table = $repository->getTableName();
+        $tableExists = $repository->tableExists($table);
         
         if (!$tableExists) {
             // Table doesn't exist yet - skip silently
@@ -139,15 +135,11 @@ class ScheduledPaymentService
      */
     public static function sendPaymentReminders(): void
     {
-        global $wpdb;
+        $repository = new \Yatra\Repositories\ScheduledPaymentRepository();
         
         // Check if table exists before querying
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $tableExists = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
-            DB_NAME,
-            $table
-        ));
+        $table = $repository->getTableName();
+        $tableExists = $repository->tableExists($table);
         
         if (!$tableExists) {
             // Table doesn't exist yet - skip silently
@@ -206,58 +198,35 @@ class ScheduledPaymentService
      */
     public static function processScheduledPayment(object $scheduled_payment, bool $is_retry = false): array
     {
-        global $wpdb;
+        $repository = new \Yatra\Repositories\ScheduledPaymentRepository();
         
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $tokens_table = $wpdb->prefix . 'yatra_payment_tokens';
+        // Mark as processing using repository
+        $repository->update($scheduled_payment->id, [
+            'status' => 'processing',
+            'last_attempt_at' => current_time('mysql'),
+            'attempt_count' => $scheduled_payment->attempt_count + 1,
+        ]);
         
-        // Mark as processing
-        $wpdb->update(
-            $table,
-            [
-                'status' => 'processing',
-                'last_attempt_at' => current_time('mysql'),
-                'attempt_count' => $scheduled_payment->attempt_count + 1,
-            ],
-            ['id' => $scheduled_payment->id],
-            ['%s', '%s', '%d'],
-            ['%d']
-        );
-        
-        // Get the payment token
+        // Get the payment token using PaymentRepository
         $token = null;
         if ($scheduled_payment->payment_token_id) {
-            $token = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$tokens_table} WHERE id = %d AND is_active = 1",
-                $scheduled_payment->payment_token_id
-            ));
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+            $token = $paymentRepository->getTokenById($scheduled_payment->payment_token_id);
         }
         
         if (!$token && $scheduled_payment->gateway_customer_id) {
-            $token = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$tokens_table} 
-                 WHERE gateway_customer_id = %s 
-                 AND gateway = %s 
-                 AND is_active = 1 
-                 ORDER BY is_default DESC, id DESC 
-                 LIMIT 1",
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+            $token = $paymentRepository->getTokenByCustomerAndGateway(
                 $scheduled_payment->gateway_customer_id,
                 $scheduled_payment->gateway
-            ));
+            );
         }
         
         if (!$token) {
-            $wpdb->update(
-                $table,
-                [
-                    'status' => 'failed',
-                    'last_error' => __('No valid payment method found', 'yatra'),
-                ],
-                ['id' => $scheduled_payment->id],
-                ['%s', '%s'],
-                ['%d']
-            );
+            $repository->update($scheduled_payment->id, [
+                'status' => 'failed',
+                'last_error' => __('No valid payment method found', 'yatra'),
+            ]);
             
             self::notifyPaymentFailed($scheduled_payment, __('No valid payment method found. Please update your payment details.', 'yatra'));
             
@@ -272,16 +241,10 @@ class ScheduledPaymentService
         $gateway = $registry->get($scheduled_payment->gateway);
         
         if (!$gateway) {
-            $wpdb->update(
-                $table,
-                [
-                    'status' => 'failed',
-                    'last_error' => __('Payment gateway not available', 'yatra'),
-                ],
-                ['id' => $scheduled_payment->id],
-                ['%s', '%s'],
-                ['%d']
-            );
+            $repository->update($scheduled_payment->id, [
+                'status' => 'failed',
+                'last_error' => __('Payment gateway not available', 'yatra'),
+            ]);
             
             return [
                 'success' => false,
@@ -290,28 +253,20 @@ class ScheduledPaymentService
         }
         
         if (!$gateway->supportsRecurring()) {
-            $wpdb->update(
-                $table,
-                [
-                    'status' => 'failed',
-                    'last_error' => __('Gateway does not support automatic payments', 'yatra'),
-                ],
-                ['id' => $scheduled_payment->id],
-                ['%s', '%s'],
-                ['%d']
-            );
+            $repository->update($scheduled_payment->id, [
+                'status' => 'failed',
+                'last_error' => __('Gateway does not support recurring payments', 'yatra'),
+            ]);
             
             return [
                 'success' => false,
-                'error' => __('Gateway does not support automatic payments', 'yatra'),
+                'error' => __('Gateway does not support recurring payments', 'yatra'),
             ];
         }
         
-        // Get booking info
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT * FROM {$bookings_table} WHERE id = %d",
-            $scheduled_payment->booking_id
-        ));
+        // Get booking info using BookingRepository
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $booking = $bookingRepository->find($scheduled_payment->booking_id);
         
         // Create invoice in gateway (gateway will charge and send webhook)
         // For Stripe, this creates an invoice that auto-charges
@@ -335,17 +290,11 @@ class ScheduledPaymentService
             if ($result['success']) {
                 // Invoice created - gateway will charge and send webhook
                 // Update status to show invoice was created (webhook will mark as completed)
-                $wpdb->update(
-                    $table,
-                    [
-                        'gateway_invoice_id' => $result['invoice_id'] ?? null,
-                        'notes' => __('Invoice created in Stripe. Awaiting payment confirmation.', 'yatra'),
-                        'updated_at' => current_time('mysql'),
-                    ],
-                    ['id' => $scheduled_payment->id],
-                    ['%s', '%s', '%s'],
-                    ['%d']
-                );
+                $repository->update($scheduled_payment->id, [
+                    'gateway_invoice_id' => $result['invoice_id'] ?? null,
+                    'notes' => __('Invoice created in Stripe. Awaiting payment confirmation.', 'yatra'),
+                    'updated_at' => current_time('mysql'),
+                ]);
                 
                 return [
                     'success' => true,
@@ -353,17 +302,11 @@ class ScheduledPaymentService
                     'invoice_id' => $result['invoice_id'] ?? null,
                 ];
             } else {
-                $wpdb->update(
-                    $table,
-                    [
-                        'status' => 'failed',
-                        'last_error' => $result['error'] ?? __('Failed to create invoice', 'yatra'),
-                        'updated_at' => current_time('mysql'),
-                    ],
-                    ['id' => $scheduled_payment->id],
-                    ['%s', '%s', '%s'],
-                    ['%d']
-                );
+                $repository->update($scheduled_payment->id, [
+                    'status' => 'failed',
+                    'last_error' => $result['error'] ?? __('Failed to create invoice', 'yatra'),
+                    'updated_at' => current_time('mysql'),
+                ]);
                 
                 return [
                     'success' => false,
@@ -396,66 +339,48 @@ class ScheduledPaymentService
         // Note: This direct charge is only for non-Stripe gateways
         // Ideally all gateways should use their invoice/subscription system
         if ($result['success']) {
-            $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
             
-            $wpdb->insert(
-                $payments_table,
-                [
-                    'booking_id' => $scheduled_payment->booking_id,
-                    'transaction_id' => $result['transaction_id'] ?? null,
-                    'gateway' => $scheduled_payment->gateway,
-                    'amount' => $scheduled_payment->amount,
-                    'currency' => $scheduled_payment->currency,
-                    'status' => 'completed',
-                    'payment_type' => $scheduled_payment->payment_type,
-                    'gateway_response' => wp_json_encode($result),
-                    'notes' => __('Manual payment triggered by admin', 'yatra'),
-                    'processed_at' => current_time('mysql'),
-                    'created_at' => current_time('mysql'),
-                ],
-                ['%d', '%s', '%s', '%f', '%s', '%s', '%s', '%s', '%s', '%s', '%s']
-            );
+            $payment_id = $paymentRepository->create([
+                'booking_id' => $scheduled_payment->booking_id,
+                'transaction_id' => $result['transaction_id'] ?? null,
+                'gateway' => $scheduled_payment->gateway,
+                'amount' => $scheduled_payment->amount,
+                'currency' => $scheduled_payment->currency,
+                'status' => 'completed',
+                'payment_type' => $scheduled_payment->payment_type,
+                'gateway_response' => wp_json_encode($result),
+                'notes' => __('Manual payment triggered by admin', 'yatra'),
+                'processed_at' => current_time('mysql'),
+                'created_at' => current_time('mysql'),
+            ]);
             
-            $payment_id = $wpdb->insert_id;
-            
-            $wpdb->update(
-                $table,
-                [
-                    'status' => 'completed',
-                    'payment_id' => $payment_id,
-                    'updated_at' => current_time('mysql'),
-                ],
-                ['id' => $scheduled_payment->id],
-                ['%s', '%d', '%s'],
-                ['%d']
-            );
+            $repository->update($scheduled_payment->id, [
+                'status' => 'completed',
+                'payment_id' => $payment_id,
+                'updated_at' => current_time('mysql'),
+            ]);
             
             if ($booking) {
                 $new_amount_paid = (float) $booking->amount_paid + (float) $scheduled_payment->amount;
                 $new_amount_due = max(0, (float) $booking->total_amount - $new_amount_paid);
                 $payment_status = $new_amount_due <= 0 ? 'paid' : 'partial';
                 
-                $wpdb->update(
-                    $bookings_table,
-                    [
-                        'amount_paid' => $new_amount_paid,
-                        'amount_due' => $new_amount_due,
-                        'payment_status' => $payment_status,
-                        'updated_at' => current_time('mysql'),
-                    ],
-                    ['id' => $booking->id],
-                    ['%f', '%f', '%s', '%s'],
-                    ['%d']
-                );
+                $bookingRepository = new \Yatra\Repositories\BookingRepository();
+                $bookingRepository->update($booking->id, [
+                    'amount_paid' => $new_amount_paid,
+                    'amount_due' => $new_amount_due,
+                    'payment_status' => $payment_status,
+                    'updated_at' => current_time('mysql'),
+                ]);
             }
             
-            self::notifyPaymentSuccess($scheduled_payment, $result);
-            do_action('yatra_scheduled_payment_completed', $scheduled_payment->id, $payment_id, $result);
+            self::notifyPaymentCompleted($scheduled_payment, $booking, $result);
             
             return [
                 'success' => true,
+                'message' => __('Payment processed successfully', 'yatra'),
                 'payment_id' => $payment_id,
-                'transaction_id' => $result['transaction_id'] ?? null,
             ];
         } else {
             // Payment failed
@@ -472,17 +397,11 @@ class ScheduledPaymentService
                 self::notifyPaymentFailed($scheduled_payment, $error_message, false);
             }
             
-            $wpdb->update(
-                $table,
-                [
-                    'status' => $new_status,
-                    'last_error' => $error_message,
-                    'updated_at' => current_time('mysql'),
-                ],
-                ['id' => $scheduled_payment->id],
-                ['%s', '%s', '%s'],
-                ['%d']
-            );
+            $repository->update($scheduled_payment->id, [
+                'status' => $new_status,
+                'last_error' => $error_message,
+                'updated_at' => current_time('mysql'),
+            ]);
             
             // Trigger action for extensions
             do_action('yatra_scheduled_payment_failed', $scheduled_payment->id, $error_message);
@@ -521,10 +440,8 @@ class ScheduledPaymentService
         string $currency,
         array $schedule
     ): array {
-        global $wpdb;
-        
-        $table = $wpdb->prefix . 'yatra_scheduled_payments';
-        $tokens_table = $wpdb->prefix . 'yatra_payment_tokens';
+        $repository = new \Yatra\Repositories\ScheduledPaymentRepository();
+        $paymentRepository = new \Yatra\Repositories\PaymentRepository();
         $created_ids = [];
         
         // Get gateway instance
@@ -535,13 +452,10 @@ class ScheduledPaymentService
             return [];
         }
         
-        // Get payment method ID
+        // Get payment method ID using PaymentRepository
         $paymentMethodId = null;
         if ($paymentTokenId) {
-            $token = $wpdb->get_row($wpdb->prepare(
-                "SELECT gateway_payment_method_id FROM {$tokens_table} WHERE id = %d",
-                $paymentTokenId
-            ));
+            $token = $paymentRepository->getTokenById($paymentTokenId);
             if ($token) {
                 $paymentMethodId = $token->gateway_payment_method_id;
             }
@@ -572,37 +486,33 @@ class ScheduledPaymentService
                 ]);
                 
                 if ($result['success']) {
-                    // Create local tracking record
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'booking_id' => $bookingId,
-                            'customer_id' => get_current_user_id() ?: null,
-                            'gateway' => $gatewayId,
-                            'gateway_customer_id' => $gatewayCustomerId,
-                            'payment_token_id' => $paymentTokenId,
-                            'amount' => $remainingAmount,
-                            'currency' => $currency,
-                            'scheduled_date' => date('Y-m-d H:i:s', strtotime("+{$days_until} days")),
-                            'status' => 'pending',
-                            'payment_type' => 'installment',
-                            'max_attempts' => 3,
-                            'notes' => sprintf(
-                                __('Stripe subscription schedule created: %s (%d installments)', 'yatra'),
-                                $result['schedule_id'],
-                                $installments
-                            ),
-                            'metadata' => wp_json_encode([
-                                'stripe_schedule_id' => $result['schedule_id'],
-                                'stripe_subscription_id' => $result['subscription_id'] ?? null,
-                                'total_installments' => $installments,
-                                'managed_by_gateway' => true,
-                            ]),
-                            'created_at' => current_time('mysql'),
-                        ],
-                        ['%d', '%d', '%s', '%s', '%d', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
-                    );
-                    $created_ids[] = $wpdb->insert_id;
+                    // Create local tracking record using repository
+                    $scheduled_payment_id = $repository->create([
+                        'booking_id' => $bookingId,
+                        'customer_id' => get_current_user_id() ?: null,
+                        'gateway' => $gatewayId,
+                        'gateway_customer_id' => $gatewayCustomerId,
+                        'payment_token_id' => $paymentTokenId,
+                        'amount' => $remainingAmount,
+                        'currency' => $currency,
+                        'scheduled_date' => date('Y-m-d H:i:s', strtotime("+{$days_until} days")),
+                        'status' => 'pending',
+                        'payment_type' => 'installment',
+                        'max_attempts' => 3,
+                        'notes' => sprintf(
+                            __('Stripe subscription schedule created: %s (%d installments)', 'yatra'),
+                            $result['schedule_id'],
+                            $installments
+                        ),
+                        'metadata' => wp_json_encode([
+                            'stripe_schedule_id' => $result['schedule_id'],
+                            'stripe_subscription_id' => $result['subscription_id'] ?? null,
+                            'total_installments' => $installments,
+                            'managed_by_gateway' => true,
+                        ]),
+                        'created_at' => current_time('mysql'),
+                    ]);
+                    $created_ids[] = $scheduled_payment_id;
                 }
             } else {
                 // Single payment - create Stripe Invoice for future date
@@ -618,48 +528,49 @@ class ScheduledPaymentService
                 ]);
                 
                 if ($result['success']) {
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'booking_id' => $bookingId,
-                            'customer_id' => get_current_user_id() ?: null,
-                            'gateway' => $gatewayId,
-                            'gateway_customer_id' => $gatewayCustomerId,
-                            'payment_token_id' => $paymentTokenId,
-                            'amount' => $remainingAmount,
-                            'currency' => $currency,
-                            'scheduled_date' => $scheduled_date,
-                            'status' => 'pending',
-                            'payment_type' => 'final',
-                            'max_attempts' => 3,
-                            'notes' => sprintf(
-                                __('Stripe invoice created: %s - will auto-charge on %s', 'yatra'),
-                                $result['invoice_id'],
-                                $scheduled_date
-                            ),
-                            'metadata' => wp_json_encode([
-                                'stripe_invoice_id' => $result['invoice_id'],
-                                'managed_by_gateway' => true,
-                            ]),
-                            'created_at' => current_time('mysql'),
-                        ],
-                        ['%d', '%d', '%s', '%s', '%d', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
-                    );
-                    $created_ids[] = $wpdb->insert_id;
+                    $scheduled_payment_id = $repository->create([
+                        'booking_id' => $bookingId,
+                        'customer_id' => get_current_user_id() ?: null,
+                        'gateway' => $gatewayId,
+                        'gateway_customer_id' => $gatewayCustomerId,
+                        'payment_token_id' => $paymentTokenId,
+                        'amount' => $remainingAmount,
+                        'currency' => $currency,
+                        'scheduled_date' => $scheduled_date,
+                        'status' => 'pending',
+                        'payment_type' => 'final',
+                        'max_attempts' => 3,
+                        'notes' => sprintf(
+                            __('Stripe invoice created: %s - will auto-charge on %s', 'yatra'),
+                            $result['invoice_id'],
+                            $scheduled_date
+                        ),
+                        'metadata' => wp_json_encode([
+                            'stripe_invoice_id' => $result['invoice_id'],
+                            'managed_by_gateway' => true,
+                        ]),
+                        'created_at' => current_time('mysql'),
+                    ]);
+                    $created_ids[] = $scheduled_payment_id;
                 }
             }
             
             return $created_ids;
         }
         
-        // Fallback for other gateways - create local tracking records
-        // These gateways may need manual processing or different subscription APIs
-        if ($schedule_type === 'single') {
             $scheduled_date = date('Y-m-d H:i:s', strtotime("+{$days_until} days"));
             
-            $wpdb->insert(
-                $table,
-                [
+            $result = $gateway->createScheduledInvoice($gatewayCustomerId, $paymentMethodId, [
+                'amount' => $remainingAmount,
+                'currency' => $currency,
+                'due_date' => $scheduled_date,
+                'booking_id' => $bookingId,
+                'description' => sprintf(__('Final payment for Booking #%d', 'yatra'), $bookingId),
+                'payment_type' => 'final',
+            ]);
+            
+            if ($result['success']) {
+                $scheduled_payment_id = $repository->create([
                     'booking_id' => $bookingId,
                     'customer_id' => get_current_user_id() ?: null,
                     'gateway' => $gatewayId,
@@ -671,53 +582,47 @@ class ScheduledPaymentService
                     'status' => 'pending',
                     'payment_type' => 'final',
                     'max_attempts' => 3,
-                    'notes' => sprintf(__('Remaining balance payment scheduled for %s', 'yatra'), $scheduled_date),
+                    'notes' => sprintf(
+                        __('Stripe invoice created: %s - will auto-charge on %s', 'yatra'),
+                        $result['invoice_id'],
+                        $scheduled_date
+                    ),
+                    'metadata' => wp_json_encode([
+                        'stripe_invoice_id' => $result['invoice_id'],
+                        'managed_by_gateway' => true,
+                    ]),
                     'created_at' => current_time('mysql'),
-                ],
-                ['%d', '%d', '%s', '%s', '%d', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s']
-            );
-            
-            $created_ids[] = $wpdb->insert_id;
-        } elseif ($schedule_type === 'installments') {
-            $amount_per_installment = round($remainingAmount / $installments, 2);
-            $last_installment = $remainingAmount - ($amount_per_installment * ($installments - 1));
-            
-            for ($i = 0; $i < $installments; $i++) {
-                $days = $days_until + ($i * $interval_days);
+                ]);
+                $created_ids[] = $scheduled_payment_id;
                 $scheduled_date = date('Y-m-d H:i:s', strtotime("+{$days} days"));
                 $amount = ($i === $installments - 1) ? $last_installment : $amount_per_installment;
                 $payment_type = ($i === $installments - 1) ? 'final' : 'installment';
                 
-                $wpdb->insert(
-                    $table,
-                    [
-                        'booking_id' => $bookingId,
-                        'customer_id' => get_current_user_id() ?: null,
-                        'gateway' => $gatewayId,
-                        'gateway_customer_id' => $gatewayCustomerId,
-                        'payment_token_id' => $paymentTokenId,
-                        'amount' => $amount,
-                        'currency' => $currency,
-                        'scheduled_date' => $scheduled_date,
-                        'status' => 'pending',
-                        'payment_type' => $payment_type,
-                        'max_attempts' => 3,
-                        'notes' => sprintf(
-                            __('Installment %d of %d scheduled for %s', 'yatra'),
-                            $i + 1,
-                            $installments,
-                            $scheduled_date
-                        ),
-                        'metadata' => wp_json_encode([
-                            'installment_number' => $i + 1,
-                            'total_installments' => $installments,
-                        ]),
-                        'created_at' => current_time('mysql'),
-                    ],
-                    ['%d', '%d', '%s', '%s', '%d', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
-                );
-                
-                $created_ids[] = $wpdb->insert_id;
+                $scheduled_payment_id = $repository->create([
+                    'booking_id' => $bookingId,
+                    'customer_id' => get_current_user_id() ?: null,
+                    'gateway' => $gatewayId,
+                    'gateway_customer_id' => $gatewayCustomerId,
+                    'payment_token_id' => $paymentTokenId,
+                    'amount' => $amount,
+                    'currency' => $currency,
+                    'scheduled_date' => $scheduled_date,
+                    'status' => 'pending',
+                    'payment_type' => $payment_type,
+                    'max_attempts' => 3,
+                    'notes' => sprintf(
+                        __('Installment %d of %d scheduled for %s', 'yatra'),
+                        $i + 1,
+                        $installments,
+                        $scheduled_date
+                    ),
+                    'metadata' => wp_json_encode([
+                        'installment_number' => $i + 1,
+                        'total_installments' => $installments,
+                    ]),
+                    'created_at' => current_time('mysql'),
+                ]);
+                $created_ids[] = $scheduled_payment_id;
             }
         }
         

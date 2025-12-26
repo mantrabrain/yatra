@@ -27,7 +27,7 @@ interface DifficultyLevel {
   slug: string;
   description: string;
   icon?: IconPickerValue | null;
-  level_order: number;
+  sorting: number;
   status: string;
   trip_count?: number;
   created_at: string;
@@ -41,7 +41,7 @@ interface DifficultyLevel {
 const DifficultyLevels: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('level_order');
+  const [sortBy, setSortBy] = useState('sorting');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -49,7 +49,7 @@ const DifficultyLevels: React.FC = () => {
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const defaultColumns = {
-      level_order: true,
+      sorting: true,
       name: true,
       description: true,
       trips: true,
@@ -73,14 +73,14 @@ const DifficultyLevels: React.FC = () => {
   // Define table columns
   const columns = [
     {
-      key: 'level_order',
+      key: 'sorting',
       label: __('Order', 'Order'),
       sortable: true,
       width: '100px',
-      visible: visibleColumns.level_order,
+      visible: visibleColumns.sorting,
       render: (level: DifficultyLevel) => (
         <div className="text-sm text-gray-900 dark:text-white">
-          {level.level_order}
+          {level.sorting}
         </div>
       ),
     },
@@ -261,7 +261,7 @@ const DifficultyLevels: React.FC = () => {
         slug: level.slug,
         description: level.description,
         icon: level.icon,
-        level_order: level.level_order,
+        sorting: level.sorting,
         status,
       });
     },
@@ -397,13 +397,13 @@ const DifficultyLevels: React.FC = () => {
   const handleResetFilters = () => {
     setSearchTerm('');
     setStatusFilter('all');
-    setSortBy('level_order');
+    setSortBy('sorting');
     setSortOrder('asc');
     setPage(1);
   };
 
   const hasFilters =
-    !!searchTerm || statusFilter !== 'all' || sortBy !== 'level_order' || sortOrder !== 'asc';
+    !!searchTerm || statusFilter !== 'all' || sortBy !== 'sorting' || sortOrder !== 'asc';
 
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
@@ -459,7 +459,7 @@ const DifficultyLevels: React.FC = () => {
                   slug: level.slug,
                   description: level.description,
                   icon: level.icon,
-                  level_order: level.level_order,
+                  sorting: level.sorting,
                   status,
                 });
               } catch {
@@ -565,7 +565,7 @@ const DifficultyLevels: React.FC = () => {
               setPage(1);
             }}
             sortOptions={[
-              { value: 'level_order', label: __('Order', 'Order') },
+              { value: 'sorting', label: __('Order', 'Order') },
               { value: 'name', label: __('Name', 'Name') },
               { value: 'created_at', label: __('Created', 'Created') },
             ]}
@@ -599,7 +599,7 @@ const DifficultyLevels: React.FC = () => {
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
             columnOptions={[
-              { key: 'level_order', label: __('Order', 'Order'), visible: visibleColumns.level_order },
+              { key: 'sorting', label: __('Order', 'Order'), visible: visibleColumns.sorting },
               { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
               { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
               { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },

@@ -209,20 +209,11 @@ class CacheService
      */
     public static function warmUpCache(): void
     {
-        global $wpdb;
-        
         Logger::info("Starting cache warm-up");
         
         // Warm up popular trips
-        $popularTrips = $wpdb->get_results("
-            SELECT t.id 
-            FROM {$wpdb->prefix}yatra_trips t
-            LEFT JOIN {$wpdb->prefix}yatra_bookings b ON b.trip_id = t.id
-            WHERE t.status = 'publish'
-            GROUP BY t.id
-            ORDER BY COUNT(b.id) DESC
-            LIMIT 20
-        ");
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $popularTrips = $tripRepository->getPopularTrips(20);
 
         foreach ($popularTrips as $trip) {
             // This would trigger cache population when the trip is next accessed
@@ -230,13 +221,8 @@ class CacheService
         }
 
         // Warm up recent bookings
-        $recentBookings = $wpdb->get_results("
-            SELECT id 
-            FROM {$wpdb->prefix}yatra_bookings 
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
-            ORDER BY created_at DESC
-            LIMIT 50
-        ");
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $recentBookings = $bookingRepository->getRecentBookings(7, 50);
 
         foreach ($recentBookings as $booking) {
             Logger::debug("Marked booking for cache warm-up", ['booking_id' => $booking->id]);

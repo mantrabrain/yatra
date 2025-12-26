@@ -157,24 +157,9 @@ class AvailabilityController extends BaseController
                 }
             }
 
+            // Use AvailabilityService to update booking availability IDs
             if (!empty($availabilityIdByDate)) {
-                foreach ($availabilityIdByDate as $date => $availabilityId) {
-                    if ($availabilityId <= 0) {
-                        continue;
-                    }
-                    $wpdb->query(
-                        $wpdb->prepare(
-                            "UPDATE {$bookingsTable}
-                             SET availability_id = %d
-                             WHERE trip_id = %d
-                               AND travel_date = %s
-                               AND (availability_id IS NULL OR availability_id = 0)",
-                            $availabilityId,
-                            (int) $tripId,
-                            $date
-                        )
-                    );
-                }
+                $this->service->updateBookingAvailabilityIds((int) $tripId, $availabilityIdByDate);
             }
 
             $activeBookingStatuses = [
@@ -187,25 +172,14 @@ class AvailabilityController extends BaseController
             $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
 
             // Aggregate bookings count per availability date for this trip
+            // Use AvailabilityService to get booking counts
             $countsByAvailabilityId = [];
-
-            $rows = $wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT availability_id, SUM(travelers_count) AS booked_count
-                     FROM {$bookingsTable}
-                     WHERE trip_id = %d
-                       AND availability_id IS NOT NULL
-                       AND status IN ({$placeholders})
-                     GROUP BY availability_id",
-                    array_merge([(int) $tripId], $activeBookingStatuses)
-                ),
-                ARRAY_A
-            );
-
-            foreach ($rows as $row) {
-                $aid = (int) ($row['availability_id'] ?? 0);
+            $bookingCounts = $this->service->getBookingCountsByAvailabilityIds(array_column($items, 'id'));
+            
+            foreach ($bookingCounts as $row) {
+                $aid = (int) ($row->availability_id ?? 0);
                 if ($aid > 0) {
-                    $countsByAvailabilityId[$aid] = (int) ($row['booked_count'] ?? 0);
+                    $countsByAvailabilityId[$aid] = (int) ($row->booked_count ?? 0);
                 }
             }
 
@@ -317,15 +291,8 @@ class AvailabilityController extends BaseController
                 ];
                 $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
 
-                $bookedCount = (int) $wpdb->get_var(
-                    $wpdb->prepare(
-                        "SELECT COALESCE(SUM(travelers_count), 0)
-                         FROM {$bookingsTable}
-                         WHERE availability_id = %d
-                           AND status IN ({$placeholders})",
-                        array_merge([(int) $prepared['id']], $activeBookingStatuses)
-                    )
-                );
+                // Use AvailabilityService to get booked count
+                $bookedCount = $this->service->getBookedCountByAvailabilityId((int) $prepared['id']);
 
                 $seatsTotal = (int) ($prepared['seats_total'] ?? 0);
                 $seatsReserved = (int) ($prepared['seats_reserved'] ?? 0);

@@ -313,22 +313,20 @@ class BookingSessionController extends BaseController
         $travel_date = !empty($data['travel_date']) ? sanitize_text_field($data['travel_date']) : '';
         $departure_time = !empty($data['departure_time']) ? sanitize_text_field($data['departure_time']) : '';
         
-        // Try to find specific availability
+        // Try to find specific availability using AvailabilityService
         if ($travel_date) {
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $query = "SELECT * FROM {$availability_table} WHERE trip_id = %d AND departure_date = %s";
-            $params = [(int) $data['trip_id'], $travel_date];
+            $availability = $this->availabilityService->getByTripAndDate((int) $data['trip_id'], $travel_date);
             
-            if ($departure_time) {
-                $query .= " AND departure_time = %s";
-                $params[] = $departure_time;
+            if ($availability && $departure_time && $availability->departure_time !== $departure_time) {
+                $availability = null; // Time mismatch
             }
             
-            $query .= " LIMIT 1";
-            $availability = $wpdb->get_row($wpdb->prepare($query, ...$params));
-
-            if (empty($availability_id) && $availability && !empty($availability->id)) {
-                $availability_id = (string) (int) $availability->id;
+            if ($availability) {
+                $data['availability_id'] = $availability->id;
+                $data['seats_available'] = $availability->seats_available;
+                $data['seats_total'] = $availability->seats_total;
+                $data['pricing'] = $availability->pricing;
+                $data['price_per'] = $availability->price_per;
             }
         }
         
@@ -397,12 +395,8 @@ class BookingSessionController extends BaseController
                 }, $price_types));
                 
                 if (!empty($categoryIds)) {
-                    $categories_table = $wpdb->prefix . 'yatra_traveler_categories';
-                    $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
-                    $cats = $wpdb->get_results($wpdb->prepare(
-                        "SELECT id, label, slug, age_min, age_max FROM {$categories_table} WHERE id IN ({$placeholders})",
-                        ...$categoryIds
-                    ));
+                    // Use AvailabilityService to get traveler categories
+                    $cats = $this->availabilityService->getTravelerCategories($categoryIds);
                     
                     $catIndex = [];
                     foreach ($cats as $cat) {
@@ -718,15 +712,9 @@ class BookingSessionController extends BaseController
         $travelers_count = count($travelers);
         $availability = null;
         
-        // Try to find availability-specific pricing
+        // Try to get availability using AvailabilityService
         if (!empty($travel_date)) {
-            global $wpdb;
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $availability = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$availability_table} WHERE trip_id = %d AND departure_date = %s LIMIT 1",
-                $trip_id,
-                $travel_date
-            ));
+            $availability = $this->availabilityService->getByTripAndDate($trip_id, $travel_date);
         }
         
         // Determine pricing type and calculate total
@@ -1065,54 +1053,51 @@ class BookingSessionController extends BaseController
             error_log('Yatra: Failed to create customer: ' . $e->getMessage());
         }
 
-        // Insert booking
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        // Create booking using BookingService
+        $booking_service = new \Yatra\Services\BookingService();
         
-        $result = $wpdb->insert(
-            $bookings_table,
-            [
-                'reference' => $booking_reference,
-                'trip_id' => $trip_id,
-                'customer_id' => $customer_id,
-                'user_id' => $user_id ?: null,
-                'contact_first_name' => $contact_data['first_name'],
-                'contact_last_name' => $contact_data['last_name'],
-                'contact_email' => $contact_data['email'],
-                'contact_phone' => $contact_data['phone'],
-                'contact_country' => $contact_data['country'],
-                'contact_data' => wp_json_encode($contact_data),
-                'emergency_contact' => wp_json_encode($emergency_data),
-                'travel_date' => sanitize_text_field($travel_date),
-                'availability_id' => !empty($availability_id) ? (int) $availability_id : null,
-                'travelers_count' => $travelers_count,
-                'travelers_data' => '', // Legacy field - travellers now stored in separate table
-                'total_amount' => $total_amount,
-                'amount_paid' => 0,
-                'amount_due' => $amount_due,
-                'currency' => \Yatra\Services\SettingsService::getCurrency(),
-                'discount_amount' => $discount_amount,
-                'discount_code' => $discount_code,
-                'payment_method' => $payment_method,
-                'payment_gateway' => $payment_gateway,
-                'status' => 'pending',
-                'special_requests' => sanitize_textarea_field($data['special_requests'] ?? ''),
-                'newsletter_optin' => !empty($data['subscribe_newsletter']) ? 1 : 0,
-                'ip_address' => $this->getClientIp(),
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql'),
-            ],
-            ['%s', '%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%f', '%f', '%s', '%f', '%s', '%s', '%s', '%s', '%d', '%s', '%s', '%s']
-        );
+        $booking_data = [
+            'reference' => $booking_reference,
+            'trip_id' => $trip_id,
+            'customer_id' => $customer_id,
+            'user_id' => $user_id ?: null,
+            'contact_first_name' => $contact_data['first_name'],
+            'contact_last_name' => $contact_data['last_name'],
+            'contact_email' => $contact_data['email'],
+            'contact_phone' => $contact_data['phone'],
+            'contact_country' => $contact_data['country'],
+            'contact_data' => wp_json_encode($contact_data),
+            'emergency_contact' => wp_json_encode($emergency_data),
+            'travel_date' => sanitize_text_field($travel_date),
+            'availability_id' => !empty($availability_id) ? (int) $availability_id : null,
+            'travelers_count' => $travelers_count,
+            'travelers_data' => '', // Legacy field - travellers now stored in separate table
+            'total_amount' => $total_amount,
+            'amount_paid' => 0,
+            'amount_due' => $amount_due,
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'discount_amount' => $discount_amount,
+            'discount_code' => $discount_code,
+            'payment_method' => $payment_method,
+            'payment_gateway' => $payment_gateway,
+            'status' => 'pending',
+            'special_requests' => sanitize_textarea_field($data['special_requests'] ?? ''),
+            'newsletter_optin' => !empty($data['subscribe_newsletter']) ? 1 : 0,
+            'ip_address' => $this->getClientIp(),
+            'created_at' => current_time('mysql'),
+            'updated_at' => current_time('mysql'),
+        ];
 
-        if ($result === false) {
+        try {
+            $booking = $booking_service->createBooking($booking_data);
+            $booking_id = $booking['id'];
+        } catch (\Exception $e) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Failed to create booking. Please try again.', 'yatra'),
-                'error' => $wpdb->last_error,
+                'error' => $e->getMessage(),
             ], 500);
         }
-
-        $booking_id = $wpdb->insert_id;
 
         // ========================================
         // SAVE ADDITIONAL SERVICES (Premium Feature)
@@ -1161,9 +1146,8 @@ class BookingSessionController extends BaseController
 
                 // Update booking with start_date and end_date (only if columns exist)
                 // Check if columns exist before trying to update
-                global $wpdb;
-                $bookingTable = $wpdb->prefix . 'yatra_bookings';
-                $bookingColumns = $wpdb->get_col("DESCRIBE {$bookingTable}");
+                $bookingRepository = new \Yatra\Repositories\BookingRepository();
+                $bookingColumns = $bookingRepository->getTableColumns();
                 
                 $bookingUpdateData = [];
                 if (in_array('start_date', $bookingColumns, true)) {
@@ -1315,33 +1299,23 @@ class BookingSessionController extends BaseController
             'status' => $booking_status,
             'payment_status' => 'pending', // No payment made yet for offline gateways
         ];
-        $update_format = ['%s', '%s'];
         
         if ($confirmed_at) {
             $update_data['confirmed_at'] = $confirmed_at;
-            $update_format[] = '%s';
         }
         
-        $wpdb->update(
-            $bookings_table,
-            $update_data,
-            ['id' => $booking_id],
-            $update_format,
-            ['%d']
-        );
+        if ($expiry_datetime) {
+            $update_data['expires_at'] = $expiry_datetime;
+        }
+        
+        // Use repository to update booking
+        $this->bookingRepository->update($booking_id, $update_data);
 
-        // ========================================
-        // FIRE BOOKING CREATED ACTION
-        // ========================================
-        // Get the full booking object for the action
-        $booking = $wpdb->get_row($wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.slug as trip_slug 
-             FROM {$bookings_table} b 
-             LEFT JOIN {$wpdb->prefix}yatra_trips t ON b.trip_id = t.id 
-             WHERE b.id = %d",
-            $booking_id
-        ));
+        // Link booking to departure
+        $this->departureService->linkBookingToDeparture($booking_id, $departure->id);
 
+        // Increment booked count for this departure
+        $this->departureService->incrementBookedCount($departure->id, $travelers_count);
         if (!is_object($booking)) {
             $booking = (object) [];
         }
@@ -1650,61 +1624,20 @@ class BookingSessionController extends BaseController
                 return;
             }
             
-            // Record the payment
-            $payments_table = $wpdb->prefix . 'yatra_booking_payments';
-            $wpdb->insert(
-                $payments_table,
-                [
-                    'booking_id' => $bookingId,
-                    'amount' => $amount,
-                    'currency' => $currency,
-                    'gateway' => $gatewayId,
-                    'transaction_id' => $transactionId,
-                    'status' => 'completed',
-                    'created_at' => current_time('mysql'),
-                ],
-                ['%d', '%f', '%s', '%s', '%s', '%s', '%s']
-            );
+            // Record the payment using PaymentRepository
+            $paymentRepository = new \Yatra\Repositories\PaymentRepository();
+            $payment_id = $paymentRepository->create([
+                'booking_id' => $bookingId,
+                'amount' => $amount,
+                'currency' => $currency,
+                'gateway' => $gatewayId,
+                'transaction_id' => $transactionId,
+                'status' => 'completed',
+                'created_at' => current_time('mysql'),
+            ]);
             
             // Calculate total paid
             $paymentRepository = new \Yatra\Repositories\PaymentRepository();
-            $totalPaid = $paymentRepository->getTotalPaidForBooking($bookingId);
-            $totalAmount = (float) $booking->total_amount;
-            
-            error_log("[Yatra] Booking {$bookingId}: totalPaid={$totalPaid}, totalAmount={$totalAmount}, amountDue=" . ($booking->amount_due ?? 'null'));
-            
-            // Update booking status
-            $bookings_table = $wpdb->prefix . 'yatra_bookings';
-            if ($totalPaid >= $totalAmount) {
-                $wpdb->update(
-                    $bookings_table,
-                    [
-                        'payment_status' => 'paid',
-                        'amount_paid' => $totalPaid,
-                        'amount_due' => 0,
-                        'status' => 'confirmed',
-                        'confirmed_at' => current_time('mysql'),
-                    ],
-                    ['id' => $bookingId],
-                    ['%s', '%f', '%f', '%s', '%s'],
-                    ['%d']
-                );
-            } else {
-                // Partial payment - confirm booking but mark payment as partial
-                $wpdb->update(
-                    $bookings_table,
-                    [
-                        'payment_status' => 'partial',
-                        'amount_paid' => $totalPaid,
-                        'amount_due' => $totalAmount - $totalPaid,
-                        'status' => 'confirmed',
-                        'confirmed_at' => $booking->confirmed_at ?: current_time('mysql'),
-                    ],
-                    ['id' => $bookingId],
-                    ['%s', '%f', '%f', '%s', '%s'],
-                    ['%d']
-                );
-            }
             
             // Fire payment completed action
             do_action('yatra_payment_completed', [
@@ -2277,36 +2210,21 @@ class BookingSessionController extends BaseController
 
         $availability = null;
         if (!empty($availability_id)) {
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $availability = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$availability_table} WHERE trip_id = %d AND id = %d LIMIT 1",
-                $trip_id,
-                (int) $availability_id
-            ));
+            $availability = $this->availabilityService->getById($availability_id);
         } elseif (!empty($travel_date)) {
-            $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-            $query = "SELECT * FROM {$availability_table} WHERE trip_id = %d AND departure_date = %s";
-            $params = [$trip_id, $travel_date];
-            if (!empty($departure_time)) {
-                $query .= " AND departure_time = %s";
-                $params[] = $departure_time;
+            $availability = $this->availabilityService->getByTripAndDate($trip_id, $travel_date);
+            
+            if ($availability && !empty($departure_time) && $availability->departure_time !== $departure_time) {
+                $availability = null; // Time mismatch
             }
-            $query .= " LIMIT 1";
-            $availability = $wpdb->get_row($wpdb->prepare($query, ...$params));
         }
         
         // Get price types for traveler-based pricing
         $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
         $categories_table = $wpdb->prefix . 'yatra_traveler_categories';
         
-        $price_types = $wpdb->get_results($wpdb->prepare(
-            "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, tc.age_min, tc.age_max
-             FROM {$price_types_table} pt
-             LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
-             WHERE pt.trip_id = %d
-             ORDER BY pt.id ASC",
-            $trip_id
-        ));
+        // Use AvailabilityService to get trip price types
+        $price_types = $this->availabilityService->getTripPriceTypes($trip_id);
         
         $resolved_pricing_type = !empty($pricing_type_from_request) ? $pricing_type_from_request : ($trip->pricing_type ?? 'regular');
 
@@ -2338,11 +2256,8 @@ class BookingSessionController extends BaseController
 
             $missing_label_category_ids = array_values(array_unique(array_filter($missing_label_category_ids)));
             if (!empty($missing_label_category_ids)) {
-                $placeholders = implode(',', array_fill(0, count($missing_label_category_ids), '%d'));
-                $cats = $wpdb->get_results($wpdb->prepare(
-                    "SELECT id, label, slug, age_min, age_max FROM {$categories_table} WHERE id IN ({$placeholders})",
-                    ...$missing_label_category_ids
-                ));
+                // Use AvailabilityService to get traveler categories
+                $cats = $this->availabilityService->getTravelerCategories($missing_label_category_ids);
 
                 $catIndex = [];
                 foreach ($cats as $cat) {
@@ -2931,17 +2846,8 @@ class BookingSessionController extends BaseController
      */
     private function getCouponUsageByUser(string $discount_code, int $user_id): int
     {
-        global $wpdb;
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        
-        // Count bookings with this coupon code by this user
-        $count = $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*) FROM {$bookings_table} WHERE customer_id = %d AND discount_code = %s AND status NOT IN ('cancelled', 'refunded', 'failed')",
-            $user_id,
-            strtoupper(sanitize_text_field($discount_code))
-        ));
-        
-        return (int) $count;
+        // Use AvailabilityService to check discount code usage
+        return $this->availabilityService->getDiscountCodeUsage($user_id, strtoupper(sanitize_text_field($discount_code)));
     }
 }
 

@@ -25,7 +25,7 @@ interface DifficultyLevelFormData {
   slug: string;
   description: string;
   icon: IconPickerValue | null;
-  level_order: number | '';
+  sorting: number | '';
   status: string;
 }
 
@@ -38,7 +38,7 @@ const DifficultyLevelForm: React.FC = () => {
     slug: '',
     description: '',
     icon: null,
-    level_order: '',
+    sorting: '',
     status: 'publish',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,7 +79,7 @@ const DifficultyLevelForm: React.FC = () => {
         slug: levelData.slug || '',
         description: levelData.description || '',
         icon: (levelData.icon as IconPickerValue) || null,
-        level_order: typeof levelData.level_order === 'number' ? levelData.level_order : '',
+        sorting: typeof levelData.sorting === 'number' ? levelData.sorting : '',
         status: levelData.status || 'publish',
       });
     }
@@ -139,8 +139,8 @@ const DifficultyLevelForm: React.FC = () => {
       newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
     }
 
-    if (formData.level_order !== '' && Number(formData.level_order) < 0) {
-      newErrors.level_order = __('Order must be a positive number', 'Order must be a positive number');
+    if (formData.sorting !== '' && Number(formData.sorting) < 0) {
+      newErrors.sorting = __('Order must be a positive number', 'Order must be a positive number');
     }
 
     setErrors(newErrors);
@@ -154,7 +154,7 @@ const DifficultyLevelForm: React.FC = () => {
         slug: data.slug.trim(),
         description: data.description,
         icon: data.icon,
-        level_order: data.level_order === '' ? null : Number(data.level_order),
+        sorting: data.sorting === '' ? null : Number(data.sorting),
         status: data.status,
       };
 
@@ -346,19 +346,19 @@ const DifficultyLevelForm: React.FC = () => {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="level_order" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="sorting" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                       {__('Display Order', 'Display Order')}
                     </label>
                     <Input
-                      id="level_order"
+                      id="sorting"
                       type="number"
                       min={0}
-                      value={formData.level_order}
-                      onChange={(e) => handleFieldChange('level_order', e.target.value === '' ? '' : Number(e.target.value))}
+                      value={formData.sorting}
+                      onChange={(e) => handleFieldChange('sorting', e.target.value === '' ? '' : Number(e.target.value))}
                       placeholder={__('Auto', 'Auto')}
-                      className={errors.level_order ? 'border-red-500' : ''}
+                      className={errors.sorting ? 'border-red-500' : ''}
                     />
-                    {errors.level_order && <p className="mt-1 text-sm text-red-500">{errors.level_order}</p>}
+                    {errors.sorting && <p className="mt-1 text-sm text-red-500">{errors.sorting}</p>}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {__('Lower numbers appear first. Leave blank to auto-assign.', 'Lower numbers appear first. Leave blank to auto-assign.')}
                     </p>

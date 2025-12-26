@@ -92,7 +92,10 @@ class ScheduledPaymentRepository extends BaseRepository
     public function getPendingForReminders(int $reminderDays): array
     {
         $table = $this->getTableName();
-        $bookingsTable = $this->wpdb->prefix . 'yatra_bookings';
+        
+        // Use BookingRepository for bookings table
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $bookingsTable = $bookingRepository->getTableName();
 
         $reminderDate = date('Y-m-d', strtotime("+{$reminderDays} days"));
 
@@ -118,7 +121,10 @@ class ScheduledPaymentRepository extends BaseRepository
     public function getUpcoming(int $days = 7, int $limit = 20): array
     {
         $table = $this->getTableName();
-        $bookingsTable = $this->wpdb->prefix . 'yatra_bookings';
+        
+        // Use BookingRepository for bookings table
+        $bookingRepository = new \Yatra\Repositories\BookingRepository();
+        $bookingsTable = $bookingRepository->getTableName();
 
         $futureDate = date('Y-m-d H:i:s', strtotime("+{$days} days"));
 
@@ -240,6 +246,22 @@ class ScheduledPaymentRepository extends BaseRepository
     }
 
     /**
+     * Check if table exists
+     * 
+     * @param string $tableName Table name
+     * @return bool True if table exists
+     */
+    public function tableExists(string $tableName): bool
+    {
+        $tableExists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = %s AND table_name = %s",
+            DB_NAME,
+            $tableName
+        ));
+        return !empty($tableExists);
+    }
+
+    /**
      * Increment retry count
      *
      * @param int    $id            Payment ID
@@ -306,6 +328,7 @@ class ScheduledPaymentRepository extends BaseRepository
      */
     public function getPaymentToken(int $tokenId): ?object
     {
+        // Using hardcoded table name since there's no dedicated repository for this table
         $table = $this->wpdb->prefix . 'yatra_payment_tokens';
 
         $result = $this->wpdb->get_row($this->wpdb->prepare(
@@ -324,6 +347,7 @@ class ScheduledPaymentRepository extends BaseRepository
      */
     public function createPaymentToken(array $data)
     {
+        // Using hardcoded table name since there's no dedicated repository for this table
         $table = $this->wpdb->prefix . 'yatra_payment_tokens';
 
         $result = $this->wpdb->insert($table, [

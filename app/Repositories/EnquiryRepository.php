@@ -31,7 +31,9 @@ class EnquiryRepository extends BaseRepository
      */
     protected function getTripsTable(): string
     {
-        return $this->wpdb->prefix . 'yatra_trips';
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        return $tripRepository->getTableName();
     }
 
     /**

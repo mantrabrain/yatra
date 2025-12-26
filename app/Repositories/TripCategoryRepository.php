@@ -155,7 +155,12 @@ class TripCategoryRepository extends BaseRepository
     public function getPublishedWithTripCounts(): array
     {
         $table = esc_sql($this->table);
-        $trip_table = esc_sql($this->wpdb->prefix . 'yatra_trips');
+        
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $trip_table = esc_sql($tripRepository->getTableName());
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
         $trip_cat_table = esc_sql($this->wpdb->prefix . 'yatra_trip_trip_categories');
         $reviews_table = esc_sql($this->wpdb->prefix . 'yatra_reviews');
 
@@ -196,7 +201,9 @@ class TripCategoryRepository extends BaseRepository
             return 0;
         }
 
-        $trip_table = esc_sql($this->wpdb->prefix . 'yatra_trips');
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $trip_table = esc_sql($tripRepository->getTableName());
         $placeholders = implode(',', array_fill(0, count($trip_ids), '%d'));
         
         $query = "SELECT MIN(CAST(original_price AS DECIMAL(10,2))) as min_price 
@@ -234,6 +241,59 @@ class TripCategoryRepository extends BaseRepository
         $query = "SELECT * FROM `{$table}` {$search_where} {$order} {$limit}";
 
         return $this->wpdb->get_results($query) ?: [];
+    }
+
+    /**
+     * Get trip count for a trip category
+     * 
+     * @param int $categoryId Category ID
+     * @return int Number of trips with this category
+     */
+    public function getTripCount(int $categoryId): int
+    {
+        global $wpdb;
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for classifications
+        // Using hardcoded table name since there's no dedicated repository for this table
+        $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripsTable}` t
+             INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
+             WHERE tc.classification_id = %d
+               AND tc.classification_type = 'trip_category'
+               AND t.status != 'trash'",
+            $categoryId
+        ));
+    }
+
+    /**
+     * Get trip count for trip category (direct field method)
+     * 
+     * @param int $categoryId Category ID
+     * @return int Number of trips with this category
+     */
+    public function getTripCountDirect(int $categoryId): int
+    {
+        global $wpdb;
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for trip categories
+        // Using hardcoded table name since there's no dedicated repository for this table
+        $tripCatTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripTable}` t
+             INNER JOIN `{$tripCatTable}` tc ON tc.trip_id = t.id
+             WHERE tc.trip_category_id = %d
+               AND t.status != 'trash'",
+            $categoryId
+        ));
     }
 }
 

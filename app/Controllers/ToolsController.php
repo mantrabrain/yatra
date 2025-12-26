@@ -201,167 +201,15 @@ class ToolsController extends BaseController
                 'data' => []
             ];
 
-            // Export based on selected data types with table existence checks and batch processing
+            // Export data using ExportImportService
             $batch_size = 1000; // Process 1000 records at a time
-            
-            if (empty($selected_data_types) || in_array('trips', $selected_data_types)) {
-                $trips_table = $wpdb->prefix . 'yatra_trips';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$trips_table'");
-                if ($table_exists) {
-                    $total_trips = (int) $wpdb->get_var("SELECT COUNT(*) FROM $trips_table");
-                    $trips = [];
-                    
-                    for ($offset = 0; $offset < $total_trips; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $trips_table LIMIT $batch_size OFFSET $offset");
-                        $trips = array_merge($trips, $batch);
-                    }
-                    
-                    $export_data['data']['trips'] = $trips;
-                } else {
-                    $export_data['data']['trips'] = [];
-                }
-            }
+            $export_data = ExportImportService::exportData($selected_data_types, $batch_size);
 
-            if (empty($selected_data_types) || in_array('destinations', $selected_data_types)) {
-                $destinations_table = $wpdb->prefix . 'yatra_destinations';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$destinations_table'");
-                if ($table_exists) {
-                    $total_destinations = (int) $wpdb->get_var("SELECT COUNT(*) FROM $destinations_table");
-                    $destinations = [];
-                    
-                    for ($offset = 0; $offset < $total_destinations; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $destinations_table LIMIT $batch_size OFFSET $offset");
-                        $destinations = array_merge($destinations, $batch);
-                    }
-                    
-                    $export_data['data']['destinations'] = $destinations;
-                } else {
-                    $export_data['data']['destinations'] = [];
-                }
-            }
+            // Add version info to export data
+            $export_data['version'] = YATRA_VERSION;
 
-            if (empty($selected_data_types) || in_array('activities', $selected_data_types)) {
-                $activities_table = $wpdb->prefix . 'yatra_activities';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$activities_table'");
-                if ($table_exists) {
-                    $total_activities = (int) $wpdb->get_var("SELECT COUNT(*) FROM $activities_table");
-                    $activities = [];
-                    
-                    for ($offset = 0; $offset < $total_activities; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $activities_table LIMIT $batch_size OFFSET $offset");
-                        $activities = array_merge($activities, $batch);
-                    }
-                    
-                    $export_data['data']['activities'] = $activities;
-                } else {
-                    $export_data['data']['activities'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('bookings', $selected_data_types)) {
-                $bookings_table = $wpdb->prefix . 'yatra_bookings';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$bookings_table'");
-                if ($table_exists) {
-                    $total_bookings = (int) $wpdb->get_var("SELECT COUNT(*) FROM $bookings_table");
-                    $bookings = [];
-                    
-                    for ($offset = 0; $offset < $total_bookings; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $bookings_table LIMIT $batch_size OFFSET $offset");
-                        $bookings = array_merge($bookings, $batch);
-                    }
-                    
-                    $export_data['data']['bookings'] = $bookings;
-                } else {
-                    $export_data['data']['bookings'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('customers', $selected_data_types)) {
-                $customers_table = $wpdb->prefix . 'yatra_customers';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$customers_table'");
-                if ($table_exists) {
-                    $total_customers = (int) $wpdb->get_var("SELECT COUNT(*) FROM $customers_table");
-                    $customers = [];
-                    
-                    for ($offset = 0; $offset < $total_customers; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $customers_table LIMIT $batch_size OFFSET $offset");
-                        $customers = array_merge($customers, $batch);
-                    }
-                    
-                    $export_data['data']['customers'] = $customers;
-                } else {
-                    $export_data['data']['customers'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('reviews', $selected_data_types)) {
-                $reviews_table = $wpdb->prefix . 'yatra_reviews';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$reviews_table'");
-                if ($table_exists) {
-                    $total_reviews = (int) $wpdb->get_var("SELECT COUNT(*) FROM $reviews_table");
-                    $reviews = [];
-                    
-                    for ($offset = 0; $offset < $total_reviews; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $reviews_table LIMIT $batch_size OFFSET $offset");
-                        $reviews = array_merge($reviews, $batch);
-                    }
-                    
-                    $export_data['data']['reviews'] = $reviews;
-                } else {
-                    $export_data['data']['reviews'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('payments', $selected_data_types)) {
-                $payments_table = $wpdb->prefix . 'yatra_booking_payments';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$payments_table'");
-                if ($table_exists) {
-                    $total_payments = (int) $wpdb->get_var("SELECT COUNT(*) FROM $payments_table");
-                    $payments = [];
-                    
-                    for ($offset = 0; $offset < $total_payments; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $payments_table LIMIT $batch_size OFFSET $offset");
-                        $payments = array_merge($payments, $batch);
-                    }
-                    
-                    $export_data['data']['payments'] = $payments;
-                } else {
-                    $export_data['data']['payments'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('enquiries', $selected_data_types)) {
-                $enquiries_table = $wpdb->prefix . 'yatra_enquiries';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$enquiries_table'");
-                if ($table_exists) {
-                    $total_enquiries = (int) $wpdb->get_var("SELECT COUNT(*) FROM $enquiries_table");
-                    $enquiries = [];
-                    
-                    for ($offset = 0; $offset < $total_enquiries; $offset += $batch_size) {
-                        $batch = $wpdb->get_results("SELECT * FROM $enquiries_table LIMIT $batch_size OFFSET $offset");
-                        $enquiries = array_merge($enquiries, $batch);
-                    }
-                    
-                    $export_data['data']['enquiries'] = $enquiries;
-                } else {
-                    $export_data['data']['enquiries'] = [];
-                }
-            }
-
-            if (empty($selected_data_types) || in_array('coupons', $selected_data_types)) {
-                // Check if coupons table exists
-                $coupons_table = $wpdb->prefix . 'yatra_coupons';
-                $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$coupons_table'");
-                if ($table_exists) {
-                    $coupons = $wpdb->get_results("SELECT * FROM $coupons_table");
-                    $export_data['data']['coupons'] = $coupons;
-                } else {
-                    $export_data['data']['coupons'] = [];
-                }
-            }
-
+            // Export settings if requested
             if (empty($selected_data_types) || in_array('settings', $selected_data_types)) {
-                // Export all Yatra-related settings
                 $settings = [
                     'yatra_settings' => get_option('yatra_settings', []),
                     'yatra_currency' => get_option('yatra_currency', 'USD'),
@@ -412,40 +260,40 @@ class ToolsController extends BaseController
                 return $this->error_response(__('Invalid import data', 'yatra'), 400);
             }
 
-            global $wpdb;
             $imported_count = 0;
 
             // Import trips
             if (!empty($import_data['data']['trips'])) {
+                $tripRepository = new \Yatra\Repositories\TripRepository();
                 foreach ($import_data['data']['trips'] as $trip) {
                     $trip = (array) $trip;
                     unset($trip['id']); // Remove ID to create new records
-                    $wpdb->insert($wpdb->prefix . 'yatra_trips', $trip);
+                    $tripRepository->create($trip);
                     $imported_count++;
                 }
             }
 
             // Import destinations
             if (!empty($import_data['data']['destinations'])) {
+                $destinationRepository = new \Yatra\Repositories\DestinationRepository();
                 foreach ($import_data['data']['destinations'] as $destination) {
                     $destination = (array) $destination;
-                    unset($destination['id']);
-                    $wpdb->insert($wpdb->prefix . 'yatra_destinations', $destination);
+                    unset($destination['id']); // Remove ID to create new records
+                    $destinationRepository->create($destination);
                     $imported_count++;
                 }
             }
 
             // Import activities
             if (!empty($import_data['data']['activities'])) {
+                $activityRepository = new \Yatra\Repositories\ActivityRepository();
                 foreach ($import_data['data']['activities'] as $activity) {
                     $activity = (array) $activity;
-                    unset($activity['id']);
-                    $wpdb->insert($wpdb->prefix . 'yatra_activities', $activity);
+                    unset($activity['id']); // Remove ID to create new records
+                    $activityRepository->create($activity);
                     $imported_count++;
                 }
             }
-
-            Logger::info("Data imported successfully. {$imported_count} records imported.");
 
             return $this->success_response([
                 'message' => sprintf(__('%d records imported successfully', 'yatra'), $imported_count),
@@ -570,8 +418,8 @@ class ToolsController extends BaseController
      */
     private function getDatabaseVersion(): string
     {
-        global $wpdb;
-        return $wpdb->get_var("SELECT VERSION()") ?: 'Unknown';
+        // Use ExportImportService to get MySQL version
+        return $this->exportImportService->getMySQLVersion();
     }
 
     /**
@@ -1224,40 +1072,13 @@ class ToolsController extends BaseController
     /**
      * Get all jobs for current user (for Jobs tab)
      */
-    public function getAllJobs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_all_jobs(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
             $userId = get_current_user_id();
             
-            global $wpdb;
-            
-            $options = $wpdb->get_results(
-                "SELECT option_name, option_value FROM {$wpdb->options} 
-                 WHERE option_name LIKE 'yatra_job_%'"
-            );
-            
-            Logger::info("Found " . count($options) . " job options in database for user {$userId}");
-            
-            $jobs = [];
-            $filteredCount = 0;
-            
-            foreach ($options as $option) {
-                $jobData = maybe_unserialize($option->option_value);
-                
-                if (!is_array($jobData)) {
-                    continue;
-                }
-                
-                // Filter by user
-                if (($jobData['user_id'] ?? 0) !== $userId) {
-                    $filteredCount++;
-                    continue;
-                }
-                
-                $jobs[] = $jobData;
-            }
-            
-            Logger::info("Returning " . count($jobs) . " jobs (filtered out {$filteredCount} jobs)");
+            // Use ExportImportService to get job options for user
+            $jobs = $this->exportImportService->getJobOptionsForUser($userId);
             
             // Sort by created_at descending (most recent first)
             usort($jobs, function($a, $b) {
@@ -1278,11 +1099,8 @@ class ToolsController extends BaseController
     public function clearAllCache(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            global $wpdb;
-            
-            // Clear transients
-            $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_yatra_%'");
-            $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '%_transient_timeout_yatra_%'");
+            // Clear Yatra transients using CacheService
+            \Yatra\Services\CacheService::clearByPrefix('yatra_');
             
             // Clear object cache if available
             if (function_exists('wp_cache_flush')) {

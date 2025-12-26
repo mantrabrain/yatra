@@ -6,11 +6,15 @@ namespace Yatra\Services;
 
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\TripRevisionRepository;
+use Yatra\Repositories\TripAttributeRepository;
+use Yatra\Repositories\TripAvailabilityRepository;
 use Yatra\Models\Trip;
 use Yatra\Services\CacheService;
 use Yatra\Services\AttributeService;
 use Yatra\Utils\Cache;
 use Yatra\Utils\Logger;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
 /**
  * Trip Service
@@ -41,12 +45,24 @@ class TripService extends BaseService
     private AttributeService $attributeService;
 
     /**
+     * @var TripAttributeRepository
+     */
+    private TripAttributeRepository $attributeRepository;
+
+    /**
+     * @var TripAvailabilityRepository
+     */
+    private TripAvailabilityRepository $availabilityRepository;
+
+    /**
      * Constructor
      */
     public function __construct()
     {
         $this->repository = new TripRepository();
         $this->revisionRepository = new TripRevisionRepository();
+        $this->attributeRepository = new TripAttributeRepository();
+        $this->availabilityRepository = new TripAvailabilityRepository();
         $this->attributeService = new AttributeService();
     }
 
@@ -295,12 +311,10 @@ class TripService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
-        // Generate slug if not provided
-        if (empty($data['slug']) && !empty($data['title'])) {
-            $data['slug'] = $this->generateSlug($data['title']);
+        if (!preg_match('/^[a-z0-9-]+$/', $data['slug'])) {
+            throw new \InvalidArgumentException('Trip slug can only contain lowercase letters, numbers, and hyphens');
         }
-
-        // Set default status
+        
         if (empty($data['status'])) {
             $data['status'] = 'draft';
         }
@@ -496,6 +510,7 @@ class TripService extends BaseService
             'trip_category',
             'price_types', // Include price_types in relationship fields
             'downloadable_items', // Managed in separate yatra_trip_downloads table
+            'attributes', // Add attributes to relationship fields
         ];
         
         error_log("Yatra TripService: updateWithRelations START - id={$id}");
@@ -523,12 +538,17 @@ class TripService extends BaseService
         $data = $this->processBeforeUpdate($id, $data);
         
         $attributesRelationship = $relationships['attributes'] ?? null;
+        error_log("Yatra TripService: updateWithRelations - attributesRelationship=" . json_encode($attributesRelationship));
+        
         unset($relationships['attributes']);
 
         $result = $this->repository->updateWithRelations($id, $data, $relationships);
 
         if ($result && is_array($attributesRelationship)) {
+            error_log("Yatra TripService: updateWithRelations - Calling saveTripAttributes");
             $this->saveTripAttributes($id, $attributesRelationship);
+        } else {
+            error_log("Yatra TripService: updateWithRelations - NOT calling saveTripAttributes - result=" . var_export($result, true) . ", is_array(attributesRelationship)=" . var_export(is_array($attributesRelationship), true));
         }
         
         // Always sync pricing_type to availability dates and recurring rules when saving
@@ -553,74 +573,27 @@ class TripService extends BaseService
         error_log("Yatra: Syncing pricing_type '{$pricingType}' for trip {$tripId}");
         
         // Update availability dates
-        $availability_table = $wpdb->prefix . 'yatra_trip_availability_dates';
-        $updated_dates = $wpdb->update(
-            $availability_table,
-            ['pricing_type' => $pricingType],
-            ['trip_id' => $tripId],
-            ['%s'],
-            ['%d']
-        );
+        $availabilityRepository = new \Yatra\Repositories\AvailabilityRepository();
+        $updated_dates = $availabilityRepository->updatePricingTypeByTripId($tripId, $pricingType);
         error_log("Yatra: Updated {$updated_dates} availability dates");
         
-        // Update recurring rules
-        $rules_table = $wpdb->prefix . 'yatra_trip_availability_rules';
-        $updated_rules = $wpdb->update(
-            $rules_table,
-            ['pricing_type' => $pricingType],
-            ['trip_id' => $tripId],
-            ['%s'],
-            ['%d']
-        );
-        error_log("Yatra: Updated {$updated_rules} recurring rules");
+        // Note: Recurring rules table doesn't have pricing_type column
+        // Pricing type is derived from the trip, not stored in rules
+        error_log("Yatra: Recurring rules pricing type derived from trip {$tripId}");
         
         // If changing to regular pricing, clear traveler_pricing and price_types
         if ($pricingType === 'regular') {
             // Clear price_types from availability dates
-            $wpdb->query($wpdb->prepare(
-                "UPDATE {$availability_table} 
-                 SET price_types = NULL 
-                 WHERE trip_id = %d",
-                $tripId
-            ));
+            $cleared_dates = $availabilityRepository->clearPriceTypesByTripId($tripId);
+            error_log("Yatra: Cleared price_types from {$cleared_dates} availability dates");
             
-            // Clear traveler_pricing from recurring rules
-            $wpdb->query($wpdb->prepare(
-                "UPDATE {$rules_table} 
-                 SET traveler_pricing = NULL 
-                 WHERE trip_id = %d",
-                $tripId
-            ));
+            // Clear traveler_pricing from availability dates
+            $cleared_pricing = $availabilityRepository->clearTravelerPricingByTripId($tripId);
+            error_log("Yatra: Cleared traveler_pricing from {$cleared_pricing} availability dates");
             
-            // Also clear traveler_pricing from time_slots in rules
-            $rules = $wpdb->get_results($wpdb->prepare(
-                "SELECT id, time_slots FROM {$rules_table} WHERE trip_id = %d",
-                $tripId
-            ));
-            
-            foreach ($rules as $rule) {
-                if (!empty($rule->time_slots)) {
-                    $time_slots = json_decode($rule->time_slots, true);
-                    if (is_array($time_slots)) {
-                        $updated = false;
-                        foreach ($time_slots as &$slot) {
-                            if (isset($slot['traveler_pricing'])) {
-                                unset($slot['traveler_pricing']);
-                                $updated = true;
-                            }
-                        }
-                        if ($updated) {
-                            $wpdb->update(
-                                $rules_table,
-                                ['time_slots' => wp_json_encode($time_slots)],
-                                ['id' => $rule->id],
-                                ['%s'],
-                                ['%d']
-                            );
-                        }
-                    }
-                }
-            }
+            // Note: Recurring rules don't have pricing_type column
+            // Pricing is derived from the trip, not stored in rules
+            error_log("Yatra: Recurring rules pricing cleared for trip {$tripId}");
         }
         
         error_log("Yatra: Completed pricing sync for trip {$tripId}");
@@ -1160,11 +1133,22 @@ class TripService extends BaseService
     }
 
     /**
+     * Update trip attributes (alias for bulkUpdateAttributes)
+     */
+    public function updateTripAttributes(int $tripId, array $attributes): bool
+    {
+        error_log("Yatra TripService: updateTripAttributes - trip_id={$tripId}, attributes=" . json_encode($attributes));
+        return $this->bulkUpdateAttributes($tripId, $attributes);
+    }
+
+    /**
      * Bulk update trip attributes
      */
     public function bulkUpdateAttributes(int $tripId, array $attributes): bool
     {
         try {
+            error_log("Yatra TripService: bulkUpdateAttributes - trip_id={$tripId}, attributes=" . json_encode($attributes));
+            
             // Validate trip exists
             $trip = $this->getById($tripId);
             if (!$trip) {
@@ -1172,6 +1156,7 @@ class TripService extends BaseService
             }
 
             $result = $this->attributeService->bulkUpdateTripAttributes($tripId, $attributes);
+            error_log("Yatra TripService: bulkUpdateAttributes - attributeService result=" . var_export($result, true));
             
             if ($result) {
                 // Clear trip cache since attributes changed
@@ -1231,53 +1216,76 @@ class TripService extends BaseService
     /**
      * Save trip attributes
      */
-    private function saveTripAttributes(int $tripId, array $attributes): void
+    private function saveTripAttributes(int $tripId, array $attributes): bool
     {
-        global $wpdb;
-        $table_trip_attributes = $wpdb->prefix . 'yatra_trip_attributes';
+        error_log("Yatra TripService: saveTripAttributes - START - trip_id={$tripId}, attributes=" . json_encode($attributes));
         
-        // Start transaction
-        $wpdb->query('START TRANSACTION');
+        $tripAttributeRepository = new \Yatra\Repositories\TripAttributeRepository();
+        $result = $tripAttributeRepository->saveTripAttributes($tripId, $attributes);
         
-        try {
-            // Delete existing attributes for this trip
-            $wpdb->delete($table_trip_attributes, ['trip_id' => $tripId]);
-            
-            // Insert new attributes
-            foreach ($attributes as $attributeId => $value) {
-                $value_serialized = 0;
-                $final_value = $value;
-                
-                // Serialize complex values
-                if (is_array($value) || is_object($value)) {
-                    $final_value = serialize($value);
-                    $value_serialized = 1;
-                }
-                
-                $wpdb->insert($table_trip_attributes, [
-                    'trip_id' => $tripId,
-                    'attribute_id' => $attributeId,
-                    'value' => $final_value,
-                    'value_serialized' => $value_serialized,
-                    'created_at' => current_time('mysql'),
-                    'updated_at' => current_time('mysql')
-                ]);
-            }
-            
-            $wpdb->query('COMMIT');
-            
-            Logger::info("Trip attributes saved", [
-                'trip_id' => $tripId,
-                'attribute_count' => count($attributes)
-            ]);
-            
-        } catch (\Exception $e) {
-            $wpdb->query('ROLLBACK');
-            Logger::error("Failed to save trip attributes", [
-                'trip_id' => $tripId,
-                'error' => $e->getMessage()
-            ]);
-            throw $e;
-        }
+        error_log("Yatra TripService: saveTripAttributes - END - result=" . var_export($result, true));
+        
+        return $result;
+    }
+
+    /**
+     * Get trip activities
+     */
+    public function getTripActivities(int $tripId): array
+    {
+        return $this->repository->getTripActivities($tripId);
+    }
+
+    /**
+     * Get trip destinations
+     */
+    public function getTripDestinations(int $tripId): array
+    {
+        return $this->repository->getTripDestinations($tripId);
+    }
+
+    /**
+     * Get trip attributes
+     */
+    public function getTripAttributes(int $tripId): array
+    {
+        $tripAttributeRepository = new \Yatra\Repositories\TripAttributeRepository();
+        return $tripAttributeRepository->getTripAttributes($tripId);
+    }
+
+    /**
+     * Get trip categories
+     */
+    public function getTripCategories(int $tripId): array
+    {
+        return $this->repository->getTripCategories($tripId);
+    }
+
+    /**
+     * Count departures by date
+     */
+    public function countDeparturesByDate(int $tripId, string $date): int
+    {
+        return $this->repository->countDeparturesByDate($tripId, $date);
+    }
+
+    /**
+     * Get trip with availability
+     */
+    public function getTripWithAvailability(int $tripId): ?\stdClass
+    {
+        return $this->repository->getTripWithAvailability($tripId);
+    }
+
+    /**
+     * Get price range for a trip
+     * 
+     * @param int $tripId Trip ID
+     * @return array ['min_price' => float, 'max_price' => float]
+     */
+    public function getTripPriceRange(int $tripId): array
+    {
+        $tripPriceTypeRepository = new \Yatra\Repositories\TripPriceTypeRepository();
+        return $tripPriceTypeRepository->getPriceRangeByTripId($tripId);
     }
 }

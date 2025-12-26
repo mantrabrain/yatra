@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Models\Availability;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 /**
  * Availability Repository
@@ -17,7 +18,7 @@ class AvailabilityRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_trip_availability_dates';
+        return TripAvailabilityDatesTable::getTableName();
     }
 
     /**
@@ -296,6 +297,186 @@ class AvailabilityRepository extends BaseRepository
     protected function hasSoftDelete(): bool
     {
         return false; // Availability table doesn't have soft delete
+    }
+
+    /**
+     * Update pricing type for all availability dates of a trip
+     * 
+     * @param int $tripId Trip ID
+     * @param string $pricingType Pricing type
+     * @return int Number of rows updated
+     */
+    public function updatePricingTypeByTripId(int $tripId, string $pricingType): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->update(
+            $table,
+            ['pricing_type' => $pricingType],
+            ['trip_id' => $tripId],
+            ['%s'],
+            ['%d']
+        );
+    }
+
+    /**
+     * Clear price types for all availability dates of a trip
+     * 
+     * @param int $tripId Trip ID
+     * @return int Number of rows updated
+     */
+    public function clearPriceTypesByTripId(int $tripId): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table} 
+                 SET price_types = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            )
+        );
+    }
+
+    /**
+     * Clear traveler pricing from availability dates for a trip
+     * 
+     * @param int $tripId Trip ID
+     * @return int Number of rows updated
+     */
+    public function clearTravelerPricingByTripId(int $tripId): int
+    {
+        $table = esc_sql($this->table);
+        return (int) $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table} 
+                 SET price_types = NULL 
+                 WHERE trip_id = %d",
+                $tripId
+            )
+        );
+    }
+
+    /**
+     * Get specific dates for a trip within a date range
+     * 
+     * @param int $tripId Trip ID
+     * @param string $startDate Start date (Y-m-d)
+     * @param string $endDate End date (Y-m-d)
+     * @return array Array of specific date records
+     */
+    public function getDatesForTrip(int $tripId, string $startDate, string $endDate): array
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "SELECT * FROM `{$table}` 
+                WHERE `trip_id` = %d 
+                AND `date` BETWEEN %s AND %s
+                ORDER BY `date` ASC";
+        
+        $query = $this->wpdb->prepare($sql, $tripId, $startDate, $endDate);
+        return $this->wpdb->get_results($query) ?: [];
+    }
+
+    /**
+     * Get specific date for a trip on a particular date
+     * 
+     * @param int $tripId Trip ID
+     * @param string $date Date (Y-m-d)
+     * @return object|null Specific date record or null
+     */
+    public function getDateForTrip(int $tripId, string $date): ?object
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "SELECT * FROM `{$table}` 
+                WHERE `trip_id` = %d 
+                AND `date` = %s
+                LIMIT 1";
+        
+        $query = $this->wpdb->prepare($sql, $tripId, $date);
+        $result = $this->wpdb->get_row($query);
+        
+        return $result ?: null;
+    }
+
+    /**
+     * Get available dates for a trip within a date range
+     * 
+     * @param int $tripId Trip ID
+     * @param string $startDate Start date (Y-m-d)
+     * @param string $endDate End date (Y-m-d)
+     * @return array Array of available dates
+     */
+    public function getAvailableDates(int $tripId, string $startDate, string $endDate): array
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "SELECT * FROM `{$table}` 
+                WHERE `trip_id` = %d 
+                AND `date` BETWEEN %s AND %s
+                AND `status` = 'available'
+                AND (`max_bookings` IS NULL OR `current_bookings` < `max_bookings`)
+                ORDER BY `date` ASC";
+        
+        $query = $this->wpdb->prepare($sql, $tripId, $startDate, $endDate);
+        return $this->wpdb->get_results($query) ?: [];
+    }
+
+    /**
+     * Update current bookings count for a specific date
+     * 
+     * @param int $id Specific date record ID
+     * @param int $bookingCount New booking count
+     * @return bool Success status
+     */
+    public function updateBookingCount(int $id, int $bookingCount): bool
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "UPDATE `{$table}` 
+                SET `current_bookings` = %d, `updated_at` = NOW()
+                WHERE `id` = %d";
+        
+        $query = $this->wpdb->prepare($sql, $bookingCount, $id);
+        return (bool) $this->wpdb->query($query);
+    }
+
+    /**
+     * Increment booking count for a specific date
+     * 
+     * @param int $id Specific date record ID
+     * @param int $increment Number to increment by (default: 1)
+     * @return bool Success status
+     */
+    public function incrementBookingCount(int $id, int $increment = 1): bool
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "UPDATE `{$table}` 
+                SET `current_bookings` = `current_bookings` + %d, `updated_at` = NOW()
+                WHERE `id` = %d";
+        
+        $query = $this->wpdb->prepare($sql, $increment, $id);
+        return (bool) $this->wpdb->query($query);
+    }
+
+    /**
+     * Decrement booking count for a specific date
+     * 
+     * @param int $id Specific date record ID
+     * @param int $decrement Number to decrement by (default: 1)
+     * @return bool Success status
+     */
+    public function decrementBookingCount(int $id, int $decrement = 1): bool
+    {
+        $table = esc_sql($this->table);
+        
+        $sql = "UPDATE `{$table}` 
+                SET `current_bookings` = GREATEST(0, `current_bookings` - %d), `updated_at` = NOW()
+                WHERE `id` = %d";
+        
+        $query = $this->wpdb->prepare($sql, $decrement, $id);
+        return (bool) $this->wpdb->query($query);
     }
 }
 

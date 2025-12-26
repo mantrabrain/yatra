@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\ReviewsTable;
+
 /**
  * Activity Repository
- * Handles database operations for activities
+ * Handles database operations for activities using the new ClassificationsTable
  */
 class ActivityRepository extends BaseRepository
 {
@@ -21,23 +27,22 @@ class ActivityRepository extends BaseRepository
     protected array $integerFields = ['id', 'created_by', 'updated_by'];
 
     /**
-     * Get table name
+     * Get table name - using the new ClassificationsTable
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_activities';
+        return ClassificationsTable::getTableName();
     }
 
     /**
-     * Find by slug
+     * Find by slug - for activities
      */
     public function findBySlug(string $slug): ?\stdClass
     {
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = 'activity' AND slug = %s",
                 $slug
             )
         );
@@ -50,7 +55,8 @@ class ActivityRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
-        $args['where']['status'] = 'publish';
+        $args['where']['type'] = 'activity';
+        $args['where']['status'] = 'active';
         return $this->all($args);
     }
 
@@ -59,6 +65,7 @@ class ActivityRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
+        $args['where']['type'] = 'activity';
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -74,7 +81,7 @@ class ActivityRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = 'activity' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -100,7 +107,7 @@ class ActivityRepository extends BaseRepository
 
         $table = esc_sql($this->table);
         $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-        $sql = "UPDATE `{$table}` SET status = %s, updated_at = %s WHERE id IN ({$placeholders})";
+        $sql = "UPDATE `{$table}` SET status = %s, updated_at = %s WHERE type = 'activity' AND id IN ({$placeholders})";
         $params = array_merge([$status, current_time('mysql')], $ids);
 
         $prepared = $this->wpdb->prepare($sql, $params);
@@ -118,7 +125,7 @@ class ActivityRepository extends BaseRepository
 
         $table = esc_sql($this->table);
         $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-        $sql = "DELETE FROM `{$table}` WHERE id IN ({$placeholders})";
+        $sql = "DELETE FROM `{$table}` WHERE type = 'activity' AND id IN ({$placeholders})";
 
         $prepared = $this->wpdb->prepare($sql, $ids);
         return $this->wpdb->query($prepared) !== false;
@@ -126,34 +133,34 @@ class ActivityRepository extends BaseRepository
 
     /**
      * Get published activities with trip counts and stats
-     * Similar to destinations, this joins with trip_activities relation table
-     * to count how many trips are linked to each activity.
+     * Uses the new ClassificationsTable and TripClassificationsTable
      */
     public function getPublishedWithTripCounts(): array
     {
         global $wpdb;
 
         $actTable     = esc_sql($this->table);
-        $relTable     = esc_sql($wpdb->prefix . 'yatra_trip_activities');
-        $tripsTable   = esc_sql($wpdb->prefix . 'yatra_trips');
-        $reviewsTable = esc_sql($wpdb->prefix . 'yatra_reviews');
+        $relTable     = TripClassificationsTable::getTableName();
+        $tripsTable   = TripsTable::getTableName();
+        $reviewsTable = ReviewsTable::getTableName();
 
-        // COUNT(DISTINCT ta.trip_id) gives real number of trips per activity.
+        // COUNT(DISTINCT tc.trip_id) gives real number of trips per activity.
         // avg_rating is computed from approved reviews across all those trips.
         // starting_price is computed in PHP using both regular trip prices and
         // traveler-based pricing from recurring availability rules.
         $sql = "SELECT a.*, 
-                       COUNT(DISTINCT ta.trip_id) AS trips_count,
+                       COUNT(DISTINCT tc.trip_id) AS trips_count,
                        COALESCE(AVG(r.rating), 0) AS avg_rating,
-                       GROUP_CONCAT(DISTINCT ta.trip_id) AS trip_ids
+                       GROUP_CONCAT(DISTINCT tc.trip_id) AS trip_ids
                 FROM `{$actTable}` a
-                LEFT JOIN `{$relTable}` ta
-                  ON ta.activity_id = a.id
+                LEFT JOIN `{$relTable}` tc
+                  ON tc.classification_id = a.id 
+                  AND tc.classification_type = 'activity'
                 LEFT JOIN `{$tripsTable}` t
-                  ON t.id = ta.trip_id
+                  ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE a.status = 'publish'
+                WHERE a.type = 'activity' AND a.status = 'active'
                 GROUP BY a.id";
 
         $rows = $this->wpdb->get_results($sql) ?: [];
@@ -187,7 +194,7 @@ class ActivityRepository extends BaseRepository
         }
 
         $placeholders = implode(',', array_fill(0, count($tripIdsArray), '%d'));
-        $tripsTable = esc_sql($wpdb->prefix . 'yatra_trips');
+        $tripsTable = TripsTable::getTableName();
         
         // Get the minimum original price from trips
         $sql = "SELECT MIN(CAST(original_price AS DECIMAL(10,2))) as min_price 
@@ -201,33 +208,131 @@ class ActivityRepository extends BaseRepository
     }
 
     /**
-     * Get counts per status for admin views
+     * Get status counts for activities
      */
-    public function getStatusCounts(): array
+    public function getStatusCounts(array $args = []): array
     {
         $table = esc_sql($this->table);
         
         // Debug logging
         error_log('ActivityRepository - Table name: ' . $table);
         
-        // Get counts for each status
-        $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE 1=1 GROUP BY status";
-        error_log('ActivityRepository - Query: ' . $query);
+        // Debug: First check what's actually in the table
+        $debug_sql = "SELECT id, type, status, name FROM `{$table}` ORDER BY id";
+        $debug_results = $this->wpdb->get_results($debug_sql);
+        error_log('ActivityRepository DEBUG - All records in table: ' . print_r($debug_results, true));
         
-        $results = $this->wpdb->get_results($query, ARRAY_A) ?: [];
-        error_log('ActivityRepository - Raw results: ' . print_r($results, true));
+        // Get counts for each status - only for activities
+        $sql = "SELECT status, COUNT(*) as count 
+                FROM `{$table}` 
+                WHERE type = 'activity'
+                GROUP BY status";
+        
+        // Debug: Log the SQL query
+        error_log('ActivityRepository getStatusCounts SQL: ' . $sql);
+        
+        $results = $this->wpdb->get_results($sql);
 
-        $counts = [];
+        
+        
+        // Debug: Log the raw results
+        error_log('ActivityRepository getStatusCounts results: ' . print_r($results, true));
+        
+        $counts = [
+            'publish' => 0,
+            'draft' => 0,
+            'trash' => 0,
+            'total' => 0
+        ];
+        
         foreach ($results as $row) {
-            $counts[$row['status']] = (int) $row['count'];
+            $status = $row->status;
+            $count = (int) $row->count;
+            
+            // Map old status values to new ones if needed
+            if ($status === 'active') {
+                $status = 'publish';
+            } elseif ($status === 'inactive') {
+                $status = 'trash';
+            }
+             
+            if (isset($counts[$status])) {
+                $counts[$status] += $count;
+                $counts['total'] += $count;
+            } else {
+                // Handle any unexpected statuses
+                $counts['total'] += $count;
+            }
         }
-
-        // Ensure we have entries for all main statuses even if count is 0
-        $counts['publish'] = $counts['publish'] ?? 0;
-        $counts['draft'] = $counts['draft'] ?? 0;
-        $counts['trash'] = $counts['trash'] ?? 0;
-
-        error_log('ActivityRepository - Final counts: ' . print_r($counts, true));
+        
+         
         return $counts;
+    }
+
+    /**
+     * Override base all() method to ensure type filtering
+     */
+    public function all(array $args = []): array
+    {
+        // IMPORTANT: Always filter by type = 'activity' for activities
+        $args['where']['type'] = 'activity';
+        return parent::all($args);
+    }
+
+    /**
+     * Override base count() method to ensure type filtering
+     */
+    public function count(array $args = []): int
+    {
+        // IMPORTANT: Always filter by type = 'activity' for activities
+        $args['where']['type'] = 'activity';
+        return parent::count($args);
+    }
+
+    /**
+     * Get trip count for an activity
+     * 
+     * @param int $activityId Activity ID
+     * @return int Number of trips with this activity
+     */
+    public function getTripCount(int $activityId): int
+    {
+        global $wpdb;
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for trip activities
+        $tripActivitiesTable = TripClassificationsTable::getTableName();
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(DISTINCT t.id)
+             FROM `{$tripsTable}` t
+             INNER JOIN `{$tripActivitiesTable}` ta ON ta.trip_id = t.id
+             WHERE ta.classification_id = %d and ta.type= %s
+               AND t.status != 'trash'",
+            $activityId,
+            ClassificationTypes::ACTIVITY
+        ));
+    }
+
+    /**
+     * Get trip count for activity (direct field method)
+     * 
+     * @param int $activityId Activity ID
+     * @return int Number of trips with this activity
+     */
+    public function getTripCountDirect(int $activityId): int
+    {
+        global $wpdb;
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripTable = $tripRepository->getTableName();
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*)
+             FROM `{$tripTable}` t
+             WHERE t.activity_id = %d
+               AND t.status != 'trash'",
+            $activityId
+        ));
     }
 }

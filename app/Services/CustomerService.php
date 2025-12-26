@@ -465,47 +465,26 @@ class CustomerService
             return [];
         }
 
-        global $wpdb;
-        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $trips_table = $wpdb->prefix . 'yatra_trips';
-
-        $placeholders = implode(',', array_fill(0, count($bookingIds), '%d'));
-
-        $query = $wpdb->prepare(
-            "SELECT p.*, 
-                    b.reference as booking_reference,
-                    b.amount_due as booking_amount_due,
-                    b.amount_paid as booking_amount_paid,
-                    b.total_amount as booking_total_amount,
-                    t.title as trip_title
-             FROM {$payments_table} p
-             LEFT JOIN {$bookings_table} b ON p.booking_id = b.id
-             LEFT JOIN {$trips_table} t ON b.trip_id = t.id
-             WHERE p.booking_id IN ($placeholders)
-             ORDER BY p.created_at DESC
-             LIMIT %d",
-            array_merge($bookingIds, [$limit])
-        );
-
-        $payments = $wpdb->get_results($query) ?: [];
+        $customerRepository = new \Yatra\Repositories\CustomerRepository();
+        $payments = $customerRepository->getPaymentsForBookingIds($bookingIds, $limit);
 
         return array_map(static function($payment) {
             return [
                 'id' => (int) $payment->id,
                 'booking_id' => (int) $payment->booking_id,
-                'reference' => 'PAY-' . str_pad((string) $payment->id, 6, '0', STR_PAD_LEFT),
-                'booking_number' => $payment->booking_reference ?? 'N/A',
-                'trip_title' => $payment->trip_title ?? '',
+                'booking_reference' => $payment->booking_reference,
                 'amount' => (float) $payment->amount,
-                'status' => $payment->status ?? 'pending',
-                'method' => $payment->gateway ?? 'N/A',
-                'date' => $payment->created_at ?? $payment->processed_at ?? '',
-                'type' => $payment->type ?? 'balance',
-                'transaction_id' => $payment->transaction_id ?? '',
-                'booking_amount_due' => isset($payment->booking_amount_due) ? (float) $payment->booking_amount_due : null,
-                'booking_amount_paid' => isset($payment->booking_amount_paid) ? (float) $payment->booking_amount_paid : null,
-                'booking_total_amount' => isset($payment->booking_total_amount) ? (float) $payment->booking_total_amount : null,
+                'currency' => $payment->currency,
+                'status' => $payment->status,
+                'payment_method' => $payment->payment_method,
+                'gateway' => $payment->gateway,
+                'transaction_id' => $payment->transaction_id,
+                'created_at' => $payment->created_at,
+                'updated_at' => $payment->updated_at,
+                'trip_title' => $payment->trip_title,
+                'booking_amount_due' => (float) $payment->booking_amount_due,
+                'booking_amount_paid' => (float) $payment->booking_amount_paid,
+                'booking_total_amount' => (float) $payment->booking_total_amount,
             ];
         }, $payments);
     }

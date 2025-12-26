@@ -141,13 +141,16 @@ export const useItineraryFormData = ({
   // Extract identifiers from the initially loaded entry (could be activity)
   const entryDayId = useMemo(() => entryData?.day_id, [entryData?.day_id]);
 
-  // Check if entryData is an activity (has item_type_id and item_id)
+  // Check if entryData is an activity (has non-zero item_type_id and item_id)
+  // Day entries have item_type_id: 0 and item_id: 0
   const isActivityEntry = useMemo(() => {
     return entryData && 
            entryData.item_type_id !== null && 
            entryData.item_type_id !== undefined && 
+           entryData.item_type_id !== 0 &&
            entryData.item_id !== null && 
-           entryData.item_id !== undefined;
+           entryData.item_id !== undefined &&
+           entryData.item_id !== 0;
   }, [entryData]);
 
   // Fetch day entry when editing a day and entryData is an activity

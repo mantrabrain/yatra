@@ -8,6 +8,8 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\DestinationService;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 
 /**
  * Destination REST API Controller
@@ -94,27 +96,15 @@ class DestinationController extends BaseController
             $items = $this->service->getAll($args);
             $total = $this->service->count($args);
 
-            // Attach trip counts for each destination
+            // Attach trip counts to items
             if (!empty($items)) {
-                global $wpdb;
-                $tripTable = $wpdb->prefix . 'yatra_trips';
-                $joinTable = $wpdb->prefix . 'yatra_trip_destinations';
-
                 foreach ($items as $item) {
                     $destinationId = isset($item->id) ? (int) $item->id : 0;
                     if ($destinationId <= 0) {
                         continue;
                     }
 
-                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(DISTINCT t.id)
-                         FROM `{$tripTable}` t
-                         INNER JOIN `{$joinTable}` td ON td.trip_id = t.id
-                         WHERE td.destination_id = %d
-                           AND t.status != 'trash'",
-                        $destinationId
-                    ));
-
+                    $tripCount = $this->service->getTripCount($destinationId);
                     $item->trip_count = $tripCount;
                 }
             }
@@ -137,19 +127,9 @@ class DestinationController extends BaseController
             }
 
             // Attach trip count for single destination
-            global $wpdb;
-            $tripTable = $wpdb->prefix . 'yatra_trips';
-            $joinTable = $wpdb->prefix . 'yatra_trip_destinations';
             $destinationId = isset($item->id) ? (int) $item->id : 0;
             if ($destinationId > 0) {
-                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(DISTINCT t.id)
-                     FROM `{$tripTable}` t
-                     INNER JOIN `{$joinTable}` td ON td.trip_id = t.id
-                     WHERE td.destination_id = %d
-                       AND t.status != 'trash'",
-                    $destinationId
-                ));
+                $tripCount = $this->service->getTripCount($destinationId);
                 $item->trip_count = $tripCount;
             }
 

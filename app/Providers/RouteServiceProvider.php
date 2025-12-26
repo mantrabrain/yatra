@@ -28,8 +28,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->routesFile = YATRA_PLUGIN_PATH . 'routes/api.php';
 
-        // Register routes on rest_api_init hook
-        add_action('rest_api_init', [$this, 'registerRoutes'], 10);
+        // Debug: Log service provider registration
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra RouteServiceProvider: Registering with routes file - ' . $this->routesFile);
+        }
+
+        // Register routes on rest_api_init hook with higher priority to ensure it runs early
+        add_action('rest_api_init', [$this, 'registerRoutes'], 5);
     }
 
     /**
@@ -50,6 +55,11 @@ class RouteServiceProvider extends ServiceProvider
             return;
         }
 
+        // Debug: Log routes file loading
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: Loading API routes from - ' . $this->routesFile);
+        }
+
         // Load routes registry
         require_once $this->routesFile;
 
@@ -58,6 +68,11 @@ class RouteServiceProvider extends ServiceProvider
         // Debug logging (only when explicitly enabled)
         if (defined('YATRA_DEBUG_API') && YATRA_DEBUG_API) {
             $this->logRegisteredRoutes();
+        }
+        
+        // Debug: Log route registration completion
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra: API routes registration completed');
         }
     }
 

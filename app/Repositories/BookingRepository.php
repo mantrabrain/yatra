@@ -173,7 +173,12 @@ class BookingRepository extends BaseRepository
     public function findByReferenceWithTrip(string $reference): ?object
     {
         $table = $this->getTableName();
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
+        
+        // Using hardcoded table names since there's no dedicated repository for these tables
         $tripDestinations = $this->wpdb->prefix . 'yatra_trip_destinations';
         $destinations = $this->wpdb->prefix . 'yatra_destinations';
         $tripActivities = $this->wpdb->prefix . 'yatra_trip_activities';
@@ -573,7 +578,10 @@ class BookingRepository extends BaseRepository
     public function getBookingsForReminder(string $travelDate): array
     {
         $table = $this->getTableName();
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
 
         return $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT b.*, t.title as trip_title, t.currency
@@ -784,7 +792,9 @@ class BookingRepository extends BaseRepository
      */
     public function calculateEndDate(string $startDate, int $tripId): string
     {
-        $tripsTable = $this->wpdb->prefix . 'yatra_trips';
+        // Use TripRepository for trips table
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $tripsTable = $tripRepository->getTableName();
         
         $durationDays = $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT duration_days FROM {$tripsTable} WHERE id = %d LIMIT 1",
@@ -801,6 +811,101 @@ class BookingRepository extends BaseRepository
     }
 
     /**
+     * Get table columns for booking table
+     * 
+     * @return array Array of column names
+     */
+    public function getTableColumns(): array
+    {
+        $table = $this->getTableName();
+        return $this->wpdb->get_col("DESCRIBE {$table}");
+    }
+
+    /**
+     * Count discount code usage by customer
+     * 
+     * @param int $customerId Customer ID
+     * @param string $discountCode Discount code
+     * @return int Number of times discount code has been used
+     */
+    public function countDiscountCodeUsage(int $customerId, string $discountCode): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} WHERE customer_id = %d AND discount_code = %s AND status NOT IN ('cancelled', 'refunded', 'failed')",
+            $customerId,
+            $discountCode
+        ));
+    }
+
+    /**
+     * Count booked travelers by availability ID
+     * 
+     * @param int $availabilityId Availability ID
+     * @return int Number of booked travelers
+     */
+    public function countBookedTravelersByAvailabilityId(int $availabilityId): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COALESCE(SUM(travelers_count), 0) 
+             FROM {$table} 
+             WHERE availability_id = %d AND status NOT IN ('cancelled', 'refunded', 'failed')",
+            $availabilityId
+        ));
+    }
+
+    /**
+     * Get booking counts for multiple availability IDs
+     * 
+     * @param array $availabilityIds Array of availability IDs
+     * @return array Array of objects with availability_id and booked_count
+     */
+    public function getBookingCountsByAvailabilityIds(array $availabilityIds): array
+    {
+        $table = $this->getTableName();
+        
+        if (empty($availabilityIds)) {
+            return [];
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($availabilityIds), '%d'));
+        
+        return $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT availability_id, SUM(travelers_count) AS booked_count
+             FROM {$table} 
+             WHERE availability_id IN ({$placeholders}) AND status NOT IN ('cancelled', 'refunded', 'failed')
+             GROUP BY availability_id",
+            ...$availabilityIds
+        ));
+    }
+
+    /**
+     * Update availability ID by trip and date
+     * 
+     * @param int $tripId Trip ID
+     * @param string $date Travel date
+     * @param int $availabilityId Availability ID
+     * @return int|false Number of rows updated or false on failure
+     */
+    public function updateAvailabilityIdByTripAndDate(int $tripId, string $date, int $availabilityId)
+    {
+        $table = $this->getTableName();
+        return $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table}
+                 SET availability_id = %d
+                 WHERE trip_id = %d
+                   AND travel_date = %s
+                   AND (availability_id IS NULL OR availability_id = 0)",
+                $availabilityId,
+                $tripId,
+                $date
+            )
+        );
+    }
+
+    /**
      * Find bookings by departure ID
      * 
      * @param int $departureId Departure ID
@@ -809,6 +914,8 @@ class BookingRepository extends BaseRepository
     public function findByDepartureId(int $departureId): array
     {
         $table = $this->getTableName();
+        
+        // Using hardcoded table name since there's no dedicated repository for this table
         $relationTable = $this->wpdb->prefix . 'yatra_booking_departures';
         
         $bookings = $this->wpdb->get_results($this->wpdb->prepare(
@@ -836,6 +943,24 @@ class BookingRepository extends BaseRepository
         ));
 
         return (int) $count > 0;
+    }
+
+    /**
+     * Get recent bookings for cache warming
+     * 
+     * @param int $days Number of days to look back
+     * @param int $limit Maximum number of bookings to return
+     * @return array Array of recent booking IDs
+     */
+    public function getRecentBookings(int $days = 7, int $limit = 50): array
+    {
+        return $this->wpdb->get_results("
+            SELECT id 
+            FROM {$this->table} 
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)
+            ORDER BY created_at DESC
+            LIMIT {$limit}
+        ") ?: [];
     }
 }
 

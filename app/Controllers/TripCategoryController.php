@@ -7,7 +7,9 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
-use Yatra\Services\TripCategoryService;
+use Yatra\Services\CategoryService;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 
 /**
  * Trip Category REST API Controller
@@ -24,11 +26,11 @@ class TripCategoryController extends BaseController
 {
     protected string $rest_base = 'trip-categories';
 
-    private TripCategoryService $service;
+    private CategoryService $service;
 
     public function __construct()
     {
-        $this->service = new TripCategoryService();
+        $this->service = new CategoryService();
     }
 
     public function register_routes(): void
@@ -100,28 +102,27 @@ class TripCategoryController extends BaseController
                 $args['status'] = sanitize_text_field($status);
             }
 
-            // Handle hierarchical and parent_id
+            // Handle hierarchical and parent_id with proper implementation
             $hierarchical = $request->get_param('hierarchical');
             if ($hierarchical) {
+                // Use proper hierarchical implementation
                 $items = $this->service->getHierarchical($args);
             } else {
                 $parent_id = $request->get_param('parent_id');
                 if ($parent_id !== null) {
+                    // Get subcategories for specific parent
                     $items = $this->service->getSubcategories((int) $parent_id, $args);
                 } else {
+                    // Get all categories
                     $items = $this->service->getAll($args);
                 }
             }
 
             $total = $this->service->count($args);
 
-            // Attach trip counts for each category (including nested subcategories)
+            // Attach trip counts for each category using service methods
             if (!empty($items)) {
-                global $wpdb;
-                $tripTable = $wpdb->prefix . 'yatra_trips';
-                $joinTable = $wpdb->prefix . 'yatra_trip_trip_categories';
-
-                $attachCounts = function (&$categories) use (&$attachCounts, $wpdb, $tripTable, $joinTable) {
+                $attachCounts = function (&$categories) use (&$attachCounts) {
                     if (empty($categories) || !is_array($categories)) {
                         return;
                     }
@@ -129,18 +130,11 @@ class TripCategoryController extends BaseController
                     foreach ($categories as &$cat) {
                         $categoryId = isset($cat->id) ? (int) $cat->id : 0;
                         if ($categoryId > 0) {
-                            $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                                "SELECT COUNT(DISTINCT t.id)
-                                 FROM `{$tripTable}` t
-                                 INNER JOIN `{$joinTable}` tc ON tc.trip_id = t.id
-                                 WHERE tc.category_id = %d
-                                   AND t.status != 'trash'",
-                                $categoryId
-                            ));
-
+                            $tripCount = $this->service->getTripCount($categoryId);
                             $cat->trip_count = $tripCount;
                         }
 
+                        // Recursively attach counts to subcategories
                         if (isset($cat->subcategories) && is_array($cat->subcategories)) {
                             $attachCounts($cat->subcategories);
                         }
@@ -150,9 +144,25 @@ class TripCategoryController extends BaseController
                 $attachCounts($items);
             }
 
-            $prepared = array_map([$this, 'prepareItem'], $items);
+            // Prepare all items including nested subcategories
+            $prepareAllItems = function (&$items) use (&$prepareAllItems) {
+                if (empty($items) || !is_array($items)) {
+                    return;
+                }
 
-            return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
+                foreach ($items as &$item) {
+                    $item = (object) $this->prepareItem($item);
+                    
+                    // Recursively prepare subcategories
+                    if (isset($item->subcategories) && is_array($item->subcategories)) {
+                        $prepareAllItems($item->subcategories);
+                    }
+                }
+            };
+
+            $prepareAllItems($items);
+
+            return $this->paginated_response($items, $total, $params['page'], $params['per_page']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
         }
@@ -167,20 +177,10 @@ class TripCategoryController extends BaseController
                 return $this->not_found(__('Category not found', 'yatra'));
             }
 
-            // Attach trip count for single category
-            global $wpdb;
-            $tripTable = $wpdb->prefix . 'yatra_trips';
-            $joinTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+            // Attach trip count for single category using service methods
             $categoryId = isset($item->id) ? (int) $item->id : 0;
             if ($categoryId > 0) {
-                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(DISTINCT t.id)
-                     FROM `{$tripTable}` t
-                     INNER JOIN `{$joinTable}` tc ON tc.trip_id = t.id
-                     WHERE tc.category_id = %d
-                       AND t.status != 'trash'",
-                    $categoryId
-                ));
+                $tripCount = $this->service->getTripCount($categoryId);
                 $item->trip_count = $tripCount;
             }
 
@@ -223,7 +223,6 @@ class TripCategoryController extends BaseController
     {
         try {
             $result = $this->service->update($this->getId($request), $this->getBody($request));
-
             if (!$result) {
                 return $this->error_response(__('Failed to update category', 'yatra'), 500);
             }

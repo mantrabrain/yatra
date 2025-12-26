@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Services;
 
 use Yatra\Repositories\AttributeRepository;
+use Yatra\Repositories\TripAttributeRepository;
 use Yatra\Utils\Logger;
 use Yatra\Utils\Cache;
 use Yatra\Helpers\FormatHelper;
@@ -18,14 +19,20 @@ class AttributeService extends BaseService
     /**
      * @var AttributeRepository
      */
-    private $repository;
+    private $attributeRepository;
+
+    /**
+     * @var TripAttributeRepository
+     */
+    private $tripAttributeRepository;
 
     /**
      * Constructor
      */
     public function __construct()
     {
-        $this->repository = new AttributeRepository();
+        $this->attributeRepository = new AttributeRepository();
+        $this->tripAttributeRepository = new TripAttributeRepository();
     }
 
     /**
@@ -33,7 +40,7 @@ class AttributeService extends BaseService
      */
     protected function getRepository()
     {
-        return $this->repository;
+        return $this->attributeRepository;
     }
 
     /**
@@ -46,12 +53,12 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () {
-                    return $this->repository->getAllPublished();
+                    return $this->attributeRepository->getAllPublished();
                 }, 3600); // Cache for 1 hour
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, getting fresh frontend attributes");
-                return $this->repository->getAllPublished();
+                return $this->attributeRepository->getAllPublished();
             }
             
         } catch (\Exception $e) {
@@ -70,12 +77,12 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () {
-                    return $this->repository->getFilterableAttributes();
+                    return $this->attributeRepository->getFilterableAttributes();
                 }, 1800); // Cache for 30 minutes
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, getting fresh filterable attributes");
-                return $this->repository->getFilterableAttributes();
+                return $this->attributeRepository->getFilterableAttributes();
             }
             
         } catch (\Exception $e) {
@@ -94,12 +101,12 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () use ($tripId) {
-                    return $this->repository->getTripAttributes($tripId);
+                    return $this->tripAttributeRepository->getTripAttributes($tripId);
                 }, 1800); // Cache for 30 minutes
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, getting fresh trip attributes", ['trip_id' => $tripId]);
-                return $this->repository->getTripAttributes($tripId);
+                return $this->tripAttributeRepository->getTripAttributes($tripId);
             }
             
         } catch (\Exception $e) {
@@ -119,7 +126,7 @@ class AttributeService extends BaseService
             }
 
             // Validate attribute exists
-            $attribute = $this->repository->find($attributeId);
+            $attribute = $this->attributeRepository->find($attributeId);
             if (!$attribute || $attribute->status !== 'publish') {
                 throw new \InvalidArgumentException('Attribute not found or not published');
             }
@@ -127,7 +134,7 @@ class AttributeService extends BaseService
             // Validate value based on field type
             $this->validateAttributeValue($attribute, $value);
 
-            $result = $this->repository->setTripAttribute($tripId, $attributeId, $value);
+            $result = $this->tripAttributeRepository->setTripAttribute($tripId, $attributeId, $value);
             
             if ($result) {
                 // Clear cache
@@ -158,7 +165,7 @@ class AttributeService extends BaseService
                 throw new \InvalidArgumentException('Trip ID and Attribute ID are required');
             }
 
-            $result = $this->repository->deleteTripAttribute($tripId, $attributeId);
+            $result = $this->tripAttributeRepository->deleteTripAttribute($tripId, $attributeId);
             
             if ($result) {
                 // Clear cache
@@ -189,12 +196,30 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () use ($attributeId, $value) {
-                    return $this->repository->getTripsByAttributeValue($attributeId, $value);
+                    // This method is not available - implement a basic version
+                    $tripAttributeTable = $this->tripAttributeRepository->getTableName();
+                    $query = "SELECT DISTINCT t.* FROM {$this->attributeRepository->getTableName()} a
+                             INNER JOIN {$tripAttributeTable} ta ON ta.attribute_id = a.id
+                             INNER JOIN {$this->attributeRepository->getTripsTableName()} t ON t.id = ta.trip_id
+                             WHERE a.id = %d AND ta.value = %s AND t.status = 'publish'";
+                    
+                    return $this->attributeRepository->wpdb->get_results(
+                        $this->attributeRepository->wpdb->prepare($query, $attributeId, $value)
+                    ) ?: [];
                 }, 1800); // Cache for 30 minutes
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, getting fresh trips by attribute value", ['attribute_id' => $attributeId, 'value' => $value]);
-                return $this->repository->getTripsByAttributeValue($attributeId, $value);
+                // This method is not available - implement a basic version
+                $tripAttributeTable = $this->tripAttributeRepository->getTableName();
+                $query = "SELECT DISTINCT t.* FROM {$this->attributeRepository->getTableName()} a
+                         INNER JOIN {$tripAttributeTable} ta ON ta.attribute_id = a.id
+                         INNER JOIN {$this->attributeRepository->getTripsTableName()} t ON t.id = ta.trip_id
+                         WHERE a.id = %d AND ta.value = %s AND t.status = 'publish'";
+                
+                return $this->attributeRepository->wpdb->get_results(
+                    $this->attributeRepository->wpdb->prepare($query, $attributeId, $value)
+                ) ?: [];
             }
             
         } catch (\Exception $e) {
@@ -213,12 +238,28 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () use ($attributeId) {
-                    return $this->repository->getAttributeValues($attributeId);
+                    // This method is not available - implement a basic version
+                    $tripAttributeTable = $this->tripAttributeRepository->getTableName();
+                    $query = "SELECT DISTINCT value, COUNT(*) as count FROM {$tripAttributeTable}
+                             WHERE attribute_id = %d AND value IS NOT NULL AND value != ''
+                             GROUP BY value ORDER BY count DESC, value ASC";
+                    
+                    return $this->attributeRepository->wpdb->get_results(
+                        $this->attributeRepository->wpdb->prepare($query, $attributeId)
+                    ) ?: [];
                 }, 3600); // Cache for 1 hour
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, getting fresh attribute values", ['attribute_id' => $attributeId]);
-                return $this->repository->getAttributeValues($attributeId);
+                // This method is not available - implement a basic version
+                $tripAttributeTable = $this->tripAttributeRepository->getTableName();
+                $query = "SELECT DISTINCT value, COUNT(*) as count FROM {$tripAttributeTable}
+                         WHERE attribute_id = %d AND value IS NOT NULL AND value != ''
+                         GROUP BY value ORDER BY count DESC, value ASC";
+                
+                return $this->attributeRepository->wpdb->get_results(
+                    $this->attributeRepository->wpdb->prepare($query, $attributeId)
+                ) ?: [];
             }
             
         } catch (\Exception $e) {
@@ -237,12 +278,12 @@ class AttributeService extends BaseService
             
             if ($this->isCacheEnabled()) {
                 return Cache::remember($cacheKey, function () use ($term) {
-                    return $this->repository->search($term);
+                    return $this->attributeRepository->search($term);
                 }, 1800); // Cache for 30 minutes
             } else {
                 // Bypass cache and get fresh data
                 Logger::debug("Cache disabled, searching attributes directly", ['term' => $term]);
-                return $this->repository->search($term);
+                return $this->attributeRepository->search($term);
             }
             
         } catch (\Exception $e) {
@@ -318,7 +359,7 @@ class AttributeService extends BaseService
             }
 
             // Check if slug already exists
-            if ($this->repository->slugExists($data['slug'])) {
+            if ($this->attributeRepository->slugExists($data['slug'])) {
                 throw new \InvalidArgumentException('Attribute with this slug already exists');
             }
 
@@ -331,7 +372,7 @@ class AttributeService extends BaseService
                 'filter_type' => 'exact',
                 'searchable' => 0,
                 'status' => 'publish',
-                'display_order' => $this->repository->getMaxDisplayOrder() + 1
+                'display_order' => $this->attributeRepository->getMaxDisplayOrder() + 1
             ], $data);
 
             // Validate field type
@@ -385,7 +426,7 @@ class AttributeService extends BaseService
                 error_log('DEBUG: AttributeService create - Icon data not set');
             }
 
-            $attributeId = $this->repository->create($data);
+            $attributeId = $this->attributeRepository->create($data);
             
             if ($attributeId) {
                 // Clear cache
@@ -417,7 +458,7 @@ class AttributeService extends BaseService
             }
 
             // Check if attribute exists
-            $existing = $this->repository->find($id);
+            $existing = $this->attributeRepository->find($id);
             if (!$existing) {
                 throw new \InvalidArgumentException('Attribute not found');
             }
@@ -428,7 +469,7 @@ class AttributeService extends BaseService
             }
 
             // Check slug uniqueness (excluding current attribute)
-            if (isset($data['slug']) && $this->repository->slugExists($data['slug'], $id)) {
+            if (isset($data['slug']) && $this->attributeRepository->slugExists($data['slug'], $id)) {
                 throw new \InvalidArgumentException('Attribute with this slug already exists');
             }
 
@@ -472,7 +513,7 @@ class AttributeService extends BaseService
                 error_log('DEBUG: AttributeService update - Icon data not set');
             }
 
-            $result = $this->repository->update($id, $data);
+            $result = $this->attributeRepository->update($id, $data);
             
             if ($result) {
                 // Clear cache
@@ -503,7 +544,7 @@ class AttributeService extends BaseService
                 throw new \InvalidArgumentException('Attribute ID is required');
             }
 
-            $result = $this->repository->delete($id);
+            $result = $this->attributeRepository->delete($id);
             
             if ($result) {
                 // Clear cache
@@ -534,7 +575,7 @@ class AttributeService extends BaseService
                 throw new \InvalidArgumentException('Attribute ID is required');
             }
 
-            $result = $this->repository->forceDelete($id);
+            $result = $this->attributeRepository->forceDelete($id);
             
             if ($result) {
                 // Clear cache
@@ -565,7 +606,7 @@ class AttributeService extends BaseService
                 throw new \InvalidArgumentException('Orders array is required');
             }
 
-            $result = $this->repository->updateDisplayOrders($orders);
+            $result = $this->attributeRepository->updateDisplayOrders($orders);
             
             if ($result) {
                 // Clear cache
@@ -728,34 +769,63 @@ class AttributeService extends BaseService
     {
         try {
             if (!$tripId || empty($attributes)) {
+                error_log("Yatra AttributeService: bulkUpdateTripAttributes - INVALID INPUT: trip_id={$tripId}, attributes=" . json_encode($attributes));
                 return false;
             }
 
-            $this->repository->getWpdb()->query('START TRANSACTION');
+            error_log("Yatra AttributeService: bulkUpdateTripAttributes - START: trip_id={$tripId}, attribute_count=" . count($attributes));
+
+            global $wpdb;
+            $wpdb->query('START TRANSACTION');
             
             $success = true;
             
-            foreach ($attributes as $attributeId => $value) {
+            foreach ($attributes as $key => $attributeData) {
+                // Handle both array with attribute_id key and simple key-value format
+                $attributeId = null;
+                $value = null;
+                
+                if (is_array($attributeData)) {
+                    // Array format: ['attribute_id' => 123, 'value' => 'some_value']
+                    $attributeId = $attributeData['attribute_id'] ?? $attributeData['id'] ?? null;
+                    $value = $attributeData['value'] ?? null;
+                } else {
+                    // Simple format: $attributeId => $value
+                    $attributeId = $key;
+                    $value = $attributeData;
+                }
+                
+                error_log("Yatra AttributeService: bulkUpdateTripAttributes - Processing: attribute_id={$attributeId}, value=" . var_export($value, true) . ", type=" . gettype($value));
+                
+                // Check if value is actually empty/null
+                if ($value === null || $value === '') {
+                    error_log("Yatra AttributeService: bulkUpdateTripAttributes - WARNING: Empty value detected for attribute_id={$attributeId}");
+                }
+                
                 if (!$this->setTripAttribute($tripId, $attributeId, $value)) {
+                    error_log("Yatra AttributeService: bulkUpdateTripAttributes - FAILED for attribute_id={$attributeId}");
                     $success = false;
                     break;
                 }
             }
             
             if ($success) {
-                $this->repository->getWpdb()->query('COMMIT');
+                $this->attributeRepository->wpdb->query('COMMIT');
+                error_log("Yatra AttributeService: bulkUpdateTripAttributes - COMMIT SUCCESS");
                 
                 // Fire bulk update hook
                 do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
                 
             } else {
-                $this->repository->getWpdb()->query('ROLLBACK');
+                $this->attributeRepository->wpdb->query('ROLLBACK');
+                error_log("Yatra AttributeService: bulkUpdateTripAttributes - ROLLBACK DUE TO FAILURE");
             }
             
+            error_log("Yatra AttributeService: bulkUpdateTripAttributes - FINAL RESULT: " . var_export($success, true));
             return $success;
             
         } catch (\Exception $e) {
-            $this->repository->getWpdb()->query('ROLLBACK');
+            $this->attributeRepository->wpdb->query('ROLLBACK');
             Logger::error("Failed to bulk update trip attributes: " . $e->getMessage());
             return false;
         }
@@ -767,7 +837,7 @@ class AttributeService extends BaseService
     public function slugExists(string $slug, ?int $excludeId = null): bool
     {
         try {
-            return $this->repository->slugExists($slug, $excludeId);
+            return $this->attributeRepository->slugExists($slug, $excludeId);
         } catch (\Exception $e) {
             Logger::error('Error checking slug existence: ' . $e->getMessage());
             return false;
@@ -779,7 +849,7 @@ class AttributeService extends BaseService
      */
     public function getStatusCounts(): array
     {
-        $counts = $this->repository->getStatusCounts();
+        $counts = $this->attributeRepository->getStatusCounts();
 
         $publish = $counts['publish'] ?? 0;
         $draft = $counts['draft'] ?? 0;

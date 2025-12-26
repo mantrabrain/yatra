@@ -47,8 +47,8 @@ class ActivityService extends BaseService
         // Slug will be auto-generated from name, so we don't need to validate it here
         // The SlugHelper will ensure uniqueness
 
-        // Validate status
-        $allowed_statuses = ['draft', 'publish', 'trash'];
+        // Validate status - accept both old and new values for backward compatibility
+        $allowed_statuses = ['draft', 'active', 'inactive', 'publish', 'trash'];
         if (isset($data['status']) && !in_array($data['status'], $allowed_statuses, true)) {
             throw new \InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $allowed_statuses));
         }
@@ -59,6 +59,9 @@ class ActivityService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        // Set the type to 'activity' for the ClassificationsTable
+        $data['type'] = 'activity';
+
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
@@ -68,7 +71,7 @@ class ActivityService extends BaseService
         if (!empty($data['name'])) {
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_activities',
+                'yatra_new_classifications',
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -83,6 +86,7 @@ class ActivityService extends BaseService
         
         // Sanitize status
         if (isset($data['status'])) {
+            // Validate status
             $allowed_statuses = ['draft', 'publish', 'trash'];
             $data['status'] = in_array($data['status'], $allowed_statuses, true) 
                 ? $data['status'] 
@@ -99,16 +103,24 @@ class ActivityService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
-                // Sanitize icon array
-                $icon = [
-                    'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
-                        ? $data['icon']['type']
-                        : 'icon',
-                    'value' => isset($data['icon']['value']) 
-                        ? sanitize_text_field($data['icon']['value'])
-                        : '',
-                ];
-                $data['icon'] = maybe_serialize($icon);
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
+                $data['icon'] = maybe_serialize($data['icon']);
             } elseif (is_string($data['icon'])) {
                 // If it's already a string, sanitize it
                 $data['icon'] = sanitize_text_field($data['icon']);
@@ -137,7 +149,7 @@ class ActivityService extends BaseService
             // Slug was explicitly provided - ensure uniqueness
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['slug'],
-                'yatra_activities',
+                ClassificationsTable::getTableName(),
                 'slug',
                 $id // Exclude current record when checking uniqueness
             );
@@ -163,6 +175,23 @@ class ActivityService extends BaseService
         // Sanitize and serialize icon if it's an array
         if (isset($data['icon'])) {
             if (is_array($data['icon'])) {
+                // Convert URL back to attachment ID if possible
+                if ($data['icon']['type'] === 'image' && !empty($data['icon']['value'])) {
+                    $value = $data['icon']['value'];
+                    
+                    // If it's a URL, try to find the attachment ID
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        $attachment_id = attachment_url_to_postid($value);
+                        if ($attachment_id) {
+                            $data['icon']['value'] = $attachment_id;
+                        }
+                    }
+                    // If it's already numeric, keep it as is
+                    elseif (is_numeric($value)) {
+                        $data['icon']['value'] = (int) $value;
+                    }
+                }
+                
                 // Sanitize icon array
                 $icon = [
                     'type' => isset($data['icon']['type']) && in_array($data['icon']['type'], ['icon', 'image'], true)
@@ -187,6 +216,9 @@ class ActivityService extends BaseService
      */
     public function getAll(array $args = []): array
     {
+        // IMPORTANT: Always filter by type = 'activity' for activities
+        $args['where']['type'] = 'activity';
+
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
@@ -231,6 +263,9 @@ class ActivityService extends BaseService
      */
     public function count(array $args = []): int
     {
+        // IMPORTANT: Always filter by type = 'activity' for activities
+        $args['where']['type'] = 'activity';
+
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
@@ -262,22 +297,21 @@ class ActivityService extends BaseService
             throw new \InvalidArgumentException(__('No activities selected.', 'yatra'));
         }
 
-        $allowed = ['draft', 'publish', 'trash'];
-        if (!in_array($status, $allowed, true)) {
-            throw new \InvalidArgumentException(__('Invalid status selected.', 'yatra'));
-        }
-
-        $result = $this->repository->bulkUpdateStatus($ids, $status);
-        if (!$result) {
-            throw new \Exception(__('Failed to update activities.', 'yatra'));
+        $updated = 0;
+        foreach ($ids as $id) {
+            if ($this->repository->update($id, ['status' => $status])) {
+                $updated++;
+            }
         }
 
         return [
+            'updated' => $updated,
+            'total' => count($ids),
             'message' => sprintf(
                 /* translators: %d number of activities */
-                _n('%d activity updated.', '%d activities updated.', count($ids), 'yatra'),
-                count($ids)
-            ),
+                _n('%d activity updated.', '%d activities updated.', $updated, 'yatra'),
+                $updated
+            )
         ];
     }
 
@@ -311,13 +345,16 @@ class ActivityService extends BaseService
     public function getStatusCounts(): array
     {
         $counts = $this->repository->getStatusCounts();
+               
+        // Debug: Log the repository counts
+        error_log('ActivityService getStatusCounts - Repository counts: ' . print_r($counts, true));
 
         $publish = $counts['publish'] ?? 0;
         $draft = $counts['draft'] ?? 0;
         $trash = $counts['trash'] ?? 0;
         
         // Calculate total from all statuses, not just the main three
-        $all = array_sum(array_values($counts));
+        $all = $counts['total'] ?? 0;
 
         $result = [
             'all' => (int) $all,
@@ -326,7 +363,29 @@ class ActivityService extends BaseService
             'trash' => (int) $trash,
         ];
 
+        // Add legacy status keys for backward compatibility
+        $result['active'] = $result['publish'];
+        $result['inactive'] = $result['trash'];
+  
         return $result;
+    }
+
+    /**
+     * Get trip count for an activity
+     */
+    public function getTripCount(int $activityId): int
+    {
+        $activityRepository = new \Yatra\Repositories\ActivityRepository();
+        return $activityRepository->getTripCount($activityId);
+    }
+
+    /**
+     * Get trip count for activity (direct field method)
+     */
+    public function getTripCountDirect(int $activityId): int
+    {
+        $activityRepository = new \Yatra\Repositories\ActivityRepository();
+        return $activityRepository->getTripCountDirect($activityId);
     }
 }
 

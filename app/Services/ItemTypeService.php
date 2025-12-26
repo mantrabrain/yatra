@@ -260,6 +260,7 @@ class ItemTypeService extends BaseService
      */
     public function count(array $args = []): int
     {
+        $args['where']['type']='item_type';
         // Sanitize and handle search
         if (!empty($args['search'])) {
             $search = sanitize_text_field($args['search']);
@@ -277,6 +278,7 @@ class ItemTypeService extends BaseService
                 $args['where']['status'] = $status;
             }
         }
+       
 
         return $this->repository->count($args);
     }

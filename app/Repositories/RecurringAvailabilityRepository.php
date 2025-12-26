@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
+
 /**
  * Recurring Availability Repository
  * Handles database operations for recurring availability rules
@@ -15,7 +17,7 @@ class RecurringAvailabilityRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . 'yatra_trip_availability_rules';
+        return TripAvailabilityRulesTable::getTableName();
     }
 
     /**
@@ -94,8 +96,15 @@ class RecurringAvailabilityRepository extends BaseRepository
     /**
      * Get status counts for recurring rules by trip ID
      */
-    public function getStatusCounts(int $tripId): array
+    public function getStatusCounts(array $args = []): array
     {
+        // Extract trip ID from args for backward compatibility
+        $tripId = $args['trip_id'] ?? null;
+        
+        if (!$tripId) {
+            throw new \InvalidArgumentException('Trip ID is required for RecurringAvailability status counts');
+        }
+        
         $table = esc_sql($this->table);
         
         $query = $this->wpdb->prepare(
@@ -343,6 +352,7 @@ class RecurringAvailabilityRepository extends BaseRepository
         }
         
         // Fetch category details
+        // Using hardcoded table name since there's no dedicated repository for this table
         $categories_table = $this->wpdb->prefix . 'yatra_traveler_categories';
         $placeholders = implode(',', array_fill(0, count($categoryIds), '%d'));
         $sql = $this->wpdb->prepare(

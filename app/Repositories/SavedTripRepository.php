@@ -241,7 +241,7 @@ class SavedTripRepository extends BaseRepository
             $hasTravelerPricing = ($pricingType === 'traveler_based' && !empty($tripObj->price_types));
             
             // Get prices from trip object - check multiple possible fields
-            $originalPrice = (float) ($tripObj->original_price ?? $tripObj->regular_price ?? $tripObj->price ?? 0);
+            $originalPrice = (float) ($tripObj->original_price ?? $tripObj->price ?? 0);
             $salePrice = (float) ($tripObj->sale_price ?? $tripObj->discounted_price ?? 0);
             $discountedPrice = (float) ($tripObj->discounted_price ?? 0);
             $displayPrice = 0;

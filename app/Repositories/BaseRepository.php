@@ -50,6 +50,14 @@ abstract class BaseRepository
     abstract protected function getTableName(): string;
 
     /**
+     * Get table name (without prefix)
+     */
+    public function getTable(): string
+    {
+        return $this->table;
+    }
+
+    /**
      * Find a record by ID
      */
     public function find(int $id, bool $includeDeleted = false): ?\stdClass
@@ -159,6 +167,13 @@ abstract class BaseRepository
         $data = $this->sanitizeData($data);
         $data['updated_at'] = current_time('mysql');
 
+        // DEBUG: Log the update attempt
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] BaseRepository - Attempting update on table: ' . $this->table);
+            error_log('[YATRA DEBUG] BaseRepository - ID: ' . $id);
+            error_log('[YATRA DEBUG] BaseRepository - Data: ' . print_r($data, true));
+        }
+
         $result = $this->wpdb->update(
             $this->table,
             $data,
@@ -167,7 +182,17 @@ abstract class BaseRepository
             ['%d']
         );
 
-        return $result !== false;
+        $success = $result !== false;
+        
+        // DEBUG: Log the result
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] BaseRepository - WPDB update result: ' . $result);
+            error_log('[YATRA DEBUG] BaseRepository - Update success: ' . ($success ? 'YES' : 'NO'));
+            error_log('[YATRA DEBUG] BaseRepository - WPDB last error: ' . $this->wpdb->last_error);
+            error_log('[YATRA DEBUG] BaseRepository - WPDB last query: ' . $this->wpdb->last_query);
+        }
+
+        return $success;
     }
 
     /**
@@ -341,6 +366,48 @@ abstract class BaseRepository
         }
 
         return (int) $this->wpdb->get_var($query);
+    }
+
+    /**
+     * Get status counts for admin list views
+     */
+    public function getStatusCounts(array $args = []): array
+    {
+        $table = esc_sql($this->table);
+        $where = $this->buildWhereClause($args);
+        
+        $sql = "SELECT status, COUNT(*) as count 
+                FROM `{$table}` 
+                {$where}
+                GROUP BY status";
+        
+        $results = $this->wpdb->get_results($sql) ?: [];
+
+        $counts = [
+            'publish' => 0,
+            'draft' => 0,
+            'trash' => 0,
+            'total' => 0
+        ];
+        
+        foreach ($results as $row) {
+            $status = $row->status;
+            $count = (int) $row->count;
+            
+            // Map old status values to new ones if needed
+            if ($status === 'active') {
+                $status = 'publish';
+            } elseif ($status === 'inactive') {
+                $status = 'trash';
+            }
+            
+            if (isset($counts[$status])) {
+                $counts[$status] = $count;
+            }
+            $counts['total'] += $count;
+        }
+        
+        return $counts;
     }
 }
 

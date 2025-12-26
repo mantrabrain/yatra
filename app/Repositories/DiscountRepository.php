@@ -67,5 +67,25 @@ class DiscountRepository extends BaseRepository
 
         return $this->wpdb->get_results($query) ?: [];
     }
+
+    /**
+     * Get all active group discounts
+     * 
+     * @return array Array of group discount objects
+     */
+    public function getActiveGroupDiscounts(): array
+    {
+        global $wpdb;
+        $table = $this->getTableName();
+        $today = date('Y-m-d');
+
+        // Query for active group discounts applicable to this trip
+        // Check both is_group_discount=1 OR discount_mode IN ('group', 'both') for backward compatibility
+        $query = "SELECT * FROM `{$table}` 
+            WHERE (is_group_discount = 1 OR discount_mode IN ('group', 'both'))
+            AND status = 'publish'";
+        
+        return $wpdb->get_results($query) ?: [];
+    }
 }
 

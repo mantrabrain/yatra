@@ -216,6 +216,14 @@ class ItemController extends BaseController
     {
         $prepared = (array) $item;
 
+        // Parse metadata and extract type_id
+        if (!empty($prepared['metadata'])) {
+            $metadata = json_decode($prepared['metadata'], true);
+            if (is_array($metadata) && isset($metadata['type_id'])) {
+                $prepared['type_id'] = (int) $metadata['type_id'];
+            }
+        }
+
         // Get item type info
         if (!empty($prepared['type_id'])) {
             $type = $this->itemTypeRepository->find((int) $prepared['type_id']);

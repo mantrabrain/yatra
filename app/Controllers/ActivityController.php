@@ -8,6 +8,8 @@ use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\ActivityService;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Validators\ActivityValidator;
 use Yatra\Exceptions\ValidationException;
 use Yatra\Utils\Logger;
@@ -121,25 +123,13 @@ class ActivityController extends BaseController
 
             // Attach trip counts for each activity
             if (!empty($items)) {
-                global $wpdb;
-                $tripTable = $wpdb->prefix . 'yatra_trips';
-                $joinTable = $wpdb->prefix . 'yatra_trip_activities';
-
                 foreach ($items as $item) {
                     $activityId = isset($item->id) ? (int) $item->id : 0;
                     if ($activityId <= 0) {
                         continue;
                     }
 
-                    $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                        "SELECT COUNT(DISTINCT t.id)
-                         FROM `{$tripTable}` t
-                         INNER JOIN `{$joinTable}` ta ON ta.trip_id = t.id
-                         WHERE ta.activity_id = %d
-                           AND t.status != 'trash'",
-                        $activityId
-                    ));
-
+                    $tripCount = $this->service->getTripCount($activityId);
                     $item->trip_count = $tripCount;
                 }
             }
@@ -177,19 +167,9 @@ class ActivityController extends BaseController
             }
 
             // Attach trip count for single activity
-            global $wpdb;
-            $tripTable = $wpdb->prefix . 'yatra_trips';
-            $joinTable = $wpdb->prefix . 'yatra_trip_activities';
             $activityId = isset($item->id) ? (int) $item->id : 0;
             if ($activityId > 0) {
-                $tripCount = (int) $wpdb->get_var($wpdb->prepare(
-                    "SELECT COUNT(DISTINCT t.id)
-                     FROM `{$tripTable}` t
-                     INNER JOIN `{$joinTable}` ta ON ta.trip_id = t.id
-                     WHERE ta.activity_id = %d
-                       AND t.status != 'trash'",
-                    $activityId
-                ));
+                $tripCount = $this->service->getTripCount($activityId);
                 $item->trip_count = $tripCount;
             }
 
