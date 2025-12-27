@@ -1,10 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Yatra\Database\Tables;
-
-use Yatra\Database\BaseTable;
 
 /**
  * Departures Table
@@ -15,21 +11,26 @@ use Yatra\Database\BaseTable;
 class DeparturesTable extends BaseTable
 {
     /**
+     * Table name without prefix
+     */
+    protected static string $table = 'yatra_trip_departures';
+
+    /**
      * Get table name
      */
     public static function getTableName(): string
     {
         global $wpdb;
-        return $wpdb->prefix . 'yatra_trip_departures';
+        return $wpdb->prefix . static::$table;
     }
 
     /**
      * Get table schema
      */
-    public function getSchema(): string
+    public static function getSchema(): string
     {
         global $wpdb;
-        $table = $this->getTableName();
+        $table = static::getTableName();
         $charset_collate = $wpdb->get_charset_collate();
 
         return "
@@ -54,13 +55,5 @@ class DeparturesTable extends BaseTable
                 KEY `trip_date` (`trip_id`, `date`)
             ) {$charset_collate};
         ";
-    }
-
-    /**
-     * Get table version
-     */
-    public function getVersion(): string
-    {
-        return '1.0.0';
     }
 }

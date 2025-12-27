@@ -19,6 +19,7 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { HelpText } from '../components/ui/help-text';
 import { DatePicker } from '../components/ui/date-picker';
 import { ApplicableTripSelector } from '../components/shared/ApplicableTripSelector';
+import { PremiumUpgradeDialog } from '../components/modules/PremiumUpgradeDialog';
 
 interface DiscountFormData {
   code: string;
@@ -69,6 +70,7 @@ const DiscountForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
   // Get initial discount_mode from URL at initialization time
   const getInitialState = (): DiscountFormData => {
     const params = new URLSearchParams(window.location.search);
@@ -268,6 +270,15 @@ const DiscountForm: React.FC = () => {
         }));
       }
     }
+  };
+
+  const handleGroupDiscountToggle = (checked: boolean) => {
+    // Check if user has permission for group discounts
+    if (checked && !can('yatra_group_discounts')) {
+      setShowPremiumModal(true);
+      return;
+    }
+    handleFieldChange('is_group_discount', checked);
   };
 
   const travelerCategoriesQuery = useQuery({
@@ -1267,7 +1278,7 @@ const DiscountForm: React.FC = () => {
                       <input
                         type="checkbox"
                         checked={formData.is_group_discount}
-                        onChange={(e) => handleFieldChange('is_group_discount', e.target.checked)}
+                        onChange={(e) => handleGroupDiscountToggle(e.target.checked)}
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -1826,6 +1837,15 @@ const DiscountForm: React.FC = () => {
           </div>
         </form>
       </ConditionalRender>
+      
+      {/* Premium Upgrade Modal */}
+      <PremiumUpgradeDialog
+        open={showPremiumModal}
+        onClose={() => setShowPremiumModal(false)}
+        moduleName={__('Group Discounts', 'Group Discounts')}
+        purchaseUrl="https://wpyatra.com/pricing?module=group-discounts"
+        moduleDescription={__('Unlock powerful group discount features to automatically apply discounts based on group size and traveler categories.', 'Unlock powerful group discount features to automatically apply discounts based on group size and traveler categories.')}
+      />
     </div>
   );
 };

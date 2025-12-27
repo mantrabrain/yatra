@@ -2,8 +2,8 @@
  * Additional Services Page
  * 
  * Premium module for managing trip add-ons and extras.
- * This page displays the UI shell in the free plugin with a premium gate.
- * The actual functionality is provided by the Yatra Pro plugin.
+ * This page only loads when Yatra Pro is active and module is enabled.
+ * Premium upgrade content is handled by premium-pages/AdditionalServices.tsx
  * 
  * @package Yatra
  * @since 3.0.0
@@ -12,9 +12,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from '../components/ui/card';
-import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
-import { PageHeader } from '../components/common/PageHeader';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
 import { usePermissions } from '../hooks/usePermissions';
@@ -26,22 +24,14 @@ import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
 import { 
-  Plus, 
   Edit, 
   Trash2, 
-  Package, 
-  DollarSign, 
-  Users, 
-  ExternalLink,
-  Sparkles,
+  Package,
   CheckCircle,
-  ArrowRight,
-  Shield,
-  Zap,
-  TrendingUp,
-  RotateCcw,
-  FileText
+  FileText,
+  RotateCcw
 } from 'lucide-react';
+import PremiumUpgradeCard from './premium-pages/AdditionalServices';
 
 // Types
 interface TripInfo {
@@ -78,142 +68,20 @@ interface ServicesResponse {
 }
 
 // Check if module is available (Pro active)
-// The additionalServicesEnabled flag is set by Pro module, but we also check isPro
-// as a fallback since the flag might not be set on first load after enabling
 const isModuleAvailable = (): boolean => {
   const yatraAdmin = (window as any)?.yatraAdmin;
-  // If Pro is active and either the flag is set OR we're on the additional-services tab
-  // (which means the module must be enabled in the free plugin's ModuleManager)
   return Boolean(yatraAdmin?.isPro);
 };
 
-// Premium Upgrade Card Component
-const PremiumUpgradeCard: React.FC = () => {
-  const features = [
-    {
-      icon: Package,
-      title: __('Unlimited Add-ons'),
-      description: __('Create unlimited services like transfers, insurance, meals, and equipment rental.')
-    },
-    {
-      icon: DollarSign,
-      title: __('Flexible Pricing'),
-      description: __('Set prices per person, per booking, or per day with fixed or percentage-based pricing.')
-    },
-    {
-      icon: Users,
-      title: __('Trip Assignment'),
-      description: __('Assign services to specific trips with optional price overrides.')
-    },
-    {
-      icon: TrendingUp,
-      title: __('Revenue Tracking'),
-      description: __('Track service revenue and popularity with detailed analytics.')
-    }
-  ];
+// Main Component
+const AdditionalServices: React.FC = () => {
+  const moduleAvailable = isModuleAvailable();
 
-  return (
-    <div className="min-h-[600px] flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 mb-6">
-            <Package className="w-10 h-10 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {__('Additional Services')}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {__('Boost your revenue by offering optional add-ons like airport transfers, travel insurance, equipment rental, and meals during trip booking.')}
-          </p>
-          <Badge className="mt-4 bg-gradient-to-r from-purple-500 to-indigo-600 text-white border-0">
-            <Sparkles className="w-3 h-3 mr-1" />
-            {__('Premium Feature')}
-          </Badge>
-        </div>
+  // Show premium upgrade content if module is not available
+  if (!moduleAvailable) {
+    return <PremiumUpgradeCard />;
+  }
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {features.map((feature, index) => (
-            <Card key={index} className="border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <feature.icon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* CTA Section */}
-        <Card className="border-2 border-purple-200 dark:border-purple-800 bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20">
-          <CardContent className="p-8 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Shield className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-              <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-                {__('Included in Yatra Pro')}
-              </span>
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              {__('Unlock Additional Services')}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-lg mx-auto">
-              {__('Get access to Additional Services and 20+ other premium features with Yatra Pro.')}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8"
-                onClick={() => window.open('https://wpyatra.com/pricing?module=additional-services', '_blank')}
-              >
-                <Zap className="w-4 h-4 mr-2" />
-                {__('Upgrade to Pro')}
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => window.open('https://docs.yatra.com/modules/additional-services', '_blank')}
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                {__('Learn More')}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Trust Indicators */}
-        <div className="mt-8 flex items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-400">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>{__('30-day money-back guarantee')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>{__('Priority support')}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>{__('Lifetime updates')}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Services List Component (shown when Pro is active)
-const ServicesList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState('name');
@@ -766,43 +634,6 @@ const ServicesList: React.FC = () => {
           </>
         )}
       </ConditionalRender>
-    </div>
-  );
-};
-
-// Main Component
-const AdditionalServices: React.FC = () => {
-  const moduleAvailable = isModuleAvailable();
-
-  const handleCreateService = () => {
-    const params = new URLSearchParams(window.location.search);
-    params.set('subpage', 'trips');
-    params.set('tab', 'additional-services');
-    params.set('action', 'create');
-    window.history.pushState({}, '', `${window.location.pathname}?${params}`);
-    window.dispatchEvent(new PopStateEvent('popstate'));
-  };
-
-  // If module is not available, show premium upgrade card
-  if (!moduleAvailable) {
-    return <PremiumUpgradeCard />;
-  }
-
-  // This component handles the list view
-  // Form view will be rendered by App.tsx routing when action=create or action=edit
-  return (
-    <div className="space-y-6">
-      <PageHeader
-        title={__('Additional Services')}
-        description={__('Manage optional add-ons that customers can purchase during booking.')}
-        actions={
-          <Button onClick={handleCreateService} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            {__('Add New Service')}
-          </Button>
-        }
-      />
-      <ServicesList />
     </div>
   );
 };

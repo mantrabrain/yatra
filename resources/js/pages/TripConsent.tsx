@@ -23,15 +23,12 @@ import { useToast } from '../components/ui/toast';
 import { Modal } from '../components/ui/modal';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
+import PremiumUpgradeCard from './premium-pages/TripConsent';
 import { 
   Plus, 
   Edit, 
   Trash2, 
-  FileSignature, 
-  Shield,
   CheckCircle,
-  ArrowRight,
-  Sparkles,
   Copy,
   Clock,
   PenTool,
@@ -138,88 +135,7 @@ interface SignedConsentsResponse {
 // Check if module is available (Pro active)
 const isModuleAvailable = (): boolean => {
   const yatraAdmin = (window as any)?.yatraAdmin;
-  return Boolean(yatraAdmin?.isPro && yatraAdmin?.tripConsentEnabled);
-};
-
-// Premium Upgrade Card Component
-const PremiumUpgradeCard: React.FC = () => {
-  const features = [
-    {
-      icon: FileSignature,
-      title: __('Digital Signatures'),
-      description: __('Collect legally-binding digital signatures from travelers before their trip.')
-    },
-    {
-      icon: Shield,
-      title: __('Liability Protection'),
-      description: __('Create custom waiver and consent forms to protect your business.')
-    },
-    {
-      icon: PenTool,
-      title: __('Dynamic Form Builder'),
-      description: __('Build custom forms with drag-and-drop fields, checkboxes, and text blocks.')
-    },
-    {
-      icon: Send,
-      title: __('Automated Delivery'),
-      description: __('Automatically send consent requests before trips with reminder emails.')
-    }
-  ];
-
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center p-8">
-      <div className="max-w-4xl w-full">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 mb-6">
-            <FileSignature className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            {__('Trip Consent Forms')}
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            {__('Collect digital consent forms and signatures from travelers. Protect your business with liability waivers, health declarations, and custom agreement forms.')}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {features.map((feature, index) => (
-            <Card key={index} className="border-0 shadow-sm bg-white dark:bg-gray-800">
-              <CardContent className="p-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <feature.icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                      {feature.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="text-center">
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8"
-            onClick={() => window.open('https://wpyatra.com/pricing?module=trip-consent', '_blank')}
-          >
-            <Sparkles className="w-5 h-5 mr-2" />
-            {__('Upgrade to Pro')}
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-          <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
-            {__('Included in Yatra Pro. 14-day money-back guarantee.')}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+  return Boolean(yatraAdmin?.isPro);
 };
 
 // Consent Forms List Component (shown when Pro is active)

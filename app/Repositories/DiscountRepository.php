@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\DiscountsTable;
+
 /**
  * Discount Repository
  * Handles database operations for discounts
@@ -12,8 +14,7 @@ class DiscountRepository extends BaseRepository
 {
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_discounts';
+        return DiscountsTable::getTableName();
     }
 
     public function findByCode(string $code): ?\stdClass

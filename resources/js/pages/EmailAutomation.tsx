@@ -12,12 +12,11 @@ import { PageHeader } from '../components/common/PageHeader';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Switch } from '../components/ui/switch';
 import { Table as SharedTable, BulkActionToolbar, Pagination } from '../components/shared';
+import PremiumUpgradeCard from './premium-pages/EmailAutomation';
 import {
   Mail,
   Edit,
   Search,
-  Sparkles,
-  ArrowRight,
   CheckCircle,
   Clock,
   FileText,
@@ -93,52 +92,6 @@ const categoryIcons: Record<string, React.ElementType> = {
   enquiry: MessageSquare,
   reminder: Bell,
   marketing: Megaphone,
-};
-
-const PremiumUpgradeCard: React.FC = () => {
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center p-8">
-      <div className="max-w-2xl text-center space-y-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white mb-4">
-          <Mail className="w-10 h-10" />
-        </div>
-        
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          {__('Email Automation')}
-        </h1>
-        
-        <p className="text-lg text-gray-600 dark:text-gray-400">
-          {__('Customize all email templates, create automated sequences, and track email delivery with our powerful email automation system.')}
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[
-            { icon: FileText, title: __('Custom Templates'), desc: __('Edit all system emails') },
-            { icon: Clock, title: __('Automated Sequences'), desc: __('Drip campaigns & reminders') },
-            { icon: CheckCircle, title: __('Email Logs'), desc: __('Track delivery & opens') },
-          ].map((feature, i) => (
-            <Card key={i} className="text-left">
-              <CardContent className="p-4">
-                <feature.icon className="w-8 h-8 text-blue-500 mb-2" />
-                <h3 className="font-semibold text-gray-900 dark:text-white">{feature.title}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{feature.desc}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-        
-        <Button
-          size="lg"
-          className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8"
-          onClick={() => window.open('https://wpyatra.com/pricing?module=email-automation', '_blank')}
-        >
-          <Sparkles className="w-5 h-5 mr-2" />
-          {__('Upgrade to Pro')}
-          <ArrowRight className="w-5 h-5 ml-2" />
-        </Button>
-      </div>
-    </div>
-  );
 };
 
 const EmailTemplatesList: React.FC = () => {

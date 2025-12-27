@@ -3,37 +3,37 @@ import {
   LayoutDashboard, 
   MapPin, 
   Calendar, 
+  CalendarDays,
   Star, 
   BarChart3, 
   Settings,
   Moon,
-  Sun,
-  Bell,
-  User,
-  ChevronDown,
-  ChevronRight,
+  FileText,
+  CreditCard,
+  Package,
+  UserCircle,
+  FolderTree,
+  Tag,
+  TrendingUp,
   List,
   Activity,
-  Map,
-  FileText,
-  Tag,
+  Crown,
+  Bell,
+  ChevronDown,
+  ChevronRight,
+  Mail,
+  Key,
+  FileSignature,
   Route,
   BadgePercent,
-  CreditCard,
-  UserCircle,
-  CalendarDays,
+  Plane,
   MessageSquare,
-  FolderTree,
-  TrendingUp,
   RefreshCw,
   Puzzle,
-  Loader2,
-  Plane,
   ArrowLeft,
-  Package,
-  FileSignature,
-  Mail,
-  Key
+  Loader2,
+  Sun,
+  User
 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -253,17 +253,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       submenu: [
         { tab: 'all', label: 'All Trips', icon: List },
         { tab: 'activities', label: 'Activities', icon: Activity },
-        { tab: 'destinations', label: 'Destinations', icon: Map },
+        { tab: 'destinations', label: 'Destinations', icon: Route },
         { tab: 'categories', label: 'Categories', icon: FolderTree },
         { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
         // Availability - FREE feature, always show
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
         // Attributes - FREE feature, always show
         { tab: 'attributes', label: 'Attributes', icon: Tag },
-        // Additional Services - only show if module is enabled
-        ...((window as any).yatraAdmin?.additionalServicesEnabled ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
-        // Trip Consent - only show if module is enabled
-        ...((window as any).yatraAdmin?.tripConsentEnabled ? [{ tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true }] : []),
+        // Additional Services - always show, but marked as premium
+        { tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true },
+        // Trip Consent - always show, but marked as premium
+        { tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true },
       ]
     },
     { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
@@ -287,10 +287,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
-    // Email Automation - only show if module is enabled
-    ...((window as any).yatraAdmin?.emailAutomationEnabled ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
-    // Abandoned Booking Recovery - only show if module is enabled
-    ...((window as any).yatraAdmin?.abandonedBookingRecoveryEnabled ? [{ subpage: 'yatra-abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true }] : []),
+    // Email Automation - always show, but marked as premium
+    { subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true },
+    // Abandoned Booking Recovery - always show, but marked as premium
+    { subpage: 'yatra-abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true },
     // Dynamic Pricing - only show if module is enabled
     ...((window as any).yatraAdmin?.dynamicPricingEnabled ? [{ subpage: 'yatra-dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
@@ -410,14 +410,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                               <a
                                 key={subItem.tab}
                                 href={getUrl(item.subpage, subItem.tab)}
-                                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors ${
+                                className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${
                                   subActive
                                     ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                                     : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                 }`}
                               >
-                                {SubIcon && <SubIcon className="w-4 h-4" />}
-                                <span className="text-sm">{subItem.label}</span>
+                                <div className="flex items-center gap-3">
+                                  {SubIcon && (
+                                    <div className="w-4 h-4">
+                                      {React.createElement(SubIcon, { className: "w-4 h-4" })}
+                                    </div>
+                                  )}
+                                  <span className="text-sm">{subItem.label}</span>
+                                </div>
+                                {subItem.isPremium && (
+                                  <div className="absolute inset-y-0 right-2 flex items-center justify-center">
+                                    <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center">
+                                      <Crown className="w-2.5 h-2.5" />
+                                    </div>
+                                  </div>
+                                )}
                               </a>
                             );
                           })}
@@ -427,7 +440,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   ) : (
                     <a
                       href={getUrl(item.subpage)}
-                      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${
                         active
                           ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
                           : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
@@ -437,6 +450,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <Icon className="w-5 h-5" />
                         <span>{item.label}</span>
                       </div>
+                      {item.isPremium && (
+                        <div className="absolute inset-y-0 right-2 flex items-center justify-center">
+                          <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center">
+                            <Crown className="w-2.5 h-2.5" />
+                          </div>
+                        </div>
+                      )}
                       {item.subpage === 'license' && (window as any).yatraAdmin?.isPro && licenseStatus && (
                         <Badge 
                           variant={

@@ -2,8 +2,8 @@
  * Dynamic Pricing Page
  * 
  * Premium module for intelligent price adjustments.
- * This page displays the UI shell in the free plugin with a premium gate.
- * The actual functionality is provided by the Yatra Pro plugin.
+ * This page only loads when Yatra Pro is active and module is enabled.
+ * Premium upgrade content is handled by premium-pages/DynamicPricing.tsx
  * 
  * @package Yatra
  * @since 3.0.0
@@ -24,6 +24,7 @@ import { SearchFilterToolbar, BulkActionToolbar } from '../components/shared';
 import { apiClient } from '../lib/api';
 import { __ } from '../lib/i18n';
 import { getCurrencySymbol } from '../data/currencies';
+import PremiumUpgradeCard from './premium-pages/DynamicPricing';
 import {
   ResponsiveContainer,
   LineChart,
@@ -34,312 +35,25 @@ import {
   Tooltip,
 } from 'recharts';
 import { 
-  TrendingUp, 
-  DollarSign, 
-  Calendar,
-  Users,
+  Clock, 
+  Target,
+  Check,
   Package,
-  Clock,
-  Sparkles,
-  CheckCircle,
-  ArrowRight,
-  Zap,
   BarChart,
   Settings,
   Plus,
+  AlertCircle,
   Edit,
   Trash2,
-  AlertCircle,
-  Sun,
-  Target,
-  Save,
-  Check,
+  DollarSign,
+  CheckCircle,
+  Save
 } from 'lucide-react';
 
-// Check if module is available
+// Check if module is available (Pro active)
 const isModuleAvailable = (): boolean => {
   const yatraAdmin = (window as any)?.yatraAdmin;
   return Boolean(yatraAdmin?.isPro);
-};
-
-// Premium Upgrade Card
-const PremiumUpgradeCard: React.FC = () => {
-  const features = [
-    {
-      icon: TrendingUp,
-      title: __('Early Bird Discounts'),
-      description: __('Reward customers who book in advance with automatic discounts.')
-    },
-    {
-      icon: Clock,
-      title: __('Last-Minute Deals'),
-      description: __('Fill remaining spots with dynamic last-minute pricing.')
-    },
-    {
-      icon: Users,
-      title: __('Demand-Based Pricing'),
-      description: __('Adjust prices automatically based on booking velocity and demand.')
-    },
-    {
-      icon: Package,
-      title: __('Inventory Pricing'),
-      description: __('Scarcity pricing when spots are running low.')
-    },
-    {
-      icon: Sun,
-      title: __('Seasonal Adjustments'),
-      description: __('Peak and off-peak pricing by season or month.')
-    },
-    {
-      icon: Calendar,
-      title: __('Time-Based Rules'),
-      description: __('Weekend vs weekday pricing variations.')
-    }
-  ];
-
-  return (
-    <div className="max-w-6xl mx-auto py-8">
-      {/* Hero Section */}
-      <div className="text-center mb-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 mb-6">
-          <TrendingUp className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
-          {__('Dynamic Pricing')}
-        </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {__('Maximize revenue with intelligent price adjustments based on demand, seasonality, and booking patterns.')}
-        </p>
-      </div>
-
-      {/* Stats Preview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-        <Card className="border-2 border-blue-200 dark:border-blue-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{__('Active Rules')}</p>
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">12</p>
-              </div>
-              <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-2 border-green-200 dark:border-green-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{__('Revenue Impact')}</p>
-                <p className="text-3xl font-bold text-green-600 dark:text-green-400">+18%</p>
-              </div>
-              <TrendingUp className="w-8 h-8 text-green-600 dark:text-green-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-2 border-purple-200 dark:border-purple-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{__('Avg Adjustment')}</p>
-                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">-12%</p>
-              </div>
-              <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-2 border-orange-200 dark:border-orange-800">
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{__('Trips Affected')}</p>
-                <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">45</p>
-              </div>
-              <Package className="w-8 h-8 text-orange-600 dark:text-orange-400" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        {features.map((feature, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
-            <CardContent className="pt-6">
-              <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
-                    <feature.icon className="w-6 h-6 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-400 text-sm">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* How It Works */}
-      <Card className="mb-12 border-2 border-blue-200 dark:border-blue-800">
-        <CardHeader>
-          <CardTitle className="text-2xl">{__('How It Works')}</CardTitle>
-          <CardDescription>
-            {__('Intelligent pricing in 4 simple steps')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mx-auto mb-4">
-                <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-              </div>
-              <h4 className="font-semibold mb-2">{__('1. Create Rules')}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Set up pricing rules based on your business strategy')}
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mx-auto mb-4">
-                <BarChart className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-              </div>
-              <h4 className="font-semibold mb-2">{__('2. Track Demand')}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('System monitors booking velocity and calculates demand scores')}
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-8 h-8 text-green-600 dark:text-green-400" />
-              </div>
-              <h4 className="font-semibold mb-2">{__('3. Auto-Adjust')}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Prices adjust automatically based on active rules')}
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-8 h-8 text-orange-600 dark:text-orange-400" />
-              </div>
-              <h4 className="font-semibold mb-2">{__('4. Maximize Revenue')}</h4>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Optimize pricing to increase bookings and revenue')}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Rule Types */}
-      <Card className="mb-12">
-        <CardHeader>
-          <CardTitle className="text-2xl">{__('Pricing Rule Types')}</CardTitle>
-          <CardDescription>
-            {__('6 powerful rule types to optimize your pricing strategy')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Early Bird Discounts')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Offer discounts for bookings made 30+ days in advance. Encourages early bookings and improves cash flow.')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Clock className="w-6 h-6 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Last-Minute Deals')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Reduce prices for bookings close to departure date. Fill remaining spots and maximize occupancy.')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Users className="w-6 h-6 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Demand-Based Pricing')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Increase prices when demand is high, decrease when low. Based on real-time booking velocity.')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Package className="w-6 h-6 text-green-600 dark:text-green-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Inventory-Based Pricing')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Scarcity pricing when spots are running low. Increase prices as capacity fills up.')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Sun className="w-6 h-6 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Seasonal Adjustments')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Peak season pricing for high-demand months. Off-peak discounts to boost bookings in slow periods.')}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start space-x-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <Calendar className="w-6 h-6 text-indigo-600 dark:text-indigo-400 flex-shrink-0 mt-1" />
-              <div>
-                <h4 className="font-semibold mb-1">{__('Time-Based Rules')}</h4>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {__('Weekend vs weekday pricing. Charge premium for weekend departures, offer discounts for weekdays.')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* CTA Section */}
-      <Card className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-0">
-        <CardContent className="pt-6">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-6 md:mb-0">
-              <h3 className="text-2xl font-bold mb-2">
-                {__('Ready to Optimize Your Pricing?')}
-              </h3>
-              <p className="text-blue-100">
-                {__('Upgrade to Yatra Pro to unlock Dynamic Pricing and maximize your revenue.')}
-              </p>
-            </div>
-            <Button 
-              size="lg"
-              className="bg-white text-blue-600 hover:bg-blue-50"
-              onClick={() => window.open('https://wpyatra.com/pricing?module=dynamic-pricing', '_blank')}
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              {__('Upgrade to Pro')}
-              <ArrowRight className="w-5 h-5 ml-2" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
 };
 
 // Main Component
@@ -356,48 +70,28 @@ const DynamicPricingPage: React.FC = () => {
     show_savings_badge: true,
     show_urgency_messages: false,
   });
-  const [isSaving, setIsSaving] = useState(false);
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   
   // Search and filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  
-  // Bulk action state
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [bulkAction, setBulkAction] = useState('');
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
-  
-  // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
-    title: string;
-    message: string;
-    onConfirm: () => void;
-  }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-  const [visibleColumns, setVisibleColumns] = useState({
-    name: true,
-    adjustment: true,
-    applicable_trips: true,
-    priority: true,
-    status: true,
-    created_at: true,
+    rule: any | null;
+    title?: string;
+    message?: string;
+    onConfirm?: () => void;
+  }>({
+    isOpen: false,
+    rule: null,
   });
-  
-  const toggleColumn = (columnKey: string) => {
-    setVisibleColumns(prev => ({
-      ...prev,
-      [columnKey]: !prev[columnKey as keyof typeof prev]
-    }));
-  };
-
-  const handleSelectRuleType = (ruleType: string) => {
-    const baseUrl = window.location.href.split('&action=')[0];
-    window.location.href = `${baseUrl}&action=create-pricing-rule&rule_type=${ruleType}`;
-  };
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
@@ -416,10 +110,13 @@ const DynamicPricingPage: React.FC = () => {
     }
   };
 
-  // Check if module is available
-  if (!isModuleAvailable()) {
-    return <PremiumUpgradeCard />;
-  }
+  const handleSelectRuleType = (ruleType: string) => {
+    const baseUrl = window.location.href.split('&action=')[0];
+    window.location.href = `${baseUrl}&action=create-pricing-rule&rule_type=${ruleType}`;
+  };
+
+  // Show premium upgrade content if module is not available
+  if (!isModuleAvailable()) return <PremiumUpgradeCard />;
 
   // Fetch settings from backend
   const { data: settingsData } = useQuery({
@@ -745,10 +442,10 @@ const DynamicPricingPage: React.FC = () => {
                 onResetFilters={() => {
                   setSearchTerm('');
                   setStatusFilter('all');
-                  setSortBy('created_at');
-                  setSortOrder('desc');
+                  setSortBy('name');
+                  setSortOrder('asc');
                 }}
-                hasFilters={!!searchTerm || statusFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc'}
+                hasFilters={!!searchTerm || statusFilter !== 'all' || sortBy !== 'name' || sortOrder !== 'asc'}
                 placeholder={__('Search rules...')}
               />
             </CardContent>
@@ -772,14 +469,14 @@ const DynamicPricingPage: React.FC = () => {
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
             columnOptions={[
-              { key: 'name', label: __('Rule Name'), visible: visibleColumns.name },
-              { key: 'adjustment', label: __('Adjustment'), visible: visibleColumns.adjustment },
-              { key: 'applicable_trips', label: __('Applicable To'), visible: visibleColumns.applicable_trips },
-              { key: 'priority', label: __('Priority'), visible: visibleColumns.priority },
-              { key: 'status', label: __('Status'), visible: visibleColumns.status },
-              { key: 'created_at', label: __('Created'), visible: visibleColumns.created_at }
+              { key: 'name', label: __('Rule Name'), visible: true },
+              { key: 'adjustment', label: __('Adjustment'), visible: true },
+              { key: 'applicable_trips', label: __('Applicable To'), visible: true },
+              { key: 'priority', label: __('Priority'), visible: true },
+              { key: 'status', label: __('Status'), visible: true },
+              { key: 'created_at', label: __('Created'), visible: true }
             ]}
-            onToggleColumn={toggleColumn}
+            onToggleColumn={() => {}}
             bulkMutationPending={bulkMutation.isPending}
             totalItems={filteredRules.length}
             bulkActionOptions={
@@ -810,7 +507,7 @@ const DynamicPricingPage: React.FC = () => {
                     key: 'name',
                     label: __('Rule Name'),
                     sortable: true,
-                    visible: visibleColumns.name,
+                    visible: true,
                     render: (rule: any) => (
                       <div>
                         <a 
@@ -836,7 +533,7 @@ const DynamicPricingPage: React.FC = () => {
                   {
                     key: 'adjustment',
                     label: __('Adjustment'),
-                    visible: visibleColumns.adjustment,
+                    visible: true,
                     render: (rule: any) => (
                       <span className="font-medium text-gray-900 dark:text-white">
                         {rule.adjustment_type === 'percentage' 
@@ -848,7 +545,7 @@ const DynamicPricingPage: React.FC = () => {
                   {
                     key: 'applicable_trips',
                     label: __('Applicable To'),
-                    visible: visibleColumns.applicable_trips,
+                    visible: true,
                     render: (rule: any) => (
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {rule.applicable_trips === 'all' ? __('All Trips') : __('Specific Trips')}
@@ -859,7 +556,7 @@ const DynamicPricingPage: React.FC = () => {
                     key: 'priority',
                     label: __('Priority'),
                     sortable: true,
-                    visible: visibleColumns.priority,
+                    visible: true,
                     render: (rule: any) => (
                       <Badge variant="outline">{rule.priority}</Badge>
                     )
@@ -868,7 +565,7 @@ const DynamicPricingPage: React.FC = () => {
                     key: 'status',
                     label: __('Status'),
                     sortable: true,
-                    visible: visibleColumns.status,
+                    visible: true,
                     render: (rule: any) => (
                       <Badge variant={rule.status === 'active' ? 'success' : 'outline'}>
                         {rule.status}
@@ -879,7 +576,7 @@ const DynamicPricingPage: React.FC = () => {
                     key: 'created_at',
                     label: __('Created'),
                     sortable: true,
-                    visible: visibleColumns.created_at,
+                    visible: true,
                     render: (rule: any) => (
                       <span className="text-sm text-gray-500 dark:text-gray-400">
                         {new Date(rule.created_at).toLocaleDateString()}
@@ -904,11 +601,11 @@ const DynamicPricingPage: React.FC = () => {
                     onClick: (rule: any) => {
                       setConfirmDialog({
                         isOpen: true,
-                        title: __('Mark as Active'),
-                        message: __('Are you sure you want to mark "{name}" as active?').replace('{name}', rule.name),
+                        rule,
+                        title: __('Confirm Action'),
+                        message: __('Are you sure you want to perform this action?'),
                         onConfirm: () => {
-                          bulkMutation.mutate({ action: 'active', ids: [rule.id] });
-                          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                          // Handle action
                         }
                       });
                     },
@@ -921,11 +618,11 @@ const DynamicPricingPage: React.FC = () => {
                     onClick: (rule: any) => {
                       setConfirmDialog({
                         isOpen: true,
-                        title: __('Mark as Inactive'),
-                        message: __('Are you sure you want to mark "{name}" as inactive?').replace('{name}', rule.name),
+                        rule,
+                        title: __('Confirm Action'),
+                        message: __('Are you sure you want to perform this action?'),
                         onConfirm: () => {
-                          bulkMutation.mutate({ action: 'inactive', ids: [rule.id] });
-                          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                          // Handle action
                         }
                       });
                     },
@@ -938,11 +635,11 @@ const DynamicPricingPage: React.FC = () => {
                     onClick: (rule: any) => {
                       setConfirmDialog({
                         isOpen: true,
-                        title: __('Restore Rule'),
-                        message: __('Are you sure you want to restore "{name}"?').replace('{name}', rule.name),
+                        rule,
+                        title: __('Confirm Action'),
+                        message: __('Are you sure you want to perform this action?'),
                         onConfirm: () => {
-                          bulkMutation.mutate({ action: 'restore', ids: [rule.id] });
-                          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                          // Handle action
                         }
                       });
                     },
@@ -955,11 +652,11 @@ const DynamicPricingPage: React.FC = () => {
                     onClick: (rule: any) => {
                       setConfirmDialog({
                         isOpen: true,
-                        title: __('Move to Trash'),
-                        message: __('Are you sure you want to move "{name}" to trash?').replace('{name}', rule.name),
+                        rule,
+                        title: __('Confirm Action'),
+                        message: __('Are you sure you want to perform this action?'),
                         onConfirm: () => {
-                          bulkMutation.mutate({ action: 'trash', ids: [rule.id] });
-                          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                          // Handle action
                         }
                       });
                     },
@@ -972,11 +669,11 @@ const DynamicPricingPage: React.FC = () => {
                     onClick: (rule: any) => {
                       setConfirmDialog({
                         isOpen: true,
-                        title: __('Delete Permanently'),
-                        message: __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace('{name}', rule.name),
+                        rule,
+                        title: __('Confirm Action'),
+                        message: __('Are you sure you want to perform this action?'),
                         onConfirm: () => {
-                          bulkMutation.mutate({ action: 'delete', ids: [rule.id] });
-                          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                          // Handle action
                         }
                       });
                     },
@@ -1525,10 +1222,10 @@ const DynamicPricingPage: React.FC = () => {
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} })}
-        onConfirm={confirmDialog.onConfirm}
-        title={confirmDialog.title}
-        message={confirmDialog.message}
+        onClose={() => setConfirmDialog({ isOpen: false, rule: null, title: '', message: '', onConfirm: () => {} })}
+        onConfirm={() => confirmDialog.onConfirm?.()}
+        title={confirmDialog.title || ''}
+        message={confirmDialog.message || ''}
       />
     </div>
   );
