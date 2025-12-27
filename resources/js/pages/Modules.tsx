@@ -482,7 +482,6 @@ const Modules: React.FC = () => {
         moduleName={premiumDialog.module?.name}
         purchaseUrl={premiumDialog.module?.purchase_url}
         moduleDescription={premiumDialog.module?.description}
-        videoUrl={premiumDialog.module?.video_url}
         onClose={() => setPremiumDialog({ open: false })}
       />
     </div>

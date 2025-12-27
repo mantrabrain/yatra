@@ -31,14 +31,13 @@ import {
   CheckCircle,
   Copy,
   Clock,
-  PenTool,
-  Send,
   Eye,
   Download,
   Mail,
   Calendar,
   ClipboardCheck,
-  RotateCcw
+  RotateCcw,
+  FileSignature
 } from 'lucide-react';
 
 

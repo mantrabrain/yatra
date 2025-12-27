@@ -23,11 +23,6 @@ import {
   PenTool,
   ClipboardCheck,
   Send,
-  Eye,
-  Download,
-  Mail,
-  Calendar,
-  Zap,
   Camera
 } from 'lucide-react';
 
