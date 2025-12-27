@@ -1,4 +1,4 @@
-import { apiClient } from '../../../lib/api';
+import { apiClient } from '../../../lib/api-client';
 
 export interface DocumentDownloadOptions {
   bookingId?: number;

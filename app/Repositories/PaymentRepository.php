@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingPaymentsTable;
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\TripsTable;
+
 /**
  * Payment Repository
  * 
@@ -16,7 +20,7 @@ class PaymentRepository extends BaseRepository
     /**
      * Table name without prefix
      */
-    private const TABLE_NAME = 'yatra_booking_payments';
+    // private const TABLE_NAME = 'yatra_new_booking_payments';
 
     /** @var bool|null */
     private ?bool $customerColumnExists = null;
@@ -26,7 +30,7 @@ class PaymentRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . self::TABLE_NAME;
+        return BookingPaymentsTable::getTableName();
     }
 
     private function hasCustomerColumn(): bool
@@ -52,9 +56,7 @@ class PaymentRepository extends BaseRepository
      */
     protected function getBookingsTable(): string
     {
-        // Use BookingRepository for bookings table
-        $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        return $bookingRepository->getTableName();
+        return BookingsTable::getTableName();
     }
 
     /**
@@ -62,9 +64,7 @@ class PaymentRepository extends BaseRepository
      */
     protected function getTripsTable(): string
     {
-        // Use TripRepository for trips table
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        return $tripRepository->getTableName();
+        return TripsTable::getTableName();
     }
 
     /**
@@ -440,4 +440,3 @@ class PaymentRepository extends BaseRepository
         return $prepared;
     }
 }
-

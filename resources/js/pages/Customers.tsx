@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Phone, MapPin } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
@@ -56,13 +57,17 @@ const Customers: React.FC = () => {
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState('');
-  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [isBulkPending, setIsBulkPending] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
-  const queryClient = useQueryClient();
+  const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const { can, isPro } = usePermissions();
+  const queryClient = useQueryClient();
   const { showToast } = useToast();
+  const translations = (window as any)?.yatraAdmin?.translations || {};
+
+  // Helper function for translations
+  const __ = (text: string) => translations[text] || text;
 
   const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
 
@@ -92,7 +97,6 @@ const Customers: React.FC = () => {
         };
   });
 
-  const apiBase = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -122,17 +126,14 @@ const Customers: React.FC = () => {
   const { data, isLoading, error } = useQuery<CustomersResponse>({
     queryKey: ['customers', queryParams],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null && value !== '') {
-          params.append(key, String(value));
+          paramsObj[key] = value;
         }
       });
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers?${params.toString()}`, {
-        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
-      });
-      if (!response.ok) throw new Error('Failed to fetch customers');
-      return response.json();
+      
+      return await apiService.getCustomers(paramsObj);
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -140,21 +141,16 @@ const Customers: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${apiBase}/customers/${id}`, {
-        method: 'DELETE',
-        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
-      });
-      if (!response.ok) throw new Error('Failed to delete customer');
-      return response.json();
+      await apiService.deleteCustomer(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
       setDeleteDialogOpen(false);
       setCustomerToDelete(null);
-      showToast(__('Customer deleted successfully', 'Customer deleted successfully'), 'success');
+      showToast(__('Customer deleted successfully'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete customer', 'Failed to delete customer'), 'error');
+      showToast(error?.message || __('Failed to delete customer'), 'error');
     },
   });
 
@@ -181,15 +177,15 @@ const Customers: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'active': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+        label: __('Active'),
       },
       'inactive': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Inactive'),
       },
       'blocked': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Blocked', 'Blocked'),
+        label: __('Blocked'),
       },
     };
 
@@ -318,19 +314,7 @@ const Customers: React.FC = () => {
   ) => {
     await Promise.all(
       ids.map(async (id) => {
-        const response = await fetch(`${apiBase}/customers/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to update customer status');
-        }
+        await apiService.updateCustomerStatus(id, newStatus);
       })
     );
   };
@@ -345,17 +329,12 @@ const Customers: React.FC = () => {
 
       if (bulkAction === 'delete') {
         await Promise.all(
-          selectedIds.map((id) =>
-            fetch(`${apiBase}/customers/${id}`, {
-              method: 'DELETE',
-              headers: { 'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '' },
-            })
-          )
+          selectedIds.map((id) => apiService.deleteCustomer(id))
         );
-        showToast(__('Selected customers deleted successfully', 'Selected customers deleted successfully'), 'success');
+        showToast(__('Selected customers deleted successfully'), 'success');
       } else {
         await updateStatusForIds(selectedIds, bulkAction);
-        showToast(__('Customer statuses updated successfully', 'Customer statuses updated successfully'), 'success');
+        showToast(__('Customer statuses updated successfully'), 'success');
       }
 
       queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -363,7 +342,7 @@ const Customers: React.FC = () => {
       setBulkAction('');
     } catch (error: any) {
       showToast(
-        error?.message || __('Failed to perform bulk action on customers', 'Failed to perform bulk action on customers'),
+        error?.message || __('Failed to perform bulk action on customers'), 
         'error'
       );
     } finally {
@@ -372,10 +351,10 @@ const Customers: React.FC = () => {
   };
 
   const allBulkActionOptions = [
-    { value: 'active', label: __('Mark as Active', 'Mark as Active') },
-    { value: 'inactive', label: __('Mark as Inactive', 'Mark as Inactive') },
-    { value: 'blocked', label: __('Mark as Blocked', 'Mark as Blocked') },
-    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+    { value: 'active', label: __('Mark as Active') },
+    { value: 'inactive', label: __('Mark as Inactive') },
+    { value: 'blocked', label: __('Mark as Blocked') },
+    { value: 'delete', label: __('Delete permanently') },
   ];
 
   const getBulkActionOptionsForStatus = (view: string) => {
@@ -400,36 +379,38 @@ const Customers: React.FC = () => {
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
   const statusOptions = [
-    { value: 'all', label: __('All Status', 'All Status') },
-    { value: 'active', label: __('Active', 'Active') },
-    { value: 'inactive', label: __('Inactive', 'Inactive') },
-    { value: 'blocked', label: __('Blocked', 'Blocked') },
+    { value: 'all', label: __('All Status') },
+    { value: 'active', label: __('Active') },
+    { value: 'inactive', label: __('Inactive') },
+    { value: 'blocked', label: __('Blocked') },
   ];
 
   const sortOptions = [
-    { value: 'created_at', label: __('Registration Date', 'Registration Date') },
-    { value: 'name', label: __('Name', 'Name') },
-    { value: 'email', label: __('Email', 'Email') },
-    { value: 'country', label: __('Country', 'Country') },
-    { value: 'total_bookings', label: __('Bookings', 'Bookings') },
-    { value: 'total_spent', label: __('Total Spent', 'Total Spent') },
-    { value: 'status', label: __('Status', 'Status') },
+    { value: 'created_at', label: __('Registration Date') },
+    { value: 'name', label: __('Name') },
+    { value: 'email', label: __('Email') },
+    { value: 'country', label: __('Country') },
+    { value: 'total_bookings', label: __('Bookings') },
+    { value: 'total_spent', label: __('Total Spent') },
+    { value: 'status', label: __('Status') },
   ];
 
+  // Helper functions};
+
   const columnOptions = [
-    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
-    { key: 'location', label: __('Location', 'Location'), visible: visibleColumns.location },
-    { key: 'total_bookings', label: __('Bookings', 'Bookings'), visible: visibleColumns.total_bookings },
-    { key: 'total_spent', label: __('Total Spent', 'Total Spent'), visible: visibleColumns.total_spent },
-    { key: 'loyalty', label: __('Loyalty', 'Loyalty'), visible: visibleColumns.loyalty },
-    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-    { key: 'created_at', label: __('Registered', 'Registered'), visible: visibleColumns.created_at },
+    { key: 'customer', label: __('Customer'), visible: visibleColumns.customer },
+    { key: 'location', label: __('Location'), visible: visibleColumns.location },
+    { key: 'total_bookings', label: __('Bookings'), visible: visibleColumns.total_bookings },
+    { key: 'total_spent', label: __('Total Spent'), visible: visibleColumns.total_spent },
+    { key: 'loyalty', label: __('Loyalty'), visible: visibleColumns.loyalty },
+    { key: 'status', label: __('Status'), visible: visibleColumns.status },
+    { key: 'created_at', label: __('Registered'), visible: visibleColumns.created_at },
   ];
 
   const columns = [
     {
       key: 'customer',
-      label: __('Customer', 'Customer'),
+      label: __('Customer'),
       sortable: true,
       visible: visibleColumns.customer,
       render: (customer: Customer) => (
@@ -442,8 +423,8 @@ const Customers: React.FC = () => {
               {customer.name || `${customer.first_name} ${customer.last_name}`}
             </a>
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            {customer.email || __('No email provided', 'No email provided')}
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            {customer.email}
           </div>
           {customer.phone && (
             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-0.5">
@@ -456,7 +437,7 @@ const Customers: React.FC = () => {
     },
     {
       key: 'location',
-      label: __('Location', 'Location'),
+      label: __('Location'),
       sortable: true,
       visible: visibleColumns.location,
       render: (customer: Customer) => (
@@ -474,7 +455,7 @@ const Customers: React.FC = () => {
     },
     isPro && {
       key: 'total_bookings',
-      label: __('Bookings', 'Bookings'),
+      label: __('Bookings'),
       sortable: true,
       visible: visibleColumns.total_bookings,
       render: (customer: Customer) => (
@@ -483,7 +464,7 @@ const Customers: React.FC = () => {
     },
     isPro && {
       key: 'total_spent',
-      label: __('Total Spent', 'Total Spent'),
+      label: __('Total Spent'),
       sortable: true,
       visible: visibleColumns.total_spent,
       render: (customer: Customer) => (
@@ -492,21 +473,21 @@ const Customers: React.FC = () => {
     },
     {
       key: 'loyalty',
-      label: __('Loyalty', 'Loyalty'),
+      label: __('Loyalty'),
       sortable: false,
       visible: visibleColumns.loyalty,
       render: (customer: Customer) => getLoyaltyBadge(customer.loyalty_tier || 'bronze'),
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status'),
       sortable: true,
       visible: visibleColumns.status,
       render: (customer: Customer) => getStatusBadge(customer.status),
     },
     {
       key: 'created_at',
-      label: __('Registered', 'Registered'),
+      label: __('Registered'),
       sortable: true,
       visible: visibleColumns.created_at,
       render: (customer: Customer) => (
@@ -520,74 +501,20 @@ const Customers: React.FC = () => {
   const actions = [
     {
       key: 'view',
-      label: __('View', 'View'),
+      label: __('View'),
       icon: <Eye className="w-4 h-4" />,
       onClick: (customer: Customer) => handleView(customer),
     },
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (customer: Customer) => handleEdit(customer),
       condition: () => can('yatra_edit_bookings'),
     },
     {
-      key: 'mark_active',
-      label: __('Mark as Active', 'Mark as Active'),
-      icon: <ArrowUp className="w-4 h-4" />,
-      onClick: async (customer: Customer) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([customer.id], 'active');
-          queryClient.invalidateQueries({ queryKey: ['customers'] });
-          showToast(__('Customer status updated', 'Customer status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'active',
-    },
-    {
-      key: 'mark_inactive',
-      label: __('Mark as Inactive', 'Mark as Inactive'),
-      icon: <ArrowDown className="w-4 h-4" />,
-      onClick: async (customer: Customer) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([customer.id], 'inactive');
-          queryClient.invalidateQueries({ queryKey: ['customers'] });
-          showToast(__('Customer status updated', 'Customer status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'inactive',
-    },
-    {
-      key: 'mark_blocked',
-      label: __('Mark as Blocked', 'Mark as Blocked'),
-      icon: <ArrowDown className="w-4 h-4" />,
-      onClick: async (customer: Customer) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([customer.id], 'blocked');
-          queryClient.invalidateQueries({ queryKey: ['customers'] });
-          showToast(__('Customer status updated', 'Customer status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update customer status', 'Failed to update customer status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'blocked',
-    },
-    {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (customer: Customer) => handleDelete(customer),
       variant: 'destructive' as const,
@@ -600,14 +527,14 @@ const Customers: React.FC = () => {
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[250px]">{__('Customer', 'Customer')}</TableHead>
-          <TableHead>{__('Location', 'Location')}</TableHead>
-          {isPro && <TableHead>{__('Bookings', 'Bookings')}</TableHead>}
-          {isPro && <TableHead>{__('Total Spent', 'Total Spent')}</TableHead>}
-          <TableHead>{__('Loyalty', 'Loyalty')}</TableHead>
-          <TableHead>{__('Status', 'Status')}</TableHead>
-          <TableHead>{__('Registered', 'Registered')}</TableHead>
-          <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+          <TableHead className="w-[250px]">{__('Customer')}</TableHead>
+          <TableHead>{__('Location')}</TableHead>
+          {isPro && <TableHead>{__('Bookings')}</TableHead>}
+          {isPro && <TableHead>{__('Total Spent')}</TableHead>}
+          <TableHead>{__('Loyalty')}</TableHead>
+          <TableHead>{__('Status')}</TableHead>
+          <TableHead>{__('Registered')}</TableHead>
+          <TableHead className="text-right w-[100px]">{__('Actions')}</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -641,20 +568,21 @@ const Customers: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Customers', 'Customers')}
-        description={__('Manage your customer database', 'Manage your customer database')}
+        title={__('Customers')}
+        description={__('Manage your customer database')}
         actionCapability="yatra_edit_bookings"
         actions={
           <Button onClick={handleCreateCustomer} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Customer', 'Add New Customer')}
+            {__('Add New Customer')}
           </Button>
         }
       />
 
       <div className="space-y-3">
         {/* Search and Filters Card */}
-        <Card>
+        <ConditionalRender capability="yatra_view_bookings">
+          <Card>
           <CardContent className="p-4">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
               {/* Search Field - Takes most space */}
@@ -681,7 +609,7 @@ const Customers: React.FC = () => {
                   sortOptions={sortOptions}
                   onResetFilters={handleResetFilters}
                   hasFilters={!!hasFilters}
-                  placeholder={__('Search customers...', 'Search customers...')}
+                  placeholder={__('Search customers...')}
                 />
               </div>
 
@@ -695,10 +623,10 @@ const Customers: React.FC = () => {
                   }}
                   className="w-full"
                 >
-                  <option value="all">{__('All Status', 'All Status')}</option>
-                  <option value="active">{__('Active', 'Active')}</option>
-                  <option value="inactive">{__('Inactive', 'Inactive')}</option>
-                  <option value="blocked">{__('Blocked', 'Blocked')}</option>
+                  <option value="all">{__('All Status')}</option>
+                  <option value="active">{__('Active')}</option>
+                  <option value="inactive">{__('Inactive')}</option>
+                  <option value="blocked">{__('Blocked')}</option>
                 </Select>
               </div>
 
@@ -713,11 +641,11 @@ const Customers: React.FC = () => {
                     }}
                     className="w-full"
                   >
-                    <option value="all">{__('All Tiers', 'All Tiers')}</option>
-                    <option value="bronze">{__('Bronze', 'Bronze')}</option>
-                    <option value="silver">{__('Silver', 'Silver')}</option>
-                    <option value="gold">{__('Gold', 'Gold')}</option>
-                    <option value="platinum">{__('Platinum', 'Platinum')}</option>
+                    <option value="all">{__('All Tiers')}</option>
+                    <option value="bronze">{__('Bronze')}</option>
+                    <option value="silver">{__('Silver')}</option>
+                    <option value="gold">{__('Gold')}</option>
+                    <option value="platinum">{__('Platinum')}</option>
                   </Select>
                 </div>
               )}
@@ -753,6 +681,7 @@ const Customers: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+        </ConditionalRender>
 
         {/* Bulk Actions Toolbar */}
         <ConditionalRender capability="yatra_view_bookings">
@@ -768,10 +697,10 @@ const Customers: React.FC = () => {
               setPage(1);
             }}
             statusOptions={[
-              { key: 'all', label: __('All', 'All'), count: 0 },
-              { key: 'active', label: __('Active', 'Active'), count: 0 },
-              { key: 'inactive', label: __('Inactive', 'Inactive'), count: 0 },
-              { key: 'blocked', label: __('Blocked', 'Blocked'), count: 0 },
+              { key: 'all', label: __('All'), count: 0 },
+              { key: 'active', label: __('Active'), count: 0 },
+              { key: 'inactive', label: __('Inactive'), count: 0 },
+              { key: 'blocked', label: __('Blocked'), count: 0 },
             ]}
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
@@ -788,7 +717,7 @@ const Customers: React.FC = () => {
           {error ? (
             <Card>
               <CardContent className="p-8 text-center text-red-500">
-                {__('Error loading customers', 'Error loading customers')}
+                {__('Error loading customers')}
               </CardContent>
             </Card>
           ) : (
@@ -803,12 +732,12 @@ const Customers: React.FC = () => {
                     actions={actions as any}
                     isLoading={isLoading}
                     isError={!!error}
-                    errorText={__('Error loading customers', 'Error loading customers')}
-                    emptyText={__('No customers found', 'No customers found')}
+                    errorText={__('Error loading customers')}
+                    emptyText={__('No customers found')}
                     emptyDescription={
                       hasFilters
-                        ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                        : __('Customers will appear here when bookings are made', 'Customers will appear here when bookings are made')
+                        ? __('Try adjusting your filters to see more results.')
+                        : __('Customers will appear here when bookings are made')
                     }
                     onCreateClick={
                       can('yatra_edit_bookings') ? handleCreateCustomer : undefined
@@ -837,7 +766,7 @@ const Customers: React.FC = () => {
                 totalItems={total}
                 itemsPerPage={10}
                 onPageChange={(newPage) => setPage(newPage)}
-                itemName={__('customers', 'customers')}
+                itemName={__('customers')}
               />
             </div>
           )}
@@ -849,13 +778,15 @@ const Customers: React.FC = () => {
         isOpen={deleteDialogOpen}
         onClose={() => setDeleteDialogOpen(false)}
         onConfirm={confirmDelete}
-        title={__('Delete Customer', 'Delete Customer')}
-        message={customerToDelete ? 
-          __('Are you sure you want to delete this customer? This action cannot be undone.', 'Are you sure you want to delete this customer? This action cannot be undone.') + 
-          ` (${customerToDelete.name || customerToDelete.email})` : ''
+        title={__('Delete Customer')}
+        description={
+          customerToDelete ? 
+            __('Are you sure you want to delete this customer? This action cannot be undone.') + 
+            ` (${customerToDelete.name || customerToDelete.email})` : 
+            __('Are you sure you want to delete this customer? This action cannot be undone.')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete')}
+        cancelText={__('Cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />

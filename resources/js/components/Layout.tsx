@@ -39,7 +39,7 @@ import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { useModulesQuery, useToggleModule, type ModuleDefinition } from '../hooks/useModules';

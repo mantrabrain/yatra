@@ -4,7 +4,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { usePermissions } from './usePermissions';
 import { __ } from '../lib/i18n';
 

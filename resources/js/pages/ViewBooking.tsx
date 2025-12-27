@@ -6,7 +6,7 @@
 import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, Calendar, Users, DollarSign, CreditCard, FileText, AlertCircle, FileSignature, CheckCircle, Clock, Send } from 'lucide-react';
-import { apiClient } from '../lib/api';
+import { apiClient, apiService } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
@@ -61,16 +61,8 @@ const ViewBooking: React.FC = () => {
   const { data: formConfig } = useQuery<BookingFormConfig>({
     queryKey: ['booking-form-config'],
     queryFn: async () => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings');
-      }
-      const result = await response.json();
-      return result.data?.booking_form_config || result.booking_form_config || null;
+      const response = await apiService.getSettings();
+      return response?.data?.booking_form_config || response?.booking_form_config || null;
     },
   });
 
@@ -102,17 +94,11 @@ const ViewBooking: React.FC = () => {
     queryFn: async () => {
       if (!bookingId) return null;
       
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-
-      if (!response.ok) {
+      const result = await apiService.getBooking(bookingId);
+      
+      if (!result) {
         throw new Error('Failed to fetch booking');
       }
-
-      const result = await response.json();
       
       // Handle both wrapped { success, data } and direct data response formats
       const data = (result.success && result.data) ? result.data : result;

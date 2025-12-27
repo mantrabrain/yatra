@@ -43,7 +43,7 @@ import {
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient, apiService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -691,13 +691,8 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
   const { data: modulesData } = useQuery({
     queryKey: ['modules'],
     queryFn: async () => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/modules`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch modules');
-      return response.json();
+      const response = await apiService.getModules();
+      return response;
     },
     staleTime: 30000, // Cache for 30 seconds
   });

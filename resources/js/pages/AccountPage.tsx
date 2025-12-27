@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import {
   LayoutDashboard,

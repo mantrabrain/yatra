@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { __ } from '../lib/i18n';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';

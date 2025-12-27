@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { __ } from '../../lib/i18n';
-import { apiClient } from '../../lib/api';
+import { apiClient } from '../../lib/api-client';
 import { Select } from '../ui/select';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';

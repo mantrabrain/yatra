@@ -11,7 +11,7 @@ import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOpti
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';

@@ -24,7 +24,7 @@ import { Input } from '../ui/input';
 import { Select } from '../ui/select';
 import { Card, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { apiClient } from '../../lib/api';
+import { apiClient } from '../../lib/api-client';
 import { useToast } from '../ui/toast';
 import { BulkActionToolbar, Table as SharedTable } from '../shared';
 import { ConfirmationDialog } from '../ui/confirmation-dialog';

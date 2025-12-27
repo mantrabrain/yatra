@@ -43,6 +43,7 @@ class Bootstrap
             return;
         }
 
+        error_log('Yatra: Bootstrap::init() called');
         try {
             // Register service providers first
             $this->registerServiceProviders();
@@ -98,11 +99,15 @@ class Bootstrap
      */
     private function registerServiceProviders(): void
     {
+        error_log('Yatra: registerServiceProviders() called');
         $providers = [];
         
         // Core providers
         if (class_exists('Yatra\Providers\AppServiceProvider')) {
+            error_log('Yatra: AppServiceProvider found, adding to providers');
             $providers[] = 'Yatra\Providers\AppServiceProvider';
+        } else {
+            error_log('Yatra: AppServiceProvider NOT found');
         }
         
         if (class_exists('Yatra\Providers\RouteServiceProvider')) {

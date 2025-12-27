@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\PaymentGateways\Gateways\PayPal;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 class PayPalGateway extends AbstractPaymentGateway
@@ -703,7 +704,7 @@ class PayPalGateway extends AbstractPaymentGateway
         $amountDue = (float) ($booking->amount_due ?? ($booking->total_amount - $booking->amount_paid));
         
         // Update booking payment status
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [

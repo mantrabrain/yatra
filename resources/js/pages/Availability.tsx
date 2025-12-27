@@ -38,7 +38,7 @@ import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
 import { AvailabilityCalendar } from '../components/availability/AvailabilityCalendar';
 import { RecurringRules } from '../components/availability/RecurringRules';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';

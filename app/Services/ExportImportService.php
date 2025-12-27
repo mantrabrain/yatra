@@ -722,32 +722,12 @@ class ExportImportService
         return $data;
     }
 
-    /**
-     * Get available tables for export
-     */
-    public static function getAvailableTables(): array
-    {
-        $repository = new ExportImportRepository();
-        
-        $tables = [
-            'trips' => $repository->getTableName('yatra_trips'),
-            'destinations' => $repository->getTableName('yatra_destinations'),
-            'activities' => $repository->getTableName('yatra_activities'),
-            'bookings' => $repository->getTableName('yatra_bookings'),
-            'customers' => $repository->getTableName('yatra_customers'),
-            'departures' => $repository->getTableName('yatra_departures'),
-            'travelers' => $repository->getTableName('yatra_travelers'),
-        ];
-
-        return $available_tables;
-    }
-
-    /**
+      /**
      * Get export summary statistics
      */
     public static function getExportSummary(): array
     {
-        $tables = self::getAvailableTables();
+        $tables = [];
         
         $summary = [
             'total_tables' => 0,

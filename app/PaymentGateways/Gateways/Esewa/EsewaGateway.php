@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\PaymentGateways\Gateways\Esewa;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 class EsewaGateway extends AbstractPaymentGateway
@@ -159,7 +160,7 @@ class EsewaGateway extends AbstractPaymentGateway
         $currency = $booking->currency ?? 'NPR';
         
         // Update booking payment status
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [

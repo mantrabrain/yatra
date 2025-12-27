@@ -14,7 +14,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { HelpText } from '../components/ui/help-text';
 import { DatePicker } from '../components/ui/date-picker';
 import { TimePicker } from '../components/ui/time-picker';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 
 interface DepartureFormData {

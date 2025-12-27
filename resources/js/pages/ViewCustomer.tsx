@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, MapPin, Calendar, Users, DollarSign, FileText, Edit, Award, CreditCard, Globe, User, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -87,13 +88,9 @@ const ViewCustomer: React.FC = () => {
     queryKey: ['customer', customerId],
     queryFn: async () => {
       if (!customerId) throw new Error('No customer ID');
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}`, {
-        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
-      });
-      if (!response.ok) throw new Error('Failed to fetch customer');
+      const response = await apiService.getCustomer(customerId);
 
-      const json = await response.json();
-      const data = json && typeof json === 'object' && 'data' in json ? (json.data as any) : json;
+      const data = response;
 
       // Normalize nested emergency_contact structure to flat fields expected by the UI
       const emergency = (data as any).emergency_contact || {};
@@ -113,11 +110,7 @@ const ViewCustomer: React.FC = () => {
     queryKey: ['customer-bookings', customerId],
     queryFn: async () => {
       if (!customerId) return [];
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}/bookings`, {
-        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
-      });
-      if (!response.ok) throw new Error('Failed to fetch bookings');
-      const json = await response.json();
+      const json = await apiService.getCustomerBookings(customerId);
       // API returns an object with data property; ensure we always return an array
       if (Array.isArray(json)) {
         return json;

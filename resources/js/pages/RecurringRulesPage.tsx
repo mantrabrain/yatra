@@ -13,7 +13,7 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { Table as SharedTable } from '../components/shared';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';

@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Modal } from './ui/modal';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { 
   Download, 
   Upload, 
@@ -213,12 +214,7 @@ const Tools: React.FC = () => {
   const loadSystemStatus = async () => {
     setIsLoadingStatus(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/system-status`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getSystemStatus();
       // API returns data directly, not wrapped in success/data
       setSystemStatus(data);
     } catch (error) {
@@ -231,36 +227,28 @@ const Tools: React.FC = () => {
   // Load active jobs on mount (to show status when returning to page)
   const loadActiveJobs = async () => {
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/active-jobs`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
+      const jobs = await apiService.getActiveJobs();
       
-      if (response.ok) {
-        const jobs = await response.json();
+      if (Array.isArray(jobs) && jobs.length > 0) {
+        // Find most recent export and import jobs
+        const exportJobData = jobs.find((j: JobStatus) => j.type === 'export');
+        const importJobData = jobs.find((j: JobStatus) => j.type === 'import');
         
-        if (Array.isArray(jobs) && jobs.length > 0) {
-          // Find most recent export and import jobs
-          const exportJobData = jobs.find((j: JobStatus) => j.type === 'export');
-          const importJobData = jobs.find((j: JobStatus) => j.type === 'import');
-          
-          if (exportJobData) {
-            setExportJob(exportJobData);
-            // Resume polling if job is still running
-            if (exportJobData.status === 'pending' || exportJobData.status === 'running') {
-              setIsExporting(true);
-              pollJobStatus(exportJobData.id, 'export');
-            }
+        if (exportJobData) {
+          setExportJob(exportJobData);
+          // Resume polling if job is still running
+          if (exportJobData.status === 'pending' || exportJobData.status === 'running') {
+            setIsExporting(true);
+            pollJobStatus(exportJobData.id, 'export');
           }
-          
-          if (importJobData) {
-            setImportJob(importJobData);
-            // Resume polling if job is still running
-            if (importJobData.status === 'pending' || importJobData.status === 'running') {
-              setIsImporting(true);
-              pollJobStatus(importJobData.id, 'import');
-            }
+        }
+        
+        if (importJobData) {
+          setImportJob(importJobData);
+          // Resume polling if job is still running
+          if (importJobData.status === 'pending' || importJobData.status === 'running') {
+            setIsImporting(true);
+            pollJobStatus(importJobData.id, 'import');
           }
         }
       }
@@ -287,12 +275,7 @@ const Tools: React.FC = () => {
   const loadLogs = async (type: string, page = 1) => {
     setIsLoadingLogs(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/logs/${type}?page=${page}`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getLogs(type, page);
       if (data.logs && Array.isArray(data.logs)) {
         // The API returns: { logs: [...], total: number, page: number, per_page: number, pages: number }
         const logsData = data; // Use the full response, not data.data

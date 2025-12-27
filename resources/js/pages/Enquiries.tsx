@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin, Send, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
@@ -134,19 +135,7 @@ const Enquiries: React.FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['enquiries-stats'],
     queryFn: async () => {
-      const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/stats`, {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch enquiry stats');
-      }
-
-      const result = await response.json();
-      return result.data || {};
+      return await apiService.getEnquiriesStats();
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -169,30 +158,11 @@ const Enquiries: React.FC = () => {
     }
 
     const run = async () => {
-      const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const nonce = (window as any)?.yatraAdmin?.nonce || '';
-
       try {
         // Use dedicated bulk endpoint for status changes and delete
         if (['delete', 'mark_spam', 'mark_trash'].includes(bulkAction)) {
-          const response = await fetch(`${baseUrl}/enquiries/bulk`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-WP-Nonce': nonce,
-            },
-            body: JSON.stringify({
-              action: bulkAction,
-              ids: selectedIds,
-            }),
-          });
-
-          if (!response.ok) {
-            // eslint-disable-next-line no-console
-            console.error('Failed to perform bulk enquiry action', await response.text());
-          } else {
-            queryClient.invalidateQueries({ queryKey: ['enquiries'] });
-          }
+          await apiService.bulkEnquiriesAction(bulkAction, selectedIds);
+          queryClient.invalidateQueries({ queryKey: ['enquiries'] });
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -266,31 +236,20 @@ const Enquiries: React.FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['enquiries', queryParams],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          params.append(key, String(value));
+          paramsObj[key] = value;
         }
       });
       
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries?${params.toString()}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch enquiries');
-      }
-      
-      const result = await response.json();
+      const response = await apiService.getEnquiries(paramsObj);
       
       return {
-        data: result.data || [],
-        total: result.meta?.total || result.total || 0,
-        page: result.meta?.page || result.page || 1,
-        per_page: result.meta?.per_page || result.per_page || 10,
+        data: response.data || [],
+        total: response.meta?.total || response.total || 0,
+        page: response.meta?.page || response.page || 1,
+        per_page: response.meta?.per_page || response.per_page || 10,
       };
     },
     enabled: can('yatra_view_bookings'),
@@ -299,19 +258,7 @@ const Enquiries: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete enquiry');
-      }
-      
-      return response.json();
+      await apiService.deleteEnquiry(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });
@@ -323,22 +270,7 @@ const Enquiries: React.FC = () => {
   // Respond mutation - sends email to customer
   const respondMutation = useMutation({
     mutationFn: async ({ id, message }: { id: number; message: string }) => {
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify({ response: message }),
-      });
-      
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to send response');
-      }
-      
-      return res.json();
+      return await apiService.respondToEnquiry(id, { response: message });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });

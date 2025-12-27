@@ -21,7 +21,7 @@ import type { IconPickerValue } from '../components/ui/icon-picker';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { 
   Edit, 

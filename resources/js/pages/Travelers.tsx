@@ -7,6 +7,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users, Search, Eye, Mail, Phone, Calendar, MapPin, Trash2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -148,16 +149,7 @@ const Travelers: React.FC = () => {
   const { data: formConfigData } = useQuery({
     queryKey: ['booking-form-config'],
     queryFn: async () => {
-      const response = await fetch(
-        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`,
-        {
-          headers: {
-            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-          },
-        }
-      );
-      if (!response.ok) return null;
-      const result = await response.json();
+      const result = await apiService.getSettings('booking_form');
       return result.success ? result.data?.booking_form_config : null;
     },
   });
@@ -169,34 +161,21 @@ const Travelers: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['travelers', searchTerm, tripFilter, page],
     queryFn: async () => {
-      const params = new URLSearchParams({
-        page: String(page),
-        per_page: String(perPage),
-      });
-      if (searchTerm) params.append('search', searchTerm);
-      if (tripFilter) params.append('trip_id', tripFilter);
+      const paramsObj: Record<string, any> = {
+        page: page,
+        per_page: perPage,
+      };
+      if (searchTerm) paramsObj.search = searchTerm;
+      if (tripFilter) paramsObj.trip_id = tripFilter;
 
-      const response = await fetch(
-        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/travelers?${params.toString()}`,
-        {
-          headers: {
-            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch travelers');
-      }
-
-      const result = await response.json();
+      const response = await apiService.getTravelers(paramsObj);
       
       // Store available trips from meta (returned on first page with no search filter)
-      if (result.meta?.available_trips?.length > 0) {
-        setAvailableTrips(result.meta.available_trips);
+      if (response.meta?.available_trips?.length > 0) {
+        setAvailableTrips(response.meta.available_trips);
       }
       
-      return result;
+      return response;
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -243,24 +222,7 @@ const Travelers: React.FC = () => {
   // Bulk delete travelers
   const bulkMutation = useMutation({
     mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
-      const response = await fetch(
-        `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/travelers/bulk`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-          },
-          body: JSON.stringify({ action, ids }),
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to perform bulk traveler action');
-      }
-
-      return response.json();
+      return await apiService.bulkTravelersAction(action, ids);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['travelers'] });

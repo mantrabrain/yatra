@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\TripsTable;
+
 /**
  * Booking Repository
  * 
@@ -15,16 +18,11 @@ namespace Yatra\Repositories;
 class BookingRepository extends BaseRepository
 {
     /**
-     * Table name without prefix
-     */
-    private const TABLE_NAME = 'yatra_bookings';
-
-    /**
      * Get full table name with prefix
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . self::TABLE_NAME;
+        return BookingsTable::getTableName();
     }
 
     /**
@@ -32,7 +30,7 @@ class BookingRepository extends BaseRepository
      */
     protected function getTripsTable(): string
     {
-        return $this->wpdb->prefix . 'yatra_trips';
+        return TripsTable::getTableName();
     }
 
     /**

@@ -24,6 +24,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { useToast } from '../components/ui/toast';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
 import PremiumUpgradeCard from './premium-pages/AbandonedRecovery';
 import { 
@@ -195,19 +196,13 @@ const AbandonedRecoveryPage: React.FC = () => {
   const { data: bookingsData, isLoading } = useQuery({
     queryKey: ['abandoned-bookings', queryParams],
     queryFn: async () => {
-      const params = new URLSearchParams();
+      const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
-        if (value !== undefined) params.append(key, value.toString());
+        if (value !== undefined) paramsObj[key] = value;
       });
       
-      const response = await fetch(`/wp-json/yatra/v1/abandoned-bookings?${params}`, {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch bookings');
-      return response.json();
+      const response = await apiService.getAbandonedBookings(paramsObj);
+      return response;
     },
   });
 
@@ -215,14 +210,8 @@ const AbandonedRecoveryPage: React.FC = () => {
   const { data: bookingDetailsData, isLoading: isLoadingDetails } = useQuery({
     queryKey: ['abandoned-booking-details', bookingId],
     queryFn: async () => {
-      const response = await fetch(`/wp-json/yatra/v1/abandoned-bookings/${bookingId}`, {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch booking details');
-      return response.json();
+      const response = await apiService.getAbandonedBooking(bookingId!);
+      return response;
     },
     enabled: action === 'view' && !!bookingId,
   });
@@ -231,14 +220,8 @@ const AbandonedRecoveryPage: React.FC = () => {
   const { data: settingsData } = useQuery({  
     queryKey: ['abandoned-recovery-settings'],
     queryFn: async () => {
-      const response = await fetch('/wp-json/yatra/v1/abandoned-bookings/settings', {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch settings');
-      return response.json();
+      const response = await apiService.getAbandonedBookingsSettings();
+      return response;
     },
   });
 
@@ -253,30 +236,15 @@ const AbandonedRecoveryPage: React.FC = () => {
   const { data: statsData } = useQuery({
     queryKey: ['abandoned-statistics'],
     queryFn: async () => {
-      const response = await fetch('/wp-json/yatra/v1/abandoned-bookings/statistics', {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to fetch statistics');
-      return response.json();
+      const response = await apiService.getAbandonedBookingsStatistics();
+      return response;
     },
   });
 
   // Send recovery email mutation
   const sendEmailMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/wp-json/yatra/v1/abandoned-bookings/${id}/send-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to send email');
-      return response.json();
+      return await apiService.sendAbandonedBookingEmail(id);
     },
     onSuccess: () => {
       showToast(__('Recovery email sent successfully'), 'success');
@@ -294,16 +262,7 @@ const AbandonedRecoveryPage: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (ids: (string | number)[]) => {
-      const deletePromises = ids.map(id => 
-        fetch(`/wp-json/yatra/v1/abandoned-bookings/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-          },
-          credentials: 'include',
-        })
-      );
-      await Promise.all(deletePromises);
+      await Promise.all(ids.map(id => apiService.deleteAbandonedBooking(id)));
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['abandoned-bookings'] });
@@ -489,17 +448,7 @@ const AbandonedRecoveryPage: React.FC = () => {
   // Save settings mutation
   const saveSettingsMutation = useMutation({
     mutationFn: async (data: typeof settings) => {
-      const response = await fetch('/wp-json/yatra/v1/abandoned-bookings/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Failed to save settings');
-      return response.json();
+      return await apiService.saveAbandonedBookingsSettings(data);
     },
     onSuccess: () => {
       showToast(__('Settings saved successfully'), 'success');

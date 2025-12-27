@@ -9,7 +9,8 @@ import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, St
 import { __ } from '../lib/i18n';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
+import { apiService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -284,17 +285,7 @@ const Reviews: React.FC = () => {
 
     const run = async () => {
       try {
-        const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-        const nonce = (window as any)?.yatraAdmin?.nonce || '';
-
-        await fetch(`${baseUrl}/reviews/bulk`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': nonce,
-          },
-          body: JSON.stringify({ action: bulkAction, ids: selectedIds }),
-        });
+        await apiService.bulkReviewsAction(bulkAction, selectedIds);
 
         queryClient.invalidateQueries({ queryKey: ['reviews'] });
       } catch (error) {
@@ -330,58 +321,22 @@ const Reviews: React.FC = () => {
   ];
 
   const handleApprove = async (review: Review) => {
-    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-    const nonce = (window as any)?.yatraAdmin?.nonce || '';
-    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': nonce,
-      },
-      body: JSON.stringify({ status: 'approved' }),
-    });
+    await apiService.updateReviewStatus(review.id, 'approved');
     queryClient.invalidateQueries({ queryKey: ['reviews'] });
   };
 
   const handleMarkPending = async (review: Review) => {
-    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-    const nonce = (window as any)?.yatraAdmin?.nonce || '';
-    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': nonce,
-      },
-      body: JSON.stringify({ status: 'pending' }),
-    });
+    await apiService.updateReviewStatus(review.id, 'pending');
     queryClient.invalidateQueries({ queryKey: ['reviews'] });
   };
 
   const handleMarkSpam = async (review: Review) => {
-    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-    const nonce = (window as any)?.yatraAdmin?.nonce || '';
-    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': nonce,
-      },
-      body: JSON.stringify({ status: 'spam' }),
-    });
+    await apiService.updateReviewStatus(review.id, 'spam');
     queryClient.invalidateQueries({ queryKey: ['reviews'] });
   };
 
   const handleMarkTrash = async (review: Review) => {
-    const baseUrl = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-    const nonce = (window as any)?.yatraAdmin?.nonce || '';
-    await fetch(`${baseUrl}/reviews/${review.id}/status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-WP-Nonce': nonce,
-      },
-      body: JSON.stringify({ status: 'trash' }),
-    });
+    await apiService.updateReviewStatus(review.id, 'trash');
     queryClient.invalidateQueries({ queryKey: ['reviews'] });
   };
 

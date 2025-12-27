@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\PaymentGateways\Gateways\Razorpay;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 class RazorpayGateway extends AbstractPaymentGateway
@@ -564,7 +565,7 @@ class RazorpayGateway extends AbstractPaymentGateway
         $currency = $paymentData['currency'] ?? ($booking->currency ?? 'INR');
         
         // Update booking payment status
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [

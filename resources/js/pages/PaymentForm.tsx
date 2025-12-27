@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -61,17 +62,11 @@ const PaymentForm: React.FC = () => {
     queryFn: async () => {
       if (!paymentId) return null;
       
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
+      const result = await apiService.getPayment(paymentId);
 
-      if (!response.ok) {
+      if (!result) {
         throw new Error('Failed to fetch payment');
       }
-
-      const result = await response.json();
       
       if (!result.success) {
         throw new Error(result.message || 'Payment not found');
@@ -160,31 +155,9 @@ const PaymentForm: React.FC = () => {
         notes: data.notes.trim() || null,
       };
 
-      const url = isEditMode && paymentId
-        ? `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`
-        : `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments`;
-      
-      const response = await fetch(url, {
-        method: isEditMode ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save payment');
-      }
-
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to save payment');
-      }
-
-      return result;
+      return isEditMode && paymentId
+        ? await apiService.updatePayment(paymentId, payload)
+        : await apiService.createPayment(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });

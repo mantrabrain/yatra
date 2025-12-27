@@ -2,6 +2,7 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\Migration\MigrationProgress;
 
 class BookingMigration extends BaseMigration
@@ -44,7 +45,7 @@ class BookingMigration extends BaseMigration
                 }
 
                 $inserted = $this->wpdb->insert(
-                    $this->wpdb->prefix . 'yatra_bookings',
+                    BookingsTable::getTableName(),
                     [
                         'trip_id' => $newTripId,
                         'customer_id' => $oldBooking->customer_id ?? null,

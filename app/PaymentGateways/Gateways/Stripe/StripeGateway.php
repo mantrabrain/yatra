@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\PaymentGateways\Gateways\Stripe;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 class StripeGateway extends AbstractPaymentGateway
@@ -472,7 +473,7 @@ class StripeGateway extends AbstractPaymentGateway
         $currency = $paymentData['currency'] ?? ($booking->currency ?? 'USD');
         
         // Update booking payment status
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [

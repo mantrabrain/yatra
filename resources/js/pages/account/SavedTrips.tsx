@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { formatPrice } from './utils';
-import { apiClient } from '../../lib/api';
+import { apiClient } from '../../lib/api-client';
 import { useToast } from '../../components/ui/toast';
 
 interface SavedTripsProps {

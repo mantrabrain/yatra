@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\CustomersTable;
+
 /**
  * Customer Repository
  * 
@@ -13,17 +15,11 @@ namespace Yatra\Repositories;
 class CustomerRepository extends BaseRepository
 {
     /**
-     * Base table name without prefix
-     */
-    private const TABLE_NAME = 'yatra_customers';
-
-    /**
      * Get full table name with prefix
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . self::TABLE_NAME;
+        return CustomersTable::getTableName();
     }
 
     /**

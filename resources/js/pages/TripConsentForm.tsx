@@ -17,7 +17,7 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { ApplicableTripSelector } from '../components/shared/ApplicableTripSelector';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { 
   ArrowLeft, 

@@ -17,6 +17,7 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { useToast } from '../components/ui/toast';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 
 interface EmailCampaignFormData {
@@ -53,13 +54,7 @@ const AbandonedRecoveryEmailForm: React.FC = () => {
     queryKey: ['abandoned-recovery-campaign', campaignId],
     queryFn: async () => {
       if (!campaignId) return null;
-      const response = await fetch(`/wp-json/yatra/v1/abandoned-bookings/campaigns/${campaignId}`, {
-        headers: {
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) throw new Error('Failed to fetch campaign');
-      const data = await response.json();
+      const data = await apiService.getAbandonedBookingCampaign(campaignId!);
       return data;
     },
     enabled: isEdit,
@@ -75,21 +70,9 @@ const AbandonedRecoveryEmailForm: React.FC = () => {
   // Create/Update mutation
   const saveMutation = useMutation({
     mutationFn: async (data: EmailCampaignFormData) => {
-      const url = isEdit 
-        ? `/wp-json/yatra/v1/abandoned-bookings/campaigns/${campaignId}`
-        : '/wp-json/yatra/v1/abandoned-bookings/campaigns';
-      
-      const response = await fetch(url, {
-        method: isEdit ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) throw new Error('Failed to save campaign');
-      return await response.json();
+      return isEdit 
+        ? await apiService.updateAbandonedBookingCampaign(campaignId!, data)
+        : await apiService.createAbandonedBookingCampaign(data);
     },
     onSuccess: () => {
       showToast(

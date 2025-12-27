@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\Services\SettingsService;
 
 /**
@@ -91,7 +92,7 @@ function yatra_can_review(int $trip_id, ?int $user_id = null): bool
         
         // Check if user has a completed booking for this trip
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_bookings';
+        $table = BookingsTable::getTableName();
         $has_booking = $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(*) FROM {$table} 
              WHERE trip_id = %d AND customer_id = %d AND status = 'completed'",

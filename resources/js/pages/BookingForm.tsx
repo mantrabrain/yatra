@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp, AlertCircle, Search, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { getCurrencySymbol } from '../data/currencies';
 import { Button } from '../components/ui/button';
@@ -145,16 +146,8 @@ const BookingForm: React.FC = () => {
   const { data: formConfig } = useQuery<BookingFormConfig>({
     queryKey: ['booking-form-config'],
     queryFn: async () => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/settings`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch settings');
-      }
-      const result = await response.json();
-      return result.data?.booking_form_config || result.booking_form_config || null;
+      const response = await apiService.getSettings();
+      return response?.data?.booking_form_config || response?.booking_form_config || null;
     },
   });
 
@@ -200,16 +193,8 @@ const BookingForm: React.FC = () => {
   const { data: gatewaysData } = useQuery({
     queryKey: ['payment-gateways'],
     queryFn: async () => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payment/gateways`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) {
-        return { data: [] };
-      }
-      const result = await response.json();
-      if (result.success) {
+      const result = await apiService.getPaymentGateways();
+      if (result?.success) {
         return {
           data: result.data.filter((gw: any) => gw.enabled).map((gw: any) => ({
             id: gw.id,
@@ -226,47 +211,7 @@ const BookingForm: React.FC = () => {
     queryKey: ['trips-list-all'],
     queryFn: async () => {
       // Fetch all trips - try without status filter first, then with status=all
-      const apiUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const nonce = window.yatraAdmin?.nonce || '';
-      
-      console.log('Fetching trips from:', apiUrl);
-      
-      const response = await fetch(`${apiUrl}/trips?per_page=500`, {
-        headers: {
-          'X-WP-Nonce': nonce,
-          'Content-Type': 'application/json',
-        },
-        credentials: 'same-origin',
-      });
-      
-      console.log('Trips API Response status:', response.status);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Trips API Error:', errorText);
-        throw new Error('Failed to fetch trips');
-      }
-      
-      const result = await response.json();
-      console.log('Trips API Response:', result);
-      
-      // The trips API returns { data: [...], total, page, per_page } directly (no success flag)
-      const tripsArray = result.data || result || [];
-      
-      if (Array.isArray(tripsArray) && tripsArray.length > 0) {
-        const trips = tripsArray.map((trip: any) => ({
-          id: String(trip.id),
-          title: trip.title,
-          price: parseFloat(trip.sale_price || trip.original_price || 0),
-          currency: trip.currency || 'USD',
-          status: trip.status || 'publish',
-        }));
-        console.log('Mapped trips:', trips, 'Total:', trips.length);
-        return { data: trips };
-      }
-      
-      console.log('No trips found in response');
-      return { data: [] };
+      return await apiService.getTrips({ per_page: 500 });
     },
     // Always fetch trips when user can manage bookings
     enabled: can('yatra_view_bookings') || can('yatra_view_trips'),
@@ -278,15 +223,11 @@ const BookingForm: React.FC = () => {
     queryKey: ['booking', bookingId],
     queryFn: async () => {
       if (!bookingId) return null;
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      if (!response.ok) {
+      const result = await apiService.getBooking(bookingId);
+      
+      if (!result) {
         throw new Error('Failed to fetch booking');
       }
-      const result = await response.json();
       console.log('Booking API Response:', result);
       
       // Handle both wrapped { success, data } and direct data response formats
@@ -526,25 +467,9 @@ const BookingForm: React.FC = () => {
         emergency_contact: emergencyContactData,
       };
 
-      const url = isEditMode && bookingId
-        ? `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${bookingId}`
-        : `${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings`;
-
-      const response = await fetch(url, {
-        method: isEditMode ? 'PUT' : 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to save booking');
-      }
-
-      return await response.json();
+      return isEditMode 
+        ? await apiService.updateBooking(bookingId!, payload)
+        : await apiService.createBooking(payload);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });

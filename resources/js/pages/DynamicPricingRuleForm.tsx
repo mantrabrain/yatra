@@ -18,7 +18,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { PageHeader } from '../components/common/PageHeader';
 import { RuleTypeSelectionModal } from '../components/modals/RuleTypeSelectionModal';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { ArrowLeft, Save, Loader2, Calendar, Clock, TrendingUp, Package, Sun, Target, Check } from 'lucide-react';
 

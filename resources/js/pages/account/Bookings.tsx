@@ -6,7 +6,7 @@ import { downloadVoucher } from './utils/downloads';
 import type { Booking } from './types';
 import BookingDetails from './BookingDetails';
 import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../../lib/api';
+import { apiClient } from '../../lib/api-client';
 
 interface BookingsProps {
   bookings: Booking[];

@@ -18,7 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { useToast } from '../components/ui/toast';
 import { usePermissions } from '../hooks/usePermissions';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { 
   ArrowLeft, 

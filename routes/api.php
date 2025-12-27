@@ -61,8 +61,9 @@ $controllers = [
     // BOOKING & PAYMENTS
     // =============================================
     \Yatra\Controllers\BookingsController::class,
+    \Yatra\Controllers\PaymentController::class, // Payment records management
     \Yatra\Controllers\BookingSessionController::class,
-    \Yatra\Controllers\PaymentGatewayController::class,
+    \Yatra\Controllers\PaymentGatewayController::class, // Payment gateway operations
 
     // =============================================
     // CUSTOMERS & CRM
@@ -87,6 +88,14 @@ $controllers = [
     \Yatra\Controllers\ToolsController::class,
 
 ];
+
+// Debug: Check if BookingsController is in the array
+if (defined('WP_DEBUG') && WP_DEBUG) {
+    error_log('Yatra: Routes file loaded at ' . date('Y-m-d H:i:s'));
+    error_log('Yatra: Controllers array contains ' . count($controllers) . ' controllers');
+    error_log('Yatra: BookingsController in array: ' . (in_array(\Yatra\Controllers\BookingsController::class, $controllers) ? 'YES' : 'NO'));
+    error_log('Yatra: Looking for BookingsController in: ' . print_r($controllers, true));
+}
 
 /**
  * Register all controller routes

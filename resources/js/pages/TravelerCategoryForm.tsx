@@ -9,7 +9,7 @@ import { ArrowLeft, Save, Loader2, Edit2, X, AlertCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { generateSlug } from '../lib/slug';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';

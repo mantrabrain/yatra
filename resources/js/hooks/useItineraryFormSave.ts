@@ -3,7 +3,7 @@
  */
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { __ } from '../lib/i18n';
 import { ItineraryFormData, ActivityForm } from './useItineraryFormValidation';

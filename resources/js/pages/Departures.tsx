@@ -20,7 +20,7 @@ import { DeparturesTableSkeleton } from '../components/ui/table-skeleton';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
 import { Table as SharedTable } from '../components/shared/Table';
 import { Pagination } from '../components/shared/Pagination';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 // Format date helper
 const formatDate = (dateString: string): string => {

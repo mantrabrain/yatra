@@ -1,5 +1,5 @@
 import { j as jsxRuntimeExports, h as Calendar, g as FileText, k as Plane, aj as ArrowRight, M as MapPin, U as User, v as ChevronRight, b7 as Sparkles, P as Package, i as CreditCard, bK as LifeBuoy, E as Bell, aC as AlertCircle, a_ as CheckCircle2, ah as Clock, ar as ExternalLink, ag as Users, ai as DollarSign, n as Mail, be as Phone, b2 as Download, r as reactExports, u as useQuery, w as React, al as CheckCircle, aN as Eye, at as PenSquare, aD as XCircle, bL as ShieldCheck, aH as Heart, ao as AlertTriangle, L as LayoutDashboard, bM as LogOut, bH as QueryClient, bI as client, bJ as QueryClientProvider } from "./react-vendor-CnQxQzei.js";
-import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, u as useToast, T as ToastProvider } from "./index-BFMeZbQt.js";
+import { _ as __, g as getCurrencySymbol, b as getCurrency, a as apiClient, u as useToast, T as ToastProvider } from "./index-CUgYXPrT.js";
 const formatDate = (value) => {
   if (!value) {
     return __("N/A", "N/A");

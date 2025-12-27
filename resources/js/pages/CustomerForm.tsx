@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
@@ -103,44 +104,38 @@ const CustomerForm: React.FC = () => {
     queryKey: ['customer', customerId],
     queryFn: async () => {
       if (!customerId) return null;
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}`, {
-        headers: { 'X-WP-Nonce': window.yatraAdmin?.nonce || '' }
-      });
-      if (!response.ok) throw new Error('Failed to fetch customer');
+      const response = await apiService.getCustomer(customerId);
 
-      const json = await response.json();
-      const data = json && typeof json === 'object' && 'data' in json ? (json.data as any) : json;
-
-      const emergency = (data as any).emergency_contact || {};
+      const emergency = (response as any).emergency_contact || {};
 
       return {
-        first_name: data.first_name || '',
-        last_name: data.last_name || '',
-        email: data.email || '',
-        phone: data.phone || '',
-        secondary_phone: data.secondary_phone || '',
-        country: data.country || '',
-        city: data.city || '',
-        state: data.state || '',
-        address: data.address || '',
-        postal_code: data.postal_code || '',
-        nationality: data.nationality || '',
-        date_of_birth: data.date_of_birth || '',
-        gender: data.gender || '',
-        passport_number: data.passport_number || '',
-        passport_expiry: data.passport_expiry || '',
-        emergency_name: (data as any).emergency_name || emergency.name || '',
-        emergency_phone: (data as any).emergency_phone || emergency.phone || '',
-        emergency_relationship: (data as any).emergency_relationship || emergency.relationship || '',
-        dietary_requirements: data.dietary_requirements || '',
-        medical_conditions: data.medical_conditions || '',
-        special_needs: data.special_needs || '',
-        newsletter_optin: Boolean(data.newsletter_optin),
-        marketing_optin: Boolean(data.marketing_optin),
-        status: data.status || 'active',
-        notes: data.notes || '',
-        loyalty_tier: data.loyalty_tier || 'bronze',
-        loyalty_points: typeof data.loyalty_points === 'number' ? data.loyalty_points : parseInt(data.loyalty_points || '0', 10) || 0,
+        first_name: response.first_name || '',
+        last_name: response.last_name || '',
+        email: response.email || '',
+        phone: response.phone || '',
+        secondary_phone: response.secondary_phone || '',
+        country: response.country || '',
+        city: response.city || '',
+        state: response.state || '',
+        address: response.address || '',
+        postal_code: response.postal_code || '',
+        nationality: response.nationality || '',
+        date_of_birth: response.date_of_birth || '',
+        gender: response.gender || '',
+        passport_number: response.passport_number || '',
+        passport_expiry: response.passport_expiry || '',
+        emergency_name: (response as any).emergency_name || emergency.name || '',
+        emergency_phone: (response as any).emergency_phone || emergency.phone || '',
+        emergency_relationship: (response as any).emergency_relationship || emergency.relationship || '',
+        dietary_requirements: response.dietary_requirements || '',
+        medical_conditions: response.medical_conditions || '',
+        special_needs: response.special_needs || '',
+        newsletter_optin: Boolean(response.newsletter_optin),
+        marketing_optin: Boolean(response.marketing_optin),
+        status: response.status || 'active',
+        notes: response.notes || '',
+        loyalty_tier: response.loyalty_tier || 'bronze',
+        loyalty_points: typeof response.loyalty_points === 'number' ? response.loyalty_points : parseInt(response.loyalty_points || '0', 10) || 0,
       } as CustomerFormData;
     },
     enabled: isEditMode && can('yatra_view_bookings'),
@@ -183,16 +178,7 @@ const CustomerForm: React.FC = () => {
       const payload = { ...data };
 
       if (isEditMode && customerId) {
-        const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/customers/${customerId}`, {
-          method: 'PUT',
-          headers: { 
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': window.yatraAdmin?.nonce || '' 
-          },
-          body: JSON.stringify(payload)
-        });
-        if (!response.ok) throw new Error('Failed to update customer');
-        return response.json();
+        return await apiService.updateCustomer(customerId, payload);
       } else {
         // For creation, we need a different approach since CustomerController
         // doesn't have a create endpoint yet - customers are created during booking

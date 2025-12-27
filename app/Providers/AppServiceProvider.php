@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        error_log('Yatra: AppServiceProvider::boot() called');
         // Load text domain
         add_action('init', [$this, 'loadTextDomain'], 1);
 
@@ -74,6 +75,20 @@ class AppServiceProvider extends ServiceProvider
         
         // Ensure database tables exist
         add_action('init', [$this, 'ensureTablesExist'], 5);
+        
+        // Force flush rewrite rules if using plain permalinks to ensure REST API works
+        add_action('init', function() {
+            $permalink_structure = get_option('permalink_structure');
+            if (empty($permalink_structure)) {
+                // Plain permalinks - ensure REST API rewrite rules are flushed
+                $flushed = get_option('yatra_rest_rewrite_flushed');
+                if (!$flushed) {
+                    flush_rewrite_rules();
+                    update_option('yatra_rest_rewrite_flushed', true);
+                    error_log('Yatra: Flushed rewrite rules for plain permalinks');
+                }
+            }
+        }, 999);
 
         // Add rewrite rules for trip permalinks
         add_action('init', [$this, 'addTripRewriteRules'], 10);
@@ -127,10 +142,36 @@ class AppServiceProvider extends ServiceProvider
 
         // Authentication (login, register, email verification)
         add_action('rest_api_init', [\Yatra\Controllers\AuthController::class, 'registerRoutes']);
+        
+        // Test endpoint to verify REST API is working
         add_action('rest_api_init', function() {
-            $bookingsController = new \Yatra\Controllers\BookingsController();
-            $bookingsController->register_routes();
+            register_rest_route('yatra/v1', '/test', [
+                'methods' => 'GET',
+                'callback' => function() {
+                    return new \WP_REST_Response(['message' => 'Yatra REST API is working!'], 200);
+                },
+                'permission_callback' => '__return_true'
+            ]);
+            
+            // Debug: List all registered yatra routes
+            add_action('rest_api_init', function() {
+                $server = rest_get_server();
+                $routes = $server->get_routes();
+                $yatra_routes = array_filter(array_keys($routes), function($route) {
+                    return strpos($route, '/yatra/v1') === 0;
+                });
+                error_log('Yatra: All registered yatra/v1 routes: ' . print_r($yatra_routes, true));
+            }, 999);
         });
+        
+        // REMOVED: BookingsController is already registered by RouteServiceProvider
+        // The duplicate registration was causing conflicts
+        // add_action('rest_api_init', function() {
+        //     error_log('Yatra: Registering BookingsController routes');
+        //     $bookingsController = new \Yatra\Controllers\BookingsController();
+        //     $bookingsController->register_routes();
+        //     error_log('Yatra: BookingsController routes registered');
+        // });
         
         // License management (shows upgrade message in free, full functionality in Pro)
         // Only register Free version routes if Pro is not active

@@ -28,7 +28,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../co
 import { Badge } from '../components/ui/badge';
 import { Alert } from '../components/ui/alert';
 import { useNavigate } from '../hooks/useNavigate';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { RecurringRuleFormSkeleton } from '../components/availability/RecurringRuleFormSkeleton';
 

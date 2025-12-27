@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
@@ -83,10 +87,10 @@ class TripRepository extends BaseRepository
         $trip_table = $this->getTableName();
         
         // Use new table classes
-        $reviews_table = $wpdb->prefix . 'yatra_reviews';
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
-        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
-        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $reviews_table = ReviewsTable::getTableName();
+        $bookings_table = BookingsTable::getTableName();
+        $classificationsTable = ClassificationsTable::getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
         
         // Build WHERE conditions and parameters
         $wheres = ["t.status IN ('publish', 'published')", "(t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')"];
@@ -1971,7 +1975,7 @@ class TripRepository extends BaseRepository
         $tripsTable = $this->getTableName();
         
         // Using hardcoded table name since there's no dedicated repository for this table
-        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        $bookingsTable = BookingsTable::getTableName();
         
         return $wpdb->get_results("
             SELECT t.id 

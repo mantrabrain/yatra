@@ -33,7 +33,7 @@ import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Edit, Trash2 } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { generateSlug } from '../lib/slug';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';

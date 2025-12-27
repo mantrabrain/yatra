@@ -9,7 +9,7 @@ import { Plus, Search, X, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2 } from '
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';

@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus, X, Tag, ChevronDown, ChevronUp } from 'lucide-react';
 import { __ } from '../../lib/i18n';
-import { apiClient } from '../../lib/api';
+import { apiClient } from '../../lib/api-client';
 import { Card, CardContent } from '../../components/ui/card';
 import { Badge } from '../../components/ui/badge';
 import { Input } from '../../components/ui/input';

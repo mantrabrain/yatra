@@ -59,6 +59,7 @@ class BookingsController extends BaseController
      */
     public function register_routes(): void
     {
+        error_log('Yatra: BookingsController::register_routes() called');
         // =====================
         // BOOKINGS ROUTES
         // =====================
@@ -144,40 +145,8 @@ class BookingsController extends BaseController
             'permission_callback' => [$this, 'checkAdminPermission'],
         ]);
 
-        // List all payments
-        register_rest_route($this->namespace, '/payments', [
-            'methods' => 'GET',
-            'callback' => [$this, 'getPayments'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
-        ]);
-
-        // Create payment
-        register_rest_route($this->namespace, '/payments', [
-            'methods' => 'POST',
-            'callback' => [$this, 'createPayment'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
-        ]);
-
-        // Get single payment
-        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
-            'methods' => 'GET',
-            'callback' => [$this, 'getPayment'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
-        ]);
-
-        // Update payment
-        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
-            'methods' => 'PUT',
-            'callback' => [$this, 'updatePayment'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
-        ]);
-
-        // Delete payment
-        register_rest_route($this->namespace, '/payments/(?P<id>\d+)', [
-            'methods' => 'DELETE',
-            'callback' => [$this, 'deletePayment'],
-            'permission_callback' => [$this, 'checkAdminPermission'],
-        ]);
+        // NOTE: Payment CRUD operations moved to PaymentController
+        // This keeps BookingsController focused on booking operations only
 
         // =====================
         // TRAVELERS ROUTES

@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Eye, CreditCard } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
@@ -81,9 +82,9 @@ const Payments: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
-  const apiBase = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
 
-  // Build query params
+  // Fetch payments from API
+
   const queryParams = useMemo(() => {
     const params: Record<string, any> = {
       page,
@@ -125,47 +126,15 @@ const Payments: React.FC = () => {
         params.append('gateway', queryParams.payment_method);
       }
 
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments?${params.toString()}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
+      const paramsObj: Record<string, any> = {
+        page: queryParams.page,
+        per_page: queryParams.per_page,
+      };
+      if (queryParams.search) paramsObj.search = queryParams.search;
+      if (queryParams.status) paramsObj.status = queryParams.status;
+      if (queryParams.payment_method) paramsObj.gateway = queryParams.payment_method;
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch payments');
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        // Map API response to expected format
-        const payments = result.data.map((payment: any) => ({
-          id: payment.id,
-          payment_number: `PAY-${payment.id.toString().padStart(6, '0')}`,
-          booking_id: payment.booking_id,
-          booking_number: payment.booking_reference || `#${payment.booking_id}`,
-          customer_name: payment.customer_name || 'N/A',
-          customer_email: payment.customer_email || '',
-          trip_title: payment.trip_title || '',
-          amount: payment.amount,
-          currency: payment.currency || 'USD',
-          payment_method: payment.gateway,
-          payment_status: payment.status,
-          transaction_id: payment.transaction_id,
-          payment_date: payment.processed_at || payment.created_at,
-          notes: payment.notes,
-          created_at: payment.created_at,
-        }));
-
-        return {
-          data: payments,
-          total: result.meta.total,
-          page: result.meta.page,
-          per_page: result.meta.per_page,
-        };
-      }
-
-      return { data: [], total: 0, page: 1, per_page: 10 };
+      return await apiService.getPayments(paramsObj);
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -173,25 +142,7 @@ const Payments: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to delete payment');
-      }
-
-      const result = await response.json();
-      
-      if (!result.success) {
-        throw new Error(result.message || 'Failed to delete payment');
-      }
-
-      return result;
+      await apiService.deletePayment(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
@@ -345,19 +296,7 @@ const Payments: React.FC = () => {
   ) => {
     await Promise.all(
       ids.map(async (id) => {
-        const response = await fetch(`${apiBase}/payments/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to update payment status');
-        }
+        await apiService.updatePaymentStatus(id, newStatus);
       })
     );
   };
@@ -371,16 +310,7 @@ const Payments: React.FC = () => {
       setIsBulkPending(true);
 
       if (bulkAction === 'delete') {
-        await Promise.all(
-          selectedIds.map((id) =>
-            fetch(`${apiBase}/payments/${id}`, {
-              method: 'DELETE',
-              headers: {
-                'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-              },
-            })
-          )
-        );
+        await apiService.bulkPaymentsAction('delete', selectedIds);
         showToast(__('Selected payments deleted successfully', 'Selected payments deleted successfully'), 'success');
       } else {
         const newStatus = bulkAction as Payment['payment_status'];

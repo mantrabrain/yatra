@@ -18,7 +18,7 @@ import { Alert } from '../components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import { DatePicker } from '../components/ui/date-picker';
 import { TimePicker } from '../components/ui/time-picker';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { AvailabilityFormSkeleton } from '../components/availability/AvailabilityFormSkeleton';
 

@@ -8,16 +8,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Skeleton } from '../components/ui/skeleton';
+import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
+import { apiService } from '../lib/api-client';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 
 interface Booking {
@@ -81,10 +81,13 @@ const Bookings: React.FC = () => {
         };
   });
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
+  const can = (capability: string) => (window as any)?.yatraAdmin?.capabilities?.[capability] || false;
   const { showToast } = useToast();
   const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
-  const apiBase = (window as any)?.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
+  const translations = (window as any)?.yatraAdmin?.translations || {};
+
+  // Helper function for translations
+  const __ = (text: string) => translations[text] || text;
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -128,60 +131,13 @@ const Bookings: React.FC = () => {
         params.append('payment_status', queryParams.payment_status);
       }
 
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings?${params.toString()}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
+      return await apiService.getBookings({
+        page: queryParams.page,
+        per_page: queryParams.per_page,
+        search: queryParams.search,
+        status: queryParams.status,
+        payment_status: queryParams.payment_status,
       });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch bookings');
-      }
-
-      const result = await response.json();
-      
-      if (result.success) {
-        // Debug: Log first 3 bookings to see what currency we're getting
-        if (result.data.length > 0) {
-          console.log('Bookings API Response - First 3:', result.data.slice(0, 3).map((b: any) => ({
-            id: b.id,
-            reference: b.reference,
-            currency: b.currency,
-            total_amount: b.total_amount
-          })));
-        }
-        
-        // Map API response to expected format
-        const bookings = result.data.map((booking: any) => {
-          console.log(`Booking ${booking.reference}: currency="${booking.currency}"`);
-          return {
-            id: booking.id,
-            booking_number: booking.reference,
-            customer_name: booking.customer_name || 'N/A',
-            customer_email: booking.customer_email,
-            trip_title: booking.trip_title || `Trip #${booking.trip_id}`,
-            trip_id: booking.trip_id,
-            booking_date: booking.created_at,
-            travel_date: booking.travel_date,
-            travelers: booking.travelers_count,
-            total_amount: booking.total_amount,
-            currency: booking.currency || 'USD',
-            payment_status: booking.payment_status,
-            booking_status: booking.status,
-            payment_method: booking.payment_gateway,
-            created_at: booking.created_at,
-          };
-        });
-
-        return {
-          data: bookings,
-          total: result.meta.total,
-          page: result.meta.page,
-          per_page: result.meta.per_page,
-        };
-      }
-
-      return { data: [], total: 0, page: 1, per_page: 10 };
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -189,25 +145,14 @@ const Bookings: React.FC = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/bookings/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete booking');
-      }
-      
-      return response.json();
+      await apiService.deleteBooking(id);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      showToast(__('Booking deleted successfully', 'Booking deleted successfully'), 'success');
+      showToast(__('Booking deleted successfully'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete booking', 'Failed to delete booking'), 'error');
+      showToast(error?.message || __('Failed to delete booking'), 'error');
     },
   });
 
@@ -234,19 +179,19 @@ const Bookings: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'confirmed': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Confirmed', 'Confirmed'),
+        label: __('Confirmed'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending'),
       },
       'cancelled': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Cancelled', 'Cancelled'),
+        label: __('Cancelled'),
       },
       'completed': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Completed', 'Completed'),
+        label: __('Completed'),
       },
     };
 
@@ -266,19 +211,19 @@ const Bookings: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'paid': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Paid', 'Paid'),
+        label: __('Paid'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending'),
       },
       'partial': {
         className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Partial', 'Partial'),
+        label: __('Partial'),
       },
       'refunded': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Refunded', 'Refunded'),
+        label: __('Refunded'),
       },
     };
 
@@ -382,23 +327,7 @@ const Bookings: React.FC = () => {
     ids: (string | number)[],
     newStatus: string
   ) => {
-    await Promise.all(
-      ids.map(async (id) => {
-        const response = await fetch(`${apiBase}/bookings/${id}/status`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-          },
-          body: JSON.stringify({ status: newStatus }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(errorData.message || 'Failed to update booking status');
-        }
-      })
-    );
+    await apiService.bulkUpdateStatus('bookings', ids, newStatus);
   };
 
   const handleBulkApply = async () => {
@@ -410,20 +339,11 @@ const Bookings: React.FC = () => {
       setIsBulkPending(true);
 
       if (bulkAction === 'delete') {
-        await Promise.all(
-          selectedIds.map((id) =>
-            fetch(`${apiBase}/bookings/${id}`, {
-              method: 'DELETE',
-              headers: {
-                'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-              },
-            })
-          )
-        );
-        showToast(__('Selected bookings deleted successfully', 'Selected bookings deleted successfully'), 'success');
+        await apiService.bulkDelete('bookings', selectedIds);
+        showToast(__('Selected bookings deleted successfully'), 'success');
       } else {
         await updateStatusForIds(selectedIds, bulkAction);
-        showToast(__('Bulk booking status updated successfully', 'Bulk booking status updated successfully'), 'success');
+        showToast(__('Bulk booking status updated successfully'), 'success');
       }
 
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
@@ -431,7 +351,7 @@ const Bookings: React.FC = () => {
       setBulkAction('');
     } catch (error: any) {
       showToast(
-        error?.message || __('Failed to perform bulk action on bookings', 'Failed to perform bulk action on bookings'),
+        __('Error: ') + (error?.message || __('Failed to perform bulk action on bookings')),
         'error'
       );
     } finally {
@@ -440,11 +360,11 @@ const Bookings: React.FC = () => {
   };
 
   const allBulkActionOptions = [
-    { value: 'confirmed', label: __('Mark as Confirmed', 'Mark as Confirmed') },
-    { value: 'pending', label: __('Mark as Pending', 'Mark as Pending') },
-    { value: 'cancelled', label: __('Mark as Cancelled', 'Mark as Cancelled') },
-    { value: 'completed', label: __('Mark as Completed', 'Mark as Completed') },
-    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+    { value: 'confirmed', label: __('Mark as Confirmed') },
+    { value: 'pending', label: __('Mark as Pending') },
+    { value: 'cancelled', label: __('Mark as Cancelled') },
+    { value: 'completed', label: __('Mark as Completed') },
+    { value: 'delete', label: __('Delete permanently') },
   ];
 
   const getBulkActionOptionsForStatus = (view: string) => {
@@ -473,39 +393,39 @@ const Bookings: React.FC = () => {
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
   const statusOptions = [
-    { value: 'all', label: __('All Status', 'All Status') },
-    { value: 'confirmed', label: __('Confirmed', 'Confirmed') },
-    { value: 'pending', label: __('Pending', 'Pending') },
-    { value: 'cancelled', label: __('Cancelled', 'Cancelled') },
-    { value: 'completed', label: __('Completed', 'Completed') },
+    { value: 'all', label: __('All Status') },
+    { value: 'confirmed', label: __('Confirmed') },
+    { value: 'pending', label: __('Pending') },
+    { value: 'cancelled', label: __('Cancelled') },
+    { value: 'completed', label: __('Completed') },
   ];
 
   const sortOptions = [
-    { value: 'booking_date', label: __('Booking Date', 'Booking Date') },
-    { value: 'travel_date', label: __('Travel Date', 'Travel Date') },
-    { value: 'booking_number', label: __('Booking Number', 'Booking Number') },
-    { value: 'customer_name', label: __('Customer', 'Customer') },
-    { value: 'trip_title', label: __('Trip', 'Trip') },
-    { value: 'total_amount', label: __('Amount', 'Amount') },
-    { value: 'booking_status', label: __('Status', 'Status') },
+    { value: 'booking_date', label: __('Booking Date') },
+    { value: 'travel_date', label: __('Travel Date') },
+    { value: 'booking_number', label: __('Booking Number') },
+    { value: 'customer_name', label: __('Customer') },
+    { value: 'trip_title', label: __('Trip') },
+    { value: 'total_amount', label: __('Amount') },
+    { value: 'booking_status', label: __('Status') },
   ];
 
   const columnOptions = [
-    { key: 'booking_number', label: __('Booking #', 'Booking #'), visible: visibleColumns.booking_number },
-    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
-    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
-    { key: 'travelers', label: __('Travelers', 'Travelers'), visible: visibleColumns.travelers },
-    { key: 'booking_date', label: __('Booking Date', 'Booking Date'), visible: visibleColumns.booking_date },
-    { key: 'travel_date', label: __('Travel Date', 'Travel Date'), visible: visibleColumns.travel_date },
-    { key: 'amount', label: __('Amount', 'Amount'), visible: visibleColumns.amount },
-    { key: 'payment_status', label: __('Payment', 'Payment'), visible: visibleColumns.payment_status },
-    { key: 'booking_status', label: __('Status', 'Status'), visible: visibleColumns.booking_status },
+    { key: 'booking_number', label: __('Booking #'), visible: visibleColumns.booking_number },
+    { key: 'customer', label: __('Customer'), visible: visibleColumns.customer },
+    { key: 'trip', label: __('Trip'), visible: visibleColumns.trip },
+    { key: 'travelers', label: __('Travelers'), visible: visibleColumns.travelers },
+    { key: 'booking_date', label: __('Booking Date'), visible: visibleColumns.booking_date },
+    { key: 'travel_date', label: __('Travel Date'), visible: visibleColumns.travel_date },
+    { key: 'amount', label: __('Amount'), visible: visibleColumns.amount },
+    { key: 'payment_status', label: __('Payment'), visible: visibleColumns.payment_status },
+    { key: 'booking_status', label: __('Status'), visible: visibleColumns.booking_status },
   ];
 
   const columns = [
     {
       key: 'booking_number',
-      label: __('Booking #', 'Booking #'),
+      label: __('Booking #'),
       sortable: true,
       visible: visibleColumns.booking_number,
       width: 'w-[140px]',
@@ -521,7 +441,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'customer',
-      label: __('Customer', 'Customer'),
+      label: __('Customer'),
       sortable: true,
       visible: visibleColumns.customer,
       render: (booking: Booking) => (
@@ -537,7 +457,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'trip',
-      label: __('Trip', 'Trip'),
+      label: __('Trip'),
       sortable: true,
       visible: visibleColumns.trip,
       render: (booking: Booking) => (
@@ -546,7 +466,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'travelers',
-      label: __('Travelers', 'Travelers'),
+      label: __('Travelers'),
       sortable: false,
       visible: visibleColumns.travelers,
       render: (booking: Booking) => (
@@ -555,7 +475,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'booking_date',
-      label: __('Booking Date', 'Booking Date'),
+      label: __('Booking Date'),
       sortable: true,
       visible: visibleColumns.booking_date,
       render: (booking: Booking) => (
@@ -566,7 +486,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'travel_date',
-      label: __('Travel Date', 'Travel Date'),
+      label: __('Travel Date'),
       sortable: true,
       visible: visibleColumns.travel_date,
       render: (booking: Booking) => (
@@ -577,7 +497,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'amount',
-      label: __('Amount', 'Amount'),
+      label: __('Amount'),
       sortable: true,
       visible: visibleColumns.amount,
       render: (booking: Booking) => (
@@ -588,14 +508,14 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'payment_status',
-      label: __('Payment', 'Payment'),
+      label: __('Payment'),
       sortable: true,
       visible: visibleColumns.payment_status,
       render: (booking: Booking) => getPaymentStatusBadge(booking.payment_status),
     },
     {
       key: 'booking_status',
-      label: __('Status', 'Status'),
+      label: __('Status'),
       sortable: true,
       visible: visibleColumns.booking_status,
       render: (booking: Booking) => getBookingStatusBadge(booking.booking_status),
@@ -605,29 +525,29 @@ const Bookings: React.FC = () => {
   const actions = [
     {
       key: 'view',
-      label: __('View', 'View'),
+      label: __('View'),
       icon: <Eye className="w-4 h-4" />,
       onClick: (booking: Booking) => handleView(booking),
     },
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (booking: Booking) => handleEdit(booking),
       condition: () => can('yatra_edit_bookings'),
     },
     {
       key: 'mark_confirmed',
-      label: __('Mark as Confirmed', 'Mark as Confirmed'),
+      label: __('Mark as Confirmed'),
       icon: <ArrowUp className="w-4 h-4" />,
       onClick: async (booking: Booking) => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([booking.id], 'confirmed');
           queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+          showToast(__('Booking status updated'), 'success');
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+          showToast(error?.message || __('Failed to update booking status'), 'error');
         } finally {
           setIsBulkPending(false);
         }
@@ -636,16 +556,16 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'mark_pending',
-      label: __('Mark as Pending', 'Mark as Pending'),
+      label: __('Mark as Pending'),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (booking: Booking) => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([booking.id], 'pending');
           queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+          showToast(__('Booking status updated'), 'success');
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+          showToast(error?.message || __('Failed to update booking status'), 'error');
         } finally {
           setIsBulkPending(false);
         }
@@ -654,16 +574,16 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'mark_cancelled',
-      label: __('Mark as Cancelled', 'Mark as Cancelled'),
+      label: __('Mark as Cancelled'),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (booking: Booking) => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([booking.id], 'cancelled');
           queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+          showToast(__('Booking status updated'), 'success');
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+          showToast(error?.message || __('Failed to update booking status'), 'error');
         } finally {
           setIsBulkPending(false);
         }
@@ -672,16 +592,16 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'mark_completed',
-      label: __('Mark as Completed', 'Mark as Completed'),
+      label: __('Mark as Completed'),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (booking: Booking) => {
         setIsBulkPending(true);
         try {
           await updateStatusForIds([booking.id], 'completed');
           queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated', 'Booking status updated'), 'success');
+          showToast(__('Booking status updated'), 'success');
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status', 'Failed to update booking status'), 'error');
+          showToast(error?.message || __('Failed to update booking status'), 'error');
         } finally {
           setIsBulkPending(false);
         }
@@ -690,7 +610,7 @@ const Bookings: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (booking: Booking) => handleDelete(booking),
       variant: 'destructive' as const,
@@ -701,13 +621,13 @@ const Bookings: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Bookings', 'Bookings')}
-        description={__('Manage customer bookings and reservations', 'Manage customer bookings and reservations')}
+        title={__('Bookings')}
+        description={__('Manage customer bookings and reservations')}
         actionCapability="yatra_edit_bookings"
         actions={
           <Button onClick={handleCreateBooking} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Create Booking', 'Create Booking')}
+            {__('Create Booking')}
           </Button>
         }
       />
@@ -738,7 +658,7 @@ const Bookings: React.FC = () => {
                 sortOptions={sortOptions}
                 onResetFilters={handleResetFilters}
                 hasFilters={!!hasFilters}
-                placeholder={__('Search bookings...', 'Search bookings...')}
+                placeholder={__('Search bookings...')}
               />
             </div>
 
@@ -752,11 +672,11 @@ const Bookings: React.FC = () => {
                 }}
                 className="w-full"
               >
-                <option value="all">{__('All Payments', 'All Payments')}</option>
-                <option value="paid">{__('Paid', 'Paid')}</option>
-                <option value="pending">{__('Pending', 'Pending')}</option>
-                <option value="partial">{__('Partial', 'Partial')}</option>
-                <option value="refunded">{__('Refunded', 'Refunded')}</option>
+                <option value="all">{__('All Payments')}</option>
+                <option value="paid">{__('Paid')}</option>
+                <option value="pending">{__('Pending')}</option>
+                <option value="partial">{__('Partial')}</option>
+                <option value="refunded">{__('Refunded')}</option>
               </Select>
             </div>
           </div>
@@ -767,7 +687,7 @@ const Bookings: React.FC = () => {
         {error ? (
           <Card>
             <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading bookings', 'Error loading bookings')}
+              {__('Error loading bookings')}
             </CardContent>
           </Card>
         ) : (
@@ -784,11 +704,11 @@ const Bookings: React.FC = () => {
                 setPage(1);
               }}
               statusOptions={[
-                { key: 'all', label: __('All', 'All'), count: 0 },
-                { key: 'confirmed', label: __('Confirmed', 'Confirmed'), count: 0 },
-                { key: 'pending', label: __('Pending', 'Pending'), count: 0 },
-                { key: 'cancelled', label: __('Cancelled', 'Cancelled'), count: 0 },
-                { key: 'completed', label: __('Completed', 'Completed'), count: 0 },
+                { key: 'all', label: __('All'), count: 0 },
+                { key: 'confirmed', label: __('Confirmed'), count: 0 },
+                { key: 'pending', label: __('Pending'), count: 0 },
+                { key: 'cancelled', label: __('Cancelled'), count: 0 },
+                { key: 'completed', label: __('Completed'), count: 0 },
               ]}
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
@@ -833,12 +753,12 @@ const Bookings: React.FC = () => {
                     actions={actions}
                     isLoading={isLoading}
                     isError={!!error}
-                    errorText={__('Error loading bookings', 'Error loading bookings')}
-                    emptyText={__('No bookings found', 'No bookings found')}
+                    errorText={__('Error loading bookings')}
+                    emptyText={__('No bookings found')}
                     emptyDescription={
                       hasFilters
-                        ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                        : __('Get started by creating your first booking.', 'Get started by creating your first booking.')
+                        ? __('Try adjusting your filters to see more results.')
+                        : __('Get started by creating your first booking.')
                     }
                     onCreateClick={
                       can('yatra_edit_bookings') ? handleCreateBooking : undefined
@@ -865,7 +785,7 @@ const Bookings: React.FC = () => {
                   totalItems={total}
                   itemsPerPage={10}
                   onPageChange={(newPage) => setPage(newPage)}
-                  itemName={__('bookings', 'bookings')}
+                  itemName={__('bookings')}
                 />
               </div>
             )}
@@ -878,14 +798,14 @@ const Bookings: React.FC = () => {
         isOpen={deleteDialogOpen}
         onClose={cancelDelete}
         onConfirm={confirmDelete}
-        title={__('Delete Booking', 'Delete Booking')}
+        title={__('Delete Booking')}
         description={
           bookingToDelete
-            ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`, `Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`)
-            : __('Are you sure you want to delete this booking?', 'Are you sure you want to delete this booking?')
+            ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`)
+            : __('Are you sure you want to delete this booking?')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete')}
+        cancelText={__('Cancel')}
         variant="danger"
         isLoading={deleteMutation.isPending}
         icon={<AlertTriangle className="w-6 h-6 text-red-500" />}

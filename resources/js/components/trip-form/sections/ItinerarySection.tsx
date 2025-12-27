@@ -36,7 +36,7 @@ import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../ui/card';
 import { HelpText } from '../../ui/help-text';
-import { apiClient } from '../../../lib/api';
+import { apiClient } from '../../../lib/api-client';
 import { useToast } from '../../ui/toast';
 import { Badge } from '../../ui/badge';
 import { IconSelector } from '../../ui/icon-selector';

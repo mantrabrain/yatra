@@ -7,6 +7,7 @@ import React, { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, Calendar, MessageSquare, Edit, ExternalLink, MapPin, Users, Send, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
@@ -51,24 +52,8 @@ const ViewEnquiry: React.FC = () => {
     queryKey: ['enquiry', enquiryId],
     queryFn: async () => {
       if (!enquiryId) return null;
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/${enquiryId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch enquiry');
-      }
-      
-      const result = await response.json();
-      
-      if (result.success && result.data) {
-        return result.data;
-      }
-      
-      throw new Error(result.message || 'Enquiry not found');
+      const response = await apiService.getEnquiry(enquiryId!);
+      return response;
     },
     enabled: !!enquiryId && can('yatra_view_bookings'),
   });
@@ -76,22 +61,7 @@ const ViewEnquiry: React.FC = () => {
   // Respond mutation
   const respondMutation = useMutation({
     mutationFn: async ({ id, message }: { id: number; message: string }) => {
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const res = await fetch(`${baseUrl}/enquiries/${id}/respond`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify({ response: message }),
-      });
-      
-      if (!res.ok) {
-        const error = await res.json();
-        throw new Error(error.message || 'Failed to send response');
-      }
-      
-      return res.json();
+      return await apiService.respondToEnquiry(id, { response: message });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });

@@ -7,6 +7,7 @@ import React, { useMemo, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -79,24 +80,8 @@ const EnquiryForm: React.FC = () => {
     queryKey: ['enquiry', enquiryId],
     queryFn: async () => {
       if (!enquiryId) return null;
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/enquiries/${enquiryId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch enquiry');
-      }
-
-      const result = await response.json();
-
-      if (result.success && result.data) {
-        return result.data as Enquiry;
-      }
-
-      throw new Error(result.message || 'Enquiry not found');
+      const response = await apiService.getEnquiry(enquiryId!);
+      return response;
     },
     enabled: !!enquiryId && can('yatra_edit_bookings'),
   });
@@ -105,19 +90,7 @@ const EnquiryForm: React.FC = () => {
   const { data: tripsData } = useQuery({
     queryKey: ['trips-select'],
     queryFn: async () => {
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const response = await fetch(`${baseUrl}/trips?per_page=100`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch trips');
-      }
-      
-      const data = await response.json();
-      return data.data || [];
+      return await apiService.getTrips({ per_page: 100 });
     },
     enabled: can('yatra_edit_bookings'),
   });
@@ -144,25 +117,9 @@ const EnquiryForm: React.FC = () => {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async (data: Partial<Enquiry>) => {
-      const baseUrl = window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-      const url = isEdit ? `${baseUrl}/enquiries/${enquiryId}` : `${baseUrl}/enquiries`;
-      const method = isEdit ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to save enquiry');
-      }
-
-      return response.json();
+      return isEdit 
+        ? await apiService.updateEnquiry(enquiryId!, data)
+        : await apiService.createEnquiry(data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });

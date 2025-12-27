@@ -21,7 +21,8 @@ import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { useToast } from '../components/ui/toast';
 import { Modal } from '../components/ui/modal';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
+import { apiService } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import PremiumUpgradeCard from './premium-pages/TripConsent';
 import { 
@@ -648,22 +649,8 @@ const SignedConsentsList: React.FC = () => {
   };
 
   const handleDownloadPdf = async (consent: SignedConsent) => {
-    const apiUrl = (window as any).yatraAdmin?.apiUrl || '/wp-json/yatra/v1';
-    const nonce = (window as any).yatraAdmin?.nonce || '';
-    
     try {
-      const response = await fetch(`${apiUrl}/signed-consents/${consent.id}/pdf`, {
-        headers: {
-          'X-WP-Nonce': nonce,
-        },
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData?.message || __('Download failed', 'yatra'));
-      }
-      
-      const data = await response.json();
+      const data = await apiService.downloadSignedConsentPdf(consent.id);
       
       if (data?.success && data?.data?.download_url) {
         window.open(data.data.download_url, '_blank');

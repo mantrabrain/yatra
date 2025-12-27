@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\PaymentGateways\Gateways\Paystack;
 
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 /**
@@ -381,7 +382,7 @@ class PaystackGateway extends AbstractPaymentGateway
         $currency = $paymentData['currency'] ?? ($booking->currency ?? 'NGN');
         
         // Update booking payment status
-        $bookings_table = $wpdb->prefix . 'yatra_bookings';
+        $bookings_table = BookingsTable::getTableName();
         $wpdb->update(
             $bookings_table,
             [

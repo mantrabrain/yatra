@@ -16,6 +16,7 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Database\Tables\BookingsTable;
 use Yatra\Services\AvailabilityService;
 use Yatra\Repositories\AvailabilityRepository;
 
@@ -138,7 +139,7 @@ class AvailabilityController extends BaseController
             $total = $this->service->countByTripId($tripId, $filters);
 
             global $wpdb;
-            $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+            $bookingsTable = BookingsTable::getTableName();
 
             $availabilityIdByDate = [];
             $dateCounts = [];
@@ -280,22 +281,12 @@ class AvailabilityController extends BaseController
 
             // Compute live booked seats for this availability_id
             if (!empty($prepared['id'])) {
-                global $wpdb;
-                $bookingsTable = $wpdb->prefix . 'yatra_bookings';
-                $activeBookingStatuses = [
-                    'pending',
-                    'confirmed',
-                    'processing',
-                    'completed',
-                    'on_hold',
-                ];
-                $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
 
                 // Use AvailabilityService to get booked count
                 $bookedCount = $this->service->getBookedCountByAvailabilityId((int) $prepared['id']);
 
                 $seatsTotal = (int) ($prepared['seats_total'] ?? 0);
-                $seatsReserved = (int) ($prepared['seats_reserved'] ?? 0);
+
                 $available = max(0, $seatsTotal - $bookedCount);
 
                 $prepared['booked_seats'] = $bookedCount;

@@ -5,6 +5,7 @@ import { Badge } from '../components/ui/badge';
 import { Switch } from '../components/ui/switch';
 import { useToast } from '../components/ui/toast';
 import { Calendar, CheckCircle, XCircle, RefreshCw, Settings, ExternalLink } from 'lucide-react';
+import { apiService } from '../lib/api-client';
 
 interface GoogleCalendarSettings {
   connected: boolean;
@@ -33,16 +34,8 @@ const GoogleCalendar: React.FC = () => {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/google-calendar/settings`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setSettings(data.data);
-      }
+      const response = await apiService.getGoogleCalendarSettings();
+      setSettings(response.data);
     } catch (error) {
       console.error('Failed to fetch settings:', error);
     } finally {
@@ -53,14 +46,7 @@ const GoogleCalendar: React.FC = () => {
   const handleConnect = async () => {
     setConnecting(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/google-calendar/connect`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-
-      const data = await response.json();
+      const data = await apiService.connectGoogleCalendar();
       
       if (data.success && data.data.auth_url) {
         // Redirect to Google OAuth
@@ -81,17 +67,9 @@ const GoogleCalendar: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/google-calendar/disconnect`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-
-      if (response.ok) {
-        showToast(__('Disconnected successfully'), 'success');
-        fetchSettings();
-      }
+      await apiService.disconnectGoogleCalendar();
+      showToast(__('Disconnected successfully'), 'success');
+      fetchSettings();
     } catch (error) {
       showToast(__('Failed to disconnect'), 'error');
     }
@@ -100,14 +78,7 @@ const GoogleCalendar: React.FC = () => {
   const handleSyncAll = async () => {
     setSyncing(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/google-calendar/sync-all`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-
-      const data = await response.json();
+      const data = await apiService.syncAllGoogleCalendar();
       
       if (data.success) {
         showToast(__('Sync completed successfully'), 'success');
@@ -124,19 +95,9 @@ const GoogleCalendar: React.FC = () => {
 
   const handleSettingChange = async (key: keyof GoogleCalendarSettings, value: any) => {
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/google-calendar/settings`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-        body: JSON.stringify({ [key]: value }),
-      });
-
-      if (response.ok) {
-        setSettings(prev => prev ? { ...prev, [key]: value } : null);
-        showToast(__('Settings updated'), 'success');
-      }
+      await apiService.updateGoogleCalendarSettings({ [key]: value });
+      setSettings(prev => prev ? { ...prev, [key]: value } : null);
+      showToast(__('Settings updated'), 'success');
     } catch (error) {
       showToast(__('Failed to update settings'), 'error');
     }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Hooks;
 
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\AvailabilityRepository;
@@ -68,7 +70,7 @@ class AvailabilityInventoryHooks
 
                     if (is_array($rows) && count($rows) === 1 && !empty($rows[0]->id)) {
                         $availabilityId = (int) $rows[0]->id;
-                        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+                        $bookingsTable = BookingsTable::getTableName();
                         $wpdb->query(
                             $wpdb->prepare(
                                 "UPDATE {$bookingsTable} SET availability_id = %d WHERE id = %d",
@@ -94,8 +96,8 @@ class AvailabilityInventoryHooks
     {
         global $wpdb;
 
-        $availabilityTable = $wpdb->prefix . 'yatra_trip_availability_dates';
-        $bookingsTable = $wpdb->prefix . 'yatra_bookings';
+        $availabilityTable = TripAvailabilityDatesTable::getTableName();
+        $bookingsTable = BookingsTable::getTableName();
 
         $availability = $wpdb->get_row(
             $wpdb->prepare(

@@ -21,7 +21,7 @@ import { useToast } from '../components/ui/toast';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Table as SharedTable } from '../components/shared/Table';
 import { SearchFilterToolbar, BulkActionToolbar } from '../components/shared';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { __ } from '../lib/i18n';
 import { getCurrencySymbol } from '../data/currencies';
 import PremiumUpgradeCard from './premium-pages/DynamicPricing';

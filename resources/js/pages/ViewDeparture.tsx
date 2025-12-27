@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { __ } from '../lib/i18n';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 // Button available for future use
 // import { Button } from '../components/ui/button';

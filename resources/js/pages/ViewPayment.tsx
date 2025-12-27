@@ -7,6 +7,7 @@ import React, { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Mail, Phone, Calendar, CreditCard, Edit, ExternalLink } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
@@ -30,17 +31,11 @@ const ViewPayment: React.FC = () => {
     queryFn: async () => {
       if (!paymentId) return null;
       
-      const response = await fetch(`${window.yatraAdmin?.apiUrl || '/wp-json/yatra/v1'}/payments/${paymentId}`, {
-        headers: {
-          'X-WP-Nonce': window.yatraAdmin?.nonce || '',
-        },
-      });
-
-      if (!response.ok) {
+      const result = await apiService.getPayment(paymentId);
+      
+      if (!result) {
         throw new Error('Failed to fetch payment');
       }
-
-      const result = await response.json();
       
       if (!result.success) {
         throw new Error(result.message || 'Payment not found');

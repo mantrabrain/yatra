@@ -31,7 +31,7 @@ import BookingStatusChart from '../components/charts/BookingStatusChart';
 import { UpcomingDepartures } from '../components/dashboard/UpcomingDepartures';
 import { PendingPayments } from '../components/dashboard/PendingPayments';
 import { RecentBookings } from '../components/dashboard/RecentBookings';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { getCurrencySymbol } from '../data/currencies';
 
 // Skeleton components

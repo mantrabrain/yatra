@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Star, Mail, Calendar, Edit, MapPin } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
-import { apiClient } from '../lib/api';
+import { apiClient } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';

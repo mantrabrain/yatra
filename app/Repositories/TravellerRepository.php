@@ -2,6 +2,11 @@
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\BookingTravellersTable;
+use Yatra\Database\Tables\BookingTravellerMetaTable;
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\TripsTable;
+
 /**
  * Traveller Repository
  * 
@@ -36,9 +41,9 @@ class TravellerRepository
         global $wpdb;
         $this->wpdb = $wpdb;
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $this->travellers_table = $wpdb->prefix . 'yatra_booking_travellers';
-        $this->meta_table = $wpdb->prefix . 'yatra_booking_traveller_meta';
+        // Use proper table classes
+        $this->travellers_table = BookingTravellersTable::getTableName();
+        $this->meta_table = BookingTravellerMetaTable::getTableName();
     }
 
     /**
@@ -499,13 +504,9 @@ class TravellerRepository
      */
     public function search(string $search = '', int $trip_id = 0, int $page = 1, int $per_page = 20): array
     {
-        // Use BookingRepository for bookings table
-        $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        $bookings_table = $bookingRepository->getTableName();
-        
-        // Use TripRepository for trips table
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $trips_table = $tripRepository->getTableName();
+        // Use Table classes for table names
+        $bookings_table = BookingsTable::getTableName();
+        $trips_table = TripsTable::getTableName();
 
         // Base query to get travellers with booking info
         $query = "SELECT t.*, b.reference as booking_reference, b.travel_date, b.contact_email, b.contact_phone,
@@ -652,13 +653,9 @@ class TravellerRepository
      */
     public function paginate(array $filters = []): array
     {
-        // Use BookingRepository for bookings table
-        $bookingRepository = new \Yatra\Repositories\BookingRepository();
-        $bookings_table = $bookingRepository->getTableName();
-        
-        // Use TripRepository for trips table
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $trips_table = $tripRepository->getTableName();
+        // Use Table classes for table names
+        $bookings_table = BookingsTable::getTableName();
+        $trips_table = TripsTable::getTableName();
 
         // Pagination
         $page = max(1, (int) ($filters['page'] ?? 1));
