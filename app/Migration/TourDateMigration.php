@@ -4,6 +4,7 @@ namespace Yatra\Migration;
 
 use Yatra\Migration\MigrationProgress;
 use Yatra\Utils\Logger;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 class TourDateMigration extends BaseMigration
 {
@@ -54,7 +55,7 @@ class TourDateMigration extends BaseMigration
                 
                 if (!$this->isForceMigration()) {
                     $existsInAvailability = $wpdb->get_var($wpdb->prepare(
-                        "SELECT id FROM {$wpdb->prefix}yatra_trip_availability_dates 
+                        "SELECT id FROM " . TripAvailabilityDatesTable::getTableName() . " 
                          WHERE trip_id IN (
                              SELECT meta_value FROM {$wpdb->prefix}postmeta 
                              WHERE post_id = %d AND meta_key = '_migrated_to_trip_id'

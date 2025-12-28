@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Database\Tables\CustomersTable;
+use Yatra\Database\Tables\BookingPaymentsTable;
 
 /**
  * Customer Repository
@@ -702,8 +703,8 @@ class CustomerRepository extends BaseRepository
         $bookings_table = $bookingRepository->getTableName();
         $trips_table = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for payments
-        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        // Use BookingPaymentsTable for payments
+        $payments_table = BookingPaymentsTable::getTableName();
 
         $placeholders = implode(',', array_fill(0, count($bookingIds), '%d'));
 

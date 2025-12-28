@@ -6,6 +6,7 @@ namespace Yatra\Repositories;
 
 use Yatra\Repositories\BaseRepository;
 use Yatra\Database\Tables\TripItineraryDaysTable;
+use Yatra\Database\Tables\TripItineraryDayEntryTable;
 
 /**
  * Itinerary Repository
@@ -13,13 +14,9 @@ use Yatra\Database\Tables\TripItineraryDaysTable;
  */
 class ItineraryRepository extends BaseRepository
 {
-    /**
-     * Get table name
-     */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_new_trip_itinerary_day_entry';
+        return TripItineraryDayEntryTable::getTableName();
     }
 
     /**

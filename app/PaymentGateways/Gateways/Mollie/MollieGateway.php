@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\PaymentGateways\Gateways\Mollie;
 
 use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\BookingPaymentsTable;
 use Yatra\PaymentGateways\AbstractPaymentGateway;
 
 /**
@@ -385,7 +386,7 @@ class MollieGateway extends AbstractPaymentGateway
         );
         
         // Record the payment
-        $payments_table = $wpdb->prefix . 'yatra_booking_payments';
+        $payments_table = BookingPaymentsTable::getTableName();
         $wpdb->insert(
             $payments_table,
             [

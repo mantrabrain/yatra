@@ -4,6 +4,7 @@ namespace Yatra\Migration;
 
 use Yatra\Migration\MigrationProgress;
 use Yatra\Utils\Logger;
+use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
 class AvailabilityConditionsMigration extends BaseMigration
 {
@@ -26,7 +27,7 @@ class AvailabilityConditionsMigration extends BaseMigration
 
         try {
             // Ensure months column exists in the table
-            $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+            $table = TripAvailabilityRulesTable::getTableName();
             $column_exists = $wpdb->get_results("SHOW COLUMNS FROM {$table} LIKE 'months'");
             
             if (empty($column_exists)) {
@@ -195,7 +196,7 @@ class AvailabilityConditionsMigration extends BaseMigration
 
                         // Check if this condition was already migrated for this trip
                         if (!$this->isForceMigration()) {
-                            $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+                            $table = TripAvailabilityRulesTable::getTableName();
                             $existing = $wpdb->get_var($wpdb->prepare(
                                 "SELECT id FROM {$table} WHERE trip_id = %d AND name = %s",
                                 $newTripId,
@@ -324,7 +325,7 @@ class AvailabilityConditionsMigration extends BaseMigration
     private function insertRecurringRule(int $tripId, array $ruleData, int $oldConditionId = null): bool
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_availability_rules';
+        $table = TripAvailabilityRulesTable::getTableName();
         
         error_log("[Yatra Migration] Inserting recurring rule for trip {$tripId} with months: " . ($ruleData['months'] ?: 'none'));
 

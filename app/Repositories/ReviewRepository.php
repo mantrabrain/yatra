@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\ReviewsTable;
+
 /**
  * Review Repository
  * 
@@ -14,16 +16,11 @@ namespace Yatra\Repositories;
 class ReviewRepository extends BaseRepository
 {
     /**
-     * Table name without prefix
-     */
-    private const TABLE_NAME = 'yatra_reviews';
-
-    /**
      * Get full table name with prefix
      */
     protected function getTableName(): string
     {
-        return $this->wpdb->prefix . self::TABLE_NAME;
+        return ReviewsTable::getTableName();
     }
 
     /**

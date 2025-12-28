@@ -222,7 +222,7 @@ class ActivityRepository extends BaseRepository
         // Get counts for each status - only for activities
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
-                WHERE type = 'activity'
+                WHERE type = '" . ClassificationTypes::ACTIVITY . "'
                 GROUP BY status";
 
         $results = $this->wpdb->get_results($sql);
@@ -296,7 +296,7 @@ class ActivityRepository extends BaseRepository
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripsTable}` t
              INNER JOIN `{$tripActivitiesTable}` ta ON ta.trip_id = t.id
-             WHERE ta.classification_id = %d and ta.type= %s
+             WHERE ta.classification_id = %d AND ta.classification_type = %s
                AND t.status != 'trash'",
             $activityId,
             ClassificationTypes::ACTIVITY

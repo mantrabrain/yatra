@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Yatra\Repositories;
 
 use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 /**
  * Trip Availability Repository
@@ -12,13 +13,9 @@ use Yatra\Database\Tables\TripsTable;
  */
 class TripAvailabilityRepository extends BaseRepository
 {
-    /**
-     * Get availability table name
-     */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_trip_availability_dates';
+        return TripAvailabilityDatesTable::getTableName();
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace Yatra\App\Ajax;
 
 use Yatra\App\Repositories\AttributeRepository;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Constants\ClassificationTypes;
 
 /**
  * Direct Attribute Query AJAX Handler
@@ -36,10 +38,11 @@ class DirectAttributeQuery
         try {
             // Direct database query - no caching
             global $wpdb;
-            $table = $wpdb->prefix . 'yatra_attributes';
+            $table = ClassificationsTable::getTableName();
             
             $query = $wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE id = %d",
+                "SELECT * FROM `{$table}` WHERE type = %s AND id = %d",
+                ClassificationTypes::ATTRIBUTE,
                 $attributeId
             );
             

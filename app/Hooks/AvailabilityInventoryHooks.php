@@ -56,7 +56,7 @@ class AvailabilityInventoryHooks
 
             if ($tripId > 0 && $availabilityId <= 0) {
                 global $wpdb;
-                $availabilityTable = $wpdb->prefix . 'yatra_trip_availability_dates';
+                $availabilityTable = TripAvailabilityDatesTable::getTableName();
                 $travelDate = (string) ($booking->travel_date ?? '');
 
                 if ($travelDate !== '') {

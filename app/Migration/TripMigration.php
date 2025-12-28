@@ -4,7 +4,7 @@ namespace Yatra\Migration;
 
 use Yatra\Utils\Logger;
 use Yatra\Migration\MigrationProgress;
-use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\TripAvailabilityDatesTable;
 
 class TripMigration extends BaseMigration
 {
@@ -238,7 +238,7 @@ class TripMigration extends BaseMigration
     private function migrateTripGallery(int $oldTourId, int $newTripId, array $meta): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_gallery_images';
+        $table = TripContentTable::getTableName();
         
         error_log("[Yatra Migration] Starting gallery migration for tour ID {$oldTourId}, trip ID {$newTripId}");
         
@@ -450,10 +450,10 @@ class TripMigration extends BaseMigration
     private function migrateTripHighlights(int $oldTourId, int $newTripId, array $meta): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_highlights';
+        $table = TripContentTable::getTableName();
         
         // Clear existing highlights for this trip
-        $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+        $wpdb->delete($table, ['trip_id' => $newTripId, 'content_type' => 'highlight'], ['%d', '%s']);
         
         $highlights = [];
         
@@ -526,13 +526,13 @@ class TripMigration extends BaseMigration
     private function migrateTripFAQs(int $oldTourId, int $newTripId, array $meta): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_faqs';
+        $table = TripContentTable::getTableName();
         
         error_log("[Yatra Migration] Starting FAQ migration for tour ID {$oldTourId}, trip ID {$newTripId}");
         
         // Clear existing FAQs for this trip (unless force migration)
         if (!$this->isForceMigration()) {
-            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
+            $deleted = $wpdb->delete($table, ['trip_id' => $newTripId, 'content_type' => 'faq'], ['%d', '%s']);
             if ($deleted) {
                 error_log("[Yatra Migration] Cleared {$deleted} existing FAQs for trip {$newTripId}");
             }
@@ -650,7 +650,7 @@ class TripMigration extends BaseMigration
     private function migrateTripAvailabilityDates(int $oldTourId, int $newTripId, array $meta, array $tripData): void
     {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_availability_dates';
+        $table = TripAvailabilityDatesTable::getTableName();
         
         // Clear existing availability dates for this trip (for re-migration)
         if ($this->isForceMigration()) {

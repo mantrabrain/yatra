@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
@@ -49,7 +50,8 @@ class CategoryRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = 'category' AND slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = %s AND slug = %s",
+                ClassificationTypes::CATEGORY,
                 $slug
             )
         );
@@ -62,7 +64,7 @@ class CategoryRepository extends BaseRepository
     public function all(array $args = []): array
     {
         // IMPORTANT: Always filter by type = 'category' for categories
-        $args['where']['type'] = 'category';
+        $args['where']['type'] = ClassificationTypes::CATEGORY;
         return parent::all($args);
     }
 
@@ -72,7 +74,7 @@ class CategoryRepository extends BaseRepository
     public function count(array $args = []): int
     {
         // IMPORTANT: Always filter by type = 'category' for categories
-        $args['where']['type'] = 'category';
+        $args['where']['type'] = ClassificationTypes::CATEGORY;
         return parent::count($args);
     }
 
@@ -82,7 +84,7 @@ class CategoryRepository extends BaseRepository
     public function find(int $id, bool $includeDeleted = false): ?\stdClass
     {
         $table = esc_sql($this->table);
-        $query = "SELECT * FROM `{$table}` WHERE type = 'category' AND id = %d";
+        $query = "SELECT * FROM `{$table}` WHERE type = '" . ClassificationTypes::CATEGORY . "' AND id = %d";
         
         if (!$includeDeleted && $this->hasSoftDelete()) {
             $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
@@ -100,7 +102,7 @@ class CategoryRepository extends BaseRepository
         $table = esc_sql($this->table);
         $search = sanitize_text_field($search);
         
-        $where = ["type = 'category'"];
+        $where = ["type = '" . ClassificationTypes::CATEGORY . "'"];
         $where[] = "(name LIKE %s OR slug LIKE %s OR description LIKE %s)";
         $searchTerm = '%' . $wpdb->esc_like($search) . '%';
 
@@ -162,12 +164,12 @@ class CategoryRepository extends BaseRepository
                 FROM `{$catTable}` c
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = c.id 
-                  AND tc.classification_type = 'category'
+                  AND tc.classification_type = '" . ClassificationTypes::CATEGORY . "'
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE c.type = 'category' AND c.status = 'publish'
+                WHERE c.type = '" . ClassificationTypes::CATEGORY . "' AND c.status = 'publish'
                 GROUP BY c.id";
 
         $rows = $this->wpdb->get_results($sql) ?: [];
@@ -234,7 +236,7 @@ class CategoryRepository extends BaseRepository
         
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
-                WHERE type = 'category'
+                WHERE type = '" . ClassificationTypes::CATEGORY . "'
                 GROUP BY status";
         
         $results = $this->wpdb->get_results($sql) ?: [];
@@ -315,17 +317,18 @@ class CategoryRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for classifications
-        $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
+        // Use TripClassificationsTable for trip-category relationships
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripsTable}` t
              INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
              WHERE tc.classification_id = %d
-               AND tc.classification_type = 'category'
+               AND tc.classification_type = %s
                AND t.status != 'trash'",
-            $categoryId
+            $categoryId,
+            ClassificationTypes::CATEGORY
         ));
     }
 

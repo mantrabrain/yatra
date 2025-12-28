@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
+
 /**
  * Trip Category Repository
  * Handles database operations for trip categories
@@ -25,8 +27,25 @@ class TripCategoryRepository extends BaseRepository
      */
     protected function getTableName(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_trip_categories';
+        // Use ClassificationsTable for categories (type = 'category')
+        return \Yatra\Database\Tables\ClassificationsTable::getTableName();
+    }
+
+    /**
+     * Build where clause (override to filter by type='category')
+     */
+    protected function buildWhereClause(array $args): string
+    {
+        $where = parent::buildWhereClause($args);
+        
+        // Always filter by type = 'category' for this repository
+        if ($where) {
+            $where .= " AND type = '" . ClassificationTypes::CATEGORY . "'";
+        } else {
+            $where = "WHERE type = '" . ClassificationTypes::CATEGORY . "'";
+        }
+        
+        return $where;
     }
 
     /**
@@ -37,8 +56,9 @@ class TripCategoryRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE slug = %s",
-                $slug
+                "SELECT * FROM `{$table}` WHERE slug = %s AND type = %s",
+                $slug,
+                ClassificationTypes::CATEGORY
             )
         );
 
@@ -160,9 +180,9 @@ class TripCategoryRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $trip_table = esc_sql($tripRepository->getTableName());
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $trip_cat_table = esc_sql($this->wpdb->prefix . 'yatra_trip_trip_categories');
-        $reviews_table = esc_sql($this->wpdb->prefix . 'yatra_reviews');
+        // Use TripClassificationsTable for trip-category relationships
+        $trip_cat_table = esc_sql(\Yatra\Database\Tables\TripClassificationsTable::getTableName());
+        $reviews_table = esc_sql(\Yatra\Database\Tables\ReviewsTable::getTableName());
 
         $query = "
             SELECT c.*, 
@@ -255,18 +275,18 @@ class TripCategoryRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for classifications
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
+        // Use TripClassificationsTable for trip-category relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripsTable}` t
              INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
              WHERE tc.classification_id = %d
-               AND tc.classification_type = 'trip_category'
+               AND tc.classification_type = %s
                AND t.status != 'trash'",
-            $categoryId
+            $categoryId,
+            ClassificationTypes::CATEGORY
         ));
     }
 
@@ -282,9 +302,8 @@ class TripCategoryRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripTable = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for trip categories
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $tripCatTable = $wpdb->prefix . 'yatra_trip_trip_categories';
+        // Use TripClassificationsTable for trip-category relationships
+        $tripCatTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id)

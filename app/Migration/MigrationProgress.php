@@ -609,7 +609,7 @@ class MigrationProgress
      */
     private function ensureTripPricingColumns(): void
     {
-        $table = $this->wpdb->prefix . 'yatra_trips';
+        $table = TripsTable::getTableName();
         $columns = $this->wpdb->get_col("SHOW COLUMNS FROM {$table}", 0);
 
         if (empty($columns)) {

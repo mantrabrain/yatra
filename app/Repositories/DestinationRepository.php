@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
@@ -41,7 +42,8 @@ class DestinationRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = 'destination' AND slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = %s AND slug = %s",
+                ClassificationTypes::DESTINATION,
                 $slug
             )
         );
@@ -54,7 +56,7 @@ class DestinationRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
-        $args['where']['type'] = 'destination';
+        $args['where']['type'] = ClassificationTypes::DESTINATION;
         $args['where']['status'] = 'active';
         return $this->all($args);
     }
@@ -64,7 +66,7 @@ class DestinationRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
-        $args['where']['type'] = 'destination';
+        $args['where']['type'] = ClassificationTypes::DESTINATION;
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -96,12 +98,12 @@ class DestinationRepository extends BaseRepository
                 FROM `{$destTable}` d
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = d.id 
-                  AND tc.classification_type = 'destination'
+                  AND tc.classification_type = '" . ClassificationTypes::DESTINATION . "'
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE d.type = 'destination' AND d.status = 'active'
+                WHERE d.type = '" . ClassificationTypes::DESTINATION . "' AND d.status = 'active'
                 GROUP BY d.id";
 
         $rows = $this->wpdb->get_results($sql) ?: [];
@@ -240,7 +242,7 @@ class DestinationRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE type = 'destination' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = '" . ClassificationTypes::DESTINATION . "' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -265,7 +267,7 @@ class DestinationRepository extends BaseRepository
         $results = $this->wpdb->get_results("
             SELECT status, COUNT(*) as count 
             FROM `{$table}` 
-            WHERE type = 'destination'
+            WHERE type = '" . ClassificationTypes::DESTINATION . "'
             GROUP BY status
         ", ARRAY_A) ?: [];
 
@@ -311,7 +313,7 @@ class DestinationRepository extends BaseRepository
     public function all(array $args = []): array
     {
         // IMPORTANT: Always filter by type = 'destination' for destinations
-        $args['where']['type'] = 'destination';
+        $args['where']['type'] = ClassificationTypes::DESTINATION;
         return parent::all($args);
     }
 
@@ -321,7 +323,7 @@ class DestinationRepository extends BaseRepository
     public function count(array $args = []): int
     {
         // IMPORTANT: Always filter by type = 'destination' for destinations
-        $args['where']['type'] = 'destination';
+        $args['where']['type'] = ClassificationTypes::DESTINATION;
         return parent::count($args);
     }
 
@@ -337,8 +339,8 @@ class DestinationRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for trip destinations
-        $tripDestinationsTable = $wpdb->prefix . 'yatra_trip_destinations';
+        // Use TripClassificationsTable for trip-destination relationships
+        $tripDestinationsTable = TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id)

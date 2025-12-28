@@ -14,6 +14,20 @@ use Yatra\Repositories\ReviewRepository;
 use Yatra\Repositories\EnquiryRepository;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripsTable;
+use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\BookingPaymentsTable;
+use Yatra\Database\Tables\ScheduledPaymentsTable;
+use Yatra\Database\Tables\PaymentTokensTable;
+use Yatra\Database\Tables\CustomersTable;
+use Yatra\Database\Tables\BookingTravellersTable;
+use Yatra\Database\Tables\BookingTravellerMetaTable;
+use Yatra\Database\Tables\BookingDeparturesTable;
+use Yatra\Database\Tables\DiscountsTable;
+use Yatra\Database\Tables\EnquiriesTable;
 
 /**
  * Application Service Provider
@@ -632,19 +646,19 @@ class AppServiceProvider extends ServiceProvider
     public function ensureTablesExist(): void
     {
         global $wpdb;
-
-        // Critical tables that must exist
         $required_tables = [
-            $wpdb->prefix . 'yatra_trips',
-            $wpdb->prefix . 'yatra_customers',
-            $wpdb->prefix . 'yatra_bookings',
-            $wpdb->prefix . 'yatra_booking_payments',
-            $wpdb->prefix . 'yatra_booking_travellers',
-            $wpdb->prefix . 'yatra_booking_traveller_meta',
-            $wpdb->prefix . 'yatra_scheduled_payments',
-            $wpdb->prefix . 'yatra_payment_tokens',
-            $wpdb->prefix . 'yatra_reviews',
-            $wpdb->prefix . 'yatra_enquiries',
+            TripsTable::getTableName(),
+            BookingsTable::getTableName(),
+            BookingPaymentsTable::getTableName(),
+            ScheduledPaymentsTable::getTableName(),
+            PaymentTokensTable::getTableName(),
+            CustomersTable::getTableName(),
+            BookingTravellersTable::getTableName(),
+            BookingTravellerMetaTable::getTableName(),
+            BookingDeparturesTable::getTableName(),
+            ReviewsTable::getTableName(),
+            DiscountsTable::getTableName(),
+            EnquiriesTable::getTableName(),
         ];
 
         $missing_table = false;
@@ -1394,14 +1408,14 @@ class AppServiceProvider extends ServiceProvider
         if ($listing_page === 'trip') {
             global $wpdb;
 
-            $trip_table         = $wpdb->prefix . 'yatra_trips';
-            $dest_rel_table     = $wpdb->prefix . 'yatra_trip_destinations';
-            $dest_table         = $wpdb->prefix . 'yatra_destinations';
-            $act_rel_table      = $wpdb->prefix . 'yatra_trip_activities';
-            $act_table          = $wpdb->prefix . 'yatra_activities';
-            $cat_table          = $wpdb->prefix . 'yatra_trip_categories';
-            $cat_rel_table      = $wpdb->prefix . 'yatra_trip_trip_categories';
-            $reviews_table      = $wpdb->prefix . 'yatra_reviews';
+            $trip_table         = TripsTable::getTableName();
+            $dest_rel_table     = TripClassificationsTable::getTableName();
+            $dest_table         = ClassificationsTable::getTableName();
+            $act_rel_table      = TripClassificationsTable::getTableName();
+            $act_table          = ClassificationsTable::getTableName();
+            $cat_table          = ClassificationsTable::getTableName();
+            $cat_rel_table      = TripClassificationsTable::getTableName();
+            $reviews_table      = ReviewsTable::getTableName();
 
             // Pagination
             

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Database\Tables\TripContentTable;
+
 /**
  * Trip Download Repository
  * 
@@ -15,13 +17,9 @@ namespace Yatra\Repositories;
  */
 class TripDownloadRepository
 {
-    /**
-     * Get the table name
-     */
     private function table(): string
     {
-        global $wpdb;
-        return $wpdb->prefix . 'yatra_trip_downloads';
+        return TripContentTable::getTableName();
     }
 
     /**
@@ -58,7 +56,7 @@ class TripDownloadRepository
 
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE trip_id = %d ORDER BY sort_order ASC, id ASC",
+                "SELECT * FROM {$table} WHERE trip_id = %d AND content_type = 'download' ORDER BY sort_order ASC, id ASC",
                 $tripId
             )
         ) ?: [];
@@ -78,7 +76,7 @@ class TripDownloadRepository
 
         return $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE id = %d LIMIT 1",
+                "SELECT * FROM {$table} WHERE id = %d AND content_type = 'download' LIMIT 1",
                 $id
             )
         ) ?: null;
@@ -99,9 +97,9 @@ class TripDownloadRepository
         $wpdb->update(
             $table,
             ['protected_path' => sanitize_text_field($protectedPath)],
-            ['id' => $id],
+            ['id' => $id, 'content_type' => 'download'],
             ['%s'],
-            ['%d']
+            ['%d', '%s']
         );
     }
 
@@ -118,7 +116,7 @@ class TripDownloadRepository
         }
 
         // Delete existing downloads for this trip
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        $wpdb->delete($table, ['trip_id' => $tripId, 'content_type' => 'download'], ['%d', '%s']);
 
         $order = 0;
         foreach ($items as $item) {
@@ -144,15 +142,16 @@ class TripDownloadRepository
                 $table,
                 [
                     'trip_id' => $tripId,
+                    'content_type' => 'download',
                     'title' => $title,
                     'description' => isset($item['description']) ? wp_kses_post($item['description']) : null,
                     'attachment_id' => isset($item['attachment_id']) ? (int) $item['attachment_id'] : null,
                     'protected_path' => isset($item['protected_path']) ? sanitize_text_field($item['protected_path']) : null,
-                    'visibility' => $visibility,
-                    'enabled' => isset($item['enabled']) ? (int) (bool) $item['enabled'] : 1,
+                    'access_level' => $visibility, // Map visibility to access_level
+                    'is_downloadable' => 1,
                     'sort_order' => isset($item['sort_order']) ? (int) $item['sort_order'] : $order,
                 ],
-                ['%d', '%s', '%s', '%d', '%s', '%s', '%d', '%d']
+                ['%d', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%d']
             );
 
             $order++;
@@ -185,15 +184,16 @@ class TripDownloadRepository
             $table,
             [
                 'trip_id' => (int) ($data['trip_id'] ?? 0),
+                'content_type' => 'download',
                 'title' => $title,
                 'description' => isset($data['description']) ? wp_kses_post($data['description']) : null,
                 'attachment_id' => isset($data['attachment_id']) ? (int) $data['attachment_id'] : null,
                 'protected_path' => isset($data['protected_path']) ? sanitize_text_field($data['protected_path']) : null,
-                'visibility' => $visibility,
-                'enabled' => isset($data['enabled']) ? (int) (bool) $data['enabled'] : 1,
+                'access_level' => $visibility, // Map visibility to access_level
+                'is_downloadable' => 1,
                 'sort_order' => isset($data['sort_order']) ? (int) $data['sort_order'] : 0,
             ],
-            ['%d', '%s', '%s', '%d', '%s', '%s', '%d', '%d']
+            ['%d', '%s', '%s', '%s', '%d', '%s', '%s', '%d', '%d']
         );
 
         return $result ? (int) $wpdb->insert_id : null;
@@ -239,12 +239,12 @@ class TripDownloadRepository
             if (!in_array($visibility, ['public', 'logged_in', 'booked_only'], true)) {
                 $visibility = 'booked_only';
             }
-            $updateData['visibility'] = $visibility;
+            $updateData['access_level'] = $visibility; // Map visibility to access_level
             $formats[] = '%s';
         }
 
         if (isset($data['enabled'])) {
-            $updateData['enabled'] = (int) (bool) $data['enabled'];
+            $updateData['is_downloadable'] = (int) (bool) $data['enabled']; // Map enabled to is_downloadable
             $formats[] = '%d';
         }
 
@@ -253,19 +253,17 @@ class TripDownloadRepository
             $formats[] = '%d';
         }
 
-        if (empty($updateData)) {
-            return false;
+        if (!empty($updateData)) {
+            $result = $wpdb->update(
+                $table,
+                $updateData,
+                ['id' => $id, 'content_type' => 'download'],
+                $formats,
+                ['%d', '%s']
+            );
         }
 
-        $result = $wpdb->update(
-            $table,
-            $updateData,
-            ['id' => $id],
-            $formats,
-            ['%d']
-        );
-
-        return $result !== false;
+        return !empty($updateData) ? $result !== false : true;
     }
 
     /**
@@ -280,7 +278,7 @@ class TripDownloadRepository
             return false;
         }
 
-        $result = $wpdb->delete($table, ['id' => $id], ['%d']);
+        $result = $wpdb->delete($table, ['id' => $id, 'content_type' => 'download'], ['%d', '%s']);
         return $result !== false;
     }
 
@@ -296,7 +294,7 @@ class TripDownloadRepository
             return false;
         }
 
-        $result = $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        $result = $wpdb->delete($table, ['trip_id' => $tripId, 'content_type' => 'download'], ['%d', '%s']);
         return $result !== false;
     }
 }

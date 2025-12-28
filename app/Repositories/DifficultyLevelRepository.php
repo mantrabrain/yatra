@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 
 /**
@@ -46,7 +47,8 @@ class DifficultyLevelRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = 'difficulty' AND slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = %s AND slug = %s",
+                ClassificationTypes::DIFFICULTY,
                 $slug
             )
         );
@@ -60,7 +62,7 @@ class DifficultyLevelRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         return $this->wpdb->get_results(
-            "SELECT * FROM `{$table}` WHERE type = 'difficulty' AND status = 'publish' ORDER BY sorting ASC, id ASC"
+            "SELECT * FROM `{$table}` WHERE type = '" . ClassificationTypes::DIFFICULTY . "' AND status = 'publish' ORDER BY sorting ASC, id ASC"
         );
     }
 
@@ -70,7 +72,7 @@ class DifficultyLevelRepository extends BaseRepository
     public function all(array $args = []): array
     {
         // Always filter by type = 'difficulty' for difficulty levels
-        $args['where']['type'] = 'difficulty';
+        $args['where']['type'] = ClassificationTypes::DIFFICULTY;
         
         return parent::all($args);
     }
@@ -81,7 +83,7 @@ class DifficultyLevelRepository extends BaseRepository
     public function count(array $args = []): int
     {
         // Always filter by type = 'difficulty' for difficulty levels
-        $args['where']['type'] = 'difficulty';
+        $args['where']['type'] = ClassificationTypes::DIFFICULTY;
         
         return parent::count($args);
     }
@@ -95,7 +97,7 @@ class DifficultyLevelRepository extends BaseRepository
         $where = $this->buildWhereClause($args);
         
         // Ensure we only count difficulty type records
-        $typeCondition = "type = 'difficulty'";
+        $typeCondition = "type = '" . ClassificationTypes::DIFFICULTY . "'";
         if (!empty($where)) {
             $where .= " AND {$typeCondition}";
         } else {
@@ -142,17 +144,18 @@ class DifficultyLevelRepository extends BaseRepository
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
         
-        // Using hardcoded table name since there's no dedicated repository for classifications
-        $tripClassificationsTable = $wpdb->prefix . 'yatra_trip_classifications';
+        // Use TripClassificationsTable for trip-difficulty relationships
+        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripsTable}` t
              INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
              WHERE tc.classification_id = %d
-               AND tc.classification_type = 'difficulty'
+               AND tc.classification_type = %s
                AND t.status IN ('publish', 'published')",
-            $levelId
+            $levelId,
+            ClassificationTypes::DIFFICULTY
         ));
     }
 
