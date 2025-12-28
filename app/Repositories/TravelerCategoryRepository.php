@@ -118,7 +118,7 @@ class TravelerCategoryRepository extends BaseRepository
             "SELECT id, name, slug, JSON_EXTRACT(metadata, '$.age_min') as age_min, JSON_EXTRACT(metadata, '$.age_max') as age_max 
              FROM {$table} 
              WHERE id IN ({$placeholders}) AND type = %s",
-            ...$categoryIds, ClassificationTypes::TRAVELER_TYPE
+            ClassificationTypes::TRAVELER_TYPE, ...$categoryIds
         ));
     }
 }

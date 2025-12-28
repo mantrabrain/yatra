@@ -346,7 +346,7 @@ class TripRepository extends BaseRepository
                  INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
                  WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
-                ...$trip_ids, ClassificationTypes::DESTINATION
+                ClassificationTypes::DESTINATION, ...$trip_ids
             ));
             
             foreach ($destinations_raw as $dest) {
@@ -368,7 +368,7 @@ class TripRepository extends BaseRepository
                  INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
                  WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
-                ...$trip_ids, ClassificationTypes::ACTIVITY
+                ClassificationTypes::ACTIVITY, ...$trip_ids
             ));
             
             foreach ($activities_raw as $act) {
@@ -393,7 +393,7 @@ class TripRepository extends BaseRepository
                  WHERE tc.trip_id IN ({$trip_ids_placeholder}) 
                    AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, c.name ASC",
-                ...array_merge($trip_ids, [ClassificationTypes::CATEGORY])
+                ClassificationTypes::CATEGORY, ...$trip_ids
             ));
             
             foreach ($categories_raw as $cat) {

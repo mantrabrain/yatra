@@ -1474,30 +1474,32 @@ const Itinerary: React.FC = () => {
                   <Calendar className="w-8 h-8 text-gray-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                     {(() => {
                       const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
                       const isSingleDay = selectedTrip?.trip_type === 'single_day';
                       return isSingleDay ? __('No itinerary entries yet', 'No itinerary entries yet') : __('No itinerary days yet', 'No itinerary days yet');
                     })()}
                   </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md">
                     {(() => {
                       const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
                       const isSingleDay = selectedTrip?.trip_type === 'single_day';
                       return isSingleDay 
-                        ? __('Start building your itinerary by adding your first entry.', 'Start building your itinerary by adding your first entry.')
-                        : __('Start building your itinerary by adding your first day.', 'Start building your itinerary by adding your first day.');
+                        ? __('Start building your itinerary by adding your first entry to create a detailed schedule for your trip.', 'Start building your itinerary by adding your first entry to create a detailed schedule for your trip.')
+                        : __('Start building your itinerary by adding your first day to organize your trip schedule.', 'Start building your itinerary by adding your first day to organize your trip schedule.');
                     })()}
                   </p>
-                  <Button onClick={handleAddDay} className="flex items-center gap-2 mx-auto">
-                    <Plus className="w-4 h-4" />
-                    {(() => {
-                      const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
-                      const isSingleDay = selectedTrip?.trip_type === 'single_day';
-                      return isSingleDay ? __('Add Your First Entry', 'Add Your First Entry') : __('Add Your First Day', 'Add Your First Day');
-                    })()}
-                  </Button>
+                  {can('yatra_edit_trips') && (
+                    <Button onClick={handleAddDay} className="flex items-center gap-2 mx-auto">
+                      <Plus className="w-4 h-4" />
+                      {(() => {
+                        const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
+                        const isSingleDay = selectedTrip?.trip_type === 'single_day';
+                        return isSingleDay ? __('Add Your First Entry', 'Add Your First Entry') : __('Add Your First Day', 'Add Your First Day');
+                      })()}
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
