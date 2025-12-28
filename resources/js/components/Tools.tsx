@@ -334,23 +334,9 @@ const Tools: React.FC = () => {
     setShowExportModal(false);
     try {
       // Create background export job
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/export-job`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-        body: JSON.stringify({
-          data_types: selectedExportData
-        })
+      const data = await apiService.createExportJob({
+        data_types: selectedExportData,
       });
-      
-      const data = await response.json();
-      
-      // API returns data directly, not wrapped in {success, data}
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create export job');
-      }
       
       // Start polling for job status
       const jobId = data.job_id;
@@ -377,17 +363,8 @@ const Tools: React.FC = () => {
     
     const poll = async () => {
       try {
-        const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/${endpoint}/${jobId}`, {
-          headers: {
-            'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-          },
-        });
-        
-        const data = await response.json();
-        
-        // API returns data directly, not wrapped in {success, data}
-        if (response.ok && data) {
-          const jobData = data as JobStatus;
+        const jobData = (await apiService.performJobAction(endpoint, jobId)) as JobStatus;
+        if (jobData) {
           
           if (type === 'export') {
             setExportJob(jobData);
@@ -429,17 +406,7 @@ const Tools: React.FC = () => {
     
     try {
       // First download the file
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}/download`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error('Download failed');
-      }
-      
-      const blob = await response.blob();
+      const blob = await apiService.downloadExportJobBlob(exportJob.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
@@ -451,17 +418,9 @@ const Tools: React.FC = () => {
       document.body.removeChild(a);
       
       // Then delete the file from server after download
-      const deleteResponse = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      
-      if (deleteResponse.ok) {
-        // Clear the job after download and deletion
-        setExportJob(null);
-      }
+      await apiService.deleteExportJob(exportJob.id);
+      // Clear the job after download and deletion
+      setExportJob(null);
     } catch (error) {
       console.error('Download error:', error);
       alert('Download failed. Please try again.');
@@ -485,19 +444,9 @@ const Tools: React.FC = () => {
     setShowDeleteModal(false);
     
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/export-job/${exportJob.id}`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      
-      if (response.ok) {
-        // Immediately clear the export job from state to remove it from UI
-        setExportJob(null);
-      } else {
-        alert('Failed to delete export file.');
-      }
+      await apiService.deleteExportJob(exportJob.id);
+      // Immediately clear the export job from state to remove it from UI
+      setExportJob(null);
     } catch (error) {
       console.error('Delete error:', error);
       alert('Failed to delete export file.');
@@ -525,20 +474,7 @@ const Tools: React.FC = () => {
       formData.append('data_types', JSON.stringify(selectedImportData));
       
       // Create background import job
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/import-job`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-        body: formData,
-      });
-      
-      const data = await response.json();
-      
-      // API returns data directly, not wrapped in {success, data}
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create import job');
-      }
+      const data = await apiService.createImportJob(formData);
       
       // Start polling for job status
       const jobId = data.job_id;
@@ -608,48 +544,16 @@ const Tools: React.FC = () => {
   const confirmClearLogs = async () => {
     try {
       console.log('Attempting to clear logs for:', selectedLogType);
-      
-      // Get the correct API URL - use yatraAdmin.restUrl instead of apiUrl for REST endpoints
-      const restUrl = (window as any).yatraAdmin?.restUrl || (window as any).yatraAdmin?.apiUrl || '/wp-json';
-      const apiUrl = `${restUrl}/yatra/v1/tools/logs/${selectedLogType}/clear`;
-      
-      console.log('API URL:', apiUrl);
-      console.log('Nonce:', (window as any).yatraAdmin?.nonce ? 'exists' : 'missing');
-      
-      const response = await fetch(apiUrl, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin?.nonce || '',
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      console.log('Response status:', response.status);
-      console.log('Response ok:', response.ok);
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Response not ok:', errorText);
-        alert(`Failed to clear logs: ${response.status} ${response.statusText}\n\nDetails: ${errorText}`);
-        return;
-      }
-      
-      const data = await response.json();
-      console.log('Response data:', data);
-      
+      const data = await apiService.clearLogs(selectedLogType);
       if (data.success) {
-        console.log('Logs cleared successfully');
-        loadLogs(selectedLogType); // Reload logs
-        setShowClearLogsModal(false);
-        alert('Logs cleared successfully!');
+        showToast(data.message || 'Logs cleared successfully', 'success');
+        setLogs(prev => ({ ...prev, [selectedLogType]: { logs: [], total: 0, page: 1, per_page: 50, pages: 0 } }));
       } else {
-        console.error('Clear logs failed:', data);
-        alert(`Failed to clear logs: ${data.message || data.data?.message || 'Unknown error'}`);
+        showToast(data.message || 'Failed to clear logs', 'error');
       }
     } catch (error) {
       console.error('Failed to clear logs:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Network error. Please check your connection.';
-      alert(`Failed to clear logs: ${errorMessage}`);
+      showToast('Failed to clear logs. Please try again.', 'error');
     }
   };
 
@@ -728,18 +632,11 @@ const Tools: React.FC = () => {
   const loadAllJobs = async () => {
     setIsLoadingJobs(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/all-jobs`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getAllJobs();
       console.log('All Jobs API response:', data);
       // API returns data directly, not wrapped in {success, data}
-      if (response.ok) {
-        console.log('Setting allJobs:', data);
-        setAllJobs(Array.isArray(data) ? data : []);
-      }
+      console.log('Setting allJobs:', data);
+      setAllJobs(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to load jobs:', error);
     } finally {
@@ -751,22 +648,15 @@ const Tools: React.FC = () => {
   const loadCronJobs = async () => {
     setIsLoadingCronJobs(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/cron-jobs`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getCronJobs();
       console.log('Cron Jobs API response:', data);
       // API returns data directly: {cron_jobs: [], wp_cron_disabled: bool, ...}
-      if (response.ok) {
-        console.log('Setting cronJobs:', data?.cron_jobs);
-        setCronJobs(data?.cron_jobs || []);
-        setCronInfo({
-          wp_cron_disabled: data?.wp_cron_disabled || false,
-          alternate_cron: data?.alternate_cron || false,
-        });
-      }
+      console.log('Setting cronJobs:', data?.cron_jobs);
+      setCronJobs(data?.cron_jobs || []);
+      setCronInfo({
+        wp_cron_disabled: data?.wp_cron_disabled || false,
+        alternate_cron: data?.alternate_cron || false,
+      });
     } catch (error) {
       console.error('Failed to load cron jobs:', error);
     } finally {
@@ -778,15 +668,9 @@ const Tools: React.FC = () => {
   const handleRunCronJob = async (hook: string) => {
     setRunningCronJob(hook);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/cron-jobs/${hook}/run`, {
-        method: 'POST',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.runCronJob(hook);
       // API returns data directly: {success: true, message: ...}
-      if (response.ok && data.success) {
+      if (data.success) {
         showToast(data.message || `Cron job "${hook}" executed successfully`, 'success');
         // Reload cron jobs to update next run times
         loadCronJobs();
@@ -808,17 +692,7 @@ const Tools: React.FC = () => {
       // Log the request
       console.log('Clearing cache - sending request');
       
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/clear-cache`, {
-        method: 'DELETE',
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      
-      // Log the raw response
-      console.log('Cache clearing response status:', response.status);
-      
-      const data = await response.json();
+      const data = await apiService.clearCache();
       console.log('Cache clearing response data:', data);
       
       // Clear React Query cache if available
@@ -827,7 +701,7 @@ const Tools: React.FC = () => {
       }
       
       // Fixed handling of response
-      if (response.ok && data.success) {
+      if (data.success) {
         // Only show success message if both response.ok and data.success are true
         showToast('All caches cleared successfully! Please refresh the page to see the changes.', 'success');
       } else {
@@ -853,12 +727,7 @@ const Tools: React.FC = () => {
   const loadMigrationStatus = async () => {
     setIsLoadingMigration(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/status`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getMigrationStatus();
       setMigrationStatus(data);
     } catch (error) {
       console.error('Failed to load migration status:', error);
@@ -870,13 +739,7 @@ const Tools: React.FC = () => {
 
   const handleDismissMigrationNotice = async () => {
     try {
-      await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/clear`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
+      await apiService.clearMigration();
       setShowMigrationCompleteNotice(false);
       await loadMigrationProgress();
       if (typeof window !== 'undefined') {
@@ -890,12 +753,7 @@ const Tools: React.FC = () => {
   // Load migration progress
   const loadMigrationProgress = async () => {
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/progress`, {
-        headers: {
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      const data = await response.json();
+      const data = await apiService.getMigrationProgress();
       
       // Debug logging
       console.log('[Yatra Migration] Progress data received:', data);
@@ -944,16 +802,7 @@ const Tools: React.FC = () => {
   const handleMigrateAll = async (force = false) => {
     setIsMigrating(true);
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/migrate-all`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-        body: JSON.stringify({ force }),
-      });
-      
-      const data = await response.json();
+      const data = await apiService.runMigrationAll({ force });
       
       console.log('[Yatra Migration] Migrate all response:', data);
       
@@ -980,15 +829,7 @@ const Tools: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/migration/cancel`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-        },
-      });
-      
-      const data = await response.json();
+      const data = await apiService.cancelMigration();
       
       if (data.success) {
         showToast('Migration cancelled successfully', 'success');
@@ -1307,18 +1148,8 @@ const Tools: React.FC = () => {
                         
                         // Call API to delete the import job and file
                         try {
-                          const response = await fetch(`${(window as any).yatraAdmin.apiUrl}/tools/import-job/${importJob.id}`, {
-                            method: 'DELETE',
-                            headers: {
-                              'X-WP-Nonce': (window as any).yatraAdmin.nonce,
-                            },
-                          });
-                          
-                          if (response.ok) {
-                            console.log('Import job deleted successfully');
-                          } else {
-                            console.error('Failed to delete import job');
-                          }
+                          await apiService.deleteImportJob(importJob.id);
+                          console.log('Import job deleted successfully');
                         } catch (e) {
                           console.error('Error deleting import job:', e);
                         }

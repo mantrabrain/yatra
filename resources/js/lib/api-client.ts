@@ -70,11 +70,27 @@ class ApiClient {
       }
     }
     
+    const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
+
+    // Build headers
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
       'X-WP-Nonce': this.nonce,
       ...options.headers,
     };
+
+    // Only set JSON content-type when we're not sending FormData and caller didn't override.
+    if (!isFormDataBody) {
+      const hasContentTypeHeader =
+        (headers instanceof Headers && headers.has('Content-Type')) ||
+        (!(headers instanceof Headers) &&
+          Object.keys(headers as Record<string, any>).some(
+            (k) => k.toLowerCase() === 'content-type'
+          ));
+
+      if (!hasContentTypeHeader) {
+        (headers as any)['Content-Type'] = 'application/json';
+      }
+    }
 
     const response = await fetch(url, {
       ...options,
@@ -88,6 +104,83 @@ class ApiClient {
     }
 
     return response.json();
+  }
+
+  private async requestBlob(
+    endpoint: string,
+    options: RequestInit = {},
+    queryParams?: URLSearchParams
+  ): Promise<Blob> {
+    const [endpointPath, endpointQuery] = endpoint.split('?');
+    const cleanEndpoint = endpointPath.startsWith('/') ? endpointPath : `/${endpointPath}`;
+
+    let url: string;
+    if (this.baseUrl.includes('?rest_route=')) {
+      const [base, queryString] = this.baseUrl.split('?');
+      const params = new URLSearchParams(queryString);
+      const restRoute = params.get('rest_route') || '';
+      params.set('rest_route', restRoute + cleanEndpoint);
+
+      if (endpointQuery) {
+        const endpointParams = new URLSearchParams(endpointQuery);
+        endpointParams.forEach((value, key) => {
+          params.append(key, value);
+        });
+      }
+      if (queryParams) {
+        queryParams.forEach((value, key) => {
+          params.append(key, value);
+        });
+      }
+      url = `${base}?${params.toString()}`;
+    } else {
+      url = `${this.baseUrl}${cleanEndpoint}`;
+      if (endpointQuery || queryParams) {
+        const params = new URLSearchParams();
+        if (endpointQuery) {
+          const endpointParams = new URLSearchParams(endpointQuery);
+          endpointParams.forEach((value, key) => {
+            params.append(key, value);
+          });
+        }
+        if (queryParams) {
+          queryParams.forEach((value, key) => {
+            params.append(key, value);
+          });
+        }
+        url += `?${params.toString()}`;
+      }
+    }
+
+    const isFormDataBody = typeof FormData !== 'undefined' && options.body instanceof FormData;
+    const headers: HeadersInit = {
+      'X-WP-Nonce': this.nonce,
+      ...options.headers,
+    };
+    if (!isFormDataBody) {
+      const hasContentTypeHeader =
+        (headers instanceof Headers && headers.has('Content-Type')) ||
+        (!(headers instanceof Headers) &&
+          Object.keys(headers as Record<string, any>).some(
+            (k) => k.toLowerCase() === 'content-type'
+          ));
+      if (!hasContentTypeHeader) {
+        (headers as any)['Content-Type'] = 'application/json';
+      }
+    }
+
+    const response = await fetch(url, {
+      ...options,
+      headers,
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.blob();
   }
 
   async get(endpoint: string, config?: { params?: Record<string, any> }): Promise<any> {
@@ -108,24 +201,39 @@ class ApiClient {
     }, queryParams);
   }
 
+  async getBlob(endpoint: string, config?: { params?: Record<string, any> }): Promise<Blob> {
+    let queryParams: URLSearchParams | undefined;
+
+    if (config?.params) {
+      queryParams = new URLSearchParams();
+      Object.entries(config.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams!.append(key, String(value));
+        }
+      });
+    }
+
+    return this.requestBlob(endpoint, { method: 'GET' }, queryParams);
+  }
+
   async post(endpoint: string, data?: any): Promise<any> {
     return this.request(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
   }
 
   async put(endpoint: string, data?: any): Promise<any> {
     return this.request(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
   }
 
   async patch(endpoint: string, data?: any): Promise<any> {
     return this.request(endpoint, {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body: data instanceof FormData ? data : JSON.stringify(data),
     });
   }
 
@@ -138,6 +246,68 @@ class ApiClient {
 }
 
 export const apiClient = new ApiClient();
+
+class WpApiClient {
+  private baseUrl: string;
+  private nonce: string;
+
+  constructor() {
+    const rawUrl = (window as any)?.yatraAdmin?.restUrl || '/wp-json';
+    this.baseUrl = rawUrl.endsWith('/') ? rawUrl.slice(0, -1) : rawUrl;
+    this.nonce = (window as any)?.yatraAdmin?.nonce || '';
+  }
+
+  async get(endpoint: string): Promise<any> {
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+    const url = `${this.baseUrl}${cleanEndpoint}`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'X-WP-Nonce': this.nonce,
+      },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+}
+
+const wpClient = new WpApiClient();
+
+export const wpService = {
+  getMedia: (id: string | number) => wpClient.get(`/wp/v2/media/${id}`),
+};
+
+export const ajaxService = {
+  post: async (action: string, data: Record<string, any>) => {
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || '';
+    const url = `${siteUrl}/wp-admin/admin-ajax.php`;
+
+    const body = new URLSearchParams({
+      action,
+      ...Object.fromEntries(
+        Object.entries(data).map(([k, v]) => [k, v == null ? '' : String(v)])
+      ),
+    });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body,
+      credentials: 'include',
+    });
+
+    return response.json();
+  },
+};
 
 // Convenience methods for common operations
 export const apiService = {
@@ -243,22 +413,26 @@ export const apiService = {
   getSystemStatus: () => apiClient.get(API_ENDPOINTS.TOOLS_SYSTEM_STATUS),
   getActiveJobs: () => apiClient.get(API_ENDPOINTS.TOOLS_ACTIVE_JOBS),
   getLogs: (type: string, page: number) => apiClient.get(API_ENDPOINTS.TOOLS_LOGS(type, page)),
+  clearLogs: (type: string) => apiClient.delete(API_ENDPOINTS.TOOLS_LOGS_CLEAR(type)),
   createExportJob: (data: any) => apiClient.post(API_ENDPOINTS.TOOLS_EXPORT_JOB, data),
-  performJobAction: (endpoint: string, jobId: string) => apiClient.post(API_ENDPOINTS.TOOLS_JOB_ACTION(endpoint, jobId)),
+  performJobAction: (endpoint: string, jobId: string) => apiClient.get(API_ENDPOINTS.TOOLS_JOB_ACTION(endpoint, jobId)),
   downloadExportJob: (jobId: string) => apiClient.get(API_ENDPOINTS.TOOLS_EXPORT_DOWNLOAD(jobId)),
+  downloadExportJobBlob: (jobId: string) => apiClient.getBlob(API_ENDPOINTS.TOOLS_EXPORT_DOWNLOAD(jobId)),
   deleteExportJob: (jobId: string) => apiClient.delete(API_ENDPOINTS.TOOLS_EXPORT_DELETE(jobId)),
   getExportJobStatus: (jobId: string) => apiClient.get(API_ENDPOINTS.TOOLS_EXPORT_STATUS(jobId)),
   createImportJob: (data: any) => apiClient.post(API_ENDPOINTS.TOOLS_IMPORT_JOB, data),
+  getImportJob: (jobId: string) => apiClient.get(API_ENDPOINTS.TOOLS_IMPORT_JOB_GET(jobId)),
+  deleteImportJob: (jobId: string) => apiClient.delete(API_ENDPOINTS.TOOLS_IMPORT_JOB_GET(jobId)),
   getAllJobs: () => apiClient.get(API_ENDPOINTS.TOOLS_ALL_JOBS),
   getCronJobs: () => apiClient.get(API_ENDPOINTS.TOOLS_CRON_JOBS),
   runCronJob: (hook: string) => apiClient.post(API_ENDPOINTS.TOOLS_CRON_RUN(hook)),
-  clearCache: () => apiClient.post(API_ENDPOINTS.TOOLS_CLEAR_CACHE),
+  clearCache: () => apiClient.delete(API_ENDPOINTS.TOOLS_CLEAR_CACHE),
 
   // Migration
   getMigrationStatus: () => apiClient.get(API_ENDPOINTS.MIGRATION_STATUS),
   clearMigration: () => apiClient.post(API_ENDPOINTS.MIGRATION_CLEAR),
   getMigrationProgress: () => apiClient.get(API_ENDPOINTS.MIGRATION_PROGRESS),
-  runMigrationAll: () => apiClient.post(API_ENDPOINTS.MIGRATION_MIGRATE_ALL),
+  runMigrationAll: (data?: any) => apiClient.post(API_ENDPOINTS.MIGRATION_MIGRATE_ALL, data),
   cancelMigration: () => apiClient.post(API_ENDPOINTS.MIGRATION_CANCEL),
 
   // Common bulk operations

@@ -42,6 +42,7 @@ import {
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api-client';
+import { wpService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -1388,17 +1389,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
       setIsResolvingFeaturedImage(true);
       try {
-        const base = mediaBaseUrl.replace(/\/$/, '');
-        const response = await fetch(`${base}/wp/v2/media/${attachmentId}`, {
-          credentials: 'same-origin',
-          headers: {
-            'X-WP-Nonce': (window as any)?.yatraAdmin?.nonce || '',
-          },
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to fetch attachment ${attachmentId}: ${response.status}`);
-        }
-        const data = await response.json();
+        const data = await wpService.getMedia(attachmentId);
         const url = data?.source_url || '';
         if (url && isMounted) {
           featuredImageCache.current[attachmentId] = url;

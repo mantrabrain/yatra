@@ -10,6 +10,7 @@ import { __ } from '../lib/i18n';
 import { useToast } from '../components/ui/toast';
 import { generateSlug } from '../lib/slug';
 import { apiClient } from '../lib/api-client';
+import { ajaxService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -212,23 +213,12 @@ const AttributeForm: React.FC = () => {
   // Direct database query to bypass caching issues (fallback only)
   const fetchDirectDatabaseValues = async (attributeId: number) => {
     try {
-      const response = await fetch(`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin-ajax.php`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          action: 'yatra_get_attribute_direct',
-          attribute_id: attributeId.toString(),
-          nonce: window.yatraAdmin?.nonce || ''
-        })
+      const data = await ajaxService.post('yatra_get_attribute_direct', {
+        attribute_id: attributeId,
+        nonce: window.yatraAdmin?.nonce || '',
       });
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.data) {
-          return data.data;
-        }
+      if (data?.success && data?.data) {
+        return data.data;
       }
     } catch (error) {
       console.warn('Direct database query failed', { error, attributeId });
