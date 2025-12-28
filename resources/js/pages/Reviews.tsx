@@ -11,6 +11,7 @@ import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api-client';
 import { apiService } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
@@ -143,6 +144,7 @@ const Reviews: React.FC = () => {
   const reviews: Review[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
 
   const formatDate = (dateString: string) => {
     return formatDateUtil(dateString);
@@ -618,6 +620,13 @@ const Reviews: React.FC = () => {
             isLoading={isLoading}
             isError={!!error}
             errorText={__('Error loading reviews', 'Error loading reviews')}
+            errorDescription={__(
+              'We couldn’t connect to the reviews service. Please refresh or try again shortly.',
+              'We couldn’t connect to the reviews service. Please refresh or try again shortly.'
+            )}
+            onRetry={() => queryClient.invalidateQueries({ queryKey: ['reviews'] })}
+            errorDetails={errorContext.details}
+            errorRequestInfo={errorContext.requestInfo}
             emptyText={__('No reviews found', 'No reviews found')}
             emptyDescription={__('When customers submit reviews, they will appear here.', 'When customers submit reviews, they will appear here.')}
             onSort={handleSort}

@@ -18,6 +18,7 @@ import { Skeleton } from '../components/ui/skeleton';
 import { Badge } from '../components/ui/badge';
 import { useToast } from '../components/ui/toast';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
+import { getErrorContext } from '../lib/errors';
 
 interface FormField {
   id: string;
@@ -158,9 +159,15 @@ const Travelers: React.FC = () => {
   const [availableTrips, setAvailableTrips] = useState<Array<{ id: number; title: string }>>([]);
 
   // Fetch travelers from API (includes trip info via JOIN, and available_trips in meta on first page)
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['travelers', searchTerm, tripFilter, page],
     queryFn: async () => {
+      // Check URL parameter for error simulation (for testing)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('simulate_error') === 'true') {
+        throw new Error('Simulated API error for testing error UI functionality');
+      }
+      
       const paramsObj: Record<string, any> = {
         page: page,
         per_page: perPage,
@@ -205,6 +212,15 @@ const Travelers: React.FC = () => {
   const travelers = data?.data || [];
   const totalTravelers = data?.meta?.total || 0;
   const totalPages = Math.ceil(totalTravelers / perPage);
+
+  // Enhanced error handling
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isTravelersError = !!error || !!apiErrorMessage;
 
   const handleViewBooking = (bookingId: number) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${bookingId}`;
@@ -427,7 +443,12 @@ const Travelers: React.FC = () => {
           <SharedTable
             data={travelers}
             isLoading={isLoading}
-            isError={false}
+            isError={isTravelersError}
+            errorText={__('Error loading travelers')}
+            errorDescription={__('We couldn\'t connect to the travelers service. Please refresh or try again shortly.')}
+            errorDetails={derivedErrorDetails}
+            errorRequestInfo={errorContext.requestInfo}
+            onRetry={() => refetch()}
             skeletonRows={5}
             emptyText={
               (searchTerm || tripFilter)

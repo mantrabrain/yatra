@@ -4,6 +4,8 @@ namespace Yatra\Migration;
 
 use Yatra\Migration\MigrationProgress;
 use Yatra\Utils\Logger;
+use YatraPro\Database\Tables\AdditionalServicesTable;
+use YatraPro\Database\Tables\TripAdditionalServicesTable;
 
 class ServicesMigration extends BaseMigration
 {
@@ -26,8 +28,8 @@ class ServicesMigration extends BaseMigration
 
         try {
             // Check if Yatra Pro tables exist (created by Pro plugin)
-            $services_table = $wpdb->prefix . 'yatra_additional_services';
-            $trip_services_table = $wpdb->prefix . 'yatra_trip_services';
+            $services_table = AdditionalServicesTable::getTableName();
+            $trip_services_table = TripAdditionalServicesTable::getTableName();
             
             $services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$services_table}'");
             $trip_services_exists = $wpdb->get_var("SHOW TABLES LIKE '{$trip_services_table}'");

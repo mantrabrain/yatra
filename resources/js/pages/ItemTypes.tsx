@@ -22,6 +22,7 @@ import { Badge } from '../components/ui/badge';
 import { Table as SharedTable } from '../components/shared/Table';
 import { Pagination } from '../components/shared/Pagination';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
+import { getErrorContext } from '../lib/errors';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 
 interface ItemType {
@@ -116,7 +117,7 @@ const ItemTypes: React.FC = () => {
     enabled: can('yatra_view_trips'),
   });
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<any>({
     queryKey: ['item-types', queryParams],
     queryFn: async () => {
       try {
@@ -148,6 +149,13 @@ const ItemTypes: React.FC = () => {
   const itemTypes = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isItemTypesError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -753,23 +761,25 @@ const ItemTypes: React.FC = () => {
 
       <ConditionalRender capability="yatra_view_trips">
         <>
-          <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkApply}
-            onClearSelection={handleClearSelection}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            statusOptions={statusOptions}
-            showColumnsDropdown={showColumnsDropdown}
-            setShowColumnsDropdown={setShowColumnsDropdown}
-            columnOptions={columnOptions}
-            onToggleColumn={toggleColumn}
-            bulkMutationPending={bulkMutationPending}
-            totalItems={total}
-            bulkActionOptions={bulkActionOptions}
-          />
+          {!isItemTypesError && (
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={handleClearSelection}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              statusOptions={statusOptions}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={columnOptions}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={bulkMutationPending}
+              totalItems={total}
+              bulkActionOptions={bulkActionOptions}
+            />
+          )}
 
           <Card>
             <CardContent className="p-0">
@@ -778,14 +788,15 @@ const ItemTypes: React.FC = () => {
                 columns={columns}
                 actions={tableActions}
                 isLoading={isLoading}
-                isError={!!error}
+                isError={isItemTypesError}
                 errorText={__('Error loading item types', 'Error loading item types')}
-                emptyText={__('No item types found', 'No item types found')}
-                emptyDescription={hasFilters
-                  ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                  : __('Get started by creating your first item type.', 'Get started by creating your first item type.')
-                }
-                onCreateClick={can('yatra_edit_trips') ? handleCreate : undefined}
+                errorDescription={__(
+                  'We couldn’t connect to the item types service. Please refresh or try again shortly.',
+                  'We couldn’t connect to the item types service. Please refresh or try again shortly.'
+                )}
+                errorDetails={derivedErrorDetails}
+                errorRequestInfo={errorContext.requestInfo}
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ['item-types'] })}
                 onSort={handleSort}
                 getSortIcon={getSortIcon}
                 selectedItemIds={selectedIds}

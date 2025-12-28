@@ -12,6 +12,7 @@ import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
@@ -132,6 +133,7 @@ const Categories: React.FC = () => {
   const categories = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 50);
+  const errorContext = getErrorContext(error);
 
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
@@ -749,9 +751,19 @@ const Categories: React.FC = () => {
             actions={actions}
             isLoading={isLoading}
             isError={!!error}
-            errorText={__('Failed to load categories', 'Failed to load categories')}
+            errorText={__('Error loading categories', 'Error loading categories')}
+            errorDescription={__(
+              'We couldn’t connect to the categories service. Please refresh or try again shortly.',
+              'We couldn’t connect to the categories service. Please refresh or try again shortly.'
+            )}
+            onRetry={() => queryClient.invalidateQueries({ queryKey: ['trip-categories'] })}
+            errorDetails={errorContext.details}
+            errorRequestInfo={errorContext.requestInfo}
             emptyText={__('No categories found', 'No categories found')}
-            emptyDescription={__('Get started by creating your first category to organize your trips.', 'Get started by creating your first category to organize your trips.')}
+            emptyDescription={__(
+              'Organize trips into categories to help travelers find the perfect fit.',
+              'Organize trips into categories to help travelers find the perfect fit.'
+            )}
             onCreateClick={handleCreateCategory}
             selectedItemIds={selectedIds}
             onSelectItem={(id: string | number, checked: boolean) => {

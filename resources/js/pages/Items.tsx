@@ -22,6 +22,7 @@ import { Badge } from '../components/ui/badge';
 import { Table as SharedTable } from '../components/shared/Table';
 import { Pagination } from '../components/shared/Pagination';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
+import { getErrorContext } from '../lib/errors';
 
 interface Item {
   id: number;
@@ -156,6 +157,13 @@ const Items: React.FC = () => {
   const items = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isItemsError = !!error || !!apiErrorMessage;
 
   // Extract available types from API response meta
   useEffect(() => {
@@ -756,23 +764,25 @@ const Items: React.FC = () => {
 
       <ConditionalRender capability="yatra_view_trips">
         <>
-          <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkApply}
-            onClearSelection={handleClearSelection}
-            statusFilter={statusFilter}
-            setStatusFilter={setStatusFilter}
-            statusOptions={statusOptions}
-            showColumnsDropdown={showColumnsDropdown}
-            setShowColumnsDropdown={setShowColumnsDropdown}
-            columnOptions={columnOptions}
-            onToggleColumn={toggleColumn}
-            bulkMutationPending={bulkMutationPending}
-            totalItems={total}
-            bulkActionOptions={bulkActionOptions}
-          />
+          {!isItemsError && (
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={handleClearSelection}
+              statusFilter={statusFilter}
+              setStatusFilter={setStatusFilter}
+              statusOptions={statusOptions}
+              showColumnsDropdown={showColumnsDropdown}
+              setShowColumnsDropdown={setShowColumnsDropdown}
+              columnOptions={columnOptions}
+              onToggleColumn={toggleColumn}
+              bulkMutationPending={bulkMutationPending}
+              totalItems={total}
+              bulkActionOptions={bulkActionOptions}
+            />
+          )}
 
           <Card>
             <CardContent className="p-0">
@@ -781,8 +791,16 @@ const Items: React.FC = () => {
                 columns={columns}
                 actions={tableActions}
                 isLoading={isLoading}
-                isError={!!error}
+                isError={isItemsError}
                 errorText={__('Error loading items', 'Error loading items')}
+                errorDescription={
+                  __('We couldn\'t connect to the items service. Please refresh or try again shortly.',
+                    'We couldn\'t connect to the items service. Please refresh or try again shortly.'
+                  )
+                }
+                errorDetails={derivedErrorDetails}
+                errorRequestInfo={errorContext.requestInfo}
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ['items'] })}
                 emptyText={__('No items found', 'No items found')}
                 emptyDescription={hasFilters
                   ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')

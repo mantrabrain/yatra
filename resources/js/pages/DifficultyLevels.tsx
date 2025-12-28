@@ -10,6 +10,7 @@ import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
@@ -290,6 +291,7 @@ const DifficultyLevels: React.FC = () => {
   const levels = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 20);
+  const errorContext = getErrorContext(error);
 
   // Status counts from stats API (stable across filters)
   const statusCounts = useMemo(() => {
@@ -576,41 +578,42 @@ const DifficultyLevels: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Bulk actions (no card, same as Activities) */}
-      <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkApply}
-            onClearSelection={() => setSelectedIds([])}
-            statusFilter={statusFilter}
-            setStatusFilter={(value) => {
-              setStatusFilter(value);
-              setPage(1);
-              setSelectedIds([]);
-              setBulkAction('');
-            }}
-            statusOptions={[
-              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-              { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-              { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-              { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
-            ]}
-            showColumnsDropdown={showColumnsDropdown}
-            setShowColumnsDropdown={setShowColumnsDropdown}
-            columnOptions={[
-              { key: 'sorting', label: __('Order', 'Order'), visible: visibleColumns.sorting },
-              { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
-              { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
-              { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-              { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
-            ]}
-            onToggleColumn={toggleColumn}
-            bulkMutationPending={false}
-            totalItems={levels.length}
-            bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
-          />
+      {!error && (
+        <BulkActionToolbar
+          selectedIds={selectedIds}
+          bulkAction={bulkAction}
+          setBulkAction={setBulkAction}
+          onApply={handleBulkApply}
+          onClearSelection={() => setSelectedIds([])}
+          statusFilter={statusFilter}
+          setStatusFilter={(value) => {
+            setStatusFilter(value);
+            setPage(1);
+            setSelectedIds([]);
+            setBulkAction('');
+          }}
+          statusOptions={[
+            { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+            { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
+            { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+            { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+          ]}
+          showColumnsDropdown={showColumnsDropdown}
+          setShowColumnsDropdown={setShowColumnsDropdown}
+          columnOptions={[
+            { key: 'sorting', label: __('Order', 'Order'), visible: visibleColumns.sorting },
+            { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
+            { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
+            { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+            { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+            { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
+          ]}
+          onToggleColumn={toggleColumn}
+          bulkMutationPending={false}
+          totalItems={levels.length}
+          bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+        />
+      )}
 
       {/* Table */}
       <Card>
@@ -622,6 +625,13 @@ const DifficultyLevels: React.FC = () => {
             isLoading={isLoading}
             isError={!!error}
             errorText={__('Failed to load difficulty levels', 'Failed to load difficulty levels')}
+            errorDescription={__(
+              'We couldn’t connect to the difficulty levels service. Please refresh or try again shortly.',
+              'We couldn’t connect to the difficulty levels service. Please refresh or try again shortly.'
+            )}
+            onRetry={() => queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] })}
+            errorDetails={errorContext.details}
+            errorRequestInfo={errorContext.requestInfo}
             emptyText={__('No difficulty levels found', 'No difficulty levels found')}
             emptyDescription={__(
               'Get started by creating your first difficulty level to categorize trips by their physical challenge level.',

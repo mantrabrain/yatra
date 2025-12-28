@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 
 /**
@@ -28,7 +29,7 @@ class ItemTypeRepository extends BaseRepository
         $table = esc_sql($this->table);
         
         // Always filter by type = 'item_type' for item types
-        $type_condition = "WHERE type = 'item_type'";
+        $type_condition = "WHERE type = %s";
         
         // Add additional where conditions if provided
         if (isset($args['where']) && !empty($args['where'])) {
@@ -46,7 +47,7 @@ class ItemTypeRepository extends BaseRepository
                 GROUP BY status";
                 
         
-        $results = $this->wpdb->get_results($sql) ?: [];
+        $results = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::ITEM_TYPE)) ?: [];
 
         $counts = [
             'publish' => 0,
@@ -82,7 +83,7 @@ class ItemTypeRepository extends BaseRepository
     {
         // Always filter by type = 'item_type' for item types
         if (!isset($args['where']['type'])) {
-            $args['where']['type'] = 'item_type';
+            $args['where']['type'] = ClassificationTypes::ITEM_TYPE;
         }
         
         return parent::all($args);
@@ -96,7 +97,8 @@ class ItemTypeRepository extends BaseRepository
         $table = esc_sql($this->table);
         $result = $this->wpdb->get_row(
             $this->wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = 'item_type' AND slug = %s",
+                "SELECT * FROM `{$table}` WHERE type = %s AND slug = %s",
+                ClassificationTypes::ITEM_TYPE,
                 $slug
             )
         );
@@ -109,7 +111,7 @@ class ItemTypeRepository extends BaseRepository
      */
     public function getPublished(array $args = []): array
     {
-        $args['where']['type'] = 'item_type';
+        $args['where']['type'] = ClassificationTypes::ITEM_TYPE;
         $args['where']['status'] = 'publish';
         return $this->all($args);
     }
@@ -119,7 +121,7 @@ class ItemTypeRepository extends BaseRepository
      */
     public function getByStatus(string $status, array $args = []): array
     {
-        $args['where']['type'] = 'item_type';
+        $args['where']['type'] = ClassificationTypes::ITEM_TYPE;
         $args['where']['status'] = $status;
         return $this->all($args);
     }
@@ -135,7 +137,8 @@ class ItemTypeRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE type = 'item_type' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = %s AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            ClassificationTypes::ITEM_TYPE,
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -161,7 +164,8 @@ class ItemTypeRepository extends BaseRepository
         $table = ClassificationsTable::getTableName();
         $count = $wpdb->get_var(
             $wpdb->prepare(
-                "SELECT COUNT(*) FROM `{$table}` WHERE `type` = 'item' AND `parent_id` = %d",
+                "SELECT COUNT(*) FROM `{$table}` WHERE `type` = %s AND `parent_id` = %d",
+                ClassificationTypes::ITEM,
                 $item_type_id
             )
         );

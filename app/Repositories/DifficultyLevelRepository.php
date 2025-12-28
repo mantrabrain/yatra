@@ -62,7 +62,10 @@ class DifficultyLevelRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         return $this->wpdb->get_results(
-            "SELECT * FROM `{$table}` WHERE type = '" . ClassificationTypes::DIFFICULTY . "' AND status = 'publish' ORDER BY sorting ASC, id ASC"
+            $this->wpdb->prepare(
+                "SELECT * FROM `{$table}` WHERE type = %s AND status = 'publish' ORDER BY sorting ASC, id ASC",
+                ClassificationTypes::DIFFICULTY
+            )
         );
     }
 
@@ -97,19 +100,23 @@ class DifficultyLevelRepository extends BaseRepository
         $where = $this->buildWhereClause($args);
         
         // Ensure we only count difficulty type records
-        $typeCondition = "type = '" . ClassificationTypes::DIFFICULTY . "'";
-        if (!empty($where)) {
-            $where .= " AND {$typeCondition}";
-        } else {
-            $where = "WHERE {$typeCondition}";
+        $typeCondition = "type = %s";
+        
+        $whereClause = "WHERE {$typeCondition}";
+        if (!empty($args['where'])) {
+            $additionalWhere = $this->buildWhereClause($args);
+            if ($additionalWhere && $additionalWhere !== ' WHERE') {
+                $additionalWhere = str_replace('WHERE ', 'AND ', $additionalWhere);
+                $whereClause .= ' ' . $additionalWhere;
+            }
         }
         
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
-                {$where}
+                {$whereClause}
                 GROUP BY status";
         
-        $results = $this->wpdb->get_results($sql) ?: [];
+        $results = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::DIFFICULTY)) ?: [];
 
         $counts = [
             'publish' => 0,

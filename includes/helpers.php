@@ -11,7 +11,11 @@ if (!defined('ABSPATH')) {
 }
 
 use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Database\Tables\TripsTable;
 use Yatra\Services\SettingsService;
+use Yatra\Constants\ClassificationTypes;
 
 /**
  * Get a plugin setting value
@@ -134,13 +138,7 @@ function yatra_get_user_review(int $trip_id, ?int $user_id = null): ?object
     }
     
     global $wpdb;
-    $table = $wpdb->prefix . 'yatra_reviews';
-    $table_exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
-    
-    if (!$table_exists) {
-        return null;
-    }
-    
+    $table = ReviewsTable::getTableName();
     $review = $wpdb->get_row($wpdb->prepare(
         "SELECT * FROM {$table} WHERE trip_id = %d AND user_id = %d ORDER BY created_at DESC LIMIT 1",
         $trip_id,
@@ -791,10 +789,11 @@ function yatra_get_destination_permalink($destination): string
 {
     if (is_numeric($destination)) {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_destinations';
+        $table = ClassificationsTable::getTableName();
         $destination = $wpdb->get_row($wpdb->prepare(
-            "SELECT slug FROM {$table} WHERE id = %d",
-            (int) $destination
+            "SELECT slug FROM {$table} WHERE id = %d AND type = %s",
+            (int) $destination,
+            ClassificationTypes::DESTINATION
         ));
     }
     
@@ -819,10 +818,11 @@ function yatra_get_activity_permalink($activity): string
 {
     if (is_numeric($activity)) {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_activities';
+        $table = ClassificationsTable::getTableName();
         $activity = $wpdb->get_row($wpdb->prepare(
-            "SELECT slug FROM {$table} WHERE id = %d",
-            (int) $activity
+            "SELECT slug FROM {$table} WHERE id = %d AND type = %s",
+            (int) $activity,
+            ClassificationTypes::ACTIVITY
         ));
     }
     
@@ -847,10 +847,11 @@ function yatra_get_category_permalink($category): string
 {
     if (is_numeric($category)) {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trip_categories';
+        $table = ClassificationsTable::getTableName();
         $category = $wpdb->get_row($wpdb->prepare(
-            "SELECT slug FROM {$table} WHERE id = %d",
-            (int) $category
+            "SELECT slug FROM {$table} WHERE id = %d AND type = %s",
+            (int) $category,
+            ClassificationTypes::CATEGORY
         ));
     }
     
@@ -875,7 +876,7 @@ function yatra_get_trip_permalink($trip): string
 {
     if (is_numeric($trip)) {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_trips';
+        $table = TripsTable::getTableName();
         $trip = $wpdb->get_row($wpdb->prepare(
             "SELECT slug FROM {$table} WHERE id = %d",
             (int) $trip
@@ -903,10 +904,11 @@ function yatra_get_difficulty_permalink($difficulty): string
 {
     if (is_numeric($difficulty)) {
         global $wpdb;
-        $table = $wpdb->prefix . 'yatra_difficulty_levels';
+        $table = ClassificationsTable::getTableName();
         $difficulty = $wpdb->get_row($wpdb->prepare(
-            "SELECT slug FROM {$table} WHERE id = %d",
-            (int) $difficulty
+            "SELECT slug FROM {$table} WHERE id = %d AND type = %s",
+            (int) $difficulty,
+            ClassificationTypes::DIFFICULTY
         ));
     }
     

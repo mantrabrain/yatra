@@ -20,6 +20,7 @@ import { IconSelector } from '../components/ui/icon-selector';
 import type { IconPickerValue } from '../components/ui/icon-picker';
 import { SearchFilterToolbar, BulkActionToolbar, Pagination, Table as SharedTable } from '../components/shared';
 import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
+import { getErrorContext } from '../lib/errors';
 
 interface TravelerCategory {
   id: number;
@@ -92,7 +93,7 @@ const TravelerCategories: React.FC = () => {
   });
 
   // Fetch categories from API
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error } = useQuery<any>({
     queryKey: ['traveler-categories', queryParams],
     queryFn: async () => {
       try {
@@ -125,6 +126,9 @@ const TravelerCategories: React.FC = () => {
   const categories = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const isCategoriesError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -612,44 +616,44 @@ const TravelerCategories: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_trips">
-        {/* Bulk actions toolbar */}
-        <BulkActionToolbar
-          selectedIds={selectedIds}
-          bulkAction={bulkAction}
-          setBulkAction={setBulkAction}
-          onApply={handleBulkApply}
-          onClearSelection={() => setSelectedIds([])}
-          statusFilter={statusFilter}
-          setStatusFilter={(value) => {
-            setStatusFilter(value);
-            setPage(1);
-            setSelectedIds([]);
-            setBulkAction('');
-          }}
-          statusOptions={[
-            { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-            { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-            { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-            { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
-          ]}
-          showColumnsDropdown={showColumnsDropdown}
-          setShowColumnsDropdown={setShowColumnsDropdown}
-          columnOptions={[
-            { key: 'category', label: __('Category', 'Category'), visible: visibleColumns.category },
-            { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-            { key: 'age_range', label: __('Age Range', 'Age Range'), visible: visibleColumns.age_range },
-            { key: 'pricing', label: __('Pricing', 'Pricing'), visible: visibleColumns.pricing },
-            { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-            { key: 'dates', label: __('Date', 'Date'), visible: visibleColumns.dates },
-            { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
-          ]}
-          onToggleColumn={(key) => toggleColumnVisibility(key as keyof typeof visibleColumns)}
-          bulkMutationPending={bulkMutation.isPending}
-          totalItems={categories.length}
-          bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
-        />
+        {!isCategoriesError && (
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+              setSelectedIds([]);
+              setBulkAction('');
+            }}
+            statusOptions={[
+              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
+              { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
+              { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
+              { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={[
+              { key: 'category', label: __('Category', 'Category'), visible: visibleColumns.category },
+              { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+              { key: 'age_range', label: __('Age Range', 'Age Range'), visible: visibleColumns.age_range },
+              { key: 'pricing', label: __('Pricing', 'Pricing'), visible: visibleColumns.pricing },
+              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+              { key: 'dates', label: __('Date', 'Date'), visible: visibleColumns.dates },
+              { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
+            ]}
+            onToggleColumn={(key) => toggleColumnVisibility(key as keyof typeof visibleColumns)}
+            bulkMutationPending={bulkMutation.isPending}
+            totalItems={categories.length}
+            bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+          />
+        )}
 
-        {/* Table */}
         <Card>
           <CardContent className="p-0">
             <SharedTable
@@ -657,8 +661,15 @@ const TravelerCategories: React.FC = () => {
               columns={columns}
               actions={actions}
               isLoading={isLoading}
-              isError={!!error}
+              isError={isCategoriesError}
               errorText={__('Error loading traveler categories', 'Error loading traveler categories')}
+              errorDescription={__(
+                'We couldn’t connect to the traveler categories service. Please refresh or try again shortly.',
+                'We couldn’t connect to the traveler categories service. Please refresh or try again shortly.'
+              )}
+              errorDetails={errorContext.details || apiErrorMessage}
+              errorRequestInfo={errorContext.requestInfo}
+              onRetry={() => queryClient.invalidateQueries({ queryKey: ['traveler-categories'] })}
               emptyText={__('No traveler categories found', 'No traveler categories found')}
               emptyDescription={
                 hasFilters
@@ -692,7 +703,6 @@ const TravelerCategories: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Pagination */}
         {total > 0 && (
           <div className="mt-4">
             <Pagination

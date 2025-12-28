@@ -157,15 +157,15 @@ class ActivityRepository extends BaseRepository
                 FROM `{$actTable}` a
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = a.id 
-                  AND tc.classification_type = '".ClassificationTypes::ACTIVITY."'
+                  AND tc.classification_type = %s
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE a.type = '".ClassificationTypes::ACTIVITY."' AND a.status = 'active'
+                WHERE a.type = %s AND a.status = 'active'
                 GROUP BY a.id";
 
-        $rows = $this->wpdb->get_results($sql) ?: [];
+        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::ACTIVITY, ClassificationTypes::ACTIVITY)) ?: [];
 
         if (empty($rows)) {
             return [];
@@ -222,10 +222,10 @@ class ActivityRepository extends BaseRepository
         // Get counts for each status - only for activities
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
-                WHERE type = '" . ClassificationTypes::ACTIVITY . "'
+                WHERE type = %s
                 GROUP BY status";
 
-        $results = $this->wpdb->get_results($sql);
+        $results = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::ACTIVITY));
          $counts = [
             'publish' => 0,
             'draft' => 0,

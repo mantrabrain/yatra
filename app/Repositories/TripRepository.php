@@ -8,6 +8,10 @@ use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripContentTable;
+use Yatra\Database\Tables\TripItineraryDayEntryTable;
+use Yatra\Database\Tables\TripItineraryDaysTable;
+use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
@@ -90,9 +94,6 @@ class TripRepository extends BaseRepository
         // Use new table classes
         $reviews_table = ReviewsTable::getTableName();
         $bookings_table = BookingsTable::getTableName();
-        $classificationsTable = ClassificationsTable::getTableName();
-        $tripClassificationsTable = TripClassificationsTable::getTableName();
-        
         // Build WHERE conditions and parameters
         $wheres = ["t.status IN ('publish', 'published')", "(t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')"];
         $params = [];
@@ -100,6 +101,9 @@ class TripRepository extends BaseRepository
         $having_clauses = [];
         $rating_params = [];
         
+        $classificationsTable = ClassificationsTable::getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
+
         // Destination filter
         if (!empty($filters['destination'])) {
             $joins[] = "LEFT JOIN {$tripClassificationsTable} tcd ON tcd.trip_id = t.id";
@@ -148,11 +152,10 @@ class TripRepository extends BaseRepository
         
         // Difficulty filter
         if (!empty($filters['difficulty']) && is_array($filters['difficulty'])) {
-            // Using hardcoded table name since there's no dedicated repository for this table
-            $difficulty_table = $wpdb->prefix . 'yatra_difficulty_levels';
-            $joins[] = "LEFT JOIN {$difficulty_table} dl ON (t.difficulty_level = dl.id OR t.difficulty_level = dl.slug)";
+            $joins[] = "LEFT JOIN {$classificationsTable} dl ON dl.id = t.difficulty_level";
             $difficulty_placeholders = implode(',', array_fill(0, count($filters['difficulty']), '%d'));
-            $wheres[] = "dl.id IN ({$difficulty_placeholders})";
+            $wheres[] = "dl.type = %s AND dl.id IN ({$difficulty_placeholders})";
+            $params[] = ClassificationTypes::DIFFICULTY;
             $params = array_merge($params, $filters['difficulty']);
         }
         
@@ -300,22 +303,24 @@ class TripRepository extends BaseRepository
 
         // Batch load pricing data for traveler-based trips
         // Using TripPricingTable for pricing data
-        $price_types_table = \Yatra\Database\Tables\TripPricingTable::getTableName();
+        $price_types_table = TripPricingTable::getTableName();
         $pricing_data = $wpdb->get_results($wpdb->prepare(
-            "SELECT trip_id, original_price, discounted_price,
+            "SELECT trip_id,
+                    base_price AS original_price,
+                    adjusted_price AS discounted_price,
                     CASE 
-                        WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
-                        ELSE original_price 
+                        WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 THEN adjusted_price 
+                        ELSE base_price 
                     END as effective_price,
                     CASE 
-                        WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
-                        THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                        WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 AND base_price > 0 
+                        THEN ROUND(((base_price - adjusted_price) / base_price) * 100)
                         ELSE 0
                     END as discount_percentage
              FROM {$price_types_table} 
              WHERE trip_id IN ({$trip_ids_placeholder}) AND (
-                 (discounted_price IS NOT NULL AND discounted_price > 0) OR 
-                 (original_price IS NOT NULL AND original_price > 0)
+                 (adjusted_price IS NOT NULL AND adjusted_price > 0) OR 
+                 (base_price IS NOT NULL AND base_price > 0)
              )
              ORDER BY trip_id, effective_price ASC",
             ...$trip_ids
@@ -339,9 +344,9 @@ class TripRepository extends BaseRepository
             $destinations_raw = $wpdb->get_results($wpdb->prepare(
                 "SELECT tc.trip_id, c.* FROM {$classificationsTable} c
                  INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = 'destination' AND c.status = 'publish'
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
-                ...$trip_ids
+                ...$trip_ids, ClassificationTypes::DESTINATION
             ));
             
             foreach ($destinations_raw as $dest) {
@@ -361,9 +366,9 @@ class TripRepository extends BaseRepository
             $activities_raw = $wpdb->get_results($wpdb->prepare(
                 "SELECT tc.trip_id, c.* FROM {$classificationsTable} c
                  INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = 'activity' AND c.status = 'publish'
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, tc.sort_order ASC, c.name ASC",
-                ...$trip_ids
+                ...$trip_ids, ClassificationTypes::ACTIVITY
             ));
             
             foreach ($activities_raw as $act) {
@@ -375,7 +380,7 @@ class TripRepository extends BaseRepository
 
         // Batch load categories
         // Using TripClassificationsTable for category relationships
-        $cat_rel_table = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
+        $cat_rel_table = $tripClassificationsTable;
         $categories_data = [];
         $catTableExists = Cache::tableExists($cat_rel_table, function() use ($wpdb, $cat_rel_table) {
             return (bool) $wpdb->get_var("SHOW TABLES LIKE '{$cat_rel_table}'");
@@ -383,11 +388,12 @@ class TripRepository extends BaseRepository
         
         if ($catTableExists) {
             $categories_raw = $wpdb->get_results($wpdb->prepare(
-                "SELECT tc.trip_id, c.* FROM {$wpdb->prefix}yatra_trip_categories c
-                 INNER JOIN {$cat_rel_table} tc ON c.id = tc.category_id
-                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) AND c.status = 'publish'
+                "SELECT tc.trip_id, c.* FROM {$classificationsTable} c
+                 INNER JOIN {$cat_rel_table} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id IN ({$trip_ids_placeholder}) 
+                   AND c.type = %s AND c.status = 'publish'
                  ORDER BY tc.trip_id, c.name ASC",
-                ...$trip_ids
+                ...array_merge($trip_ids, [ClassificationTypes::CATEGORY])
             ));
             
             foreach ($categories_raw as $cat) {
@@ -445,23 +451,22 @@ class TripRepository extends BaseRepository
         $trip->effective_price_min = 0;
         
         if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
-            // Using hardcoded table name since there's no dedicated repository for this table
-            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+            $price_types_table = TripPricingTable::getTableName();
             $all_price_types = $wpdb->get_results($wpdb->prepare(
-                "SELECT original_price, discounted_price,
+                "SELECT base_price AS original_price, adjusted_price AS discounted_price,
                         CASE 
-                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 THEN discounted_price 
-                            ELSE original_price 
+                            WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 THEN adjusted_price 
+                            ELSE base_price 
                         END as effective_price,
                         CASE 
-                            WHEN discounted_price IS NOT NULL AND discounted_price > 0 AND original_price > 0 
-                            THEN ROUND(((original_price - discounted_price) / original_price) * 100)
+                            WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 AND base_price > 0 
+                            THEN ROUND(((base_price - adjusted_price) / base_price) * 100)
                             ELSE 0
                         END as discount_percentage
                  FROM {$price_types_table} 
-                 WHERE trip_id = %d AND (
-                     (discounted_price IS NOT NULL AND discounted_price > 0) OR 
-                     (original_price IS NOT NULL AND original_price > 0)
+                 WHERE trip_id = %d AND pricing_type = 'traveler_category' AND (
+                     (adjusted_price IS NOT NULL AND adjusted_price > 0) OR 
+                     (base_price IS NOT NULL AND base_price > 0)
                  )
                  ORDER BY effective_price ASC",
                 $trip->id
@@ -507,9 +512,9 @@ class TripRepository extends BaseRepository
         $destinations = $wpdb->get_results($wpdb->prepare(
             "SELECT c.* FROM {$classificationsTable} c
              INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-             WHERE tc.trip_id = %d AND c.type = 'destination' AND c.status = 'publish'
+             WHERE tc.trip_id = %d AND c.type = %s AND c.status = 'publish'
              ORDER BY tc.sort_order ASC, c.name ASC",
-            $trip->id
+            $trip->id, ClassificationTypes::DESTINATION
         ));
         $trip->destinations = $destinations ?: [];
         
@@ -517,9 +522,9 @@ class TripRepository extends BaseRepository
         $activities = $wpdb->get_results($wpdb->prepare(
             "SELECT c.* FROM {$classificationsTable} c
              INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-             WHERE tc.trip_id = %d AND c.type = 'activity' AND c.status = 'publish'
+             WHERE tc.trip_id = %d AND c.type = %s AND c.status = 'publish'
              ORDER BY tc.sort_order ASC, c.name ASC",
-            $trip->id
+            $trip->id, ClassificationTypes::ACTIVITY
         ));
         $trip->activities = $activities ?: [];
         
@@ -527,9 +532,9 @@ class TripRepository extends BaseRepository
         $categories = $wpdb->get_results($wpdb->prepare(
             "SELECT c.* FROM {$classificationsTable} c
              INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-             WHERE tc.trip_id = %d AND c.type = 'category' AND c.status = 'publish'
+             WHERE tc.trip_id = %d AND c.type = %s AND c.status = 'publish'
              ORDER BY tc.sort_order ASC, c.name ASC",
-            $trip->id
+            $trip->id, ClassificationTypes::CATEGORY
         ));
         $trip->categories = $categories ?: [];
         
@@ -626,9 +631,9 @@ class TripRepository extends BaseRepository
                 "SELECT tc.*, c.name as destination_name, c.slug as destination_slug 
                  FROM {$tripClassificationsTable} tc
                  LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
-                 WHERE tc.trip_id = %d AND c.type = 'destination'
+                 WHERE tc.trip_id = %d AND c.type = %s
                  ORDER BY tc.sort_order ASC, tc.id ASC",
-                $tripId
+                $tripId, ClassificationTypes::DESTINATION
             )
         ) ?: [];
     }
@@ -649,9 +654,9 @@ class TripRepository extends BaseRepository
                 "SELECT tc.*, c.name as activity_name, c.slug as activity_slug 
                  FROM {$tripClassificationsTable} tc
                  LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
-                 WHERE tc.trip_id = %d AND c.type = 'activity'
+                 WHERE tc.trip_id = %d AND c.type = %s
                  ORDER BY tc.sort_order ASC, tc.id ASC",
-                $tripId
+                $tripId, ClassificationTypes::ACTIVITY
             )
         ) ?: [];
     }
@@ -672,9 +677,9 @@ class TripRepository extends BaseRepository
                 "SELECT tc.*, c.name as category_name, c.slug as category_slug 
                  FROM {$tripClassificationsTable} tc
                  LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
-                 WHERE tc.trip_id = %d AND c.type = 'category'
+                 WHERE tc.trip_id = %d AND c.type = %s
                  ORDER BY tc.sort_order ASC, tc.id ASC",
-                $tripId
+                $tripId, ClassificationTypes::CATEGORY
             )
         ) ?: [];
         
@@ -870,24 +875,32 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_destinations';
+        $table = TripClassificationsTable::getTableName();
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        // Delete existing destination relations
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'classification_type' => ClassificationTypes::DESTINATION,
+            ],
+            ['%d', '%s']
+        );
         
-        // Insert new
+        // Insert new destination relations
         if (!empty($destinationIds)) {
             foreach ($destinationIds as $index => $destinationId) {
                 $wpdb->insert(
                     $table,
                     [
                         'trip_id' => $tripId,
-                        'destination_id' => (int) $destinationId,
-                        'is_primary' => $index === 0 ? 1 : 0,
-                        'order' => $index,
+                        'classification_id' => (int) $destinationId,
+                        'classification_type' => ClassificationTypes::DESTINATION,
+                        'relationship_type' => $index === 0 ? 'primary' : 'secondary',
+                        'sort_order' => $index,
+                        'is_featured' => $index === 0 ? 1 : 0,
                     ],
-                    ['%d', '%d', '%d', '%d']
+                    ['%d', '%d', '%s', '%s', '%d', '%d']
                 );
             }
         }
@@ -900,24 +913,32 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_activities';
+        $table = TripClassificationsTable::getTableName();
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        // Delete existing activity relations
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'classification_type' => ClassificationTypes::ACTIVITY,
+            ],
+            ['%d', '%s']
+        );
         
-        // Insert new
+        // Insert new activity relations
         if (!empty($activityIds)) {
             foreach ($activityIds as $index => $activityId) {
                 $wpdb->insert(
                     $table,
                     [
                         'trip_id' => $tripId,
-                        'activity_id' => (int) $activityId,
-                        'is_primary' => $index === 0 ? 1 : 0,
-                        'order' => $index,
+                        'classification_id' => (int) $activityId,
+                        'classification_type' => ClassificationTypes::ACTIVITY,
+                        'relationship_type' => $index === 0 ? 'primary' : 'secondary',
+                        'sort_order' => $index,
+                        'is_featured' => $index === 0 ? 1 : 0,
                     ],
-                    ['%d', '%d', '%d', '%d']
+                    ['%d', '%d', '%s', '%s', '%d', '%d']
                 );
             }
         }
@@ -930,55 +951,33 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_trip_categories';
+        $table = TripClassificationsTable::getTableName();
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra: saveTripCategories called with tripId={$tripId}, categoryIds=" . json_encode($categoryIds));
-        }
+        // Delete existing category relations
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'classification_type' => ClassificationTypes::CATEGORY,
+            ],
+            ['%d', '%s']
+        );
         
-        // Check if table exists first
-        $table_exists = $wpdb->get_var($wpdb->prepare(
-            "SHOW TABLES LIKE %s",
-            $table
-        )) === $table;
-        
-        if (!$table_exists) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: Table {$table} does not exist, creating tables...");
-            }
-            // Try to create tables
-            \Yatra\Core\Database::createTables();
-        }
-        
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
-        
-        // Insert new
+        // Insert new categories
         if (!empty($categoryIds)) {
             foreach ($categoryIds as $index => $categoryId) {
-                $result = $wpdb->insert(
+                $wpdb->insert(
                     $table,
                     [
                         'trip_id' => $tripId,
-                        'category_id' => (int) $categoryId,
-                        'is_primary' => $index === 0 ? 1 : 0,
-                        'order' => $index,
+                        'classification_id' => (int) $categoryId,
+                        'classification_type' => ClassificationTypes::CATEGORY,
+                        'relationship_type' => $index === 0 ? 'primary' : 'secondary',
+                        'sort_order' => $index,
+                        'is_featured' => $index === 0 ? 1 : 0,
                     ],
-                    ['%d', '%d', '%d', '%d']
+                    ['%d', '%d', '%s', '%s', '%d', '%d']
                 );
-                
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    if ($result === false) {
-                        error_log("Yatra: Failed to insert trip category - " . $wpdb->last_error);
-                    } else {
-                        error_log("Yatra: Inserted trip category {$categoryId} for trip {$tripId}");
-                    }
-                }
-            }
-        } else {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: No category IDs to save for trip {$tripId}");
             }
         }
     }
@@ -990,15 +989,14 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_price_types';
+        $table = TripPricingTable::getTableName();
         
         error_log("Yatra savePriceTypes: START - tripId={$tripId}, count=" . count($priceTypes));
         error_log("Yatra savePriceTypes: priceTypes=" . json_encode($priceTypes));
         
-        // Delete existing price types for this trip first
+        // Delete existing traveler-category price types for this trip
         $deleteResult = $wpdb->query($wpdb->prepare(
-            "DELETE FROM `{$table}` WHERE `trip_id` = %d",
+            "DELETE FROM `{$table}` WHERE `trip_id` = %d AND `pricing_type` = 'traveler_category'",
             $tripId
         ));
         
@@ -1027,23 +1025,28 @@ class TripRepository extends BaseRepository
                 
                 $processedCategories[] = $categoryId;
                 
-                // Simple insert with all required fields
-                $insertData = [
-                        'trip_id' => $tripId,
-                    'category_id' => $categoryId,
-                        'original_price' => (float) ($priceType['original_price'] ?? 0),
-                    'is_default' => 0,
-                    'min_quantity' => 1,
-                ];
+                $basePrice = (float) ($priceType['original_price'] ?? $priceType['base_price'] ?? 0);
+                $adjustedPrice = isset($priceType['discounted_price']) && $priceType['discounted_price'] !== '' && $priceType['discounted_price'] !== null
+                    ? (float) $priceType['discounted_price']
+                    : null;
                 
-                // Add optional fields if they have values
-                if (isset($priceType['discounted_price']) && $priceType['discounted_price'] !== '' && $priceType['discounted_price'] !== null) {
-                    $insertData['discounted_price'] = (float) $priceType['discounted_price'];
-                }
+                $insertData = [
+                    'trip_id' => $tripId,
+                    'pricing_type' => 'traveler_category',
+                    'category_id' => $categoryId,
+                    'base_price' => $basePrice,
+                    'adjusted_price' => $adjustedPrice,
+                    'price_per' => 'person',
+                    'currency' => get_option('yatra_currency', 'USD'),
+                    'min_quantity' => 1,
+                    'is_default' => $index === 0 ? 1 : 0,
+                    'sort_order' => $index,
+                    'is_active' => 1,
+                ];
                 
                 error_log("Yatra savePriceTypes: Inserting data=" . json_encode($insertData));
                 
-                $result = $wpdb->insert($table, $insertData);
+                $result = $wpdb->insert($table, $insertData, ['%d','%s','%d','%f','%f','%s','%s','%d','%d','%d','%d']);
                 
                 if ($result === false) {
                     error_log("Yatra savePriceTypes: INSERT FAILED - " . $wpdb->last_error);
@@ -1065,30 +1068,48 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_highlights';
+        $table = TripContentTable::getTableName();
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        // Delete existing highlights
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'content_type' => 'highlight',
+            ],
+            ['%d', '%s']
+        );
         
-        // Insert new
         if (!empty($highlights)) {
             foreach ($highlights as $index => $highlight) {
                 $highlightText = is_string($highlight) ? $highlight : ($highlight['text'] ?? $highlight['highlight_text'] ?? '');
-                if (!empty($highlightText)) {
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'trip_id' => $tripId,
-                            'highlight_text' => sanitize_text_field($highlightText),
-                            'highlight_icon' => is_array($highlight) ? ($highlight['icon'] ?? null) : null,
-                            'highlight_image_id' => is_array($highlight) ? ($highlight['image_id'] ?? null) : null,
-                            'order' => $index,
-                            'is_featured' => is_array($highlight) && isset($highlight['is_featured']) ? (int) $highlight['is_featured'] : 0,
-                        ],
-                        ['%d', '%s', '%s', '%d', '%d', '%d']
-                    );
+                if (empty($highlightText)) {
+                    continue;
                 }
+                
+                $metadata = [];
+                if (is_array($highlight)) {
+                    if (!empty($highlight['icon'])) {
+                        $metadata['icon'] = $highlight['icon'];
+                    }
+                    if (!empty($highlight['image_id'])) {
+                        $metadata['image_id'] = (int) $highlight['image_id'];
+                    }
+                }
+                
+                $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $tripId,
+                        'content_type' => 'highlight',
+                        'title' => sanitize_text_field($highlightText),
+                        'description' => is_array($highlight) && !empty($highlight['description']) ? wp_kses_post($highlight['description']) : null,
+                        'metadata' => !empty($metadata) ? wp_json_encode($metadata) : null,
+                        'sort_order' => $index,
+                        'is_featured' => is_array($highlight) && isset($highlight['is_featured']) ? (int) $highlight['is_featured'] : 0,
+                    ],
+                    ['%d', '%s', '%s', '%s', '%s', '%d', '%d']
+                );
             }
         }
     }
@@ -1100,32 +1121,50 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_gallery_images';
+        $table = TripContentTable::getTableName();
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        // Delete existing gallery images
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'content_type' => 'image',
+            ],
+            ['%d', '%s']
+        );
         
         // Insert new
         if (!empty($galleryImages)) {
             foreach ($galleryImages as $index => $image) {
                 $imageUrl = is_string($image) ? $image : ($image['url'] ?? $image['image_url'] ?? '');
-                if (!empty($imageUrl)) {
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'trip_id' => $tripId,
-                            'image_url' => esc_url_raw($imageUrl),
-                            'image_id' => is_array($image) && isset($image['id']) ? (int) $image['id'] : 0,
-                            'thumbnail_url' => is_array($image) ? ($image['thumbnail_url'] ?? null) : null,
-                            'alt_text' => is_array($image) ? ($image['alt_text'] ?? null) : null,
-                            'caption' => is_array($image) ? ($image['caption'] ?? null) : null,
-                            'order' => $index,
-                            'is_featured' => is_array($image) && isset($image['is_featured']) ? (int) $image['is_featured'] : 0,
-                        ],
-                        ['%d', '%s', '%d', '%s', '%s', '%s', '%d', '%d']
-                    );
+                if (empty($imageUrl)) {
+                    continue;
                 }
+                
+                $metadata = [];
+                if (is_array($image)) {
+                    if (!empty($image['alt_text'])) {
+                        $metadata['alt_text'] = $image['alt_text'];
+                    }
+                    if (!empty($image['caption'])) {
+                        $metadata['caption'] = $image['caption'];
+                    }
+                }
+                
+                $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $tripId,
+                        'content_type' => 'image',
+                        'content_url' => esc_url_raw($imageUrl),
+                        'file_path' => is_array($image) ? ($image['file_path'] ?? null) : null,
+                        'metadata' => !empty($metadata) ? wp_json_encode($metadata) : null,
+                        'thumbnail_url' => is_array($image) ? ($image['thumbnail_url'] ?? null) : null,
+                        'sort_order' => $index,
+                        'is_featured' => is_array($image) && isset($image['is_featured']) ? (int) $image['is_featured'] : 0,
+                    ],
+                    ['%d', '%s', '%s', '%s', '%s', '%s', '%d', '%d']
+                );
             }
         }
     }
@@ -1137,29 +1176,43 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table name since there's no dedicated repository for this table
-        $table = $wpdb->prefix . 'yatra_trip_faqs';
+        $table = TripContentTable::getTableName();
         
-        // Delete existing
-        $wpdb->delete($table, ['trip_id' => $tripId], ['%d']);
+        // Delete existing FAQs
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'content_type' => 'faq',
+            ],
+            ['%d', '%s']
+        );
         
-        // Insert new
+        // Insert new FAQs
         if (!empty($faqs)) {
             foreach ($faqs as $index => $faq) {
-                if (is_array($faq) && !empty($faq['question']) && !empty($faq['answer'])) {
-                    $wpdb->insert(
-                        $table,
-                        [
-                            'trip_id' => $tripId,
-                            'question' => sanitize_text_field($faq['question']),
-                            'answer' => wp_kses_post($faq['answer']),
-                            'category' => isset($faq['category']) ? sanitize_text_field($faq['category']) : null,
-                            'order' => $index,
-                            'is_featured' => isset($faq['is_featured']) ? (int) $faq['is_featured'] : 0,
-                        ],
-                        ['%d', '%s', '%s', '%s', '%d', '%d']
-                    );
+                if (!is_array($faq) || empty($faq['question']) || empty($faq['answer'])) {
+                    continue;
                 }
+                
+                $metadata = [];
+                if (!empty($faq['category'])) {
+                    $metadata['category'] = sanitize_text_field($faq['category']);
+                }
+                
+                $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $tripId,
+                        'content_type' => 'faq',
+                        'title' => sanitize_text_field($faq['question']),
+                        'description' => wp_kses_post($faq['answer']),
+                        'metadata' => !empty($metadata) ? wp_json_encode($metadata) : null,
+                        'sort_order' => $index,
+                        'is_featured' => isset($faq['is_featured']) ? (int) $faq['is_featured'] : 0,
+                    ],
+                    ['%d', '%s', '%s', '%s', '%s', '%d', '%d']
+                );
             }
         }
     }
@@ -1171,9 +1224,8 @@ class TripRepository extends BaseRepository
     {
         global $wpdb;
         
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $tableDays = $wpdb->prefix . 'yatra_trip_itinerary_days';
-        $tableEntries = $wpdb->prefix . 'yatra_trip_itinerary_entries';
+        $tableDays = TripItineraryDaysTable::getTableName();
+        $tableEntries = TripItineraryDayEntryTable::getTableName();
         
         // Delete existing itinerary
         $wpdb->delete($tableEntries, ['trip_id' => $tripId], ['%d']);

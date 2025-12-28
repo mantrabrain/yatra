@@ -12,6 +12,7 @@ import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
@@ -157,6 +158,7 @@ const Activities: React.FC = () => {
   const activities = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
 
   // Status counts from stats API
   const statusCounts = useMemo(() => {
@@ -378,15 +380,8 @@ const Activities: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_trips">
-        {/* Table */}
-        {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading activities', 'Error loading activities')}
-            </CardContent>
-          </Card>
-        ) : (
-          <>
+        <>
+          {!error && (
             <BulkActionToolbar
               selectedIds={selectedIds}
               bulkAction={bulkAction}
@@ -418,10 +413,11 @@ const Activities: React.FC = () => {
               totalItems={activities.length}
               bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
             />
+          )}
 
-            <Card className="overflow-visible">
-              <CardContent className="p-0 overflow-visible">
-                <SharedTable
+          <Card className="overflow-visible">
+            <CardContent className="p-0 overflow-visible">
+              <SharedTable
                   data={activities}
                   columns={[
                     {
@@ -606,6 +602,13 @@ const Activities: React.FC = () => {
                     isLoading={isLoading}
                     isError={!!error}
                     errorText={__('Error loading activities', 'Error loading activities')}
+                    errorDescription={__(
+                      'We couldn’t connect to the activities service. Please refresh or try again shortly.',
+                      'We couldn’t connect to the activities service. Please refresh or try again shortly.'
+                    )}
+                    onRetry={() => queryClient.invalidateQueries({ queryKey: ['activities'] })}
+                    errorDetails={errorContext.details}
+                    errorRequestInfo={errorContext.requestInfo}
                     emptyText={__('No activities found', 'No activities found')}
                     emptyDescription={hasFilters 
                       ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
@@ -635,11 +638,9 @@ const Activities: React.FC = () => {
                     statusFilter={statusFilter}
                     skeletonRows={5}
                   />
-              </CardContent>
-            </Card>
-
-          </>
-        )}
+            </CardContent>
+          </Card>
+        </>
       </ConditionalRender>
 
       {/* Pagination */}

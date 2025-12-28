@@ -721,7 +721,7 @@ class PayPalGateway extends AbstractPaymentGateway
         );
         
         // Record the payment
-        $payments_table = $wpdb->prefix . 'yatra_payments';
+        $payments_table = BookingPaymentsTable::getTableName();
         $wpdb->insert(
             $payments_table,
             [

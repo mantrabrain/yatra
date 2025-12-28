@@ -2,6 +2,7 @@
 
 namespace Yatra\Migration;
 
+use Yatra\Database\Tables\DiscountsTable;
 use Yatra\Migration\MigrationProgress;
 
 class CouponMigration extends BaseMigration
@@ -53,7 +54,7 @@ class CouponMigration extends BaseMigration
                 ];
 
                 $wpdb->insert(
-                    $wpdb->prefix . 'yatra_coupons',
+                    DiscountsTable::getTableName(),
                     $couponData
                 );
 

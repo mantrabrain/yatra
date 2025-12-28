@@ -30,10 +30,10 @@ import { SearchableSelect } from '../components/ui/searchable-select';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { Alert } from '../components/ui/alert';
 import { IconSelector } from '../components/ui/icon-selector';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
+import { getErrorContext } from '../lib/errors';
 
 interface ItineraryEntry {
   id: number;
@@ -224,27 +224,31 @@ const Itinerary: React.FC = () => {
   const { data, isLoading, error, refetch } = useQuery<DayGroup[]>({
     queryKey: ['itinerary', tripFilter, tripsData],
     queryFn: async (): Promise<DayGroup[]> => {
-      try {
-        const trips = Array.isArray(tripsData) ? tripsData : [];
-        const allEntries: ItineraryEntry[] = [];
-        const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number; day_status?: string }>();
-        const dayStatuses = new Map<string, string>();
+      const trips = Array.isArray(tripsData) ? tripsData : [];
+      const allEntries: ItineraryEntry[] = [];
+      const allDays = new Map<string, { trip_id: number; trip_title: string; day: number; day_title: string; day_id?: number; day_status?: string }>();
+      const dayStatuses = new Map<string, string>();
 
-        // Fetch itinerary data for the selected trip
-        if (!tripFilter) {
-          return [];
-        }
-        const tripsToFetch = trips.filter((t: any) => t.id === parseInt(tripFilter));
+      // Fetch itinerary data for the selected trip
+      if (!tripFilter) {
+        return [];
+      }
+      const tripsToFetch = trips.filter((t: any) => t.id === parseInt(tripFilter));
 
         for (const trip of tripsToFetch) {
-          try {
-            // Fetch itinerary data from the new itinerary endpoint
-            const itineraryResponse = await apiClient.get('/itinerary', {
-              params: {
-                trip_id: trip.id,
-                _t: Date.now(), // Cache buster
-              }
-            });
+          // Check URL parameter for error simulation (for testing)
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('simulate_error') === 'true') {
+            throw new Error('Simulated API error for testing error UI functionality');
+          }
+          
+          // Fetch itinerary data from the new itinerary endpoint
+          const itineraryResponse = await apiClient.get('/itinerary', {
+            params: {
+              trip_id: trip.id,
+              _t: Date.now(), // Cache buster
+            }
+          });
             
             // Debug logging
             console.log('[ITINERARY FRONTEND DEBUG] Raw API response:', itineraryResponse);
@@ -417,9 +421,6 @@ const Itinerary: React.FC = () => {
                 });
               }
             }
-          } catch (error: any) {
-            console.error(`Failed to fetch itinerary for trip ${trip.id}:`, error);
-          }
       }
 
       // Group by trip and day
@@ -465,10 +466,6 @@ const Itinerary: React.FC = () => {
       });
 
       return grouped;
-      } catch (error: any) {
-        showToast(error?.message || __('Failed to load itinerary', 'Failed to load itinerary'), 'error');
-        return [];
-      }
     },
     enabled: can('yatra_view_trips') && !!tripsData && !!tripFilter,
     staleTime: 0, // Always refetch to ensure fresh data
@@ -1097,6 +1094,29 @@ const Itinerary: React.FC = () => {
   };
 
   const dayGroups: DayGroup[] = (data || []) as DayGroup[];
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  
+  // More precise error detection - only true if query ran and failed
+  const queryEnabled = can('yatra_view_trips') && !!tripsData && !!tripFilter;
+  const isItineraryError = queryEnabled && (!!error || !!apiErrorMessage);
+
+  // Debug logging to understand the state
+  console.log('[ITINERARY DEBUG] Query state:', {
+    isLoading,
+    error,
+    data,
+    tripFilter,
+    tripsData,
+    queryEnabled,
+    isItineraryError,
+    derivedErrorDetails,
+    dayGroupsLength: dayGroups.length
+  });
 
   const matchesStatusValue = (statusValue: string | undefined | null, filter: string) => {
     if (!filter || filter === 'all') {
@@ -1353,10 +1373,81 @@ const Itinerary: React.FC = () => {
             totalItems={totalSelectableItems}
             bulkActionOptions={bulkActionOptions}
           />
-          {error ? (
-            <Alert variant="error" title={__('Error Loading Itinerary', 'Error Loading Itinerary')}>
-              {__('We couldn\'t load itinerary entries. Please refresh the page or try again later.', 'We couldn\'t load itinerary entries. Please refresh the page or try again later.')}
-            </Alert>
+          {isItineraryError ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {__('Error Loading Itinerary', 'Error Loading Itinerary')}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__('We couldn\'t connect to the itinerary service. Please refresh or try again shortly.', 'We couldn\'t connect to the itinerary service. Please refresh or try again shortly.')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {derivedErrorDetails && (
+                    <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                          {__('Error Details', 'Error Details')}
+                        </h4>
+                        <button
+                          onClick={() => {
+                            const details = JSON.stringify({
+                              error: derivedErrorDetails,
+                              request: errorContext.requestInfo,
+                            }, null, 2);
+                            navigator.clipboard.writeText(details);
+                            // Show toast feedback
+                            showToast(__('Error details copied to clipboard', 'Error details copied to clipboard'), 'success');
+                          }}
+                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        >
+                          {__('Copy', 'Copy')}
+                        </button>
+                      </div>
+                      <div className="space-y-2 text-sm">
+                        <div className="text-gray-700 dark:text-gray-300 font-mono bg-white dark:bg-gray-900 p-2 rounded border">
+                          {derivedErrorDetails}
+                        </div>
+                        {errorContext.requestInfo && (
+                          <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                            <div><strong>{__('Request', 'Request')}:</strong> {errorContext.requestInfo.method} {errorContext.requestInfo.url}</div>
+                            {errorContext.requestInfo.payload && (
+                              <div><strong>{__('Payload', 'Payload')}:</strong> <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-1 rounded overflow-auto max-h-20">{JSON.stringify(errorContext.requestInfo.payload, null, 2)}</pre></div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => refetch()}
+                      variant="outline"
+                      className="flex items-center gap-2"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      {__('Retry', 'Retry')}
+                    </Button>
+                    <Button
+                      onClick={() => window.location.reload()}
+                      variant="ghost"
+                      className="text-gray-600 dark:text-gray-400"
+                    >
+                      {__('Refresh Page', 'Refresh Page')}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ) : isLoading || isLoadingTrips ? (
             <div className="space-y-3">
               {[1, 2, 3].map((i) => (

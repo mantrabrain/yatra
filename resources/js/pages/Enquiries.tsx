@@ -19,6 +19,7 @@ import { Badge } from '../components/ui/badge';
 import { useNavigate } from '../hooks/useNavigate';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Pagination, Table as SharedTable, BulkActionToolbar } from '../components/shared';
+import { getErrorContext } from '../lib/errors';
 
 interface Enquiry {
   id: number;
@@ -233,9 +234,15 @@ const Enquiries: React.FC = () => {
   ];
 
   // Fetch enquiries from API
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['enquiries', queryParams],
     queryFn: async () => {
+      // Check URL parameter for error simulation (for testing)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('simulate_error') === 'true') {
+        throw new Error('Simulated API error for testing error UI functionality');
+      }
+      
       const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -284,6 +291,15 @@ const Enquiries: React.FC = () => {
   const total = data?.total || 0;
   const perPage = 10;
   const totalPages = Math.ceil(total / perPage || 1);
+
+  // Enhanced error handling
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isEnquiriesError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
     return formatDateUtil(dateString);
@@ -601,9 +617,13 @@ const Enquiries: React.FC = () => {
             ].filter(Boolean)}
             actions={actions}
             isLoading={isLoading}
-            isError={!!error}
-            errorText={__('Error loading enquiries', 'Error loading enquiries')}
-            emptyText={__('No enquiries found', 'No enquiries found')}
+            isError={isEnquiriesError}
+            errorText={__('Error loading enquiries')}
+            errorDescription={__('We couldn\'t connect to the enquiries service. Please refresh or try again shortly.')}
+            errorDetails={derivedErrorDetails}
+            errorRequestInfo={errorContext.requestInfo}
+            onRetry={() => refetch()}
+            emptyText={__('No enquiries found')}
             emptyDescription={hasFilters
               ? __('Try adjusting your search or filter criteria to find what you\'re looking for.', 'Try adjusting your search or filter criteria to find what you\'re looking for.')
               : __('When customers submit enquiries, they will appear here.', 'When customers submit enquiries, they will appear here.')

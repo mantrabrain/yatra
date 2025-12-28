@@ -98,15 +98,15 @@ class DestinationRepository extends BaseRepository
                 FROM `{$destTable}` d
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = d.id 
-                  AND tc.classification_type = '" . ClassificationTypes::DESTINATION . "'
+                  AND tc.classification_type = %s
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE d.type = '" . ClassificationTypes::DESTINATION . "' AND d.status = 'active'
+                WHERE d.type = %s AND d.status = 'active'
                 GROUP BY d.id";
 
-        $rows = $this->wpdb->get_results($sql) ?: [];
+        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::DESTINATION, ClassificationTypes::DESTINATION)) ?: [];
 
         if (empty($rows)) {
             return [];
@@ -242,7 +242,8 @@ class DestinationRepository extends BaseRepository
         $limit = $this->buildLimitClause($args);
 
         $search_where = $this->wpdb->prepare(
-            "WHERE type = '" . ClassificationTypes::DESTINATION . "' AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            "WHERE type = %s AND (name LIKE %s OR slug LIKE %s OR description LIKE %s)",
+            ClassificationTypes::DESTINATION,
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%',
             '%' . $this->wpdb->esc_like($search) . '%'
@@ -264,12 +265,12 @@ class DestinationRepository extends BaseRepository
         $table = esc_sql($this->table);
 
         // Get counts for each status - only for destinations
-        $results = $this->wpdb->get_results("
+        $results = $this->wpdb->get_results($this->wpdb->prepare("
             SELECT status, COUNT(*) as count 
             FROM `{$table}` 
-            WHERE type = '" . ClassificationTypes::DESTINATION . "'
+            WHERE type = %s
             GROUP BY status
-        ", ARRAY_A) ?: [];
+        ", ClassificationTypes::DESTINATION), ARRAY_A) ?: [];
 
         $counts = [
             'publish' => 0,

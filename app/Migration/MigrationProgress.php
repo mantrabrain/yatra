@@ -11,6 +11,7 @@ namespace Yatra\Migration;
 use Yatra\Constants\ClassificationTypes;
 use Yatra\Core\Database;
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\DiscountsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Utils\Logger;
 use Yatra\Migration\TripMigration;
@@ -736,7 +737,7 @@ class MigrationProgress
                 ];
                 
                 $wpdb->insert(
-                    $wpdb->prefix . 'yatra_coupons',
+                    DiscountsTable::getTableName(),
                     $couponData
                 );
                 

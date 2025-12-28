@@ -9,6 +9,7 @@ import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Phone, MapPin
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { apiService } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
@@ -157,6 +158,7 @@ const Customers: React.FC = () => {
   const customers = data?.data || [];
   const total = data?.total || 0;
   const totalPages = data?.pages || Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
 
   const formatDate = (dateString: string | null | undefined) => {
     return formatDateUtil(dateString);
@@ -714,48 +716,46 @@ const Customers: React.FC = () => {
 
         {/* Customers Table Card */}
         <ConditionalRender capability="yatra_view_bookings">
-          {error ? (
-            <Card>
-              <CardContent className="p-8 text-center text-red-500">
-                {__('Error loading customers')}
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  renderSkeleton()
-                ) : (
-                  <SharedTable
-                    data={customers}
-                    columns={columns as any}
-                    actions={actions as any}
-                    isLoading={isLoading}
-                    isError={!!error}
-                    errorText={__('Error loading customers')}
-                    emptyText={__('No customers found')}
-                    emptyDescription={
-                      hasFilters
-                        ? __('Try adjusting your filters to see more results.')
-                        : __('Customers will appear here when bookings are made')
-                    }
-                    onCreateClick={
-                      can('yatra_edit_bookings') ? handleCreateCustomer : undefined
-                    }
-                    onSort={handleSort}
-                    getSortIcon={getSortIcon}
-                    selectedItemIds={selectedIds}
-                    onSelectItem={handleSelectItem}
-                    onSelectAll={handleSelectAll}
-                    isAllSelected={isAllSelected}
-                    getItemId={(customer: Customer) => customer.id}
-                    skeletonRows={5}
-                    capability="yatra_view_bookings"
-                  />
-                )}
-              </CardContent>
-            </Card>
-          )}
+          <Card>
+            <CardContent className="p-0">
+              {isLoading ? (
+                renderSkeleton()
+              ) : (
+                <SharedTable
+                  data={customers}
+                  columns={columns as any}
+                  actions={actions as any}
+                  isLoading={isLoading}
+                  isError={!!error}
+                  errorText={__('Error loading customers')}
+                  errorDetails={errorContext.details}
+                  errorRequestInfo={errorContext.requestInfo}
+                  errorDescription={__(
+                    'We couldn’t connect to the customers service. Please refresh or try again shortly.'
+                  )}
+                  onRetry={() => queryClient.invalidateQueries({ queryKey: ['customers'] })}
+                  emptyText={__('No customers found')}
+                  emptyDescription={
+                    hasFilters
+                      ? __('Try adjusting your filters to see more results.')
+                      : __('Customers will appear here when bookings are made')
+                  }
+                  onCreateClick={
+                    can('yatra_edit_bookings') ? handleCreateCustomer : undefined
+                  }
+                  onSort={handleSort}
+                  getSortIcon={getSortIcon}
+                  selectedItemIds={selectedIds}
+                  onSelectItem={handleSelectItem}
+                  onSelectAll={handleSelectAll}
+                  isAllSelected={isAllSelected}
+                  getItemId={(customer: Customer) => customer.id}
+                  skeletonRows={5}
+                  capability="yatra_view_bookings"
+                />
+              )}
+            </CardContent>
+          </Card>
 
           {/* Pagination */}
           {total > 0 && (

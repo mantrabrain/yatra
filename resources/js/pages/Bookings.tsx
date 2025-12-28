@@ -14,11 +14,11 @@ import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { Skeleton } from '../components/ui/skeleton';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
 import { apiService } from '../lib/api-client';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
+import { getErrorContext } from '../lib/errors';
 
 interface Booking {
   id: number;
@@ -114,9 +114,15 @@ const Bookings: React.FC = () => {
   }, [searchTerm, statusFilter, paymentFilter, sortBy, sortOrder, page]);
 
   // Fetch bookings from API
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['bookings', queryParams],
     queryFn: async () => {
+      // Check URL parameter for error simulation (for testing)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('simulate_error') === 'true') {
+        throw new Error('Simulated API error for testing error UI functionality');
+      }
+      
       const params = new URLSearchParams();
       params.append('page', String(queryParams.page));
       params.append('per_page', String(queryParams.per_page));
@@ -159,6 +165,15 @@ const Bookings: React.FC = () => {
   const bookings: Booking[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+
+  // Enhanced error handling
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isBookingsError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
     return formatDateUtil(dateString);
@@ -684,98 +699,68 @@ const Bookings: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {error ? (
+        <>
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+            }}
+            statusOptions={[
+              { key: 'all', label: __('All'), count: 0 },
+              { key: 'confirmed', label: __('Confirmed'), count: 0 },
+              { key: 'pending', label: __('Pending'), count: 0 },
+              { key: 'cancelled', label: __('Cancelled'), count: 0 },
+              { key: 'completed', label: __('Completed'), count: 0 },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={columnOptions}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={isBulkPending}
+            totalItems={total}
+            bulkActionOptions={bulkActionOptions}
+          />
+
           <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading bookings')}
+            <CardContent className="p-0">
+              <SharedTable
+                data={bookings}
+                columns={columns}
+                actions={actions}
+                isLoading={isLoading}
+                isError={isBookingsError}
+                errorText={__('Error loading bookings')}
+                errorDescription={__('We couldn\'t connect to the bookings service. Please refresh or try again shortly.')}
+                errorDetails={derivedErrorDetails}
+                errorRequestInfo={errorContext.requestInfo}
+                onRetry={() => refetch()}
+                emptyText={__('No bookings found')}
+                emptyDescription={
+                  hasFilters
+                    ? __('Try adjusting your filters to see more results.')
+                    : __('Get started by creating your first booking.')
+                }
+                onCreateClick={
+                  can('yatra_edit_bookings') ? handleCreateBooking : undefined
+                }
+                onSort={handleSort}
+                getSortIcon={getSortIcon}
+                selectedItemIds={selectedIds}
+                onSelectItem={handleSelectItem}
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+                getItemId={(booking: Booking) => booking.id}
+                skeletonRows={5}
+                capability="yatra_view_bookings"
+              />
             </CardContent>
           </Card>
-        ) : (
-          <>
-            <BulkActionToolbar
-              selectedIds={selectedIds}
-              bulkAction={bulkAction}
-              setBulkAction={setBulkAction}
-              onApply={handleBulkApply}
-              onClearSelection={() => setSelectedIds([])}
-              statusFilter={statusFilter}
-              setStatusFilter={(value) => {
-                setStatusFilter(value);
-                setPage(1);
-              }}
-              statusOptions={[
-                { key: 'all', label: __('All'), count: 0 },
-                { key: 'confirmed', label: __('Confirmed'), count: 0 },
-                { key: 'pending', label: __('Pending'), count: 0 },
-                { key: 'cancelled', label: __('Cancelled'), count: 0 },
-                { key: 'completed', label: __('Completed'), count: 0 },
-              ]}
-              showColumnsDropdown={showColumnsDropdown}
-              setShowColumnsDropdown={setShowColumnsDropdown}
-              columnOptions={columnOptions}
-              onToggleColumn={toggleColumn}
-              bulkMutationPending={isBulkPending}
-              totalItems={total}
-              bulkActionOptions={bulkActionOptions}
-            />
-
-            <Card>
-              <CardContent className="p-0">
-                {isLoading ? (
-                  <div className="p-4 space-y-3">
-                    {[...Array(5)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-4 p-3 border-b border-gray-100 dark:border-gray-700 last:border-0"
-                      >
-                        <Skeleton className="h-4 w-24" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-48" />
-                        </div>
-                        <Skeleton className="h-4 w-28" />
-                        <Skeleton className="h-4 w-20" />
-                        <Skeleton className="h-4 w-20" />
-                        <Skeleton className="h-6 w-16 rounded-full" />
-                        <Skeleton className="h-6 w-16 rounded-full" />
-                        <div className="flex gap-1">
-                          <Skeleton className="h-8 w-8 rounded" />
-                          <Skeleton className="h-8 w-8 rounded" />
-                          <Skeleton className="h-8 w-8 rounded" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <SharedTable
-                    data={bookings}
-                    columns={columns}
-                    actions={actions}
-                    isLoading={isLoading}
-                    isError={!!error}
-                    errorText={__('Error loading bookings')}
-                    emptyText={__('No bookings found')}
-                    emptyDescription={
-                      hasFilters
-                        ? __('Try adjusting your filters to see more results.')
-                        : __('Get started by creating your first booking.')
-                    }
-                    onCreateClick={
-                      can('yatra_edit_bookings') ? handleCreateBooking : undefined
-                    }
-                    onSort={handleSort}
-                    getSortIcon={getSortIcon}
-                    selectedItemIds={selectedIds}
-                    onSelectItem={handleSelectItem}
-                    onSelectAll={handleSelectAll}
-                    isAllSelected={isAllSelected}
-                    getItemId={(booking: Booking) => booking.id}
-                    skeletonRows={5}
-                    capability="yatra_view_bookings"
-                  />
-                )}
-              </CardContent>
-            </Card>
 
             {total > 0 && (
               <div className="mt-4">
@@ -790,7 +775,6 @@ const Bookings: React.FC = () => {
               </div>
             )}
           </>
-        )}
       </ConditionalRender>
 
       {/* Delete Confirmation Dialog */}

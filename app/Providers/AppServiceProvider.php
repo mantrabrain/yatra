@@ -16,6 +16,8 @@ use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Database\Tables\TripContentTable;
+use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Database\Tables\BookingsTable;
@@ -28,6 +30,7 @@ use Yatra\Database\Tables\BookingTravellerMetaTable;
 use Yatra\Database\Tables\BookingDeparturesTable;
 use Yatra\Database\Tables\DiscountsTable;
 use Yatra\Database\Tables\EnquiriesTable;
+use Yatra\Constants\ClassificationTypes;
 
 /**
  * Application Service Provider
@@ -1479,71 +1482,39 @@ class AppServiceProvider extends ServiceProvider
         $entity = null;
         $trips = [];
 
-        switch ($type) {
-            case 'destination':
-                $table = $wpdb->prefix . 'yatra_destinations';
-                $entity = $wpdb->get_row($wpdb->prepare(
-                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
-                    $slug
-                ));
-                if ($entity) {
-                    // Get trips for this destination
-                    $trips_table = $wpdb->prefix . 'yatra_trips';
-                    $relation_table = $wpdb->prefix . 'yatra_trip_destinations';
-                    $trips = $wpdb->get_results($wpdb->prepare(
-                        "SELECT t.* FROM {$trips_table} t
-                         INNER JOIN {$relation_table} td ON t.id = td.trip_id
-                         WHERE td.destination_id = %d 
-                         AND t.status IN ('publish', 'published')
-                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
-                         ORDER BY t.created_at DESC",
-                        $entity->id
-                    ));
-                    
-                }
-                break;
+        $classificationMap = [
+            'destination' => ClassificationTypes::DESTINATION,
+            'activity'    => ClassificationTypes::ACTIVITY,
+            'category'    => ClassificationTypes::CATEGORY,
+        ];
 
-            case 'activity':
-                $table = $wpdb->prefix . 'yatra_activities';
-                $entity = $wpdb->get_row($wpdb->prepare(
-                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
-                    $slug
-                ));
-                if ($entity) {
-                    // Get trips for this activity
-                    $trips_table = $wpdb->prefix . 'yatra_trips';
-                    $relation_table = $wpdb->prefix . 'yatra_trip_activities';
-                    $trips = $wpdb->get_results($wpdb->prepare(
-                        "SELECT t.* FROM {$trips_table} t
-                         INNER JOIN {$relation_table} ta ON t.id = ta.trip_id
-                         WHERE ta.activity_id = %d AND t.status IN ('publish', 'published')
-                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
-                         ORDER BY t.created_at DESC",
-                        $entity->id
-                    ));
-                }
-                break;
+        if (!isset($classificationMap[$type])) {
+            return;
+        }
 
-            case 'category':
-                $table = $wpdb->prefix . 'yatra_trip_categories';
-                $entity = $wpdb->get_row($wpdb->prepare(
-                    "SELECT * FROM {$table} WHERE slug = %s AND status IN ('publish', 'published')",
-                    $slug
-                ));
-                if ($entity) {
-                    // Get trips for this category
-                    $trips_table = $wpdb->prefix . 'yatra_trips';
-                    $relation_table = $wpdb->prefix . 'yatra_trip_trip_categories';
-                    $trips = $wpdb->get_results($wpdb->prepare(
-                        "SELECT t.* FROM {$trips_table} t
-                         INNER JOIN {$relation_table} tc ON t.id = tc.trip_id
-                         WHERE tc.category_id = %d AND t.status IN ('publish', 'published')
-                         AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
-                         ORDER BY t.created_at DESC",
-                        $entity->id
-                    ));
-                }
-                break;
+        $classificationType = $classificationMap[$type];
+        $classificationsTable = ClassificationsTable::getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
+        $tripsTable = TripsTable::getTableName();
+
+        $entity = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$classificationsTable} WHERE slug = %s AND type = %s AND status IN ('publish', 'published')",
+            $slug,
+            $classificationType
+        ));
+
+        if ($entity) {
+            $trips = $wpdb->get_results($wpdb->prepare(
+                "SELECT t.* FROM {$tripsTable} t
+                 INNER JOIN {$tripClassificationsTable} tc ON t.id = tc.trip_id
+                 WHERE tc.classification_id = %d
+                   AND tc.classification_type = %s
+                   AND t.status IN ('publish', 'published')
+                   AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
+                 ORDER BY t.created_at DESC",
+                $entity->id,
+                $classificationType
+            ));
         }
 
         // If entity not found, return 404
@@ -1561,74 +1532,68 @@ class AppServiceProvider extends ServiceProvider
                 $trip->featured_image_url = wp_get_attachment_url($trip->featured_image);
             } else {
                 // Fallback to first gallery image
-                $gallery_table = $wpdb->prefix . 'yatra_trip_gallery_images';
+                $galleryTable = TripContentTable::getTableName();
                 $first_image = $wpdb->get_row($wpdb->prepare(
-                    "SELECT image_url FROM {$gallery_table} WHERE trip_id = %d ORDER BY `order` ASC LIMIT 1",
+                    "SELECT content_url FROM {$galleryTable} 
+                     WHERE trip_id = %d AND content_type = 'image' 
+                     ORDER BY sort_order ASC, id ASC LIMIT 1",
                     $trip->id
                 ));
-                $trip->featured_image_url = $first_image ? $first_image->image_url : '';
+                $trip->featured_image_url = $first_image ? $first_image->content_url : '';
             }
             
             // Get destinations for this trip
-            $dest_table = $wpdb->prefix . 'yatra_destinations';
-            $trip_dest_table = $wpdb->prefix . 'yatra_trip_destinations';
+            $classificationsTable = ClassificationsTable::getTableName();
+            $tripClassificationsTable = TripClassificationsTable::getTableName();
             $trip->destinations = $wpdb->get_results($wpdb->prepare(
-                "SELECT d.name, d.slug FROM {$dest_table} d
-                 INNER JOIN {$trip_dest_table} td ON d.id = td.destination_id
-                 WHERE td.trip_id = %d",
-                $trip->id
+                "SELECT c.name, c.slug FROM {$classificationsTable} c
+                 INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d AND tc.classification_type = %s",
+                $trip->id,
+                ClassificationTypes::DESTINATION
             ));
             $trip->location = !empty($trip->destinations) ? $trip->destinations[0]->name : '';
             
             // Get activities for this trip
-            $act_table = $wpdb->prefix . 'yatra_activities';
-            $trip_act_table = $wpdb->prefix . 'yatra_trip_activities';
             $trip->activities = $wpdb->get_results($wpdb->prepare(
-                "SELECT a.name, a.slug FROM {$act_table} a
-                 INNER JOIN {$trip_act_table} ta ON a.id = ta.activity_id
-                 WHERE ta.trip_id = %d",
-                $trip->id
+                "SELECT c.name, c.slug FROM {$classificationsTable} c
+                 INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d AND tc.classification_type = %s",
+                $trip->id,
+                ClassificationTypes::ACTIVITY
             ));
             
             // Get categories for this trip - including parent/child
-            $cat_table = $wpdb->prefix . 'yatra_trip_categories';
-            $trip_cat_table = $wpdb->prefix . 'yatra_trip_trip_categories';
             $trip->categories = $wpdb->get_results($wpdb->prepare(
-                "SELECT DISTINCT c.id, c.name, c.slug, c.parent_id FROM {$cat_table} c
-                 INNER JOIN {$trip_cat_table} tc ON c.id = tc.category_id
-                 WHERE tc.trip_id = %d AND c.status IN ('publish', 'published')
+                "SELECT DISTINCT c.id, c.name, c.slug, c.parent_id FROM {$classificationsTable} c
+                 INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
+                 WHERE tc.trip_id = %d 
+                   AND tc.classification_type = %s
+                   AND c.status IN ('publish', 'published')
                  ORDER BY c.parent_id ASC, c.name ASC",
-                $trip->id
+                $trip->id,
+                ClassificationTypes::CATEGORY
             ));
             
-            // Get difficulty name - try multiple possible table names
+            // Get difficulty name from unified classifications table
             if (!empty($trip->difficulty)) {
-                $possible_tables = [
-                    $wpdb->prefix . 'yatra_trip_difficulties',
-                    $wpdb->prefix . 'yatra_difficulties',
-                    $wpdb->prefix . 'yatra_difficulty_levels'
-                ];
+                $difficultyName = $wpdb->get_var($wpdb->prepare(
+                    "SELECT name FROM {$classificationsTable} 
+                     WHERE type = %s 
+                       AND (id = %d OR slug = %s)
+                     LIMIT 1",
+                    ClassificationTypes::DIFFICULTY,
+                    (int) $trip->difficulty,
+                    $trip->difficulty
+                ));
                 
-                foreach ($possible_tables as $difficulty_table) {
-                    $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$difficulty_table}'");
-                    if ($table_exists) {
-                        $difficulty_name = $wpdb->get_var($wpdb->prepare(
-                            "SELECT name FROM {$difficulty_table} WHERE id = %s OR slug = %s LIMIT 1",
-                            $trip->difficulty, $trip->difficulty
-                        ));
-                        if ($difficulty_name) {
-                            $trip->difficulty_name = $difficulty_name;
-                            break;
-                        }
-                    }
+                if ($difficultyName) {
+                    $trip->difficulty_name = $difficultyName;
                 }
-                
-                // Don't create fake difficulty names - only use real database values
-                // Removed fallback that was creating difficulty names from slugs
             }
             
             // Calculate average rating
-            $reviews_table = $wpdb->prefix . 'yatra_reviews';
+            $reviews_table = ReviewsTable::getTableName();
             $trip->average_rating = $wpdb->get_var($wpdb->prepare(
                 "SELECT AVG(rating) FROM {$reviews_table} WHERE trip_id = %d AND status = 'approved'",
                 $trip->id
@@ -1644,7 +1609,7 @@ class AppServiceProvider extends ServiceProvider
             // Check if this is traveler-based pricing
             if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
                 // Query price types table for minimum and maximum prices
-                $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
+                $price_types_table = TripPricingTable::getTableName();
                 // Get all price type data for discount calculation
                 $all_price_types = $wpdb->get_results($wpdb->prepare(
                     "SELECT 
@@ -1697,7 +1662,7 @@ class AppServiceProvider extends ServiceProvider
             if (
                 $trip->pricing_type === 'traveler_based'
             ) {
-                $priceTypeTable = $wpdb->prefix . 'yatra_trip_price_types';
+                $priceTypeTable = TripPricingTable::getTableName();
 
                 $row = $wpdb->get_row($wpdb->prepare(
                     "SELECT
@@ -2233,15 +2198,17 @@ HTML;
         if (empty($booking->price_types) && $booking->pricing_type === 'traveler_based') {
             // Fetch price types from database
             global $wpdb;
-            $price_types_table = $wpdb->prefix . 'yatra_trip_price_types';
-            $categories_table = $wpdb->prefix . 'yatra_traveler_categories';
+            $price_types_table = TripPricingTable::getTableName();
+            $categories_table = ClassificationsTable::getTableName();
             
             $price_types = $wpdb->get_results($wpdb->prepare(
-                "SELECT pt.*, tc.label as category_label, tc.slug as category_slug, tc.age_min, tc.age_max
+                "SELECT pt.*, tc.name as category_label, tc.slug as category_slug, 
+                        JSON_UNQUOTE(JSON_EXTRACT(tc.metadata, '$.age_min')) as age_min,
+                        JSON_UNQUOTE(JSON_EXTRACT(tc.metadata, '$.age_max')) as age_max
                  FROM {$price_types_table} pt
-                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id
-                 WHERE pt.trip_id = %d
-                 ORDER BY pt.id ASC",
+                 LEFT JOIN {$categories_table} tc ON pt.category_id = tc.id AND tc.type = %s
+                 WHERE pt.trip_id = %d AND pt.pricing_type = 'traveler_category'",
+                ClassificationTypes::TRAVELER_TYPE,
                 $trip_id
             ));
             

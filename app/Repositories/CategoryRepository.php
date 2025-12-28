@@ -84,13 +84,13 @@ class CategoryRepository extends BaseRepository
     public function find(int $id, bool $includeDeleted = false): ?\stdClass
     {
         $table = esc_sql($this->table);
-        $query = "SELECT * FROM `{$table}` WHERE type = '" . ClassificationTypes::CATEGORY . "' AND id = %d";
+        $query = "SELECT * FROM `{$table}` WHERE type = %s AND id = %d";
         
         if (!$includeDeleted && $this->hasSoftDelete()) {
             $query .= " AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')";
         }
 
-        $result = $this->wpdb->get_row($this->wpdb->prepare($query, $id));
+        $result = $this->wpdb->get_row($this->wpdb->prepare($query, ClassificationTypes::CATEGORY, $id));
         return $result ?: null;
     }
 
@@ -102,7 +102,7 @@ class CategoryRepository extends BaseRepository
         $table = esc_sql($this->table);
         $search = sanitize_text_field($search);
         
-        $where = ["type = '" . ClassificationTypes::CATEGORY . "'"];
+        $where = ["type = %s"];
         $where[] = "(name LIKE %s OR slug LIKE %s OR description LIKE %s)";
         $searchTerm = '%' . $wpdb->esc_like($search) . '%';
 
@@ -126,7 +126,7 @@ class CategoryRepository extends BaseRepository
 
         $query = "SELECT * FROM `{$table}` WHERE {$whereClause} ORDER BY {$order} {$limit}";
         
-        $params = [$searchTerm, $searchTerm, $searchTerm];
+        $params = [ClassificationTypes::CATEGORY, $searchTerm, $searchTerm, $searchTerm];
         if (isset($args['where']) && is_array($args['where'])) {
             foreach ($args['where'] as $field => $value) {
                 if (is_array($value)) {
@@ -164,15 +164,15 @@ class CategoryRepository extends BaseRepository
                 FROM `{$catTable}` c
                 LEFT JOIN `{$relTable}` tc
                   ON tc.classification_id = c.id 
-                  AND tc.classification_type = '" . ClassificationTypes::CATEGORY . "'
+                  AND tc.classification_type = %s
                 LEFT JOIN `{$tripsTable}` t
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE c.type = '" . ClassificationTypes::CATEGORY . "' AND c.status = 'publish'
+                WHERE c.type = %s AND c.status = 'publish'
                 GROUP BY c.id";
 
-        $rows = $this->wpdb->get_results($sql) ?: [];
+        $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::CATEGORY, ClassificationTypes::CATEGORY)) ?: [];
 
         // Compute starting prices for the trip IDs found.
         $tripIds = [];
@@ -236,10 +236,10 @@ class CategoryRepository extends BaseRepository
         
         $sql = "SELECT status, COUNT(*) as count 
                 FROM `{$table}` 
-                WHERE type = '" . ClassificationTypes::CATEGORY . "'
+                WHERE type = %s
                 GROUP BY status";
         
-        $results = $this->wpdb->get_results($sql) ?: [];
+        $results = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::CATEGORY)) ?: [];
 
         $counts = [
             'publish' => 0,

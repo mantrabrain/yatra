@@ -12,6 +12,7 @@ import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
@@ -136,16 +137,17 @@ const Discounts: React.FC = () => {
   }, [searchTerm, statusFilter, typeFilter, sortBy, sortOrder, page]);
 
   // Fetch discounts from API
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['discounts', queryParams],
     queryFn: async () => {
-      try {
-        const response = await apiClient.get('/discounts', { params: queryParams });
-        return response;
-      } catch (error: any) {
-        showToast(error?.message || __('Failed to load discounts', 'Failed to load discounts'), 'error');
-        throw error;
+      // Check URL parameter for error simulation (for testing)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('simulate_error') === 'true') {
+        throw new Error('Simulated API error for testing error UI functionality');
       }
+      
+      const response = await apiClient.get('/discounts', { params: queryParams });
+      return response;
     },
     enabled: can('yatra_view_bookings'),
   });
@@ -169,6 +171,15 @@ const Discounts: React.FC = () => {
   const total = data?.total || 0;
   const itemsPerPage = 10;
   const totalPages = Math.ceil(total / itemsPerPage);
+
+  // Enhanced error handling
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (data as any)?.error || (data as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isDiscountsError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
     if (!dateString) return __('N/A', 'N/A');
@@ -930,106 +941,102 @@ const Discounts: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {error ? (
+        <>
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={(value) => {
+              setStatusFilter(value);
+              setPage(1);
+            }}
+            statusOptions={[
+              {
+                key: 'all',
+                label: __('All', 'All'),
+                count: 0,
+              },
+              {
+                key: 'publish',
+                label: __('Publish', 'Publish'),
+                count: 0,
+              },
+              {
+                key: 'draft',
+                label: __('Draft', 'Draft'),
+                count: 0,
+              },
+              {
+                key: 'trash',
+                label: __('Trash', 'Trash'),
+                count: 0,
+              },
+              {
+                key: 'expired',
+                label: __('Expired', 'Expired'),
+                count: 0,
+              },
+            ]}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={columnOptions}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={isBulkPending}
+            totalItems={total}
+            bulkActionOptions={bulkActionOptions}
+          />
+
           <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading discounts', 'Error loading discounts')}
+            <CardContent className="p-0">
+              <SharedTable
+                data={discounts}
+                columns={columns}
+                actions={actions}
+                isLoading={isLoading}
+                isError={isDiscountsError}
+                errorText={__('Error loading discounts', 'Error loading discounts')}
+                errorDescription={__('We couldn\'t connect to the discounts service. Please refresh or try again shortly.', 'We couldn\'t connect to the discounts service. Please refresh or try again shortly.')}
+                errorDetails={derivedErrorDetails}
+                errorRequestInfo={errorContext.requestInfo}
+                onRetry={() => refetch()}
+                emptyText={__('No discounts found', 'No discounts found')}
+                emptyDescription={
+                  hasFilters
+                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                    : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
+                }
+                onCreateClick={
+                  can('yatra_edit_bookings') ? handleCreateDiscount : undefined
+                }
+                onSort={handleSort}
+                getSortIcon={getSortIcon}
+                selectedItemIds={selectedIds}
+                onSelectItem={handleSelectItem}
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+                getItemId={(discount: Discount) => discount.id}
+                skeletonRows={5}
+                capability="yatra_view_bookings"
+              />
             </CardContent>
           </Card>
-        ) : (
-          <>
-            <BulkActionToolbar
-              selectedIds={selectedIds}
-              bulkAction={bulkAction}
-              setBulkAction={setBulkAction}
-              onApply={handleBulkApply}
-              onClearSelection={() => setSelectedIds([])}
-              statusFilter={statusFilter}
-              setStatusFilter={(value) => {
-                setStatusFilter(value);
-                setPage(1);
-              }}
-              statusOptions={[
-                {
-                  key: 'all',
-                  label: __('All', 'All'),
-                  count: 0,
-                },
-                {
-                  key: 'publish',
-                  label: __('Publish', 'Publish'),
-                  count: 0,
-                },
-                {
-                  key: 'draft',
-                  label: __('Draft', 'Draft'),
-                  count: 0,
-                },
-                {
-                  key: 'trash',
-                  label: __('Trash', 'Trash'),
-                  count: 0,
-                },
-                {
-                  key: 'expired',
-                  label: __('Expired', 'Expired'),
-                  count: 0,
-                },
-              ]}
-              showColumnsDropdown={showColumnsDropdown}
-              setShowColumnsDropdown={setShowColumnsDropdown}
-              columnOptions={columnOptions}
-              onToggleColumn={toggleColumn}
-              bulkMutationPending={isBulkPending}
-              totalItems={total}
-              bulkActionOptions={bulkActionOptions}
-            />
-
-            <Card>
-              <CardContent className="p-0">
-                <SharedTable
-                  data={discounts}
-                  columns={columns}
-                  actions={actions}
-                  isLoading={isLoading}
-                  isError={!!error}
-                  errorText={__('Error loading discounts', 'Error loading discounts')}
-                  emptyText={__('No discounts found', 'No discounts found')}
-                  emptyDescription={
-                    hasFilters
-                      ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                      : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
-                  }
-                  onCreateClick={
-                    can('yatra_edit_bookings') ? handleCreateDiscount : undefined
-                  }
-                  onSort={handleSort}
-                  getSortIcon={getSortIcon}
-                  selectedItemIds={selectedIds}
-                  onSelectItem={handleSelectItem}
-                  onSelectAll={handleSelectAll}
-                  isAllSelected={isAllSelected}
-                  getItemId={(discount: Discount) => discount.id}
-                  skeletonRows={5}
-                  capability="yatra_view_bookings"
-                />
-              </CardContent>
-            </Card>
 
             {total > 0 && (
-              <div className="mt-4">
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  totalItems={total}
-                  itemsPerPage={itemsPerPage}
-                  onPageChange={(newPage) => setPage(newPage)}
-                  itemName={__('coupons', 'coupons')}
-                />
-              </div>
-            )}
-          </>
-        )}
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={itemsPerPage}
+                onPageChange={(newPage) => setPage(newPage)}
+                itemName={__('coupons', 'coupons')}
+              />
+            </div>
+          )}
+        </>
       </ConditionalRender>
     </div>
   );

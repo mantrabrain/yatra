@@ -39,6 +39,7 @@ import { useNavigate } from '../hooks/useNavigate';
 import { AvailabilityCalendar } from '../components/availability/AvailabilityCalendar';
 import { RecurringRules } from '../components/availability/RecurringRules';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { useToast } from '../components/ui/toast';
 import { BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
@@ -224,7 +225,7 @@ const Availability: React.FC = () => {
   });
 
   // Fetch availability dates for selected trip
-  const { data: availabilityData, isLoading } = useQuery({
+  const { data: availabilityData, isLoading, error: availabilityError } = useQuery({
     queryKey: ['availability', selectedTripId, monthFilter, page, searchTerm],
     queryFn: async () => {
       if (!selectedTripId) return { dates: [], total: 0 };
@@ -360,6 +361,7 @@ const Availability: React.FC = () => {
   };
 
   const selectedTrip = tripsData?.trips.find(t => t.id === selectedTripId);
+  const availabilityErrorContext = availabilityError ? getErrorContext(availabilityError) : null;
 
   // Filter availability dates
   const filteredDates = useMemo(() => {
@@ -1326,7 +1328,15 @@ const Availability: React.FC = () => {
                   columns={tableColumns}
                   actions={tableActions}
                   isLoading={isLoading}
-                  isError={false}
+                  isError={!!availabilityError}
+                  errorText={__('Error loading availability', 'Error loading availability')}
+                  errorDescription={__(
+                    'We couldn’t connect to the availability service. Please refresh or try again shortly.',
+                    'We couldn’t connect to the availability service. Please refresh or try again shortly.'
+                  )}
+                  errorDetails={availabilityErrorContext?.details || ''}
+                  errorRequestInfo={availabilityErrorContext?.requestInfo}
+                  onRetry={() => queryClient.invalidateQueries({ queryKey: ['availability'] })}
                   emptyText={__('No availability dates found for this trip.', 'No availability dates found for this trip.')}
                   emptyDescription={__('Try adjusting your filters or add a new availability date.', 'Try adjusting your filters or add a new availability date.')}
                   selectedItemIds={selectedIds}

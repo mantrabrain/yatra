@@ -12,6 +12,7 @@ import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { Button } from '../components/ui/button';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent } from '../components/ui/card';
@@ -148,6 +149,7 @@ const Destinations: React.FC = () => {
   const destinations = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
 
   const handleEdit = (destination: Destination) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`;
@@ -328,51 +330,45 @@ const Destinations: React.FC = () => {
         </CardContent>
       </Card>
 
-      <BulkActionToolbar
-        selectedIds={selectedIds}
-        bulkAction={bulkAction}
-        setBulkAction={setBulkAction}
-        onApply={handleBulkApply}
-        onClearSelection={() => setSelectedIds([])}
-        statusFilter={statusFilter}
-        setStatusFilter={(value) => {
-          setStatusFilter(value);
-          setPage(1);
-          setSelectedIds([]);
-          setBulkAction('');
-        }}
-        statusOptions={viewFilters}
-        showColumnsDropdown={showColumnsDropdown}
-        setShowColumnsDropdown={setShowColumnsDropdown}
-        columnOptions={[
-          { key: 'name', label: __('Destination', 'Destination'), visible: visibleColumns.name },
-          { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-          { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
-          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-          { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
-          { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
-          { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
-          { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
-        ]}
-        onToggleColumn={toggleColumn}
-        bulkMutationPending={bulkMutation.isPending}
-        totalItems={destinations.length}
-        bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
-      />
+      {!error && (
+        <BulkActionToolbar
+          selectedIds={selectedIds}
+          bulkAction={bulkAction}
+          setBulkAction={setBulkAction}
+          onApply={handleBulkApply}
+          onClearSelection={() => setSelectedIds([])}
+          statusFilter={statusFilter}
+          setStatusFilter={(value) => {
+            setStatusFilter(value);
+            setPage(1);
+            setSelectedIds([]);
+            setBulkAction('');
+          }}
+          statusOptions={viewFilters}
+          showColumnsDropdown={showColumnsDropdown}
+          setShowColumnsDropdown={setShowColumnsDropdown}
+          columnOptions={[
+            { key: 'name', label: __('Destination', 'Destination'), visible: visibleColumns.name },
+            { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
+            { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
+            { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+            { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
+            { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
+            { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
+            { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
+          ]}
+          onToggleColumn={toggleColumn}
+          bulkMutationPending={bulkMutation.isPending}
+          totalItems={destinations.length}
+          bulkActionOptions={getDefaultBulkStatusOptions(statusFilter)}
+        />
+      )}
 
       <ConditionalRender capability="yatra_view_trips">
-        {/* Table */}
-        {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading destinations', 'Error loading destinations')}
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <Card className="overflow-visible">
-              <CardContent className="p-0 overflow-visible">
-                <SharedTable
+        <>
+          <Card className="overflow-visible">
+            <CardContent className="p-0 overflow-visible">
+              <SharedTable
                   data={destinations}
                   columns={[
                     {
@@ -558,6 +554,13 @@ const Destinations: React.FC = () => {
                   isLoading={isLoading}
                   isError={!!error}
                   errorText={__('Error loading destinations', 'Error loading destinations')}
+                  errorDescription={__(
+                    'We couldn’t connect to the destinations service. Please refresh or try again shortly.',
+                    'We couldn’t connect to the destinations service. Please refresh or try again shortly.'
+                  )}
+                  onRetry={() => queryClient.invalidateQueries({ queryKey: ['destinations'] })}
+                  errorDetails={errorContext.details}
+                  errorRequestInfo={errorContext.requestInfo}
                   emptyText={__('No destinations found', 'No destinations found')}
                   emptyDescription={hasFilters 
                     ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
@@ -587,11 +590,9 @@ const Destinations: React.FC = () => {
                   statusFilter={statusFilter}
                   skeletonRows={5}
                 />
-              </CardContent>
-            </Card>
-
-          </>
-        )}
+            </CardContent>
+          </Card>
+        </>
       </ConditionalRender>
 
       {/* Pagination */}

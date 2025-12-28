@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Plus, Calendar, Edit, Trash2, AlertCircle, Search, Copy, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Plus, Edit, Trash2, AlertCircle, Search, Copy, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -16,6 +16,7 @@ import { Badge } from '../components/ui/badge';
 import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
 import { Table as SharedTable } from '../components/shared';
+import { getErrorContext } from '../lib/errors';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useNavigate } from '../hooks/useNavigate';
 
@@ -77,7 +78,7 @@ const RecurringRulesPage: React.FC = () => {
   });
 
   // Fetch recurring rules
-  const { data: rulesResponse, isLoading } = useQuery({
+  const { data: rulesResponse, isLoading, error } = useQuery<any>({
     queryKey: ['recurring-availability', tripId, statusFilter, searchTerm, page],
     queryFn: async () => {
       if (!tripId) return { data: [], total: 0 };
@@ -99,6 +100,9 @@ const RecurringRulesPage: React.FC = () => {
   });
   
   const rulesData = rulesResponse?.data || [];
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (rulesResponse as any)?.error || (rulesResponse as any)?.message;
+  const isRulesError = !!error || !!apiErrorMessage;
 
   // Delete rule mutation
   const deleteMutation = useMutation({
@@ -418,8 +422,8 @@ const RecurringRulesPage: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Bulk Actions */}
-          {selectedIds.length > 0 && (
+          {/* Bulk Actions (hide when error) */}
+          {selectedIds.length > 0 && !isRulesError && (
             <Card>
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
@@ -460,43 +464,40 @@ const RecurringRulesPage: React.FC = () => {
           {/* Table */}
           <Card>
             <CardContent className="pt-6">
-              {isLoading ? (
-                <div className="text-center py-8 text-gray-500">{__('Loading...', 'Loading...')}</div>
-              ) : !rulesData?.length ? (
-                <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">{__('No recurring rules found', 'No recurring rules found')}</p>
-                  <Button onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create-recurring', trip_id: tripId.toString() })} variant="outline">
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add First Rule', 'Add First Rule')}
-                  </Button>
-                </div>
-              ) : (
-                <SharedTable
-                  data={rulesData}
-                  columns={tableColumns}
-                  actions={tableActions}
-                  selectedItemIds={selectedIds}
-                  onSelectItem={(id, checked) => {
-                    if (checked) {
-                      setSelectedIds([...selectedIds, id.toString()]);
-                    } else {
-                      setSelectedIds(selectedIds.filter(sid => sid !== id.toString()));
-                    }
-                  }}
-                  onSelectAll={(checked) => {
-                    if (checked) {
-                      setSelectedIds(rulesData.map((r: RecurringRule) => r.id.toString()));
-                    } else {
-                      setSelectedIds([]);
-                    }
-                  }}
-                  isAllSelected={selectedIds.length === rulesData.length && rulesData.length > 0}
-                  getItemId={(rule) => rule.id}
-                  emptyText={__('No recurring rules found', 'No recurring rules found')}
-                  emptyDescription={__('Create your first recurring rule to get started', 'Create your first recurring rule to get started')}
-                />
-              )}
+              <SharedTable
+                data={rulesData}
+                columns={tableColumns}
+                actions={tableActions}
+                isLoading={isLoading}
+                isError={isRulesError}
+                errorText={__('Error loading recurring rules', 'Error loading recurring rules')}
+                errorDescription={__(
+                  'We couldn’t connect to the recurring rules service. Please refresh or try again shortly.',
+                  'We couldn’t connect to the recurring rules service. Please refresh or try again shortly.'
+                )}
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ['recurring-availability'] })}
+                errorDetails={errorContext.details || apiErrorMessage}
+                errorRequestInfo={errorContext.requestInfo}
+                selectedItemIds={selectedIds}
+                onSelectItem={(id, checked) => {
+                  if (checked) {
+                    setSelectedIds([...selectedIds, id.toString()]);
+                  } else {
+                    setSelectedIds(selectedIds.filter(sid => sid !== id.toString()));
+                  }
+                }}
+                onSelectAll={(checked) => {
+                  if (checked) {
+                    setSelectedIds(rulesData.map((r: RecurringRule) => r.id.toString()));
+                  } else {
+                    setSelectedIds([]);
+                  }
+                }}
+                isAllSelected={selectedIds.length === rulesData.length && rulesData.length > 0}
+                getItemId={(rule) => rule.id}
+                emptyText={__('No recurring rules found', 'No recurring rules found')}
+                emptyDescription={__('Create your first recurring rule to get started', 'Create your first recurring rule to get started')}
+              />
             </CardContent>
           </Card>
         </>

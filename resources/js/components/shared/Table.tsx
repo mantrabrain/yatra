@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Table as UITable, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Button } from '../ui/button';
-import { MoreVertical, ChevronRight, ChevronDown } from 'lucide-react';
+import { MoreVertical, ChevronRight, ChevronDown, Copy, Check } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { ConditionalRender } from '../ui/conditional-render';
+import { ErrorRequestInfo } from '../../lib/errors';
 
 interface TableColumn {
   key: string;
@@ -44,6 +45,10 @@ interface TableProps {
   statusFilter?: string;
   capability?: string;
   skeletonRows?: number;
+  errorDescription?: string;
+  onRetry?: () => void;
+  errorDetails?: string;
+  errorRequestInfo?: ErrorRequestInfo;
   // Hierarchical support
   isHierarchical?: boolean;
   expandedIds?: Set<string | number>;
@@ -73,6 +78,10 @@ export const Table: React.FC<TableProps> = ({
   statusFilter = '',
   capability = 'yatra_view_trips',
   skeletonRows = 5,
+  errorDescription = __('Something went wrong while loading this data. Please try again in a moment.', 'Something went wrong while loading this data. Please try again in a moment.'),
+  onRetry,
+  errorDetails,
+  errorRequestInfo,
   // Hierarchical props
   isHierarchical = false,
   expandedIds = new Set(),
@@ -82,6 +91,17 @@ export const Table: React.FC<TableProps> = ({
 }) => {
   const [openDropdownId, setOpenDropdownId] = useState<string | number | null>(null);
   const [dropdownPosition, setDropdownPosition] = useState<{ top: number; right: number } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const handleRetry = () => {
+    if (onRetry) {
+      onRetry();
+      return;
+    }
+    if (typeof window !== 'undefined') {
+      window.location.reload();
+    }
+  };
 
   // Close dropdown when clicking outside
   React.useEffect(() => {
@@ -150,9 +170,137 @@ export const Table: React.FC<TableProps> = ({
   );
 
   // Render error state
+  const composedErrorText = useMemo(() => {
+    const parts: string[] = [];
+    if (errorRequestInfo) {
+      if (errorRequestInfo.method) {
+        parts.push(`Request Method: ${errorRequestInfo.method}`);
+      }
+      if (errorRequestInfo.url) {
+        parts.push(`Request URL: ${errorRequestInfo.url}`);
+      }
+      if (errorRequestInfo.payload) {
+        parts.push(`Request Payload:\n${errorRequestInfo.payload}`);
+      }
+    }
+    if (errorDetails) {
+      parts.push(`Response:\n${errorDetails}`);
+    }
+    return parts.join('\n\n').trim();
+  }, [errorRequestInfo, errorDetails]);
+
   const renderError = () => (
-    <div className="p-8 text-center text-red-500">
-      {errorText}
+    <div className="relative flex flex-col items-center justify-center text-center py-14 px-6 my-4 min-h-[360px]">
+      <div className="absolute inset-4 rounded-2xl border-2 border-dashed border-red-200/60 dark:border-red-900/50 bg-gradient-to-br from-red-50 via-orange-50/60 to-white dark:from-red-900/40 dark:via-orange-900/10 dark:to-gray-900 shadow-sm" />
+      <div className="relative z-10 max-w-lg mx-auto space-y-6">
+        <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl bg-gradient-to-br from-red-100 via-rose-50 to-orange-100 dark:from-red-900/50 dark:via-rose-800/30 dark:to-orange-900/40 ring-8 ring-red-100/70 dark:ring-red-900/30 shadow-lg">
+          <svg
+            className="w-12 h-12 text-red-500 dark:text-red-300"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 9v4m0 4h.01M10.29 3.86L2.82 17a2 2 0 001.71 3h14.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+            />
+          </svg>
+        </div>
+
+        <div className="space-y-3">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {errorText}
+          </h3>
+          <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed">
+            {errorDescription}
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Button onClick={handleRetry} className="w-full sm:w-auto px-6">
+            {__('Try again', 'Try again')}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.open('https://wordpress.org/support/plugin/yatra', '_blank');
+              }
+            }}
+            className="w-full sm:w-auto px-6 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
+          >
+            {__('Visit support center', 'Visit support center')}
+          </Button>
+        </div>
+
+        {(errorDetails || errorRequestInfo) && (
+          <div className="relative w-full text-left rounded-2xl border border-red-100/80 dark:border-red-900/40 bg-white/90 dark:bg-gray-900/70 shadow-inner space-y-0">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-red-50 dark:border-red-900/30">
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                {__('Technical details', 'Technical details')}
+              </p>
+              <Button
+                type="button"
+                size="sm"
+                variant="ghost"
+                className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-900"
+                onClick={() => {
+                  if (!navigator?.clipboard || !composedErrorText) {
+                    return;
+                  }
+                  navigator.clipboard.writeText(composedErrorText).then(() => {
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }).catch(() => {});
+                }}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4" />
+                    {__('Copied', 'Copied')}
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4" />
+                    {__('Copy details', 'Copy details')}
+                  </>
+                )}
+              </Button>
+            </div>
+            {errorRequestInfo && (
+              <div className="px-4 py-3 border-b border-red-50 dark:border-red-900/20 space-y-2 text-sm text-left text-gray-700 dark:text-gray-200">
+                {errorRequestInfo.method && (
+                  <div>
+                    <span className="font-medium">{__('Method:', 'Method:')}</span>{' '}
+                    <span className="font-mono">{errorRequestInfo.method}</span>
+                  </div>
+                )}
+                {errorRequestInfo.url && (
+                  <div className="break-all">
+                    <span className="font-medium">{__('URL:', 'URL:')}</span>{' '}
+                    <span className="font-mono">{errorRequestInfo.url}</span>
+                  </div>
+                )}
+                {errorRequestInfo.payload && (
+                  <div>
+                    <span className="font-medium block mb-1">{__('Payload:', 'Payload:')}</span>
+                    <pre className="max-h-40 overflow-auto px-3 py-2 rounded bg-red-50/60 dark:bg-red-900/30 text-xs font-mono text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
+                      {errorRequestInfo.payload}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+            {errorDetails && (
+              <pre className="max-h-56 overflow-auto px-4 py-3 text-xs leading-relaxed font-mono text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
+                {errorDetails}
+              </pre>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 

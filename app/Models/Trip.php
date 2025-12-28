@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yatra\Models;
 
+use Yatra\Constants\ClassificationTypes;
+use Yatra\Database\Tables\ClassificationsTable;
+
 /**
  * Trip Model
  * Represents a trip/tour entity with comprehensive data structure
@@ -952,8 +955,9 @@ class Trip
             global $wpdb;
             
             $difficulty_data = $wpdb->get_row($wpdb->prepare(
-                "SELECT * FROM {$wpdb->prefix}yatra_difficulty_levels WHERE id = %d",
-                (int) $this->difficulty_level
+                "SELECT * FROM " . ClassificationsTable::getTableName() . " WHERE id = %d AND type = %s",
+                (int) $this->difficulty_level,
+                ClassificationTypes::DIFFICULTY
             ));
             
             if ($difficulty_data) {

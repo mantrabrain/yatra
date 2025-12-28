@@ -123,10 +123,10 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE type = 'attribute' AND status = 'publish' 
+                 WHERE type = %s AND status = 'publish' 
                  ORDER BY sorting ASC, name ASC";
         
-        return $this->wpdb->get_results($query) ?: [];
+        return $this->wpdb->get_results($this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE)) ?: [];
     }
 
     /**
@@ -136,10 +136,10 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE type = 'attribute' AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_on_frontend') = 1 
+                 WHERE type = %s AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_on_frontend') = 1 
                  ORDER BY sorting ASC, name ASC";
         
-        return $this->wpdb->get_results($query) ?: [];
+        return $this->wpdb->get_results($this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE)) ?: [];
     }
 
     /**
@@ -149,10 +149,10 @@ class AttributeRepository extends BaseRepository
     {
         $table = esc_sql($this->table);
         $query = "SELECT * FROM `{$table}` 
-                 WHERE type = 'attribute' AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_in_filters') = 1 
+                 WHERE type = %s AND status = 'publish' AND JSON_EXTRACT(metadata, '$.show_in_filters') = 1 
                  ORDER BY sorting ASC, name ASC";
         
-        return $this->wpdb->get_results($query) ?: [];
+        return $this->wpdb->get_results($this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE)) ?: [];
     }
 
     /**
@@ -404,7 +404,10 @@ class AttributeRepository extends BaseRepository
         $table = esc_sql($this->table);
         
         return (int) $this->wpdb->get_var(
-            "SELECT MAX(sorting) FROM `{$table}` WHERE type = 'attribute'"
+            $this->wpdb->prepare(
+                "SELECT MAX(sorting) FROM `{$table}` WHERE type = %s",
+                ClassificationTypes::ATTRIBUTE
+            )
         );
     }
 
@@ -447,8 +450,8 @@ class AttributeRepository extends BaseRepository
         wp_cache_flush();
         
         // Get counts for each status
-        $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE type = 'attribute' GROUP BY status";
-        $results = $this->wpdb->get_results($query, ARRAY_A);
+        $query = "SELECT status, COUNT(*) as count FROM `{$table}` WHERE type = %s GROUP BY status";
+        $results = $this->wpdb->get_results($this->wpdb->prepare($query, ClassificationTypes::ATTRIBUTE), ARRAY_A);
 
 
         $counts = [];
@@ -500,10 +503,13 @@ class AttributeRepository extends BaseRepository
         $table = esc_sql($this->getTableName());
         
         $attributes = $this->wpdb->get_results(
-            "SELECT id, name, JSON_EXTRACT(metadata, '$.field_type') as field_type, JSON_EXTRACT(metadata, '$.field_options') as field_options, icon, description 
-             FROM {$table} 
-             WHERE type = 'attribute' AND status = 'publish' 
-             ORDER BY sorting ASC, name ASC"
+            $this->wpdb->prepare(
+                "SELECT id, name, JSON_EXTRACT(metadata, '$.field_type') as field_type, JSON_EXTRACT(metadata, '$.field_options') as field_options, icon, description 
+                 FROM {$table} 
+                 WHERE type = %s AND status = 'publish' 
+                 ORDER BY sorting ASC, name ASC",
+                ClassificationTypes::ATTRIBUTE
+            )
         );
         
         $formattedAttributes = [];

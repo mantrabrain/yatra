@@ -5,6 +5,88 @@
 
 import { API_ENDPOINTS } from './api-endpoints';
 
+type RequestInfo = {
+  url: string;
+  method: string;
+  payload?: string;
+};
+
+const serializePayload = (body: BodyInit | null | undefined): string | undefined => {
+  if (!body) {
+    return undefined;
+  }
+
+  if (typeof body === 'string') {
+    return body;
+  }
+
+  if (body instanceof URLSearchParams) {
+    return body.toString();
+  }
+
+  if (typeof FormData !== 'undefined' && body instanceof FormData) {
+    const entries: Record<string, unknown> = {};
+    body.forEach((value, key) => {
+      entries[key] = value;
+    });
+    try {
+      return JSON.stringify(entries, null, 2);
+    } catch {
+      return '[FormData]';
+    }
+  }
+
+  if (typeof body === 'object') {
+    try {
+      return JSON.stringify(body, null, 2);
+    } catch {
+      return String(body);
+    }
+  }
+
+  return String(body);
+};
+
+const formatRequestUrl = (rawUrl: string): string => {
+  try {
+    const parsed = new URL(rawUrl, window.location.origin);
+    const params = new URLSearchParams(parsed.search);
+    const restRoute = params.get('rest_route');
+
+    if (restRoute) {
+      params.delete('rest_route');
+      const decodedRoute = decodeURIComponent(restRoute);
+      const normalizedRoute = decodedRoute.startsWith('/') ? decodedRoute : `/${decodedRoute}`;
+      const remainingParams = params.toString();
+      return `${parsed.origin}${normalizedRoute}${remainingParams ? `?${remainingParams}` : ''}`;
+    }
+
+    return parsed.toString();
+  } catch {
+    return rawUrl;
+  }
+};
+
+class ApiError extends Error {
+  response: {
+    status: number;
+    statusText: string;
+    data: any;
+  };
+  requestInfo?: RequestInfo;
+
+  constructor(
+    message: string,
+    response: { status: number; statusText: string; data: any },
+    requestInfo?: RequestInfo
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.response = response;
+    this.requestInfo = requestInfo;
+  }
+}
+
 class ApiClient {
   private baseUrl: string;
   private nonce: string;
@@ -92,6 +174,9 @@ class ApiClient {
       }
     }
 
+    const method = (options.method || 'GET').toUpperCase();
+    const serializedPayload = serializePayload(options.body);
+
     const response = await fetch(url, {
       ...options,
       headers,
@@ -99,11 +184,50 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-      throw new Error(error.message || `HTTP error! status: ${response.status}`);
+      const raw = await response.text();
+      let data: any = null;
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch {
+          data = raw;
+        }
+      }
+      const message =
+        (typeof data === 'object' && data?.message) ||
+        (typeof data === 'string' && data) ||
+        response.statusText ||
+        `HTTP error! status: ${response.status}`;
+
+      throw new ApiError(
+        message,
+        {
+          status: response.status,
+          statusText: response.statusText,
+          data,
+        },
+        {
+          url: formatRequestUrl(url),
+          method,
+          payload: serializedPayload,
+        }
+      );
     }
 
-    return response.json();
+    if (response.status === 204) {
+      return null;
+    }
+
+    const text = await response.text();
+    if (!text) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
   }
 
   private async requestBlob(

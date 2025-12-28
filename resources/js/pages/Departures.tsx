@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, Search, AlertCircle, Edit, Trash2, RotateCcw, Eye, MapPin, CalendarDays } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, RotateCcw, Eye, MapPin, CalendarDays } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -16,12 +16,12 @@ import { Card, CardContent } from '../components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { DateRangePicker } from '../components/ui/date-range-picker';
-import { DeparturesTableSkeleton } from '../components/ui/table-skeleton';
 import { BulkActionToolbar } from '../components/shared/BulkActionToolbar';
 import { Table as SharedTable } from '../components/shared/Table';
 import { Pagination } from '../components/shared/Pagination';
 import { apiClient } from '../lib/api-client';
 import { useToast } from '../components/ui/toast';
+import { getErrorContext } from '../lib/errors';
 // Format date helper
 const formatDate = (dateString: string): string => {
   if (!dateString) return '--';
@@ -203,9 +203,15 @@ const Departures: React.FC = () => {
   // Note: We pass filter values directly to the API call instead of building queryParams
 
   // Fetch departures data for the current status tab (filtered list)
-  const { data: departuresData, isLoading } = useQuery({
+  const { data: departuresData, isLoading, error, refetch } = useQuery({
     queryKey: ['departures', selectedTripId, statusFilter, sourceFilter, searchTerm, dateFrom, dateTo, page],
     queryFn: async () => {
+      // Check URL parameter for error simulation (for testing)
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('simulate_error') === 'true') {
+        throw new Error('Simulated API error for testing error UI functionality');
+      }
+      
       // API endpoint based on if a trip is selected
       const endpoint = selectedTripId ? `/trips/${selectedTripId}/departures` : '/departures';
       
@@ -244,6 +250,15 @@ const Departures: React.FC = () => {
   });
 
   const departures: Departure[] = departuresData?.data || [];
+
+  // Enhanced error handling
+  const errorContext = getErrorContext(error);
+  const apiErrorMessage = (departuresData as any)?.error || (departuresData as any)?.message;
+  const derivedErrorDetails =
+    errorContext.details ||
+    (apiErrorMessage ? String(apiErrorMessage) : undefined) ||
+    (error ? String(error?.message || error) : undefined);
+  const isDeparturesError = !!error || !!apiErrorMessage;
 
   const totalItems = departuresData?.meta?.total ?? 0;
   const itemsPerPage = 20;
@@ -894,54 +909,58 @@ const Departures: React.FC = () => {
           </Card>
 
           {/* Bulk actions + status tabs */}
-          <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkApply}
-            onClearSelection={() => setSelectedIds([])}
-            statusFilter={statusFilter}
-            setStatusFilter={(filter) => {
-              setStatusFilter(filter as any);
-              setPage(1);
-            }}
-            statusOptions={statusOptions}
-            showColumnsDropdown={showColumnMenu}
-            setShowColumnsDropdown={setShowColumnMenu}
-            columnOptions={columnOptions}
-            onToggleColumn={(key) => toggleColumn(key as keyof typeof visibleColumns)}
-            bulkMutationPending={deleteMutation.isPending}
-            totalItems={departures.length}
-            bulkActionOptions={bulkActionOptions}
-          />
+          {!isDeparturesError && (
+            <BulkActionToolbar
+              selectedIds={selectedIds}
+              bulkAction={bulkAction}
+              setBulkAction={setBulkAction}
+              onApply={handleBulkApply}
+              onClearSelection={() => setSelectedIds([])}
+              statusFilter={statusFilter}
+              setStatusFilter={(filter) => {
+                setStatusFilter(filter as any);
+                setPage(1);
+              }}
+              statusOptions={statusOptions}
+              showColumnsDropdown={showColumnMenu}
+              setShowColumnsDropdown={setShowColumnMenu}
+              columnOptions={columnOptions}
+              onToggleColumn={(key) => toggleColumn(key as keyof typeof visibleColumns)}
+              bulkMutationPending={deleteMutation.isPending}
+              totalItems={departures.length}
+              bulkActionOptions={bulkActionOptions}
+            />
+          )}
 
           {/* Departures Table */}
           <Card>
             <CardContent className="pt-6">
-              {isLoading ? (
-                <DeparturesTableSkeleton visibleColumns={visibleColumns} />
-              ) : !departuresData?.data?.length ? (
-                <div className="text-center py-8">
-                  <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">{__('No departures found', 'No departures found')}</p>
-                  <Button onClick={navigateToAdd} variant="outline" className="mt-4">
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Departure', 'Add Departure')}
-                  </Button>
-                </div>
-              ) : (
-                <SharedTable
-                  data={departures}
-                  columns={departureColumns}
-                  actions={tableActions}
-                  selectedItemIds={selectedIds}
-                  onSelectItem={(id, checked) => handleSelectRow(id as number, checked)}
-                  onSelectAll={handleSelectAll}
-                  isAllSelected={isAllSelected}
-                  getItemId={(departure: Departure) => departure.id}
-                  getItemStatus={(departure: Departure) => departure.status}
-                />
-              )}
+              <SharedTable
+                data={departures}
+                columns={departureColumns}
+                actions={tableActions}
+                isLoading={isLoading}
+                isError={isDeparturesError}
+                errorText={__('Error loading departures', 'Error loading departures')}
+                errorDescription={
+                  __('We couldn\'t connect to the departures service. Please refresh or try again shortly.',
+                    'We couldn\'t connect to the departures service. Please refresh or try again shortly.'
+                  )
+                }
+                errorDetails={derivedErrorDetails}
+                errorRequestInfo={errorContext.requestInfo}
+                onRetry={() => refetch()}
+                emptyText={__('No departures found', 'No departures found')}
+                emptyDescription={__('Get started by creating your first departure.', 'Get started by creating your first departure.')}
+                onCreateClick={navigateToAdd}
+                selectedItemIds={selectedIds}
+                onSelectItem={(id, checked) => handleSelectRow(id as number, checked)}
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+                getItemId={(departure: Departure) => departure.id}
+                getItemStatus={(departure: Departure) => departure.status}
+                capability="yatra_view_trips"
+              />
             </CardContent>
           </Card>
 

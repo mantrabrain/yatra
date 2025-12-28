@@ -8,6 +8,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Eye, CreditCard } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
+import { getErrorContext } from '../lib/errors';
 import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
@@ -158,6 +159,7 @@ const Payments: React.FC = () => {
   const payments: Payment[] = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
+  const errorContext = getErrorContext(error);
 
   const formatDate = (dateString: string) => {
     return formatDateUtil(dateString);
@@ -679,14 +681,8 @@ const Payments: React.FC = () => {
       </Card>
 
       <ConditionalRender capability="yatra_view_bookings">
-        {error ? (
-          <Card>
-            <CardContent className="p-8 text-center text-red-500">
-              {__('Error loading payments', 'Error loading payments')}
-            </CardContent>
-          </Card>
-        ) : (
-          <>
+        <>
+          {!error && (
             <BulkActionToolbar
               selectedIds={selectedIds}
               bulkAction={bulkAction}
@@ -715,52 +711,59 @@ const Payments: React.FC = () => {
               totalItems={total}
               bulkActionOptions={bulkActionOptions}
             />
+          )}
 
-            <Card>
-              <CardContent className="p-0">
-                <SharedTable
-                  data={payments}
-                  columns={columns}
-                  actions={actions}
-                  isLoading={isLoading}
-                  isError={!!error}
-                  errorText={__('Error loading payments', 'Error loading payments')}
-                  emptyText={__('No payments found', 'No payments found')}
-                  emptyDescription={
-                    hasFilters
-                      ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                      : __('Get started by recording your first payment.', 'Get started by recording your first payment.')
-                  }
-                  onCreateClick={
-                    can('yatra_edit_bookings') ? handleCreatePayment : undefined
-                  }
-                  onSort={handleSort}
-                  getSortIcon={getSortIcon}
-                  selectedItemIds={selectedIds}
-                  onSelectItem={handleSelectItem}
-                  onSelectAll={handleSelectAll}
-                  isAllSelected={isAllSelected}
-                  getItemId={(payment: Payment) => payment.id}
-                  skeletonRows={5}
-                  capability="yatra_view_bookings"
-                />
-              </CardContent>
-            </Card>
+          <Card>
+            <CardContent className="p-0">
+              <SharedTable
+                data={payments}
+                columns={columns}
+                actions={actions}
+                isLoading={isLoading}
+                isError={!!error}
+                errorText={__('Error loading payments', 'Error loading payments')}
+                errorDescription={__(
+                  'We couldn’t connect to the payments service. Please refresh or try again in a moment.',
+                  'We couldn’t connect to the payments service. Please refresh or try again in a moment.'
+                )}
+                onRetry={() => queryClient.invalidateQueries({ queryKey: ['payments'] })}
+                errorDetails={errorContext.details}
+                errorRequestInfo={errorContext.requestInfo}
+                emptyText={__('No payments found', 'No payments found')}
+                emptyDescription={
+                  hasFilters
+                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
+                    : __('Get started by recording your first payment.', 'Get started by recording your first payment.')
+                }
+                onCreateClick={
+                  can('yatra_edit_bookings') ? handleCreatePayment : undefined
+                }
+                onSort={handleSort}
+                getSortIcon={getSortIcon}
+                selectedItemIds={selectedIds}
+                onSelectItem={handleSelectItem}
+                onSelectAll={handleSelectAll}
+                isAllSelected={isAllSelected}
+                getItemId={(payment: Payment) => payment.id}
+                skeletonRows={5}
+                capability="yatra_view_bookings"
+              />
+            </CardContent>
+          </Card>
 
-            {total > 0 && (
-              <div className="mt-4">
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  totalItems={total}
-                  itemsPerPage={10}
-                  onPageChange={(newPage) => setPage(newPage)}
-                  itemName={__('payments', 'payments')}
-                />
-              </div>
-            )}
-          </>
-        )}
+          {!error && total > 0 && (
+            <div className="mt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={total}
+                itemsPerPage={10}
+                onPageChange={(newPage) => setPage(newPage)}
+                itemName={__('payments', 'payments')}
+              />
+            </div>
+          )}
+        </>
       </ConditionalRender>
     </div>
   );

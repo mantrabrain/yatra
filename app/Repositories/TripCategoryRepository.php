@@ -40,9 +40,9 @@ class TripCategoryRepository extends BaseRepository
         
         // Always filter by type = 'category' for this repository
         if ($where) {
-            $where .= " AND type = '" . ClassificationTypes::CATEGORY . "'";
+            $where .= sprintf(" AND type = '%s'", ClassificationTypes::CATEGORY);
         } else {
-            $where = "WHERE type = '" . ClassificationTypes::CATEGORY . "'";
+            $where = sprintf("WHERE type = '%s'", ClassificationTypes::CATEGORY);
         }
         
         return $where;

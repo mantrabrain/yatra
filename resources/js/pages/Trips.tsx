@@ -34,6 +34,7 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Edit, Trash2 } from 'lucide-react';
 import { HelpText } from '../components/ui/help-text';
 import { apiClient } from '../lib/api-client';
+import { getErrorContext } from '../lib/errors';
 import { useToast } from '../components/ui/toast';
 import { generateSlug } from '../lib/slug';
 import { getCurrencySymbol, getCurrency } from '../data/currencies';
@@ -233,6 +234,7 @@ const Trips: React.FC = () => {
   const total = (data as any)?.total || 0;
   const itemsPerPage = (data as any)?.per_page || 10;
   const totalPages = Math.ceil(total / itemsPerPage);
+  const errorContext = getErrorContext(error);
 
   // Get difficulty level data for lookup
   const { data: difficultyLevelsData } = useQuery({
@@ -1213,23 +1215,25 @@ const Trips: React.FC = () => {
       <ConditionalRender capability="yatra_view_trips">
 
         {/* Bulk Actions & Column Visibility */}
-        <BulkActionToolbar
-          selectedIds={selectedIds}
-          bulkAction={bulkAction}
-          setBulkAction={setBulkAction}
-          onApply={handleBulkApply}
-          onClearSelection={() => setSelectedIds([])}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          statusOptions={statusOptions}
-          showColumnsDropdown={showColumnsDropdown}
-          setShowColumnsDropdown={setShowColumnsDropdown}
-          columnOptions={columnOptions}
-          onToggleColumn={toggleColumn}
-          bulkMutationPending={false}
-          totalItems={total}
-          bulkActionOptions={bulkActionOptions}
-        />
+        {!error && (
+          <BulkActionToolbar
+            selectedIds={selectedIds}
+            bulkAction={bulkAction}
+            setBulkAction={setBulkAction}
+            onApply={handleBulkApply}
+            onClearSelection={() => setSelectedIds([])}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            statusOptions={statusOptions}
+            showColumnsDropdown={showColumnsDropdown}
+            setShowColumnsDropdown={setShowColumnsDropdown}
+            columnOptions={columnOptions}
+            onToggleColumn={toggleColumn}
+            bulkMutationPending={false}
+            totalItems={total}
+            bulkActionOptions={bulkActionOptions}
+          />
+        )}
 
         {/* Table */}
         <Card>
@@ -1241,6 +1245,13 @@ const Trips: React.FC = () => {
               isLoading={isLoading}
               isError={!!error}
               errorText={__('Error Loading Trips', 'Error Loading Trips')}
+              errorDescription={__(
+                'We couldn’t connect to the trips service. Please refresh or try again shortly.',
+                'We couldn’t connect to the trips service. Please refresh or try again shortly.'
+              )}
+              onRetry={() => queryClient.invalidateQueries({ queryKey: ['trips'] })}
+              errorDetails={errorContext.details}
+              errorRequestInfo={errorContext.requestInfo}
               emptyText={searchTerm || statusFilter !== 'all'
                 ? __('No trips match your search', 'No trips match your search')
                 : __('No trips yet', 'No trips yet')}
