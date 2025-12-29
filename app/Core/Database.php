@@ -31,17 +31,6 @@ use Yatra\Database\Tables\TripItineraryDayEntryTable;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Database\Tables\TripAvailabilityRulesTable;
 
-/**
- * Optimized Database Management v2.0.0
- * Handles table creation and updates using the new optimized schema
- * 
- * Key improvements:
- * - 29% reduction in table count (58 → 41 tables)
- * - JSON-based flexible data structures
- * - Polymorphic relationships
- * - EAV pattern for extensibility
- * - Performance-optimized indexing
- */
 class Database
 {
     /**
@@ -181,28 +170,5 @@ class Database
         
         // Remove database version
         delete_option('yatra_db_version');
-    }
-
-    /**
-     * Get database optimization summary
-     * 
-     * @return array Optimization details
-     */
-    public static function getOptimizationSummary(): array
-    {
-        return [
-            'version' => '2.0.0',
-            'tables_before' => 58,
-            'tables_after' => 41,
-            'reduction_percentage' => 29,
-            'optimized_tables' => [
-                'TripItineraryDaysTable' => ['replaced' => 'new', 'benefits' => ['Day-level information', 'Metadata support', 'Better performance']],
-                'TripItineraryDayEntryTable' => ['replaced' => 'new', 'benefits' => ['Individual entries', 'Foreign key relationships', 'Comprehensive indexing']],
-                'ClassificationsTable' => ['replaced' => 8, 'benefits' => ['Unified classification system', 'Attributes/items/types in one table', 'JSON metadata flexibility']],
-                'TripClassificationsTable' => ['replaced' => 4, 'benefits' => ['Polymorphic relationships', 'Future extensibility']],
-                'TripPricingTable' => ['replaced' => 'new', 'benefits' => ['Comprehensive pricing', 'Rule-based engine']],
-                'TripContentTable' => ['replaced' => 4, 'benefits' => ['Type-based content', 'Access control']]
-            ]
-        ];
     }
 }

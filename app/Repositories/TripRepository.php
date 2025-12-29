@@ -1362,7 +1362,7 @@ class TripRepository extends BaseRepository
         // Create main trip record
         $tripId = $this->create($data);
         
-        // Save relationships
+        // Update relationships if provided
         if (!empty($destinations)) {
             $this->saveDestinations($tripId, $destinations);
         }

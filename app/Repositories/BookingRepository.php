@@ -960,5 +960,36 @@ class BookingRepository extends BaseRepository
             LIMIT {$limit}
         ") ?: [];
     }
+
+    /**
+     * Get total travelers count for a trip and availability with specific statuses
+     * 
+     * @param int $tripId Trip ID
+     * @param int $availabilityId Availability ID
+     * @param array $statuses Array of booking statuses to include
+     * @return int Total travelers count
+     */
+    public function getTotalTravelersByTripAndAvailability(int $tripId, int $availabilityId, array $statuses = []): int
+    {
+        $table = esc_sql($this->table);
+        
+        if (empty($statuses)) {
+            $statuses = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
+        }
+        
+        $placeholders = implode(',', array_fill(0, count($statuses), '%s'));
+        $params = array_merge([$tripId, $availabilityId], $statuses);
+        
+        $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT COALESCE(SUM(travelers_count), 0)
+             FROM {$table}
+             WHERE trip_id = %d
+               AND availability_id = %d
+               AND status IN ({$placeholders})",
+            $params
+        ));
+        
+        return $count;
+    }
 }
 

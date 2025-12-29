@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `country_code` char(2) DEFAULT NULL COMMENT 'ISO 3166-1 alpha-2',
     
     -- DURATION & SCHEDULE
-    `trip_type` enum('single_day','multi_day','flexible') DEFAULT 'multi_day',
+    `trip_type` varchar(50) DEFAULT 'multi_day',
     `duration_days` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Total days',
     `duration_nights` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'Total nights',
     `duration_hours` smallint(5) UNSIGNED DEFAULT NULL COMMENT 'For single-day trips',
@@ -93,13 +93,13 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `trip_category_parent` varchar(100) DEFAULT NULL,
     `trip_category_sub` varchar(100) DEFAULT NULL,
     `difficulty_level` bigint(20) UNSIGNED DEFAULT NULL,
-    `activity_intensity` enum('relaxing','light','moderate','active','strenuous') DEFAULT NULL,
-    `featured_priority` enum('none','featured','popular','new','limited','bestseller') DEFAULT 'none',
+    `activity_intensity` varchar(50) DEFAULT NULL,
+    `featured_priority` varchar(50) DEFAULT 'none',
     `trip_style` varchar(50) DEFAULT NULL,
-    `group_type` enum('private','shared','both') DEFAULT 'both',
+    `group_type` varchar(50) DEFAULT 'both',
     
     -- PRICING (CORE BUSINESS LOGIC)
-    `pricing_type` enum('regular','traveler_based','dynamic','custom') DEFAULT 'regular',
+    `pricing_type` varchar(50) DEFAULT 'regular',
     `original_price` decimal(10,2) DEFAULT 0.00,
     `discounted_price` decimal(10,2) DEFAULT NULL,
     `sale_price` decimal(10,2) DEFAULT NULL,
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `group_pricing_enabled` tinyint(1) DEFAULT 0,
     `group_size_min` smallint(5) UNSIGNED DEFAULT NULL,
     `group_size_max` smallint(5) UNSIGNED DEFAULT NULL,
-    `group_discount_type` enum('percentage','fixed','tiered') DEFAULT 'percentage',
+    `group_discount_type` varchar(50) DEFAULT 'percentage',
     `group_discount_percentage` decimal(5,2) DEFAULT NULL,
     `group_discount_amount` decimal(10,2) DEFAULT NULL,
     
@@ -164,8 +164,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     
     -- ACCOMMODATION
     `accommodation_type` varchar(100) DEFAULT NULL,
-    `accommodation_standard` enum('budget','standard','comfort','luxury','premium') DEFAULT NULL,
-    `meal_plan` enum('none','breakfast','half_board','full_board','all_inclusive') DEFAULT NULL,
+    `accommodation_standard` varchar(50) DEFAULT NULL,
+    `meal_plan` varchar(50) DEFAULT NULL,
     `accommodation_details` text,
     `accommodation_included` tinyint(1) DEFAULT 1,
     
@@ -200,7 +200,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `schema_markup` text COMMENT 'JSON-LD structured data',
     
     -- STATUS & LIFECYCLE
-    `status` enum('draft','review','approved','published','archived','suspended') DEFAULT 'draft',
+    `status` varchar(50) DEFAULT 'draft',
     `scheduled_publish_date` datetime DEFAULT NULL,
     `scheduled_unpublish_date` datetime DEFAULT NULL,
     `published_at` datetime DEFAULT NULL,

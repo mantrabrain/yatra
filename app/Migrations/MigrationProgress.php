@@ -163,7 +163,7 @@ class MigrationProgress
         $startTime = microtime(true);
         
         // Get total count before starting migration
-        $detector = new \Yatra\Migration\MigrationDetector();
+        $detector = new \Yatra\Migrations\MigrationDetector();
         $oldData = $detector->detectOldData();
         $total = $oldData[$dataType]['count'] ?? 0;
         

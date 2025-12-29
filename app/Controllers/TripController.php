@@ -648,7 +648,6 @@ class TripController extends BaseController
                 $relationships['availability_dates'] = $data['availability_dates'];
             }
             if (isset($data['attributes'])) {
-                error_log("Yatra TripController: update_item - RAW attributes from request: " . json_encode($data['attributes']));
                 $relationships['attributes'] = $data['attributes'];
             }
 
@@ -657,7 +656,7 @@ class TripController extends BaseController
             // Validate and sanitize input data
             TripValidator::validateUpdate($data, $id);
             $data = TripValidator::sanitize($data);
-            $data = apply_filters('yatra_trip_update_sanitized_data', $data, $id, $relationships, $request);
+             $data = apply_filters('yatra_trip_update_sanitized_data', $data, $id, $relationships, $request);
 
             $extraUnsetKeys = apply_filters('yatra_trip_update_unset_keys', [], $data, $relationships, $request);
             if (is_array($extraUnsetKeys) && !empty($extraUnsetKeys)) {
@@ -681,12 +680,6 @@ class TripController extends BaseController
                 $data['availability_dates'],
                 $data['attributes']
             );
-
-            $result = $this->service->updateWithRelations($id, $data, $relationships);
-
-            if (!$result) {
-                return $this->error_response(__('Failed to update trip', 'yatra'), 500);
-            }
 
             return $this->success_response([
                 'message' => __('Trip updated successfully', 'yatra'),

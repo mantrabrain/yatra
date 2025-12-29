@@ -3,7 +3,7 @@
  * Migration Detector - Detects old Yatra data from previous versions
  * 
  * This class detects data from Yatra versions prior to 3.0.0
- * All migration-related code is in app/Migration folder for easy removal
+ * All migration-related code is in app/Migrations folder for easy removal
  * 
  * @package Yatra\Migration
  * @since 3.0.0

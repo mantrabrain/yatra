@@ -6,9 +6,9 @@ namespace Yatra\Hooks;
 
 use Yatra\Database\Tables\BookingsTable;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
+use Yatra\Repositories\AvailabilityRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DepartureRepository;
-use Yatra\Repositories\AvailabilityRepository;
 use Yatra\Services\CapacityService;
 
 class AvailabilityInventoryHooks
@@ -55,29 +55,18 @@ class AvailabilityInventoryHooks
             $availabilityId = isset($booking->availability_id) ? (int) $booking->availability_id : 0;
 
             if ($tripId > 0 && $availabilityId <= 0) {
-                global $wpdb;
-                $availabilityTable = TripAvailabilityDatesTable::getTableName();
                 $travelDate = (string) ($booking->travel_date ?? '');
 
                 if ($travelDate !== '') {
-                    $rows = $wpdb->get_results(
-                        $wpdb->prepare(
-                            "SELECT id FROM {$availabilityTable} WHERE trip_id = %d AND departure_date = %s LIMIT 2",
-                            $tripId,
-                            $travelDate
-                        )
-                    );
-
-                    if (is_array($rows) && count($rows) === 1 && !empty($rows[0]->id)) {
-                        $availabilityId = (int) $rows[0]->id;
-                        $bookingsTable = BookingsTable::getTableName();
-                        $wpdb->query(
-                            $wpdb->prepare(
-                                "UPDATE {$bookingsTable} SET availability_id = %d WHERE id = %d",
-                                $availabilityId,
-                                $bookingId
-                            )
-                        );
+                    $availabilityRepo = new AvailabilityRepository();
+                    $availabilityRecords = $availabilityRepo->findByTripAndDate($tripId, $travelDate);
+                    
+                    if (is_array($availabilityRecords) && count($availabilityRecords) === 1 && !empty($availabilityRecords[0]->id)) {
+                        $availabilityId = (int) $availabilityRecords[0]->id;
+                        
+                        // Update booking with availability_id
+                        $bookingRepo = new BookingRepository();
+                        $bookingRepo->update($bookingId, ['availability_id' => $availabilityId]);
                     }
                 }
             }
@@ -94,17 +83,8 @@ class AvailabilityInventoryHooks
 
     private static function syncAvailabilityId(int $availabilityId, int $tripId): void
     {
-        global $wpdb;
-
-        $availabilityTable = TripAvailabilityDatesTable::getTableName();
-        $bookingsTable = BookingsTable::getTableName();
-
-        $availability = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT id, seats_total, seats_available, seats_reserved, status FROM {$availabilityTable} WHERE id = %d LIMIT 1",
-                $availabilityId
-            )
-        );
+        $availabilityRepo = new AvailabilityRepository();
+        $availability = $availabilityRepo->find($availabilityId);
 
         if (!$availability) {
             return;
@@ -113,18 +93,10 @@ class AvailabilityInventoryHooks
         $departureTime = isset($availability->departure_time) ? (string) $availability->departure_time : '';
 
         $activeBookingStatuses = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
-        $placeholders = implode(',', array_fill(0, count($activeBookingStatuses), '%s'));
-
-        $bookedCount = (int) $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COALESCE(SUM(travelers_count), 0)
-                 FROM {$bookingsTable}
-                 WHERE trip_id = %d
-                   AND availability_id = %d
-                   AND status IN ({$placeholders})",
-                array_merge([(int) $tripId, (int) $availabilityId], $activeBookingStatuses)
-            )
-        );
+        
+        // Get booked count using repository
+        $bookingRepo = new BookingRepository();
+        $bookedCount = $bookingRepo->getTotalTravelersByTripAndAvailability($tripId, $availabilityId, $activeBookingStatuses);
 
         $seatsTotal = (int) ($availability->seats_total ?? 0);
         $seatsReserved = $bookedCount;
@@ -141,17 +113,12 @@ class AvailabilityInventoryHooks
             }
         }
 
-        $wpdb->update(
-            $availabilityTable,
-            [
-                'seats_available' => $seatsAvailable,
-                'seats_reserved' => $seatsReserved,
-                'status' => $status,
-            ],
-            ['id' => (int) $availabilityId],
-            ['%d', '%d', '%s'],
-            ['%d']
-        );
+        // Update availability using repository
+        $availabilityRepo->update($availabilityId, [
+            'seats_available' => $seatsAvailable,
+            'seats_reserved' => $seatsReserved,
+            'status' => $status,
+        ]);
 
         self::syncDepartureWithAvailability($tripId, $availability, $bookedCount, $seatsTotal);
     }

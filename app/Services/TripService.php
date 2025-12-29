@@ -499,6 +499,7 @@ class TripService extends BaseService
      */
     public function updateWithRelations(int $id, array $data, array $relationships = []): bool
     {
+         
         // Extract relationship fields from data if not already in relationships array
         // (these should not be in the main table)
         $relationshipFields = [
@@ -514,7 +515,6 @@ class TripService extends BaseService
         ];
         
         error_log("Yatra TripService: updateWithRelations START - id={$id}");
-        error_log("Yatra TripService: price_types in relationships BEFORE: " . json_encode($relationships['price_types'] ?? 'NOT SET'));
         
         foreach ($relationshipFields as $field) {
             if (!isset($relationships[$field]) && isset($data[$field])) {
@@ -538,7 +538,6 @@ class TripService extends BaseService
         $data = $this->processBeforeUpdate($id, $data);
         
         $attributesRelationship = $relationships['attributes'] ?? null;
-        error_log("Yatra TripService: updateWithRelations - attributesRelationship=" . json_encode($attributesRelationship));
         
         unset($relationships['attributes']);
 

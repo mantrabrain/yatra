@@ -186,8 +186,8 @@ class Bootstrap
 
         // Register migration routes
         add_action('rest_api_init', function() {
-            if (class_exists('\Yatra\Migration\MigrationController')) {
-                $migrationController = new \Yatra\Migration\MigrationController();
+            if (class_exists('\Yatra\Migrations\MigrationController')) {
+                $migrationController = new \Yatra\Migrations\MigrationController();
                 $migrationController->registerRoutes();
             }
         });
@@ -196,8 +196,8 @@ class Bootstrap
         add_action('yatra_migrate_data_type', function($dataType, $force = false) {
             error_log("[Yatra Migration] Action Scheduler hook called for: {$dataType} (force=" . ($force ? 'true' : 'false') . ')');
             
-            if (class_exists('\Yatra\Migration\MigrationProgress')) {
-                $migrationService = new \Yatra\Migration\MigrationProgress();
+            if (class_exists('\Yatra\Migrations\MigrationProgress')) {
+                $migrationService = new \Yatra\Migrations\MigrationProgress();
                 $result = $migrationService->processMigration($dataType, (bool) $force);
                 error_log("[Yatra Migration] Migration result for {$dataType}: " . json_encode($result));
             } else {

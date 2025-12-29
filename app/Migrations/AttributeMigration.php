@@ -1,304 +1,468 @@
 <?php
 
-declare(strict_types=1);
+namespace Yatra\Migration;
 
-namespace Yatra\Migrations;
-
-use Yatra\Services\AttributeService;
 use Yatra\Utils\Logger;
+use Yatra\Migration\MigrationProgress;
 
 /**
- * Attribute Migration Script
+ * Attribute Migration - Migrates trip attributes from old Yatra system
  * 
- * Migrates attributes from old WordPress taxonomy system to new Yatra attribute tables
- * 
- * Old System:
- * - wp_terms (term_id, name, slug)
- * - wp_term_taxonomy (term_id, taxonomy = 'attributes')
- * - wp_termmeta (term_id, meta_key = 'attribute_field_type', meta_value)
- * - wp_postmeta (post_id, meta_key = 'tour_meta_custom_attributes', meta_value = serialized)
- * 
- * New System:
- * - yatra_attributes (id, name, slug, field_type, etc.)
- * - yatra_trip_attributes (trip_id, attribute_id, value)
+ * Old System: Attributes stored as post meta on tour posts
+ * New System: Dedicated yatra_attributes and yatra_trip_attributes tables
  */
-class AttributeMigration
+class AttributeMigration extends BaseMigration
 {
-    /**
-     * @var AttributeService
-     */
-    private $attributeService;
-
-    /**
-     * @var \wpdb
-     */
-    private $wpdb;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
+    public function __construct(MigrationProgress $service)
     {
-        global $wpdb;
-        $this->wpdb = $wpdb;
-        $this->attributeService = new AttributeService();
+        parent::__construct($service);
+    }
+
+    public function run(): array
+    {
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+
+        Logger::info("Starting attribute migration", ['source' => 'migration']);
+
+        // Step 1: Migrate attribute definitions
+        $attributeResult = $this->migrateAttributeDefinitions();
+        $migrated += $attributeResult['migrated'];
+        $skipped += $attributeResult['skipped'];
+        $failed += $attributeResult['failed'];
+
+        // Step 2: Migrate trip-attribute relationships
+        $relationshipResult = $this->migrateTripAttributeRelationships();
+        $migrated += $relationshipResult['migrated'];
+        $skipped += $relationshipResult['skipped'];
+        $failed += $relationshipResult['failed'];
+
+        Logger::info("Attribute migration completed", [
+            'source' => 'migration',
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+            'failed' => $failed
+        ]);
+
+        return compact('migrated', 'skipped', 'failed');
     }
 
     /**
-     * Run the migration
+     * Migrate attribute definitions from old system
+     * 
+     * Old system stores attributes in various ways:
+     * - Custom taxonomies (tour_attribute)
+     * - Post meta fields
+     * - Plugin-specific tables (if they exist)
      */
-    public function migrate(): array
+    private function migrateAttributeDefinitions(): array
     {
-        $results = [
-            'attributes_created' => 0,
-            'trip_attributes_migrated' => 0,
-            'errors' => [],
-            'warnings' => []
-        ];
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
 
-        try {
-            Logger::info('Starting attribute migration from WordPress taxonomy to Yatra tables');
+        // Check if old attributes table exists (some versions had this)
+        $oldAttributesTable = $this->wpdb->prefix . 'yatra_tour_attributes';
+        $tableExists = $this->tableExists($oldAttributesTable);
 
-            // Step 1: Migrate attribute definitions
-            $attributeMap = $this->migrateAttributeDefinitions($results);
+        if ($tableExists) {
+            Logger::info("Found old yatra_tour_attributes table", ['source' => 'migration']);
+            
+            $oldAttributes = $this->wpdb->get_results("SELECT * FROM {$oldAttributesTable}");
+            $total = count($oldAttributes);
 
-            // Step 2: Migrate trip attribute values
-            $this->migrateTripAttributeValues($attributeMap, $results);
+            Logger::info("Found {$total} attributes in old table", [
+                'source' => 'migration',
+                'count' => $total
+            ]);
+            
+            $this->updateProgress('attributes', 'running', 0, 0, 0, $total, null, null);
 
-            Logger::info('Attribute migration completed successfully', $results);
+            foreach ($oldAttributes as $oldAttr) {
+                try {
+                    // Check if already migrated
+                    $exists = $this->wpdb->get_var($this->wpdb->prepare(
+                        "SELECT id FROM {$this->wpdb->prefix}yatra_attributes WHERE slug = %s",
+                        $oldAttr->slug ?? sanitize_title($oldAttr->name)
+                    ));
 
-        } catch (\Exception $e) {
-            $results['errors'][] = 'Migration failed: ' . $e->getMessage();
-            Logger::error('Attribute migration failed', ['error' => $e->getMessage()]);
-        }
-
-        return $results;
-    }
-
-    /**
-     * Migrate attribute definitions from wp_terms to yatra_attributes
-     */
-    private function migrateAttributeDefinitions(array &$results): array
-    {
-        $attributeMap = [];
-
-        // Get old attributes from WordPress taxonomy
-        $oldAttributes = $this->wpdb->get_results("
-            SELECT t.term_id, t.name, t.slug, tm.meta_value as field_type
-            FROM {$this->wpdb->terms} t
-            JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-            LEFT JOIN {$this->wpdb->termmeta} tm ON t.term_id = tm.term_id AND tm.meta_key = 'attribute_field_type'
-            WHERE tt.taxonomy = 'attributes'
-            ORDER BY t.term_id
-        ");
-
-        if (empty($oldAttributes)) {
-            $results['warnings'][] = 'No old attributes found in WordPress taxonomy system';
-            return $attributeMap;
-        }
-
-        foreach ($oldAttributes as $oldAttr) {
-            try {
-                // Prepare attribute data
-                $attributeData = [
-                    'name' => $oldAttr->name,
-                    'slug' => $oldAttr->slug,
-                    'field_type' => $oldAttr->field_type ?: 'text_field',
-                    'description' => '',
-                    'required' => 0,
-                    'show_on_frontend' => 1,
-                    'show_in_filters' => 0,
-                    'filter_type' => 'exact',
-                    'searchable' => 0,
-                    'status' => 'publish'
-                ];
-
-                // Create new attribute
-                $newAttributeId = $this->attributeService->createAttribute($attributeData);
-
-                if ($newAttributeId) {
-                    $attributeMap[$oldAttr->term_id] = $newAttributeId;
-                    $results['attributes_created']++;
-                    
-                    Logger::info("Migrated attribute: {$oldAttr->name} (old ID: {$oldAttr->term_id} -> new ID: {$newAttributeId})");
-                } else {
-                    $results['errors'][] = "Failed to create attribute: {$oldAttr->name}";
-                }
-
-            } catch (\Exception $e) {
-                $results['errors'][] = "Error migrating attribute {$oldAttr->name}: " . $e->getMessage();
-            }
-        }
-
-        return $attributeMap;
-    }
-
-    /**
-     * Migrate trip attribute values from wp_postmeta to yatra_trip_attributes
-     */
-    private function migrateTripAttributeValues(array $attributeMap, array &$results): void
-    {
-        if (empty($attributeMap)) {
-            $results['warnings'][] = 'No attribute mappings available, skipping trip attribute migration';
-            return;
-        }
-
-        // Get all trips with custom attributes
-        $tripsWithAttributes = $this->wpdb->get_results("
-            SELECT post_id, meta_value
-            FROM {$this->wpdb->postmeta}
-            WHERE meta_key = 'tour_meta_custom_attributes'
-            AND meta_value IS NOT NULL
-            AND meta_value != ''
-        ");
-
-        if (empty($tripsWithAttributes)) {
-            $results['warnings'][] = 'No trips with custom attributes found';
-            return;
-        }
-
-        foreach ($tripsWithAttributes as $tripMeta) {
-            try {
-                $tripId = (int) $tripMeta->post_id;
-                $attributes = maybe_unserialize($tripMeta->meta_value);
-
-                if (!is_array($attributes)) {
-                    continue;
-                }
-
-                foreach ($attributes as $oldAttributeId => $attributeData) {
-                    // Check if this old attribute ID exists in our migration map
-                    if (!isset($attributeMap[$oldAttributeId])) {
-                        $results['warnings'][] = "Unknown attribute ID {$oldAttributeId} for trip {$tripId}";
+                    if (!$this->isForceMigration() && $exists) {
+                        $skipped++;
+                        Logger::info("Skipping attribute: {$oldAttr->name} (already exists with ID {$exists})", [
+                            'source' => 'migration',
+                            'attribute_name' => $oldAttr->name,
+                            'existing_id' => $exists
+                        ]);
+                        $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
 
-                    $newAttributeId = $attributeMap[$oldAttributeId];
-                    $value = $attributeData['content'] ?? '';
+                    $slug = $this->generateUniqueSlug(
+                        $oldAttr->slug ?? sanitize_title($oldAttr->name),
+                        'yatra_attributes'
+                    );
 
+                    // Parse field options if they exist
+                    $fieldOptions = null;
+                    if (!empty($oldAttr->options)) {
+                        $fieldOptions = is_string($oldAttr->options) 
+                            ? $oldAttr->options 
+                            : json_encode($oldAttr->options);
+                    }
+
+                    // Parse icon data
+                    $icon = null;
+                    if (!empty($oldAttr->icon)) {
+                        $icon = is_string($oldAttr->icon) 
+                            ? $oldAttr->icon 
+                            : maybe_serialize($oldAttr->icon);
+                    }
+
+                    $attributeData = [
+                        'name' => $oldAttr->name,
+                        'slug' => $slug,
+                        'description' => $oldAttr->description ?? '',
+                        'field_type' => $oldAttr->field_type ?? 'text',
+                        'field_options' => $fieldOptions,
+                        'icon' => $icon,
+                        'display_order' => $oldAttr->display_order ?? 0,
+                        'status' => $oldAttr->status ?? 'publish',
+                        'created_at' => $oldAttr->created_at ?? current_time('mysql'),
+                        'updated_at' => $oldAttr->updated_at ?? current_time('mysql'),
+                    ];
+
+                    if ($exists && $this->isForceMigration()) {
+                        $this->wpdb->update(
+                            $this->wpdb->prefix . 'yatra_attributes',
+                            $attributeData,
+                            ['id' => $exists]
+                        );
+                        Logger::info("Updated attribute: {$oldAttr->name}", [
+                            'source' => 'migration',
+                            'attribute_id' => $exists
+                        ]);
+                        $migrated++;
+                    } else {
+                        $inserted = $this->wpdb->insert(
+                            $this->wpdb->prefix . 'yatra_attributes',
+                            $attributeData
+                        );
+
+                        if ($inserted) {
+                            $newId = $this->wpdb->insert_id;
+                            Logger::info("Migrated attribute: {$oldAttr->name}", [
+                                'source' => 'migration',
+                                'old_id' => $oldAttr->id,
+                                'new_id' => $newId,
+                                'field_type' => $attributeData['field_type']
+                            ]);
+                            $migrated++;
+                        } else {
+                            $failed++;
+                            Logger::error("Failed to insert attribute: {$oldAttr->name}", [
+                                'source' => 'migration',
+                                'error' => $this->wpdb->last_error
+                            ]);
+                            $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+                            continue;
+                        }
+                    }
+                    
+                    $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+
+                } catch (\Exception $e) {
+                    $failed++;
+                    Logger::error("Exception migrating attribute: {$oldAttr->name}", [
+                        'source' => 'migration',
+                        'error' => $e->getMessage()
+                    ]);
+                    $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+                }
+            }
+        } else {
+            Logger::info("No old yatra_tour_attributes table found, checking for taxonomy-based attributes", [
+                'source' => 'migration'
+            ]);
+
+            // Check for taxonomy-based attributes
+            $taxonomyResult = $this->migrateAttributesFromTaxonomy();
+            $migrated += $taxonomyResult['migrated'];
+            $skipped += $taxonomyResult['skipped'];
+            $failed += $taxonomyResult['failed'];
+        }
+
+        return compact('migrated', 'skipped', 'failed');
+    }
+
+    /**
+     * Migrate attributes from old taxonomy system
+     */
+    private function migrateAttributesFromTaxonomy(): array
+    {
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+
+        // Check for 'attributes' taxonomy (old Yatra system)
+        $terms = $this->wpdb->get_results(
+            "SELECT t.*, tt.description 
+             FROM {$this->wpdb->terms} t
+             INNER JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+             WHERE tt.taxonomy = 'attributes'"
+        );
+
+        if (empty($terms)) {
+            Logger::info("No 'attributes' taxonomy terms found", ['source' => 'migration']);
+            return compact('migrated', 'skipped', 'failed');
+        }
+
+        $total = count($terms);
+        Logger::info("Found {$total} attribute terms in taxonomy", [
+            'source' => 'migration',
+            'count' => $total
+        ]);
+        
+        $this->updateProgress('attributes', 'running', 0, 0, 0, $total, null, null);
+
+        foreach ($terms as $term) {
+            try {
+                // Check if already migrated
+                $existingId = get_term_meta($term->term_id, '_migrated_to_attribute_id', true);
+                if (!$this->isForceMigration() && $existingId) {
+                    $skipped++;
+                    Logger::info("Skipping taxonomy attribute: {$term->name} (already migrated to ID {$existingId})", [
+                        'source' => 'migration',
+                        'term_id' => $term->term_id,
+                        'existing_id' => $existingId
+                    ]);
+                    $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+                    continue;
+                }
+                
+                $slug = $this->generateUniqueSlug($term->slug, 'yatra_attributes');
+
+                // Get term meta from old system
+                // Old system uses 'attribute_field_type' as meta key
+                $fieldType = get_term_meta($term->term_id, 'attribute_field_type', true);
+                if (empty($fieldType)) {
+                    $fieldType = 'text'; // Default to text if not set
+                }
+                
+                // Get icon from term meta
+                $icon = get_term_meta($term->term_id, 'icon', true);
+                
+                // Get field options if available
+                $fieldOptions = get_term_meta($term->term_id, 'field_options', true);
+                
+                Logger::debug("Processing taxonomy attribute: {$term->name}", [
+                    'source' => 'migration',
+                    'term_id' => $term->term_id,
+                    'field_type' => $fieldType,
+                    'has_icon' => !empty($icon)
+                ]);
+
+                $attributeData = [
+                    'name' => $term->name,
+                    'slug' => $slug,
+                    'description' => $term->description ?? '',
+                    'field_type' => $fieldType,
+                    'field_options' => $fieldOptions ? json_encode($fieldOptions) : null,
+                    'icon' => $icon ? maybe_serialize($icon) : null,
+                    'display_order' => 0,
+                    'status' => 'publish',
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql'),
+                ];
+
+                $inserted = $this->wpdb->insert(
+                    $this->wpdb->prefix . 'yatra_attributes',
+                    $attributeData
+                );
+
+                if ($inserted) {
+                    $newId = $this->wpdb->insert_id;
+                    
+                    // Store mapping for relationship migration
+                    update_term_meta($term->term_id, '_migrated_to_attribute_id', $newId);
+                    
+                    Logger::info("Migrated taxonomy attribute: {$term->name}", [
+                        'source' => 'migration',
+                        'term_id' => $term->term_id,
+                        'new_id' => $newId
+                    ]);
+                    $migrated++;
+                } else {
+                    $failed++;
+                    Logger::error("Failed to insert taxonomy attribute: {$term->name}", [
+                        'source' => 'migration',
+                        'error' => $this->wpdb->last_error
+                    ]);
+                }
+                
+                $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+
+            } catch (\Exception $e) {
+                $failed++;
+                Logger::error("Exception migrating taxonomy attribute: {$term->name}", [
+                    'source' => 'migration',
+                    'error' => $e->getMessage()
+                ]);
+                $this->updateProgress('attributes', 'running', $migrated, $skipped, $failed, $total, null, null);
+            }
+        }
+
+        return compact('migrated', 'skipped', 'failed');
+    }
+
+    /**
+     * Migrate trip-attribute relationships
+     * Old system stores attributes in post meta: 'tour_meta_custom_attributes' (serialized array)
+     */
+    private function migrateTripAttributeRelationships(): array
+    {
+        $migrated = 0;
+        $skipped = 0;
+        $failed = 0;
+
+        // Get all trips with custom attributes from old system
+        $tripsWithAttributes = $this->wpdb->get_results(
+            "SELECT post_id, meta_value 
+             FROM {$this->wpdb->postmeta}
+             WHERE meta_key = 'tour_meta_custom_attributes'
+             AND meta_value IS NOT NULL
+             AND meta_value != ''"
+        );
+
+        if (empty($tripsWithAttributes)) {
+            Logger::info("No trips with custom attributes found in old system", ['source' => 'migration']);
+            return compact('migrated', 'skipped', 'failed');
+        }
+
+        $total = count($tripsWithAttributes);
+        Logger::info("Found {$total} trips with custom attributes", [
+            'source' => 'migration',
+            'count' => $total
+        ]);
+
+        foreach ($tripsWithAttributes as $tripMeta) {
+            try {
+                $oldTripId = (int) $tripMeta->post_id;
+                
+                // Get the new trip ID
+                $newTripId = $this->getMigratedTripId($oldTripId);
+                
+                if (!$newTripId) {
+                    $skipped++;
+                    Logger::debug("Skipping trip {$oldTripId} - not migrated yet", ['source' => 'migration']);
+                    continue;
+                }
+
+                // Unserialize the attributes array
+                $attributes = maybe_unserialize($tripMeta->meta_value);
+                
+                if (!is_array($attributes)) {
+                    $skipped++;
+                    Logger::debug("Skipping trip {$oldTripId} - invalid attributes data", ['source' => 'migration']);
+                    continue;
+                }
+
+                // Process each attribute
+                foreach ($attributes as $oldAttributeId => $attributeData) {
+                    // Get the new attribute ID from term meta
+                    $newAttributeId = get_term_meta($oldAttributeId, '_migrated_to_attribute_id', true);
+                    
+                    if (!$newAttributeId) {
+                        Logger::debug("Attribute term {$oldAttributeId} not migrated yet", ['source' => 'migration']);
+                        continue;
+                    }
+
+                    // Get the value from the attribute data
+                    $value = $attributeData['content'] ?? $attributeData['value'] ?? '';
+                    
                     if (empty($value)) {
                         continue; // Skip empty values
                     }
 
-                    // Set the attribute value for the trip
-                    $success = $this->attributeService->setTripAttribute($tripId, $newAttributeId, $value);
-
-                    if ($success) {
-                        $results['trip_attributes_migrated']++;
-                    } else {
-                        $results['errors'][] = "Failed to set attribute {$newAttributeId} for trip {$tripId}";
+                    // Insert trip-attribute relationship
+                    if ($this->insertTripAttribute($newTripId, $newAttributeId, $value)) {
+                        $migrated++;
+                        
+                        Logger::debug("Migrated attribute relationship", [
+                            'source' => 'migration',
+                            'old_trip_id' => $oldTripId,
+                            'new_trip_id' => $newTripId,
+                            'old_attribute_id' => $oldAttributeId,
+                            'new_attribute_id' => $newAttributeId,
+                            'value' => substr($value, 0, 50)
+                        ]);
                     }
                 }
 
             } catch (\Exception $e) {
-                $results['errors'][] = "Error migrating attributes for trip {$tripMeta->post_id}: " . $e->getMessage();
+                $failed++;
+                Logger::error("Exception migrating attributes for trip {$tripMeta->post_id}", [
+                    'source' => 'migration',
+                    'error' => $e->getMessage()
+                ]);
             }
         }
+
+        Logger::info("Completed trip-attribute relationship migration", [
+            'source' => 'migration',
+            'migrated' => $migrated,
+            'skipped' => $skipped,
+            'failed' => $failed
+        ]);
+
+        return compact('migrated', 'skipped', 'failed');
     }
 
-    /**
-     * Check if migration is needed
-     */
-    public function isMigrationNeeded(): bool
-    {
-        // Check if old attributes exist
-        $oldAttributes = $this->wpdb->get_var("
-            SELECT COUNT(*)
-            FROM {$this->wpdb->term_taxonomy}
-            WHERE taxonomy = 'attributes'
-        ");
-
-        // Check if new attributes already exist
-        $newAttributes = $this->wpdb->get_var("
-            SELECT COUNT(*)
-            FROM {$this->wpdb->prefix}yatra_attributes
-        ");
-
-        return $oldAttributes > 0 && $newAttributes == 0;
-    }
 
     /**
-     * Get migration preview
+     * Insert trip-attribute relationship
      */
-    public function getMigrationPreview(): array
+    private function insertTripAttribute(int $tripId, int $attributeId, $value): bool
     {
-        $preview = [
-            'old_attributes_count' => 0,
-            'old_trip_attributes_count' => 0,
-            'sample_attributes' => []
-        ];
+        // Check if relationship already exists
+        $exists = $this->wpdb->get_var($this->wpdb->prepare(
+            "SELECT id FROM {$this->wpdb->prefix}yatra_trip_attributes 
+             WHERE trip_id = %d AND attribute_id = %d",
+            $tripId,
+            $attributeId
+        ));
 
-        // Count old attributes
-        $preview['old_attributes_count'] = (int) $this->wpdb->get_var("
-            SELECT COUNT(*)
-            FROM {$this->wpdb->term_taxonomy}
-            WHERE taxonomy = 'attributes'
-        ");
-
-        // Count trips with attributes
-        $preview['old_trip_attributes_count'] = (int) $this->wpdb->get_var("
-            SELECT COUNT(*)
-            FROM {$this->wpdb->postmeta}
-            WHERE meta_key = 'tour_meta_custom_attributes'
-            AND meta_value IS NOT NULL
-            AND meta_value != ''
-        ");
-
-        // Get sample attributes
-        $sampleAttributes = $this->wpdb->get_results("
-            SELECT t.term_id, t.name, t.slug, tm.meta_value as field_type
-            FROM {$this->wpdb->terms} t
-            JOIN {$this->wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
-            LEFT JOIN {$this->wpdb->termmeta} tm ON t.term_id = tm.term_id AND tm.meta_key = 'attribute_field_type'
-            WHERE tt.taxonomy = 'attributes'
-            LIMIT 5
-        ");
-
-        foreach ($sampleAttributes as $attr) {
-            $preview['sample_attributes'][] = [
-                'id' => $attr->term_id,
-                'name' => $attr->name,
-                'slug' => $attr->slug,
-                'field_type' => $attr->field_type ?: 'text_field'
-            ];
+        $valueSerialized = 0;
+        if (is_array($value) || is_object($value)) {
+            $value = maybe_serialize($value);
+            $valueSerialized = 1;
         }
 
-        return $preview;
-    }
-
-    /**
-     * Rollback migration (for testing purposes)
-     */
-    public function rollback(): array
-    {
-        $results = [
-            'attributes_deleted' => 0,
-            'trip_attributes_deleted' => 0,
-            'errors' => []
-        ];
-
-        try {
-            // Delete all trip attributes
-            $deletedTripAttrs = $this->wpdb->query("
-                DELETE FROM {$this->wpdb->prefix}yatra_trip_attributes
-            ");
-
-            $results['trip_attributes_deleted'] = $deletedTripAttrs ?: 0;
-
-            // Delete all attributes
-            $deletedAttrs = $this->wpdb->query("
-                DELETE FROM {$this->wpdb->prefix}yatra_attributes
-            ");
-
-            $results['attributes_deleted'] = $deletedAttrs ?: 0;
-
-            Logger::info('Attribute migration rollback completed', $results);
-
-        } catch (\Exception $e) {
-            $results['errors'][] = 'Rollback failed: ' . $e->getMessage();
-            Logger::error('Attribute migration rollback failed', ['error' => $e->getMessage()]);
+        if ($exists) {
+            if ($this->isForceMigration()) {
+                return (bool) $this->wpdb->update(
+                    $this->wpdb->prefix . 'yatra_trip_attributes',
+                    [
+                        'value' => $value,
+                        'value_serialized' => $valueSerialized,
+                        'updated_at' => current_time('mysql')
+                    ],
+                    ['id' => $exists]
+                );
+            }
+            return false;
         }
 
-        return $results;
+        return (bool) $this->wpdb->insert(
+            $this->wpdb->prefix . 'yatra_trip_attributes',
+            [
+                'trip_id' => $tripId,
+                'attribute_id' => $attributeId,
+                'value' => $value,
+                'value_serialized' => $valueSerialized,
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql'),
+            ]
+        );
     }
 }

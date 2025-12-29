@@ -63,6 +63,29 @@ class AvailabilityRepository extends BaseRepository
         return $result ?: null;
     }
 
+    /**
+     * Find availability records by trip ID and departure date
+     * 
+     * @param int $tripId Trip ID
+     * @param string $departureDate Departure date (YYYY-MM-DD)
+     * @return array Array of availability objects
+     */
+    public function findByTripAndDate(int $tripId, string $departureDate): array
+    {
+        $table = esc_sql($this->table);
+        
+        $results = $this->wpdb->get_results($this->wpdb->prepare(
+            "SELECT * FROM `{$table}` 
+             WHERE trip_id = %d 
+             AND departure_date = %s
+             ORDER BY departure_time ASC",
+            $tripId,
+            $departureDate
+        ));
+        
+        return $results ?: [];
+    }
+
     public function existsForTripDateTime(int $tripId, string $departureDate, ?string $departureTime): bool
     {
         $table = esc_sql($this->table);

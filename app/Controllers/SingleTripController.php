@@ -78,6 +78,8 @@ class SingleTripController
             )
         );
 
+
+
         // Check if trip exists but has other status - return null to show "not found"
         if (!$trip) {
             // Try to find trip regardless of status to check if it exists
