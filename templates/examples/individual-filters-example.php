@@ -23,16 +23,16 @@ $active_filters = [
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Individual Filter Components Example</title>
+    <title><?php esc_html_e('Individual Filter Components Example', 'yatra'); ?></title>
     <link rel="stylesheet" href="../public/css/listing.css">
 </head>
 <body>
 
-<h1>Individual Filter Components Examples</h1>
+<h1><?php esc_html_e('Individual Filter Components Examples', 'yatra'); ?></h1>
 
 <!-- Example 1: Single Price Filter -->
 <section>
-    <h2>Example 1: Price Filter Only</h2>
+    <h2><?php esc_html_e('Example 1: Price Filter Only', 'yatra'); ?></h2>
     <div class="filter-container">
         <?php echo yatra_render_price_filter($active_filters); ?>
     </div>
@@ -40,7 +40,7 @@ $active_filters = [
 
 <!-- Example 2: Categories and Destinations Only -->
 <section>
-    <h2>Example 2: Categories + Destinations</h2>
+    <h2><?php esc_html_e('Example 2: Categories + Destinations', 'yatra'); ?></h2>
     <div class="filter-container">
         <?php 
         echo yatra_render_categories_filter($active_filters);
@@ -51,7 +51,7 @@ $active_filters = [
 
 <!-- Example 3: Custom Filter Combination -->
 <section>
-    <h2>Example 3: Custom Filter Set</h2>
+    <h2><?php esc_html_e('Example 3: Custom Filter Set', 'yatra'); ?></h2>
     <div class="filter-container">
         <?php 
         echo yatra_render_custom_filters([
@@ -65,7 +65,7 @@ $active_filters = [
 
 <!-- Example 4: Complete Sidebar with Custom Options -->
 <section>
-    <h2>Example 4: Complete Sidebar (Custom Configuration)</h2>
+    <h2><?php esc_html_e('Example 4: Complete Sidebar (Custom Configuration)', 'yatra'); ?></h2>
     <div class="filter-container">
         <?php 
         echo yatra_render_filter_sidebar($active_filters, [
@@ -79,7 +79,7 @@ $active_filters = [
 
 <!-- Example 5: Horizontal Filter Layout -->
 <section>
-    <h2>Example 5: Horizontal Filter Layout</h2>
+    <h2><?php esc_html_e('Example 5: Horizontal Filter Layout', 'yatra'); ?></h2>
     <div style="display: flex; gap: 20px; flex-wrap: wrap;">
         <div style="flex: 1; min-width: 250px;">
             <?php echo yatra_render_price_filter($active_filters); ?>
@@ -95,7 +95,7 @@ $active_filters = [
 
 <!-- Example 6: Using FilterService Directly -->
 <section>
-    <h2>Example 6: Using FilterService Directly</h2>
+    <h2><?php esc_html_e('Example 6: Using FilterService Directly', 'yatra'); ?></h2>
     <div class="filter-container">
         <?php
         use Yatra\Services\FilterService;

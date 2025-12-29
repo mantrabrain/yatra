@@ -86,10 +86,10 @@ try {
             <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <?php _e('Group Discounts', 'Group Discounts'); ?>
+            <?php esc_html_e('Group Discounts', 'yatra'); ?>
         </div>
         <?php endif; ?>
-        <button class="yatra-favorite-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>" title="Add to favorites" aria-label="Add to favorites">
+        <button class="yatra-favorite-btn" data-trip-id="<?php echo esc_attr($trip->id); ?>" title="<?php esc_attr_e('Add to favorites', 'yatra'); ?>" aria-label="<?php esc_attr_e('Add to favorites', 'yatra'); ?>">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
             </svg>
@@ -150,7 +150,7 @@ try {
                     </svg>
                     <span class="yatra-rating-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
                 </div>
-                <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> reviews)</span>
+                <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> <?php esc_html_e('reviews', 'yatra'); ?>)</span>
             </div>
         </div>
 
@@ -207,7 +207,7 @@ try {
                             <span class="yatra-original-price"><?php echo esc_html($pricing['original_price']); ?></span>
                         <?php endif; ?>
                     <?php else: ?>
-                        <?php _e('Contact for pricing', 'yatra'); ?>
+                        <?php esc_html_e('Contact for pricing', 'yatra'); ?>
                     <?php endif; ?>
                 </span>
             </div>

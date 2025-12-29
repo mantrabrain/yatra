@@ -10,12 +10,14 @@ use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\ReviewsTable;
 use Yatra\Constants\ClassificationTypes;
+use Yatra\Services\TripListingService;
 
 if (!defined('ABSPATH')) {
     exit;
 }
 
-global $wpdb;
+// Initialize TripListingService for template data
+$tripListingService = new TripListingService();
 
 $tripTable = esc_sql(TripsTable::getTableName());
 $reviewsTable = esc_sql(ReviewsTable::getTableName());
@@ -89,12 +91,6 @@ function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field'
     return [];
 }
 
-// DEBUG: Check raw $_GET data (only in debug mode)
-if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-    error_log('YATRA DEBUG - Raw $_GET data: ' . print_r($_GET, true));
-    error_log('YATRA DEBUG - Raw difficulty param: ' . print_r($_GET['difficulty'] ?? 'NOT SET', true));
-}
-
 // Get active filters from URL parameters
 $active_filters = [
     'destination'        => sanitize_text_field($_GET['destination'] ?? ''),
@@ -121,10 +117,6 @@ $active_filters = [
     }, $_GET['attributes']) : [],
 ];
 
-// DEBUG: Check processed active filters (only in debug mode)
-if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-    error_log('YATRA DEBUG - Processed active_filters difficulty: ' . print_r($active_filters['difficulty'], true));
-}
 
 // Enqueue the filter JavaScript
 wp_enqueue_script(
@@ -173,13 +165,6 @@ if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
     $trip_dest_options = [];
     $trip_act_options = [];
     
-    // Debug logging for troubleshooting
-    if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-        error_log('[YATRA DEBUG] Trip listing: No data from new system');
-        error_log('[YATRA DEBUG] yatra_trip_list: ' . print_r($yatra_trip_list, true));
-        error_log('[YATRA DEBUG] yatra_taxonomy_context: ' . print_r($yatra_taxonomy_context, true));
-        error_log('[YATRA DEBUG] Final trips_source count: ' . count($trips_source));
-    }
 }
 
 get_header();
@@ -206,7 +191,7 @@ get_header();
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         <div class="yatra-dropdown-content">
-                            <span class="yatra-dropdown-label">DESTINATION</span>
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Destination', 'yatra'); ?></span>
                             <span class="yatra-dropdown-value"><?php echo !empty($active_filters['destination']) ? esc_html($active_filters['destination']) : __('Pick a destination', 'yatra'); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -235,7 +220,7 @@ get_header();
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                         </svg>
                         <div class="yatra-dropdown-content">
-                            <span class="yatra-dropdown-label">ACTIVITIES</span>
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Activities', 'yatra'); ?></span>
                             <span class="yatra-dropdown-value"><?php echo !empty($active_filters['activity']) ? esc_html($active_filters['activity']) : __('Choose an activity', 'yatra'); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -264,8 +249,8 @@ get_header();
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 018 0z"/>
                         </svg>
                         <div class="yatra-dropdown-content">
-                            <span class="yatra-dropdown-label">DURATION</span>
-                            <span class="yatra-dropdown-value">Trip duration</span>
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Duration', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['duration']) ? esc_html($active_filters['duration']) : esc_html__('Trip duration', 'yatra'); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow yatra-arrow-up" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
@@ -274,8 +259,8 @@ get_header();
                     <div class="yatra-dropdown-menu yatra-duration-menu">
                         <div class="yatra-duration-slider-wrapper">
                             <div class="yatra-duration-badges">
-                                <span class="yatra-duration-badge yatra-duration-min-badge">2 Days</span>
-                                <span class="yatra-duration-badge yatra-duration-max-badge">29 Days</span>
+                                <span class="yatra-duration-badge yatra-duration-min-badge"><?php echo esc_html__('2 Days', 'yatra'); ?></span>
+                                <span class="yatra-duration-badge yatra-duration-max-badge"><?php echo esc_html__('29 Days', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-dual-range-slider">
                                 <input type="range" id="durationMin" min="1" max="30" value="2" class="yatra-range-min">
@@ -284,8 +269,8 @@ get_header();
                                 <div class="yatra-slider-range"></div>
                             </div>
                             <div class="yatra-duration-labels">
-                                <span>2 Days</span>
-                                <span>29 Days</span>
+                                <span><?php echo esc_html__('2 Days', 'yatra'); ?></span>
+                                <span><?php echo esc_html__('29 Days', 'yatra'); ?></span>
                             </div>
                         </div>
                     </div>
@@ -300,19 +285,19 @@ get_header();
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                         </svg>
                         <div class="yatra-dropdown-content">
-                            <span class="yatra-dropdown-label">BUDGET</span>
-                            <span class="yatra-dropdown-value">Your budget range</span>
+                            <span class="yatra-dropdown-label"><?php esc_html_e('Budget', 'yatra'); ?></span>
+                            <span class="yatra-dropdown-value"><?php echo !empty($active_filters['budget']) ? esc_html($active_filters['budget']) : esc_html__('Your budget range', 'yatra'); ?></span>
                         </div>
                         <svg class="yatra-dropdown-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                         </svg>
                     </div>
                     <div class="yatra-dropdown-menu">
-                        <div class="yatra-dropdown-option" data-value="0-1000">Under $1,000</div>
-                        <div class="yatra-dropdown-option" data-value="1000-2000">$1,000 - $2,000</div>
-                        <div class="yatra-dropdown-option" data-value="2000-3000">$2,000 - $3,000</div>
-                        <div class="yatra-dropdown-option" data-value="3000-5000">$3,000 - $5,000</div>
-                        <div class="yatra-dropdown-option" data-value="5000+">$5,000+</div>
+                        <div class="yatra-dropdown-option" data-value="0-1000"><?php echo esc_html__('Under $1,000', 'yatra'); ?></div>
+                        <div class="yatra-dropdown-option" data-value="1000-2000"><?php echo esc_html__('$1,000 - $2,000', 'yatra'); ?></div>
+                        <div class="yatra-dropdown-option" data-value="2000-3000"><?php echo esc_html__('$2,000 - $3,000', 'yatra'); ?></div>
+                        <div class="yatra-dropdown-option" data-value="3000-5000"><?php echo esc_html__('$3,000 - $5,000', 'yatra'); ?></div>
+                        <div class="yatra-dropdown-option" data-value="5000+"><?php echo esc_html__('$5,000+', 'yatra'); ?></div>
                     </div>
                 </div>
 
@@ -321,7 +306,7 @@ get_header();
                     <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                     </svg>
-                    Search
+                    <?php esc_html_e('Search', 'yatra'); ?>
                 </button>
             </div>
         </div>
@@ -343,7 +328,7 @@ get_header();
                 </div>
                 <div class="yatra-results-controls">
                     <div class="yatra-sort-control">
-                        <label>Sort by:</label>
+                        <label><?php esc_html_e('Sort by:', 'yatra'); ?></label>
                         <?php
                         $sort_options = [
                             ''              => __('Recommended', 'yatra'),
@@ -385,24 +370,19 @@ get_header();
                                 $url = esc_url(add_query_arg($args, $base_url_sort));
                                 $selected = ($value === $current_sort) ? 'selected' : '';
                                 
-                                // DEBUG: Log sort URL generation for admin users
-                                if (defined('WP_DEBUG') && WP_DEBUG && current_user_can('manage_options')) {
-                                    error_log('YATRA SORT DEBUG - Sort option "' . $label . '" args: ' . print_r($args, true));
-                                    error_log('YATRA SORT DEBUG - Generated URL: ' . $url);
-                                }
-                                
+                                                       
                                 echo '<option value="' . $url . '" ' . $selected . '>' . esc_html($label) . '</option>';
                             }
                             ?>
                         </select>
                     </div>
                     <div class="yatra-view-toggle">
-                        <button class="yatra-view-btn active" data-view="grid" title="Grid View">
+                        <button class="yatra-view-btn active" data-view="grid" title="<?php esc_attr_e('Grid View', 'yatra'); ?>">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
                             </svg>
                         </button>
-                        <button class="yatra-view-btn" data-view="list" title="List View">
+                        <button class="yatra-view-btn" data-view="list" title="<?php esc_attr_e('List View', 'yatra'); ?>">
                             <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                             </svg>
@@ -415,21 +395,14 @@ get_header();
                 <!-- Filter Sidebar - Comprehensive Filters -->
                 <aside class="yatra-filter-sidebar">
                     <div class="yatra-filter-header">
-                        <h2>Filters</h2>
-                        <span class="yatra-clear-filters">Clear all</span>
+                        <h2><?php esc_html_e('Filters', 'yatra'); ?></h2>
+                        <span class="yatra-clear-filters"><?php esc_html_e('Clear all', 'yatra'); ?></span>
                     </div>
 
                     <!-- Price Range -->
                     <?php
-                    // Get dynamic price range from database
-                    global $wpdb;
-                    $price_stats = $wpdb->get_row(
-                        "SELECT 
-                            MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
-                            MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
-                         FROM {$tripTable}
-                         WHERE status = 'publish' AND original_price > 0"
-                    );
+                    // Get price statistics from service
+                    $price_stats = $tripListingService->getPriceStats();
                     
                     $min_price = $price_stats ? (int)$price_stats->min_price : 0;
                     $max_price = $price_stats ? (int)$price_stats->max_price : 10000;
@@ -441,10 +414,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
                                 </svg>
-                                <span>Price Range</span>
+                                <span><?php esc_html_e('Price Range', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="price" title="Clear price filters">
+                                <span class="yatra-clear-section" data-section="price" title="<?php esc_attr_e('Clear price filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -458,12 +431,12 @@ get_header();
                             <div class="yatra-price-range">
                                 <div class="yatra-price-inputs">
                                     <div class="yatra-price-input-group">
-                                        <label class="yatra-price-input-label">Min Price</label>
+                                        <label class="yatra-price-input-label"><?php esc_html_e('Min Price', 'yatra'); ?></label>
                                         <input type="number" name="price_min" placeholder="<?php echo $min_price; ?>" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo !empty($active_filters['price_min']) ? esc_attr($active_filters['price_min']) : ''; ?>" id="priceMin">
                                     </div>
                                     <div class="yatra-price-separator">—</div>
                                     <div class="yatra-price-input-group">
-                                        <label class="yatra-price-input-label">Max Price</label>
+                                        <label class="yatra-price-input-label"><?php esc_html_e('Max Price', 'yatra'); ?></label>
                                         <input type="number" name="price_max" placeholder="<?php echo $max_price; ?>" min="<?php echo $min_price; ?>" max="<?php echo $max_price; ?>" value="<?php echo !empty($active_filters['price_max']) ? esc_attr($active_filters['price_max']) : ''; ?>" id="priceMax">
                                     </div>
                                 </div>
@@ -483,10 +456,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Trip Type</span>
+                                <span><?php esc_html_e('Trip Type', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="trip-type" title="Clear trip type filter">
+                                <span class="yatra-clear-section" data-section="trip-type" title="<?php esc_attr_e('Clear trip type filter', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -499,25 +472,15 @@ get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
                                 <?php
-                                // Get trip type counts from database
-                                global $wpdb;
-                                $trip_type_options = [
-                                    'single_day' => __('Single Day Trips', 'yatra'),
-                                    'multi_day' => __('Multi Day Trips', 'yatra')
-                                ];
+                                // Get trip type options from service
+                                $trip_type_options = $tripListingService->getFilterData()['trip_types'];
                                 
-                                foreach ($trip_type_options as $type_value => $type_label) :
-                                    // Get trip count for this type
-                                    $trip_count = $wpdb->get_var($wpdb->prepare(
-                                        "SELECT COUNT(*) FROM {$tripTable} 
-                                         WHERE trip_type = %s AND status = 'publish'",
-                                        $type_value
-                                    ));
+                                foreach ($trip_type_options as $type_option) :
                                 ?>
                                 <label class="yatra-checkbox-label">
-                                    <input type="radio" name="trip_type" value="<?php echo esc_attr($type_value); ?>" <?php echo ($active_filters['trip_type'] === $type_value) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($type_label); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$trip_count; ?>)</span>
+                                    <input type="radio" name="trip_type" value="<?php echo esc_attr($type_option->value); ?>" <?php echo ($active_filters['trip_type'] === $type_option->value) ? 'checked' : ''; ?>>
+                                    <span><?php echo esc_html($type_option->label); ?></span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$type_option->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                                 
@@ -542,10 +505,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                                 </svg>
-                                <span>Difficulty Level</span>
+                                <span><?php esc_html_e('Difficulty Level', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="difficulty" title="Clear difficulty filters">
+                                <span class="yatra-clear-section" data-section="difficulty" title="<?php esc_attr_e('Clear difficulty filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -557,25 +520,17 @@ get_header();
                         </div>
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
-                                <?php foreach ($difficulty_levels as $level) : 
-                                    // Get trip count for this difficulty level
-                                    // Note: trips.difficulty_level is varchar, can store slug, name, or ID
-                                    global $wpdb;
-                                    $trip_count = $wpdb->get_var($wpdb->prepare(
-                                        "SELECT COUNT(*) FROM {$tripTable} 
-                                         WHERE (difficulty_level = %s OR difficulty_level = %s OR difficulty_level = %d) 
-                                         AND status = 'publish'",
-                                        $level->slug,
-                                        $level->name,
-                                        $level->id
-                                    ));
-                                    
+                                <?php 
+                                // Get difficulty levels from service
+                                $difficulty_levels = $tripListingService->getFilterData()['difficulty_levels'];
+                                
+                                foreach ($difficulty_levels as $level) : 
                                     // Show all difficulty levels, even with 0 count for better UX
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="difficulty[]" value="<?php echo esc_attr($level->id); ?>" <?php echo in_array($level->id, $active_filters['difficulty'] ?? []) ? 'checked' : ''; ?>>
                                     <span><?php echo esc_html($level->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$trip_count; ?>)</span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$level->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -590,10 +545,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="#fbbf24" viewBox="0 0 24 24">
                                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                                 </svg>
-                                <span>Rating</span>
+                                <span><?php esc_html_e('Rating', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="rating" title="Clear rating filters">
+                                <span class="yatra-clear-section" data-section="rating" title="<?php esc_attr_e('Clear rating filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -606,51 +561,22 @@ get_header();
                         <div class="yatra-filter-content">
                             <div class="yatra-rating-filter">
                                 <?php
-                                global $wpdb;
-                                $rating_options = [
-                                    ['stars' => 5, 'label' => 'And Up'],
-                                    ['stars' => 4, 'label' => 'And Up'],
-                                    ['stars' => 3, 'label' => 'And Up'],
-                                    ['stars' => 2, 'label' => 'And Up'],
-                                    ['stars' => 1, 'label' => 'And Up']
-                                ];
-                                
-                                // Check if reviews table exists
-                                $reviews_table_exists = $wpdb->get_var(
-                                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
-                                     WHERE TABLE_SCHEMA = DATABASE() 
-                                       AND TABLE_NAME = '{$reviewsTable}'"
-                                );
+                                // Get rating options from service
+                                $rating_options = $tripListingService->getFilterData()['ratings'];
                                 
                                 foreach ($rating_options as $option) :
-                                    // Get trip count for this rating and above
-                                    $trip_count = 0;
-                                    if ($reviews_table_exists) {
-                                        $trip_count = $wpdb->get_var($wpdb->prepare(
-                                            "SELECT COUNT(DISTINCT trip_id) 
-                                             FROM (
-                                                 SELECT r.trip_id, AVG(r.rating) as avg_rating
-                                                 FROM {$reviewsTable} r
-                                                 INNER JOIN {$tripTable} t ON r.trip_id = t.id
-                                                 WHERE t.status = 'publish' AND r.status = 'approved' AND r.rating > 0
-                                                 GROUP BY r.trip_id
-                                                 HAVING avg_rating >= %d
-                                             ) as trip_ratings",
-                                            $option['stars']
-                                        ));
-                                    }
-                                    
                                     // Show all rating options, even with 0 count for better UX
                                 ?>
                                 <label class="yatra-rating-option">
-                                    <input type="checkbox" name="rating[]" value="<?php echo esc_attr($option['stars']); ?>" <?php echo in_array($option['stars'], $active_filters['rating'] ?? []) ? 'checked' : ''; ?>>
+                                    <input type="checkbox" name="rating[]" value="<?php echo esc_attr($option->rating); ?>" <?php echo in_array($option->rating, $active_filters['rating'] ?? []) ? 'checked' : ''; ?>>
                                     <div class="yatra-stars-display">
                                         <?php for ($i = 1; $i <= 5; $i++) : ?>
-                                            <svg class="yatra-star <?php echo $i <= $option['stars'] ? 'filled' : 'empty'; ?>" width="16" height="16" viewBox="0 0 24 24">
-                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="<?php echo $i <= $option['stars'] ? '#fbbf24' : '#e5e7eb'; ?>"/>
+                                            <svg class="yatra-star <?php echo $i <= $option->rating ? 'filled' : 'empty'; ?>" width="16" height="16" viewBox="0 0 24 24">
+                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="<?php echo $i <= $option->rating ? '#fbbf24' : '#e5e7eb'; ?>"/>
                                             </svg>
                                         <?php endfor; ?>
-                                        <span class="yatra-rating-label"><?php echo esc_html($option['label']); ?></span>
+                                        <span class="yatra-rating-label"><?php echo esc_html($option->label); ?></span>
+                                        <span class="yatra-filter-count">(<?php echo (int)$option->count; ?>)</span>
                                     </div>
                                 </label>
                                 <?php endforeach; ?>
@@ -670,10 +596,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd" />
                                 </svg>
-                                <span>Categories</span>
+                                <span><?php esc_html_e('Categories', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="categories" title="Clear category filters">
+                                <span class="yatra-clear-section" data-section="categories" title="<?php esc_attr_e('Clear category filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -685,23 +611,16 @@ get_header();
                         </div>
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
-                                <?php foreach ($categories as $category) : 
-                                    // Get trip count for this category
-                                    global $wpdb;
-                                    $trip_count = $wpdb->get_var($wpdb->prepare(
-                                        "SELECT COUNT(DISTINCT t.id) FROM {$tripTable} t
-                                         INNER JOIN {$tripClassificationsTable} tc ON t.id = tc.trip_id 
-                                         WHERE tc.classification_id = %d 
-                                           AND tc.classification_type = %s
-                                           AND t.status = 'publish'",
-                                        $category->id,
-                                        ClassificationTypes::CATEGORY
-                                    ));
+                                <?php 
+                                // Get categories from service
+                                $categories = $tripListingService->getFilterData()['categories'];
+                                
+                                foreach ($categories as $category) : 
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="categories[]" value="<?php echo esc_attr($category->id); ?>" <?php echo in_array($category->id, $active_filters['categories'] ?? []) ? 'checked' : ''; ?>>
                                     <span><?php echo esc_html($category->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$trip_count; ?>)</span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$category->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -721,10 +640,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
                                 </svg>
-                                <span>Destinations</span>
+                                <span><?php esc_html_e('Destinations', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="destinations" title="Clear destination filters">
+                                <span class="yatra-clear-section" data-section="destinations" title="<?php esc_attr_e('Clear destination filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -736,25 +655,17 @@ get_header();
                         </div>
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
-                                <?php foreach ($destinations as $destination) : 
-                                    // Get trip count for this destination
-                                    global $wpdb;
-                                    $trip_count = $wpdb->get_var($wpdb->prepare(
-                                        "SELECT COUNT(DISTINCT t.id) FROM {$tripTable} t 
-                                         INNER JOIN {$tripClassificationsTable} tc ON t.id = tc.trip_id 
-                                         WHERE tc.classification_id = %d 
-                                           AND tc.classification_type = %s
-                                           AND t.status = 'publish'",
-                                        $destination->id,
-                                        ClassificationTypes::DESTINATION
-                                    ));
-                                    
-                                    if ($trip_count > 0) :
+                                <?php 
+                                // Get destinations from service
+                                $destinations = $tripListingService->getFilterData()['destinations'];
+                                
+                                foreach ($destinations as $destination) : 
+                                    if ($destination->count > 0) :
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="destinations[]" value="<?php echo esc_attr($destination->id); ?>" <?php echo in_array($destination->id, $active_filters['destinations'] ?? []) ? 'checked' : ''; ?>>
                                     <span><?php echo esc_html($destination->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$trip_count; ?>)</span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$destination->count; ?>)</span>
                                 </label>
                                 <?php endif; endforeach; ?>
                             </div>
@@ -774,10 +685,10 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                                 </svg>
-                                <span>Activities</span>
+                                <span><?php esc_html_e('Activities', 'yatra'); ?></span>
                             </div>
                             <div class="yatra-filter-actions">
-                                <span class="yatra-clear-section" data-section="activities" title="Clear activity filters">
+                                <span class="yatra-clear-section" data-section="activities" title="<?php esc_attr_e('Clear activity filters', 'yatra'); ?>">
                                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
@@ -789,23 +700,16 @@ get_header();
                         </div>
                         <div class="yatra-filter-content">
                             <div class="yatra-checkbox-group">
-                                <?php foreach ($activities as $activity) : 
-                                    // Get trip count for this activity
-                                    global $wpdb;
-                                    $trip_count = $wpdb->get_var($wpdb->prepare(
-                                        "SELECT COUNT(DISTINCT t.id) FROM {$tripTable} t 
-                                         INNER JOIN {$tripClassificationsTable} tc ON t.id = tc.trip_id 
-                                         WHERE tc.classification_id = %d 
-                                           AND tc.classification_type = %s
-                                           AND t.status = 'publish'",
-                                        $activity->id,
-                                        ClassificationTypes::ACTIVITY
-                                    ));
+                                <?php 
+                                // Get activities from service
+                                $activities = $tripListingService->getFilterData()['activities'];
+                                
+                                foreach ($activities as $activity) : 
                                 ?>
                                 <label class="yatra-checkbox-label">
                                     <input type="checkbox" name="activities[]" value="<?php echo esc_attr($activity->id); ?>" <?php echo in_array($activity->id, $active_filters['activities'] ?? []) ? 'checked' : ''; ?>>
                                     <span><?php echo esc_html($activity->name); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$trip_count; ?>)</span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$activity->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -815,15 +719,8 @@ get_header();
 
                     <!-- Accommodation Type -->
                     <?php
-                    // Get dynamic accommodation types from database
-                    global $wpdb;
-                    $accommodation_types = $wpdb->get_results(
-                        "SELECT accommodation_type, COUNT(*) as trip_count 
-                         FROM {$tripTable} 
-                         WHERE status = 'publish' AND accommodation_type IS NOT NULL AND accommodation_type != '' 
-                         GROUP BY accommodation_type 
-                         ORDER BY trip_count DESC, accommodation_type ASC"
-                    );
+                    // Get accommodation types from service
+                    $accommodation_types = $tripListingService->getFilterData()['accommodations'];
                     
                     if (!empty($accommodation_types)) :
                     ?>
@@ -833,7 +730,7 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                                 </svg>
-                                <span>Accommodation</span>
+                                <span><?php esc_html_e('Accommodation', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -843,8 +740,8 @@ get_header();
                             <div class="yatra-checkbox-group">
                                 <?php foreach ($accommodation_types as $accommodation) : ?>
                                 <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="accommodation[]" value="<?php echo esc_attr($accommodation->accommodation_type); ?>" <?php echo in_array($accommodation->accommodation_type, $active_filters['accommodation'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html(ucwords(str_replace(['_', '-'], ' ', $accommodation->accommodation_type))); ?></span>
+                                    <input type="checkbox" name="accommodation[]" value="<?php echo esc_attr($accommodation->name); ?>" <?php echo in_array($accommodation->name, $active_filters['accommodation'] ?? []) ? 'checked' : ''; ?>>
+                                    <span><?php echo esc_html(ucwords(str_replace(['_', '-'], ' ', $accommodation->name))); ?></span>
                                     <span class="yatra-filter-count">(<?php echo (int)$accommodation->trip_count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
@@ -855,42 +752,8 @@ get_header();
 
                     <!-- Included Services -->
                     <?php
-                    // Get dynamic included services from database with JSON validation
-                    global $wpdb;
-                    $included_services = [];
-                    
-                    // First check if we have any trips with valid JSON in included_items
-                    $has_valid_json = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' 
-                           AND included_items IS NOT NULL 
-                           AND included_items != '' 
-                           AND included_items != '[]' 
-                           AND included_items != '{}'
-                           AND JSON_VALID(included_items) = 1"
-                    );
-                    
-                    if ($has_valid_json > 0) {
-                        $included_services = $wpdb->get_results(
-                            "SELECT DISTINCT JSON_UNQUOTE(JSON_EXTRACT(included_items, CONCAT('$[', numbers.n, ']'))) as service_name,
-                                    COUNT(*) as trip_count
-                             FROM {$tripTable}
-                             CROSS JOIN (
-                                 SELECT 0 as n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 
-                                 UNION SELECT 5 UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9
-                             ) numbers
-                             WHERE status = 'publish' 
-                               AND included_items IS NOT NULL 
-                               AND JSON_VALID(included_items) = 1
-                               AND JSON_LENGTH(included_items) > numbers.n
-                               AND JSON_UNQUOTE(JSON_EXTRACT(included_items, CONCAT('$[', numbers.n, ']'))) IS NOT NULL
-                               AND JSON_UNQUOTE(JSON_EXTRACT(included_items, CONCAT('$[', numbers.n, ']'))) != ''
-                             GROUP BY service_name
-                             HAVING service_name IS NOT NULL AND service_name != ''
-                             ORDER BY trip_count DESC, service_name ASC
-                             LIMIT 10"
-                        );
-                    }
+                    // Get included services from service
+                    $included_services = $tripListingService->getFilterData()['included_services'];
                     
                     if (!empty($included_services)) :
                     ?>
@@ -900,7 +763,7 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"/>
                                 </svg>
-                                <span>Included Services</span>
+                                <span><?php esc_html_e('Included Services', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -922,74 +785,8 @@ get_header();
 
                     <!-- Special Offers -->
                     <?php
-                    // Get dynamic special offers from database
-                    global $wpdb;
-                    $special_offers = [];
-                    
-                    // Check for discounted trips
-                    $discount_count = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' AND (discounted_price IS NOT NULL OR sale_price IS NOT NULL)"
-                    );
-                    if ($discount_count > 0) {
-                        $special_offers[] = ['value' => 'discount', 'label' => 'Discount Available', 'count' => $discount_count];
-                    }
-                    
-                    // Check for early bird offers (with column existence check)
-                    $early_bird_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$tripTable}' 
-                           AND COLUMN_NAME = 'early_bird_discount_enabled'"
-                    );
-                    if ($column_exists) {
-                        $early_bird_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$tripTable} 
-                             WHERE status = 'publish' AND early_bird_discount_enabled = 1"
-                        );
-                        if ($early_bird_count > 0) {
-                            $special_offers[] = ['value' => 'early-bird', 'label' => 'Early Bird Offer', 'count' => $early_bird_count];
-                        }
-                    }
-                    
-                    // Check for last minute deals (with column existence check)
-                    $last_minute_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$tripTable}' 
-                           AND COLUMN_NAME = 'last_minute_discount_enabled'"
-                    );
-                    if ($column_exists) {
-                        $last_minute_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$tripTable} 
-                             WHERE status = 'publish' AND last_minute_discount_enabled = 1"
-                        );
-                        if ($last_minute_count > 0) {
-                            $special_offers[] = ['value' => 'last-minute', 'label' => 'Last Minute Deal', 'count' => $last_minute_count];
-                        }
-                    }
-                    
-                    // Check for group discounts (with column existence check) - only if Advanced Discount module is enabled
-                    if (apply_filters('yatra_advanced_discount_enabled', false)) {
-                        $group_discount_count = 0;
-                        $column_exists = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                             WHERE TABLE_SCHEMA = DATABASE() 
-                               AND TABLE_NAME = '{$tripTable}' 
-                               AND COLUMN_NAME = 'group_pricing_enabled'"
-                        );
-                        if ($column_exists) {
-                            $group_discount_count = $wpdb->get_var(
-                                "SELECT COUNT(*) FROM {$tripTable} 
-                                 WHERE status = 'publish' AND group_pricing_enabled = 1"
-                            );
-                            if ($group_discount_count > 0) {
-                                $special_offers[] = ['value' => 'group-discount', 'label' => 'Group Discount', 'count' => $group_discount_count];
-                            }
-                        }
-                    }
+                    // Get special offers from service
+                    $special_offers = $tripListingService->getFilterData()['special_offers'];
                     
                     if (!empty($special_offers)) :
                     ?>
@@ -997,9 +794,9 @@ get_header();
                         <div class="yatra-filter-title" data-toggle="offers">
                             <div class="yatra-filter-title-content">
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>
                                 </svg>
-                                <span>Special Offers</span>
+                                <span><?php esc_html_e('Special Offers', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1009,9 +806,9 @@ get_header();
                             <div class="yatra-checkbox-group">
                                 <?php foreach ($special_offers as $offer) : ?>
                                 <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="offers[]" value="<?php echo esc_attr($offer['value']); ?>" <?php echo in_array($offer['value'], $active_filters['offers'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($offer['label']); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$offer['count']; ?>)</span>
+                                    <input type="checkbox" name="offers[]" value="<?php echo esc_attr($offer->value); ?>" <?php echo in_array($offer->value, $active_filters['offers'] ?? []) ? 'checked' : ''; ?>>
+                                    <span><?php echo esc_html($offer->label); ?></span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$offer->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -1021,63 +818,8 @@ get_header();
 
                     <!-- Booking Options -->
                     <?php
-                    // Get dynamic booking options from database
-                    global $wpdb;
-                    $booking_options = [];
-                    
-                    // Check for instant booking (with column existence check)
-                    $instant_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$tripTable}' 
-                           AND COLUMN_NAME = 'instant_booking'"
-                    );
-                    if ($column_exists) {
-                        $instant_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$tripTable} 
-                             WHERE status = 'publish' AND instant_booking = 1"
-                        );
-                        if ($instant_count > 0) {
-                            $booking_options[] = ['value' => 'instant', 'label' => 'Instant Confirmation', 'count' => $instant_count];
-                        }
-                    }
-                    
-                    // Check for flexible dates (with column existence check)
-                    $flexible_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$tripTable}' 
-                           AND COLUMN_NAME = 'flexible_dates'"
-                    );
-                    if ($column_exists) {
-                        $flexible_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$tripTable} 
-                             WHERE status = 'publish' AND flexible_dates = 1"
-                        );
-                        if ($flexible_count > 0) {
-                            $booking_options[] = ['value' => 'flexible', 'label' => 'Flexible Dates', 'count' => $flexible_count];
-                        }
-                    }
-                    
-                    // Check for deposit options (pay later) (with column existence check)
-                    $deposit_count = 0;
-                    $column_exists = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
-                         WHERE TABLE_SCHEMA = DATABASE() 
-                           AND TABLE_NAME = '{$tripTable}' 
-                           AND COLUMN_NAME = 'deposit_required'"
-                    );
-                    if ($column_exists) {
-                        $deposit_count = $wpdb->get_var(
-                            "SELECT COUNT(*) FROM {$tripTable} 
-                             WHERE status = 'publish' AND deposit_required = 1"
-                        );
-                        if ($deposit_count > 0) {
-                            $booking_options[] = ['value' => 'pay-later', 'label' => 'Reserve Now, Pay Later', 'count' => $deposit_count];
-                        }
-                    }
+                    // Get booking options from service
+                    $booking_options = $tripListingService->getFilterData()['booking_options'];
                     
                     if (!empty($booking_options)) :
                     ?>
@@ -1087,7 +829,7 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                                 </svg>
-                                <span>Booking Options</span>
+                                <span><?php esc_html_e('Booking Options', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1097,9 +839,9 @@ get_header();
                             <div class="yatra-checkbox-group">
                                 <?php foreach ($booking_options as $option) : ?>
                                 <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="booking[]" value="<?php echo esc_attr($option['value']); ?>" <?php echo in_array($option['value'], $active_filters['booking'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($option['label']); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$option['count']; ?>)</span>
+                                    <input type="checkbox" name="booking[]" value="<?php echo esc_attr($option->value); ?>" <?php echo in_array($option->value, $active_filters['booking'] ?? []) ? 'checked' : ''; ?>>
+                                    <span><?php echo esc_html($option->label); ?></span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$option->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -1109,45 +851,8 @@ get_header();
 
                     <!-- Age Suitability -->
                     <?php
-                    // Get dynamic age suitability from database
-                    global $wpdb;
-                    $age_options = [];
-                    
-                    // Check for family friendly (no age restrictions or low minimum age)
-                    $family_count = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 5)"
-                    );
-                    if ($family_count > 0) {
-                        $age_options[] = ['value' => 'family', 'label' => 'Family Friendly', 'count' => $family_count];
-                    }
-                    
-                    // Check for kids suitable (age_min <= 12)
-                    $kids_count = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 12)"
-                    );
-                    if ($kids_count > 0) {
-                        $age_options[] = ['value' => 'kids', 'label' => 'Suitable for Kids', 'count' => $kids_count];
-                    }
-                    
-                    // Check for senior friendly (no upper age limit or high limit)
-                    $senior_count = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' AND (age_max IS NULL OR age_max >= 65)"
-                    );
-                    if ($senior_count > 0) {
-                        $age_options[] = ['value' => 'seniors', 'label' => 'Senior Friendly', 'count' => $senior_count];
-                    }
-                    
-                    // Check for adults only (minimum age >= 18)
-                    $adults_count = $wpdb->get_var(
-                        "SELECT COUNT(*) FROM {$tripTable} 
-                         WHERE status = 'publish' AND age_min >= 18"
-                    );
-                    if ($adults_count > 0) {
-                        $age_options[] = ['value' => 'adults', 'label' => 'Adults Only', 'count' => $adults_count];
-                    }
+                    // Get age restrictions from service
+                    $age_options = $tripListingService->getFilterData()['age_restrictions'];
                     
                     if (!empty($age_options)) :
                     ?>
@@ -1157,7 +862,7 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Age Suitability</span>
+                                <span><?php esc_html_e('Age Suitability', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1167,9 +872,9 @@ get_header();
                             <div class="yatra-checkbox-group">
                                 <?php foreach ($age_options as $option) : ?>
                                 <label class="yatra-checkbox-label">
-                                    <input type="checkbox" name="age[]" value="<?php echo esc_attr($option['value']); ?>" <?php echo in_array($option['value'], $active_filters['age'] ?? []) ? 'checked' : ''; ?>>
-                                    <span><?php echo esc_html($option['label']); ?></span>
-                                    <span class="yatra-filter-count">(<?php echo (int)$option['count']; ?>)</span>
+                                    <input type="checkbox" name="age[]" value="<?php echo esc_attr($option->value); ?>" <?php echo in_array($option->value, $active_filters['age'] ?? []) ? 'checked' : ''; ?>>
+                                    <span><?php echo esc_html($option->label); ?></span>
+                                    <span class="yatra-filter-count">(<?php echo (int)$option->count; ?>)</span>
                                 </label>
                                 <?php endforeach; ?>
                             </div>
@@ -1185,7 +890,7 @@ get_header();
                                 <svg class="yatra-filter-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                 </svg>
-                                <span><?php _e('Trip Attributes', 'yatra'); ?></span>
+                                <span><?php esc_html_e('Trip Attributes', 'yatra'); ?></span>
                             </div>
                             <svg class="yatra-filter-arrow" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -1322,8 +1027,8 @@ get_header();
                             <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100"><?php _e('No trips found', 'yatra'); ?></h3>
-                            <p class="mt-1 text-gray-500 dark:text-gray-400"><?php _e('Try adjusting your search or filter to find what you\'re looking for.', 'yatra'); ?></p>
+                            <h3 class="mt-2 text-lg font-medium text-gray-900 dark:text-gray-100"><?php esc_html_e('No trips found', 'yatra'); ?></h3>
+                            <p class="mt-1 text-gray-500 dark:text-gray-400"><?php esc_html_e('Try adjusting your search or filter to find what you\'re looking for.', 'yatra'); ?></p>
                         </div>
                     <?php endif; ?>
                 </main>

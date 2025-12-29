@@ -19,6 +19,11 @@ use Yatra\Services\ExportImportService;
 class ToolsController extends BaseController
 {
     /**
+     * Export Import Service instance
+     */
+    private ExportImportService $exportImportService;
+
+    /**
      * Register REST API routes
      */
     public function register_routes(): void
@@ -185,62 +190,31 @@ class ToolsController extends BaseController
     }
 
     /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->exportImportService = new ExportImportService();
+    }
+
+    /**
      * Export Yatra data
      */
     public function exportData(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         try {
-            global $wpdb;
-            
             // Get selected data types from request
             $selected_data_types = $request->get_param('data_types') ?: [];
+
+            // For backward compatibility, create a background job and return immediate response
+            $userId = get_current_user_id();
+            $jobId = ExportImportService::createExportJob($selected_data_types, $userId);
             
-            $export_data = [
-                'version' => YATRA_VERSION,
-                'export_date' => current_time('mysql'),
-                'data' => []
-            ];
-
-            // Export data using ExportImportService
-            $batch_size = 1000; // Process 1000 records at a time
-            $export_data = ExportImportService::exportData($selected_data_types, $batch_size);
-
-            // Add version info to export data
-            $export_data['version'] = YATRA_VERSION;
-
-            // Export settings if requested
-            if (empty($selected_data_types) || in_array('settings', $selected_data_types)) {
-                $settings = [
-                    'yatra_settings' => get_option('yatra_settings', []),
-                    'yatra_currency' => get_option('yatra_currency', 'USD'),
-                    'yatra_version' => get_option('yatra_version', ''),
-                    'yatra_db_version' => get_option('yatra_db_version', ''),
-                    'yatra_license_key' => get_option('yatra_license_key', ''),
-                    'yatra_license_status' => get_option('yatra_license_status', ''),
-                    'yatra_email_settings' => get_option('yatra_email_settings', []),
-                    'yatra_payment_settings' => get_option('yatra_payment_settings', []),
-                    'yatra_booking_settings' => get_option('yatra_booking_settings', []),
-                    'yatra_display_settings' => get_option('yatra_display_settings', []),
-                    'yatra_security_settings' => get_option('yatra_security_settings', []),
-                    'yatra_integration_settings' => get_option('yatra_integration_settings', []),
-                ];
-                $export_data['data']['settings'] = $settings;
-            }
-
-            Logger::info('Data exported successfully with selected types: ' . implode(', ', $selected_data_types));
-
-            // Create JSON file content
-            $json_content = json_encode($export_data, JSON_PRETTY_PRINT);
-            $filename = 'yatra-export-' . date('Y-m-d-H-i-s') . '.json';
-
-            // Set headers for file download
-            header('Content-Type: application/json');
-            header('Content-Disposition: attachment; filename="' . $filename . '"');
-            header('Content-Length: ' . strlen($json_content));
-            
-            // Output the file content
-            echo $json_content;
-            exit;
+            return $this->success_response([
+                'message' => __('Export job created successfully. The export will be processed in the background.', 'yatra'),
+                'job_id' => $jobId,
+                'status_url' => rest_url('yatra/v1/tools/export-job/' . $jobId . '/status')
+            ]);
 
         } catch (\Exception $e) {
             Logger::error('Export failed: ' . $e->getMessage());

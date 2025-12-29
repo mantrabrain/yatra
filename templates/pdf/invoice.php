@@ -74,7 +74,7 @@ $amountDue = (string) ($amount_due ?? '0.00');
     <tr>
         <td class="brand">
             <h1><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></h1>
-            <p>Payment Invoice</p>
+            <p><?php esc_html_e('Payment Invoice', 'yatra'); ?></p>
         </td>
     </tr>
 </table>
@@ -83,29 +83,29 @@ $amountDue = (string) ($amount_due ?? '0.00');
     <table class="panel">
         <tr>
             <td style="width: 40%;">
-                <h3>Invoice To</h3>
+                <h3><?php esc_html_e('Invoice To', 'yatra'); ?></h3>
                 <div><strong><?php echo htmlspecialchars($customerName, ENT_QUOTES, 'UTF-8'); ?></strong></div>
                 <div class="muted"><?php echo htmlspecialchars($customerEmail, ENT_QUOTES, 'UTF-8'); ?></div>
             </td>
             <td style="width: 30%;">
-                <h3>Invoice Details</h3>
+                <h3><?php esc_html_e('Invoice Details', 'yatra'); ?></h3>
                 <table class="details">
                     <tr>
-                        <td class="k">Invoice #:</td>
+                        <td class="k"><?php esc_html_e('Invoice #:', 'yatra'); ?></td>
                         <td class="v-wrap"><?php echo htmlspecialchars($paymentRef, ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <tr>
-                        <td class="k">Date:</td>
+                        <td class="k"><?php esc_html_e('Date:', 'yatra'); ?></td>
                         <td class="v"><?php echo htmlspecialchars($paymentDate, ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <tr>
-                        <td class="k">Status:</td>
+                        <td class="k"><?php esc_html_e('Status:', 'yatra'); ?></td>
                         <td class="v"><span class="badge badge-<?php echo htmlspecialchars($statusClass, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($paymentStatus, ENT_QUOTES, 'UTF-8'); ?></span></td>
                     </tr>
                 </table>
             </td>
             <td style="width: 30%;">
-                <h3>Company</h3>
+                <h3><?php esc_html_e('Company', 'yatra'); ?></h3>
                 <div><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php if ($companyAddress !== ''): ?>
                     <div class="muted"><?php echo htmlspecialchars($companyAddress, ENT_QUOTES, 'UTF-8'); ?></div>
@@ -123,17 +123,17 @@ $amountDue = (string) ($amount_due ?? '0.00');
     <table class="items">
         <thead>
         <tr>
-            <th>Description</th>
-            <th>Booking Ref</th>
-            <th>Travel Date</th>
-            <th class="right">Amount</th>
+            <th><?php esc_html_e('Description', 'yatra'); ?></th>
+            <th><?php esc_html_e('Booking Ref', 'yatra'); ?></th>
+            <th><?php esc_html_e('Travel Date', 'yatra'); ?></th>
+            <th class="right"><?php esc_html_e('Amount', 'yatra'); ?></th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <td>
                 <div><strong><?php echo htmlspecialchars($tripTitle, ENT_QUOTES, 'UTF-8'); ?></strong></div>
-                <div class="muted">Payment via <?php echo htmlspecialchars($paymentMethod, ENT_QUOTES, 'UTF-8'); ?></div>
+                <div class="muted"><?php esc_html_e('Payment via', 'yatra'); ?> <?php echo htmlspecialchars($paymentMethod, ENT_QUOTES, 'UTF-8'); ?></div>
             </td>
             <td><?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></td>
             <td><?php echo htmlspecialchars($travelDate, ENT_QUOTES, 'UTF-8'); ?></td>
@@ -144,19 +144,19 @@ $amountDue = (string) ($amount_due ?? '0.00');
 
     <table class="totals">
         <tr>
-            <td class="label">Booking Total</td>
+            <td class="label"><?php esc_html_e('Booking Total', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($bookingTotal, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
-            <td class="label">Total Paid</td>
+            <td class="label"><?php esc_html_e('Total Paid', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountPaid, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
-            <td class="label">Balance Due</td>
+            <td class="label"><?php esc_html_e('Balance Due', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountDue, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
-            <td class="label grand">This Payment</td>
+            <td class="label grand"><?php esc_html_e('This Payment', 'yatra'); ?></td>
             <td class="value grand"><?php echo $currencySymbol . htmlspecialchars($amount, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
     </table>

@@ -88,43 +88,43 @@ $destination = (string) ($destination ?? '');
     <tr>
         <td class="brand">
             <h1><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></h1>
-            <p>Travel Voucher</p>
+            <p><?php esc_html_e('Travel Voucher', 'yatra'); ?></p>
         </td>
     </tr>
 </table>
 
 <div class="voucher-number">
-    <div class="number">Voucher #<?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></div>
+    <div class="number"><?php esc_html_e('Voucher #', 'yatra'); ?><?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></div>
 </div>
 
 <div class="content">
     <table class="panel">
         <tr>
             <td style="width: 40%;">
-                <h3>Traveler Information</h3>
+                <h3><?php esc_html_e('Traveler Information', 'yatra'); ?></h3>
                 <div><strong><?php echo htmlspecialchars($customerName, ENT_QUOTES, 'UTF-8'); ?></strong></div>
                 <div class="muted"><?php echo htmlspecialchars($customerEmail, ENT_QUOTES, 'UTF-8'); ?></div>
-                <div class="muted">Travelers: <?php echo (int) $traveler_count; ?></div>
+                <div class="muted"><?php esc_html_e('Travelers:', 'yatra'); ?> <?php echo (int) $traveler_count; ?></div>
             </td>
             <td style="width: 30%;">
-                <h3>Booking Details</h3>
+                <h3><?php esc_html_e('Booking Details', 'yatra'); ?></h3>
                 <table class="details">
                     <tr>
-                        <td class="k">Booking #:</td>
+                        <td class="k"><?php esc_html_e('Booking #:', 'yatra'); ?></td>
                         <td class="v-wrap"><?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <tr>
-                        <td class="k">Date:</td>
+                        <td class="k"><?php esc_html_e('Date:', 'yatra'); ?></td>
                         <td class="v"><?php echo htmlspecialchars($bookingDate, ENT_QUOTES, 'UTF-8'); ?></td>
                     </tr>
                     <tr>
-                        <td class="k">Status:</td>
+                        <td class="k"><?php esc_html_e('Status:', 'yatra'); ?></td>
                         <td class="v"><span class="badge badge-<?php echo htmlspecialchars($statusClass, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($bookingStatus, ENT_QUOTES, 'UTF-8'); ?></span></td>
                     </tr>
                 </table>
             </td>
             <td style="width: 30%;">
-                <h3>Company</h3>
+                <h3><?php esc_html_e('Company', 'yatra'); ?></h3>
                 <div><?php echo htmlspecialchars($companyName, ENT_QUOTES, 'UTF-8'); ?></div>
                 <?php if ($companyAddress !== ''): ?>
                     <div class="muted"><?php echo htmlspecialchars($companyAddress, ENT_QUOTES, 'UTF-8'); ?></div>
@@ -143,34 +143,34 @@ $destination = (string) ($destination ?? '');
         <h4><?php echo htmlspecialchars($tripTitle, ENT_QUOTES, 'UTF-8'); ?></h4>
         <table class="details">
             <tr>
-                <td class="k">Duration:</td>
+                <td class="k"><?php esc_html_e('Duration:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($tripDuration, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php if ($tripDifficulty !== ''): ?>
             <tr>
-                <td class="k">Difficulty:</td>
+                <td class="k"><?php esc_html_e('Difficulty:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($tripDifficulty, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php endif; ?>
             <?php if ($departureLocation !== ''): ?>
             <tr>
-                <td class="k">Departure:</td>
+                <td class="k"><?php esc_html_e('Departure:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($departureLocation, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php endif; ?>
             <?php if ($destination !== ''): ?>
             <tr>
-                <td class="k">Destination:</td>
+                <td class="k"><?php esc_html_e('Destination:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php endif; ?>
             <tr>
-                <td class="k">Travel Date:</td>
+                <td class="k"><?php esc_html_e('Travel Date:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($travelDate, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php if ($returnDate !== ''): ?>
             <tr>
-                <td class="k">Return Date:</td>
+                <td class="k"><?php esc_html_e('Return Date:', 'yatra'); ?></td>
                 <td class="v"><?php echo htmlspecialchars($returnDate, ENT_QUOTES, 'UTF-8'); ?></td>
             </tr>
             <?php endif; ?>
@@ -179,23 +179,23 @@ $destination = (string) ($destination ?? '');
 
     <table class="totals">
         <tr>
-            <td class="label">Total Amount</td>
+            <td class="label"><?php esc_html_e('Total Amount', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($totalAmount, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
-            <td class="label">Amount Paid</td>
+            <td class="label"><?php esc_html_e('Amount Paid', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountPaid, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
         <tr>
-            <td class="label">Balance Due</td>
+            <td class="label"><?php esc_html_e('Balance Due', 'yatra'); ?></td>
             <td class="value"><?php echo $currencySymbol . htmlspecialchars($amountDue, ENT_QUOTES, 'UTF-8'); ?></td>
         </tr>
     </table>
 </div>
 
 <div class="footer">
-    <p>This voucher confirms your booking and should be presented at check-in. Please keep it safe for your travel records.</p>
-    <p>For questions or changes, contact us at <?php echo htmlspecialchars($companyEmail, ENT_QUOTES, 'UTF-8'); ?> or call <?php echo htmlspecialchars($companyPhone, ENT_QUOTES, 'UTF-8'); ?></p>
+    <p><?php esc_html_e('This voucher confirms your booking and should be presented at check-in. Please keep it safe for your travel records.', 'yatra'); ?></p>
+    <p><?php esc_html_e('For questions or changes, contact us at', 'yatra'); ?> <?php echo htmlspecialchars($companyEmail, ENT_QUOTES, 'UTF-8'); ?> <?php esc_html_e('or call', 'yatra'); ?> <?php echo htmlspecialchars($companyPhone, ENT_QUOTES, 'UTF-8'); ?></p>
 </div>
 </body>
 </html>

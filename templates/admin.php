@@ -93,28 +93,28 @@ $has_build = file_exists($app_js);
 <div id="yatra-app-root">
     <?php if (!$has_build): ?>
     <div class="yatra-build-message">
-        <h1>🚀 Yatra Admin UI Setup Required</h1>
+        <h1><?php esc_html_e('🚀 Yatra Admin UI Setup Required', 'yatra'); ?></h1>
         <p style="font-size: 16px; margin-bottom: 30px; color: #666;">
-            The modern React admin interface needs to be built before it can be used.
+            <?php esc_html_e('The modern React admin interface needs to be built before it can be used.', 'yatra'); ?>
         </p>
         <div style="background: #f9f9f9; border: 1px solid #ddd; border-radius: 4px; padding: 20px; text-align: left; margin: 20px 0;">
-            <h3 style="margin-top: 0;">To build the Admin UI:</h3>
+            <h3 style="margin-top: 0;"><?php esc_html_e('To build the Admin UI:', 'yatra'); ?></h3>
             <ol style="line-height: 2;">
-                <li>Open your terminal/command prompt</li>
-                <li>Navigate to the plugin directory:
+                <li><?php esc_html_e('Open your terminal/command prompt', 'yatra'); ?></li>
+                <li><?php esc_html_e('Navigate to the plugin directory:', 'yatra'); ?>
                     <code><?php echo esc_html(YATRA_PLUGIN_PATH); ?></code>
                 </li>
-                <li>Install dependencies:
+                <li><?php esc_html_e('Install dependencies:', 'yatra'); ?>
                     <code>npm install</code>
                 </li>
-                <li>Build the application:
+                <li><?php esc_html_e('Build the application:', 'yatra'); ?>
                     <code>npm run build</code>
                 </li>
-                <li>Refresh this page</li>
+                <li><?php esc_html_e('Refresh this page', 'yatra'); ?></li>
             </ol>
         </div>
         <p style="color: #999; font-size: 14px;">
-            For development with hot reload, use <code>npm run dev</code> instead of <code>npm run build</code>
+            <?php esc_html_e('For development with hot reload, use', 'yatra'); ?> <code>npm run dev</code> <?php esc_html_e('instead of', 'yatra'); ?> <code>npm run build</code>
         </p>
     </div>
     <?php endif; ?>

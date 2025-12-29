@@ -537,5 +537,20 @@ class ReviewRepository extends BaseRepository
 
         return $prepared;
     }
+
+    /**
+     * Check if reviews table exists
+     */
+    public function tableExists(): bool
+    {
+        global $wpdb;
+        $tableName = $this->getTableName();
+        
+        return (bool) $wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$tableName}'"
+        );
+    }
 }
 

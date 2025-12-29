@@ -2045,4 +2045,235 @@ class TripRepository extends BaseRepository
             LIMIT {$limit}
         ") ?: [];
     }
+
+    /**
+     * Get price statistics for filter sidebar
+     */
+    public function getPriceStats(): object
+    {
+        global $wpdb;
+        $table = $this->getTableName();
+        
+        return $wpdb->get_row(
+            "SELECT 
+                MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
+                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
+             FROM {$table}
+             WHERE status = 'publish' AND original_price IS NOT NULL AND original_price > 0"
+        ) ?: (object) ['min_price' => 0, 'max_price' => 1000];
+    }
+
+    /**
+     * Get available trip types
+     */
+    public function getTripTypes(): array
+    {
+        return [
+            (object) ['value' => 'adventure', 'label' => __('Adventure', 'yatra')],
+            (object) ['value' => 'cultural', 'label' => __('Cultural', 'yatra')],
+            (object) ['value' => 'wildlife', 'label' => __('Wildlife', 'yatra')],
+            (object) ['value' => 'pilgrimage', 'label' => __('Pilgrimage', 'yatra')],
+            (object) ['value' => 'educational', 'label' => __('Educational', 'yatra')]
+        ];
+    }
+
+    /**
+     * Count trips by trip type
+     */
+    public function countByTripType(string $tripType): int
+    {
+        global $wpdb;
+        $table = $this->getTableName();
+        
+        return (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE trip_type = %s AND status = 'publish'",
+            $tripType
+        ));
+    }
+
+    /**
+     * Count trips with discounts
+     */
+    public function countByDiscount(): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE status = 'publish' AND (discounted_price IS NOT NULL OR sale_price IS NOT NULL)"
+        );
+    }
+
+    /**
+     * Count trips with early bird offers
+     */
+    public function countByEarlyBird(): int
+    {
+        $table = $this->getTableName();
+        
+        // Check if column exists
+        $column_exists = (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$table}' 
+               AND COLUMN_NAME = 'early_bird_discount_enabled'"
+        );
+        
+        if ($column_exists) {
+            return (int) $this->wpdb->get_var(
+                "SELECT COUNT(*) FROM {$table} 
+                 WHERE status = 'publish' AND early_bird_discount_enabled = 1"
+            );
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Count trips with last minute deals
+     */
+    public function countByLastMinute(): int
+    {
+        $table = $this->getTableName();
+        
+        // Check if column exists
+        $column_exists = (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$table}' 
+               AND COLUMN_NAME = 'last_minute_discount_enabled'"
+        );
+        
+        if ($column_exists) {
+            return (int) $this->wpdb->get_var(
+                "SELECT COUNT(*) FROM {$table} 
+                 WHERE status = 'publish' AND last_minute_discount_enabled = 1"
+            );
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Count trips with instant booking
+     */
+    public function countByInstantBooking(): int
+    {
+        $table = $this->getTableName();
+        
+        // Check if column exists
+        $column_exists = (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$table}' 
+               AND COLUMN_NAME = 'instant_booking'"
+        );
+        
+        if ($column_exists) {
+            return (int) $this->wpdb->get_var(
+                "SELECT COUNT(*) FROM {$table} 
+                 WHERE status = 'publish' AND instant_booking = 1"
+            );
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Count trips with flexible dates
+     */
+    public function countByFlexibleDates(): int
+    {
+        $table = $this->getTableName();
+        
+        // Check if column exists
+        $column_exists = (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$table}' 
+               AND COLUMN_NAME = 'flexible_dates'"
+        );
+        
+        if ($column_exists) {
+            return (int) $this->wpdb->get_var(
+                "SELECT COUNT(*) FROM {$table} 
+                 WHERE status = 'publish' AND flexible_dates = 1"
+            );
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Count trips requiring deposit
+     */
+    public function countByDepositRequired(): int
+    {
+        $table = $this->getTableName();
+        
+        // Check if column exists
+        $column_exists = (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() 
+               AND TABLE_NAME = '{$table}' 
+               AND COLUMN_NAME = 'deposit_required'"
+        );
+        
+        if ($column_exists) {
+            return (int) $this->wpdb->get_var(
+                "SELECT COUNT(*) FROM {$table} 
+                 WHERE status = 'publish' AND deposit_required = 1"
+            );
+        }
+        
+        return 0;
+    }
+
+    /**
+     * Count family friendly trips
+     */
+    public function countByFamilyFriendly(): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 5)"
+        );
+    }
+
+    /**
+     * Count kids friendly trips
+     */
+    public function countByKidsFriendly(): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE status = 'publish' AND (age_min IS NULL OR age_min <= 12)"
+        );
+    }
+
+    /**
+     * Count senior friendly trips
+     */
+    public function countBySeniorFriendly(): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE status = 'publish' AND (age_max IS NULL OR age_max >= 65)"
+        );
+    }
+
+    /**
+     * Count adults only trips
+     */
+    public function countByAdultsOnly(): int
+    {
+        $table = $this->getTableName();
+        return (int) $this->wpdb->get_var(
+            "SELECT COUNT(*) FROM {$table} 
+             WHERE status = 'publish' AND age_min >= 18"
+        );
+    }
 }

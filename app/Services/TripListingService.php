@@ -7,6 +7,8 @@ namespace Yatra\Services;
 use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\DestinationRepository;
 use Yatra\Repositories\ActivityRepository;
+use Yatra\Repositories\TripCategoryRepository;
+use Yatra\Repositories\ReviewRepository;
 use Yatra\Utils\Cache;
 use Yatra\Utils\Logger;
 
@@ -22,6 +24,8 @@ class TripListingService extends BaseService
     private TripRepository $tripRepository;
     private DestinationRepository $destinationRepository;
     private ActivityRepository $activityRepository;
+    private TripCategoryRepository $categoryRepository;
+    private ReviewRepository $reviewRepository;
 
     protected function getRepository(): TripRepository
     {
@@ -31,11 +35,15 @@ class TripListingService extends BaseService
     public function __construct(
         ?TripRepository $tripRepository = null,
         ?DestinationRepository $destinationRepository = null,
-        ?ActivityRepository $activityRepository = null
+        ?ActivityRepository $activityRepository = null,
+        ?TripCategoryRepository $categoryRepository = null,
+        ?ReviewRepository $reviewRepository = null
     ) {
         $this->tripRepository = $tripRepository ?? new TripRepository();
         $this->destinationRepository = $destinationRepository ?? new DestinationRepository();
         $this->activityRepository = $activityRepository ?? new ActivityRepository();
+        $this->categoryRepository = $categoryRepository ?? new TripCategoryRepository();
+        $this->reviewRepository = $reviewRepository ?? new ReviewRepository();
     }
 
     /**
@@ -344,5 +352,281 @@ class TripListingService extends BaseService
         }
 
         return false;
+    }
+
+    /**
+     * Get filter data for trip listing templates
+     * 
+     * @return array All filter options with counts
+     */
+    public function getFilterData(): array
+    {
+        if ($this->isCacheEnabled()) {
+            return Cache::remember('trip_listing_filter_data', function() {
+                return $this->buildFilterData();
+            }, 3600); // Cache for 1 hour
+        }
+
+        return $this->buildFilterData();
+    }
+
+    /**
+     * Build filter data from repositories
+     */
+    private function buildFilterData(): array
+    {
+        return [
+            'price_stats' => $this->tripRepository->getPriceStats(),
+            'trip_types' => $this->getTripTypeOptions(),
+            'difficulty_levels' => $this->getDifficultyLevelOptions(),
+            'ratings' => $this->getRatingOptions(),
+            'categories' => $this->getCategoryOptions(),
+            'destinations' => $this->getDestinationOptions(),
+            'activities' => $this->getActivityOptions(),
+            'accommodations' => $this->tripRepository->getAccommodationTypes(),
+            'included_services' => $this->tripRepository->getIncludedServices(),
+            'durations' => $this->tripRepository->getDurationOptions(),
+            'group_sizes' => $this->tripRepository->getGroupSizeOptions(),
+            'physical_grades' => $this->tripRepository->getPhysicalGrades(),
+            'special_offers' => $this->getSpecialOffers(),
+            'age_restrictions' => $this->getAgeRestrictions(),
+            'booking_options' => $this->getBookingOptions()
+        ];
+    }
+
+    /**
+     * Get trip type options with counts
+     */
+    private function getTripTypeOptions(): array
+    {
+        $tripTypes = $this->tripRepository->getTripTypes();
+        $result = [];
+
+        foreach ($tripTypes as $type) {
+            $count = $this->tripRepository->countByTripType($type->value);
+            $result[] = (object) [
+                'value' => $type->value,
+                'label' => $type->label,
+                'count' => $count
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get difficulty level options with counts
+     */
+    private function getDifficultyLevelOptions(): array
+    {
+        $levels = $this->categoryRepository->getDifficultyLevels();
+        $result = [];
+
+        foreach ($levels as $level) {
+            $count = $this->tripRepository->countByDifficultyLevel((int) $level->id);
+            $result[] = (object) [
+                'slug' => $level->slug,
+                'name' => $level->name,
+                'id' => (int) $level->id,
+                'count' => $count
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get rating options with counts
+     */
+    private function getRatingOptions(): array
+    {
+        $result = [];
+        
+        // Check if reviews table exists
+        if (!$this->reviewRepository->tableExists()) {
+            return $result;
+        }
+
+        for ($rating = 5; $rating >= 1; $rating--) {
+            $count = $this->tripRepository->countByMinRating($rating);
+            $result[] = (object) [
+                'rating' => $rating,
+                'count' => $count,
+                'label' => sprintf('%d %s', $rating, _n('Star', 'Stars', $rating, 'yatra'))
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get category options with counts
+     */
+    private function getCategoryOptions(): array
+    {
+        $categories = $this->categoryRepository->getPublishedCategories();
+        $result = [];
+
+        foreach ($categories as $category) {
+            $count = $this->tripRepository->countByCategory($category->id);
+            $result[] = (object) [
+                'id' => $category->id,
+                'name' => $category->name,
+                'slug' => $category->slug,
+                'count' => $count
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get destination options with counts
+     */
+    private function getDestinationOptions(): array
+    {
+        $destinations = $this->destinationRepository->getPublishedDestinations();
+        $result = [];
+
+        foreach ($destinations as $destination) {
+            $count = $this->tripRepository->countByCategory($destination->id);
+            $result[] = (object) [
+                'id' => $destination->id,
+                'name' => $destination->name,
+                'slug' => $destination->slug,
+                'count' => $count
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get activity options with counts
+     */
+    private function getActivityOptions(): array
+    {
+        $activities = $this->activityRepository->getPublishedActivities();
+        $result = [];
+
+        foreach ($activities as $activity) {
+            $count = $this->tripRepository->countByCategory($activity->id);
+            $result[] = (object) [
+                'id' => $activity->id,
+                'name' => $activity->name,
+                'slug' => $activity->slug,
+                'count' => $count
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Get special offers with counts
+     */
+    private function getSpecialOffers(): array
+    {
+        $special_offers = [];
+        
+        // Check for discounted trips
+        $discount_count = $this->tripRepository->countByDiscount();
+        if ($discount_count > 0) {
+            $special_offers[] = (object) ['value' => 'discount', 'label' => __('Discount Available', 'yatra'), 'count' => $discount_count];
+        }
+        
+        // Check for early bird offers
+        $early_bird_count = $this->tripRepository->countByEarlyBird();
+        if ($early_bird_count > 0) {
+            $special_offers[] = (object) ['value' => 'early-bird', 'label' => __('Early Bird Offer', 'yatra'), 'count' => $early_bird_count];
+        }
+        
+        // Check for last minute deals
+        $last_minute_count = $this->tripRepository->countByLastMinute();
+        if ($last_minute_count > 0) {
+            $special_offers[] = (object) ['value' => 'last-minute', 'label' => __('Last Minute Deal', 'yatra'), 'count' => $last_minute_count];
+        }
+        
+        // Check for instant booking
+        $instant_count = $this->tripRepository->countByInstantBooking();
+        if ($instant_count > 0) {
+            $special_offers[] = (object) ['value' => 'instant-booking', 'label' => __('Instant Booking', 'yatra'), 'count' => $instant_count];
+        }
+        
+        // Check for flexible dates
+        $flexible_count = $this->tripRepository->countByFlexibleDates();
+        if ($flexible_count > 0) {
+            $special_offers[] = (object) ['value' => 'flexible-dates', 'label' => __('Flexible Dates', 'yatra'), 'count' => $flexible_count];
+        }
+        
+        // Check for deposit options
+        $deposit_count = $this->tripRepository->countByDepositRequired();
+        if ($deposit_count > 0) {
+            $special_offers[] = (object) ['value' => 'deposit-available', 'label' => __('Pay Later Available', 'yatra'), 'count' => $deposit_count];
+        }
+        
+        return $special_offers;
+    }
+
+    /**
+     * Get age restrictions with counts
+     */
+    private function getAgeRestrictions(): array
+    {
+        $age_options = [];
+        
+        // Check for family friendly (no age restrictions or low minimum age)
+        $family_count = $this->tripRepository->countByFamilyFriendly();
+        if ($family_count > 0) {
+            $age_options[] = (object) ['value' => 'family-friendly', 'label' => __('Family Friendly', 'yatra'), 'count' => $family_count];
+        }
+        
+        // Check for kids suitable (age_min <= 12)
+        $kids_count = $this->tripRepository->countByKidsFriendly();
+        if ($kids_count > 0) {
+            $age_options[] = (object) ['value' => 'kids-friendly', 'label' => __('Kids Friendly', 'yatra'), 'count' => $kids_count];
+        }
+        
+        // Check for senior friendly (no upper age limit or high limit)
+        $senior_count = $this->tripRepository->countBySeniorFriendly();
+        if ($senior_count > 0) {
+            $age_options[] = (object) ['value' => 'senior-friendly', 'label' => __('Senior Friendly', 'yatra'), 'count' => $senior_count];
+        }
+        
+        // Check for adults only (age_min >= 18)
+        $adults_count = $this->tripRepository->countByAdultsOnly();
+        if ($adults_count > 0) {
+            $age_options[] = (object) ['value' => 'adults-only', 'label' => __('Adults Only', 'yatra'), 'count' => $adults_count];
+        }
+        
+        return $age_options;
+    }
+
+    /**
+     * Get booking options with counts
+     */
+    private function getBookingOptions(): array
+    {
+        $booking_options = [];
+        
+        // Check for instant booking
+        $instant_count = $this->tripRepository->countByInstantBooking();
+        if ($instant_count > 0) {
+            $booking_options[] = (object) ['value' => 'instant', 'label' => __('Instant Confirmation', 'yatra'), 'count' => $instant_count];
+        }
+        
+        // Check for flexible dates
+        $flexible_count = $this->tripRepository->countByFlexibleDates();
+        if ($flexible_count > 0) {
+            $booking_options[] = (object) ['value' => 'flexible', 'label' => __('Flexible Dates', 'yatra'), 'count' => $flexible_count];
+        }
+        
+        // Check for deposit options
+        $deposit_count = $this->tripRepository->countByDepositRequired();
+        if ($deposit_count > 0) {
+            $booking_options[] = (object) ['value' => 'pay-later', 'label' => __('Reserve Now, Pay Later', 'yatra'), 'count' => $deposit_count];
+        }
+        
+        return $booking_options;
     }
 }

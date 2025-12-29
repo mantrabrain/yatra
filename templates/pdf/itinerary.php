@@ -107,12 +107,12 @@ $destination = (string) ($destination ?? '');
                 <td style="width: 60%;">
                     <div class="brand">
                         <h1><?php echo htmlspecialchars($companyName ?: 'Travel Company', ENT_QUOTES, 'UTF-8'); ?></h1>
-                        <p>Travel Itinerary Document</p>
+                        <p><?php esc_html_e('Travel Itinerary Document', 'yatra'); ?></p>
                     </div>
                 </td>
                 <td style="width: 40%;">
                     <div class="brand" style="background: #374151; text-align: right;">
-                        <p style="font-size: 10px; margin-bottom: 2px;">Booking Reference</p>
+                        <p style="font-size: 10px; margin-bottom: 2px;"><?php esc_html_e('Booking Reference', 'yatra'); ?></p>
                         <p style="font-size: 14px; font-weight: 700;"><?php echo htmlspecialchars($bookingRef ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </td>
@@ -120,14 +120,14 @@ $destination = (string) ($destination ?? '');
         </table>
 
         <div class="itinerary-number">
-            <h2>Travel Itinerary</h2>
-            <div class="ref">Issued: <?php echo htmlspecialchars($bookingDate, ENT_QUOTES, 'UTF-8'); ?></div>
+            <h2><?php esc_html_e('Travel Itinerary', 'yatra'); ?></h2>
+            <div class="ref"><?php esc_html_e('Issued:', 'yatra'); ?> <?php echo htmlspecialchars($bookingDate, ENT_QUOTES, 'UTF-8'); ?></div>
         </div>
 
         <!-- Trip Description -->
         <?php if (!empty($tripDescription)): ?>
         <div class="section">
-            <div class="section-title">About This Trip</div>
+            <div class="section-title"><?php esc_html_e('About This Trip', 'yatra'); ?></div>
             <div class="trip-description">
                 <h3><?php echo htmlspecialchars($tripTitle, ENT_QUOTES, 'UTF-8'); ?></h3>
                 <p><?php echo nl2br(htmlspecialchars($tripDescription, ENT_QUOTES, 'UTF-8')); ?></p>
@@ -137,53 +137,53 @@ $destination = (string) ($destination ?? '');
 
         <!-- Trip Details -->
         <div class="section">
-            <div class="section-title">Trip Information</div>
+            <div class="section-title"><?php esc_html_e('Trip Information', 'yatra'); ?></div>
             <table class="panel">
                 <tr>
                     <td style="width: 50%;">
-                        <h3>Trip Details</h3>
+                        <h3><?php esc_html_e('Trip Details', 'yatra'); ?></h3>
                         <table class="trip-details">
                             <tr>
-                                <th class="label">Trip Name</th>
+                                <th class="label"><?php esc_html_e('Trip Name', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($tripTitle, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Duration</th>
+                                <th class="label"><?php esc_html_e('Duration', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($tripDuration ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Difficulty Level</th>
+                                <th class="label"><?php esc_html_e('Difficulty Level', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($tripDifficulty ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Number of Travelers</th>
+                                <th class="label"><?php esc_html_e('Number of Travelers', 'yatra'); ?></th>
                                 <td><?php echo $travelerCount; ?></td>
                             </tr>
                         </table>
                     </td>
                     <td style="width: 50%;">
-                        <h3>Travel Information</h3>
+                        <h3><?php esc_html_e('Travel Information', 'yatra'); ?></h3>
                         <table class="trip-details">
                             <tr>
-                                <th class="label">Departure Location</th>
+                                <th class="label"><?php esc_html_e('Departure Location', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($departureLocation ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Destination</th>
+                                <th class="label"><?php esc_html_e('Destination', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($destination ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Travel Date</th>
+                                <th class="label"><?php esc_html_e('Travel Date', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($travelDate ?: 'N/A', ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <?php if (!empty($returnDate)): ?>
                             <tr>
-                                <th class="label">Return Date</th>
+                                <th class="label"><?php esc_html_e('Return Date', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($returnDate, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <?php endif; ?>
                             <tr>
-                                <th class="label">Booking Status</th>
+                                <th class="label"><?php esc_html_e('Booking Status', 'yatra'); ?></th>
                                 <td><span class="status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($bookingStatus, ENT_QUOTES, 'UTF-8'); ?></span></td>
                             </tr>
                         </table>
@@ -194,35 +194,35 @@ $destination = (string) ($destination ?? '');
 
         <!-- Customer Information -->
         <div class="section">
-            <div class="section-title">Traveler Information</div>
+            <div class="section-title"><?php esc_html_e('Traveler Information', 'yatra'); ?></div>
             <table class="panel">
                 <tr>
                     <td style="width: 50%;">
-                        <h3>Primary Traveler</h3>
+                        <h3><?php esc_html_e('Primary Traveler', 'yatra'); ?></h3>
                         <table class="trip-details">
                             <tr>
-                                <th class="label">Name</th>
+                                <th class="label"><?php esc_html_e('Name', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($customerName, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Email</th>
+                                <th class="label"><?php esc_html_e('Email', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($customerEmail, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                         </table>
                     </td>
                     <td style="width: 50%;">
-                        <h3>Booking Information</h3>
+                        <h3><?php esc_html_e('Booking Information', 'yatra'); ?></h3>
                         <table class="trip-details">
                             <tr>
-                                <th class="label">Booking Reference</th>
+                                <th class="label"><?php esc_html_e('Booking Reference', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($bookingRef, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Booking Date</th>
+                                <th class="label"><?php esc_html_e('Booking Date', 'yatra'); ?></th>
                                 <td><?php echo htmlspecialchars($bookingDate, ENT_QUOTES, 'UTF-8'); ?></td>
                             </tr>
                             <tr>
-                                <th class="label">Status</th>
+                                <th class="label"><?php esc_html_e('Status', 'yatra'); ?></th>
                                 <td><span class="status <?php echo $statusClass; ?>"><?php echo htmlspecialchars($bookingStatus, ENT_QUOTES, 'UTF-8'); ?></span></td>
                             </tr>
                         </table>
@@ -234,7 +234,7 @@ $destination = (string) ($destination ?? '');
         <!-- Trip Highlights -->
         <?php if (!empty($tripHighlights)): ?>
         <div class="section">
-            <div class="section-title">Trip Highlights</div>
+            <div class="section-title"><?php esc_html_e('Trip Highlights', 'yatra'); ?></div>
             <div class="itinerary-highlights">
                 <?php 
                 $highlights = is_array($tripHighlights) ? $tripHighlights : explode("\n", $tripHighlights);
@@ -255,7 +255,7 @@ $destination = (string) ($destination ?? '');
 
         <!-- Travel Timeline -->
         <div class="section">
-            <div class="section-title">Travel Timeline</div>
+            <div class="section-title"><?php esc_html_e('Travel Timeline', 'yatra'); ?></div>
             <div class="timeline">
                 <div class="timeline-item">
                     <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: 'TBD', ENT_QUOTES, 'UTF-8'); ?></div>

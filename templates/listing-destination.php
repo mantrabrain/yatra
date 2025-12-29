@@ -90,8 +90,8 @@ get_header();
             <!-- Page Header -->
             <div class="yatra-destination-header">
                 <div class="yatra-destination-header-content">
-                    <h1>All Destinations</h1>
-                    <p>Explore breathtaking destinations around the world</p>
+                    <h1><?php esc_html_e('All Destinations', 'yatra'); ?></h1>
+                    <p><?php esc_html_e('Explore breathtaking destinations around the world', 'yatra'); ?></p>
                 </div>
                 <div class="yatra-results-controls">
                     <div class="yatra-sort-control">

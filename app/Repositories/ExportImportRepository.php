@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
-use Yatra\Repositories\BaseRepository;
-
 /**
  * Export/Import Repository
  * 
  * Handles database operations for export/import functionality.
  */
-class ExportImportRepository extends BaseRepository
+class ExportImportRepository
 {
     /**
      * Get MySQL version
@@ -112,14 +110,5 @@ class ExportImportRepository extends BaseRepository
         }
         
         return true;
-    }
-
-    /**
-     * Get table name with prefix
-     */
-    public function getTableName(string $tableName): string
-    {
-        global $wpdb;
-        return $wpdb->prefix . $tableName;
     }
 }

@@ -212,7 +212,7 @@ class ExportImportService
                     continue;
                 }
                 
-                $tableName = $repository->getTableName($tableMap[$dataType]);
+                $tableName = $wpdb->prefix . $tableMap[$dataType];
                 $tableExists = $repository->tableExists($tableName);
                 
                 if (!$tableExists) {
@@ -393,7 +393,7 @@ class ExportImportService
                     continue;
                 }
                 
-                $tableName = $repository->getTableName($tableMap[$dataType]);
+                $tableName = $wpdb->prefix . $tableMap[$dataType];
                 $records = $dataContainer[$dataType];
                 
                 // Initialize statistics for this data type
@@ -537,7 +537,7 @@ class ExportImportService
                 continue;
             }
             
-            $tableName = $repository->getTableName($tableMap[$dataType]);
+            $tableName = $wpdb->prefix . $tableMap[$dataType];
             $tableExists = $repository->tableExists($tableName);
             
             if ($tableExists) {

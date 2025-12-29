@@ -159,7 +159,7 @@ get_header();
                                 </div>
                             <?php endif; ?>
                             
-                            <button class="yatra-favorite-btn" title="Add to favorites">
+                            <button class="yatra-favorite-btn" title="<?php esc_attr_e('Add to favorites', 'yatra'); ?>">
                                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                 </svg>
@@ -171,7 +171,7 @@ get_header();
                                 <span class="yatra-trip-location"><?php echo esc_html($trip->location ?? $destination->name); ?></span>
                                 <?php if (!empty($trip->duration)): ?>
                                     <span class="yatra-trip-separator">•</span>
-                                    <span class="yatra-trip-duration"><?php echo esc_html($trip->duration); ?> Days</span>
+                                    <span class="yatra-trip-duration"><?php echo esc_html($trip->duration); ?> <?php esc_html_e('Days', 'yatra'); ?></span>
                                 <?php endif; ?>
                                 <?php if (!empty($trip->difficulty)): ?>
                                     <span class="yatra-trip-separator">•</span>
@@ -200,7 +200,7 @@ get_header();
                                     </svg>
                                     <span class="yatra-rating-value"><?php echo esc_html(number_format($trip->average_rating ?? 0, 1)); ?></span>
                                 </div>
-                                <span class="yatra-reviews-count">(<?php echo esc_html($trip->review_count ?? 0); ?> reviews)</span>
+                                <span class="yatra-reviews-count">(<?php echo esc_html($trip->review_count ?? 0); ?> <?php esc_html_e('reviews', 'yatra'); ?>)</span>
                             </div>
                             
                             <div class="yatra-trip-footer">
@@ -237,9 +237,9 @@ get_header();
                                         }
                                         ?>
                                     </div>
-                                    <div class="yatra-price-note">per person</div>
+                                    <div class="yatra-price-note"><?php esc_html_e('per person', 'yatra'); ?></div>
                                 </div>
-                                <a href="<?php echo esc_url($trip->permalink ?? ''); ?>" class="yatra-card-view-btn">View Details</a>
+                                <a href="<?php echo esc_url($trip->permalink ?? ''); ?>" class="yatra-card-view-btn"><?php esc_html_e('View Details', 'yatra'); ?></a>
                             </div>
                         </div>
                     </div>
