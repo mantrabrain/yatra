@@ -9,9 +9,6 @@
  * @package Yatra
  */
 
-// Enqueue activity-specific CSS
-wp_enqueue_style('yatra-activity', plugins_url('assets/css/activity.css', dirname(__FILE__)), [], '1.0.0');
-
 // Prevent direct access
 if (!defined('ABSPATH')) {
     exit;

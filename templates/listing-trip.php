@@ -117,28 +117,6 @@ $active_filters = [
     }, $_GET['attributes']) : [],
 ];
 
-
-// Enqueue the filter JavaScript
-wp_enqueue_script(
-    'yatra-listing-filters',
-    plugin_dir_url(__FILE__) . '../public/js/listing-filters.js',
-    ['jquery'],
-    '1.0.0',
-    true
-);
-
-// Add currency formatting function to JavaScript with proper escaping
-$contact_for_pricing = esc_js(__('Contact for pricing', 'yatra'));
-wp_add_inline_script('yatra-listing-filters', "
-    window.yatra_format_price = function(amount) {
-        if (!amount || amount == 0) return '{$contact_for_pricing}';
-        // Use global currency settings if available
-        const currency = window.yatraSettings?.currency || 'USD';
-        const symbol = window.yatraSettings?.currencySymbol || '$';
-        return symbol + amount.toLocaleString();
-    };
-");
-
 if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
     $trips_source      = $yatra_trip_list['trips'];
     $trip_total        = isset($yatra_trip_list['total']) ? (int) $yatra_trip_list['total'] : count($trips_source);

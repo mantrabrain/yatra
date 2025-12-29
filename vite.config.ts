@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   plugins: [
@@ -18,7 +21,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'public',
+    outDir: 'assets',
     emptyOutDir: false,
     minify: false, // Disable minification for better debugging
     // terserOptions: {
@@ -33,13 +36,36 @@ export default defineConfig({
         'account-page': path.resolve(__dirname, 'resources/js/account-page.tsx'),
       },
       output: {
-        entryFileNames: 'js/[name].js',
-        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: (chunkInfo) => {
+          // Admin app goes to admin/dist/js/
+          if (chunkInfo.name === 'app') {
+            return 'admin/dist/js/[name].js';
+          }
+          // Frontend account page goes to dist/js/
+          return 'dist/js/[name].js';
+        },
+        chunkFileNames: (chunkInfo) => {
+          // Admin chunks go to admin/dist/js/
+          if (chunkInfo.name.includes('app') || chunkInfo.name.includes('react-vendor') || chunkInfo.name.includes('query-vendor')) {
+            return 'admin/dist/js/[name]-[hash].js';
+          }
+          // Frontend chunks go to dist/js/
+          return 'dist/js/[name]-[hash].js';
+        },
         assetFileNames: (assetInfo) => {
           if (assetInfo.name?.endsWith('.css')) {
-            return 'css/[name][extname]';
+            // Admin CSS goes to admin/dist/css/
+            if (assetInfo.name?.includes('app') || assetInfo.name?.includes('react-vendor') || assetInfo.name?.includes('index')) {
+              return 'admin/dist/css/[name][extname]';
+            }
+            // Frontend CSS goes to dist/css/
+            return 'dist/css/[name][extname]';
           }
-          return 'assets/[name]-[hash][extname]';
+          // Other assets
+          if (assetInfo.name?.includes('app') || assetInfo.name?.includes('react-vendor')) {
+            return 'admin/dist/assets/[name]-[hash][extname]';
+          }
+          return 'dist/assets/[name]-[hash][extname]';
         },
         manualChunks(id) {
           // Separate chunking for admin app vs frontend account page

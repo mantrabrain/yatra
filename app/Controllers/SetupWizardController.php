@@ -141,25 +141,9 @@ class SetupWizardController
      */
     private function enqueue_wizard_assets()
     {
-        wp_enqueue_style(
-            'yatra-setup-wizard',
-            YATRA_PLUGIN_URI . 'assets/css/setup-wizard.css',
-            array(),
-            YATRA_VERSION
-        );
-
-        wp_enqueue_script(
-            'yatra-setup-wizard',
-            YATRA_PLUGIN_URI . 'assets/js/setup-wizard.js',
-            array('jquery'),
-            YATRA_VERSION,
-            true
-        );
-
-        wp_localize_script('yatra-setup-wizard', 'yatraSetupWizard', array(
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('yatra-setup-wizard'),
-        ));
+        // Use centralized AdminAssetsService for setup wizard assets
+        $adminAssetsService = new \Yatra\Services\AdminAssetsService();
+        $adminAssetsService->enqueueSetupWizardAssets();
     }
 
     /**

@@ -1,0 +1,47 @@
+{
+  "_index-!~{002}~.js": {
+    "file": "admin/dist/css/index.css",
+    "src": "_index-!~{002}~.js"
+  },
+  "_index-CLb9q-Jm.js": {
+    "file": "dist/js/index-CLb9q-Jm.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-Do2o1fTZ.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_react-vendor-!~{001}~.js": {
+    "file": "admin/dist/css/react-vendor.css",
+    "src": "_react-vendor-!~{001}~.js"
+  },
+  "_react-vendor-Do2o1fTZ.js": {
+    "file": "admin/dist/js/react-vendor-Do2o1fTZ.js",
+    "name": "react-vendor",
+    "css": [
+      "admin/dist/css/react-vendor.css"
+    ]
+  },
+  "resources/js/account-page.tsx": {
+    "file": "dist/js/account-page.js",
+    "name": "account-page",
+    "src": "resources/js/account-page.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-vendor-Do2o1fTZ.js",
+      "_index-CLb9q-Jm.js"
+    ]
+  },
+  "resources/js/main.tsx": {
+    "file": "admin/dist/js/app.js",
+    "name": "app",
+    "src": "resources/js/main.tsx",
+    "isEntry": true,
+    "imports": [
+      "_react-vendor-Do2o1fTZ.js",
+      "_index-CLb9q-Jm.js"
+    ]
+  }
+}

@@ -9,8 +9,8 @@ if (!defined('ABSPATH')) {
 }
 
 // Check if React app is built
-$app_js = YATRA_PLUGIN_PATH . 'public/js/app.js';
-$app_css = YATRA_PLUGIN_PATH . 'public/css/app.css';
+$app_js = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
+$app_css = YATRA_PLUGIN_PATH . 'assets/admin/dist/css/app.css';
 $has_build = file_exists($app_js);
 ?>
 <script>

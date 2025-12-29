@@ -9,6 +9,7 @@ use Yatra\Core\Database;
 use Yatra\Providers\AppServiceProvider;
 use Yatra\Providers\RouteServiceProvider;
 use Yatra\Providers\AdminServiceProvider;
+use Yatra\Providers\FrontendAssetsProvider;
 
 /**
  * Main Bootstrap class for Yatra plugin
@@ -116,6 +117,11 @@ class Bootstrap
         
         if (is_admin() && class_exists('Yatra\Providers\AdminServiceProvider')) {
             $providers[] = 'Yatra\Providers\AdminServiceProvider';
+        }
+
+        // Frontend assets provider (always load for frontend asset management)
+        if (!is_admin() && class_exists('Yatra\Providers\FrontendAssetsProvider')) {
+            $providers[] = 'Yatra\Providers\FrontendAssetsProvider';
         }
 
         // Register each provider

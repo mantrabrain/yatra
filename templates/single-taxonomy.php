@@ -286,22 +286,6 @@ get_header();
     </div>
 </div>
 
-<?php
-// Enqueue the listing filters JavaScript
-wp_enqueue_script(
-    'yatra-listing-filters',
-    plugins_url('public/js/listing-filters.js', dirname(__FILE__)),
-    ['jquery'],
-    '1.0.0',
-    true
-);
-?>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize filters (from listing-filters.js)
-    if (typeof initializeFilters === 'function') {
-        initializeFilters();
     }
     
     // View toggle

@@ -469,6 +469,7 @@ function yatra_get_trip(): ?object
  */
 function yatra_is_single_trip(): bool
 {
+    
     global $wp_query;
     return !empty($wp_query->get('yatra_trip_id'));
 }
@@ -892,6 +893,83 @@ function yatra_get_trip_permalink($trip): string
     $base = SettingsService::getTripBase();
     
     return home_url('/' . $base . '/' . $slug . '/');
+}
+
+/**
+ * Check if we're on a trip listing page
+ * 
+ * @return bool True if on a trip listing page
+ */
+function yatra_is_trip_listing(): bool
+{
+    global $yatra_trip_list;
+
+    // Check for trip list context (base trip listing page)
+    if (!empty($yatra_trip_list)) {
+        return true;
+    }
+
+    // Check if we're on the main trips listing page
+    $trip_base = SettingsService::getTripBase();
+    $request_uri = $_SERVER['REQUEST_URI'] ?? '';
+    $parsed_url = parse_url($request_uri, PHP_URL_PATH);
+    
+    if ($parsed_url && strpos($parsed_url, '/' . $trip_base) === 0) {
+        // Exclude single trip pages (which have slug after base)
+        $path_parts = explode('/', trim($parsed_url, '/'));
+        if (count($path_parts) <= 2) { // Only /trips/ or /trips/page/2
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+/**
+ * Check if we're on a taxonomy page (destination, activity, category)
+ * 
+ * @return bool True if on a taxonomy page
+ */
+function yatra_is_taxonomy_page(): bool
+{
+    global $yatra_taxonomy_data;
+    return !empty($yatra_taxonomy_data);
+}
+
+/**
+ * Check if we're on an activity listing page
+ * 
+ * @return bool True if on an activity listing page
+ */
+function yatra_is_activity_listing(): bool
+{
+    return isset($_GET['yatra_page_type']) && $_GET['yatra_page_type'] === 'activities';
+}
+
+/**
+ * Check if we're on a destination listing page
+ * 
+ * @return bool True if on a destination listing page
+ */
+function yatra_is_destination_listing(): bool
+{
+    return isset($_GET['yatra_page_type']) && $_GET['yatra_page_type'] === 'destinations';
+}
+
+/**
+ * Check if we're on an account page
+ * 
+ * @return bool True if on an account page
+ */
+function yatra_is_account_page(): bool
+{
+    global $post;
+    if (!$post) {
+        return false;
+    }
+
+    $accountPageId = get_option('yatra_my_account_page');
+    return $accountPageId && $post->ID == $accountPageId;
 }
 
 /**

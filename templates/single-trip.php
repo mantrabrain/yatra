@@ -1395,32 +1395,32 @@ document.addEventListener('DOMContentLoaded', function() {
             // Determine if this is a multi-day trip
             $is_multi_day = ($trip->duration_days ?? 1) > 1;
             
-            // Check for group discounts availability early for the badge
+            // Check for group discounts availability early for the badge (premium feature)
             $sidebar_has_group_discounts = false;
             $sidebar_group_discounts_data = [];
             $sidebar_group_discount_summary = '';
             try {
-                $discountService = new \Yatra\Services\DiscountService();
-                $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->id);
-                if (!empty($groupDiscountsResult)) {
-                    $sidebar_has_group_discounts = true;
-                    $sidebar_group_discounts_data = $groupDiscountsResult;
-                    // Get min_group_size from ranges if available, otherwise use legacy field
-                    $min_group = 2;
-                    if (!empty($groupDiscountsResult[0]['group_discount_ranges'])) {
-                        $first_range = $groupDiscountsResult[0]['group_discount_ranges'][0] ?? null;
-                        if ($first_range && !empty($first_range['min_group_size'])) {
-                            $min_group = (int) $first_range['min_group_size'];
+                // Check if group discounts method exists (premium feature)
+                if (class_exists('\Yatra\Services\DiscountService') && 
+                    method_exists('\Yatra\Services\DiscountService', 'getGroupDiscountsForTrip')) {
+                    $discountService = new \Yatra\Services\DiscountService();
+                    $groupDiscountsResult = $discountService->getGroupDiscountsForTrip((int) $trip->id);
+                    if (!empty($groupDiscountsResult)) {
+                        $sidebar_has_group_discounts = true;
+                        $sidebar_group_discounts_data = $groupDiscountsResult;
+                        // Get min_group_size from ranges if available, otherwise use legacy field
+                        $min_group = 2;
+                        if (!empty($groupDiscountsResult[0]['group_discount_ranges'])) {
+                            $first_range = $groupDiscountsResult[0]['group_discount_ranges'][0] ?? null;
+                            if ($first_range && !empty($first_range['min_group_size'])) {
+                                $min_group = (int) $first_range['min_group_size'];
+                            }
                         }
-                    } elseif (!empty($groupDiscountsResult[0]['min_group_size'])) {
-                        $min_group = $groupDiscountsResult[0]['min_group_size'];
                     }
-                    $sidebar_group_discount_summary = sprintf(__('Save with %d+ travelers', 'yatra'), $min_group);
                 }
             } catch (\Exception $e) {
+                // Silently fail if premium features are not available
                 $sidebar_has_group_discounts = false;
-                // Debug: uncomment to see errors
-                // echo '<!-- DEBUG Group Discount Error: ' . $e->getMessage() . ' -->';
             }
             
             // Prepare availability data for JavaScript

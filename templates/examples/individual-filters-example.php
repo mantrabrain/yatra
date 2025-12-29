@@ -24,7 +24,7 @@ $active_filters = [
 <html>
 <head>
     <title><?php esc_html_e('Individual Filter Components Example', 'yatra'); ?></title>
-    <link rel="stylesheet" href="../public/css/listing.css">
+    <link rel="stylesheet" href="../../assets/css/listing.css">
 </head>
 <body>
 
