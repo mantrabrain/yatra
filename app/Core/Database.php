@@ -22,7 +22,6 @@ use Yatra\Database\Tables\TripRevisionsTable;
 // Optimized Tables
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
-use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\TripItineraryDaysTable;
 use Yatra\Database\Tables\TripItineraryDayEntryTable;
@@ -105,9 +104,6 @@ class Database
         // Polymorphic trip relationships (consolidates 4 old tables)
         dbDelta(TripClassificationsTable::getSchema());
         
-        // Comprehensive pricing system (new unified system)
-        dbDelta(TripPricingTable::getSchema());
-        
         // Unified content management (consolidates 4 old tables)
         dbDelta(TripContentTable::getSchema());
         
@@ -160,7 +156,6 @@ class Database
             TripItineraryDayEntryTable::getTableName(),
             ClassificationsTable::getTableName(),
             TripClassificationsTable::getTableName(),
-            TripPricingTable::getTableName(),
             TripContentTable::getTableName(),
         ];
 

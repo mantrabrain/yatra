@@ -11,7 +11,6 @@ use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\TripItineraryDayEntryTable;
 use Yatra\Database\Tables\TripItineraryDaysTable;
-use Yatra\Database\Tables\TripPricingTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
@@ -301,37 +300,6 @@ class TripRepository extends BaseRepository
         $trip_ids = array_column($trips, 'id');
         $trip_ids_placeholder = implode(',', array_fill(0, count($trip_ids), '%d'));
 
-        // Batch load pricing data for traveler-based trips
-        // Using TripPricingTable for pricing data
-        $price_types_table = TripPricingTable::getTableName();
-        $pricing_data = $wpdb->get_results($wpdb->prepare(
-            "SELECT trip_id,
-                    base_price AS original_price,
-                    adjusted_price AS discounted_price,
-                    CASE 
-                        WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 THEN adjusted_price 
-                        ELSE base_price 
-                    END as effective_price,
-                    CASE 
-                        WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 AND base_price > 0 
-                        THEN ROUND(((base_price - adjusted_price) / base_price) * 100)
-                        ELSE 0
-                    END as discount_percentage
-             FROM {$price_types_table} 
-             WHERE trip_id IN ({$trip_ids_placeholder}) AND (
-                 (adjusted_price IS NOT NULL AND adjusted_price > 0) OR 
-                 (base_price IS NOT NULL AND base_price > 0)
-             )
-             ORDER BY trip_id, effective_price ASC",
-            ...$trip_ids
-        ));
-
-        // Group pricing data by trip_id
-        $pricing_by_trip = [];
-        foreach ($pricing_data as $price) {
-            $pricing_by_trip[$price->trip_id][] = $price;
-        }
-
         // Batch load destinations
         $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
@@ -403,36 +371,17 @@ class TripRepository extends BaseRepository
             }
         }
 
-        // Apply enriched data to each trip
+        // Apply enriched data to each trip (regular pricing fallback only)
         foreach ($trips as $trip) {
-            // Set pricing data
             $trip->effective_price_min = 0;
-            
-            if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
-                if (isset($pricing_by_trip[$trip->id]) && !empty($pricing_by_trip[$trip->id])) {
-                    $min_price_row = $pricing_by_trip[$trip->id][0];
-                    $trip->effective_price_min = (float)$min_price_row->effective_price;
-                    $trip->min_category_original_price = (float)$min_price_row->original_price;
-                    
-                    $max_discount = 0;
-                    foreach ($pricing_by_trip[$trip->id] as $price_type) {
-                        if ($price_type->discount_percentage > $max_discount) {
-                            $max_discount = $price_type->discount_percentage;
-                        }
-                    }
-                    $trip->max_discount_percentage = $max_discount;
-                }
-            } else {
-                // Regular pricing logic
-                if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-                    $trip->effective_price_min = (float)$trip->discounted_price;
-                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-                    $trip->effective_price_min = (float)$trip->sale_price;
-                } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-                    $trip->effective_price_min = (float)$trip->original_price;
-                }
+            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+                $trip->effective_price_min = (float)$trip->discounted_price;
+            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                $trip->effective_price_min = (float)$trip->sale_price;
+            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+                $trip->effective_price_min = (float)$trip->original_price;
             }
-
+            
             // Set relationships
             $trip->destinations = $destinations_data[$trip->id] ?? [];
             $trip->activities = $activities_data[$trip->id] ?? [];
@@ -449,51 +398,13 @@ class TripRepository extends BaseRepository
         
         // Compute effective pricing based on pricing type
         $trip->effective_price_min = 0;
-        
-        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
-            $price_types_table = TripPricingTable::getTableName();
-            $all_price_types = $wpdb->get_results($wpdb->prepare(
-                "SELECT base_price AS original_price, adjusted_price AS discounted_price,
-                        CASE 
-                            WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 THEN adjusted_price 
-                            ELSE base_price 
-                        END as effective_price,
-                        CASE 
-                            WHEN adjusted_price IS NOT NULL AND adjusted_price > 0 AND base_price > 0 
-                            THEN ROUND(((base_price - adjusted_price) / base_price) * 100)
-                            ELSE 0
-                        END as discount_percentage
-                 FROM {$price_types_table} 
-                 WHERE trip_id = %d AND pricing_type = 'traveler_category' AND (
-                     (adjusted_price IS NOT NULL AND adjusted_price > 0) OR 
-                     (base_price IS NOT NULL AND base_price > 0)
-                 )
-                 ORDER BY effective_price ASC",
-                $trip->id
-            ));
-            
-            if ($all_price_types && count($all_price_types) > 0) {
-                $min_price_row = $all_price_types[0];
-                $trip->effective_price_min = (float)$min_price_row->effective_price;
-                $trip->min_category_original_price = (float)$min_price_row->original_price;
-                
-                $max_discount = 0;
-                foreach ($all_price_types as $price_type) {
-                    if ($price_type->discount_percentage > $max_discount) {
-                        $max_discount = $price_type->discount_percentage;
-                    }
-                }
-                $trip->max_discount_percentage = $max_discount;
-            }
-        } else {
-            // Regular pricing logic
-            if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
-                $trip->effective_price_min = (float)$trip->discounted_price;
-            } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
-                $trip->effective_price_min = (float)$trip->sale_price;
-            } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
-                $trip->effective_price_min = (float)$trip->original_price;
-            }
+        // Regular pricing logic only (traveler-based table removed)
+        if (!empty($trip->discounted_price) && (float)$trip->discounted_price > 0) {
+            $trip->effective_price_min = (float)$trip->discounted_price;
+        } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+            $trip->effective_price_min = (float)$trip->sale_price;
+        } elseif (!empty($trip->original_price) && (float)$trip->original_price > 0) {
+            $trip->effective_price_min = (float)$trip->original_price;
         }
     }
 
@@ -539,18 +450,7 @@ class TripRepository extends BaseRepository
         $trip->categories = $categories ?: [];
         
         // Load price types for traveler-based pricing
-        if (!empty($trip->pricing_type) && $trip->pricing_type === 'traveler_based') {
-            $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
-            $price_types = $wpdb->get_results($wpdb->prepare(
-                "SELECT * FROM {$tripPricingTable}
-                 WHERE trip_id = %d AND pricing_type = 'traveler_category'
-                 ORDER BY original_price ASC",
-                $trip->id
-            ));
-            $trip->price_types = $price_types ?: [];
-        } else {
-            $trip->price_types = [];
-        }
+        $trip->price_types = [];
     }
 
     /**
@@ -698,31 +598,8 @@ class TripRepository extends BaseRepository
      */
     public function getPriceTypes(int $tripId): array
     {
-        global $wpdb;
-        
-        // Use TripPricingTable for pricing data and ClassificationsTable for traveler categories
-        $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
-        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
-        
-        $sql = $wpdb->prepare(
-                "SELECT tpt.*, c.name as category_label, c.slug as category_slug 
-                 FROM {$tripPricingTable} tpt
-                 LEFT JOIN {$classificationsTable} c ON tpt.category_id = c.id
-                 WHERE tpt.trip_id = %d AND tpt.pricing_type = 'traveler_category'
-                 ORDER BY tpt.id ASC",
-                $tripId
-        );
-        
-        error_log("Yatra getPriceTypes: SQL=" . $sql);
-        
-        $results = $wpdb->get_results($sql) ?: [];
-        
-        error_log("Yatra getPriceTypes: tripId={$tripId}, count=" . count($results));
-        if (!empty($results)) {
-            error_log("Yatra getPriceTypes: results=" . json_encode($results));
-        }
-        
-        return $results;
+        // Table removed: return empty price types
+        return [];
     }
 
     /**
@@ -987,78 +864,71 @@ class TripRepository extends BaseRepository
      */
     public function savePriceTypes(int $tripId, array $priceTypes): void
     {
-        global $wpdb;
-        
-        $table = TripPricingTable::getTableName();
-        
-        error_log("Yatra savePriceTypes: START - tripId={$tripId}, count=" . count($priceTypes));
-        error_log("Yatra savePriceTypes: priceTypes=" . json_encode($priceTypes));
-        
-        // Delete existing traveler-category price types for this trip
-        $deleteResult = $wpdb->query($wpdb->prepare(
-            "DELETE FROM `{$table}` WHERE `trip_id` = %d AND `pricing_type` = 'traveler_category'",
-            $tripId
-        ));
-        
-        error_log("Yatra savePriceTypes: Deleted {$deleteResult} existing price types");
-        
-        // Insert new price types
-        if (!empty($priceTypes)) {
-            // Track category IDs to prevent duplicates in input
-            $processedCategories = [];
-            
-            foreach ($priceTypes as $index => $priceType) {
-                error_log("Yatra savePriceTypes: Processing index={$index}, priceType=" . json_encode($priceType));
-                
-                $categoryId = (int) ($priceType['category_id'] ?? 0);
-                
-                // Skip if category_id is 0 or already processed (duplicate in input)
-                if ($categoryId <= 0) {
-                    error_log("Yatra savePriceTypes: Skipping - invalid category_id={$categoryId}");
-                    continue;
-                }
-                
-                if (in_array($categoryId, $processedCategories, true)) {
-                    error_log("Yatra savePriceTypes: Skipping - duplicate category_id={$categoryId}");
-                    continue;
-                }
-                
-                $processedCategories[] = $categoryId;
-                
-                $basePrice = (float) ($priceType['original_price'] ?? $priceType['base_price'] ?? 0);
-                $adjustedPrice = isset($priceType['discounted_price']) && $priceType['discounted_price'] !== '' && $priceType['discounted_price'] !== null
-                    ? (float) $priceType['discounted_price']
-                    : null;
-                
-                $insertData = [
-                    'trip_id' => $tripId,
-                    'pricing_type' => 'traveler_category',
-                    'category_id' => $categoryId,
-                    'base_price' => $basePrice,
-                    'adjusted_price' => $adjustedPrice,
-                    'price_per' => 'person',
-                    'currency' => get_option('yatra_currency', 'USD'),
-                    'min_quantity' => 1,
-                    'is_default' => $index === 0 ? 1 : 0,
-                    'sort_order' => $index,
-                    'is_active' => 1,
-                ];
-                
-                error_log("Yatra savePriceTypes: Inserting data=" . json_encode($insertData));
-                
-                $result = $wpdb->insert($table, $insertData, ['%d','%s','%d','%f','%f','%s','%s','%d','%d','%d','%d']);
-                
-                if ($result === false) {
-                    error_log("Yatra savePriceTypes: INSERT FAILED - " . $wpdb->last_error);
-                } else {
-                    error_log("Yatra savePriceTypes: INSERT SUCCESS - insert_id=" . $wpdb->insert_id);
-                }
-            }
-        } else {
-            error_log("Yatra savePriceTypes: No price types to insert (empty array)");
+        if (empty($priceTypes)) {
+            return;
         }
-        
-        error_log("Yatra savePriceTypes: END");
+
+        // Compute minimal pricing values from provided price types
+        $minOriginal   = PHP_FLOAT_MAX;
+        $minDiscounted = PHP_FLOAT_MAX;
+        $minSale       = PHP_FLOAT_MAX;
+
+        foreach ($priceTypes as $priceType) {
+            $original   = isset($priceType['original_price']) ? (float) $priceType['original_price'] : null;
+            $discounted = isset($priceType['discounted_price']) ? (float) $priceType['discounted_price'] : null;
+            $sale       = isset($priceType['sale_price']) ? (float) $priceType['sale_price'] : null;
+
+            if ($original !== null && $original > 0 && $original < $minOriginal) {
+                $minOriginal = $original;
+            }
+            if ($discounted !== null && $discounted > 0 && $discounted < $minDiscounted) {
+                $minDiscounted = $discounted;
+            }
+            if ($sale !== null && $sale > 0 && $sale < $minSale) {
+                $minSale = $sale;
+            }
+        }
+
+        // Normalize infinity values to null
+        $minOriginal   = ($minOriginal === PHP_FLOAT_MAX)   ? null : $minOriginal;
+        $minDiscounted = ($minDiscounted === PHP_FLOAT_MAX) ? null : $minDiscounted;
+        $minSale       = ($minSale === PHP_FLOAT_MAX)       ? null : $minSale;
+
+        // Determine final prices to store on trips table
+        $finalOriginal   = $minOriginal;
+        $finalDiscounted = $minDiscounted ?? null;
+        $finalSale       = $minSale ?? null;
+
+        // If no discounted/sale but original exists, keep it; else leave unchanged
+        $data   = [];
+        $format = [];
+
+        // Persist full price_types JSON for reference (stored on trips table)
+        $data['price_types'] = wp_json_encode($priceTypes);
+        $format[] = '%s';
+
+        if ($finalOriginal !== null) {
+            $data['original_price'] = $finalOriginal;
+            $format[] = '%f';
+        }
+        if ($finalDiscounted !== null) {
+            $data['discounted_price'] = $finalDiscounted;
+            $format[] = '%f';
+        }
+        if ($finalSale !== null) {
+            $data['sale_price'] = $finalSale;
+            $format[] = '%f';
+        }
+
+        if (!empty($data)) {
+            $this->wpdb->update(
+                TripsTable::getTableName(),
+                $data,
+                ['id' => $tripId],
+                $format,
+                ['%d']
+            );
+        }
     }
 
     /**
@@ -1561,14 +1431,6 @@ class TripRepository extends BaseRepository
         // Get all active trips first
         $all_trips = $this->all($args);
         
-        // DEBUG: Log trips found
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA PRICE RANGE DEBUG - Found ' . count($all_trips) . ' active trips');
-            if (!empty($all_trips)) {
-                error_log('YATRA PRICE RANGE DEBUG - First trip sample: ' . print_r($all_trips[0], true));
-            }
-        }
-        
         if (empty($all_trips)) {
             return [];
         }
@@ -1578,50 +1440,7 @@ class TripRepository extends BaseRepository
             return $trip->id;
         }, $all_trips);
         
-        // Get minimum prices for each trip from all pricing sources
-        // Using TripPricingTable for pricing data
-        $prices_table = TripPricingTable::getTableName();
-        $availability_table = TripAvailabilityRulesTable::getTableName();
-        
-        // Get minimum prices from price types
-        $price_types_sql = "
-            SELECT trip_id, MIN(LEAST(
-                NULLIF(sale_price, 0), 
-                NULLIF(discounted_price, 0), 
-                NULLIF(original_price, 0)
-            )) as min_price
-            FROM {$prices_table}
-            WHERE trip_id IN (" . implode(',', array_fill(0, count($trip_ids), '%d')) . ")
-            GROUP BY trip_id
-        ";
-        
-        // Get minimum prices from availability rules
-        $availability_sql = "
-            SELECT 
-                trip_id, 
-                MIN(LEAST(
-                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].sale_price'), 'null'),
-                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].discounted_price'), 'null'),
-                    NULLIF(JSON_EXTRACT(traveler_pricing, '$[*].original_price'), 'null'),
-                    NULLIF(sale_price, 0),
-                    NULLIF(original_price, 0)
-                )) as min_price
-            FROM {$availability_table}
-            WHERE trip_id IN (" . implode(',', array_fill(0, count($trip_ids), '%d')) . ")
-                AND status = 'active'
-            GROUP BY trip_id
-        ";
-        
-        // Execute queries with trip IDs
-        $price_type_prices = $wpdb->get_results(
-            $wpdb->prepare(
-                $price_types_sql,
-                $trip_ids // Only pass trip_ids once, not twice
-            ),
-            OBJECT_K
-        );
-        
-        // Get trip prices and filter by range
+        // Get trip prices and filter by range (price types table removed)
         $filtered_trips = [];
         
         // DEBUG: Log price filtering process
@@ -1643,11 +1462,6 @@ class TripRepository extends BaseRepository
             }
             if (!empty($trip->original_price) && $trip->original_price > 0) {
                 $trip_min_price = min($trip_min_price, (float)$trip->original_price);
-            }
-            
-            // Check price types
-            if (isset($price_type_prices[$trip_id]) && $price_type_prices[$trip_id]->min_price > 0) {
-                $trip_min_price = min($trip_min_price, (float)$price_type_prices[$trip_id]->min_price);
             }
             
             // If no valid price found, skip

@@ -7,6 +7,8 @@ namespace Yatra\Controllers;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
+use Yatra\Repositories\RecurringAvailabilityRepository;
+use Yatra\Services\RecurringAvailabilityService;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Services\TripService;
 use Yatra\Repositories\TripRevisionRepository;
@@ -548,13 +550,24 @@ class TripController extends BaseController
             
             // Map old field names to new table schema
             if (isset($rawData['booking_deadline'])) {
-                $rawData['booking_deadline_hours'] = $rawData['booking_deadline'];
+                $rawData['booking_deadline_hours'] = is_numeric($rawData['booking_deadline']) ? (int) $rawData['booking_deadline'] : 24;
                 unset($rawData['booking_deadline']);
             }
             
             // Validate and sanitize input data
             TripValidator::validateCreate($rawData);
             $data = TripValidator::sanitize($rawData);
+            
+            // Ensure JSON fields stay in main data (not relationships)
+            if (isset($rawData['included_items'])) {
+                $data['included_items'] = wp_json_encode($rawData['included_items']);
+            }
+            if (isset($rawData['excluded_items'])) {
+                $data['excluded_items'] = wp_json_encode($rawData['excluded_items']);
+            }
+            if (isset($rawData['frontend_tabs'])) {
+                $data['frontend_tabs'] = wp_json_encode($rawData['frontend_tabs']);
+            }
             $data = apply_filters('yatra_trip_create_sanitized_data', $data, $rawData, $request);
             
             // Extract relationships (fields stored in separate tables)
@@ -607,8 +620,19 @@ class TripController extends BaseController
 
             // Map old field names to new table schema
             if (isset($data['booking_deadline'])) {
-                $data['booking_deadline_hours'] = $data['booking_deadline'];
+                $data['booking_deadline_hours'] = is_numeric($data['booking_deadline']) ? (int) $data['booking_deadline'] : 24;
                 unset($data['booking_deadline']);
+            }
+            
+            // Ensure JSON fields stay in main data (not relationships)
+            if (isset($data['included_items'])) {
+                $data['included_items'] = is_string($data['included_items']) ? $data['included_items'] : wp_json_encode($data['included_items']);
+            }
+            if (isset($data['excluded_items'])) {
+                $data['excluded_items'] = is_string($data['excluded_items']) ? $data['excluded_items'] : wp_json_encode($data['excluded_items']);
+            }
+            if (isset($data['frontend_tabs'])) {
+                $data['frontend_tabs'] = is_string($data['frontend_tabs']) ? $data['frontend_tabs'] : wp_json_encode($data['frontend_tabs']);
             }
 
             // Extract relationships (fields stored in separate tables)
@@ -664,6 +688,7 @@ class TripController extends BaseController
             }
 
             // Remove relationships from main data (these should not be in the main table)
+            // Note: included_items, excluded_items, frontend_tabs stay in main data as JSON
             unset(
                 $data['destinations'], 
                 $data['activity_types'], 
@@ -1288,7 +1313,7 @@ class TripController extends BaseController
             // Generate recurring dates
             $recurring_dates = [];
             try {
-                $recurringService = new \Yatra\Services\RecurringAvailabilityService();
+                $recurringService = new RecurringAvailabilityService(new RecurringAvailabilityRepository());
                 $fromDate = date('Y-m-d');
                 $toDate = date('Y-m-d', strtotime('+90 days')); // Show next 90 days
                 $generatedDates = $recurringService->generateDatesForTrip($id, $fromDate, $toDate);
@@ -1464,6 +1489,11 @@ class TripController extends BaseController
             $current_time = time();
             
             foreach ($trip_data->availability_dates as $avail) {
+                if (empty($avail->departure_date)) {
+                    // Skip entries without a valid departure date
+                    continue;
+                }
+
                 $departure_date = strtotime($avail->departure_date);
                 
                 // Check booking cutoff - show all dates regardless of cutoff time

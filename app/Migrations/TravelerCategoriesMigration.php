@@ -498,85 +498,12 @@ class TravelerCategoriesMigration extends BaseMigration
             "SELECT COUNT(*) FROM {$table} WHERE slug = %s",
             $slug
         ));
+        
+        Logger::info("Slug exists result", [
+            'slug' => $slug,
+            'count' => $count
+        ]);
 
         return $count > 0;
-    }
-
-    /**
-     * Create price type assignment
-     */
-    private function createPriceType(array $data): ?int
-    {
-        $table = $this->wpdb->prefix . 'yatra_trip_price_types';
-        
-        // Check if this assignment already exists
-        $existing = $this->wpdb->get_var($this->wpdb->prepare(
-            "SELECT id FROM {$table} WHERE trip_id = %d AND category_id = %d",
-            $data['trip_id'],
-            $data['category_id']
-        ));
-
-        if ($existing) {
-            Logger::info("Price type assignment already exists, updating", [
-                'trip_id' => $data['trip_id'],
-                'category_id' => $data['category_id'],
-                'existing_id' => $existing
-            ]);
-
-            // Update existing record
-            $result = $this->wpdb->update(
-                $table,
-                [
-                    'original_price' => $data['regular_price'],
-                    'sale_price' => $data['sales_price'] > 0 ? $data['sales_price'] : null,
-                    'min_quantity' => $data['minimum_pax'],
-                    'max_quantity' => $data['maximum_pax'] > 0 ? $data['maximum_pax'] : null,
-                    'updated_at' => current_time('mysql')
-                ],
-                [
-                    'trip_id' => $data['trip_id'],
-                    'category_id' => $data['category_id']
-                ],
-                ['%f', '%f', '%d', '%d', '%s'],
-                ['%d', '%d']
-            );
-
-            return $result !== false ? (int) $existing : null;
-        }
-
-        Logger::info("Creating new price type assignment", [
-            'trip_id' => $data['trip_id'],
-            'category_id' => $data['category_id'],
-            'original_price' => $data['regular_price'],
-            'sale_price' => $data['sales_price']
-        ]);
-
-        // Create new assignment
-        $result = $this->wpdb->insert(
-            $table,
-            [
-                'trip_id' => $data['trip_id'],
-                'category_id' => $data['category_id'],
-                'original_price' => $data['regular_price'],
-                'sale_price' => $data['sales_price'] > 0 ? $data['sales_price'] : null,
-                'min_quantity' => $data['minimum_pax'],
-                'max_quantity' => $data['maximum_pax'] > 0 ? $data['maximum_pax'] : null,
-                'created_at' => current_time('mysql'),
-                'updated_at' => current_time('mysql')
-            ],
-            ['%d', '%d', '%f', '%f', '%d', '%d', '%s', '%s']
-        );
-
-        $insertId = $result ? (int) $this->wpdb->insert_id : null;
-        
-        Logger::info("Price type assignment result", [
-            'trip_id' => $data['trip_id'],
-            'category_id' => $data['category_id'],
-            'insert_result' => $result,
-            'insert_id' => $insertId,
-            'wpdb_error' => $this->wpdb->last_error
-        ]);
-
-        return $insertId;
     }
 }

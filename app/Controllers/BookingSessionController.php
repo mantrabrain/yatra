@@ -16,8 +16,6 @@ use Yatra\Services\DepartureService;
 use Yatra\Services\AvailabilityService;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
-use Yatra\Database\Tables\TripPricingTable;
-use Yatra\Database\Tables\ClassificationsTable;
 
 /**
  * Booking Session REST API Controller
@@ -2231,11 +2229,10 @@ class BookingSessionController extends BaseController
         }
         
         // Get price types for traveler-based pricing
-        $price_types_table = TripPricingTable::getTableName();
-        $categories_table = ClassificationsTable::getTableName();
-        
-        // Use AvailabilityService to get trip price types
-        $price_types = $this->availabilityService->getTripPriceTypes($trip_id);
+        // Table removed: rely on availability price_types or trip->price_types only
+        $price_types_table = null;
+        $categories_table = null;
+        $price_types = [];
         
         $resolved_pricing_type = !empty($pricing_type_from_request) ? $pricing_type_from_request : ($trip->pricing_type ?? 'regular');
 

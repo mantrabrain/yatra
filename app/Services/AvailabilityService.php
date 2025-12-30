@@ -414,8 +414,8 @@ class AvailabilityService
      */
     public function getTripPriceTypes(int $tripId): array
     {
-        $tripPriceTypeRepository = new \Yatra\Repositories\TripPriceTypeRepository();
-        return $tripPriceTypeRepository->getByTripId($tripId);
+        // Table deprecated/removed: return empty so callers fall back gracefully
+        return [];
     }
 }
 

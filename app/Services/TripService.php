@@ -145,6 +145,11 @@ class TripService extends BaseService
         $this->validatePricing($data);
         $this->validateDuration($data);
 
+        // Drop per-trip currency (managed globally)
+        if (isset($data['currency'])) {
+            unset($data['currency']);
+        }
+
         // Process data
         $processedData = $this->processBeforeCreate($data);
 
@@ -319,9 +324,9 @@ class TripService extends BaseService
             $data['status'] = 'draft';
         }
 
-        // Set default currency
-        if (empty($data['currency'])) {
-            $data['currency'] = 'USD';
+        // Currency is managed globally (not per-trip); drop any incoming value
+        if (isset($data['currency'])) {
+            unset($data['currency']);
         }
 
         // Set created_by

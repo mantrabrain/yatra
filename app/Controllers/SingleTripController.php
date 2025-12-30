@@ -368,40 +368,8 @@ class SingleTripController
      */
     private function getPriceTypes(int $trip_id): array
     {
-        // Use TripPricingTable for pricing data and ClassificationsTable for traveler categories
-        $tripPricingTable = \Yatra\Database\Tables\TripPricingTable::getTableName();
-        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
-        
-        $sql = $this->wpdb->prepare(
-                "SELECT pt.*, tc.name as category_label, tc.slug as category_slug, 
-                        tc.description as category_description
-                 FROM {$tripPricingTable} pt
-                 LEFT JOIN {$classificationsTable} tc ON pt.category_id = tc.id
-                 WHERE pt.trip_id = %d AND pt.pricing_type = 'traveler_category'
-             ORDER BY pt.id ASC",
-                $trip_id
-        );
-        
-        $price_types = $this->wpdb->get_results($sql) ?: [];
-        
-        // Format price types for frontend use
-        foreach ($price_types as $pt) {
-            $pt->original_price = (float) $pt->original_price;
-            $pt->discounted_price = $pt->discounted_price ? (float) $pt->discounted_price : null;
-            $pt->sale_price = $pt->sale_price ? (float) $pt->sale_price : null;
-            $pt->min_quantity = (int) ($pt->min_quantity ?? 1);
-            $pt->max_quantity = $pt->max_quantity ? (int) $pt->max_quantity : null;
-            $pt->age_min = $pt->age_min ? (int) $pt->age_min : null;
-            $pt->age_max = $pt->age_max ? (int) $pt->age_max : null;
-            $pt->pricing_mode = $pt->pricing_mode ?? 'per_person';
-            $pt->min_pax = $pt->min_pax ? (int) $pt->min_pax : null;
-            $pt->max_pax = $pt->max_pax ? (int) $pt->max_pax : null;
-            
-            // Calculate effective price (sale_price > discounted_price > original_price)
-            $pt->effective_price = $pt->sale_price ?? $pt->discounted_price ?? $pt->original_price;
-        }
-        
-        return $price_types;
+        // Table removed: return empty price types for traveler-based pricing
+        return [];
     }
 
     /**
