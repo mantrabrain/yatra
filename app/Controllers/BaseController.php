@@ -269,6 +269,23 @@ abstract class BaseController
     }
 
     /**
+     * Public permission callback that bypasses WordPress cookie validation
+     * 
+     * This is needed for endpoints that should work without authentication,
+     * especially for guest users. Using __return_true alone causes WordPress
+     * to validate cookies when they're present, leading to "Cookie check failed" errors.
+     * 
+     * This method explicitly tells WordPress to skip cookie validation.
+     */
+    public function public_permission_callback(?WP_REST_Request $request = null): bool
+    {
+        // Remove cookie validation requirement for this endpoint
+        // This allows guest users to access the endpoint without nonce validation
+        remove_filter('rest_authentication_errors', 'rest_cookie_check_errors', 100);
+        return true;
+    }
+
+    /**
      * Prepare item for response
      */
     protected function prepare_item_for_response($item, WP_REST_Request $request): array

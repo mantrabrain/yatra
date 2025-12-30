@@ -1874,7 +1874,7 @@ class TripRepository extends BaseRepository
         $availability_table = \Yatra\Database\Tables\TripAvailabilityDatesTable::getTableName();
         
         return $wpdb->get_row($wpdb->prepare(
-            "SELECT t.*, a.departure_date, a.seats_total, a.seats_booked, a.status as availability_status
+            "SELECT t.*, a.departure_date, a.seats_total, a.seats_reserved AS seats_booked, a.status as availability_status
              FROM {$trips_table} t
              LEFT JOIN {$availability_table} a ON a.trip_id = t.id
              WHERE t.id = %d",

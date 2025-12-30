@@ -613,7 +613,7 @@ class SingleTripController
         // Get similar trips based on category or difficulty
         $similar = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT id, title, slug, featured_image, duration_days, duration_nights, 
+                "SELECT id, title, slug, featured_image_id, featured_image_url, duration_days, duration_nights, 
                         original_price, sale_price, currency, difficulty_level, 
                         short_description
                  FROM {$this->table_trips} 
@@ -633,7 +633,7 @@ class SingleTripController
         if (empty($similar)) {
             $similar = $this->wpdb->get_results(
                 $this->wpdb->prepare(
-                    "SELECT id, title, slug, featured_image, duration_days, duration_nights, 
+                    "SELECT id, title, slug, featured_image_id, featured_image_url, duration_days, duration_nights, 
                             original_price, sale_price, currency, difficulty_level, 
                             short_description
                      FROM {$this->table_trips} 
@@ -655,7 +655,14 @@ class SingleTripController
             $s->original_price = (float) ($s->original_price ?? 0);
             $s->sale_price = (float) ($s->sale_price ?? $s->original_price);
             $s->currency = $s->currency ?? get_option('yatra_currency', 'USD');
-            $s->featured_image_url = $this->getFeaturedImageUrl($s->featured_image ?? '');
+            // Handle featured image - use URL if available, otherwise get from ID
+            if (!empty($s->featured_image_url)) {
+                // URL is already set, keep it as is
+            } elseif (!empty($s->featured_image_id)) {
+                $s->featured_image_url = $this->getFeaturedImageUrl($s->featured_image_id);
+            } else {
+                $s->featured_image_url = $this->getFeaturedImageUrl('');
+            }
             
             // Calculate discount
             $s->discount_percentage = 0;
@@ -803,7 +810,7 @@ class SingleTripController
     {
         // Using hardcoded table names for legacy itinerary tables since they use a different schema
         // Note: Items and Item Types now use ClassificationsTable with unified approach
-        $table_days = $this->wpdb->prefix . 'yatra_trip_itinerary_days';
+        $table_days = $this->wpdb->prefix . 'yatra_new_trip_itinerary_days';
         $table_entries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
         $table_classifications = ClassificationsTable::getTableName();
 

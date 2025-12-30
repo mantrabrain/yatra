@@ -1501,19 +1501,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 echo '<!-- DEBUG: Trip ID: ' . ($trip->id ?? 'NO ID') . ' -->';
                 echo '<!-- DEBUG: Original Price: ' . var_export($trip->original_price, true) . ' -->';
                 echo '<!-- DEBUG: Discounted Price: ' . var_export($trip->discounted_price, true) . ' -->';
-                echo '<!-- DEBUG: Price: ' . var_export($trip->price, true) . ' -->';
+                echo '<!-- DEBUG: Sale Price: ' . var_export($trip->sale_price, true) . ' -->';
                 echo '<!-- DEBUG: Effective Price Min: ' . var_export($trip->effective_price_min, true) . ' -->';
                 
-                // Determine current price: Priority: discounted_price > original_price > price field
+                // Determine current price: Priority: discounted_price > original_price > sale_price
                 if ($discounted > 0) {
                     $current = $discounted;
                     echo '<!-- DEBUG: Using discounted price: ' . $current . ' -->';
                 } elseif ($original > 0) {
                     $current = $original;
                     echo '<!-- DEBUG: Using original price: ' . $current . ' -->';
-                } elseif (!empty($trip->price) && (float)$trip->price > 0) {
-                    $current = (float) $trip->price;
-                    echo '<!-- DEBUG: Using price field: ' . $current . ' -->';
+                } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
+                    $current = (float) $trip->sale_price;
+                    echo '<!-- DEBUG: Using sale_price field: ' . $current . ' -->';
                 } else {
                     $current = 0;
                     echo '<!-- DEBUG: No price found, current = 0 -->';
@@ -2907,7 +2907,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Update display
         if (totalAmountElement) {
-            totalAmountElement.textContent = '<?php echo yatra_get_currency_symbol(); ?>' + finalTotal.toFixed(2);
+            totalAmountElement.textContent = '<?php echo yatra_get_currency_symbol($trip->currency ?? 'USD'); ?>' + finalTotal.toFixed(2);
         }
 
         // Show/hide group discount indicator

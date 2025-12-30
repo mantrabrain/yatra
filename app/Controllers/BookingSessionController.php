@@ -13,6 +13,7 @@ use Yatra\Repositories\TripRepository;
 use Yatra\Repositories\BookingRepository;
 use Yatra\Repositories\DiscountRepository;
 use Yatra\Services\DepartureService;
+use Yatra\Services\AvailabilityService;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
 use Yatra\Database\Tables\TripPricingTable;
@@ -55,6 +56,11 @@ class BookingSessionController extends BaseController
     private DepartureService $departureService;
 
     /**
+     * @var AvailabilityService
+     */
+    private AvailabilityService $availabilityService;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -69,6 +75,9 @@ class BookingSessionController extends BaseController
             new \Yatra\Repositories\BookingDepartureRepository(),
             $this->bookingRepository,
             $this->tripRepository
+        );
+        $this->availabilityService = new AvailabilityService(
+            new \Yatra\Repositories\AvailabilityRepository()
         );
     }
 
@@ -86,28 +95,28 @@ class BookingSessionController extends BaseController
         register_rest_route($this->namespace, '/booking/session', [
             'methods' => 'POST',
             'callback' => [$this, 'set_session'],
-            'permission_callback' => '__return_true', // Allow all users (guests too)
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
 
         // Get booking session
         register_rest_route($this->namespace, '/booking/session', [
             'methods' => 'GET',
             'callback' => [$this, 'get_session'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
 
         // Clear booking session
         register_rest_route($this->namespace, '/booking/session', [
             'methods' => 'DELETE',
             'callback' => [$this, 'clear_session'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
 
         // Get trip data for booking
         register_rest_route($this->namespace, '/booking/trip/(?P<id>\d+)', [
             'methods' => 'GET',
             'callback' => [$this, 'get_trip_for_booking'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
             'args' => [
                 'id' => [
                     'required' => true,
@@ -121,35 +130,35 @@ class BookingSessionController extends BaseController
         register_rest_route($this->namespace, '/booking/create', [
             'methods' => 'POST',
             'callback' => [$this, 'create_booking'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
         
         // Apply coupon code
         register_rest_route($this->namespace, '/booking/coupon/apply', [
             'methods' => 'POST',
             'callback' => [$this, 'apply_coupon'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
         
         // Remove coupon code
         register_rest_route($this->namespace, '/booking/coupon/remove', [
             'methods' => 'POST',
             'callback' => [$this, 'remove_coupon'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
         
         // Calculate booking summary (AJAX endpoint for dynamic updates)
         register_rest_route($this->namespace, '/booking/summary', [
             'methods' => 'POST',
             'callback' => [$this, 'calculate_summary'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
         
         // Complete payment for client-side gateways (Square, etc.)
         register_rest_route($this->namespace, '/payment/(?P<gateway>[a-z_]+)/complete', [
             'methods' => 'POST',
             'callback' => [$this, 'complete_gateway_payment'],
-            'permission_callback' => '__return_true',
+            'permission_callback' => [$this, 'public_permission_callback'],
         ]);
     }
     

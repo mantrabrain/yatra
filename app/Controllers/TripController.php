@@ -51,11 +51,7 @@ class TripController extends BaseController
     {
         $namespace = 'yatra/v1';
         $base = 'trips';
-
-        // Debug: Log route registration
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra TripController: Registering routes for namespace: ' . $namespace . ', base: ' . $base);
-        }
+ 
 
         // Add a simple test endpoint first
         register_rest_route($namespace, '/test', [

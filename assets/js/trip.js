@@ -728,9 +728,9 @@
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
                 },
-                credentials: 'same-origin'
+                // Public endpoint: do not send cookies/nonces
+                credentials: 'omit',
             })
             .then(response => {
                 console.log('Response status:', response.status);
@@ -2007,7 +2007,6 @@
 
             const base = (window.yatraTripData?.restUrl || window.yatraTripData?.apiUrl || '/wp-json/yatra/v1').replace(/\/$/, '');
             const url = `${base}/trips/${tripId}/availability-template?sort=${encodeURIComponent(sortKey || 'date-asc')}`;
-            const nonce = window.yatraTripData?.nonce || '';
 
             const prevDisabled = !!(selectEl && selectEl.disabled);
             if (selectEl) {
@@ -2018,9 +2017,9 @@
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce,
                 },
-                credentials: 'same-origin',
+                // Public endpoint: do not send cookies/nonces
+                credentials: 'omit',
             })
             .then((resp) => resp.json())
             .then((data) => {
@@ -2072,10 +2071,9 @@
             // credentials: 'same-origin' is required to send cookies for session
             fetch(window.yatraTripData.apiUrl + '/booking/session', {
                 method: 'POST',
-                credentials: 'same-origin',
+                credentials: 'same-origin', // needed for PHP session cookie
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': window.yatraTripData.nonce
                 },
                 body: JSON.stringify(sessionPayload)
             })
@@ -2714,20 +2712,23 @@
                         this.showBookingError(newBtn, 'Unable to process booking. Invalid trip data.');
                         return;
                     }
-                    
+
+                    // Build minimal session payload for legacy book-now flow
+                    const sessionPayload = {
+                        trip_id: parseInt(tripId),
+                        travel_date: date || '',
+                        travelers: travelers,
+                        availability_id: itemIndex
+                    };
+
                     // Set booking session via REST API
                     fetch(window.yatraTripData.apiUrl + '/booking/session', {
                         method: 'POST',
-                        credentials: 'same-origin',
+                        credentials: 'same-origin', // needs PHP session cookie
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-WP-Nonce': window.yatraTripData.nonce
                         },
-                        body: JSON.stringify({
-                            trip_id: parseInt(tripId),
-                            travelers: travelers,
-                            travel_date: date || ''
-                        })
+                        body: JSON.stringify(sessionPayload)
                     })
                     .then(response => response.json())
                     .then(data => {

@@ -709,13 +709,12 @@
                 sessionPayload.traveler_counts = travelerCounts;
             }
             
-            // Update session via REST API
+            // Update session via REST API (needs session cookie, but no nonce)
             fetch(apiUrl + '/booking/session', {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
                 },
                 body: JSON.stringify(sessionPayload)
             })
@@ -1102,11 +1101,11 @@
         function loadCouponFromSession() {
             fetch(apiUrl + '/booking/session', {
                 method: 'GET',
+                // Needs session cookie, but no nonce header
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
                 },
-                credentials: 'same-origin'
             })
             .then(response => response.json())
             .then(response => {
@@ -1243,11 +1242,11 @@
             
             fetch(apiUrl + '/booking/session', {
                 method: 'POST',
+                // Needs session cookie, but no nonce header
+                credentials: 'same-origin',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
                 },
-                credentials: 'same-origin',
                 body: JSON.stringify({
                     additional_services: serviceIds
                 })

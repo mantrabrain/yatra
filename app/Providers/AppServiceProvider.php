@@ -2,6 +2,7 @@
 
 namespace Yatra\Providers;
 
+use WP_REST_Request;
 use Yatra\Core\Database;
 
 /**
@@ -41,6 +42,7 @@ class AppServiceProvider
 
         // Initialize REST API hooks
         \Yatra\Hooks\RestApiHooks::init();
+
     }
 
     /**
