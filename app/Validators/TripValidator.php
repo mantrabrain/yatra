@@ -293,8 +293,8 @@ class TripValidator
             $sanitized['original_price'] = (float)$data['original_price'];
         }
 
-        if (isset($data['sale_price'])) {
-            $sanitized['sale_price'] = (float)$data['sale_price'];
+        if (isset($data['discounted_price'])) {
+            $sanitized['discounted_price'] = (float)$data['discounted_price'];
         }
 
         if (isset($data['duration_days'])) {

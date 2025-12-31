@@ -449,8 +449,8 @@ class TripRepository extends BaseRepository
         ));
         $trip->categories = $categories ?: [];
         
-        // Load price types for traveler-based pricing
-        $trip->price_types = [];
+        // Load price types for traveler-based pricing (from trips table JSON)
+        $trip->price_types = $this->getPriceTypes((int) $trip->id);
     }
 
     /**
@@ -598,8 +598,35 @@ class TripRepository extends BaseRepository
      */
     public function getPriceTypes(int $tripId): array
     {
-        // Table removed: return empty price types
-        return [];
+        // Read price_types JSON from trips table
+        $table = esc_sql($this->table);
+        $json  = $this->wpdb->get_var(
+            $this->wpdb->prepare("SELECT price_types FROM `{$table}` WHERE id = %d", $tripId)
+        );
+
+        if (empty($json)) {
+            return [];
+        }
+
+        // Decode JSON safely
+        $decoded = is_string($json) ? json_decode($json, true) : $json;
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        // Normalize each price type entry
+        return array_values(array_filter(array_map(function ($pt) {
+            if (!is_array($pt)) {
+                return null;
+            }
+            return [
+                'category_id'      => isset($pt['category_id']) ? (int) $pt['category_id'] : null,
+                'original_price'   => isset($pt['original_price']) ? (float) $pt['original_price'] : null,
+                'discounted_price' => isset($pt['discounted_price']) ? (float) $pt['discounted_price'] : null,
+                'sale_price'       => isset($pt['sale_price']) ? (float) $pt['sale_price'] : null,
+                'label'            => $pt['label'] ?? ($pt['title'] ?? null),
+            ];
+        }, $decoded)));
     }
 
     /**
@@ -1220,7 +1247,6 @@ class TripRepository extends BaseRepository
             $data['destinations'], 
             $data['activities'], 
             $data['trip_category'],
-            $data['price_types'],
             $data['highlights'],
             $data['gallery_images'],
             $data['faqs'],
@@ -1308,8 +1334,8 @@ class TripRepository extends BaseRepository
             $data['availability_dates'],
             $data['attributes']
         );
-        
-        // Update main trip record
+
+             // Update main trip record
         $result = $this->update($id, $data);
         
         // Update relationships if provided

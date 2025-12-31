@@ -55,18 +55,7 @@ class TripController extends BaseController
         $base = 'trips';
  
 
-        // Add a simple test endpoint first
-        register_rest_route($namespace, '/test', [
-            [
-                'methods' => \WP_REST_Server::READABLE,
-                'callback' => function() {
-                    return new \WP_REST_Response(['message' => 'TripController test endpoint working', 'timestamp' => time()], 200);
-                },
-                'permission_callback' => '__return_true',
-            ],
-        ]);
-
-        register_rest_route($namespace, '/' . $base, [
+       register_rest_route($namespace, '/' . $base, [
             [
                 'methods' => \WP_REST_Server::READABLE,
                 'callback' => [$this, 'get_items'],
@@ -568,6 +557,12 @@ class TripController extends BaseController
             if (isset($rawData['frontend_tabs'])) {
                 $data['frontend_tabs'] = wp_json_encode($rawData['frontend_tabs']);
             }
+            // Remove legacy/removed columns not present in trips table
+            foreach (['currency', 'testimonials', 'countries', 'regions', 'landmarks', 'tags'] as $deprecatedKey) {
+                if (isset($data[$deprecatedKey])) {
+                    unset($data[$deprecatedKey]);
+                }
+            }
             $data = apply_filters('yatra_trip_create_sanitized_data', $data, $rawData, $request);
             
             // Extract relationships (fields stored in separate tables)
@@ -634,6 +629,12 @@ class TripController extends BaseController
             if (isset($data['frontend_tabs'])) {
                 $data['frontend_tabs'] = is_string($data['frontend_tabs']) ? $data['frontend_tabs'] : wp_json_encode($data['frontend_tabs']);
             }
+            // Remove legacy/removed columns not present in trips table
+            foreach (['currency', 'testimonials', 'countries', 'regions', 'landmarks', 'tags'] as $deprecatedKey) {
+                if (isset($data[$deprecatedKey])) {
+                    unset($data[$deprecatedKey]);
+                }
+            }
 
             // Extract relationships (fields stored in separate tables)
             $relationships = [];
@@ -675,10 +676,12 @@ class TripController extends BaseController
 
             // Validate and sanitize input data
             TripValidator::validateUpdate($data, $id);
-            $data = TripValidator::sanitize($data);
-             $data = apply_filters('yatra_trip_update_sanitized_data', $data, $id, $relationships, $request);
 
-            $extraUnsetKeys = apply_filters('yatra_trip_update_unset_keys', [], $data, $relationships, $request);
+            $data = TripValidator::sanitize($data);
+
+            $data = apply_filters('yatra_trip_update_sanitized_data', $data, $id, $relationships, $request);
+
+           $extraUnsetKeys = apply_filters('yatra_trip_update_unset_keys', [], $data, $relationships, $request);
             if (is_array($extraUnsetKeys) && !empty($extraUnsetKeys)) {
                 foreach ($extraUnsetKeys as $key) {
                     if (is_string($key) && isset($data[$key])) {
@@ -693,7 +696,6 @@ class TripController extends BaseController
                 $data['destinations'], 
                 $data['activity_types'], 
                 $data['trip_category'],
-                $data['price_types'],
                 $data['highlights'],
                 $data['gallery_images'],
                 $data['faqs'],
@@ -702,9 +704,17 @@ class TripController extends BaseController
                 $data['attributes']
             );
 
-            return $this->success_response([
-                'message' => __('Trip updated successfully', 'yatra'),
-            ]);
+            // Update via service to persist main data and relations
+            $updated = $this->service->updateWithRelations($id, $data, $relationships);
+
+            if (!$updated) {
+                return $this->error_response(__('Failed to update trip', 'yatra'), 500);
+            }
+
+            $trip = $this->service->getWithRelations($id);
+            $prepared = $this->prepare_item_for_response($trip, $request);
+
+            return $this->success_response($prepared, 200);
         } catch (\InvalidArgumentException $e) {
             return $this->error_response($e->getMessage(), 400);
         } catch (\Exception $e) {
@@ -1103,19 +1113,23 @@ class TripController extends BaseController
         if (isset($item->price_types)) {
             error_log("Yatra prepare_item_for_response: price_types found, count=" . count($item->price_types));
             $data['price_types'] = array_map(function ($pt) {
+                // Normalize array to object for consistent access
+                if (is_array($pt)) {
+                    $pt = (object) $pt;
+                }
                 return [
-                    'id' => (int) $pt->id,
-                    'category_id' => (int) $pt->category_id,
-                    'category_label' => $pt->category_label ?? '',
+                    'id' => isset($pt->id) ? (int) $pt->id : 0,
+                    'category_id' => isset($pt->category_id) ? (int) $pt->category_id : null,
+                    'category_label' => $pt->category_label ?? ($pt->label ?? ''),
                     'category_slug' => $pt->category_slug ?? '',
-                    'original_price' => (float) $pt->original_price,
+                    'original_price' => isset($pt->original_price) ? (float) $pt->original_price : null,
                     'discounted_price' => isset($pt->discounted_price) ? (float) $pt->discounted_price : null,
                     'sale_price' => isset($pt->sale_price) ? (float) $pt->sale_price : null,
-                    'is_default' => (bool) $pt->is_default,
-                    'min_quantity' => (int) $pt->min_quantity,
+                    'is_default' => isset($pt->is_default) ? (bool) $pt->is_default : false,
+                    'min_quantity' => isset($pt->min_quantity) ? (int) $pt->min_quantity : 0,
                     'max_quantity' => isset($pt->max_quantity) ? (int) $pt->max_quantity : null,
-                    'valid_from' => $pt->valid_from,
-                    'valid_to' => $pt->valid_to,
+                    'valid_from' => $pt->valid_from ?? null,
+                    'valid_to' => $pt->valid_to ?? null,
                 ];
             }, $item->price_types);
             error_log("Yatra prepare_item_for_response: price_types formatted=" . json_encode($data['price_types']));
