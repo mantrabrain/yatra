@@ -574,6 +574,7 @@ class TripController extends BaseController
                 'highlights' => $rawData['highlights'] ?? [],
                 'gallery_images' => $rawData['gallery_images'] ?? [],
                 'faqs' => $rawData['faqs'] ?? [],
+                'downloadable_items' => $rawData['downloadable_items'] ?? [],
                 'itinerary_days' => $rawData['itinerary_days'] ?? [],
                 'availability_dates' => $rawData['availability_dates'] ?? [],
             ];
@@ -661,6 +662,9 @@ class TripController extends BaseController
             }
             if (isset($data['faqs'])) {
                 $relationships['faqs'] = $data['faqs'];
+            }
+            if (isset($data['downloadable_items'])) {
+                $relationships['downloadable_items'] = $data['downloadable_items'];
             }
             if (isset($data['itinerary_days'])) {
                 $relationships['itinerary_days'] = $data['itinerary_days'];
@@ -1111,7 +1115,16 @@ class TripController extends BaseController
         }
 
         if (isset($item->price_types)) {
-            error_log("Yatra prepare_item_for_response: price_types found, count=" . count($item->price_types));
+            // Normalize to array
+            $rawPriceTypes = $item->price_types;
+            if (is_string($rawPriceTypes)) {
+                $decoded = json_decode($rawPriceTypes, true);
+                $rawPriceTypes = is_array($decoded) ? $decoded : [];
+            } elseif (!is_array($rawPriceTypes)) {
+                $rawPriceTypes = [];
+            }
+
+            error_log("Yatra prepare_item_for_response: price_types found, count=" . count($rawPriceTypes));
             $data['price_types'] = array_map(function ($pt) {
                 // Normalize array to object for consistent access
                 if (is_array($pt)) {
@@ -1131,17 +1144,29 @@ class TripController extends BaseController
                     'valid_from' => $pt->valid_from ?? null,
                     'valid_to' => $pt->valid_to ?? null,
                 ];
-            }, $item->price_types);
+            }, $rawPriceTypes);
             error_log("Yatra prepare_item_for_response: price_types formatted=" . json_encode($data['price_types']));
         } else {
             error_log("Yatra prepare_item_for_response: price_types NOT SET on item");
             $data['price_types'] = [];
         }
 
-        // Handle highlights relationship
+        // Handle highlights relationship (send simple strings to match form expectations)
         if (isset($item->highlights)) {
             $data['highlights'] = array_map(function ($h) {
-                return $h->highlight_text ?? '';
+                if (is_object($h) && isset($h->text)) {
+                    return $h->text;
+                }
+                if (is_array($h) && isset($h['text'])) {
+                    return $h['text'];
+                }
+                if (is_object($h) && isset($h->highlight_text)) {
+                    return $h->highlight_text;
+                }
+                if (is_array($h) && isset($h['highlight_text'])) {
+                    return $h['highlight_text'];
+                }
+                return is_string($h) ? $h : '';
             }, $item->highlights);
         }
 
@@ -1158,6 +1183,21 @@ class TripController extends BaseController
                     'is_featured' => (bool) ($img->is_featured ?? false),
                 ];
             }, $item->gallery_images);
+        }
+
+        // Handle FAQs relationship (already normalized in repository)
+        if (isset($item->faqs)) {
+            $data['faqs'] = array_map(function ($faq) {
+                return [
+                    'question'    => $faq->question ?? '',
+                    'answer'      => $faq->answer ?? '',
+                    'category'    => $faq->category ?? '',
+                    'is_featured' => isset($faq->is_featured) ? (bool) $faq->is_featured : false,
+                    'order'       => isset($faq->order) ? (int) $faq->order : 0,
+                ];
+            }, $item->faqs);
+        } else {
+            $data['faqs'] = [];
         }
 
         if (isset($item->itinerary_days)) {

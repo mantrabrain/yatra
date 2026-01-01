@@ -48,6 +48,11 @@ class SingleTripController
     private string $table_reviews;
 
     /**
+     * @var string Trip-category relationship table name
+     */
+    private string $table_trip_cat_rel;
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -58,6 +63,7 @@ class SingleTripController
         $this->table_destinations = ClassificationsTable::getTableName();
         $this->table_activities = ClassificationsTable::getTableName();
         $this->table_reviews = ReviewsTable::getTableName();
+        $this->table_trip_cat_rel = TripClassificationsTable::getTableName();
     }
 
     /**
@@ -581,18 +587,31 @@ class SingleTripController
         // Get similar trips based on category or difficulty
         $similar = $this->wpdb->get_results(
             $this->wpdb->prepare(
-                "SELECT id, title, slug, featured_image_id, featured_image_url, duration_days, duration_nights, 
-                        original_price, sale_price, currency, difficulty_level, 
+                "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights, 
+                        original_price, sale_price, difficulty_level, 
                         short_description
-                 FROM {$this->table_trips} 
-                 WHERE id != %d 
-                 AND status IN ('publish', 'published') 
-                 AND (deleted_at IS NULL OR deleted_at = '0000-00-00 00:00:00')
-                 AND (trip_category = %s OR difficulty_level = %s)
+                 FROM {$this->table_trips} t
+                 WHERE t.id != %d 
+                 AND t.status IN ('publish', 'published') 
+                 AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00')
+                 AND (
+                    EXISTS (
+                        SELECT 1 FROM {$this->table_trip_cat_rel} tc 
+                        WHERE tc.trip_id = t.id 
+                          AND tc.classification_type = 'category'
+                          AND tc.classification_id IN (
+                            SELECT tc2.classification_id 
+                            FROM {$this->table_trip_cat_rel} tc2 
+                            WHERE tc2.trip_id = %d
+                              AND tc2.classification_type = 'category'
+                          )
+                    )
+                    OR t.difficulty_level = %s
+                 )
                  ORDER BY RAND() 
                  LIMIT 4",
                 $trip_id,
-                $trip->trip_category ?? '',
+                $trip_id,
                 $trip->difficulty_level ?? ''
             )
         );
@@ -601,8 +620,8 @@ class SingleTripController
         if (empty($similar)) {
             $similar = $this->wpdb->get_results(
                 $this->wpdb->prepare(
-                    "SELECT id, title, slug, featured_image_id, featured_image_url, duration_days, duration_nights, 
-                            original_price, sale_price, currency, difficulty_level, 
+                    "SELECT id, title, slug, featured_image AS featured_image_id, '' AS featured_image_url, duration_days, duration_nights, 
+                            original_price, sale_price, difficulty_level, 
                             short_description
                      FROM {$this->table_trips} 
                      WHERE id != %d 

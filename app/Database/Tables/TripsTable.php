@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `transportation_details` text,
     
     -- MEDIA (Form Fields)
-    `featured_image_id` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
+    `featured_image` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
     `video_url` varchar(500) DEFAULT NULL,
     `virtual_tour_url` varchar(500) DEFAULT NULL,
     
@@ -173,7 +173,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `idx_bookings_count` (`bookings_count`),
     KEY `idx_avg_rating` (`avg_rating`),
     KEY `idx_deleted_at` (`deleted_at`),
-    KEY `idx_featured_image_id` (`featured_image_id`)
+    KEY `idx_featured_image` (`featured_image`)
 ) {$charsetCollate} COMMENT='Optimized trips table with only used fields';
 SQL;
     }

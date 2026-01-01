@@ -162,7 +162,7 @@ class Trip
     public bool $domestic_flights_included = false;
 
     // Media
-    public ?int $featured_image_id = null;
+    public ?int $featured_image = null;
     public ?string $featured_image_url = null;
     public ?string $video_url = null;
     public ?string $virtual_tour_url = null;
@@ -386,7 +386,7 @@ class Trip
         $trip->domestic_flights_included = (bool) ($data['domestic_flights_included'] ?? false);
 
         // Media
-        $trip->featured_image_id = isset($data['featured_image_id']) ? (int) $data['featured_image_id'] : null;
+        $trip->featured_image = isset($data['featured_image']) ? (int) $data['featured_image'] : null;
         $trip->featured_image_url = $data['featured_image_url'] ?? null;
         $trip->video_url = $data['video_url'] ?? null;
         $trip->virtual_tour_url = $data['virtual_tour_url'] ?? null;
@@ -569,7 +569,7 @@ class Trip
             'internal_transportation' => $this->internal_transportation,
             'international_flights_included' => $this->international_flights_included ? 1 : 0,
             'domestic_flights_included' => $this->domestic_flights_included ? 1 : 0,
-            'featured_image_id' => $this->featured_image_id,
+            'featured_image' => $this->featured_image,
             'featured_image_url' => $this->featured_image_url,
             'video_url' => $this->video_url,
             'virtual_tour_url' => $this->virtual_tour_url,

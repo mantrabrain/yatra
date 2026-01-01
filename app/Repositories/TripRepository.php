@@ -12,6 +12,7 @@ use Yatra\Database\Tables\TripContentTable;
 use Yatra\Database\Tables\TripItineraryDayEntryTable;
 use Yatra\Database\Tables\TripItineraryDaysTable;
 use Yatra\Database\Tables\TripsTable;
+use Yatra\Repositories\TripDownloadRepository;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
@@ -73,6 +74,48 @@ class TripRepository extends BaseRepository
         );
 
         return $result ?: null;
+    }
+
+    /**
+     * Get downloads for a trip (normalized for UI)
+     */
+    public function getDownloads(int $tripId): array
+    {
+        $repo = new TripDownloadRepository();
+        $rows = $repo->getByTripId($tripId);
+
+        return array_map(function ($row) {
+            $metadata = [];
+            if (!empty($row->metadata)) {
+                $decoded = json_decode($row->metadata, true);
+                if (is_array($decoded)) {
+                    $metadata = $decoded;
+                }
+            }
+
+            $attachmentId = $metadata['attachment_id'] ?? null;
+            $protectedPath = $metadata['protected_path'] ?? null;
+
+            // Map access_level to visibility used by UI
+            $visibility = 'booked_only';
+            if ($row->access_level === 'public') {
+                $visibility = 'public';
+            } elseif ($row->access_level === 'registered') {
+                $visibility = 'logged_in';
+            }
+
+            return (object) [
+                'id' => isset($row->id) ? (int) $row->id : 0,
+                'title' => $row->title ?? '',
+                'description' => $row->description ?? '',
+                'attachment_id' => $attachmentId ? (int) $attachmentId : null,
+                'protected_path' => $protectedPath,
+                'content_url' => $row->content_url ?? '',
+                'visibility' => $visibility,
+                'is_downloadable' => isset($row->is_downloadable) ? (bool) $row->is_downloadable : true,
+                'sort_order' => isset($row->sort_order) ? (int) $row->sort_order : 0,
+            ];
+        }, $rows);
     }
 
     /**
@@ -498,6 +541,9 @@ class TripRepository extends BaseRepository
         // Load gallery images
         $trip->gallery_images = $this->getGalleryImages($id);
         
+        // Load downloads
+        $trip->downloadable_items = $this->getDownloads($id);
+        
         // Load highlights
         $trip->highlights = $this->getHighlights($id);
         
@@ -639,7 +685,7 @@ class TripRepository extends BaseRepository
         // Use TripContentTable for gallery images
         $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
-        return $wpdb->get_results(
+        $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$tripContentTable} 
                  WHERE trip_id = %d AND content_type = 'image'
@@ -647,6 +693,36 @@ class TripRepository extends BaseRepository
                 $tripId
             )
         ) ?: [];
+
+        // Normalize to the shape the edit form expects
+        return array_map(function ($row) {
+            $metadata = [];
+            if (!empty($row->metadata)) {
+                $decoded = json_decode($row->metadata, true);
+                if (is_array($decoded)) {
+                    $metadata = $decoded;
+                }
+            }
+
+            $imageId = $metadata['image_id'] ?? ($row->image_id ?? null);
+            $altText = $metadata['alt_text'] ?? null;
+            $caption = $metadata['caption'] ?? null;
+            $dimensions = $metadata['dimensions'] ?? null;
+
+            return (object) [
+                'id'            => $imageId ? (int) $imageId : 0,
+                'image_id'      => $imageId ? (int) $imageId : 0,
+                'url'           => $row->content_url ?? '',
+                'image_url'     => $row->content_url ?? '',
+                'thumbnail_url' => $row->thumbnail_url ?? '',
+                'alt_text'      => $altText ?? '',
+                'caption'       => $caption ?? '',
+                'width'         => is_array($dimensions) && isset($dimensions['width']) ? (int) $dimensions['width'] : null,
+                'height'        => is_array($dimensions) && isset($dimensions['height']) ? (int) $dimensions['height'] : null,
+                'is_featured'   => isset($row->is_featured) ? (bool) $row->is_featured : false,
+                'order'         => isset($row->sort_order) ? (int) $row->sort_order : 0,
+            ];
+        }, $rows);
     }
 
     /**
@@ -659,7 +735,7 @@ class TripRepository extends BaseRepository
         // Use TripContentTable for highlights
         $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
-        return $wpdb->get_results(
+        $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$tripContentTable} 
                  WHERE trip_id = %d AND content_type = 'highlight'
@@ -667,6 +743,29 @@ class TripRepository extends BaseRepository
                 $tripId
             )
         ) ?: [];
+
+        // Normalize to UI shape
+        return array_map(function ($row) {
+            $metadata = [];
+            if (!empty($row->metadata)) {
+                $decoded = json_decode($row->metadata, true);
+                if (is_array($decoded)) {
+                    $metadata = $decoded;
+                }
+            }
+
+            $imageId = $metadata['image_id'] ?? ($row->image_id ?? null);
+            $icon = $metadata['icon'] ?? ($row->icon ?? null);
+
+            return (object) [
+                'text'        => $row->title ?? '',
+                'description' => $row->description ?? '',
+                'image_id'    => $imageId ? (int) $imageId : 0,
+                'icon'        => $icon ?? '',
+                'is_featured' => isset($row->is_featured) ? (bool) $row->is_featured : false,
+                'order'       => isset($row->sort_order) ? (int) $row->sort_order : 0,
+            ];
+        }, $rows);
     }
 
     /**
@@ -679,7 +778,7 @@ class TripRepository extends BaseRepository
         // Use TripContentTable for FAQs
         $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
         
-        return $wpdb->get_results(
+        $rows = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT * FROM {$tripContentTable} 
                  WHERE trip_id = %d AND content_type = 'faq'
@@ -687,6 +786,24 @@ class TripRepository extends BaseRepository
                 $tripId
             )
         ) ?: [];
+
+        // Normalize to UI shape
+        return array_map(function ($row) {
+            $metadata = [];
+            if (!empty($row->metadata)) {
+                $decoded = json_decode($row->metadata, true);
+                if (is_array($decoded)) {
+                    $metadata = $decoded;
+                }
+            }
+            return (object) [
+                'question'    => $row->title ?? '',
+                'answer'      => $row->description ?? '',
+                'category'    => $metadata['category'] ?? '',
+                'is_featured' => isset($row->is_featured) ? (bool) $row->is_featured : false,
+                'order'       => isset($row->sort_order) ? (int) $row->sort_order : 0,
+            ];
+        }, $rows);
     }
 
     /**
@@ -1231,16 +1348,17 @@ class TripRepository extends BaseRepository
     public function createWithRelations(array $data, array $relationships = []): int
     {
         // Extract relationship data
-        $destinations = $relationships['destinations'] ?? [];
-        $activities = $relationships['activities'] ?? [];
-        $tripCategories = $relationships['trip_category'] ?? [];
-        $priceTypes = $relationships['price_types'] ?? [];
-        $highlights = $relationships['highlights'] ?? [];
-        $galleryImages = $relationships['gallery_images'] ?? [];
-        $faqs = $relationships['faqs'] ?? [];
-        $itineraryDays = $relationships['itinerary_days'] ?? [];
+        $destinations      = $relationships['destinations'] ?? [];
+        $activities        = $relationships['activities'] ?? [];
+        $tripCategories    = $relationships['trip_category'] ?? [];
+        $priceTypes        = $relationships['price_types'] ?? [];
+        $highlights        = $relationships['highlights'] ?? [];
+        $galleryImages     = $relationships['gallery_images'] ?? [];
+        $faqs              = $relationships['faqs'] ?? [];
+        $downloadableItems = $relationships['downloadable_items'] ?? [];
+        $itineraryDays     = $relationships['itinerary_days'] ?? [];
         $availabilityDates = $relationships['availability_dates'] ?? [];
-        $attributes = $relationships['attributes'] ?? [];
+        $attributes        = $relationships['attributes'] ?? [];
         
         // Remove relationship data from main data (these should not be in the main table)
         unset(
@@ -1250,6 +1368,7 @@ class TripRepository extends BaseRepository
             $data['highlights'],
             $data['gallery_images'],
             $data['faqs'],
+            $data['downloadable_items'],
             $data['itinerary_days'],
             $data['availability_dates'],
             $data['attributes']
@@ -1286,6 +1405,10 @@ class TripRepository extends BaseRepository
         if (!empty($faqs)) {
             $this->saveFaqs($tripId, $faqs);
         }
+
+        // Always replace downloads (clear if empty array)
+        $downloadRepo = new TripDownloadRepository();
+        $downloadRepo->replaceForTrip($tripId, is_array($downloadableItems) ? $downloadableItems : []);
         
         if (!empty($itineraryDays)) {
             $this->saveItinerary($tripId, $itineraryDays);
@@ -1310,16 +1433,17 @@ class TripRepository extends BaseRepository
     public function updateWithRelations(int $id, array $data, array $relationships = []): bool
     {
         // Extract relationship data
-        $destinations = $relationships['destinations'] ?? null;
-        $activities = $relationships['activities'] ?? null;
-        $tripCategories = $relationships['trip_category'] ?? null;
-        $priceTypes = $relationships['price_types'] ?? null;
-        $highlights = $relationships['highlights'] ?? null;
-        $galleryImages = $relationships['gallery_images'] ?? null;
-        $faqs = $relationships['faqs'] ?? null;
-        $itineraryDays = $relationships['itinerary_days'] ?? null;
+        $destinations      = $relationships['destinations'] ?? null;
+        $activities        = $relationships['activities'] ?? null;
+        $tripCategories    = $relationships['trip_category'] ?? null;
+        $priceTypes        = $relationships['price_types'] ?? null;
+        $highlights        = $relationships['highlights'] ?? null;
+        $galleryImages     = $relationships['gallery_images'] ?? null;
+        $faqs              = $relationships['faqs'] ?? null;
+        $downloadableItems = $relationships['downloadable_items'] ?? null;
+        $itineraryDays     = $relationships['itinerary_days'] ?? null;
         $availabilityDates = $relationships['availability_dates'] ?? null;
-        $attributes = $relationships['attributes'] ?? null;
+        $attributes        = $relationships['attributes'] ?? null;
         
         // Remove relationship data from main data (these should not be in the main table)
         unset(
@@ -1365,6 +1489,11 @@ class TripRepository extends BaseRepository
         
         if ($faqs !== null) {
             $this->saveFaqs($id, $faqs);
+        }
+        
+        if (is_array($downloadableItems)) {
+            $downloadRepo = new TripDownloadRepository();
+            $downloadRepo->replaceForTrip($id, $downloadableItems);
         }
         
         if ($itineraryDays !== null) {

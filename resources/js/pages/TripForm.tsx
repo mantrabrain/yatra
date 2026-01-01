@@ -8,7 +8,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
   Save, 
   Loader2, 
-  Eye, 
   Sparkles,
   Box,
   Calendar,
@@ -22,7 +21,6 @@ import {
   DollarSign,
   AlertCircle,
   Plus,
-  X,
   Upload,
   MapPin,
   Tag,
@@ -34,11 +32,15 @@ import {
   History,
   Lightbulb,
   Copy,
+  Check,
   BookOpen,
   Mail,
   Database,
-  Download
+  Download,
+  Eye,
+  X
 } from 'lucide-react';
+import { RichTextEditor } from '../components/ui/rich-text-editor';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api-client';
@@ -56,6 +58,7 @@ import { ItinerarySection } from '../components/trip-form/sections/ItinerarySect
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
 import { MultiSelect } from '../components/ui/multi-select';
+import { getErrorContext } from '../lib/errors';
 
 type SectionId = 
   | 'basic'             // 1. Basic Information (title, description, highlights, featured image, trip type, duration)
@@ -839,6 +842,45 @@ const TripForm: React.FC = () => {
   
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
+  const [copiedErrorDetails, setCopiedErrorDetails] = useState(false);
+
+  const copyErrorDetailsToClipboard = (text: string) => {
+    if (!text) return;
+    const fallbackCopy = () => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+      } catch (e) {
+        // ignore
+      }
+      document.body.removeChild(textarea);
+      setCopiedErrorDetails(true);
+      setTimeout(() => setCopiedErrorDetails(false), 1500);
+    };
+
+    try {
+      if (navigator?.clipboard?.writeText) {
+        navigator.clipboard
+          .writeText(text)
+          .then(() => {
+            setCopiedErrorDetails(true);
+            setTimeout(() => setCopiedErrorDetails(false), 1500);
+          })
+          .catch(() => fallbackCopy());
+      } else {
+        fallbackCopy();
+      }
+    } catch {
+      fallbackCopy();
+    }
+  };
 
   // Get action and id from URL
   const action = useMemo(() => {
@@ -1038,6 +1080,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     enabled: !!tripId && isEditMode,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
+
+  // Build error context for edit error state
+  const tripErrorContext = useMemo(() => getErrorContext(tripError), [tripError]);
 
   // Fetch trip attributes if editing
   const { data: tripAttributesData } = useQuery({
@@ -2497,19 +2542,117 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   }
 
   if (isEditMode && tripError) {
+    const requestInfo = tripErrorContext.requestInfo || (tripError as any)?.config || {};
+    const method = (requestInfo.method || 'GET').toUpperCase?.() || 'GET';
+    const url = requestInfo.url || (tripError as any)?.config?.url || '';
+    const payload = requestInfo.payload || (tripError as any)?.config?.data || '';
+    const composedErrorText = `Method: ${method}\nURL: ${url}\nPayload: ${payload || 'N/A'}\n\n${tripErrorContext.details || ''}`;
+
     return (
-      <div className="flex flex-col items-center justify-center p-8">
-        <AlertCircle className="w-8 h-8 text-red-500 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{__('Error Loading Trip', 'Error Loading Trip')}</h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
-          {tripError instanceof Error ? tripError.message : __('Failed to load trip data', 'Failed to load trip data')}
-        </p>
-        <Button onClick={() => window.location.reload()}>
-          {__('Reload Page', 'Reload Page')}
-        </Button>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="w-full max-w-5xl px-6 py-12">
+          <div className="relative flex flex-col items-center text-center gap-4 rounded-2xl border border-dashed border-[#fddfe1] bg-gradient-to-br from-[#fff7f8] via-white to-[#fff9f5] p-10 shadow-sm">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[#ffdede] flex items-center justify-center">
+              <svg
+                className="w-10 h-10 text-red-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                strokeWidth="1.8"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 9v4m0 4h.01M10.29 3.86L2.82 17a2 2 0 001.71 3h14.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+                />
+              </svg>
+            </div>
+            <div className="space-y-1">
+              <h2 className="text-2xl font-semibold text-gray-900">{__('Error Loading Trips', 'Error Loading Trips')}</h2>
+              <p className="text-sm text-gray-600">
+                {__('We couldn’t connect to the trips service. Please refresh or try again shortly.', 'We couldn’t connect to the trips service. Please refresh or try again shortly.')}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['trip', tripId] })}>
+                {__('Try again', 'Try again')}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open('https://wordpress.org/support/plugin/yatra', '_blank');
+                  }
+                }}
+              >
+                {__('Visit support center', 'Visit support center')}
+              </Button>
+            </div>
+
+            <div className="w-full mt-10">
+              <div className="relative w-full text-left rounded-2xl border border-gray-200 bg-white shadow-sm space-y-0">
+                <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+                  <p className="text-sm font-medium text-gray-800">
+                    {__('Technical details', 'Technical details')}
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    onClick={() => copyErrorDetailsToClipboard(composedErrorText)}
+                  >
+                    {copiedErrorDetails ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        {__('Copied', 'Copied')}
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        {__('Copy details', 'Copy details')}
+                      </>
+                    )}
+                  </Button>
+                </div>
+                <div className="px-5 py-3 border-b border-gray-200 space-y-2 text-sm text-left text-gray-800">
+                  <div>
+                    <span className="font-medium">{__('Method:', 'Method:')}</span>{' '}
+                    <span className="font-mono">{method}</span>
+                  </div>
+                  <div className="break-all">
+                    <span className="font-medium">{__('URL:', 'URL:')}</span>{' '}
+                    <span className="font-mono">{url || __('N/A', 'N/A')}</span>
+                  </div>
+                  {payload && (
+                    <div>
+                      <span className="font-medium block mb-1">{__('Payload:', 'Payload:')}</span>
+                      <pre className="max-h-40 overflow-auto px-3 py-2 rounded bg-gray-50 text-xs font-mono text-gray-900 whitespace-pre-wrap border border-gray-200">
+                        {payload}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+                <pre className="max-h-56 overflow-auto px-5 py-3 text-xs leading-relaxed font-mono text-gray-900 whitespace-pre-wrap bg-white">
+                  {tripErrorContext.details ||
+                    JSON.stringify(
+                      {
+                        message: tripError instanceof Error ? tripError.message : __('Failed to load trip data', 'Failed to load trip data'),
+                        method,
+                        url,
+                        payload,
+                      },
+                      null,
+                      2
+                    )}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
-  };
+  }
 
   const renderSectionContent = () => {
     switch (currentSection) {
@@ -2670,7 +2813,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Short Description */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="short_description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                      <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
                         {__('Short Description', 'Short Description')}
                         <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                           {__('Recommended', 'Recommended')}
@@ -2699,20 +2842,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       text={__('💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."', '💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."')}
                       className="mb-2"
                     />
-                    <textarea
-                      id="short_description"
+                    <RichTextEditor
                       value={formData.short_description}
-                      onChange={(e) => handleFieldChange('short_description', e.target.value)}
+                      onChange={(value) => handleFieldChange('short_description', value)}
                       placeholder={__('Escape to paradise with our 7-day Bali beach retreat...', 'Escape to paradise with our 7-day Bali beach retreat...')}
-                      rows={2}
-                      maxLength={200}
-                      className={`flex w-full rounded-md border-2 px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 dark:text-gray-100 dark:bg-gray-800 resize-none transition-colors ${
-                        formData.short_description.length >= 100 && formData.short_description.length <= 150
-                          ? 'border-green-500 dark:border-green-600 bg-white dark:bg-gray-800'
-                          : formData.short_description.length > 200
-                          ? 'border-red-500 dark:border-red-600 bg-white dark:bg-gray-800'
-                          : 'border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-600'
-                      }`}
+                      minHeight={120}
                     />
                     {formData.short_description.length > 0 && formData.short_description.length < 100 && (
                       <p className="mt-1.5 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
@@ -2724,7 +2858,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                   {/* Tour Description */}
                   <div className="mb-4">
-                    <label htmlFor="description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
+                    <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
                       {__('Trip Description', 'Trip Description')}
                       <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                         {__('Recommended', 'Recommended')}
@@ -2734,27 +2868,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       text={__('💡 Tell travelers what makes your trip special! Describe the experience, highlights, and what they\'ll see. Write 2-4 paragraphs. Be enthusiastic and detailed!', '💡 Tell travelers what makes your trip special! Describe the experience, highlights, and what they\'ll see. Write 2-4 paragraphs. Be enthusiastic and detailed!')}
                       className="mb-2"
                     />
-                    <textarea
-                      id="description"
+                    <RichTextEditor
                       value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
+                      onChange={(value) => handleFieldChange('description', value)}
                       placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...')}
-                      rows={6}
-                      className={`flex w-full rounded-md border-2 px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors ${
-                        errors.description ? 'border-red-500 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'
-                      } bg-white dark:bg-gray-800 dark:text-gray-100`}
+                      minHeight={260}
                     />
-                    <div className="mt-1.5 flex items-center justify-between">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formData.description.length} {__('characters', 'characters')}
-                      </span>
-                      {formData.description.length >= 150 && formData.description.length <= 500 && !errors.description && (
-                        <span className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
-                          <CheckCircle2 className="w-3 h-3" />
-                          {__('Great length!', 'Great length!')}
-                        </span>
-                      )}
-                    </div>
                     {errors.description && (
                       <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                         <AlertCircle className="w-4 h-4" />
