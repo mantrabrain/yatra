@@ -4,10 +4,10 @@
  */
 
 import React from 'react';
-import { AlertTriangle, X, Loader2 } from 'lucide-react';
+import { AlertTriangle, Loader2 } from 'lucide-react';
 import { __ } from '../../lib/i18n';
 import { Button } from './button';
-import { Card, CardContent, CardHeader, CardTitle } from './card';
+import { Modal } from './modal';
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -44,13 +44,6 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
 }) => {
   // Use description if provided, otherwise fall back to message
   const displayMessage = description || message || '';
-  if (!isOpen) return null;
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
 
   const getVariantStyles = () => {
     switch (variant) {
@@ -79,73 +72,56 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-      onClick={handleBackdropClick}
-    >
-      <Card className="w-full max-w-md mx-4 shadow-xl animate-in fade-in zoom-in-95 duration-200">
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-3">
-              <div className={`flex-shrink-0 mt-0.5 ${getVariantStyles()}`}>
-                {icon || <AlertTriangle className="w-6 h-6" />}
-              </div>
-              <div>
-                <CardTitle className="text-lg">
-                  {title || __('Confirm Action', 'Confirm Action')}
-                </CardTitle>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-              disabled={isLoading}
-              aria-label={__('Close', 'Close')}
-            >
-              <X className="w-5 h-5" />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={
+        <div className="flex items-start gap-3">
+          <div className={`flex-shrink-0 mt-0.5 ${getVariantStyles()}`}>
+            {icon || <AlertTriangle className="w-6 h-6" />}
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {displayMessage}
-          </p>
-          <div className="flex gap-2 justify-end pt-2 flex-wrap">
+          <div>{title || __('Confirm Action', 'Confirm Action')}</div>
+        </div>
+      }
+      hideHeader={false}
+      hideFooter={false}
+      size="sm"
+      panelClassName="yatra-confirmation-ui yatra-model-ui"
+      bodyClassName="px-6 py-5"
+      footer={
+        <div className="flex gap-2 justify-end pt-2 flex-wrap">
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
+            {cancelText || __('Cancel', 'Cancel')}
+          </Button>
+          {secondaryAction && (
             <Button
-              variant="outline"
-              onClick={onClose}
+              variant={secondaryAction.variant || 'outline'}
+              onClick={secondaryAction.onClick}
               disabled={isLoading}
             >
-              {cancelText || __('Cancel', 'Cancel')}
+              {secondaryAction.label}
             </Button>
-            {secondaryAction && (
-              <Button
-                variant={secondaryAction.variant || 'outline'}
-                onClick={secondaryAction.onClick}
-                disabled={isLoading}
-              >
-                {secondaryAction.label}
-              </Button>
+          )}
+          <Button
+            variant={getButtonVariant()}
+            onClick={onConfirm}
+            disabled={isLoading}
+            className="min-w-[100px]"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                {__('Deleting...', 'Deleting...')}
+              </>
+            ) : (
+              confirmText || __('Confirm', 'Confirm')
             )}
-            <Button
-              variant={getButtonVariant()}
-              onClick={onConfirm}
-              disabled={isLoading}
-              className="min-w-[100px]"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Deleting...', 'Deleting...')}
-                </>
-              ) : (
-                confirmText || __('Confirm', 'Confirm')
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </Button>
+        </div>
+      }
+    >
+      <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed">{displayMessage}</p>
+    </Modal>
   );
 };
 

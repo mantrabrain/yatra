@@ -37,6 +37,69 @@ class BookingPageHandler extends BasePageHandler
             'yatra_booking_page' => $page,
         ]);
 
+        // Hydrate global $booking from session so templates don't crash
+        $booking = null;
+        if (function_exists('yatra_get_booking_session')) {
+            $session = yatra_get_booking_session();
+            if (!empty($session) && !empty($session['trip_id'])) {
+                // Load trip for display context
+                try {
+                    $tripRepo = new \Yatra\Repositories\TripRepository();
+                    $trip = $tripRepo->findPublished((int) $session['trip_id']);
+                } catch (\Throwable $e) {
+                    $trip = null;
+                }
+
+                // Ensure trip has a price property for templates
+                if ($trip && !isset($trip->price)) {
+                    $price = null;
+                    if (!empty($trip->discounted_price)) {
+                        $price = (float) $trip->discounted_price;
+                    } elseif (!empty($trip->sale_price)) {
+                        $price = (float) $trip->sale_price;
+                    } elseif (!empty($trip->original_price)) {
+                        $price = (float) $trip->original_price;
+                    }
+                    $trip->price = $price;
+                }
+
+                // Ensure trip has a usable featured_image URL (not attachment ID)
+                if ($trip && !empty($trip->featured_image)) {
+                    if (is_numeric($trip->featured_image)) {
+                        $imgUrl = wp_get_attachment_url((int) $trip->featured_image);
+                        if ($imgUrl) {
+                            $trip->featured_image = $imgUrl;
+                        }
+                    }
+                }
+
+                // Build booking view model expected by templates
+                $booking = (object) [
+                    'trip' => $trip,
+                    'travel_date' => $session['travel_date'] ?? '',
+                    'travelers' => $session['travelers'] ?? 0,
+                    'pricing_type' => $session['pricing_type'] ?? 'regular',
+                    'price_types' => $session['price_types'] ?? [],
+                    'traveler_counts' => $session['traveler_counts'] ?? [],
+                    'partial_payment' => $session['partial_payment'] ?? null,
+                    'partial_payment_percentage' => $session['partial_payment_percentage'] ?? null,
+                    'deposit_required' => $session['deposit_required'] ?? null,
+                    'deposit_percentage' => $session['deposit_percentage'] ?? null,
+                    'enabled_gateways' => $session['enabled_gateways'] ?? [],
+                    'group_discount' => $session['group_discount'] ?? null,
+                    // amounts for templates
+                    'total_amount' => $session['total_amount'] ?? null,
+                    'amount_paid' => $session['amount_paid'] ?? null,
+                    'remaining_amount' => $session['remaining_amount'] ?? null,
+                    'booking_reference' => $session['booking_reference'] ?? null,
+                ];
+            }
+        }
+
+        if ($booking !== null) {
+            $this->setGlobal('booking', $booking);
+        }
+
         // Load the booking page template
         $template_path = YATRA_PLUGIN_PATH . 'templates/booking.php';
 

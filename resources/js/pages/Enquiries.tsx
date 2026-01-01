@@ -14,12 +14,13 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Select } from '../components/ui/select';
 import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { useNavigate } from '../hooks/useNavigate';
-import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { Pagination, Table as SharedTable, BulkActionToolbar } from '../components/shared';
 import { getErrorContext } from '../lib/errors';
+import { Modal } from '../components/ui/modal';
+import { useToast } from '../components/ui/toast';
 
 interface Enquiry {
   id: number;
@@ -30,6 +31,7 @@ interface Enquiry {
   trip_id?: number;
   message: string;
   travelers_count?: number;
+  metadata?: any;
   travel_date?: string;
   status:
     | 'new'
@@ -40,7 +42,8 @@ interface Enquiry {
     | 'read'
     | 'archived'
     | 'spam'
-    | 'trash';
+    | 'trash'
+    | '';
   created_at: string;
   responded_at?: string;
   response_notes?: string;
@@ -59,6 +62,9 @@ const Enquiries: React.FC = () => {
   const [enquiryToDelete, setEnquiryToDelete] = useState<Enquiry | null>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState('');
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
+  const [bulkApplying, setBulkApplying] = useState(false);
+  const [pendingBulkAction, setPendingBulkAction] = useState<string | null>(null);
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
     if (typeof window === 'undefined') {
@@ -111,6 +117,7 @@ const Enquiries: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { navigate } = useNavigate();
+  const { showToast } = useToast();
 
   // Build query params
   const queryParams = useMemo(() => {
@@ -157,24 +164,30 @@ const Enquiries: React.FC = () => {
     if (!bulkAction || selectedIds.length === 0) {
       return;
     }
+    setPendingBulkAction(bulkAction);
+    setBulkConfirmOpen(true);
+  };
 
-    const run = async () => {
-      try {
-        // Use dedicated bulk endpoint for status changes and delete
-        if (['delete', 'mark_spam', 'mark_trash'].includes(bulkAction)) {
-          await apiService.bulkEnquiriesAction(bulkAction, selectedIds);
-          queryClient.invalidateQueries({ queryKey: ['enquiries'] });
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Bulk enquiry action error', error);
-      } finally {
-        setSelectedIds([]);
-        setBulkAction('');
+  const confirmBulkApply = async () => {
+    if (!pendingBulkAction || selectedIds.length === 0) {
+      setBulkConfirmOpen(false);
+      return;
+    }
+    setBulkApplying(true);
+    try {
+      if (['delete', 'mark_spam', 'mark_trash'].includes(pendingBulkAction)) {
+        await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
+        queryClient.invalidateQueries({ queryKey: ['enquiries'] });
       }
-    };
-
-    void run();
+    } catch (error) {
+      console.error('Bulk enquiry action error', error);
+    } finally {
+      setBulkApplying(false);
+      setBulkConfirmOpen(false);
+      setPendingBulkAction(null);
+      setSelectedIds([]);
+      setBulkAction('');
+    }
   };
 
   const toggleColumn = (columnKey: string) => {
@@ -284,13 +297,15 @@ const Enquiries: React.FC = () => {
       setRespondDialogOpen(false);
       setSelectedEnquiry(null);
       setResponseMessage('');
+      showToast(__('Response sent successfully.', 'Response sent successfully.'), 'success');
     },
   });
 
-  const enquiries: Enquiry[] = data?.data || [];
-  const total = data?.total || 0;
-  const perPage = 10;
-  const totalPages = Math.ceil(total / perPage || 1);
+  const enquiriesResponse: any = data;
+  const enquiries: Enquiry[] = enquiriesResponse?.data || enquiriesResponse?.enquiries || [];
+  const total = enquiriesResponse?.meta?.total ?? enquiriesResponse?.total ?? enquiries.length ?? 0;
+  const perPage = enquiriesResponse?.meta?.per_page ?? 10;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   // Enhanced error handling
   const errorContext = getErrorContext(error);
@@ -665,140 +680,200 @@ const Enquiries: React.FC = () => {
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
+      {/* Bulk action confirmation modal */}
+      <Modal
+        isOpen={bulkConfirmOpen}
+        onClose={() => {
+          if (!bulkApplying) {
+            setBulkConfirmOpen(false);
+            setPendingBulkAction(null);
+          }
+        }}
+        title={__('Apply Bulk Action', 'Apply Bulk Action')}
+        description={
+          pendingBulkAction
+            ? __(
+                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
+                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`
+              )
+            : undefined
+        }
+        size="sm"
+        panelClassName="yatra-model-ui"
+        bodyClassName="p-0"
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setBulkConfirmOpen(false);
+                setPendingBulkAction(null);
+              }}
+              disabled={bulkApplying}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={confirmBulkApply}
+              disabled={bulkApplying}
+            >
+              {bulkApplying ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {__('Applying...', 'Applying...')}
+                </>
+              ) : (
+                __('Apply', 'Apply')
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <div aria-hidden="true" />
+      </Modal>
+
+      {/* Delete Confirmation Modal (shared) */}
+      <Modal
         isOpen={deleteDialogOpen}
         onClose={() => {
-          setDeleteDialogOpen(false);
-          setEnquiryToDelete(null);
+          if (!deleteMutation.isPending) {
+            setDeleteDialogOpen(false);
+            setEnquiryToDelete(null);
+          }
         }}
-        onConfirm={confirmDelete}
         title={__('Delete Enquiry', 'Delete Enquiry')}
-        message={enquiryToDelete 
-          ? __(`Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`, `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`)
-          : __('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?')
+        description={
+          enquiryToDelete
+            ? __(
+                `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`,
+                `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`
+              )
+            : __('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
-        variant="danger"
-        isLoading={deleteMutation.isPending}
-      />
+        size="sm"
+        panelClassName="yatra-model-ui"
+        bodyClassName="p-0"
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteDialogOpen(false);
+                setEnquiryToDelete(null);
+              }}
+              disabled={deleteMutation.isPending}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={confirmDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {__('Deleting...', 'Deleting...')}
+                </>
+              ) : (
+                __('Delete', 'Delete')
+              )}
+            </Button>
+          </div>
+        }
+      >
+        <div />
+      </Modal>
 
-      {/* Respond Dialog */}
-      {respondDialogOpen && selectedEnquiry && (
-        <div
-          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !respondMutation.isPending) {
-              setRespondDialogOpen(false);
-              setSelectedEnquiry(null);
-            }
-          }}
-        >
-          <Card className="w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800">
-            <CardHeader className="pb-3 bg-white dark:bg-gray-800 rounded-t-lg">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">
-                    <Send className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">
-                      {__('Respond to Enquiry', 'Respond to Enquiry')}
-                    </CardTitle>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {__('Send a response to', 'Send a response to')} <strong>{selectedEnquiry.name}</strong>
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setRespondDialogOpen(false);
-                    setSelectedEnquiry(null);
-                  }}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  disabled={respondMutation.isPending}
-                  aria-label={__('Close', 'Close')}
-                >
-                  <X className="w-5 h-5" />
-                </button>
+      {/* Respond Dialog via shared Modal */}
+      <Modal
+        isOpen={respondDialogOpen && !!selectedEnquiry}
+        onClose={() => {
+          if (!respondMutation.isPending) setRespondDialogOpen(false);
+        }}
+        title={__('Respond to Enquiry', 'Respond to Enquiry')}
+        description={
+          selectedEnquiry ? (
+            <span>
+              {__('Send a response to', 'Send a response to')} <strong>{selectedEnquiry.name}</strong>
+            </span>
+          ) : null
+        }
+        size="md"
+        panelClassName="yatra-model-ui"
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setRespondDialogOpen(false)}
+              disabled={respondMutation.isPending}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={sendResponse}
+              disabled={respondMutation.isPending || !responseMessage.trim()}
+            >
+              {respondMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {__('Sending...', 'Sending...')}
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  {__('Send Response', 'Send Response')}
+                </>
+              )}
+            </Button>
+          </div>
+        }
+      >
+        {selectedEnquiry && (
+          <div className="space-y-4">
+            {/* Customer Info */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.email}</span>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Customer Info */}
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+              {selectedEnquiry.trip_title && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.email}</span>
-                </div>
-                {selectedEnquiry.trip_title && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.trip_title}</span>
-                  </div>
-                )}
-                <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <strong>{__('Original Message:', 'Original Message:')}</strong>
-                  <p className="mt-1 text-gray-600 dark:text-gray-400">{selectedEnquiry.message}</p>
-                </div>
-              </div>
-
-              {/* Response Message */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={responseMessage}
-                  onChange={(e) => setResponseMessage(e.target.value)}
-                  placeholder={__('Type your response here...', 'Type your response here...')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={5}
-                  disabled={respondMutation.isPending}
-                />
-              </div>
-
-              {respondMutation.isError && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.trip_title}</span>
                 </div>
               )}
-
-              <div className="flex gap-2 justify-end pt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setRespondDialogOpen(false);
-                    setSelectedEnquiry(null);
-                  }}
-                  disabled={respondMutation.isPending}
-                >
-                  {__('Cancel', 'Cancel')}
-                </Button>
-                <Button
-                  onClick={sendResponse}
-                  disabled={respondMutation.isPending || !responseMessage.trim()}
-                >
-                  {respondMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {__('Sending...', 'Sending...')}
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      {__('Send Response', 'Send Response')}
-                    </>
-                  )}
-                </Button>
+              <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                <strong>{__('Original Message:', 'Original Message:')}</strong>
+                <p className="mt-1 text-gray-600 dark:text-gray-400">{selectedEnquiry.message}</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+
+            {/* Response Message */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={responseMessage}
+                onChange={(e) => setResponseMessage(e.target.value)}
+                placeholder={__('Type your response here...', 'Type your response here...')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows={5}
+                disabled={respondMutation.isPending}
+              />
+            </div>
+
+            {respondMutation.isError && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
 
 export default Enquiries;
-

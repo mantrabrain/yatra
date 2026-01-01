@@ -46,7 +46,8 @@ import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api-client';
 import { wpService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
+import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/ui/date-picker';
 import { Select } from '../components/ui/select';
 import { Alert } from '../components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -842,8 +843,6 @@ const TripForm: React.FC = () => {
   
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [showUnsavedChangesDialog, setShowUnsavedChangesDialog] = useState(false);
   const [copiedErrorDetails, setCopiedErrorDetails] = useState(false);
 
   const copyErrorDetailsToClipboard = (text: string) => {
@@ -2371,6 +2370,36 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     saveMutation.mutate({ ...formData, status: 'publish' });
   };
 
+  // Enter should trigger publish/update (skip multiline and interactive controls)
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+
+      const tag = target.tagName.toLowerCase();
+      const isTextarea = tag === 'textarea';
+      const isButton = tag === 'button';
+      const isLink = tag === 'a';
+      const isContentEditable = target.getAttribute('contenteditable') === 'true';
+
+      // Ignore Enter in multiline or interactive elements
+      if (isTextarea || isButton || isLink || isContentEditable) return;
+
+      const inputType = (target as HTMLInputElement).type;
+      if (['submit', 'button', 'file'].includes(inputType)) return;
+
+      e.preventDefault();
+      if (!isSubmitting) {
+        handlePublish();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isSubmitting, handlePublish]);
+
   // Using static revisions data for UI only
   const revisions = dummyRevisions;
   const isLoadingRevisions = false;
@@ -3414,11 +3443,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <label htmlFor="available_from" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Available From', 'Available From')}
                   </label>
-                  <Input
-                    id="available_from"
-                    type="date"
+                  <DatePicker
                     value={formData.available_from}
-                    onChange={(e) => handleFieldChange('available_from', e.target.value)}
+                    onChange={(val) => handleFieldChange('available_from', val)}
+                    placeholder={__('Select date', 'Select date')}
                   />
                   <HelpText
                     text={__('Earliest date this trip becomes available for booking', 'Earliest date this trip becomes available for booking')}
@@ -3429,11 +3457,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <label htmlFor="available_to" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Available To', 'Available To')}
                   </label>
-                  <Input
-                    id="available_to"
-                    type="date"
+                  <DatePicker
                     value={formData.available_to}
-                    onChange={(e) => handleFieldChange('available_to', e.target.value)}
+                    onChange={(val) => handleFieldChange('available_to', val)}
+                    placeholder={__('Select date', 'Select date')}
                   />
                   <HelpText
                     text={__('Latest date this trip is available for booking', 'Latest date this trip is available for booking')}
@@ -4664,11 +4691,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <label htmlFor="booking_deadline" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Booking Deadline', 'Booking Deadline')}
                   </label>
-                  <Input
-                    id="booking_deadline"
-                    type="date"
+                  <DatePicker
                     value={formData.booking_deadline}
-                    onChange={(e) => handleFieldChange('booking_deadline', e.target.value)}
+                    onChange={(val) => handleFieldChange('booking_deadline', val)}
+                    placeholder={__('Select date', 'Select date')}
                   />
                   <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                     {__('Last date customers can book this trip', 'Last date customers can book this trip')}
@@ -4982,10 +5008,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Schedule Publish Date', 'Schedule Publish Date')}
                   </label>
-                  <Input
-                    type="datetime-local"
+                  <DatePicker
                     value={formData.scheduled_publish_date}
-                    onChange={(e) => handleFieldChange('scheduled_publish_date', e.target.value)}
+                    onChange={(val) => handleFieldChange('scheduled_publish_date', val)}
+                    placeholder={__('Select date', 'Select date')}
                   />
                   <HelpText
                     text={__('Trip will be automatically published on this date and time', 'Trip will be automatically published on this date and time')}
@@ -4996,10 +5022,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                     {__('Schedule Unpublish Date', 'Schedule Unpublish Date')}
                   </label>
-                  <Input
-                    type="datetime-local"
+                  <DatePicker
                     value={formData.scheduled_unpublish_date}
-                    onChange={(e) => handleFieldChange('scheduled_unpublish_date', e.target.value)}
+                    onChange={(val) => handleFieldChange('scheduled_unpublish_date', val)}
+                    placeholder={__('Select date', 'Select date')}
                   />
                   <HelpText
                     text={__('Trip will be automatically unpublished (archived) on this date and time', 'Trip will be automatically unpublished (archived) on this date and time')}
@@ -5035,10 +5061,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Auto-Enable Date', 'Auto-Enable Date')}
                       </label>
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={formData.seasonal_enable_date}
-                        onChange={(e) => handleFieldChange('seasonal_enable_date', e.target.value)}
+                        onChange={(val) => handleFieldChange('seasonal_enable_date', val)}
+                        placeholder={__('Select date', 'Select date')}
                       />
                       <HelpText
                         text={__('Trip will become available for booking on this date', 'Trip will become available for booking on this date')}
@@ -5049,10 +5075,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
                         {__('Auto-Disable Date', 'Auto-Disable Date')}
                       </label>
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={formData.seasonal_disable_date}
-                        onChange={(e) => handleFieldChange('seasonal_disable_date', e.target.value)}
+                        onChange={(val) => handleFieldChange('seasonal_disable_date', val)}
+                        placeholder={__('Select date', 'Select date')}
                       />
                       <HelpText
                         text={__('Trip will become unavailable for booking on this date', 'Trip will become unavailable for booking on this date')}

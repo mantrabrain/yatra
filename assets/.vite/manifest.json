@@ -3,11 +3,31 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-C_NIfZQg.js": {
-    "file": "dist/js/index-C_NIfZQg.js",
+  "_index-CApEIhKv.js": {
+    "file": "dist/js/index-CApEIhKv.js",
     "name": "index",
     "imports": [
-      "_react-vendor-DTDLDly6.js"
+      "_react-vendor-BSjFqD7k.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_index-DAAphP2N.js": {
+    "file": "dist/js/index-DAAphP2N.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-sv6w3LCc.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_index-tPtnSXOG.js": {
+    "file": "dist/js/index-tPtnSXOG.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-BJLoI0Ru.js"
     ],
     "css": [
       "admin/dist/css/index.css"
@@ -17,8 +37,22 @@
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-DTDLDly6.js": {
-    "file": "admin/dist/js/react-vendor-DTDLDly6.js",
+  "_react-vendor-BJLoI0Ru.js": {
+    "file": "admin/dist/js/react-vendor-BJLoI0Ru.js",
+    "name": "react-vendor",
+    "css": [
+      "admin/dist/css/react-vendor.css"
+    ]
+  },
+  "_react-vendor-BSjFqD7k.js": {
+    "file": "admin/dist/js/react-vendor-BSjFqD7k.js",
+    "name": "react-vendor",
+    "css": [
+      "admin/dist/css/react-vendor.css"
+    ]
+  },
+  "_react-vendor-sv6w3LCc.js": {
+    "file": "admin/dist/js/react-vendor-sv6w3LCc.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
@@ -30,8 +64,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-DTDLDly6.js",
-      "_index-C_NIfZQg.js"
+      "_react-vendor-BSjFqD7k.js",
+      "_index-CApEIhKv.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -40,8 +74,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-DTDLDly6.js",
-      "_index-C_NIfZQg.js"
+      "_react-vendor-BSjFqD7k.js",
+      "_index-CApEIhKv.js"
     ]
   }
 }

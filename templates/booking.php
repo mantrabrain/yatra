@@ -18,6 +18,12 @@ if (!defined('ABSPATH')) {
 global $booking;
 
 // Handle error states
+if (empty($booking) || (!is_object($booking))) {
+    $booking = (object) [
+        'error' => 'no_session',
+    ];
+}
+
 if (!empty($booking->error)) {
     get_header();
     ?>

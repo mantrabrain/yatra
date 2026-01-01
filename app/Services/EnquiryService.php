@@ -83,6 +83,63 @@ class EnquiryService
             }
         }
 
+        // Build metadata for traveler classifications (flat array, no wrapper)
+        $classifications = [];
+        if (!empty($data['metadata'])) {
+            $metaValue = $data['metadata'];
+            if (is_string($metaValue)) {
+                $decoded = json_decode($metaValue, true);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $metaValue = $decoded;
+                }
+            }
+            if (is_array($metaValue)) {
+                // Accept both wrapped {classifications: [...]} and direct array [...]
+                if (isset($metaValue['classifications']) && is_array($metaValue['classifications'])) {
+                    $classifications = $metaValue['classifications'];
+                } elseif (array_is_list($metaValue)) {
+                    $classifications = $metaValue;
+                }
+            }
+        }
+
+        // Backward compatibility: derive from adults/children if still not provided
+        if (empty($classifications) && (isset($data['adults']) || isset($data['children']))) {
+            $adults = isset($data['adults']) ? (int) $data['adults'] : null;
+            $children = isset($data['children']) ? (int) $data['children'] : null;
+            if ($adults !== null) {
+                $classifications[] = ['id' => 'adult', 'title' => 'Adult', 'count' => $adults];
+            }
+            if ($children !== null) {
+                $classifications[] = ['id' => 'child', 'title' => 'Child', 'count' => $children];
+            }
+        }
+
+        // Compute travelers_count from classifications
+        $travelersCount = null;
+        if (!empty($classifications)) {
+            $travelersCount = array_reduce($classifications, function ($carry, $item) {
+                $count = isset($item['count']) ? (int) $item['count'] : 0;
+                return $carry + $count;
+            }, 0);
+            if ($travelersCount === 0) {
+                $travelersCount = null;
+            }
+        } elseif (isset($data['adults']) || isset($data['children'])) {
+            $travelersCount = ((int) ($data['adults'] ?? 0) + (int) ($data['children'] ?? 0)) ?: null;
+        }
+
+        $data['metadata'] = !empty($classifications) ? wp_json_encode($classifications) : null;
+        $data['travelers_count'] = $travelersCount;
+
+        // Capture IP and user agent if not provided
+        if (empty($data['ip_address'])) {
+            $data['ip_address'] = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? null;
+        }
+        if (empty($data['user_agent'])) {
+            $data['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        }
+
         // Set default status
         if (empty($data['status'])) {
             $data['status'] = 'pending';
@@ -277,6 +334,30 @@ class EnquiryService
      */
     private function formatEnquiry(object $enquiry): array
     {
+        $metadata = [];
+        if (!empty($enquiry->metadata)) {
+            $decoded = json_decode($enquiry->metadata, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $metadata = $decoded;
+            }
+        }
+
+        $travelersCount = null;
+        if (!empty($metadata['classifications']) && is_array($metadata['classifications'])) {
+            $travelersCount = array_reduce($metadata['classifications'], function ($carry, $item) {
+                $count = isset($item['count']) ? (int) $item['count'] : 0;
+                return $carry + $count;
+            }, 0);
+            if ($travelersCount === 0) {
+                $travelersCount = null;
+            }
+        } elseif (isset($enquiry->travelers_count)) {
+            $travelersCount = $enquiry->travelers_count ? (int) $enquiry->travelers_count : null;
+        } elseif (isset($enquiry->adults) || isset($enquiry->children)) {
+            // Backward compatibility fallback
+            $travelersCount = ((int) ($enquiry->adults ?? 0) + (int) ($enquiry->children ?? 0)) ?: null;
+        }
+
         return [
             'id' => (int) $enquiry->id,
             'trip_id' => $enquiry->trip_id ? (int) $enquiry->trip_id : null,
@@ -288,9 +369,11 @@ class EnquiryService
             'subject' => $enquiry->subject ?? null,
             'message' => $enquiry->message,
             'travel_date' => $enquiry->travel_date ?? null,
-            'travelers_count' => isset($enquiry->travelers_count) ? (int) $enquiry->travelers_count : (((int) ($enquiry->adults ?? 0) + (int) ($enquiry->children ?? 0)) ?: null),
+            'travelers_count' => $travelersCount,
+            'metadata' => $metadata ?: null,
             'status' => $enquiry->status,
-            'response' => $enquiry->response ?? null,
+            'response' => $enquiry->response_notes ?? ($enquiry->response ?? null),
+            'response_notes' => $enquiry->response_notes ?? null,
             'responded_by' => $enquiry->responded_by ? (int) $enquiry->responded_by : null,
             'responded_at' => $enquiry->responded_at ?? null,
             'created_at' => $enquiry->created_at,

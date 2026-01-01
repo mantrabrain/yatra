@@ -435,6 +435,18 @@ class EnquiryRepository extends BaseRepository
             $prepared['travelers_count'] = (int) $data['travelers_count'];
         }
 
+        if (array_key_exists('metadata', $data)) {
+            $prepared['metadata'] = is_null($data['metadata']) ? null : wp_unslash((string) $data['metadata']);
+        }
+
+        if (array_key_exists('ip_address', $data)) {
+            $prepared['ip_address'] = sanitize_text_field((string) $data['ip_address']);
+        }
+
+        if (array_key_exists('user_agent', $data)) {
+            $prepared['user_agent'] = sanitize_text_field((string) $data['user_agent']);
+        }
+
         return $prepared;
     }
 }

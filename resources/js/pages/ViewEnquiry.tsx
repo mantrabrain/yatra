@@ -16,6 +16,8 @@ import { ConditionalRender } from '../components/ui/conditional-render';
 import { Badge } from '../components/ui/badge';
 import { useNavigate } from '../hooks/useNavigate';
 import { Skeleton } from '../components/ui/skeleton';
+import { Modal } from '../components/ui/modal';
+import { useToast } from '../components/ui/toast';
 
 interface Enquiry {
   id: number;
@@ -28,7 +30,7 @@ interface Enquiry {
   message: string;
   travelers_count?: number;
   travel_date?: string;
-  status: 'new' | 'pending' | 'responded' | 'closed' | 'converted';
+  status: 'new' | 'pending' | 'responded' | 'closed' | 'converted' | '' | string;
   created_at: string;
   responded_at?: string;
   response?: string;
@@ -38,6 +40,7 @@ const ViewEnquiry: React.FC = () => {
   const { can } = usePermissions();
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState('');
 
@@ -53,7 +56,8 @@ const ViewEnquiry: React.FC = () => {
     queryFn: async () => {
       if (!enquiryId) return null;
       const response = await apiService.getEnquiry(enquiryId!);
-      return response;
+      // Some endpoints return { success, data }, others return the object directly
+      return (response as any)?.data ?? response;
     },
     enabled: !!enquiryId && can('yatra_view_bookings'),
   });
@@ -67,6 +71,7 @@ const ViewEnquiry: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
       setRespondDialogOpen(false);
       setResponseMessage('');
+      showToast(__('Response sent successfully.', 'Response sent successfully.'), 'success');
     },
   });
 
@@ -211,7 +216,6 @@ const ViewEnquiry: React.FC = () => {
       </div>
     );
   }
-
   if (error || !enquiry) {
     return (
       <div className="space-y-3">
@@ -425,111 +429,92 @@ const ViewEnquiry: React.FC = () => {
         </div>
       </ConditionalRender>
 
-      {/* Respond Dialog */}
-      {respondDialogOpen && enquiry && (
-        <div
-          className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-          onClick={(e) => {
-            if (e.target === e.currentTarget && !respondMutation.isPending) {
-              setRespondDialogOpen(false);
-            }
-          }}
-        >
-          <Card className="w-full max-w-lg mx-4 shadow-xl bg-white dark:bg-gray-800">
-            <CardHeader className="pb-3 bg-white dark:bg-gray-800 rounded-t-lg">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-1 text-blue-600 dark:text-blue-400">
-                    <Send className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg">
-                      {__('Respond to Enquiry', 'Respond to Enquiry')}
-                    </CardTitle>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                      {__('Send a response to', 'Send a response to')} <strong>{enquiry.name}</strong>
-                    </p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setRespondDialogOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  disabled={respondMutation.isPending}
-                  aria-label={__('Close', 'Close')}
-                >
-                  <span className="text-xl">&times;</span>
-                </button>
+      {/* Respond Dialog via shared Modal */}
+      <Modal
+        isOpen={respondDialogOpen && !!enquiry}
+        onClose={() => {
+          if (!respondMutation.isPending) setRespondDialogOpen(false);
+        }}
+        title={__('Respond to Enquiry', 'Respond to Enquiry')}
+        description={
+          enquiry ? (
+            <span>
+              {__('Send a response to', 'Send a response to')} <strong>{enquiry.name}</strong>
+            </span>
+          ) : null
+        }
+        size="md"
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => setRespondDialogOpen(false)}
+              disabled={respondMutation.isPending}
+            >
+              {__('Cancel', 'Cancel')}
+            </Button>
+            <Button
+              onClick={sendResponse}
+              disabled={respondMutation.isPending || !responseMessage.trim()}
+            >
+              {respondMutation.isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {__('Sending...', 'Sending...')}
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  {__('Send Response', 'Send Response')}
+                </>
+              )}
+            </Button>
+          </div>
+        }
+      >
+        {enquiry && (
+          <div className="space-y-4">
+            {/* Customer Info */}
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <Mail className="w-4 h-4 text-gray-400" />
+                <span className="text-gray-600 dark:text-gray-400">{enquiry.email}</span>
               </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Customer Info */}
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+              {enquiry.trip_title && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-400">{enquiry.email}</span>
-                </div>
-                {enquiry.trip_title && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600 dark:text-gray-400">{enquiry.trip_title}</span>
-                  </div>
-                )}
-                <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                  <strong>{__('Original Message:', 'Original Message:')}</strong>
-                  <p className="mt-1 text-gray-600 dark:text-gray-400">{enquiry.message}</p>
-                </div>
-              </div>
-
-              {/* Response Message */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  value={responseMessage}
-                  onChange={(e) => setResponseMessage(e.target.value)}
-                  placeholder={__('Type your response here...', 'Type your response here...')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  rows={5}
-                  disabled={respondMutation.isPending}
-                />
-              </div>
-
-              {respondMutation.isError && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                  {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                  <MapPin className="w-4 h-4 text-gray-400" />
+                  <span className="text-gray-600 dark:text-gray-400">{enquiry.trip_title}</span>
                 </div>
               )}
-
-              <div className="flex gap-2 justify-end pt-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setRespondDialogOpen(false)}
-                  disabled={respondMutation.isPending}
-                >
-                  {__('Cancel', 'Cancel')}
-                </Button>
-                <Button
-                  onClick={sendResponse}
-                  disabled={respondMutation.isPending || !responseMessage.trim()}
-                >
-                  {respondMutation.isPending ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {__('Sending...', 'Sending...')}
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4 mr-2" />
-                      {__('Send Response', 'Send Response')}
-                    </>
-                  )}
-                </Button>
+              <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
+                <strong>{__('Original Message:', 'Original Message:')}</strong>
+                <p className="mt-1 text-gray-600 dark:text-gray-400">{enquiry.message}</p>
               </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+            </div>
+
+            {/* Response Message */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={responseMessage}
+                onChange={(e) => setResponseMessage(e.target.value)}
+                placeholder={__('Type your response here...', 'Type your response here...')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows={5}
+                disabled={respondMutation.isPending}
+              />
+            </div>
+
+            {respondMutation.isError && (
+              <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
+                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };

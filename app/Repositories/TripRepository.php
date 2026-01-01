@@ -47,6 +47,84 @@ class TripRepository extends BaseRepository
     protected array $integerFields = ['id', 'created_by', 'updated_by', 'difficulty_level', 'duration', 'group_size'];
 
     /**
+     * Publish trips whose scheduled_publish_date has passed
+     */
+    public function publishScheduledTrips(string $now): void
+    {
+        $table = esc_sql($this->table);
+        $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table}
+                 SET status = 'publish', scheduled_publish_date = NULL, updated_at = %s
+                 WHERE scheduled_publish_date IS NOT NULL
+                   AND scheduled_publish_date <= %s
+                   AND status <> 'publish'",
+                $now,
+                $now
+            )
+        );
+    }
+
+    /**
+     * Archive trips whose scheduled_unpublish_date has passed
+     */
+    public function archiveScheduledTrips(string $now): void
+    {
+        $table = esc_sql($this->table);
+        $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table}
+                 SET status = 'archived', scheduled_unpublish_date = NULL, updated_at = %s
+                 WHERE scheduled_unpublish_date IS NOT NULL
+                   AND scheduled_unpublish_date <= %s
+                   AND status = 'publish'",
+                $now,
+                $now
+            )
+        );
+    }
+
+    /**
+     * Enable trips when seasonal_auto_enable is set and enable date reached
+     */
+    public function enableSeasonalTrips(string $today, string $now): void
+    {
+        $table = esc_sql($this->table);
+        $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table}
+                 SET status = 'publish', updated_at = %s
+                 WHERE seasonal_auto_enable = 1
+                   AND seasonal_enable_date IS NOT NULL
+                   AND seasonal_enable_date <= %s
+                   AND status <> 'publish'",
+                $now,
+                $today
+            )
+        );
+    }
+
+    /**
+     * Disable trips when seasonal_auto_enable is set and disable date reached
+     */
+    public function disableSeasonalTrips(string $today, string $now): void
+    {
+        $table = esc_sql($this->table);
+        $this->wpdb->query(
+            $this->wpdb->prepare(
+                "UPDATE {$table}
+                 SET status = 'archived', updated_at = %s
+                 WHERE seasonal_auto_enable = 1
+                   AND seasonal_disable_date IS NOT NULL
+                   AND seasonal_disable_date <= %s
+                   AND status = 'publish'",
+                $now,
+                $today
+            )
+        );
+    }
+
+    /**
      * Get table name
      */
     protected function getTableName(): string
@@ -95,6 +173,7 @@ class TripRepository extends BaseRepository
 
             $attachmentId = $metadata['attachment_id'] ?? null;
             $protectedPath = $metadata['protected_path'] ?? null;
+            $visibilityMeta = $metadata['visibility'] ?? null;
 
             // Map access_level to visibility used by UI
             $visibility = 'booked_only';
@@ -102,6 +181,8 @@ class TripRepository extends BaseRepository
                 $visibility = 'public';
             } elseif ($row->access_level === 'registered') {
                 $visibility = 'logged_in';
+            } elseif ($visibilityMeta) {
+                $visibility = $visibilityMeta;
             }
 
             return (object) [
@@ -111,6 +192,10 @@ class TripRepository extends BaseRepository
                 'attachment_id' => $attachmentId ? (int) $attachmentId : null,
                 'protected_path' => $protectedPath,
                 'content_url' => $row->content_url ?? '',
+                'file_path' => $row->file_path ?? null,
+                'file_size' => isset($row->file_size) ? (int) $row->file_size : null,
+                'file_type' => $row->file_type ?? null,
+                'thumbnail_url' => $row->thumbnail_url ?? null,
                 'visibility' => $visibility,
                 'is_downloadable' => isset($row->is_downloadable) ? (bool) $row->is_downloadable : true,
                 'sort_order' => isset($row->sort_order) ? (int) $row->sort_order : 0,

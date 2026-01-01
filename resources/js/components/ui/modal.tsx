@@ -22,6 +22,7 @@ interface ModalProps {
   size?: ModalSize;
   maxWidthClassName?: string;
   panelClassName?: string;
+  bodyClassName?: string;
   showCloseButton?: boolean;
   closeOnOverlayClick?: boolean;
   loading?: boolean;
@@ -43,6 +44,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'xl',
   maxWidthClassName,
   panelClassName = '',
+  bodyClassName,
   showCloseButton = true,
   closeOnOverlayClick = true,
   loading = false,
@@ -71,6 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
   }
 
   const panelWidthClass = maxWidthClassName || sizeClasses[size];
+  const bodyClasses = bodyClassName ?? 'px-6 py-5';
   const zIndex = customZIndex || 999999;
 
   // Default loading skeleton
@@ -110,7 +113,7 @@ export const Modal: React.FC<ModalProps> = ({
         }}
       />
       <div
-        className={`relative w-full ${panelWidthClass} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in duration-150 ${panelClassName}`}
+        className={`relative w-full ${panelWidthClass} bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden animate-in fade-in zoom-in duration-150 yatra-model-ui ${panelClassName}`}
         style={{ zIndex: zIndex + 1 }}
       >
         {!hideHeader && (title || showCloseButton) && (
@@ -137,8 +140,10 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className="px-6 py-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          {loading ? (loadingSkeleton || defaultLoadingSkeleton) : error ? (errorComponent || defaultErrorComponent) : children}
+        <div className={`${bodyClasses} max-h-[70vh] overflow-y-auto custom-scrollbar`}>
+          <div className="w-full">
+            {loading ? (loadingSkeleton || defaultLoadingSkeleton) : error ? (errorComponent || defaultErrorComponent) : children}
+          </div>
         </div>
 
         {!hideFooter && footer && (

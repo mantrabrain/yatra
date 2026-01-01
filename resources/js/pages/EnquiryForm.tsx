@@ -11,7 +11,9 @@ import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
+import { DatePicker } from '../components/ui/date-picker';
 import { Select } from '../components/ui/select';
+import { useToast } from '../components/ui/toast';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
@@ -52,6 +54,7 @@ const EnquiryForm: React.FC = () => {
   const { can } = usePermissions();
   const { navigate } = useNavigate();
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
 
   // Form state
   const [formData, setFormData] = useState<Partial<Enquiry>>({
@@ -81,7 +84,8 @@ const EnquiryForm: React.FC = () => {
     queryFn: async () => {
       if (!enquiryId) return null;
       const response = await apiService.getEnquiry(enquiryId!);
-      return response;
+      // Some endpoints return { success, data }, others return the object directly
+      return (response as any)?.data ?? response;
     },
     enabled: !!enquiryId && can('yatra_edit_bookings'),
   });
@@ -95,7 +99,12 @@ const EnquiryForm: React.FC = () => {
     enabled: can('yatra_edit_bookings'),
   });
 
-  const trips: Trip[] = tripsData || [];
+  // Normalize trips response to array
+  const trips: Trip[] = Array.isArray((tripsData as any)?.data)
+    ? (tripsData as any).data
+    : Array.isArray(tripsData)
+    ? (tripsData as Trip[])
+    : [];
 
   // Update form when enquiry data loads
   useEffect(() => {
@@ -124,6 +133,7 @@ const EnquiryForm: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
+      showToast(__('Enquiry saved successfully.', 'Enquiry saved successfully.'), 'success');
       navigate({ subpage: 'enquiries' });
     },
   });
@@ -309,13 +319,13 @@ const EnquiryForm: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                         {__('Preferred Travel Date', 'Preferred Travel Date')}
                       </label>
-                      <Input
-                        type="date"
+                      <DatePicker
                         value={formData.travel_date || ''}
-                        onChange={(e) => handleChange('travel_date', e.target.value)}
+                        onChange={(val) => handleChange('travel_date', val)}
+                        placeholder={__('Select date', 'Select date')}
                       />
                     </div>
                   </div>

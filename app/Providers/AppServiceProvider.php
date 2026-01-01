@@ -43,6 +43,8 @@ class AppServiceProvider
         // Initialize REST API hooks
         \Yatra\Hooks\RestApiHooks::init();
 
+        // Initialize cron hooks (trip lifecycle, etc.)
+        \Yatra\Hooks\CronHooks::init();
     }
 
     /**
