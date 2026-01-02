@@ -16,6 +16,8 @@ use Yatra\Services\DepartureService;
 use Yatra\Services\AvailabilityService;
 use Yatra\Repositories\DepartureRepository;
 use Yatra\Repositories\BookingDepartureRepository;
+use Yatra\PaymentGateways\PaymentGatewayRegistry;
+use Yatra\Services\SettingsService;
 
 /**
  * Booking Session REST API Controller
@@ -459,6 +461,23 @@ class BookingSessionController extends BaseController
             $additional_services = array_map('intval', $data['additional_services']);
         }
         
+        // Resolve enabled gateways for this session (use registry to respect availability)
+        $gatewayRegistry = PaymentGatewayRegistry::getInstance();
+        $availableGateways = $gatewayRegistry->getForCheckout();
+        $enabled_gateways = [];
+        foreach ($availableGateways as $gateway) {
+            if (!empty($gateway['id'])) {
+                $enabled_gateways[$gateway['id']] = $gateway;
+            }
+        }
+        // Fallback: if registry returned nothing, use saved settings gateways
+        if (empty($enabled_gateways)) {
+            $settings_gateways = SettingsService::get('payment_gateways', []);
+            if (is_array($settings_gateways)) {
+                $enabled_gateways = $settings_gateways;
+            }
+        }
+
         // Prepare session data
         $session_data = [
             'trip_id' => (int) $trip->id,
@@ -481,6 +500,8 @@ class BookingSessionController extends BaseController
             'is_day_trip' => $is_day_trip,
             // Additional services (selected in popup)
             'additional_services' => $additional_services,
+            // Payment gateways available for checkout UI
+            'enabled_gateways' => $enabled_gateways,
         ];
 
         if (!empty($data['is_remaining_payment'])) {
@@ -1099,12 +1120,29 @@ class BookingSessionController extends BaseController
 
         try {
             $booking = $booking_service->createBooking($booking_data);
-            $booking_id = $booking['id'];
+            // BookingService returns ['success'=>bool, 'booking_id'=>int, ...]
+            $booking_id = $booking['booking_id'] ?? $booking['id'] ?? null;
+            if (empty($booking['success'])) {
+                return new WP_REST_Response([
+                    'success' => false,
+                    'message' => $booking['message'] ?? __('Failed to create booking. Please try again.', 'yatra'),
+                    'error'   => $booking['message'] ?? '',
+                    'errors'  => $booking['errors'] ?? null,
+                ], 500);
+            }
         } catch (\Exception $e) {
             return new WP_REST_Response([
                 'success' => false,
                 'message' => __('Failed to create booking. Please try again.', 'yatra'),
                 'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        if (empty($booking_id)) {
+            return new WP_REST_Response([
+                'success' => false,
+                'message' => __('Failed to create booking. Please try again.', 'yatra'),
+                'error' => __('Booking ID was not generated.', 'yatra'),
             ], 500);
         }
 
@@ -1403,7 +1441,16 @@ class BookingSessionController extends BaseController
     {
         // Check if a custom confirmation page is set
         $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
-        
+
+        $permalinkStructure = get_option('permalink_structure');
+        $isPlain = empty($permalinkStructure);
+
+        if ($isPlain) {
+            // Plain permalinks: use the query var consumed by BookingConfirmationPageHandler
+            // Use root home URL (avoid any path segment to prevent 404)
+            return add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
+        }
+
         $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
 
         return trailingslashit($baseUrl) . $reference . '/';

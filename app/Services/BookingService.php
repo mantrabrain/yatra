@@ -182,7 +182,29 @@ class BookingService
             ]);
             
             // Comprehensive validation using BookingValidator
-            BookingValidator::validateCreate($data);
+            try {
+                BookingValidator::validateCreate($data);
+            } catch (\Yatra\Exceptions\ValidationException $e) {
+                Logger::warning('Booking validation failed', [
+                    'trip_id' => $data['trip_id'] ?? null,
+                    'errors' => $e->getErrors(),
+                    'error' => $e->getMessage(),
+                ]);
+                return [
+                    'success' => false,
+                    'message' => $e->getMessage() ?: __('Booking validation failed.', 'yatra'),
+                    'errors'  => $e->getErrors(),
+                ];
+            } catch (\Exception $e) {
+                Logger::warning('Booking validation failed', [
+                    'trip_id' => $data['trip_id'] ?? null,
+                    'error' => $e->getMessage(),
+                ]);
+                return [
+                    'success' => false,
+                    'message' => $e->getMessage() ?: __('Booking validation failed.', 'yatra'),
+                ];
+            }
             $data = BookingValidator::sanitize($data);
             
             // Business rule validations
@@ -588,34 +610,42 @@ class BookingService
     {
         // Build customer name from contact fields
         $customerName = trim(
-            ($booking->contact_first_name ?? '') . ' ' . ($booking->contact_last_name ?? '')
-        ) ?: null;
+            ($booking->customer_first_name ?? $booking->contact_first_name ?? '') . ' ' . ($booking->customer_last_name ?? $booking->contact_last_name ?? '')
+        ) ?: ($booking->customer_name ?? $booking->customer_email ?? $booking->contact_email ?? null);
+
+        $customerEmail = $booking->customer_email ?? $booking->contact_email ?? null;
+        $customerPhone = $booking->contact_phone ?? null;
 
         return [
             'id' => (int) $booking->id,
             'reference' => $booking->reference,
+            // UI expects booking_number and booking_status fields
+            'booking_number' => $booking->reference,
+            'booking_status' => $booking->status,
             'trip_id' => (int) $booking->trip_id,
             'trip_title' => $booking->trip_title ?? '',
             'trip_slug' => $booking->trip_slug ?? '',
             'customer_id' => $booking->customer_id ? (int) $booking->customer_id : null,
             'user_id' => $booking->user_id ? (int) $booking->user_id : null,
             'customer_name' => $customerName,
-            'customer_email' => $booking->contact_email ?? null,
-            'customer_phone' => $booking->contact_phone ?? null,
+            'customer_email' => $customerEmail,
+            'customer_phone' => $customerPhone,
             'contact' => [
-                'first_name' => $booking->contact_first_name,
-                'last_name' => $booking->contact_last_name,
-                'email' => $booking->contact_email,
-                'phone' => $booking->contact_phone,
+                'first_name' => $booking->contact_first_name ?? $booking->customer_first_name ?? null,
+                'last_name' => $booking->contact_last_name ?? $booking->customer_last_name ?? null,
+                'email' => $customerEmail,
+                'phone' => $customerPhone,
                 'country' => $booking->contact_country,
             ],
-            'contact_first_name' => $booking->contact_first_name ?? null,
-            'contact_last_name' => $booking->contact_last_name ?? null,
-            'contact_email' => $booking->contact_email ?? null,
-            'contact_phone' => $booking->contact_phone ?? null,
+            'contact_first_name' => $booking->contact_first_name ?? $booking->customer_first_name ?? null,
+            'contact_last_name' => $booking->contact_last_name ?? $booking->customer_last_name ?? null,
+            'contact_email' => $customerEmail,
+            'contact_phone' => $customerPhone,
             'contact_country' => $booking->contact_country ?? null,
             'travel_date' => $booking->travel_date,
-            'travelers_count' => (int) $booking->travelers_count,
+            // travelers_count stored; also fallback to total_travelers/travelers if present
+            'travelers_count' => (int) ($booking->travelers_count ?? $booking->total_travelers ?? $booking->travelers ?? 0),
+            'travelers' => (int) ($booking->travelers_count ?? $booking->total_travelers ?? $booking->travelers ?? 0),
             'total_amount' => (float) $booking->total_amount,
             'amount_paid' => (float) $booking->amount_paid,
             'amount_due' => (float) $booking->amount_due,
@@ -624,7 +654,11 @@ class BookingService
             'currency' => $booking->currency,
             'status' => $booking->status,
             'payment_status' => $booking->payment_status,
+            // Some UIs expect payment_method; map from payment_gateway
             'payment_gateway' => $booking->payment_gateway,
+            'payment_method' => $booking->payment_gateway,
+            // booking_date is used in admin table; map to created_at
+            'booking_date' => $booking->created_at,
             'created_at' => $booking->created_at,
             'updated_at' => $booking->updated_at,
         ];

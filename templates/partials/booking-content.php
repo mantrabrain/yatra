@@ -126,8 +126,9 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                         $pricing_type = $booking->pricing_type ?? 'regular';
                         $price_types = $booking->price_types ?? [];
                         $traveler_counts = $booking->traveler_counts ?? [];
+
                         // Include shared booking form fields
-                        include YATRA_PLUGIN_PATH . 'templates/partials/booking-form-fields.php'; 
+                        include YATRA_PLUGIN_PATH . 'templates/partials/booking-form-fields.php';
                         ?>
 
                     <!-- Submit Button -->

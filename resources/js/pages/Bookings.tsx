@@ -19,6 +19,7 @@ import { getCurrencySymbol, getCurrency } from '../data/currencies';
 import { apiService } from '../lib/api-client';
 import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { getErrorContext } from '../lib/errors';
+import { usePermissions } from '../hooks/usePermissions';
 
 interface Booking {
   id: number;
@@ -29,12 +30,15 @@ interface Booking {
   trip_id: number;
   booking_date: string;
   travel_date: string;
-  travelers: number;
+  travelers?: number;
+  travelers_count?: number;
   total_amount: number;
+  amount_paid?: number;
   currency?: string;
   payment_status: string;
   booking_status: string;
-  payment_method: string;
+  payment_method?: string;
+  payment_gateway?: string;
   created_at: string;
 }
 
@@ -81,10 +85,11 @@ const Bookings: React.FC = () => {
         };
   });
   const queryClient = useQueryClient();
-  const can = (capability: string) => (window as any)?.yatraAdmin?.capabilities?.[capability] || false;
+  const { can } = usePermissions();
   const { showToast } = useToast();
   const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
   const translations = (window as any)?.yatraAdmin?.translations || {};
+  const statsEnabled = can('yatra_view_bookings') !== false;
 
   // Helper function for translations
   const __ = (text: string) => translations[text] || text;
@@ -114,6 +119,8 @@ const Bookings: React.FC = () => {
   }, [searchTerm, statusFilter, paymentFilter, sortBy, sortOrder, page]);
 
   // Fetch bookings from API
+  const canViewBookings = can('yatra_view_bookings') !== false; // default true when capability data missing
+
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['bookings', queryParams],
     queryFn: async () => {
@@ -145,8 +152,23 @@ const Bookings: React.FC = () => {
         payment_status: queryParams.payment_status,
       });
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: canViewBookings,
   });
+
+  // Fetch booking stats (counts)
+  const { data: statsRaw } = useQuery({
+    queryKey: ['bookings-stats'],
+    queryFn: async () => {
+      return await apiService.getBookingsStats();
+    },
+    enabled: statsEnabled,
+  });
+  const statsData: any =  statsRaw ?? {};
+  const totalBookings = statsData?.all ?? statsData?.all ?? 0;
+  const confirmedCount = statsData?.confirmed ?? 0;
+  const pendingCount = statsData?.pending ?? 0;
+  const cancelledCount = statsData?.cancelled ?? 0;
+  const completedCount = statsData?.completed?? 0;
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -408,11 +430,11 @@ const Bookings: React.FC = () => {
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
   const statusOptions = [
-    { value: 'all', label: __('All Status') },
-    { value: 'confirmed', label: __('Confirmed') },
-    { value: 'pending', label: __('Pending') },
-    { value: 'cancelled', label: __('Cancelled') },
-    { value: 'completed', label: __('Completed') },
+    { value: 'all', label: __('All Status'), count: statsData?.all ?? totalBookings },
+    { value: 'confirmed', label: __('Confirmed'), count: confirmedCount },
+    { value: 'pending', label: __('Pending'), count: pendingCount },
+    { value: 'cancelled', label: __('Cancelled'), count: cancelledCount },
+    { value: 'completed', label: __('Completed'), count: completedCount },
   ];
 
   const sortOptions = [
@@ -460,13 +482,9 @@ const Bookings: React.FC = () => {
       sortable: true,
       visible: visibleColumns.customer,
       render: (booking: Booking) => (
-        <div>
-          <div className="font-medium text-gray-900 dark:text-white">
-            {booking.customer_name}
-          </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-            {booking.customer_email}
-          </div>
+        <div className="flex flex-col">
+          <span className="font-medium">{booking.customer_name || __('Guest')}</span>
+          <span className="text-xs text-muted-foreground">{booking.customer_email}</span>
         </div>
       ),
     },
@@ -476,16 +494,24 @@ const Bookings: React.FC = () => {
       sortable: true,
       visible: visibleColumns.trip,
       render: (booking: Booking) => (
-        <span className="text-gray-900 dark:text-white">{booking.trip_title}</span>
+        <div className="flex flex-col">
+          <a
+            href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&action=edit&id=${booking.trip_id}`}
+            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+          >
+            {booking.trip_title}
+          </a>
+          <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">{booking.trip_id ? `(ID: ${booking.trip_id})` : ''}</span>
+        </div>
       ),
     },
     {
       key: 'travelers',
       label: __('Travelers'),
-      sortable: false,
+      sortable: true,
       visible: visibleColumns.travelers,
       render: (booking: Booking) => (
-        <span className="text-gray-600 dark:text-gray-400">{booking.travelers}</span>
+        <span className="font-medium">{booking.travelers ?? booking.travelers_count ?? 0}</span>
       ),
     },
     {
@@ -493,22 +519,14 @@ const Bookings: React.FC = () => {
       label: __('Booking Date'),
       sortable: true,
       visible: visibleColumns.booking_date,
-      render: (booking: Booking) => (
-        <span className="text-gray-500 dark:text-gray-400 text-sm">
-          {formatDate(booking.booking_date)}
-        </span>
-      ),
+      render: (booking: Booking) => <span>{formatDate(booking.booking_date)}</span>,
     },
     {
       key: 'travel_date',
       label: __('Travel Date'),
       sortable: true,
       visible: visibleColumns.travel_date,
-      render: (booking: Booking) => (
-        <span className="text-gray-500 dark:text-gray-400 text-sm">
-          {formatDate(booking.travel_date)}
-        </span>
-      ),
+      render: (booking: Booking) => <span>{formatDate(booking.travel_date)}</span>,
     },
     {
       key: 'amount',
@@ -516,9 +534,15 @@ const Bookings: React.FC = () => {
       sortable: true,
       visible: visibleColumns.amount,
       render: (booking: Booking) => (
-        <span className="font-medium">
-          {formatPrice(booking.total_amount, booking.currency || defaultCurrency)}
-        </span>
+        <div className="flex flex-col">
+          <span className="font-semibold">{formatPrice(booking.total_amount, booking.currency)}</span>
+          {booking.amount_paid ? (
+            <span className="text-xs text-muted-foreground">
+              {__('Paid: ')}
+              {formatPrice(booking.amount_paid, booking.currency)}
+            </span>
+          ) : null}
+        </div>
       ),
     },
     {
@@ -538,265 +562,302 @@ const Bookings: React.FC = () => {
   ];
 
   const actions = [
-    {
-      key: 'view',
-      label: __('View'),
-      icon: <Eye className="w-4 h-4" />,
-      onClick: (booking: Booking) => handleView(booking),
+  {
+    key: 'view',
+    label: __('View'),
+    icon: <Eye className="w-4 h-4" />,
+    onClick: (booking: Booking) => handleView(booking),
+    condition: () => can('yatra_view_bookings'),
+  },
+  {
+    key: 'edit',
+    label: __('Edit'),
+    icon: <Edit className="w-4 h-4" />,
+    onClick: (booking: Booking) => handleEdit(booking),
+    condition: () => can('yatra_edit_bookings'),
+  },
+  {
+    key: 'mark_confirmed',
+    label: __('Mark as Confirmed'),
+    icon: <ArrowDown className="w-4 h-4" />,
+    onClick: async (booking: Booking) => {
+      setIsBulkPending(true);
+      try {
+        await updateStatusForIds([booking.id], 'confirmed');
+        queryClient.invalidateQueries({ queryKey: ['bookings'] });
+        showToast(__('Booking status updated'), 'success');
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to update booking status'), 'error');
+      } finally {
+        setIsBulkPending(false);
+      }
     },
-    {
-      key: 'edit',
-      label: __('Edit'),
-      icon: <Edit className="w-4 h-4" />,
-      onClick: (booking: Booking) => handleEdit(booking),
-      condition: () => can('yatra_edit_bookings'),
+    condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'confirmed',
+  },
+  {
+    key: 'mark_pending',
+    label: __('Mark as Pending'),
+    icon: <ArrowUp className="w-4 h-4" />,
+    onClick: async (booking: Booking) => {
+      setIsBulkPending(true);
+      try {
+        await updateStatusForIds([booking.id], 'pending');
+        queryClient.invalidateQueries({ queryKey: ['bookings'] });
+        showToast(__('Booking status updated'), 'success');
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to update booking status'), 'error');
+      } finally {
+        setIsBulkPending(false);
+      }
     },
-    {
-      key: 'mark_confirmed',
-      label: __('Mark as Confirmed'),
-      icon: <ArrowUp className="w-4 h-4" />,
-      onClick: async (booking: Booking) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([booking.id], 'confirmed');
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'confirmed',
+    condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'pending',
+  },
+  {
+    key: 'mark_cancelled',
+    label: __('Mark as Cancelled'),
+    icon: <ArrowDown className="w-4 h-4" />,
+    onClick: async (booking: Booking) => {
+      setIsBulkPending(true);
+      try {
+        await updateStatusForIds([booking.id], 'cancelled');
+        queryClient.invalidateQueries({ queryKey: ['bookings'] });
+        showToast(__('Booking status updated'), 'success');
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to update booking status'), 'error');
+      } finally {
+        setIsBulkPending(false);
+      }
     },
-    {
-      key: 'mark_pending',
-      label: __('Mark as Pending'),
-      icon: <ArrowDown className="w-4 h-4" />,
-      onClick: async (booking: Booking) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([booking.id], 'pending');
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'pending',
+    condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'cancelled',
+  },
+  {
+    key: 'mark_completed',
+    label: __('Mark as Completed'),
+    icon: <ArrowDown className="w-4 h-4" />,
+    onClick: async (booking: Booking) => {
+      setIsBulkPending(true);
+      try {
+        await updateStatusForIds([booking.id], 'completed');
+        queryClient.invalidateQueries({ queryKey: ['bookings'] });
+        showToast(__('Booking status updated'), 'success');
+      } catch (error: any) {
+        showToast(error?.message || __('Failed to update booking status'), 'error');
+      } finally {
+        setIsBulkPending(false);
+      }
     },
-    {
-      key: 'mark_cancelled',
-      label: __('Mark as Cancelled'),
-      icon: <ArrowDown className="w-4 h-4" />,
-      onClick: async (booking: Booking) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([booking.id], 'cancelled');
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'cancelled',
-    },
-    {
-      key: 'mark_completed',
-      label: __('Mark as Completed'),
-      icon: <ArrowDown className="w-4 h-4" />,
-      onClick: async (booking: Booking) => {
-        setIsBulkPending(true);
-        try {
-          await updateStatusForIds([booking.id], 'completed');
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Booking status updated'), 'success');
-        } catch (error: any) {
-          showToast(error?.message || __('Failed to update booking status'), 'error');
-        } finally {
-          setIsBulkPending(false);
-        }
-      },
-      condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'completed',
-    },
-    {
-      key: 'delete',
-      label: __('Delete'),
-      icon: <Trash2 className="w-4 h-4" />,
-      onClick: (booking: Booking) => handleDelete(booking),
-      variant: 'destructive' as const,
-      condition: () => can('yatra_delete_bookings'),
-    },
-  ];
+    condition: (booking: Booking) => can('yatra_edit_bookings') && booking.booking_status !== 'completed',
+  },
+  {
+    key: 'delete',
+    label: __('Delete'),
+    icon: <Trash2 className="w-4 h-4" />,
+    onClick: (booking: Booking) => handleDelete(booking),
+    variant: 'destructive' as const,
+    condition: () => can('yatra_delete_bookings'),
+  },
+];
 
-  return (
-    <div className="space-y-3">
-      <PageHeader
-        title={__('Bookings')}
-        description={__('Manage customer bookings and reservations')}
-        actionCapability="yatra_edit_bookings"
-        actions={
+return (
+  <div className="space-y-3">
+    <PageHeader
+      title={__('Bookings')}
+      description={__('Manage customer bookings and reservations')}
+      actions={
+        <div className="flex items-center gap-2">
           <Button onClick={handleCreateBooking} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
             {__('Create Booking')}
           </Button>
-        }
-      />
+        </div>
+      }
+    />
 
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
-            <div className="flex-1 min-w-0">
-              <SearchFilterToolbar
-                searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                statusFilter={statusFilter}
-                onStatusChange={(value) => {
-                  setStatusFilter(value);
-                  setPage(1);
-                }}
-                statusOptions={statusOptions}
-                sortBy={sortBy}
-                onSortByChange={(field) => {
-                  setSortBy(field);
-                  setPage(1);
-                }}
-                sortOrder={sortOrder}
-                onSortOrderChange={(order) => {
-                  setSortOrder(order);
-                  setPage(1);
-                }}
-                sortOptions={sortOptions}
-                onResetFilters={handleResetFilters}
-                hasFilters={!!hasFilters}
-                placeholder={__('Search bookings...')}
-              />
+    {/* Stats summary */}
+    {statsData && (
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">{__('Total Bookings')}</div>
+            <div className="text-2xl font-semibold">{totalBookings}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">{__('Confirmed')}</div>
+            <div className="text-2xl font-semibold">
+              {confirmedCount}
             </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">{__('Pending')}</div>
+            <div className="text-2xl font-semibold">
+              {pendingCount}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="text-sm text-muted-foreground">{__('Cancelled')}</div>
+            <div className="text-2xl font-semibold">
+              {cancelledCount}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )}
 
-            {/* Payment Status Filter */}
-            <div className="w-full lg:w-auto lg:min-w-[160px]">
-              <Select
-                value={paymentFilter}
-                onChange={(e) => {
-                  setPaymentFilter(e.target.value);
-                  setPage(1);
-                }}
-                className="w-full"
-              >
-                <option value="all">{__('All Payments')}</option>
-                <option value="paid">{__('Paid')}</option>
-                <option value="pending">{__('Pending')}</option>
-                <option value="partial">{__('Partial')}</option>
-                <option value="refunded">{__('Refunded')}</option>
-              </Select>
-            </div>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
+          <div className="flex-1 min-w-0">
+            <SearchFilterToolbar
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              statusFilter={statusFilter}
+              onStatusChange={(value) => {
+                setStatusFilter(value);
+                setPage(1);
+              }}
+              statusOptions={statusOptions}
+              sortBy={sortBy}
+              onSortByChange={(field) => {
+                setSortBy(field);
+                setPage(1);
+              }}
+              sortOrder={sortOrder}
+              onSortOrderChange={(order) => {
+                setSortOrder(order);
+                setPage(1);
+              }}
+              sortOptions={sortOptions}
+              onResetFilters={handleResetFilters}
+              hasFilters={!!hasFilters}
+              placeholder={__('Search bookings...')}
+            />
           </div>
-        </CardContent>
-      </Card>
 
-      <ConditionalRender capability="yatra_view_bookings">
-        <>
-          <BulkActionToolbar
-            selectedIds={selectedIds}
-            bulkAction={bulkAction}
-            setBulkAction={setBulkAction}
-            onApply={handleBulkApply}
-            onClearSelection={() => setSelectedIds([])}
-            statusFilter={statusFilter}
-            setStatusFilter={(value) => {
-              setStatusFilter(value);
-              setPage(1);
-            }}
-            statusOptions={[
-              { key: 'all', label: __('All'), count: 0 },
-              { key: 'confirmed', label: __('Confirmed'), count: 0 },
-              { key: 'pending', label: __('Pending'), count: 0 },
-              { key: 'cancelled', label: __('Cancelled'), count: 0 },
-              { key: 'completed', label: __('Completed'), count: 0 },
-            ]}
-            showColumnsDropdown={showColumnsDropdown}
-            setShowColumnsDropdown={setShowColumnsDropdown}
-            columnOptions={columnOptions}
-            onToggleColumn={toggleColumn}
-            bulkMutationPending={isBulkPending}
-            totalItems={total}
-            bulkActionOptions={bulkActionOptions}
-          />
+          {/* Payment Status Filter */}
+          <div className="w-full lg:w-auto lg:min-w-[160px]">
+            <Select
+              value={paymentFilter}
+              onChange={(e) => {
+                setPaymentFilter(e.target.value);
+                setPage(1);
+              }}
+              className="w-full"
+            >
+              <option value="all">{__('All Payments')}</option>
+              <option value="paid">{__('Paid')}</option>
+              <option value="pending">{__('Pending')}</option>
+              <option value="partial">{__('Partial')}</option>
+              <option value="refunded">{__('Refunded')}</option>
+            </Select>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
 
-          <Card>
-            <CardContent className="p-0">
-              <SharedTable
-                data={bookings}
-                columns={columns}
-                actions={actions}
-                isLoading={isLoading}
-                isError={isBookingsError}
-                errorText={__('Error loading bookings')}
-                errorDescription={__('We couldn\'t connect to the bookings service. Please refresh or try again shortly.')}
-                errorDetails={derivedErrorDetails}
-                errorRequestInfo={errorContext.requestInfo}
-                onRetry={() => refetch()}
-                emptyText={__('No bookings found')}
-                emptyDescription={
-                  hasFilters
-                    ? __('Try adjusting your filters to see more results.')
-                    : __('Get started by creating your first booking.')
-                }
-                onCreateClick={
-                  can('yatra_edit_bookings') ? handleCreateBooking : undefined
-                }
-                onSort={handleSort}
-                getSortIcon={getSortIcon}
-                selectedItemIds={selectedIds}
-                onSelectItem={handleSelectItem}
-                onSelectAll={handleSelectAll}
-                isAllSelected={isAllSelected}
-                getItemId={(booking: Booking) => booking.id}
-                skeletonRows={5}
-                capability="yatra_view_bookings"
-              />
-            </CardContent>
-          </Card>
+    <ConditionalRender capability="yatra_view_bookings">
+      <>
+        <BulkActionToolbar
+          selectedIds={selectedIds}
+          bulkAction={bulkAction}
+          setBulkAction={setBulkAction}
+          onApply={handleBulkApply}
+          onClearSelection={() => setSelectedIds([])}
+          statusFilter={statusFilter}
+          setStatusFilter={(value) => {
+            setStatusFilter(value);
+            setPage(1);
+          }}
+          statusOptions={[
+            { key: 'all', label: __('All'), count: statsData?.all ?? totalBookings },
+            { key: 'confirmed', label: __('Confirmed'), count: confirmedCount },
+            { key: 'pending', label: __('Pending'), count: pendingCount },
+            { key: 'cancelled', label: __('Cancelled'), count: cancelledCount },
+            { key: 'completed', label: __('Completed'), count: completedCount },
+          ]}
+          showColumnsDropdown={showColumnsDropdown}
+          setShowColumnsDropdown={setShowColumnsDropdown}
+          columnOptions={columnOptions}
+          onToggleColumn={toggleColumn}
+          bulkMutationPending={isBulkPending}
+          totalItems={total}
+          bulkActionOptions={bulkActionOptions}
+        />
 
-            {total > 0 && (
-              <div className="mt-4">
-                <Pagination
-                  currentPage={page}
-                  totalPages={totalPages}
-                  totalItems={total}
-                  itemsPerPage={10}
-                  onPageChange={(newPage) => setPage(newPage)}
-                  itemName={__('bookings')}
-                />
-              </div>
-            )}
-          </>
-      </ConditionalRender>
+        <Card>
+          <CardContent className="p-0">
+            <SharedTable
+              data={bookings}
+              columns={columns}
+              actions={actions}
+              isLoading={isLoading}
+              isError={isBookingsError}
+              errorText={__('Error loading bookings')}
+              errorDescription={__('We couldn\'t connect to the bookings service. Please refresh or try again shortly.')}
+              errorDetails={derivedErrorDetails}
+              errorRequestInfo={errorContext.requestInfo}
+              onRetry={() => refetch()}
+              emptyText={__('No bookings found')}
+              emptyDescription={
+                hasFilters
+                  ? __('Try adjusting your filters to see more results.')
+                  : __('Get started by creating your first booking.')
+              }
+              onCreateClick={
+                can('yatra_edit_bookings') ? handleCreateBooking : undefined
+              }
+              onSort={handleSort}
+              getSortIcon={getSortIcon}
+              selectedItemIds={selectedIds}
+              onSelectItem={handleSelectItem}
+              onSelectAll={handleSelectAll}
+              isAllSelected={isAllSelected}
+              getItemId={(booking: Booking) => booking.id}
+              skeletonRows={5}
+              capability="yatra_view_bookings"
+            />
+          </CardContent>
+        </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmationDialog
-        isOpen={deleteDialogOpen}
-        onClose={cancelDelete}
-        onConfirm={confirmDelete}
-        title={__('Delete Booking')}
-        description={
-          bookingToDelete
-            ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`)
-            : __('Are you sure you want to delete this booking?')
-        }
-        confirmText={__('Delete')}
-        cancelText={__('Cancel')}
-        variant="danger"
-        isLoading={deleteMutation.isPending}
-        icon={<AlertTriangle className="w-6 h-6 text-red-500" />}
-      />
-    </div>
-  );
+        {total > 0 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalItems={total}
+              itemsPerPage={10}
+              onPageChange={(newPage) => setPage(newPage)}
+              itemName={__('bookings')}
+            />
+          </div>
+        )}
+      </>
+    </ConditionalRender>
+
+    {/* Delete Confirmation Dialog */}
+    <ConfirmationDialog
+      isOpen={deleteDialogOpen}
+      onClose={cancelDelete}
+      onConfirm={confirmDelete}
+      title={__('Delete Booking')}
+      description={
+        bookingToDelete
+          ? __(`Are you sure you want to delete booking "${bookingToDelete.booking_number}"? This action cannot be undone.`)
+          : __('Are you sure you want to delete this booking?')
+      }
+      confirmText={__('Delete')}
+      cancelText={__('Cancel')}
+      variant="danger"
+      isLoading={deleteMutation.isPending}
+      icon={<AlertTriangle className="w-6 h-6 text-red-500" />}
+    />
+  </div>
+);
 };
 
 export default Bookings;
-

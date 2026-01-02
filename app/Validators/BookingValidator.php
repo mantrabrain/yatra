@@ -27,17 +27,20 @@ class BookingValidator
             $errors['trip_id'][] = __('Trip ID must be a valid positive integer', 'yatra');
         }
 
-        if (empty($data['customer_id'])) {
-            $errors['customer_id'][] = __('Customer ID is required', 'yatra');
-        } elseif (!is_numeric($data['customer_id']) || (int)$data['customer_id'] <= 0) {
-            $errors['customer_id'][] = __('Customer ID must be a valid positive integer', 'yatra');
+        // Customer can be guest, so customer_id is optional (if provided, validate)
+        if (isset($data['customer_id']) && $data['customer_id'] !== '') {
+            if (!is_numeric($data['customer_id']) || (int)$data['customer_id'] <= 0) {
+                $errors['customer_id'][] = __('Customer ID must be a valid positive integer', 'yatra');
+            }
         }
 
-        if (empty($data['departure_date'])) {
+        // Accept either departure_date or travel_date
+        $departureDate = $data['departure_date'] ?? $data['travel_date'] ?? null;
+        if (empty($departureDate)) {
             $errors['departure_date'][] = __('Departure date is required', 'yatra');
-        } elseif (!self::isValidDate($data['departure_date'])) {
+        } elseif (!self::isValidDate($departureDate)) {
             $errors['departure_date'][] = __('Departure date must be a valid date', 'yatra');
-        } elseif (strtotime($data['departure_date']) < strtotime('today')) {
+        } elseif (strtotime($departureDate) < strtotime('today')) {
             $errors['departure_date'][] = __('Departure date cannot be in the past', 'yatra');
         }
 
@@ -63,16 +66,35 @@ class BookingValidator
         }
 
         // Validate traveler count
-        if (isset($data['total_travelers'])) {
-            if (!is_numeric($data['total_travelers']) || (int)$data['total_travelers'] < 1) {
+        $travelerCount = $data['total_travelers'] ?? $data['travelers_count'] ?? null;
+        if ($travelerCount !== null) {
+            if (!is_numeric($travelerCount) || (int)$travelerCount < 1) {
                 $errors['total_travelers'][] = __('Total travelers must be at least 1', 'yatra');
             }
         }
 
         // Validate payment method
-        if (isset($data['payment_method'])) {
-            $validMethods = ['cash', 'bank_transfer', 'credit_card', 'paypal', 'stripe', 'razorpay'];
-            if (!in_array($data['payment_method'], $validMethods)) {
+        // Validate payment method or gateway (frontend may send either)
+        if (isset($data['payment_method']) || isset($data['payment_gateway'])) {
+            $value = $data['payment_method'] ?? $data['payment_gateway'];
+            $validMethods = [
+                'full',
+                'partial',
+                'cash',
+                'bank_transfer',
+                'credit_card',
+                'paypal',
+                'stripe',
+                'razorpay',
+                'pay_later',
+                'paystack',
+                'mollie',
+                'square',
+                'authorize_net',
+                'esewa',
+                'khalti',
+            ];
+            if (!in_array($value, $validMethods, true)) {
                 $errors['payment_method'][] = __('Invalid payment method', 'yatra');
             }
         }
@@ -170,6 +192,9 @@ class BookingValidator
         if (isset($data['total_travelers'])) {
             $sanitized['total_travelers'] = (int)$data['total_travelers'];
         }
+        if (isset($data['travelers_count'])) {
+            $sanitized['travelers_count'] = (int)$data['travelers_count'];
+        }
 
         // Float fields
         if (isset($data['total_amount'])) {
@@ -183,6 +208,9 @@ class BookingValidator
         // Date fields
         if (isset($data['departure_date'])) {
             $sanitized['departure_date'] = sanitize_text_field($data['departure_date']);
+        }
+        if (isset($data['travel_date'])) {
+            $sanitized['travel_date'] = sanitize_text_field($data['travel_date']);
         }
 
         if (isset($data['booking_date'])) {
@@ -213,8 +241,30 @@ class BookingValidator
         }
 
         if (isset($data['payment_method'])) {
-            $validMethods = ['cash', 'bank_transfer', 'credit_card', 'paypal', 'stripe', 'razorpay'];
-            $sanitized['payment_method'] = in_array($data['payment_method'], $validMethods) ? $data['payment_method'] : 'cash';
+            // Align with allowed frontend values (full/partial or gateway handles)
+            $validMethods = [
+                'full',
+                'partial',
+                'cash',
+                'bank_transfer',
+                'credit_card',
+                'paypal',
+                'stripe',
+                'razorpay',
+                'pay_later',
+                'paystack',
+                'mollie',
+                'square',
+                'authorize_net',
+                'esewa',
+                'khalti',
+            ];
+            $sanitized['payment_method'] = in_array($data['payment_method'], $validMethods, true)
+                ? $data['payment_method']
+                : $data['payment_method']; // keep original so validation can report exact value
+        }
+        if (isset($data['payment_gateway'])) {
+            $sanitized['payment_gateway'] = sanitize_text_field($data['payment_gateway']);
         }
 
         if (isset($data['payment_status'])) {

@@ -23,9 +23,13 @@ class BookingConfirmationPageHandler extends BasePageHandler
     {
         $confirmation_id = $route_data['confirmation_id'];
 
-        // Validate confirmation ID
+        // Validate confirmation ID (stored as booking reference)
         $bookingRepo = new BookingRepository();
-        $booking = $bookingRepo->findByConfirmationId($confirmation_id);
+        // Try rich booking first (with trip data), then fallback
+        $booking = $bookingRepo->findByReferenceWithTrip($confirmation_id);
+        if (!$booking) {
+            $booking = $bookingRepo->findByReference($confirmation_id);
+        }
 
         if (!$booking) {
             return false;

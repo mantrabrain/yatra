@@ -73,6 +73,24 @@ class BookingPageHandler extends BasePageHandler
                     }
                 }
 
+                // Resolve enabled gateways (prefer session, fallback to registry)
+                $enabled_gateways = $session['enabled_gateways'] ?? [];
+                if (empty($enabled_gateways)) {
+                    // Fallback: get available gateways from registry
+                    $gatewayRegistry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+                    $availableGateways = $gatewayRegistry->getForCheckout();
+                    foreach ($availableGateways as $gateway) {
+                        if (!empty($gateway['id'])) {
+                            $enabled_gateways[$gateway['id']] = $gateway;
+                        }
+                    }
+                }
+
+                // Debug log to verify gateways are being resolved
+                error_log('BookingPageHandler: enabled_gateways count = ' . count($enabled_gateways));
+                if (!empty($enabled_gateways)) {
+                    error_log('BookingPageHandler: gateway IDs = ' . implode(', ', array_keys($enabled_gateways)));
+                }
                 // Build booking view model expected by templates
                 $booking = (object) [
                     'trip' => $trip,
@@ -85,7 +103,7 @@ class BookingPageHandler extends BasePageHandler
                     'partial_payment_percentage' => $session['partial_payment_percentage'] ?? null,
                     'deposit_required' => $session['deposit_required'] ?? null,
                     'deposit_percentage' => $session['deposit_percentage'] ?? null,
-                    'enabled_gateways' => $session['enabled_gateways'] ?? [],
+                    'enabled_gateways' => $enabled_gateways,
                     'group_discount' => $session['group_discount'] ?? null,
                     // amounts for templates
                     'total_amount' => $session['total_amount'] ?? null,

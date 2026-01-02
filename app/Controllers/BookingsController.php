@@ -219,6 +219,10 @@ class BookingsController extends BaseController
      */
     public function checkAdminPermission(): bool
     {
+        // Allow custom booking capability or fallback to manage_options
+        if (current_user_can('yatra_view_bookings')) {
+            return true;
+        }
         return current_user_can('manage_options');
     }
 
@@ -397,10 +401,8 @@ class BookingsController extends BaseController
     {
         $stats = $this->bookingService->getStats();
 
-        return new WP_REST_Response([
-            'success' => true,
-            'data' => $stats,
-        ]);
+         return new WP_REST_Response($stats ?? []);
+
     }
 
     /**

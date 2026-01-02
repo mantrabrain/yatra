@@ -158,7 +158,7 @@ class BookingDepartureRepository extends BaseRepository
         $table = $this->getTableName();
         
         // Get old departure ID
-        $oldDepartureId = $this->getDepartureForBooking($bookingId);
+        $oldDepartureId = $this->getDepartureIdForBooking($bookingId);
         
         // Remove old link
         if ($oldDepartureId) {

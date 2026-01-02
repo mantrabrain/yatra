@@ -216,9 +216,12 @@ class DepartureService
             throw new \InvalidArgumentException('Departure not found');
         }
         
-        // Check if capacity allows
-        if ($departure->booked_count + $amount > $departure->max_capacity) {
-            throw new \InvalidArgumentException('Cannot exceed max capacity');
+        // Check if capacity allows (only when max_capacity is set)
+        $currentBooked = (int) ($departure->booked_count ?? 0);
+        $maxCapacity = $departure->max_capacity !== null ? (int) $departure->max_capacity : 0;
+        if ($maxCapacity > 0 && ($currentBooked + $amount > $maxCapacity)) {
+            // Do not throw; just prevent exceeding capacity
+            return false;
         }
         
         return $this->repository->incrementBookedCount($id, $amount);
@@ -492,7 +495,7 @@ class DepartureService
     {
         // Get departure ID if not provided
         if ($departureId === null) {
-            $departureId = $this->bookingDepartureRepository->getDepartureForBooking($bookingId);
+            $departureId = $this->bookingDepartureRepository->getDepartureIdForBooking($bookingId);
             if ($departureId === null) {
                 return true; // No link exists
             }
@@ -613,7 +616,8 @@ class DepartureService
      */
     public function getBookingsForDeparture(int $departureId): array
     {
-        $bookingIds = $this->bookingDepartureRepository->getBookingsForDeparture($departureId);
+        // Use repository helper to get booking IDs for this departure
+        $bookingIds = $this->bookingDepartureRepository->getBookingIdsForDeparture($departureId);
         
         if (empty($bookingIds)) {
             return [];
@@ -621,6 +625,10 @@ class DepartureService
 
         $bookings = [];
         foreach ($bookingIds as $bookingId) {
+            $bookingId = (int) $bookingId;
+            if ($bookingId <= 0) {
+                continue;
+            }
             $booking = $this->bookingRepository->find($bookingId);
             if ($booking) {
                 $bookings[] = $booking;
@@ -638,7 +646,7 @@ class DepartureService
      */
     public function getDepartureForBooking(int $bookingId): ?Departure
     {
-        $departureId = $this->bookingDepartureRepository->getDepartureForBooking($bookingId);
+        $departureId = $this->bookingDepartureRepository->getDepartureIdForBooking($bookingId);
         
         if ($departureId === null) {
             return null;
@@ -707,7 +715,8 @@ class DepartureService
      */
     public function recalculateDepartureRevenue(int $departureId): float
     {
-        $bookingIds = $this->bookingDepartureRepository->getBookingsForDeparture($departureId);
+        // Use repository helper to fetch booking IDs
+        $bookingIds = $this->bookingDepartureRepository->getBookingIdsForDeparture($departureId);
         
         if (empty($bookingIds)) {
             $this->repository->update($departureId, ['total_revenue' => 0.00]);
@@ -717,6 +726,10 @@ class DepartureService
         $totalRevenue = 0.00;
         
         foreach ($bookingIds as $bookingId) {
+            $bookingId = (int) $bookingId;
+            if ($bookingId <= 0) {
+                continue;
+            }
             $booking = $this->bookingRepository->find($bookingId);
             if ($booking) {
                 // Only count confirmed/pending bookings, exclude cancelled/refunded

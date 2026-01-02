@@ -4,25 +4,58 @@ declare(strict_types=1);
 
 namespace Yatra\Repositories;
 
+use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\BookingsTable;
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 
 /**
  * Booking Repository
- * 
+ *
  * Handles all database operations for bookings.
  * No business logic here - only database CRUD operations.
- * 
+ *
  * @package Yatra\Repositories
  */
 class BookingRepository extends BaseRepository
 {
+    private ?string $resolvedBookingsTable = null;
+
+    private function getResolvedBookingsTable(): string
+    {
+        if ($this->resolvedBookingsTable !== null) {
+            return $this->resolvedBookingsTable;
+        }
+        $candidates = [
+            $this->wpdb->prefix . 'yatra_new_bookings',
+            $this->wpdb->prefix . 'yatra_bookings',
+        ];
+        foreach ($candidates as $candidate) {
+            $exists = $this->wpdb->get_var($this->wpdb->prepare("SHOW TABLES LIKE %s", $candidate));
+            if ($exists === $candidate) {
+                $this->resolvedBookingsTable = $candidate;
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('[Yatra] BookingRepository using table: ' . $candidate);
+                }
+                return $candidate;
+            }
+        }
+        // Fallback to default
+        $this->resolvedBookingsTable = BookingsTable::getTableName();
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Yatra] BookingRepository fallback table: ' . $this->resolvedBookingsTable);
+        }
+        return $this->resolvedBookingsTable;
+    }
+
     /**
      * Get full table name with prefix
      */
     protected function getTableName(): string
     {
-        return BookingsTable::getTableName();
+        return $this->getResolvedBookingsTable();
     }
 
     /**
@@ -35,16 +68,16 @@ class BookingRepository extends BaseRepository
 
     /**
      * Get paginated bookings with filters
-     * 
+     *
      * @param array $filters {
-     *     @type int    $page           Page number (default: 1)
-     *     @type int    $per_page       Items per page (default: 20)
-     *     @type string $status         Booking status filter
-     *     @type string $payment_status Payment status filter
-     *     @type int    $trip_id        Trip ID filter
-     *     @type string $search         Search term
-     *     @type string $date_from      Start date filter
-     *     @type string $date_to        End date filter
+     * @type int $page Page number (default: 1)
+     * @type int $per_page Items per page (default: 20)
+     * @type string $status Booking status filter
+     * @type string $payment_status Payment status filter
+     * @type int $trip_id Trip ID filter
+     * @type string $search Search term
+     * @type string $date_from Start date filter
+     * @type string $date_to End date filter
      * }
      * @return array {data: array, total: int, page: int, per_page: int, total_pages: int}
      */
@@ -52,10 +85,11 @@ class BookingRepository extends BaseRepository
     {
         $table = $this->getTableName();
         $trips_table = $this->getTripsTable();
+        $customers_table = \Yatra\Database\Tables\CustomersTable::getTableName();
 
         // Pagination
-        $page = max(1, (int) ($filters['page'] ?? 1));
-        $per_page = max(1, min(100, (int) ($filters['per_page'] ?? 20)));
+        $page = max(1, (int)($filters['page'] ?? 1));
+        $per_page = max(1, min(100, (int)($filters['per_page'] ?? 20)));
         $offset = ($page - 1) * $per_page;
 
         // Build WHERE clause
@@ -74,7 +108,7 @@ class BookingRepository extends BaseRepository
 
         if (!empty($filters['trip_id'])) {
             $where_clauses[] = 'b.trip_id = %d';
-            $where_values[] = (int) $filters['trip_id'];
+            $where_values[] = (int)$filters['trip_id'];
         }
 
         if (!empty($filters['search'])) {
@@ -100,12 +134,20 @@ class BookingRepository extends BaseRepository
         if (!empty($where_values)) {
             $count_query = $this->wpdb->prepare($count_query, ...$where_values);
         }
-        $total = (int) $this->wpdb->get_var($count_query);
+        $total = (int)$this->wpdb->get_var($count_query);
 
-        // Get bookings with trip info
-        $query = "SELECT b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image
+        // Get bookings with trip info and customer info
+        $query = "SELECT 
+                    b.*, 
+                    t.title as trip_title, 
+                    t.slug as trip_slug, 
+                    t.featured_image,
+                    c.first_name AS customer_first_name,
+                    c.last_name AS customer_last_name,
+                    c.email AS customer_email
                   FROM {$table} b
                   LEFT JOIN {$trips_table} t ON b.trip_id = t.id
+                  LEFT JOIN {$customers_table} c ON c.id = b.customer_id
                   WHERE {$where_sql}
                   ORDER BY b.created_at DESC
                   LIMIT %d OFFSET %d";
@@ -118,13 +160,13 @@ class BookingRepository extends BaseRepository
             'total' => $total,
             'page' => $page,
             'per_page' => $per_page,
-            'total_pages' => (int) ceil($total / $per_page),
+            'total_pages' => (int)ceil($total / $per_page),
         ];
     }
 
     /**
      * Find booking by ID with trip info
-     * 
+     *
      * @param int $id Booking ID
      * @return object|null
      */
@@ -146,75 +188,82 @@ class BookingRepository extends BaseRepository
 
     /**
      * Find booking by reference code
-     * 
+     *
      * @param string $reference Booking reference
      * @return object|null
      */
     public function findByReference(string $reference): ?object
     {
-        $table = $this->getTableName();
+        $table = $this->getResolvedBookingsTable();
 
         $query = $this->wpdb->prepare(
             "SELECT * FROM {$table} WHERE reference = %s",
             sanitize_text_field($reference)
         );
 
-        return $this->wpdb->get_row($query) ?: null;
+        $row = $this->wpdb->get_row($query);
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Yatra] findByReference table=' . $table . ' ref=' . $reference . ' found=' . (!empty($row) ? 'yes' : 'no'));
+        }
+        return $row ?: null;
     }
 
     /**
      * Find booking by reference with trip data
-     * 
+     *
      * @param string $reference Booking reference
      * @return object|null
      */
     public function findByReferenceWithTrip(string $reference): ?object
     {
-        $table = $this->getTableName();
-        
+        $table = $this->getResolvedBookingsTable();
+
         // Use TripRepository for trips table
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
-        
-        // Using hardcoded table names since there's no dedicated repository for these tables
-        $tripDestinations = $this->wpdb->prefix . 'yatra_trip_destinations';
-        $destinations = $this->wpdb->prefix . 'yatra_destinations';
-        $tripActivities = $this->wpdb->prefix . 'yatra_trip_activities';
-        $activities = $this->wpdb->prefix . 'yatra_activities';
-        $tripCategories = $this->wpdb->prefix . 'yatra_trip_trip_categories';
-        $categories = $this->wpdb->prefix . 'yatra_trip_categories';
-        $reviewsTable = $this->wpdb->prefix . 'yatra_reviews';
+
+        $tripClassificationTable = TripClassificationsTable::getTableName();
+        $classificationTable = ClassificationsTable::getTableName();
+        $reviewsTable = ReviewsTable::getTableName();
+
+        $joins = [];
+        $selectParts = [
+            "b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image, 
+             t.duration_days, t.duration_nights, t.difficulty_level,
+             t.starting_location, t.ending_location"
+        ];
+
+        $joins[] = "LEFT JOIN {$tripClassificationTable} tc ON tc.trip_id = t.id";
+        $joins[] = "LEFT JOIN {$classificationTable} cls ON cls.id = tc.classification_id";
+        $selectParts[] = "GROUP_CONCAT(DISTINCT cls.name ORDER BY tc.`sort_order` SEPARATOR ',') as trip_classifications";
+
+        $joins[] = "LEFT JOIN {$reviewsTable} rv ON rv.trip_id = t.id AND rv.status = 'approved'";
+        $selectParts[] = "AVG(rv.rating) as trip_average_rating";
+        $selectParts[] = "COUNT(DISTINCT CASE WHEN rv.status = 'approved' THEN rv.id END) as trip_review_count";
+
+        $selectSql = implode(",\n                    ", $selectParts);
+        $joinsSql = implode("\n             ", $joins);
 
         $query = $this->wpdb->prepare(
-            "SELECT b.*, t.title as trip_title, t.slug as trip_slug, t.featured_image, 
-                    t.duration_days, t.duration_nights, t.difficulty_level,
-                    t.starting_location, t.ending_location,
-                    GROUP_CONCAT(DISTINCT d.name ORDER BY td.`order` SEPARATOR ',') as trip_destinations,
-                    GROUP_CONCAT(DISTINCT act.name ORDER BY ta.`order` SEPARATOR ',') as trip_activities,
-                    GROUP_CONCAT(DISTINCT cat.name ORDER BY tc.`order` SEPARATOR ',') as trip_categories,
-                    AVG(rv.rating) as trip_average_rating,
-                    COUNT(DISTINCT CASE WHEN rv.status = 'approved' THEN rv.id END) as trip_review_count
+            "SELECT {$selectSql}
              FROM {$table} b
              LEFT JOIN {$tripsTable} t ON b.trip_id = t.id
-             LEFT JOIN {$tripDestinations} td ON td.trip_id = t.id
-             LEFT JOIN {$destinations} d ON d.id = td.destination_id
-             LEFT JOIN {$tripActivities} ta ON ta.trip_id = t.id
-             LEFT JOIN {$activities} act ON act.id = ta.activity_id
-             LEFT JOIN {$tripCategories} tc ON tc.trip_id = t.id
-             LEFT JOIN {$categories} cat ON cat.id = tc.category_id
-             LEFT JOIN {$reviewsTable} rv ON rv.trip_id = t.id AND rv.status = 'approved'
+             {$joinsSql}
              WHERE b.reference = %s
              GROUP BY b.id
              LIMIT 1",
             sanitize_text_field($reference)
         );
 
-        return $this->wpdb->get_row($query) ?: null;
+
+        $row = $this->wpdb->get_row($query);
+
+        return $row ?: null;
     }
 
     /**
      * Find bookings by customer ID
-     * 
+     *
      * @param int $customerId Customer ID
      * @param int $limit Limit results
      * @return array
@@ -240,7 +289,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Find bookings by user ID (WordPress user)
-     * 
+     *
      * @param int $userId WordPress user ID
      * @param int $limit Limit results
      * @return array
@@ -268,7 +317,7 @@ class BookingRepository extends BaseRepository
      * Find bookings by contact email
      *
      * @param string $email Contact email
-     * @param int    $limit Limit results
+     * @param int $limit Limit results
      * @return array
      */
     public function findByContactEmail(string $email, int $limit = 10): array
@@ -292,7 +341,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Create a new booking
-     * 
+     *
      * @param array $data Booking data
      * @return int Booking ID on success
      * @throws \Exception on failure
@@ -310,7 +359,7 @@ class BookingRepository extends BaseRepository
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
         $hasStartDate = in_array('start_date', $columns, true);
         $hasEndDate = in_array('end_date', $columns, true);
-        
+
         if (!$hasStartDate && isset($insertData['start_date'])) {
             unset($insertData['start_date']);
         }
@@ -329,8 +378,8 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update a booking
-     * 
-     * @param int   $id   Booking ID
+     *
+     * @param int $id Booking ID
      * @param array $data Booking data to update
      * @return bool
      */
@@ -346,7 +395,7 @@ class BookingRepository extends BaseRepository
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
         $hasStartDate = in_array('start_date', $columns, true);
         $hasEndDate = in_array('end_date', $columns, true);
-        
+
         if (!$hasStartDate && isset($updateData['start_date'])) {
             unset($updateData['start_date']);
         }
@@ -371,8 +420,8 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update booking status
-     * 
-     * @param int    $id     Booking ID
+     *
+     * @param int $id Booking ID
      * @param string $status New status
      * @return bool
      */
@@ -408,8 +457,8 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update payment status
-     * 
-     * @param int    $id     Booking ID
+     *
+     * @param int $id Booking ID
      * @param string $status New payment status
      * @return bool
      */
@@ -431,8 +480,8 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update amount paid
-     * 
-     * @param int   $id         Booking ID
+     *
+     * @param int $id Booking ID
      * @param float $amountPaid New amount paid
      * @return bool
      */
@@ -446,7 +495,7 @@ class BookingRepository extends BaseRepository
             return false;
         }
 
-        $amountDue = max(0, (float) $booking->total_amount - $amountPaid);
+        $amountDue = max(0, (float)$booking->total_amount - $amountPaid);
         $paymentStatus = $amountDue <= 0 ? 'paid' : ($amountPaid > 0 ? 'partial' : 'pending');
 
         $result = $this->wpdb->update(
@@ -465,7 +514,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Delete a booking
-     * 
+     *
      * @param int $id Booking ID
      * @return bool
      */
@@ -480,7 +529,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Get booking statistics
-     * 
+     *
      * @return array
      */
     public function getStats(): array
@@ -488,18 +537,41 @@ class BookingRepository extends BaseRepository
         $table = $this->getTableName();
 
         // Total bookings by status
-        $statusStats = $this->wpdb->get_results(
+        $statusStatsRaw = $this->wpdb->get_results(
             "SELECT status, COUNT(*) as count FROM {$table} GROUP BY status",
             OBJECT_K
         );
 
+        // Normalize by_status with integer counts and default buckets
+        $byStatus = [
+            'pending' => (object) ['status' => 'pending', 'count' => 0],
+            'confirmed' => (object) ['status' => 'confirmed', 'count' => 0],
+            'cancelled' => (object) ['status' => 'cancelled', 'count' => 0],
+            'completed' => (object) ['status' => 'completed', 'count' => 0],
+            'processing' => (object) ['status' => 'processing', 'count' => 0],
+            'refunded' => (object) ['status' => 'refunded', 'count' => 0],
+            'failed' => (object) ['status' => 'failed', 'count' => 0],
+            'on_hold' => (object) ['status' => 'on_hold', 'count' => 0],
+            'trash' => (object) ['status' => 'trash', 'count' => 0],
+        ];
+
+        foreach ((array)$statusStatsRaw as $status => $row) {
+            $count = isset($row->count) ? (int)$row->count : 0;
+            if (isset($byStatus[$status])) {
+                $byStatus[$status]->count = $count;
+            } else {
+                // keep unexpected statuses too
+                $byStatus[$status] = (object) ['status' => $status, 'count' => $count];
+            }
+        }
+
         // Total revenue
-        $totalRevenue = (float) $this->wpdb->get_var(
+        $totalRevenue = (float)$this->wpdb->get_var(
             "SELECT SUM(total_amount) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed')"
         );
 
         // Total collected
-        $totalCollected = (float) $this->wpdb->get_var(
+        $totalCollected = (float)$this->wpdb->get_var(
             "SELECT SUM(amount_paid) FROM {$table} WHERE status NOT IN ('cancelled', 'refunded', 'failed')"
         );
 
@@ -515,19 +587,20 @@ class BookingRepository extends BaseRepository
             date('Y-m-d')
         ));
 
+        // Normalize counts for UI expectations
         return [
-            'total' => array_sum(array_column((array) $statusStats, 'count')),
-            'by_status' => $statusStats,
-            'total_revenue' => $totalRevenue,
-            'total_collected' => $totalCollected,
-            'this_month' => (int) $thisMonth,
-            'upcoming' => (int) $upcoming,
+            'all' => array_sum(array_column((array)$byStatus, 'count')),
+            'confirmed' => $byStatus['confirmed']->count ?? 0,
+            'pending' => $byStatus['pending']->count ?? 0,
+            'trash' => $byStatus['trash']->count ?? 0,
+            'cancelled' => $byStatus['cancelled']->count ?? 0,
+            'completed' => $byStatus['completed']->count ?? 0,
         ];
     }
 
     /**
      * Generate unique booking reference
-     * 
+     *
      * @return string
      */
     public function generateReference(): string
@@ -535,7 +608,7 @@ class BookingRepository extends BaseRepository
         $table = $this->getTableName();
 
         do {
-            $reference = 'YTR-' . strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 8));
+            $reference = 'YTR-' . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 8));
             $exists = $this->wpdb->get_var($this->wpdb->prepare(
                 "SELECT COUNT(*) FROM {$table} WHERE reference = %s",
                 $reference
@@ -547,9 +620,9 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update customer ID for all bookings (used for merging customers)
-     * 
+     *
      * @param int $fromCustomerId Source customer ID
-     * @param int $toCustomerId   Target customer ID
+     * @param int $toCustomerId Target customer ID
      * @return int Number of affected rows
      */
     public function updateCustomerBookings(int $fromCustomerId, int $toCustomerId): int
@@ -564,19 +637,19 @@ class BookingRepository extends BaseRepository
             ['%d']
         );
 
-        return (int) $this->wpdb->rows_affected;
+        return (int)$this->wpdb->rows_affected;
     }
 
     /**
      * Get bookings for reminder emails
-     * 
+     *
      * @param string $travelDate Target travel date
      * @return array
      */
     public function getBookingsForReminder(string $travelDate): array
     {
         $table = $this->getTableName();
-        
+
         // Use TripRepository for trips table
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
@@ -594,7 +667,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Mark booking reminder as sent
-     * 
+     *
      * @param int $bookingId Booking ID
      * @return bool
      */
@@ -618,7 +691,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Get expired pending bookings
-     * 
+     *
      * @param string $expiryThreshold Datetime threshold
      * @return array
      */
@@ -638,9 +711,9 @@ class BookingRepository extends BaseRepository
 
     /**
      * Expire a booking
-     * 
-     * @param int    $bookingId Booking ID
-     * @param string $reason    Cancellation reason
+     *
+     * @param int $bookingId Booking ID
+     * @param string $reason Cancellation reason
      * @return bool
      */
     public function expireBooking(int $bookingId, string $reason): bool
@@ -665,8 +738,8 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update payment session ID for a booking
-     * 
-     * @param int    $bookingId Booking ID
+     *
+     * @param int $bookingId Booking ID
      * @param string $sessionId Payment session ID from gateway
      * @return bool
      */
@@ -687,7 +760,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Prepare booking data for insert/update
-     * 
+     *
      * @param array $data Raw data
      * @return array Sanitized data
      */
@@ -714,19 +787,19 @@ class BookingRepository extends BaseRepository
 
         foreach ($stringFields as $field) {
             if (array_key_exists($field, $data)) {
-                $prepared[$field] = sanitize_text_field((string) $data[$field]);
+                $prepared[$field] = sanitize_text_field((string)$data[$field]);
             }
         }
 
         foreach ($intFields as $field) {
             if (array_key_exists($field, $data)) {
-                $prepared[$field] = $data[$field] === null ? null : (int) $data[$field];
+                $prepared[$field] = $data[$field] === null ? null : (int)$data[$field];
             }
         }
 
         foreach ($floatFields as $field) {
             if (array_key_exists($field, $data)) {
-                $prepared[$field] = (float) $data[$field];
+                $prepared[$field] = (float)$data[$field];
             }
         }
 
@@ -750,7 +823,7 @@ class BookingRepository extends BaseRepository
 
         // Calculate end_date if start_date is provided but end_date is not
         if (isset($prepared['start_date']) && !isset($prepared['end_date']) && !empty($prepared['trip_id'])) {
-            $prepared['end_date'] = $this->calculateEndDate($prepared['start_date'], (int) $prepared['trip_id']);
+            $prepared['end_date'] = $this->calculateEndDate($prepared['start_date'], (int)$prepared['trip_id']);
         }
 
         // Sync travel_date with start_date if start_date is provided
@@ -762,7 +835,7 @@ class BookingRepository extends BaseRepository
         // If columns don't exist, only use travel_date (backward compatibility)
         $table = $this->getTableName();
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
-        
+
         if (!in_array('start_date', $columns, true)) {
             unset($prepared['start_date']);
         }
@@ -771,11 +844,11 @@ class BookingRepository extends BaseRepository
         }
 
         if (array_key_exists('user_agent', $data)) {
-            $prepared['user_agent'] = sanitize_textarea_field((string) $data['user_agent']);
+            $prepared['user_agent'] = sanitize_textarea_field((string)$data['user_agent']);
         }
 
         if (array_key_exists('payment_notes', $data)) {
-            $prepared['payment_notes'] = sanitize_textarea_field((string) $data['payment_notes']);
+            $prepared['payment_notes'] = sanitize_textarea_field((string)$data['payment_notes']);
         }
 
         return $prepared;
@@ -783,7 +856,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Calculate end date from start date and trip duration
-     * 
+     *
      * @param string $startDate Start date (YYYY-MM-DD)
      * @param int $tripId Trip ID
      * @return string End date (YYYY-MM-DD)
@@ -793,24 +866,24 @@ class BookingRepository extends BaseRepository
         // Use TripRepository for trips table
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripsTable = $tripRepository->getTableName();
-        
+
         $durationDays = $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT duration_days FROM {$tripsTable} WHERE id = %d LIMIT 1",
             $tripId
         ));
-        
-        $durationDays = $durationDays ? (int) $durationDays : 1;
-        
+
+        $durationDays = $durationDays ? (int)$durationDays : 1;
+
         // end_date = start_date + (duration_days - 1) days
         // Example: 5-day trip starting Jan 1 = Jan 1 + 4 days = Jan 5
         $endDate = date('Y-m-d', strtotime($startDate . ' + ' . ($durationDays - 1) . ' days'));
-        
+
         return $endDate;
     }
 
     /**
      * Get table columns for booking table
-     * 
+     *
      * @return array Array of column names
      */
     public function getTableColumns(): array
@@ -821,7 +894,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Count discount code usage by customer
-     * 
+     *
      * @param int $customerId Customer ID
      * @param string $discountCode Discount code
      * @return int Number of times discount code has been used
@@ -829,7 +902,7 @@ class BookingRepository extends BaseRepository
     public function countDiscountCodeUsage(int $customerId, string $discountCode): int
     {
         $table = $this->getTableName();
-        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+        return (int)$this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COUNT(*) FROM {$table} WHERE customer_id = %d AND discount_code = %s AND status NOT IN ('cancelled', 'refunded', 'failed')",
             $customerId,
             $discountCode
@@ -838,14 +911,14 @@ class BookingRepository extends BaseRepository
 
     /**
      * Count booked travelers by availability ID
-     * 
+     *
      * @param int $availabilityId Availability ID
      * @return int Number of booked travelers
      */
     public function countBookedTravelersByAvailabilityId(int $availabilityId): int
     {
         $table = $this->getTableName();
-        return (int) $this->wpdb->get_var($this->wpdb->prepare(
+        return (int)$this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COALESCE(SUM(travelers_count), 0) 
              FROM {$table} 
              WHERE availability_id = %d AND status NOT IN ('cancelled', 'refunded', 'failed')",
@@ -855,20 +928,20 @@ class BookingRepository extends BaseRepository
 
     /**
      * Get booking counts for multiple availability IDs
-     * 
+     *
      * @param array $availabilityIds Array of availability IDs
      * @return array Array of objects with availability_id and booked_count
      */
     public function getBookingCountsByAvailabilityIds(array $availabilityIds): array
     {
         $table = $this->getTableName();
-        
+
         if (empty($availabilityIds)) {
             return [];
         }
-        
+
         $placeholders = implode(',', array_fill(0, count($availabilityIds), '%d'));
-        
+
         return $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT availability_id, SUM(travelers_count) AS booked_count
              FROM {$table} 
@@ -880,7 +953,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Update availability ID by trip and date
-     * 
+     *
      * @param int $tripId Trip ID
      * @param string $date Travel date
      * @param int $availabilityId Availability ID
@@ -905,17 +978,17 @@ class BookingRepository extends BaseRepository
 
     /**
      * Find bookings by departure ID
-     * 
+     *
      * @param int $departureId Departure ID
      * @return array Array of booking objects
      */
     public function findByDepartureId(int $departureId): array
     {
         $table = $this->getTableName();
-        
+
         // Using hardcoded table name since there's no dedicated repository for this table
         $relationTable = $this->wpdb->prefix . 'yatra_booking_departures';
-        
+
         $bookings = $this->wpdb->get_results($this->wpdb->prepare(
             "SELECT b.* FROM {$table} b
              INNER JOIN {$relationTable} bd ON b.id = bd.booking_id
@@ -923,13 +996,13 @@ class BookingRepository extends BaseRepository
              ORDER BY b.created_at DESC",
             $departureId
         ));
-        
+
         return $bookings ?: [];
     }
 
     /**
      * Check if a user has made any previous bookings
-     * 
+     *
      * @param int $user_id User ID
      * @return bool True if user has made at least one booking
      */
@@ -940,12 +1013,12 @@ class BookingRepository extends BaseRepository
             $user_id
         ));
 
-        return (int) $count > 0;
+        return (int)$count > 0;
     }
 
     /**
      * Get recent bookings for cache warming
-     * 
+     *
      * @param int $days Number of days to look back
      * @param int $limit Maximum number of bookings to return
      * @return array Array of recent booking IDs
@@ -963,7 +1036,7 @@ class BookingRepository extends BaseRepository
 
     /**
      * Get total travelers count for a trip and availability with specific statuses
-     * 
+     *
      * @param int $tripId Trip ID
      * @param int $availabilityId Availability ID
      * @param array $statuses Array of booking statuses to include
@@ -972,15 +1045,15 @@ class BookingRepository extends BaseRepository
     public function getTotalTravelersByTripAndAvailability(int $tripId, int $availabilityId, array $statuses = []): int
     {
         $table = esc_sql($this->table);
-        
+
         if (empty($statuses)) {
             $statuses = ['pending', 'confirmed', 'processing', 'completed', 'on_hold'];
         }
-        
+
         $placeholders = implode(',', array_fill(0, count($statuses), '%s'));
         $params = array_merge([$tripId, $availabilityId], $statuses);
-        
-        $count = (int) $this->wpdb->get_var($this->wpdb->prepare(
+
+        $count = (int)$this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COALESCE(SUM(travelers_count), 0)
              FROM {$table}
              WHERE trip_id = %d
@@ -988,7 +1061,7 @@ class BookingRepository extends BaseRepository
                AND status IN ({$placeholders})",
             $params
         ));
-        
+
         return $count;
     }
 }

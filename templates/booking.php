@@ -185,6 +185,8 @@ $partial_payment = $booking->partial_payment;
 $partial_payment_percentage = $booking->partial_payment_percentage;
 $enabled_gateways = $booking->enabled_gateways;
 
+
+
 get_header();
 
 // Include the shared booking content partial

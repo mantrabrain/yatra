@@ -85,13 +85,25 @@ get_header();
             </div>
         </div>
 
+        <?php
+        // Resolve featured image URL (handle attachment ID or direct URL)
+        $featured_image_url = '';
+        if (!empty($booking->featured_image)) {
+            if (is_numeric($booking->featured_image)) {
+                $featured_image_url = wp_get_attachment_url((int) $booking->featured_image) ?: '';
+            } else {
+                $featured_image_url = $booking->featured_image;
+            }
+        }
+        ?>
+
         <div class="yatra-confirmation-content">
             <!-- Trip Summary Card -->
             <div class="yatra-confirmation-card yatra-trip-summary-card">
                 <div class="yatra-trip-summary">
-                    <?php if (!empty($booking->featured_image)) : ?>
+                    <?php if (!empty($featured_image_url)) : ?>
                     <div class="yatra-trip-image">
-                        <img src="<?php echo esc_url($booking->featured_image); ?>" alt="<?php echo esc_attr($booking->trip_title); ?>">
+                        <img src="<?php echo esc_url($featured_image_url); ?>" alt="<?php echo esc_attr($booking->trip_title); ?>">
                     </div>
                     <?php endif; ?>
                     

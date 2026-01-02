@@ -282,6 +282,16 @@ class FrontendAssetsProvider
             'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
             'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
             'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
+            // Payment gateways data
+            'paymentGateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
+            'paymentMethods' => \Yatra\Services\SettingsService::get('payment_methods', []),
+            'paymentTestMode' => \Yatra\Services\SettingsService::get('payment_test_mode', false),
+            'partialPayment' => \Yatra\Services\SettingsService::get('partial_payment', false),
+            'partialPaymentPercentage' => \Yatra\Services\SettingsService::get('partial_payment_percentage', 0),
+            'gatewayOrder' => \Yatra\Services\SettingsService::get('gateway_order', []),
+            'autoConfirmPayLater' => \Yatra\Services\SettingsService::get('auto_confirm_pay_later', true),
+            'gateways' => apply_filters('yatra_payment_gateways', \Yatra\Services\SettingsService::get('payment_gateways', [])),
+            'enabledGateways' => \Yatra\Services\SettingsService::get('payment_gateways', []),
         ];
 
         wp_localize_script('yatra-booking', 'yatraBookingData', $bookingData);

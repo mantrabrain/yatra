@@ -397,7 +397,15 @@ class PaymentGatewayController extends BaseController
     {
         $confirmation_page_id = \Yatra\Services\SettingsService::get('booking_confirmation_page');
 
+        $permalinkStructure = get_option('permalink_structure');
+        $isPlain = empty($permalinkStructure);
+
         $baseUrl = $confirmation_page_id ? get_permalink($confirmation_page_id) : home_url('/booking-confirmation/');
+
+        if ($isPlain) {
+            // For plain permalinks, avoid path-based 404s – use site root with query arg
+            return add_query_arg('yatra_booking_confirmation', $reference, home_url('/'));
+        }
 
         return trailingslashit($baseUrl) . $reference . '/';
     }

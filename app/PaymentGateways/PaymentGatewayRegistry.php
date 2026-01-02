@@ -121,8 +121,15 @@ class PaymentGatewayRegistry
     public function getForCheckout(): array
     {
         $checkoutGateways = [];
-
-        foreach ($this->getAvailable() as $id => $gateway) {
+        $available = $this->getAvailable();
+        
+        error_log('PaymentGatewayRegistry::getForCheckout - Total registered gateways: ' . count($this->gateways));
+        error_log('PaymentGatewayRegistry::getForCheckout - Available gateways: ' . count($available));
+        
+        foreach ($available as $id => $gateway) {
+            $config = $gateway->getConfig();
+            error_log("Gateway {$id}: enabled=" . (!empty($config['enabled']) ? 'true' : 'false'));
+            
             $checkoutGateways[] = [
                 'id' => $id,
                 'title' => $gateway->getTitle(),

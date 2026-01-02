@@ -33,6 +33,7 @@ $is_dynamic_form_enabled = apply_filters('yatra_dynamic_form_field_enabled', fal
 // Get form configuration - returns default config if module disabled, custom config if enabled
 $form_config = yatra_get_booking_form_config();
 
+
 // Country list for country type fields
 $countries = [
     'AF' => 'Afghanistan', 'AL' => 'Albania', 'DZ' => 'Algeria', 'AR' => 'Argentina',
@@ -542,7 +543,7 @@ $has_flexible_options = $flexible_payments_enabled && !empty($payment_method_opt
         <?php 
         $first = true;
         foreach ($enabled_gateways as $gateway_id => $gateway) : 
-            $icon = !empty($gateway['icon']) ? $gateway['icon'] : plugins_url('public/images/payment-placeholder.png', dirname(__DIR__));
+            $icon = !empty($gateway['icon']) ? $gateway['icon'] : plugins_url('assets/images/payment-placeholder.png', dirname(__DIR__));
         ?>
         <div class="yatra-gateway-option-wrapper">
             <label class="yatra-gateway-option">

@@ -4684,9 +4684,32 @@ onChange={handleFieldChange}
                   className="font-mono"
                 />
                 {formData.trip_base && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.trip_base || 'trip'}/trip-name</code>
-                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                    <span>
+                      {__('Example URL:', 'Example URL:')}{' '}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                        {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                          ? `?yatra_trip_slug=trip-name`
+                          : `/${formData.trip_base || 'trip'}/trip-name`}
+                      </code>
+                    </span>
+                    <a
+                      href={
+                        (window as any)?.yatraAdmin?.siteUrl
+                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, '')}${
+                              (window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                                ? `?yatra_trip_slug=trip-name`
+                                : `/${formData.trip_base || 'trip'}/trip-name`
+                            }`
+                          : `/${formData.trip_base || 'trip'}/trip-name`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                    </a>
+                  </div>
                 )}
               </FormField>
 
@@ -4704,9 +4727,32 @@ onChange={handleFieldChange}
                   className="font-mono"
                 />
                 {formData.destination_base && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.destination_base || 'destination'}/nepal</code>
-                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                    <span>
+                      {__('Example URL:', 'Example URL:')}{' '}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                        {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                          ? `?yatra_destination_slug=nepal`
+                          : `/${formData.destination_base || 'destination'}/nepal`}
+                      </code>
+                    </span>
+                    <a
+                      href={
+                        (window as any)?.yatraAdmin?.siteUrl
+                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, '')}${
+                              (window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                                ? `?yatra_destination_slug=nepal`
+                                : `/${formData.destination_base || 'destination'}/nepal`
+                            }`
+                          : `/${formData.destination_base || 'destination'}/nepal`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                    </a>
+                  </div>
                 )}
               </FormField>
 
@@ -4724,9 +4770,32 @@ onChange={handleFieldChange}
                   className="font-mono"
                 />
                 {formData.activity_base && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.activity_base || 'activity'}/trekking</code>
-                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                    <span>
+                      {__('Example URL:', 'Example URL:')}{' '}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                        {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                          ? `?yatra_activity_slug=trekking`
+                          : `/${formData.activity_base || 'activity'}/trekking`}
+                      </code>
+                    </span>
+                    <a
+                      href={
+                        (window as any)?.yatraAdmin?.siteUrl
+                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, '')}${
+                              (window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                                ? `?yatra_activity_slug=trekking`
+                                : `/${formData.activity_base || 'activity'}/trekking`
+                            }`
+                          : `/${formData.activity_base || 'activity'}/trekking`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                    </a>
+                  </div>
                 )}
               </FormField>
 
@@ -4744,9 +4813,32 @@ onChange={handleFieldChange}
                   className="font-mono"
                 />
                 {formData.trip_category_base && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.trip_category_base || 'trip-category'}/adventure</code>
-                  </p>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                    <span>
+                      {__('Example URL:', 'Example URL:')}{' '}
+                      <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                        {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                          ? `?yatra_category_slug=adventure`
+                          : `/${formData.trip_category_base || 'trip-category'}/adventure`}
+                      </code>
+                    </span>
+                    <a
+                      href={
+                        (window as any)?.yatraAdmin?.siteUrl
+                          ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, '')}${
+                              (window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                                ? `?yatra_category_slug=adventure`
+                                : `/${formData.trip_category_base || 'trip-category'}/adventure`
+                            }`
+                          : `/${formData.trip_category_base || 'trip-category'}/adventure`
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                    </a>
+                  </div>
                 )}
               </FormField>
 
@@ -4774,37 +4866,36 @@ onChange={handleFieldChange}
                     onChange={handleFieldChange}
                     placeholder="book"
                     className="font-mono"
-                    disabled={formData.use_booking_page}
                   />
-                  {formData.booking_base && !formData.use_booking_page && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__('Example URL:', 'Example URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">/{formData.booking_base || 'book'}/nepal-adventure</code>
-                    </p>
+                  {formData.booking_base && (
+                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
+                      <span>
+                        {__('Example URL:', 'Example URL:')}{' '}
+                        <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
+                          {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                            ? `?yatra_booking_page=main`
+                            : `/${formData.booking_base || 'book'}/trip-name`}
+                        </code>
+                      </span>
+                      <a
+                        href={
+                          (window as any)?.yatraAdmin?.siteUrl
+                            ? `${(window as any).yatraAdmin.siteUrl.replace(/\/$/, '')}${
+                                (window as any)?.yatraAdmin?.permalinkStructure === 'plain'
+                                  ? `?yatra_booking_page=main`
+                                  : `/${formData.booking_base || 'book'}/trip-name`
+                              }`
+                            : `/${formData.booking_base || 'book'}/trip-name`
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                      </a>
+                    </div>
                   )}
                 </FormField>
-
-                <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                  <input
-                    type="checkbox"
-                    id="use_booking_page"
-                    checked={formData.use_booking_page}
-                    onChange={(e) => {
-                      handleFieldChange({ target: { name: 'use_booking_page', value: e.target.checked } } as any);
-                      if (!e.target.checked) {
-                        handleFieldChange({ target: { name: 'booking_page_id', value: 0 } } as any);
-                      }
-                    }}
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <div className="flex-1">
-                    <Label htmlFor="use_booking_page" className="font-medium cursor-pointer">
-                      {__('Use Custom Page for Booking', 'Use Custom Page for Booking')}
-                    </Label>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {__('Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.', 'Select a WordPress page to use for bookings instead of the default URL. The page must contain the [yatra_booking] shortcode.')}
-                    </p>
-                  </div>
-                </div>
 
                 {formData.use_booking_page && (
                   <FormField
@@ -4897,7 +4988,7 @@ onChange={handleFieldChange}
                       }}
                       className="w-full justify-center"
                     >
-                      {__('Cancel', 'Cancel')}
+                      {__('Skip for now', 'Skip for now')}
                     </Button>
                   </div>
                 </div>

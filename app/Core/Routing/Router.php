@@ -59,6 +59,20 @@ class Router
     {
         $request_path = UrlParser::getCleanRequestPath();
 
+        // Plain permalink fallback: if booking query var is present, dispatch booking handler
+        $booking_page_query = get_query_var('yatra_booking_page');
+        if (!empty($booking_page_query) && !\Yatra\Services\SettingsService::useCustomBookingPage()) {
+            $handler = $this->getHandler('booking');
+            if ($handler) {
+                return $handler->handle([
+                    'type' => 'booking',
+                    'page' => $booking_page_query,
+                    'base' => \Yatra\Services\SettingsService::getBookingBase(),
+                ]);
+            }
+            return false;
+        }
+
         if (empty($request_path)) {
             return false;
         }

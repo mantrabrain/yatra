@@ -7,6 +7,8 @@ namespace Yatra\Core;
 use Yatra\Core\Routing\Router;
 use Yatra\Services\SettingsService;
 use Yatra\Core\Handlers\TripPageHandler;
+use Yatra\Core\Handlers\BookingConfirmationPageHandler;
+use Yatra\Repositories\BookingRepository;
 
 /**
  * Template Loader
@@ -33,8 +35,56 @@ class TemplateLoader
         add_action('init', [self::class, 'addTripRewriteRules'], 10);
         add_filter('query_vars', [self::class, 'addCustomQueryVars']);
 
+        // Early template include for booking confirmation (plain permalinks safety net)
+        add_filter('template_include', [self::class, 'maybeLoadBookingConfirmationTemplate'], 0);
+
         // Initialize the main router for template handling
         add_action('template_redirect', [self::class, 'handleTemplateRedirect'], 1);
+    }
+
+    /**
+     * Early template include for booking confirmation (plain permalinks)
+     */
+    public static function maybeLoadBookingConfirmationTemplate(string $template): string
+    {
+        $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
+        if (empty($confirmationId)) {
+            return $template;
+        }
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Yatra] Confirmation template check for reference: ' . $confirmationId);
+        }
+
+        $bookingRepo = new BookingRepository();
+        $booking = $bookingRepo->findByReferenceWithTrip($confirmationId) ?: $bookingRepo->findByReference($confirmationId);
+        if (!$booking) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[Yatra] Confirmation booking not found for reference: ' . $confirmationId);
+            }
+            return $template;
+        }
+
+        // Prevent 404 and set globals
+        global $wp_query;
+        $wp_query->is_404 = false;
+        status_header(200);
+        $GLOBALS['yatra_booking'] = $booking;
+        $wp_query->set('yatra_booking_confirmation', $confirmationId);
+        $wp_query->set('yatra_booking', $booking);
+
+        $template_path = YATRA_PLUGIN_PATH . 'templates/booking-confirmation.php';
+        if (file_exists($template_path)) {
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('[Yatra] Loading booking confirmation template for reference: ' . $confirmationId);
+            }
+            return $template_path;
+        }
+
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[Yatra] Booking confirmation template not found at: ' . $template_path);
+        }
+        return $template;
     }
 
     /**
@@ -42,6 +92,26 @@ class TemplateLoader
      */
     public static function handleTemplateRedirect(): void
     {
+        // Early plain-permalink handling for booking confirmation via query var
+        $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? ($_GET['reference'] ?? ''));
+        if (!empty($confirmationId)) {
+            $bookingRepo = new BookingRepository();
+            $booking = $bookingRepo->findByReferenceWithTrip($confirmationId) ?: $bookingRepo->findByReference($confirmationId);
+            if ($booking) {
+                global $wp_query;
+                $wp_query->is_404 = false;
+                status_header(200);
+                $GLOBALS['yatra_booking'] = $booking;
+                $wp_query->set('yatra_booking_confirmation', $confirmationId);
+                $wp_query->set('yatra_booking', $booking);
+                $template_path = YATRA_PLUGIN_PATH . 'templates/booking-confirmation.php';
+                if (file_exists($template_path)) {
+                    include $template_path;
+                    exit;
+                }
+            }
+        }
+
         if (!self::$router) {
             self::$router = new Router();
         }
@@ -59,6 +129,15 @@ class TemplateLoader
                     'type' => 'trip',
                     'slug' => sanitize_title($slug),
                     'base' => SettingsService::getTripBase(),
+                ]);
+            }
+
+            // Plain permalink fallback: handle ?yatra_booking_confirmation=
+            $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? '');
+            if (!$handled && !empty($confirmationId)) {
+                $handler = new BookingConfirmationPageHandler();
+                $handled = $handler->handle([
+                    'confirmation_id' => sanitize_text_field($confirmationId),
                 ]);
             }
         }
@@ -142,6 +221,13 @@ class TemplateLoader
         // Add rewrite rule for booking confirmation: book/confirmation/{id}
         add_rewrite_rule(
             '^book/confirmation/([a-zA-Z0-9_-]+)/?$',
+            'index.php?yatra_booking_confirmation=$matches[1]',
+            'top'
+        );
+
+        // Add rewrite rule for booking confirmation page slug: /booking-confirmation/{reference}
+        add_rewrite_rule(
+            '^booking-confirmation/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_booking_confirmation=$matches[1]',
             'top'
         );

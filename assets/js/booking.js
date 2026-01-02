@@ -193,9 +193,10 @@
             
             // Call the AJAX endpoint
             const { base: restBase, isPlain } = getRestBase();
+            const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
             let summaryUrl;
-            if (isPlain && !restBase.includes('/yatra/v1')) {
-                summaryUrl = `${restBase}/?rest_route=/yatra/v1/booking/summary`;
+            if (isPlain) {
+                summaryUrl = `${siteBase}/?rest_route=/yatra/v1/booking/summary`;
             } else if (restBase.includes('/yatra/v1')) {
                 summaryUrl = `${restBase}/booking/summary`;
             } else {
@@ -740,9 +741,10 @@
             
             // Update session via REST API (needs session cookie, but no nonce)
             const { base: restBase, isPlain } = getRestBase();
+            const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
             let sessionUrl;
-            if (isPlain && !restBase.includes('/yatra/v1')) {
-                sessionUrl = `${restBase}/?rest_route=/yatra/v1/booking/session`;
+            if (isPlain) {
+                sessionUrl = `${siteBase}/?rest_route=/yatra/v1/booking/session`;
             } else if (restBase.includes('/yatra/v1')) {
                 sessionUrl = `${restBase}/booking/session`;
             } else {
@@ -964,6 +966,17 @@
          * Submit booking to server
          */
         function submitBookingToServer(bookingData, originalBtnHtml) {
+            const { base: restBase, isPlain } = getRestBase();
+            const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
+            let createUrl;
+            if (isPlain) {
+                createUrl = `${siteBase}/?rest_route=/yatra/v1/booking/create`;
+            } else if (restBase.includes('/yatra/v1')) {
+                createUrl = `${restBase}/booking/create`;
+            } else {
+                createUrl = `${restBase}/yatra/v1/booking/create`;
+            }
+
             // Show loading state
             $submitBtn.prop('disabled', true).html(
                 '<svg class="animate-spin" style="display: inline-block; width: 20px; height: 20px; margin-right: 8px; animation: spin 1s linear infinite;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
@@ -971,11 +984,10 @@
                 '<span>Processing...</span>'
             );
 
-            fetch(apiUrl + '/booking/create', {
+            fetch(createUrl, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-WP-Nonce': nonce
+                    'Content-Type': 'application/json'
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify(bookingData)
@@ -1139,9 +1151,10 @@
          */
         function loadCouponFromSession() {
             const { base: restBase, isPlain } = getRestBase();
+            const siteBase = (window.yatraBookingData?.siteUrl || window.location.origin || '').replace(/\/$/, '');
             let sessionUrl;
-            if (isPlain && !restBase.includes('/yatra/v1')) {
-                sessionUrl = `${restBase}/?rest_route=/yatra/v1/booking/session`;
+            if (isPlain) {
+                sessionUrl = `${siteBase}/?rest_route=/yatra/v1/booking/session`;
             } else if (restBase.includes('/yatra/v1')) {
                 sessionUrl = `${restBase}/booking/session`;
             } else {

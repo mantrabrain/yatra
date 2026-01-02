@@ -213,6 +213,9 @@ function yatra_get_review_edit_time_remaining(object $review): string
  */
 function yatra_get_booking_url(string $trip_slug, array $params = []): string
 {
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
     // Check if using custom booking page via SettingsService
     if (SettingsService::useCustomBookingPage()) {
         $page_url = get_permalink(SettingsService::getBookingPageId());
@@ -224,8 +227,19 @@ function yatra_get_booking_url(string $trip_slug, array $params = []): string
     
     // Using default dynamic URL
     $booking_base = SettingsService::getBookingBase();
+    if ($is_plain) {
+        // Plain permalinks: rely on query var to route booking page
+        $params['trip'] = $trip_slug;
+        $url = add_query_arg(
+            array_merge(['yatra_booking_page' => 'main'], $params),
+            home_url('/')
+        );
+        // params already appended; avoid double-adding later
+        return $url;
+    }
+
     $url = home_url('/' . $booking_base . '/' . $trip_slug);
-    
+
     if (!empty($params)) {
         $url = add_query_arg($params, $url);
     }
@@ -760,6 +774,9 @@ function yatra_get_active_checkout_session(): array
  */
 function yatra_get_checkout_url(): string
 {
+    $permalink_structure = get_option('permalink_structure');
+    $is_plain = empty($permalink_structure);
+
     // Check if custom booking page is set via SettingsService
     if (SettingsService::useCustomBookingPage()) {
         $page_id = SettingsService::getBookingPageId();
@@ -770,7 +787,11 @@ function yatra_get_checkout_url(): string
     
     // Default dynamic URL using booking base from settings
     $base = SettingsService::getBookingBase();
-    
+    if ($is_plain) {
+        // Plain permalinks: route via query var
+        return add_query_arg(['yatra_booking_page' => 'main'], home_url('/'));
+    }
+
     return home_url('/' . $base . '/');
 }
 
