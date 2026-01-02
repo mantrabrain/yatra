@@ -7,6 +7,26 @@
 (function() {
   'use strict';
 
+  const getRestBase = () => {
+    const siteUrl =
+        (window.yatraTripData && window.yatraTripData.siteUrl) ||
+        (window.yatraAdmin && window.yatraAdmin.siteUrl) ||
+        window.location.origin ||
+        '';
+    let base =
+        (window.yatraTripData && (window.yatraTripData.apiUrl || window.yatraTripData.restUrl)) ||
+        (window.wpApiSettings && window.wpApiSettings.root) ||
+        `${siteUrl.replace(/\/$/, '')}/wp-json`;
+    base = base.replace(/\/$/, '');
+    // Support plain permalinks via rest_route when pretty permalinks are off
+    const permalinkStructure =
+        (window.yatraTripData && window.yatraTripData.permalinkStructure) ||
+        (window.yatraAdmin && window.yatraAdmin.permalinkStructure) ||
+        '';
+    const isPlain = permalinkStructure === 'plain' || !permalinkStructure;
+    return { base, isPlain };
+  };
+
   // Currency formatting helper for trip page (uses localized yatraTripData)
   if (typeof window.yatra_format_price_js !== 'function') {
     window.yatra_format_price_js = function(amount) {
@@ -702,23 +722,15 @@
       }
 
       // Make AJAX call to get availability template
-      let baseUrl = '/wp-json';
-      if (window.yatraTripData && window.yatraTripData.restUrl) {
-        baseUrl = window.yatraTripData.restUrl;
-      } else if (window.wpApiSettings && window.wpApiSettings.root) {
-        baseUrl = window.wpApiSettings.root;
-      }
+      const { base: baseUrl, isPlain } = getRestBase();
 
-      // Ensure baseUrl doesn't end with slash
-      baseUrl = baseUrl.replace(/\/$/, '');
-
-      // Check if baseUrl already includes /yatra/v1 (rest_url('yatra/v1') includes it)
+      // Build REST endpoint; support plain permalinks via rest_route query
       let restUrl;
-      if (baseUrl.includes('/yatra/v1')) {
-        // baseUrl already includes the namespace, just add the endpoint
+      if (isPlain && !baseUrl.includes('/yatra/v1')) {
+        restUrl = `${baseUrl}/?rest_route=/yatra/v1/trips/${tripId}/availability-template`;
+      } else if (baseUrl.includes('/yatra/v1')) {
         restUrl = baseUrl + '/trips/' + tripId + '/availability-template';
       } else {
-        // Need to add the namespace
         restUrl = baseUrl + '/yatra/v1/trips/' + tripId + '/availability-template';
       }
       const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
@@ -992,14 +1004,7 @@
       if (!tripId) return;
 
       // Build REST URL
-      let baseUrl = '/wp-json';
-      if (window.yatraTripData && window.yatraTripData.restUrl) {
-        baseUrl = window.yatraTripData.restUrl;
-      } else if (window.wpApiSettings && window.wpApiSettings.root) {
-        baseUrl = window.wpApiSettings.root;
-      }
-
-      baseUrl = baseUrl.replace(/\/$/, '');
+      let baseUrl = getRestBase();
 
       let restUrl;
       if (baseUrl.includes('/yatra/v1')) {
@@ -2082,7 +2087,17 @@
     proceedToBooking(btn, originalText, sessionPayload) {
       // Set booking session via REST API
       // credentials: 'same-origin' is required to send cookies for session
-      fetch(window.yatraTripData.apiUrl + '/booking/session', {
+      const { base: baseUrl, isPlain } = getRestBase();
+      let sessionUrl;
+      if (isPlain && !baseUrl.includes('/yatra/v1')) {
+        sessionUrl = `${baseUrl}/?rest_route=/yatra/v1/booking/session`;
+      } else if (baseUrl.includes('/yatra/v1')) {
+        sessionUrl = `${baseUrl}/booking/session`;
+      } else {
+        sessionUrl = `${baseUrl}/yatra/v1/booking/session`;
+      }
+
+      fetch(sessionUrl, {
         method: 'POST',
         credentials: 'same-origin', // needed for PHP session cookie
         headers: {
@@ -2735,7 +2750,17 @@
           };
 
           // Set booking session via REST API
-          fetch(window.yatraTripData.apiUrl + '/booking/session', {
+          const { base: baseUrl, isPlain } = getRestBase();
+          let sessionUrl;
+          if (isPlain && !baseUrl.includes('/yatra/v1')) {
+            sessionUrl = `${baseUrl}/?rest_route=/yatra/v1/booking/session`;
+          } else if (baseUrl.includes('/yatra/v1')) {
+            sessionUrl = `${baseUrl}/booking/session`;
+          } else {
+            sessionUrl = `${baseUrl}/yatra/v1/booking/session`;
+          }
+
+          fetch(sessionUrl, {
             method: 'POST',
             credentials: 'same-origin', // needs PHP session cookie
             headers: {

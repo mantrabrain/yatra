@@ -14,6 +14,25 @@
     const apiUrl = window.yatraBookingData?.apiUrl || '/wp-json/yatra/v1';
     const nonce = window.yatraBookingData?.nonce || '';
 
+    // Unified REST base resolver with plain-permalink support
+    const getRestBase = () => {
+        const siteUrl = window.yatraBookingData?.siteUrl || window.location.origin || '';
+        let base =
+            window.yatraBookingData?.apiUrl ||
+            window.yatraBookingData?.restUrl ||
+            (window.wpApiSettings && window.wpApiSettings.root) ||
+            `${siteUrl.replace(/\/$/, '')}/wp-json`;
+        base = base.replace(/\/$/, '');
+        const permalinkStructure =
+            window.yatraBookingData?.permalinkStructure ||
+            window.yatraTripData?.permalinkStructure ||
+            window.yatraAdmin?.permalinkStructure ||
+            '';
+        // Default to plain when structure is unknown to avoid 404s under Plain permalinks
+        const isPlain = permalinkStructure === 'plain' || !permalinkStructure;
+        return { base, isPlain };
+    };
+
     $(document).ready(function() {
         const $form = $('#yatra-booking-form');
         const $submitBtn = $('#yatra-submit-booking');
@@ -173,8 +192,18 @@
             });
             
             // Call the AJAX endpoint
+            const { base: restBase, isPlain } = getRestBase();
+            let summaryUrl;
+            if (isPlain && !restBase.includes('/yatra/v1')) {
+                summaryUrl = `${restBase}/?rest_route=/yatra/v1/booking/summary`;
+            } else if (restBase.includes('/yatra/v1')) {
+                summaryUrl = `${restBase}/booking/summary`;
+            } else {
+                summaryUrl = `${restBase}/yatra/v1/booking/summary`;
+            }
+
             $.ajax({
-                url: (window.yatraBookingData?.restUrl || '/wp-json/') + 'yatra/v1/booking/summary',
+                url: summaryUrl,
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
@@ -710,7 +739,17 @@
             }
             
             // Update session via REST API (needs session cookie, but no nonce)
-            fetch(apiUrl + '/booking/session', {
+            const { base: restBase, isPlain } = getRestBase();
+            let sessionUrl;
+            if (isPlain && !restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/?rest_route=/yatra/v1/booking/session`;
+            } else if (restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/booking/session`;
+            } else {
+                sessionUrl = `${restBase}/yatra/v1/booking/session`;
+            }
+
+            fetch(sessionUrl, {
                 method: 'POST',
                 credentials: 'same-origin',
                 headers: {
@@ -1099,7 +1138,17 @@
          * Load existing coupon from session and display it
          */
         function loadCouponFromSession() {
-            fetch(apiUrl + '/booking/session', {
+            const { base: restBase, isPlain } = getRestBase();
+            let sessionUrl;
+            if (isPlain && !restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/?rest_route=/yatra/v1/booking/session`;
+            } else if (restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/booking/session`;
+            } else {
+                sessionUrl = `${restBase}/yatra/v1/booking/session`;
+            }
+
+            fetch(sessionUrl, {
                 method: 'GET',
                 // Needs session cookie, but no nonce header
                 credentials: 'same-origin',
@@ -1240,7 +1289,17 @@
             const selectedServices = getSelectedServices();
             const serviceIds = selectedServices.map(s => s.id);
             
-            fetch(apiUrl + '/booking/session', {
+            const { base: restBase, isPlain } = getRestBase();
+            let sessionUrl;
+            if (isPlain && !restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/?rest_route=/yatra/v1/booking/session`;
+            } else if (restBase.includes('/yatra/v1')) {
+                sessionUrl = `${restBase}/booking/session`;
+            } else {
+                sessionUrl = `${restBase}/yatra/v1/booking/session`;
+            }
+
+            fetch(sessionUrl, {
                 method: 'POST',
                 // Needs session cookie, but no nonce header
                 credentials: 'same-origin',

@@ -500,19 +500,44 @@ const Trips: React.FC = () => {
     (settings as any)?.default_currency ||
     'USD';
 
-  const handleView = (trip: Trip) => {
-    const siteUrl = window.yatraAdmin?.siteUrl || '';
+  const handleView = async (trip: Trip) => {
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || '';
     const tripBase = settings?.trip_base || 'trip';
     const tripSlug = trip.slug || '';
-    
-    if (!tripSlug) {
+    let apiPermalink = (trip as any)?.permalink || (trip as any)?.url;
+    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
+    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
+    const isPlainPermalink = permalinkStructure === 'plain';
+
+    if (!tripSlug && !apiPermalink) {
       showToast(__('Trip slug is missing', 'Trip slug is missing'), 'error');
       return;
     }
-    
-    // Construct URL: domain.com/tripbase/tripslug
-    const tripUrl = `${siteUrl.replace(/\/$/, '')}/${tripBase}/${tripSlug}`;
-    window.open(tripUrl, '_blank', 'noopener,noreferrer');
+
+    // If permalink is missing, try fetching the single trip to get the backend-computed permalink
+    if (!apiPermalink && trip.id) {
+      try {
+        const detail = await apiClient.get(`/trips/${trip.id}`);
+        apiPermalink = (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
+      } catch (e) {
+        // Ignore and fall back to pretty URL
+      }
+    }
+
+    // Prefer server-provided permalink when available (respects current permalink structure)
+    if (apiPermalink) {
+      window.open(apiPermalink, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Fallback: Pretty permalink path (matches TripPageHandler route)
+    const baseSite = siteUrl.replace(/\/$/, '');
+    const prettyUrl = `${baseSite}/${tripBase}/${tripSlug}`;
+    const plainUrl = `${baseSite}/?trip=${encodeURIComponent(tripSlug)}`;
+
+    // Honor site permalink structure (default to plain when unknown)
+    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleCreateTrip = () => {

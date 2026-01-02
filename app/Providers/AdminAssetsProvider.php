@@ -186,10 +186,14 @@ class AdminAssetsProvider
         // Localize script with API data, permissions, and translations
         wp_localize_script('yatra-admin', 'yatraAdmin', apply_filters('yatra_admin_localized_data', [
             'apiUrl' => rest_url('yatra/v1'),
+            'restUrl' => rest_url(),
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
             'siteUrl' => home_url(),
             'adminUrl' => admin_url('admin.php'),
+            'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
+            'tripBase' => \Yatra\Services\SettingsService::getTripBase(),
+            'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
             'permissions' => array_keys($capabilities),
             'capabilities' => $capabilities,
             'roles' => $current_user->roles,

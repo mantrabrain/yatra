@@ -177,8 +177,47 @@ class FrontendAssetsProvider
      */
     private function enqueueTripDetailAssets(): void
     {
-        // Additional assets for trip detail can be added here
         // Trip detail assets are already enqueued in common assets
+        // Localize trip page data for JS (trip.js, booking.js)
+        global $trip;
+
+        $permalink_structure = get_option('permalink_structure') ?: '';
+        $is_plain = empty($permalink_structure);
+
+        $trip_id = null;
+        $trip_slug = null;
+        if (isset($trip->id)) {
+            $trip_id = (int) $trip->id;
+        }
+        if (isset($trip->slug)) {
+            $trip_slug = $trip->slug;
+        }
+
+        $tripData = [
+            'apiUrl' => rest_url('yatra/v1'),
+            'restUrl' => rest_url(),
+            'siteUrl' => site_url(),
+            'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
+            'permalinkStructure' => $is_plain ? 'plain' : $permalink_structure,
+            'nonce' => wp_create_nonce('wp_rest'),
+            'tripId' => $trip_id,
+            'tripSlug' => $trip_slug,
+            // Currency/settings
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
+            'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
+            'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
+        ];
+
+        wp_localize_script('yatra-trip', 'yatraTripData', $tripData);
+        wp_localize_script('yatra-booking', 'yatraBookingData', array_merge($tripData, [
+            // booking page expects these keys; leave placeholders if not set on trip view
+            'isRemainingPayment' => false,
+            'remainingAmount' => 0,
+            'totalAmount' => 0,
+            'amountPaid' => 0,
+        ]));
     }
 
     /**
@@ -227,7 +266,25 @@ class FrontendAssetsProvider
     private function enqueueBookingAssets(): void
     {
         // Booking assets are already enqueued in common assets
-        // Additional booking-specific assets can be added here
+        // Localize booking data for booking.js
+        $permalink_structure = get_option('permalink_structure') ?: '';
+        $is_plain = empty($permalink_structure);
+
+        $bookingData = [
+            'apiUrl' => rest_url('yatra/v1'),
+            'restUrl' => rest_url(),
+            'siteUrl' => site_url(),
+            'bookingBase' => \Yatra\Services\SettingsService::getBookingBase(),
+            'permalinkStructure' => $is_plain ? 'plain' : $permalink_structure,
+            'nonce' => wp_create_nonce('wp_rest'),
+            'currency' => \Yatra\Services\SettingsService::getCurrency(),
+            'currencyPosition' => \Yatra\Services\SettingsService::getString('currency_position', 'before'),
+            'decimalPlaces' => (int) \Yatra\Services\SettingsService::getString('currency_decimals', '2'),
+            'thousandSeparator' => \Yatra\Services\SettingsService::getString('thousand_separator', ','),
+            'decimalSeparator' => \Yatra\Services\SettingsService::getString('decimal_separator', '.'),
+        ];
+
+        wp_localize_script('yatra-booking', 'yatraBookingData', $bookingData);
     }
 
     /**

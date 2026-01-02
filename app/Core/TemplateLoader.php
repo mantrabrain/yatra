@@ -6,6 +6,7 @@ namespace Yatra\Core;
 
 use Yatra\Core\Routing\Router;
 use Yatra\Services\SettingsService;
+use Yatra\Core\Handlers\TripPageHandler;
 
 /**
  * Template Loader
@@ -49,6 +50,20 @@ class TemplateLoader
         $handled = self::$router->route();
 
         // If router didn't handle it, let WordPress continue normally
+        if (!$handled) {
+            // Plain permalink fallback: handle ?yatra_trip_slug= or ?trip= requests
+            $slug = get_query_var('yatra_trip_slug') ?: ($_GET['yatra_trip_slug'] ?? ($_GET['trip'] ?? ''));
+            if (!empty($slug)) {
+                $handler = new TripPageHandler();
+                $handled = $handler->handle([
+                    'type' => 'trip',
+                    'slug' => sanitize_title($slug),
+                    'base' => SettingsService::getTripBase(),
+                ]);
+            }
+        }
+
+        // If still not handled, continue normally
         if (!$handled) {
             return;
         }
