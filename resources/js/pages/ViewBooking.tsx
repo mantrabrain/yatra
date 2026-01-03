@@ -95,24 +95,25 @@ const ViewBooking: React.FC = () => {
       if (!bookingId) return null;
       
       const result = await apiService.getBooking(bookingId);
-      
+
       if (!result) {
         throw new Error('Failed to fetch booking');
       }
-      
+
       // Handle both wrapped { success, data } and direct data response formats
-      const data = (result.success && result.data) ? result.data : result;
-      
+      const data = (result as any)?.data ?? result;
+
       if (data && data.id) {
+        const contact = (data as any).contact || {};
         return {
           id: data.id,
           booking_number: data.reference,
           customer_name: data.customer_name || (data.contact?.first_name && data.contact?.last_name 
             ? `${data.contact.first_name} ${data.contact.last_name}`.trim()
             : `${data.contact_first_name || ''} ${data.contact_last_name || ''}`.trim()) || 'N/A',
-          customer_email: data.customer_email,
-          customer_phone: data.customer_phone,
-          customer_country: data.contact_country,
+          customer_email: data.customer_email || data.contact_email || contact.email || '',
+          customer_phone: data.customer_phone || data.contact_phone || contact.phone || '',
+          customer_country: data.contact_country || contact.country || '',
           trip_id: data.trip_id,
           trip_title: data.trip_title || `Trip #${data.trip_id}`,
           trip_image: data.trip_image,

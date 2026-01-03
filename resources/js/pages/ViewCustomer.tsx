@@ -89,8 +89,7 @@ const ViewCustomer: React.FC = () => {
     queryFn: async () => {
       if (!customerId) throw new Error('No customer ID');
       const response = await apiService.getCustomer(customerId);
-
-      const data = response;
+      const data = (response as any)?.data ?? response;
 
       // Normalize nested emergency_contact structure to flat fields expected by the UI
       const emergency = (data as any).emergency_contact || {};

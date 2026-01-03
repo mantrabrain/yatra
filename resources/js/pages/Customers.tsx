@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Phone, MapPin } from 'lucide-react';
+import { Plus, ArrowUpDown, ArrowDown, ArrowUp, Eye, Edit, Trash2, MapPin, Phone, Check, PauseCircle, ShieldX } from 'lucide-react';
 import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
 import { __ } from '../lib/i18n';
 import { apiService } from '../lib/api-client';
@@ -138,6 +138,16 @@ const Customers: React.FC = () => {
     },
     enabled: can('yatra_view_bookings'),
   });
+
+  // Fetch customer stats (counts)
+  const { data: statsRaw } = useQuery({
+    queryKey: ['customers-stats'],
+    queryFn: async () => {
+      return await apiService.getCustomerStats();
+    },
+    enabled: can('yatra_view_bookings'),
+  });
+  const statsData: any = statsRaw ?? {};
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -515,6 +525,36 @@ const Customers: React.FC = () => {
       condition: () => can('yatra_edit_bookings'),
     },
     {
+      key: 'mark_active',
+      label: __('Mark as Active'),
+      icon: <Check className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        await updateStatusForIds([customer.id], 'active');
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'active',
+    },
+    {
+      key: 'mark_inactive',
+      label: __('Mark as Inactive'),
+      icon: <PauseCircle className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        await updateStatusForIds([customer.id], 'inactive');
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'inactive',
+    },
+    {
+      key: 'mark_blocked',
+      label: __('Mark as Blocked'),
+      icon: <ShieldX className="w-4 h-4" />,
+      onClick: async (customer: Customer) => {
+        await updateStatusForIds([customer.id], 'blocked');
+        queryClient.invalidateQueries({ queryKey: ['customers'] });
+      },
+      condition: (customer: Customer) => can('yatra_edit_bookings') && customer.status !== 'blocked',
+    },
+    {
       key: 'delete',
       label: __('Delete'),
       icon: <Trash2 className="w-4 h-4" />,
@@ -587,8 +627,8 @@ const Customers: React.FC = () => {
           <Card>
           <CardContent className="p-4">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-              {/* Search Field - Takes most space */}
-              <div className="lg:col-span-6">
+              {/* Search & status/sort (handled by toolbar) */}
+              <div className={isPro ? "lg:col-span-8" : "lg:col-span-12"}>
                 <SearchFilterToolbar
                   searchTerm={searchTerm}
                   onSearchChange={setSearchTerm}
@@ -615,26 +655,9 @@ const Customers: React.FC = () => {
                 />
               </div>
 
-              {/* Status Filter */}
-              <div className="lg:col-span-2">
-                <Select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
-                    setPage(1);
-                  }}
-                  className="w-full"
-                >
-                  <option value="all">{__('All Status')}</option>
-                  <option value="active">{__('Active')}</option>
-                  <option value="inactive">{__('Inactive')}</option>
-                  <option value="blocked">{__('Blocked')}</option>
-                </Select>
-              </div>
-
               {/* Loyalty Filter */}
               {isPro && (
-                <div className="lg:col-span-2">
+                <div className="lg:col-span-4">
                   <Select
                     value={loyaltyFilter}
                     onChange={(e) => {
@@ -651,35 +674,6 @@ const Customers: React.FC = () => {
                   </Select>
                 </div>
               )}
-
-              {/* Sort Controls */}
-              <div className="lg:col-span-2">
-                <div className="flex gap-2">
-                  <Select
-                    value={sortBy}
-                    onChange={(e) => {
-                      setSortBy(e.target.value);
-                      setPage(1);
-                    }}
-                    className="flex-1"
-                  >
-                    {sortOptions.map(option => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Select>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="px-3"
-                  >
-                    {sortOrder === 'asc' ? '↑' : '↓'}
-                  </Button>
-                </div>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -699,10 +693,10 @@ const Customers: React.FC = () => {
               setPage(1);
             }}
             statusOptions={[
-              { key: 'all', label: __('All'), count: 0 },
-              { key: 'active', label: __('Active'), count: 0 },
-              { key: 'inactive', label: __('Inactive'), count: 0 },
-              { key: 'blocked', label: __('Blocked'), count: 0 },
+              { key: 'all', label: __('All'), count: statsData?.all ?? 0 },
+              { key: 'active', label: __('Active'), count: statsData?.active ?? 0 },
+              { key: 'inactive', label: __('Inactive'), count: statsData?.inactive ?? 0 },
+              { key: 'blocked', label: __('Blocked'), count: statsData?.blocked ?? 0 },
             ]}
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}

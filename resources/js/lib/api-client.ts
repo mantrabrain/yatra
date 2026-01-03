@@ -452,6 +452,7 @@ export const apiService = {
   updateCustomer: (id: string | number, data: any) => apiClient.put(API_ENDPOINTS.CUSTOMER_GET(id), data),
   updateCustomerStatus: (id: string | number, status: string) => apiClient.put(API_ENDPOINTS.CUSTOMER_GET(id), { status }),
   getCustomerBookings: (id: string | number) => apiClient.get(API_ENDPOINTS.CUSTOMER_BOOKINGS(id)),
+  getCustomerStats: () => apiClient.get(API_ENDPOINTS.CUSTOMER_STATS),
   
   // Travelers
   getTravelers: (params?: Record<string, any>) => apiClient.get(API_ENDPOINTS.TRAVELERS, { params }),

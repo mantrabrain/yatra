@@ -167,6 +167,15 @@ class CustomerController extends BaseController
                 'permission_callback' => [$this, 'checkAdminPermission'],
             ],
         ]);
+
+        // Customer statistics
+        register_rest_route($namespace, '/' . $base . '/stats', [
+            [
+                'methods' => \WP_REST_Server::READABLE,
+                'callback' => [$this, 'getCustomerStats'],
+                'permission_callback' => [$this, 'checkAdminPermission'],
+            ],
+        ]);
     }
 
     /**
@@ -405,10 +414,11 @@ class CustomerController extends BaseController
             ], 404);
         }
 
-        return new WP_REST_Response([
+        // Return both legacy flat fields and wrapped data for UI compatibility
+        return new WP_REST_Response(array_merge([
             'success' => true,
             'data' => $customer,
-        ]);
+        ], is_array($customer) ? $customer : []));
     }
 
     /**
@@ -499,5 +509,14 @@ class CustomerController extends BaseController
         }
 
         return new WP_REST_Response($result);
+    }
+
+    /**
+     * GET /customers/stats - Get customer statistics
+     */
+    public function getCustomerStats(WP_REST_Request $request): WP_REST_Response
+    {
+        $stats = $this->customerService->getStats();
+        return new WP_REST_Response($stats ?? []);
     }
 }

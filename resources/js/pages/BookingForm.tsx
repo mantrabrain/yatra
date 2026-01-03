@@ -7,6 +7,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2, Plus, Trash2, Users, ChevronDown, ChevronUp, AlertCircle, Search, X } from 'lucide-react';
 import { __ } from '../lib/i18n';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 import { apiService } from '../lib/api-client';
 import { usePermissions } from '../hooks/usePermissions';
 import { getCurrencySymbol } from '../data/currencies';
@@ -17,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+import { DatePicker } from '../components/ui/date-picker';
 
 // Dynamic traveler data - keys are field IDs from form config
 interface TravelerData {
@@ -98,10 +100,17 @@ const countryList = [
   { code: 'ZA', name: 'South Africa' },
 ];
 
+// Normalize ISO/date-like string to formatted date using shared date library
+const normalizeDateInput = (value?: string | null) => {
+  if (!value) return '';
+  const formatted = formatDateUtil(value);
+  return formatted || value;
+};
+
 const BookingForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
-  
+
   // Get global currency settings
   const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
   const currencySymbol = getCurrencySymbol(globalCurrency);
@@ -111,7 +120,7 @@ const BookingForm: React.FC = () => {
     customer_email: '',
     customer_phone: '',
     trip_id: '',
-    booking_date: new Date().toISOString().split('T')[0],
+    booking_date: normalizeDateInput(new Date().toISOString()),
     travel_date: '',
     travelers: '1',
     total_amount: '',
@@ -224,20 +233,24 @@ const BookingForm: React.FC = () => {
     queryFn: async () => {
       if (!bookingId) return null;
       const result = await apiService.getBooking(bookingId);
-      
+
       if (!result) {
         throw new Error('Failed to fetch booking');
       }
       console.log('Booking API Response:', result);
-      
+
       // Handle both wrapped { success, data } and direct data response formats
-      const booking = (result.success && result.data) ? result.data : result;
-      
+      const booking = (result as any)?.data ?? result;
+
       if (booking && booking.id) {
         // Use customer_name if available, otherwise construct from first/last name
-        const customerName = booking.customer_name || 
-          `${booking.contact_first_name || ''} ${booking.contact_last_name || ''}`.trim();
-        
+        const contact = booking.contact || {};
+        const firstName = booking.contact_first_name || contact.first_name || '';
+        const lastName = booking.contact_last_name || contact.last_name || '';
+        const customerName =
+          booking.customer_name ||
+          `${firstName} ${lastName}`.trim();
+
         // Parse travelers data - dynamic fields based on stored data
         let travelers: TravelerData[] = [];
         if (booking.travelers && Array.isArray(booking.travelers)) {
@@ -280,18 +293,24 @@ const BookingForm: React.FC = () => {
           Object.entries(booking.emergency_contact).forEach(([key, value]) => {
             emergencyContact[key] = String(value || '');
           });
+        } else if (contact.emergency_name || contact.emergency_phone || contact.emergency_relationship) {
+          emergencyContact = {
+            name: String(contact.emergency_name || ''),
+            phone: String(contact.emergency_phone || ''),
+            relationship: String(contact.emergency_relationship || ''),
+          };
         }
 
         const mappedData = {
           id: booking.id,
           customer_name: customerName,
-          customer_email: booking.customer_email || '',
-          customer_phone: booking.customer_phone || '',
+          customer_email: booking.customer_email || contact.email || booking.contact_email || '',
+          customer_phone: booking.customer_phone || contact.phone || booking.contact_phone || '',
           trip_id: String(booking.trip_id || ''),
           trip_title: booking.trip_title || '',
-          booking_date: booking.created_at ? booking.created_at.split(' ')[0] : new Date().toISOString().split('T')[0],
-          travel_date: booking.travel_date || '',
-          travelers: booking.travelers_count || 1,
+          booking_date: normalizeDateInput(booking.booking_date ?? booking.created_at ?? new Date().toISOString()),
+          travel_date: normalizeDateInput(booking.travel_date ?? ''),
+          travelers: booking.travelers_count || travelers.length || 1,
           total_amount: parseFloat(booking.total_amount || 0),
           payment_status: booking.payment_status || 'pending',
           booking_status: booking.status || 'pending',
@@ -827,13 +846,11 @@ const BookingForm: React.FC = () => {
                       <label htmlFor="booking_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         {__('Booking Date', 'Booking Date')} <span className="text-red-500">*</span>
                       </label>
-                      <Input
-                        id="booking_date"
-                        type="date"
+                      <DatePicker
                         value={formData.booking_date}
-                        onChange={(e) => handleFieldChange('booking_date', e.target.value)}
-                        className={errors.booking_date ? 'border-red-500' : ''}
-                        required
+                        onChange={(value: string) => handleFieldChange('booking_date', value)}
+                        placeholder={__('Select booking date', 'Select booking date')}
+                        error={!!errors.booking_date}
                       />
                       {errors.booking_date && (
                         <p className="mt-1 text-sm text-red-500">{errors.booking_date}</p>
@@ -845,13 +862,11 @@ const BookingForm: React.FC = () => {
                       <label htmlFor="travel_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         {__('Travel Date', 'Travel Date')} <span className="text-red-500">*</span>
                       </label>
-                      <Input
-                        id="travel_date"
-                        type="date"
+                      <DatePicker
                         value={formData.travel_date}
-                        onChange={(e) => handleFieldChange('travel_date', e.target.value)}
-                        className={errors.travel_date ? 'border-red-500' : ''}
-                        required
+                        onChange={(value: string) => handleFieldChange('travel_date', value)}
+                        placeholder={__('Select travel date', 'Select travel date')}
+                        error={!!errors.travel_date}
                       />
                       {errors.travel_date && (
                         <p className="mt-1 text-sm text-red-500">{errors.travel_date}</p>
@@ -1155,13 +1170,21 @@ const BookingForm: React.FC = () => {
                                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:placeholder:text-gray-400 resize-none"
                                     />
                                   ) : (
-                                    <Input
-                                      id={`traveler-${travelerIndex}-${field.id}`}
-                                      type={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'date' ? 'date' : field.type === 'number' ? 'number' : 'text'}
-                                      value={traveler[field.id] || ''}
-                                      onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
-                                      placeholder={field.placeholder}
-                                    />
+                                    field.type === 'date' || field.id.toLowerCase().includes('date') || field.id.toLowerCase().includes('expiry') ? (
+                                      <DatePicker
+                                        value={traveler[field.id] || ''}
+                                        onChange={(value: string) => handleTravelerChange(travelerIndex, field.id, value)}
+                                        placeholder={field.placeholder || __('Select date', 'Select date')}
+                                      />
+                                    ) : (
+                                      <Input
+                                        id={`traveler-${travelerIndex}-${field.id}`}
+                                        type={field.type === 'email' ? 'email' : field.type === 'tel' ? 'tel' : field.type === 'number' ? 'number' : 'text'}
+                                        value={traveler[field.id] || ''}
+                                        onChange={(e) => handleTravelerChange(travelerIndex, field.id, e.target.value)}
+                                        placeholder={field.placeholder}
+                                      />
+                                    )
                                   )}
                                 </div>
                               ))}

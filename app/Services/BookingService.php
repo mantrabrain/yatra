@@ -616,6 +616,32 @@ class BookingService
         $customerEmail = $booking->customer_email ?? $booking->contact_email ?? null;
         $customerPhone = $booking->contact_phone ?? null;
 
+        // Fallback: fetch customer record if customer_id is set and info missing
+        if (($booking->customer_id ?? 0) && (empty($customerName) || empty($customerEmail) || empty($customerPhone))) {
+            $customerRepo = new \Yatra\Repositories\CustomerRepository();
+            $customerRecord = $customerRepo->find((int)$booking->customer_id);
+            if ($customerRecord) {
+                if (empty($customerName)) {
+                    $customerName = trim(($customerRecord->first_name ?? '') . ' ' . ($customerRecord->last_name ?? '')) ?: ($customerRecord->email ?? $customerName);
+                }
+                if (empty($customerEmail)) {
+                    $customerEmail = $customerRecord->email ?? $customerEmail;
+                }
+                if (empty($customerPhone)) {
+                    $customerPhone = $customerRecord->phone ?? $customerPhone;
+                }
+                if (empty($booking->contact_first_name) && !empty($customerRecord->first_name)) {
+                    $booking->contact_first_name = $customerRecord->first_name;
+                }
+                if (empty($booking->contact_last_name) && !empty($customerRecord->last_name)) {
+                    $booking->contact_last_name = $customerRecord->last_name;
+                }
+                if (empty($booking->contact_country) && !empty($customerRecord->country)) {
+                    $booking->contact_country = $customerRecord->country;
+                }
+            }
+        }
+
         return [
             'id' => (int) $booking->id,
             'reference' => $booking->reference,
@@ -691,8 +717,20 @@ class BookingService
         // Add full contact data
         $formatted['contact_data'] = $booking->contact_data ? json_decode($booking->contact_data, true) : null;
 
-        // Add emergency contact
-        $formatted['emergency_contact'] = $booking->emergency_contact ? json_decode($booking->emergency_contact, true) : null;
+        // Add emergency contact: handle JSON, serialized, or array
+        $emergency = $booking->emergency_contact ?? null;
+        if (is_string($emergency)) {
+            $decoded = json_decode($emergency, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $emergency = $decoded;
+            } else {
+                $maybe = maybe_unserialize($emergency);
+                $emergency = is_array($maybe) ? $maybe : null;
+            }
+        } elseif (!is_array($emergency)) {
+            $emergency = null;
+        }
+        $formatted['emergency_contact'] = $emergency;
 
         // Add travelers
         $formatted['travelers'] = $this->getBookingTravelers((int) $booking->id);

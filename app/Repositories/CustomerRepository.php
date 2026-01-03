@@ -689,8 +689,48 @@ class CustomerRepository extends BaseRepository
     }
 
     /**
+     * Get customer statistics
+     *
+     * @return array
+     */
+    public function getStats(): array
+    {
+        $table = $this->getTableName();
+
+        // Total customers by status
+        $statusStatsRaw = $this->wpdb->get_results(
+            "SELECT status, COUNT(*) as count FROM {$table} GROUP BY status",
+            OBJECT_K
+        );
+
+        // Normalize by_status with integer counts and default buckets
+        $byStatus = [
+            'active' => (object) ['status' => 'active', 'count' => 0],
+            'inactive' => (object) ['status' => 'inactive', 'count' => 0],
+            'blocked' => (object) ['status' => 'blocked', 'count' => 0],
+        ];
+
+        foreach ((array)$statusStatsRaw as $status => $row) {
+            $count = isset($row->count) ? (int)$row->count : 0;
+            if (isset($byStatus[$status])) {
+                $byStatus[$status]->count = $count;
+            } else {
+                // keep unexpected statuses too
+                $byStatus[$status] = (object) ['status' => $status, 'count' => $count];
+            }
+        }
+        // Normalize counts for UI expectations
+      return [
+            'all' => array_sum(array_column((array)$byStatus, 'count')),
+            'active' => $byStatus['active']->count ?? 0,
+            'inactive' => $byStatus['inactive']->count ?? 0,
+            'blocked' => $byStatus['blocked']->count ?? 0,
+        ];
+    }
+
+    /**
      * Get payments for specific booking IDs with related booking and trip information
-     * 
+     *
      * @param array $bookingIds Array of booking IDs
      * @param int $limit Maximum number of payments to return
      * @return array Array of payment objects with booking and trip details
@@ -698,7 +738,6 @@ class CustomerRepository extends BaseRepository
     public function getPaymentsForBookingIds(array $bookingIds, int $limit = 50): array
     {
         global $wpdb;
-        $bookingRepository = new \Yatra\Repositories\BookingRepository();
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $bookings_table = $bookingRepository->getTableName();
         $trips_table = $tripRepository->getTableName();

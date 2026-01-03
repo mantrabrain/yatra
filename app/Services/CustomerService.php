@@ -29,8 +29,18 @@ class CustomerService
     }
 
     /**
+     * Get customer statistics
+     *
+     * @return array
+     */
+    public function getStats(): array
+    {
+        return $this->customerRepository->getStats();
+    }
+
+    /**
      * Get paginated customers
-     * 
+     *
      * @param array $filters Filters
      * @return array
      */

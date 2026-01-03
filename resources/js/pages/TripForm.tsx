@@ -2404,11 +2404,42 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const revisions = dummyRevisions;
   const isLoadingRevisions = false;
 
-  const handlePreview = () => {
-    // Open preview in new window - use trip_base from settings
-    const tripBase = settingsData?.trip_base || 'trip';
-    const previewUrl = `${window.yatraAdmin?.siteUrl || ''}/${tripBase}/${formData.slug || 'preview'}`;
-    window.open(previewUrl, '_blank');
+  const handlePreview = async () => {
+    const slug = (formData.slug || '').trim();
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || '';
+    const tripBase = settingsData?.trip_base || (window as any)?.yatraAdmin?.tripBase || 'trip';
+    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
+    const isPlainPermalink = permalinkStructure === 'plain';
+
+    if (!slug) {
+      showToast(__('Trip slug is missing. Please add a slug before previewing.', 'Trip slug is missing. Please add a slug before previewing.'), 'error');
+      return;
+    }
+
+    let apiPermalink = (tripData as any)?.permalink || (tripData as any)?.url;
+
+    // If backend permalink missing but trip exists, try to fetch it (matches Trips list behavior)
+    if (!apiPermalink && tripId) {
+      try {
+        const detail = await apiClient.get(`/trips/${tripId}`);
+        apiPermalink = (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
+      } catch (error) {
+        // Fail silently and fall back to computed URL
+      }
+    }
+
+    if (apiPermalink) {
+      window.open(apiPermalink, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    // Fallback: honor permalink structure with pretty vs plain URLs
+    const baseSite = siteUrl.replace(/\/$/, '');
+    const prettyUrl = `${baseSite}/${tripBase}/${slug}`;
+    const plainUrl = `${baseSite}/?trip=${encodeURIComponent(slug)}`;
+    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
   const handleRevisionClick = (revisionId: number) => {

@@ -123,8 +123,21 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                     >
                         <?php 
                         // Pass pricing type info to form fields partial
-                        $pricing_type = $booking->pricing_type ?? 'regular';
-                        $price_types = $booking->price_types ?? [];
+                        // Prefer booking pricing data, fallback to trip definition
+                        $pricing_type = !empty($booking->pricing_type) ? $booking->pricing_type : ($trip->pricing_type ?? 'regular');
+                        $price_types = !empty($booking->price_types) ? $booking->price_types : ($trip->price_types ?? []);
+                        if (empty($pricing_type) && !empty($price_types)) {
+                            $pricing_type = 'traveler_based';
+                        }
+                        if ($pricing_type === 'regular' && !empty($price_types)) {
+                            // Infer traveler-based if price types are present but flag not set
+                            $pricing_type = 'traveler_based';
+                        }
+                        // Ensure price_types is always the trip's price_types if booking lacks it
+                        if (empty($price_types) && !empty($trip->price_types)) {
+                            $price_types = $trip->price_types;
+                            $pricing_type = 'traveler_based';
+                        }
                         $traveler_counts = $booking->traveler_counts ?? [];
 
                         // Include shared booking form fields
@@ -289,36 +302,74 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                             <?php endif; ?>
                         </div>
                         
-                        <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): ?>
-                        <!-- Traveler-based pricing: Read-only display -->
+                        <?php if (!empty($trip->price_types) || (!empty($price_types) && $pricing_type === 'traveler_based')): ?>
+                        <!-- Traveler-based pricing: use shared traveler selector partial -->
                         <div class="yatra-summary-form-group yatra-traveler-categories">
                             <label><?php esc_html_e('Travelers', 'yatra'); ?></label>
-                            <?php 
-                            $display_parts = [];
+                            <?php
+                            $traveler_rows = [];
                             foreach ($price_types as $index => $pt) {
                                 $pt = (object) $pt;
                                 $category_id = $pt->category_id ?? $index;
                                 $category_label = $pt->category_label ?? __('Traveler', 'yatra');
                                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
-                                if ($count > 0) {
-                                    $display_parts[] = $category_label . ' x ' . $count;
+                                $category_price = isset($pt->effective_price) ? (float) $pt->effective_price : ($pt->sale_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                                $pricing_mode = (!empty($pt->pricing_mode) && $pt->pricing_mode === 'per_group') ? 'per_group' : 'per_person';
+                                $age_info = '';
+                                if (isset($pt->age_min) || isset($pt->age_max)) {
+                                    if (isset($pt->age_min) && isset($pt->age_max)) {
+                                        $age_info = sprintf(__('(Age %d-%d)', 'yatra'), $pt->age_min, $pt->age_max);
+                                    } elseif (isset($pt->age_min)) {
+                                        $age_info = sprintf(__('(Age %d+)', 'yatra'), $pt->age_min);
+                                    } else {
+                                        $age_info = sprintf(__('(Up to age %d)', 'yatra'), $pt->age_max);
+                                    }
                                 }
+                                $input_id = 'traveler_' . $category_id;
+                                $traveler_rows[] = [
+                                    'label' => $category_label,
+                                    'subtitle' => $age_info,
+                                    'price_html' => $category_price > 0 ? '<span class="yatra-quantity-price">' . yatra_format_price($category_price) . '</span>' : '',
+                                    'row_attrs' => [
+                                        'data-category-id' => $category_id,
+                                        'data-price' => $category_price,
+                                        'data-pricing-mode' => $pricing_mode,
+                                    ],
+                                    'minus_disabled' => ($index !== 0 && $count <= 0),
+                                    'plus_disabled' => false,
+                                    'minus_attrs' => [
+                                        'data-target' => $input_id,
+                                        'aria-label' => sprintf(__('Decrease %s', 'yatra'), $category_label),
+                                    ],
+                                    'plus_attrs' => [
+                                        'data-target' => $input_id,
+                                        'aria-label' => sprintf(__('Increase %s', 'yatra'), $category_label),
+                                    ],
+                                    'input_attrs' => [
+                                        'id' => $input_id,
+                                        'name' => 'travelers[' . $category_id . ']',
+                                        'value' => $count,
+                                        'min' => 0,
+                                        'max' => $trip->max_travelers ?: 20,
+                                        'data-category-label' => $category_label,
+                                        'data-price' => $category_price,
+                                        'data-pricing-mode' => $pricing_mode,
+                                    ],
+                                ];
                             }
-                            $display_text = !empty($display_parts) ? implode(', ', $display_parts) : __('No travelers selected', 'yatra');
-                            ?>
-                            <div class="yatra-summary-readonly-field">
-                                <?php echo esc_html($display_text); ?>
-                            </div>
-                            <?php 
-                            // Hidden inputs for form submission
-                            foreach ($price_types as $index => $pt) {
-                                $pt = (object) $pt;
-                                $category_id = $pt->category_id ?? $index;
-                                $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
-                                ?>
-                                <input type="hidden" class="yatra-qty-input" name="traveler_counts[<?php echo esc_attr($category_id); ?>]" form="yatra-booking-form" value="<?php echo esc_attr($count); ?>" data-category-id="<?php echo esc_attr($category_id); ?>">
-                                <?php
-                            }
+                            $traveler_display_text = !empty($traveler_rows) ? ($traveler_rows[0]['label'] . ' x ' . max(1, (int) $traveler_rows[0]['input_attrs']['value'])) : __('Traveler x 1', 'yatra');
+                            $root_id = '';
+                            $root_class = 'yatra-booking-field-select yatra-participants-select';
+                            $container_attrs = [];
+                            $display_id = 'participants-display';
+                            $display_class = 'yatra-participants-display';
+                            $display_attrs = [];
+                            $dropdown_id = 'quantity-selector';
+                            $dropdown_class = 'yatra-booking-quantity-selector';
+                            $dropdown_attrs = [];
+                            $icon_html = yatra_svg_icon('users', 'yatra-icon-sm');
+                            $rows = $traveler_rows;
+                            include YATRA_PLUGIN_PATH . 'templates/partials/traveler-selector.php';
                             ?>
                         </div>
                         <?php else: ?>
@@ -495,7 +546,7 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                     <!-- Price Breakdown -->
                     <div class="yatra-summary-pricing" id="yatra-summary-pricing" data-pricing-type="<?php echo esc_attr($pricing_type); ?>" data-is-remaining="<?php echo esc_attr($is_remaining_payment ? 'yes' : 'no'); ?>">
                         <!-- This section is loaded/updated via AJAX -->
-                        <?php if ($pricing_type === 'traveler_based' && !empty($price_types)): 
+                        <?php if (!empty($trip->price_types) || (!empty($price_types) && $pricing_type === 'traveler_based')):
                             // Calculate total for traveler-based pricing
                             $calculated_total = 0;
                             foreach ($price_types as $index => $pt) {

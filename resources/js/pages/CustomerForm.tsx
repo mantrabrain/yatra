@@ -8,7 +8,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { apiService } from '../lib/api-client';
-import { usePermissions } from '../hooks/usePermissions';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -17,6 +16,8 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
+import { DatePicker } from '../components/ui/date-picker';
+import { formatDate as formatDateUtil } from '../lib/dateFormat';
 
 interface CustomerFormData {
   first_name: string;
@@ -50,7 +51,6 @@ interface CustomerFormData {
 
 const CustomerForm: React.FC = () => {
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
   const { showToast } = useToast();
 
   const baseAdminUrl = (window as any).yatraAdmin?.adminUrl || '';
@@ -105,40 +105,41 @@ const CustomerForm: React.FC = () => {
     queryFn: async () => {
       if (!customerId) return null;
       const response = await apiService.getCustomer(customerId);
+      const data = (response as any)?.data ?? response;
 
-      const emergency = (response as any).emergency_contact || {};
+      const emergency = (data as any).emergency_contact || {};
 
       return {
-        first_name: response.first_name || '',
-        last_name: response.last_name || '',
-        email: response.email || '',
-        phone: response.phone || '',
-        secondary_phone: response.secondary_phone || '',
-        country: response.country || '',
-        city: response.city || '',
-        state: response.state || '',
-        address: response.address || '',
-        postal_code: response.postal_code || '',
-        nationality: response.nationality || '',
-        date_of_birth: response.date_of_birth || '',
-        gender: response.gender || '',
-        passport_number: response.passport_number || '',
-        passport_expiry: response.passport_expiry || '',
-        emergency_name: (response as any).emergency_name || emergency.name || '',
-        emergency_phone: (response as any).emergency_phone || emergency.phone || '',
-        emergency_relationship: (response as any).emergency_relationship || emergency.relationship || '',
-        dietary_requirements: response.dietary_requirements || '',
-        medical_conditions: response.medical_conditions || '',
-        special_needs: response.special_needs || '',
-        newsletter_optin: Boolean(response.newsletter_optin),
-        marketing_optin: Boolean(response.marketing_optin),
-        status: response.status || 'active',
-        notes: response.notes || '',
-        loyalty_tier: response.loyalty_tier || 'bronze',
-        loyalty_points: typeof response.loyalty_points === 'number' ? response.loyalty_points : parseInt(response.loyalty_points || '0', 10) || 0,
+        first_name: data.first_name || '',
+        last_name: data.last_name || '',
+        email: data.email || '',
+        phone: data.phone || '',
+        secondary_phone: data.secondary_phone || '',
+        country: data.country || '',
+        city: data.city || '',
+        state: data.state || '',
+        address: data.address || '',
+        postal_code: data.postal_code || '',
+        nationality: data.nationality || '',
+        date_of_birth: data.date_of_birth || '',
+        gender: data.gender || '',
+        passport_number: data.passport_number || '',
+        passport_expiry: data.passport_expiry || '',
+        emergency_name: (data as any).emergency_name || emergency.name || '',
+        emergency_phone: (data as any).emergency_phone || emergency.phone || '',
+        emergency_relationship: (data as any).emergency_relationship || emergency.relationship || '',
+        dietary_requirements: data.dietary_requirements || '',
+        medical_conditions: data.medical_conditions || '',
+        special_needs: data.special_needs || '',
+        newsletter_optin: Boolean(data.newsletter_optin),
+        marketing_optin: Boolean(data.marketing_optin),
+        status: data.status || 'active',
+        notes: data.notes || '',
+        loyalty_tier: data.loyalty_tier || 'bronze',
+        loyalty_points: typeof data.loyalty_points === 'number' ? data.loyalty_points : parseInt(data.loyalty_points || '0', 10) || 0,
       } as CustomerFormData;
     },
-    enabled: isEditMode && can('yatra_view_bookings'),
+    enabled: isEditMode,
   });
 
   // Load customer data into form when editing
@@ -390,11 +391,10 @@ const CustomerForm: React.FC = () => {
                       <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         {__('Date of Birth', 'Date of Birth')}
                       </label>
-                      <Input
-                        id="date_of_birth"
-                        type="date"
+                      <DatePicker
                         value={formData.date_of_birth}
-                        onChange={(e) => handleFieldChange('date_of_birth', e.target.value)}
+                        onChange={(value: string) => handleFieldChange('date_of_birth', value)}
+                        placeholder={__('Select date of birth', 'Select date of birth')}
                       />
                     </div>
                     <div>
@@ -536,11 +536,10 @@ const CustomerForm: React.FC = () => {
                       <label htmlFor="passport_expiry" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                         {__('Passport Expiry', 'Passport Expiry')}
                       </label>
-                      <Input
-                        id="passport_expiry"
-                        type="date"
+                      <DatePicker
                         value={formData.passport_expiry}
-                        onChange={(e) => handleFieldChange('passport_expiry', e.target.value)}
+                        onChange={(value: string) => handleFieldChange('passport_expiry', value)}
+                        placeholder={__('Select passport expiry date', 'Select passport expiry date')}
                       />
                     </div>
                   </div>

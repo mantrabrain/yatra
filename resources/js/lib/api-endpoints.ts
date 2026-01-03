@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
   CUSTOMER_GET: (id: string | number) => `/customers/${id}`,
   CUSTOMER_DELETE: (id: string | number) => `/customers/${id}`,
   CUSTOMERS_BULK: '/customers/bulk',
+  CUSTOMER_STATS: '/customers/stats',
   CUSTOMER_BOOKINGS: (id: string | number) => `/customers/${id}/bookings`,
   CUSTOMER_ME: '/customers/me',
   CUSTOMER_MY_BOOKINGS: '/customers/my-bookings',
