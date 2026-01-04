@@ -238,6 +238,31 @@ button.yatra-booking-button svg path {
     height: 20px;
 }
 
+.yatra-sticky-nav-cta {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.yatra-sticky-nav-cta .yatra-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.yatra-sticky-nav-cta .yatra-btn-primary {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.yatra-sticky-nav-cta .yatra-btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
 /* ============================================
    NEW HERO SECTION
    ============================================ */
@@ -874,6 +899,18 @@ button.yatra-booking-button svg path {
    ============================================ */
 .yatra-trip-main {
     min-width: 0;
+}
+
+/* Sidebar Column */
+.yatra-trip-sidebar-column {
+    min-width: 0;
+    width: 100%;
+}
+
+.yatra-trip-sidebar-column .yatra-trip-sidebar {
+    position: sticky;
+    top: 0;
+    height: fit-content;
 }
 
 .yatra-trip-section {

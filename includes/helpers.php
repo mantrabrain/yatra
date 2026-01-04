@@ -1021,3 +1021,241 @@ function yatra_get_difficulty_permalink($difficulty): string
     
     return home_url('/' . $base . '/' . $slug . '/');
 }
+
+/**
+ * Load a template file with theme override support
+ *
+ * This function allows themes to override plugin templates by placing them in:
+ * theme/yatra/template-name.php
+ *
+ * If no theme override exists, loads from plugin templates directory.
+ *
+ * @param string $template_name Template file name (without .php extension)
+ * @param array  $args          Arguments to extract and make available in template
+ * @param string $template_path Template path within plugin (default: 'templates/')
+ * @param array  $data          Alternative data array (won't be extracted, available as $data)
+ * @return void
+ */
+function yatra_get_template(string $template_name, array $args = [], string $template_path = 'templates/', array $data = []): void
+{
+    $template_name = ltrim($template_name, '/');
+    
+    // Check if theme has override
+    $theme_template = locate_template([
+        'yatra/' . $template_name . '.php',
+        'yatra/' . $template_name
+    ]);
+    
+    if ($theme_template) {
+        // Load from theme
+        $template_file = $theme_template;
+    } else {
+        // Load from plugin
+        $template_file = YATRA_PLUGIN_PATH . ltrim($template_path, '/') . '/' . $template_name . '.php';
+    }
+    
+    // Extract arguments to make them available as individual variables
+    if (!empty($args)) {
+        extract($args);
+    }
+    
+    // Make data available as $data array (not extracted)
+    if (!empty($data)) {
+        $data = $data;
+    }
+    
+    // Include the template
+    if (file_exists($template_file)) {
+        include $template_file;
+    }
+}
+
+/**
+ * Enqueue single trip scripts and styles
+ *
+ * @return void
+ */
+function yatra_enqueue_single_trip_scripts(): void
+{
+    // Only enqueue on single trip pages
+    if (!is_single() || get_post_type() !== 'trip') {
+        return;
+    }
+    
+    // Enqueue the single trip JavaScript
+    wp_enqueue_script(
+        'yatra-single-trip',
+        YATRA_PLUGIN_URL . 'assets/js/single-trip.js',
+        ['jquery'],
+        YATRA_VERSION,
+        true
+    );
+    
+    // Localize script data
+    global $trip;
+    if ($trip) {
+        wp_localize_script(
+            'yatra-single-trip',
+            'yatraSingleTripData',
+            [
+                'tripId' => (int) $trip->id,
+                'basePrice' => (float) ($trip->base_price ?? 0),
+                'currencySymbol' => yatra_get_currency_symbol($trip->currency ?? 'USD'),
+                'apiUrls' => [
+                    'groupDiscounts' => rest_url('yatra/v1/discounts/group-discounts')
+                ]
+            ]
+        );
+    }
+}
+
+/**
+ * Calculate base price for single trip display
+ * 
+ * @param object $trip Trip object
+ * @return array Pricing data including base_price, has_availability, has_traveler_pricing, pricing_type
+ */
+function yatra_single_trip_calculate_base_price($trip) {
+    // Check if availability dates exist (PRIORITY)
+    $has_availability = !empty($trip->availability_dates) && is_array($trip->availability_dates) && count($trip->availability_dates) > 0;
+    
+    // Determine pricing type from trip settings
+    $pricing_type = $trip->pricing_type ?? 'regular';
+    $has_traveler_pricing = ($pricing_type === 'traveler_based' && !empty($trip->price_types));
+    
+    // Calculate base price (for display)
+    if ($has_availability) {
+        // Get the lowest price from availability dates
+        $min_price = PHP_FLOAT_MAX;
+        foreach ($trip->availability_dates as $avail) {
+            $avail_price = $avail->effective_price ?? $avail->original_price ?? 0;
+            if ($avail_price > 0 && $avail_price < $min_price) {
+                $min_price = $avail_price;
+            }
+
+            // Also check price_types within availability if traveler-based
+            if (!empty($avail->price_types) && is_array($avail->price_types)) {
+                foreach ($avail->price_types as $pt) {
+                    $pt = (object)$pt;
+                    $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                    if ($pt_price > 0 && $pt_price < $min_price) {
+                        $min_price = $pt_price;
+                    }
+                }
+            }
+        }
+
+        // If no price found from availability, check traveler-based pricing
+        if ($min_price >= PHP_FLOAT_MAX && $has_traveler_pricing) {
+            foreach ($trip->price_types as $pt) {
+                $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                if ($pt_price > 0 && $pt_price < $min_price) {
+                    $min_price = $pt_price;
+                }
+            }
+        }
+
+        $base_price = ($min_price < PHP_FLOAT_MAX) ? $min_price : ($trip->sale_price ?: $trip->original_price);
+    } elseif ($has_traveler_pricing) {
+        // Get default or first traveler category price
+        $default_price_type = null;
+        foreach ($trip->price_types as $pt) {
+            if (!empty($pt->is_default)) {
+                $default_price_type = $pt;
+                break;
+            }
+        }
+        if (!$default_price_type && !empty($trip->price_types)) {
+            $default_price_type = $trip->price_types[0];
+        }
+
+        // Get the price from the price type - check multiple possible fields
+        if ($default_price_type) {
+            $base_price = 0;
+            // Try effective_price first, then discounted_price, then original_price
+            if (!empty($default_price_type->effective_price) && $default_price_type->effective_price > 0) {
+                $base_price = (float)$default_price_type->effective_price;
+            } elseif (!empty($default_price_type->discounted_price) && $default_price_type->discounted_price > 0) {
+                $base_price = (float)$default_price_type->discounted_price;
+            } elseif (!empty($default_price_type->original_price) && $default_price_type->original_price > 0) {
+                $base_price = (float)$default_price_type->original_price;
+            } elseif (!empty($default_price_type->sale_price) && $default_price_type->sale_price > 0) {
+                $base_price = (float)$default_price_type->sale_price;
+            }
+
+            // If still no price, try to get the minimum from all price types
+            if ($base_price <= 0) {
+                foreach ($trip->price_types as $pt) {
+                    $pt_price = (float)($pt->effective_price ?? $pt->discounted_price ?? $pt->original_price ?? 0);
+                    if ($pt_price > 0 && ($base_price <= 0 || $pt_price < $base_price)) {
+                        $base_price = $pt_price;
+                    }
+                }
+            }
+        } else {
+            $base_price = $trip->sale_price ?: $trip->original_price;
+        }
+    } else {
+        // Regular pricing
+        $base_price = $trip->sale_price > 0 ? $trip->sale_price : $trip->original_price;
+    }
+
+    // Apply dynamic pricing if module is enabled
+    if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)) {
+        $base_price = apply_filters('yatra_trip_display_price', $base_price, $trip->id ?? 0, [
+            'departure_date' => null, // Generic display for single trip page
+            'spots_remaining' => null,
+        ]);
+    }
+
+    return [
+        'base_price' => $base_price,
+        'has_availability' => $has_availability,
+        'has_traveler_pricing' => $has_traveler_pricing,
+        'pricing_type' => $pricing_type
+    ];
+}
+
+/**
+ * Get group discounts data for single trip
+ * 
+ * @param int $trip_id Trip ID
+ * @return array Group discounts data including has_group_discounts and group_discounts_data
+ */
+function yatra_single_trip_get_group_discounts($trip_id) {
+    $has_group_discounts = false;
+    $group_discounts_data = [];
+    
+    try {
+        // Call the group discount API to get detailed discount information
+        $api_url = rest_url('yatra/v1/discounts/group-discounts');
+        $response = wp_remote_post($api_url, [
+            'method' => 'GET',
+            'body' => [
+                'trip_ids' => [$trip_id]
+            ],
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ]);
+
+        if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+            $data = json_decode(wp_remote_retrieve_body($response), true);
+            if (isset($data[$trip_id]) && $data[$trip_id]['has_group_discounts']) {
+                $has_group_discounts = true;
+                $group_discounts_data = $data[$trip_id]['discounts'];
+            }
+        }
+    } catch (Exception $e) {
+        // Silently fail if API call fails - don't break the page
+        $has_group_discounts = false;
+    }
+    
+    return [
+        'has_group_discounts' => $has_group_discounts,
+        'group_discounts_data' => $group_discounts_data
+    ];
+}
+
+// Hook into WordPress enqueue system
+add_action('wp_enqueue_scripts', 'yatra_enqueue_single_trip_scripts');
