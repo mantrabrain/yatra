@@ -71,6 +71,9 @@ class Bootstrap
             
             // Set up WordPress hooks
             $this->setupWordPressHooks();
+            
+            // Load text domain
+            $this->loadTextDomain();
 
         } catch (\Exception $e) {
             // Log the error
@@ -252,6 +255,23 @@ class Bootstrap
     {
         // Clean up if needed
         flush_rewrite_rules();
+    }
+
+    /**
+     * Load plugin text domain
+     */
+    public function loadTextDomain(): void
+    {
+        $locale = determine_locale();
+        
+        // Unload any existing text domain
+        unload_textdomain('yatra');
+        
+        // Load from WordPress language directory first
+        load_textdomain('yatra', WP_LANG_DIR . '/yatra/yatra-' . $locale . '.mo');
+        
+        // Load from plugin directory
+        load_plugin_textdomain('yatra', false, 'i18n/languages');
     }
 
     /**

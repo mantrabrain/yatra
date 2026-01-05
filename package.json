@@ -9,7 +9,7 @@
     "dev": "npm run makepot && vite build --watch",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "makepot": "babel assets/dist --out-file /dev/null && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot",
+    "makepot": "babel assets/dist assets/admin/dist --out-file /dev/null && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot",
     "i18n": "npm run makepot"
   },
   "dependencies": {
