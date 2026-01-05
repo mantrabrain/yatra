@@ -1413,7 +1413,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                           </span>
                         )}
                         {field.required && (
-                          <span className="text-xs text-red-500 font-medium">Required</span>
+                          <span className="text-xs text-red-500 font-medium">{__('Required', 'Required')}</span>
                         )}
                         {field.locked && (
                           <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded" title="This field is protected and cannot be deleted">
@@ -2331,10 +2331,10 @@ onChange={handleFieldChange}
                     name="timezone"
 onChange={handleFieldChange}
                   >
-                    <option value="UTC">UTC</option>
-                    <option value="America/New_York">America/New_York</option>
-                    <option value="Europe/London">Europe/London</option>
-                    <option value="Asia/Kathmandu">Asia/Kathmandu</option>
+                    <option value="UTC">{__('UTC', 'UTC')}</option>
+                    <option value="America/New_York">{__('America/New_York', 'America/New_York')}</option>
+                    <option value="Europe/London">{__('Europe/London', 'Europe/London')}</option>
+                    <option value="Asia/Kathmandu">{__('Asia/Kathmandu', 'Asia/Kathmandu')}</option>
                     <option value="Asia/Dubai">Asia/Dubai</option>
                     <option value="Asia/Kolkata">Asia/Kolkata</option>
                   </Select>
@@ -2396,11 +2396,11 @@ onChange={handleFieldChange}
                   name="language"
 onChange={handleFieldChange}
                 >
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                  <option value="ne">Nepali</option>
+                  <option value="en">{__('English', 'English')}</option>
+                  <option value="es">{__('Spanish', 'Spanish')}</option>
+                  <option value="fr">{__('French', 'French')}</option>
+                  <option value="de">{__('German', 'German')}</option>
+                  <option value="ne">{__('Nepali', 'Nepali')}</option>
                 </Select>
               </FormField>
             </div>
@@ -3335,9 +3335,9 @@ onChange={handleFieldChange}
                       name='smtp_encryption'
                       onChange={handleFieldChange}
                     >
-                      <option value="tls">TLS</option>
-                      <option value="ssl">SSL</option>
-                      <option value="none">None</option>
+                      <option value="tls">{__('TLS', 'TLS')}</option>
+                      <option value="ssl">{__('SSL', 'SSL')}</option>
+                      <option value="none">{__('None', 'None')}</option>
                     </Select>
                   </FormField>
 
@@ -3998,9 +3998,9 @@ onChange={handleFieldChange}
                       name='sms_provider'
                       onChange={handleFieldChange}
                     >
-                      <option value="twilio">Twilio</option>
-                      <option value="nexmo">Nexmo (Vonage)</option>
-                      <option value="aws_sns">AWS SNS</option>
+                      <option value="twilio">{__('Twilio', 'Twilio')}</option>
+                      <option value="nexmo">{__('Nexmo (Vonage)', 'Nexmo (Vonage)')}</option>
+                      <option value="aws_sns">{__('AWS SNS', 'AWS SNS')}</option>
                     </Select>
                   </FormField>
 

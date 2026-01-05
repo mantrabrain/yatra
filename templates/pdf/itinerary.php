@@ -259,14 +259,14 @@ $destination = (string) ($destination ?? '');
             <div class="timeline">
                 <div class="timeline-item">
                     <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: 'TBD', ENT_QUOTES, 'UTF-8'); ?></div>
-                    <div class="timeline-title">Departure</div>
-                    <div class="timeline-desc">Departure from <?php echo htmlspecialchars($departureLocation ?: 'meeting point', ENT_QUOTES, 'UTF-8'); ?>. Please arrive at least 30 minutes before departure time.</div>
+                    <div class="timeline-title"><?php esc_html_e('Departure', 'yatra'); ?></div>
+                    <div class="timeline-desc"><?php echo esc_html(sprintf(__('Departure from %s. Please arrive at least 30 minutes before departure time.', 'yatra'), htmlspecialchars($departureLocation ?: __('meeting point', 'yatra'), ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
                 
                 <div class="timeline-item">
                     <div class="timeline-date"><?php echo htmlspecialchars($travelDate ?: 'TBD', ENT_QUOTES, 'UTF-8'); ?></div>
-                    <div class="timeline-title">Arrival at Destination</div>
-                    <div class="timeline-desc">Arrival at <?php echo htmlspecialchars($destination ?: 'destination', ENT_QUOTES, 'UTF-8'); ?>. Check-in and accommodation briefing.</div>
+                    <div class="timeline-title"><?php esc_html_e('Arrival at Destination', 'yatra'); ?></div>
+                    <div class="timeline-desc"><?php echo esc_html(sprintf(__('Arrival at %s. Check-in and accommodation briefing.', 'yatra'), htmlspecialchars($destination ?: __('destination', 'yatra'), ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
 
                 <?php if (!empty($tripDuration)): ?>
@@ -275,9 +275,9 @@ $destination = (string) ($destination ?? '');
                 for ($i = 2; $i <= $days; $i++): 
                 ?>
                 <div class="timeline-item">
-                    <div class="timeline-date">Day <?php echo $i; ?></div>
-                    <div class="timeline-title">Activities & Sightseeing</div>
-                    <div class="timeline-desc">Full day of planned activities and sightseeing at <?php echo htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'); ?>. Detailed itinerary will be provided by your tour guide.</div>
+                    <div class="timeline-date"><?php esc_html_e('Day', 'yatra'); ?> <?php echo $i; ?></div>
+                    <div class="timeline-title"><?php esc_html_e('Activities & Sightseeing', 'yatra'); ?></div>
+                    <div class="timeline-desc"><?php echo esc_html(sprintf(__('Full day of planned activities and sightseeing at %s. Detailed itinerary will be provided by your tour guide.', 'yatra'), htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
                 <?php endfor; ?>
                 <?php endif; ?>
@@ -285,8 +285,8 @@ $destination = (string) ($destination ?? '');
                 <?php if (!empty($returnDate)): ?>
                 <div class="timeline-item">
                     <div class="timeline-date"><?php echo htmlspecialchars($returnDate, ENT_QUOTES, 'UTF-8'); ?></div>
-                    <div class="timeline-title">Return Journey</div>
-                    <div class="timeline-desc">Departure from <?php echo htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'); ?> and return to <?php echo htmlspecialchars($departureLocation ?: 'origin', ENT_QUOTES, 'UTF-8'); ?>.</div>
+                    <div class="timeline-title"><?php esc_html_e('Return Journey', 'yatra'); ?></div>
+                    <div class="timeline-desc"><?php echo esc_html(sprintf(__('Departure from %s and return to %s.', 'yatra'), htmlspecialchars($destination, ENT_QUOTES, 'UTF-8'), htmlspecialchars($departureLocation ?: __('origin', 'yatra'), ENT_QUOTES, 'UTF-8'))); ?></div>
                 </div>
                 <?php endif; ?>
             </div>
@@ -294,18 +294,18 @@ $destination = (string) ($destination ?? '');
 
         <!-- Important Information -->
         <div class="section">
-            <div class="section-title">Important Information</div>
+            <div class="section-title"><?php esc_html_e('Important Information', 'yatra'); ?></div>
             <table class="trip-details">
                 <tr>
-                    <th class="label">What to Bring</th>
+                    <th class="label"><?php esc_html_e('What to Bring', 'yatra'); ?></th>
                     <td>Comfortable clothing, walking shoes, sunscreen, hat, camera, personal medications, and any required travel documents.</td>
                 </tr>
                 <tr>
-                    <th class="label">Weather Conditions</th>
+                    <th class="label"><?php esc_html_e('Weather Conditions', 'yatra'); ?></th>
                     <td>Please check weather forecast before departure and pack accordingly. Weather conditions may vary by destination.</td>
                 </tr>
                 <tr>
-                    <th class="label">Emergency Contact</th>
+                    <th class="label"><?php esc_html_e('Emergency Contact', 'yatra'); ?></th>
                     <td><?php echo htmlspecialchars($companyPhone ?: 'Contact your travel agent', ENT_QUOTES, 'UTF-8'); ?></td>
                 </tr>
             </table>
@@ -314,7 +314,7 @@ $destination = (string) ($destination ?? '');
         <!-- What's Included -->
         <?php if (!empty($tripIncludes)): ?>
         <div class="section avoid-break">
-            <div class="section-title">What's Included</div>
+            <div class="section-title"><?php esc_html_e('What\'s Included', 'yatra'); ?></div>
             <div class="trip-description">
                 <?php 
                 $includes = is_array($tripIncludes) ? $tripIncludes : explode("\n", $tripIncludes);
@@ -334,7 +334,7 @@ $destination = (string) ($destination ?? '');
         <!-- What's Not Included -->
         <?php if (!empty($tripExcludes)): ?>
         <div class="section avoid-break">
-            <div class="section-title">What's Not Included</div>
+            <div class="section-title"><?php esc_html_e('What\'s Not Included', 'yatra'); ?></div>
             <div class="trip-description">
                 <?php 
                 $excludes = is_array($tripExcludes) ? $tripExcludes : explode("\n", $tripExcludes);

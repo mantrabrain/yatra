@@ -313,7 +313,7 @@ const License: React.FC = () => {
           <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center gap-3">
               <Key className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">License</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{__('License', 'License')}</h1>
             </div>
           </div>
 
@@ -346,11 +346,11 @@ const License: React.FC = () => {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">Advanced Booking Management</span>
+                    <span className="text-gray-700 dark:text-gray-300">{__('Advanced Booking Management', 'Advanced Booking Management')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">Premium Payment Gateways</span>
+                    <span className="text-gray-700 dark:text-gray-300">{__('Premium Payment Gateways', 'Premium Payment Gateways')}</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
@@ -386,7 +386,7 @@ const License: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Key className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">License Management</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{__('License Management', 'License Management')}</h1>
             </div>
             <div className="flex items-center gap-3">
               {licenseInfo?.status && getStatusBadge(licenseInfo.status)}
@@ -495,7 +495,7 @@ const License: React.FC = () => {
               {/* License Key Display */}
               <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">License Key</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('License Key', 'License Key')}</h3>
                   <button
                     onClick={() => setShowKey(!showKey)}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
@@ -522,7 +522,7 @@ const License: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {licenseInfo.server_response?.customer_name && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Licensed To</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Licensed To', 'Licensed To')}</div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {licenseInfo.server_response.customer_name}
                     </div>
@@ -531,7 +531,7 @@ const License: React.FC = () => {
 
                 {licenseInfo.server_response?.customer_email && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Email</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Email', 'Email')}</div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {licenseInfo.server_response.customer_email}
                     </div>
@@ -540,7 +540,7 @@ const License: React.FC = () => {
 
                 {licenseInfo.server_response?.expires && licenseInfo.server_response.expires !== 'lifetime' && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Expires</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Expires', 'Expires')}</div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {(() => {
                         try {
@@ -558,16 +558,16 @@ const License: React.FC = () => {
                 
                 {licenseInfo.server_response?.expires === 'lifetime' && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Expires</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Expires', 'Expires')}</div>
                     <div className="font-medium text-green-600 dark:text-green-400">
-                      Lifetime License
+                      {__('Lifetime License', 'Lifetime License')}
                     </div>
                   </div>
                 )}
 
                 {licenseInfo.server_response?.site_count !== undefined && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">Active Sites</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Active Sites', 'Active Sites')}</div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {licenseInfo.server_response.site_count} / {licenseInfo.server_response.license_limit || '∞'}
                     </div>
@@ -657,7 +657,7 @@ const License: React.FC = () => {
                     onClick={() => setDebugData(null)}
                     className="text-xs text-purple-600 dark:text-purple-400 hover:underline"
                   >
-                    Clear
+                    {__('Clear', 'Clear')}
                   </button>
                 )}
               </div>

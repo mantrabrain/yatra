@@ -1,3 +1,8 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <section class="yatra-trip-section" id="included">
     <h2 class="yatra-trip-section-title">
         <?php echo yatra_svg_icon('check', 'yatra-trip-section-title-icon'); ?>

@@ -270,22 +270,22 @@ const ViewDeparture: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-3xl font-bold text-blue-600">{bookedCount}</div>
-              <div className="text-sm text-blue-800 mt-1">Bookings</div>
+              <div className="text-sm text-blue-800 mt-1">{__('Bookings', 'Bookings')}</div>
             </div>
             
             <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
               <div className="text-3xl font-bold text-green-600">{maxCapacity}</div>
-              <div className="text-sm text-green-800 mt-1">Total Capacity</div>
+              <div className="text-sm text-green-800 mt-1">{__('Total Capacity', 'Total Capacity')}</div>
             </div>
             
             <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
               <div className="text-3xl font-bold text-purple-600">{occupancyRate.toFixed(1)}%</div>
-              <div className="text-sm text-purple-800 mt-1">Occupancy Rate</div>
+              <div className="text-sm text-purple-800 mt-1">{__('Occupancy Rate', 'Occupancy Rate')}</div>
             </div>
             
             <div className="text-center p-4 bg-orange-50 rounded-lg border border-orange-200">
               <div className="text-3xl font-bold text-orange-600">{formatCurrency(departure.total_revenue || 0)}</div>
-              <div className="text-sm text-orange-800 mt-1">Total Revenue</div>
+              <div className="text-sm text-orange-800 mt-1">{__('Total Revenue', 'Total Revenue')}</div>
             </div>
           </div>
           )}

@@ -9,7 +9,7 @@ if (!defined('ABSPATH')) {
 <section class="yatra-trip-section" id="important-info">
     <h2 class="yatra-trip-section-title">
         <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
-        Important Information
+        <?php echo esc_html__('Important Information', 'yatra'); ?>
     </h2>
     <div class="yatra-important-info-grid">
         <?php if (!empty($trip->physical_requirements ?? '')): ?>
@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('shield', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Physical Requirements</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Physical Requirements', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content"><?php echo esc_html($trip->physical_requirements ?? ''); ?></p>
             </div>
         <?php endif; ?>
@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('file', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Visa Requirements</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Visa Requirements', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content"><?php echo esc_html($trip->visa_requirements ?? ''); ?></p>
             </div>
         <?php endif; ?>
@@ -37,7 +37,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('shield', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Vaccination Requirements</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Vaccination Requirements', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content"><?php echo esc_html($trip->vaccination_requirements ?? ''); ?></p>
             </div>
         <?php endif; ?>
@@ -47,7 +47,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('info', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Cancellation Policy</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Cancellation Policy', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content"><?php echo esc_html($trip->cancellation_policy ?? ''); ?></p>
             </div>
         <?php endif; ?>
@@ -57,7 +57,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('users', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Age Requirements</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Age Requirements', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content">
                     Minimum age: <?php echo esc_html($trip->age_min ?? 'N/A'); ?> years.
                     <?php if (!empty($trip->age_max)): ?>
@@ -73,7 +73,7 @@ if (!defined('ABSPATH')) {
                 <div class="yatra-important-info-icon">
                     <?php echo yatra_svg_icon('sun', 'yatra-icon-lg'); ?>
                 </div>
-                <h3 class="yatra-important-info-title">Best Time to Visit</h3>
+                <h3 class="yatra-important-info-title"><?php esc_html_e('Best Time to Visit', 'yatra'); ?></h3>
                 <p class="yatra-important-info-content"><?php echo esc_html($trip->best_season ?? ''); ?></p>
             </div>
         <?php endif; ?>

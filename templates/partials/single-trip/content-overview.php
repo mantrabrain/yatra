@@ -1,7 +1,12 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <section class="yatra-trip-section" id="overview">
     <h2 class="yatra-trip-section-title">
         <?php echo yatra_svg_icon('book-open', 'yatra-trip-section-title-icon'); ?>
-        Overview
+        <?php echo esc_html__('Overview', 'yatra'); ?>
     </h2>
     <div class="yatra-trip-description">
         <?php echo wp_kses_post($trip->description ?? ''); ?>

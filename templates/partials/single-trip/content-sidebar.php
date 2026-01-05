@@ -1,3 +1,8 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <aside class="yatra-trip-sidebar" id="booking">
     <?php
     // Determine if this is a multi-day trip
@@ -578,7 +583,7 @@
                         <?php echo yatra_svg_icon('check', 'yatra-icon-xs'); ?>
                     </div>
                     <div class="yatra-booking-trust-text">
-                        <strong>Free cancellation</strong> up to 24 hours before
+                        <strong><?php esc_html_e('Free cancellation', 'yatra'); ?></strong> <?php esc_html_e('up to 24 hours before', 'yatra'); ?>
                     </div>
                 </div>
             </form>

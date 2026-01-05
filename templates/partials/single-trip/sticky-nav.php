@@ -10,35 +10,35 @@ if (!defined('ABSPATH')) {
     <div class="yatra-sticky-nav-container">
         <a href="#overview" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('book-open', 'yatra-icon-sm'); ?>
-            <span>Overview</span>
+            <span><?php esc_html_e('Overview', 'yatra'); ?></span>
         </a>
         <a href="#trip-details" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
-            <span>Trip Details</span>
+            <span><?php esc_html_e('Trip Details', 'yatra'); ?></span>
         </a>
         <a href="#itinerary" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
-            <span>Itinerary</span>
+            <span><?php esc_html_e('Itinerary', 'yatra'); ?></span>
         </a>
         <a href="#included" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('check', 'yatra-icon-sm'); ?>
-            <span>What's Included</span>
+            <span><?php esc_html_e('What\'s Included', 'yatra'); ?></span>
         </a>
         <a href="#gallery" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
-            <span>Gallery</span>
+            <span><?php esc_html_e('Gallery', 'yatra'); ?></span>
         </a>
         <a href="#location" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('map-pin', 'yatra-icon-sm'); ?>
-            <span>Location</span>
+            <span><?php esc_html_e('Location', 'yatra'); ?></span>
         </a>
         <a href="#faq" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
-            <span>FAQ</span>
+            <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
         </a>
         <a href="#reviews" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('star', 'yatra-icon-sm'); ?>
-            <span>Reviews</span>
+            <span><?php esc_html_e('Reviews', 'yatra'); ?></span>
         </a>
         <div class="yatra-sticky-nav-price">
             <?php if ($has_availability || $has_traveler_pricing): ?>

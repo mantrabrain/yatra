@@ -1,3 +1,8 @@
+<?php
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 <section class="yatra-trip-section" id="itinerary">
     <div class="yatra-section-header-with-actions">
         <h2 class="yatra-trip-section-title">
@@ -371,7 +376,7 @@
         <?php foreach ($itinerary_days as $day): ?>
             <div class="yatra-itinerary-day" data-day="<?php echo esc_attr($day['day']); ?>">
                 <div class="yatra-itinerary-day-header">
-                    <div class="yatra-day-badge">Day <?php echo esc_html($day['day']); ?></div>
+                    <div class="yatra-day-badge"><?php esc_html_e('Day', 'yatra'); ?> <?php echo esc_html($day['day']); ?></div>
                     <h3 class="yatra-day-title"><?php echo esc_html($day['day_title']); ?></h3>
                     <button type="button" class="yatra-day-toggle" aria-expanded="true">
                         <svg class="yatra-chevron-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">

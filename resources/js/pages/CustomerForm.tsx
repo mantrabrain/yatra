@@ -17,7 +17,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { Skeleton } from '../components/ui/skeleton';
 import { DatePicker } from '../components/ui/date-picker';
-import { formatDate as formatDateUtil } from '../lib/dateFormat';
 
 interface CustomerFormData {
   first_name: string;
