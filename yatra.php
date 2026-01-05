@@ -11,7 +11,7 @@
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: yatra
- * Domain Path: /resources/lang
+ * Domain Path: /i18n/languages
  * Network: false
  * Update URI: https://updates.yatra.com
  */
