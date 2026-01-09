@@ -909,7 +909,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         const categories = response?.data?.data || response?.data || response || [];
         return Array.isArray(categories) ? categories : [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load traveler categories', 'Failed to load traveler categories'), 'error');
+        showToast(error?.message || __('Failed to load traveler categories', 'yatra'), 'error');
         return [];
       }
     },
@@ -956,7 +956,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         });
         return response.data || [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load activities', 'Failed to load activities'), 'error');
+        showToast(error?.message || __('Failed to load activities', 'yatra'), 'error');
         return [];
       }
     },
@@ -980,7 +980,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load trip categories', 'Failed to load trip categories'), 'error');
+        showToast(error?.message || __('Failed to load trip categories', 'yatra'), 'error');
         return [];
       }
     },
@@ -1003,7 +1003,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load difficulty levels', 'Failed to load difficulty levels'), 'error');
+        showToast(error?.message || __('Failed to load difficulty levels', 'yatra'), 'error');
         return [];
       }
     },
@@ -1048,7 +1048,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         });
         return response.data || [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load destinations', 'Failed to load destinations'), 'error');
+        showToast(error?.message || __('Failed to load destinations', 'yatra'), 'error');
         return [];
       }
     },
@@ -1072,7 +1072,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return tripData;
       } catch (error: any) {
         console.error('Error loading trip:', error);
-        showToast(error?.message || __('Failed to load trip data', 'Failed to load trip data'), 'error');
+        showToast(error?.message || __('Failed to load trip data', 'yatra'), 'error');
         throw error;
       }
     },
@@ -1496,7 +1496,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 1: Basic Information (includes Trip Type & Duration)
     { 
       id: 'basic', 
-      label: __('Basic Information', 'Basic Information'), 
+      label: __('Basic Information', 'yatra'), 
       icon: FileText, 
       required: true, 
       completed: !!(formData.title?.trim() && formData.slug?.trim()),
@@ -1506,7 +1506,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 2: Location & Geography
     { 
       id: 'location', 
-      label: __('Location & Geography', 'Location & Geography'), 
+      label: __('Location & Geography', 'yatra'), 
       icon: MapPin, 
       required: false, 
       completed: !!(formData.destinations.length > 0),
@@ -1516,7 +1516,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 3: Schedule & Availability (renamed from Duration & Schedule)
     { 
       id: 'duration', 
-      label: __('Schedule & Availability', 'Schedule & Availability'), 
+      label: __('Schedule & Availability', 'yatra'), 
       icon: Calendar, 
       required: false, 
       completed: !!(formData.available_from || formData.available_to),
@@ -1526,7 +1526,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 4: Pricing & Payment
     { 
       id: 'pricing', 
-      label: __('Pricing & Payment', 'Pricing & Payment'), 
+      label: __('Pricing & Payment', 'yatra'), 
       icon: DollarSign, 
       required: false, 
       completed: formData.pricing_type === 'regular' ? !!(formData.original_price && parseFloat(formData.original_price) > 0) : formData.price_types.some(pt => pt.original_price && parseFloat(pt.original_price) > 0),
@@ -1536,7 +1536,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 5: Booking Requirements
     { 
       id: 'booking', 
-      label: __('Booking Requirements', 'Booking Requirements'), 
+      label: __('Booking Requirements', 'yatra'), 
       icon: Mail, 
       required: false, 
       completed: !!(formData.min_travelers && formData.max_travelers),
@@ -1546,7 +1546,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 6: Attributes & Properties
     { 
       id: 'attributes', 
-      label: __('Attributes & Properties', 'Attributes & Properties'), 
+      label: __('Attributes & Properties', 'yatra'), 
       icon: Tag, 
       required: false, 
       completed: formData.attributes && Object.keys(formData.attributes).length > 0,
@@ -1556,7 +1556,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Step 7: Itinerary Builder (includes Included/Excluded, now optional)
     { 
       id: 'itinerary', 
-      label: __('Itinerary Builder', 'Itinerary Builder'), 
+      label: __('Itinerary Builder', 'yatra'), 
       icon: Calendar, 
       required: false, 
       completed: formData.itinerary_days.length > 0 || formData.included_items.length > 0,
@@ -1567,7 +1567,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const marketingSections: Section[] = [
     { 
       id: 'media', 
-      label: __('Media & Content', 'Media & Content'), 
+      label: __('Media & Content', 'yatra'), 
       icon: Image, 
       required: false, 
       completed: formData.gallery_images.length > 0 || !!formData.video_url,
@@ -1576,7 +1576,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     ...(showDownloadsUI ? ([
       {
         id: 'downloads',
-        label: __('Downloads', 'Downloads'),
+        label: __('Downloads', 'yatra'),
         icon: Download,
         required: false,
         completed: (formData.downloadable_items || []).length > 0,
@@ -1585,7 +1585,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     ] as Section[]) : []),
     { 
       id: 'categorization', 
-      label: __('Categorization', 'Categorization'), 
+      label: __('Categorization', 'yatra'), 
       icon: Tag, 
       required: false, 
       completed: !!(formData.trip_category || formData.activity_types.length > 0 || formData.tags.length > 0),
@@ -1593,7 +1593,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     },
     { 
       id: 'faqs', 
-      label: __('FAQs', 'FAQs'), 
+      label: __('FAQs', 'yatra'), 
       icon: HelpCircle, 
       required: false, 
       completed: formData.faqs.length > 0,
@@ -1601,7 +1601,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     },
     { 
       id: 'seo', 
-      label: __('SEO Settings', 'SEO Settings'), 
+      label: __('SEO Settings', 'yatra'), 
       icon: Search, 
       required: false, 
       completed: !!(formData.meta_title && formData.meta_description),
@@ -1617,7 +1617,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     : 0;
 
   // Get current step number and total steps for navigation
-  const allSections = [...essentialsSections, ...marketingSections, { id: 'advanced' as SectionId, label: __('Lifecycle', 'Lifecycle'), icon: Settings, required: false, completed: false }];
+  const allSections = [...essentialsSections, ...marketingSections, { id: 'advanced' as SectionId, label: __('Lifecycle', 'yatra'), icon: Settings, required: false, completed: false }];
   const currentStepIndex = allSections.findIndex(s => s.id === currentSection);
   const currentStepNumber = currentStepIndex >= 0 ? currentStepIndex + 1 : 1;
   const totalSteps = allSections.length;
@@ -1748,8 +1748,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     // Use WordPress media library with multiple selection
     if (window.wp && window.wp.media) {
       const mediaUploader = window.wp.media({
-        title: __('Select Gallery Images', 'Select Gallery Images'),
-        button: { text: __('Add to Gallery', 'Add to Gallery') },
+        title: __('Select Gallery Images', 'yatra'),
+        button: { text: __('Add to Gallery', 'yatra') },
         multiple: true, // Allow multiple image selection
         library: { type: 'image' }
       });
@@ -1782,7 +1782,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       mediaUploader.open();
     } else {
       // Fallback for when wp.media is not available
-      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'Media library not available. Please ensure you are logged in as admin.'), 'error');
+      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'yatra'), 'error');
     }
   };
 
@@ -1859,8 +1859,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const handleDownloadableItemSelectFile = (index: number) => {
     if (window.wp && window.wp.media) {
       const mediaUploader = window.wp.media({
-        title: __('Select File', 'Select File'),
-        button: { text: __('Use this file', 'Use this file') },
+        title: __('Select File', 'yatra'),
+        button: { text: __('Use this file', 'yatra') },
         multiple: false,
       });
 
@@ -1878,14 +1878,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       mediaUploader.open();
     } else {
       // Fallback for when wp.media is not available
-      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'Media library not available. Please ensure you are logged in as admin.'), 'error');
+      showToast(__('Media library not available. Please ensure you are logged in as admin.', 'yatra'), 'error');
     }
   };
 
   const handlePriceTypeAdd = (categoryId: number) => {
     // Check if category already exists (compare as numbers to handle string/number mismatch)
     if (formData.price_types.some(pt => Number(pt.category_id) === Number(categoryId))) {
-      showToast(__('This category already has pricing set', 'This category already has pricing set'), 'warning');
+      showToast(__('This category already has pricing set', 'yatra'), 'warning');
       return;
     }
     setFormData(prev => ({
@@ -1953,7 +1953,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     
     // Show toast notification
     showToast(
-      __('Dummy data filled', 'Dummy data filled') + ` (${nextIndex + 1}/${dummyTripsData.length})`,
+      __('Dummy data filled', 'yatra') + ` (${nextIndex + 1}/${dummyTripsData.length})`,
       'success'
     );
   };
@@ -2004,7 +2004,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         ...prev.frontend_tabs,
         {
           id: newTabId,
-          label: __('New Tab', 'New Tab'),
+          label: __('New Tab', 'yatra'),
           enabled: true,
           order: maxOrder + 1,
           content_type: 'custom',
@@ -2138,13 +2138,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) {
-      newErrors.title = __('Title is required', 'Title is required');
+      newErrors.title = __('Title is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     return newErrors;
@@ -2311,13 +2311,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       if (isEditMode) {
         // Edit mode: updating existing trip
         successMessage = variables.status === 'publish' 
-          ? __('Trip updated and published successfully', 'Trip updated and published successfully')
-          : __('Trip updated successfully', 'Trip updated successfully');
+          ? __('Trip updated and published successfully', 'yatra')
+          : __('Trip updated successfully', 'yatra');
       } else {
         // Create mode: creating new trip
         successMessage = variables.status === 'publish' 
-          ? __('Trip created and published successfully', 'Trip created and published successfully')
-          : __('Trip saved as draft successfully', 'Trip saved as draft successfully');
+          ? __('Trip created and published successfully', 'yatra')
+          : __('Trip saved as draft successfully', 'yatra');
       }
       showToast(successMessage, 'success');
       
@@ -2331,7 +2331,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       // When editing (isEditMode), always stay on the same page - no redirect
     },
     onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || error?.message || __('An error occurred while saving', 'An error occurred while saving');
+      const errorMessage = error?.response?.data?.message || error?.message || __('An error occurred while saving', 'yatra');
       showToast(errorMessage, 'error');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
@@ -2347,7 +2347,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
   const handleSaveDraft = async () => {
     if (!validateDraft()) {
-      showToast(__('Please add a trip title and URL before saving.', 'Please add a trip title and URL before saving.'), 'error');
+      showToast(__('Please add a trip title and URL before saving.', 'yatra'), 'error');
       return;
     }
     setIsSubmitting(true);
@@ -2358,7 +2358,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     if (!validateForm()) {
       const firstError = Object.keys(errors)[0];
       if (firstError) {
-        showToast(__('Trip title and slug are required before publishing.', 'Trip title and slug are required before publishing.'), 'error');
+        showToast(__('Trip title and slug are required before publishing.', 'yatra'), 'error');
         const errorElement = document.querySelector(`[name="${firstError}"], #${firstError}`);
         if (errorElement) {
           errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2412,7 +2412,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     const isPlainPermalink = permalinkStructure === 'plain';
 
     if (!slug) {
-      showToast(__('Trip slug is missing. Please add a slug before previewing.', 'Trip slug is missing. Please add a slug before previewing.'), 'error');
+      showToast(__('Trip slug is missing. Please add a slug before previewing.', 'yatra'), 'error');
       return;
     }
 
@@ -2450,7 +2450,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   const handleRevisionConfirm = () => {
     // UI only - no actual functionality
     if (selectedRevisionId) {
-      showToast(__('Revision feature is coming soon', 'Revision feature is coming soon'), 'info');
+      showToast(__('Revision feature is coming soon', 'yatra'), 'info');
     }
     setShowRevisionConfirm(false);
     setShowRevisionsDialog(false);
@@ -2628,14 +2628,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               </svg>
             </div>
             <div className="space-y-1">
-              <h2 className="text-2xl font-semibold text-gray-900">{__('Error Loading Trips', 'Error Loading Trips')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">{__('Error Loading Trips', 'yatra')}</h2>
               <p className="text-sm text-gray-600">
-                {__('We couldn’t connect to the trips service. Please refresh or try again shortly.', 'We couldn’t connect to the trips service. Please refresh or try again shortly.')}
+                {__('We couldn’t connect to the trips service. Please refresh or try again shortly.', 'yatra')}
               </p>
             </div>
             <div className="flex flex-wrap gap-2 justify-center">
               <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['trip', tripId] })}>
-                {__('Try again', 'Try again')}
+                {__('Try again', 'yatra')}
               </Button>
               <Button
                 variant="outline"
@@ -2645,7 +2645,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   }
                 }}
               >
-                {__('Visit support center', 'Visit support center')}
+                {__('Visit support center', 'yatra')}
               </Button>
             </div>
 
@@ -2653,7 +2653,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="relative w-full text-left rounded-2xl border border-gray-200 bg-white shadow-sm space-y-0">
                 <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
                   <p className="text-sm font-medium text-gray-800">
-                    {__('Technical details', 'Technical details')}
+                    {__('Technical details', 'yatra')}
                   </p>
                   <Button
                     type="button"
@@ -2665,28 +2665,28 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     {copiedErrorDetails ? (
                       <>
                         <Check className="w-4 h-4" />
-                        {__('Copied', 'Copied')}
+                        {__('Copied', 'yatra')}
                       </>
                     ) : (
                       <>
                         <Copy className="w-4 h-4" />
-                        {__('Copy details', 'Copy details')}
+                        {__('Copy details', 'yatra')}
                       </>
                     )}
                   </Button>
                 </div>
                 <div className="px-5 py-3 border-b border-gray-200 space-y-2 text-sm text-left text-gray-800">
                   <div>
-                    <span className="font-medium">{__('Method:', 'Method:')}</span>{' '}
+                    <span className="font-medium">{__('Method:', 'yatra')}</span>{' '}
                     <span className="font-mono">{method}</span>
                   </div>
                   <div className="break-all">
-                    <span className="font-medium">{__('URL:', 'URL:')}</span>{' '}
-                    <span className="font-mono">{url || __('N/A', 'N/A')}</span>
+                    <span className="font-medium">{__('URL:', 'yatra')}</span>{' '}
+                    <span className="font-mono">{url || __('N/A', 'yatra')}</span>
                   </div>
                   {payload && (
                     <div>
-                      <span className="font-medium block mb-1">{__('Payload:', 'Payload:')}</span>
+                      <span className="font-medium block mb-1">{__('Payload:', 'yatra')}</span>
                       <pre className="max-h-40 overflow-auto px-3 py-2 rounded bg-gray-50 text-xs font-mono text-gray-900 whitespace-pre-wrap border border-gray-200">
                         {payload}
                       </pre>
@@ -2697,7 +2697,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {tripErrorContext.details ||
                     JSON.stringify(
                       {
-                        message: tripError instanceof Error ? tripError.message : __('Failed to load trip data', 'Failed to load trip data'),
+                        message: tripError instanceof Error ? tripError.message : __('Failed to load trip data', 'yatra'),
                         method,
                         url,
                         payload,
@@ -2721,17 +2721,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-3">
               <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Basic Information', 'Basic Information')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Basic Information', 'yatra')}</h2>
               <Badge variant="outline" className="ml-2 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800">
-                {__('Start Here', 'Start Here')}
+                {__('Start Here', 'yatra')}
               </Badge>
             </div>
             <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400 p-3 rounded-r-md mb-6">
               <p className="text-sm text-blue-900 dark:text-blue-100 font-medium mb-1">
-                {__('💡 Getting Started', '💡 Getting Started')}
+                {__('💡 Getting Started', 'yatra')}
               </p>
               <p className="text-xs text-blue-800 dark:text-blue-200">
-                {__('Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions.', 'Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions.')}
+                {__('Only the Trip Title and Trip URL are required to create a draft. Everything else is optional for now, but filling it in is highly recommended for better discovery and conversions.', 'yatra')}
               </p>
             </div>
 
@@ -2742,14 +2742,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
                       <label htmlFor="title" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                        {__('Trip Title', 'Trip Title')}
+                        {__('Trip Title', 'yatra')}
                         <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                          {__('Required', 'Required')}
+                          {__('Required', 'yatra')}
                         </Badge>
                         <button
                           type="button"
                           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
-                          title={__('A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.', 'A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.')}
+                          title={__('A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.', 'yatra')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
                         </button>
@@ -2765,7 +2765,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       </span>
                     </div>
                     <HelpText
-                      text={__('💡 Tip: Include your destination and trip length. Example: "Bali Beach Retreat - 7 Days" or "Paris City Tour - Half Day"', '💡 Tip: Include your destination and trip length. Example: "Bali Beach Retreat - 7 Days" or "Paris City Tour - Half Day"')}
+                      text={__('💡 Tip: Include your destination and trip length. Example: "Bali Beach Retreat - 7 Days" or "Paris City Tour - Half Day"', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -2773,7 +2773,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
-                      placeholder={__('e.g., Bali Beach Retreat - 7 Days', 'e.g., Bali Beach Retreat - 7 Days')}
+                      placeholder={__('e.g., Bali Beach Retreat - 7 Days', 'yatra')}
                       maxLength={100}
                       className={`${errors.title ? 'border-red-500' : formData.title && formData.title.length <= 60 ? 'border-green-500' : ''} transition-colors`}
                       required
@@ -2786,7 +2786,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     ) : formData.title && formData.title.length > 60 && (
                       <p className="mt-1.5 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5" />
-                        {__('Title is longer than recommended for SEO (60 characters)', 'Title is longer than recommended for SEO (60 characters)')}
+                        {__('Title is longer than recommended for SEO (60 characters)', 'yatra')}
                       </p>
                     )}
                   </div>
@@ -2795,14 +2795,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
                       <label htmlFor="slug" className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                        {__('Trip URL', 'Trip URL')}
+                        {__('Trip URL', 'yatra')}
                         <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                          {__('Required', 'Required')}
+                          {__('Required', 'yatra')}
                         </Badge>
                         <button
                           type="button"
                           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
-                          title={__('The web address for your trip page. Auto-generated from your title, but you can customize it.', 'The web address for your trip page. Auto-generated from your title, but you can customize it.')}
+                          title={__('The web address for your trip page. Auto-generated from your title, but you can customize it.', 'yatra')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
                         </button>
@@ -2813,7 +2813,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           onClick={() => setShowSlugPreview(false)}
                           className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                         >
-                          {__('Hide', 'Hide')}
+                          {__('Hide', 'yatra')}
                         </button>
                       )}
                     </div>
@@ -2826,7 +2826,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       type="text"
                       value={formData.slug}
                       onChange={(e) => handleFieldChange('slug', e.target.value)}
-                      placeholder={__('bali-beach-retreat-7-days', 'bali-beach-retreat-7-days')}
+                      placeholder={__('bali-beach-retreat-7-days', 'yatra')}
                       className={`font-mono text-sm ${errors.slug ? 'border-red-500' : ''}`}
                       required
                     />
@@ -2839,7 +2839,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     {showSlugPreview && formData.slug && !errors.slug && (
                       <div className="mt-2 p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-gray-600 dark:text-gray-400 border border-blue-200 dark:border-blue-800 flex items-center justify-between">
                         <div>
-                          <span className="text-gray-500 dark:text-gray-400">{__('Preview URL:', 'Preview URL:')} </span>
+                          <span className="text-gray-500 dark:text-gray-400">{__('Preview URL:', 'yatra')} </span>
                           <span className="font-mono text-blue-600 dark:text-blue-400">
                             {(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/{settingsData?.trip_base || 'trip'}/{formData.slug}
                           </span>
@@ -2850,10 +2850,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             const tripBase = settingsData?.trip_base || 'trip';
                             const url = `${(window as any).yatraAdmin?.siteUrl || 'yoursite.com'}/${tripBase}/${formData.slug}`;
                             navigator.clipboard.writeText(url);
-                            showToast(__('URL copied to clipboard', 'URL copied to clipboard'), 'success');
+                            showToast(__('URL copied to clipboard', 'yatra'), 'success');
                           }}
                           className="ml-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-1"
-                          title={__('Copy URL', 'Copy URL')}
+                          title={__('Copy URL', 'yatra')}
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
@@ -2865,7 +2865,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         onClick={() => setShowSlugPreview(true)}
                         className="mt-2 text-xs text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        {__('Show URL Preview', 'Show URL Preview')}
+                        {__('Show URL Preview', 'yatra')}
                       </button>
                     )}
                   </div>
@@ -2874,14 +2874,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1.5">
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
-                        {__('Short Description', 'Short Description')}
+                        {__('Short Description', 'yatra')}
                         <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-                          {__('Recommended', 'Recommended')}
+                          {__('Recommended', 'yatra')}
                         </Badge>
                         <button
                           type="button"
                           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
-                          title={__('A brief summary that appears in listings. Recommended: 100-150 characters for best results.', 'A brief summary that appears in listings. Recommended: 100-150 characters for best results.')}
+                          title={__('A brief summary that appears in listings. Recommended: 100-150 characters for best results.', 'yatra')}
                         >
                           <HelpCircle className="w-3.5 h-3.5" />
                         </button>
@@ -2899,19 +2899,19 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       </span>
                     </div>
                     <HelpText
-                      text={__('💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."', '💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."')}
+                      text={__('💡 Write 2-3 sentences that grab attention! This appears in trip listings. Example: "Escape to paradise with our 7-day Bali beach retreat. Experience stunning sunsets, world-class diving, and authentic local culture."', 'yatra')}
                       className="mb-2"
                     />
                     <RichTextEditor
                       value={formData.short_description}
                       onChange={(value) => handleFieldChange('short_description', value)}
-                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat...', 'Escape to paradise with our 7-day Bali beach retreat...')}
+                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat...', 'yatra')}
                       minHeight={120}
                     />
                     {formData.short_description.length > 0 && formData.short_description.length < 100 && (
                       <p className="mt-1.5 text-xs text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
                         <AlertCircle className="w-3.5 h-3.5" />
-                        {__('Consider adding more details (recommended: 100-150 characters)', 'Consider adding more details (recommended: 100-150 characters)')}
+                        {__('Consider adding more details (recommended: 100-150 characters)', 'yatra')}
                       </p>
                     )}
                   </div>
@@ -2919,9 +2919,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Tour Description */}
                   <div className="mb-4">
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
-                      {__('Trip Description', 'Trip Description')}
+                      {__('Trip Description', 'yatra')}
                       <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-                        {__('Recommended', 'Recommended')}
+                        {__('Recommended', 'yatra')}
                       </Badge>
                     </label>
                     <HelpText
@@ -2931,7 +2931,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     <RichTextEditor
                       value={formData.description}
                       onChange={(value) => handleFieldChange('description', value)}
-                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...')}
+                      placeholder={__('Escape to paradise with our 7-day Bali beach retreat... Or describe your single day trip experience...', 'yatra')}
                       minHeight={260}
                     />
                     {errors.description && (
@@ -2945,20 +2945,20 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Featured Image */}
                   <div className="mb-6">
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5 flex items-center gap-1.5">
-                      {__('Featured Image', 'Featured Image')}
+                      {__('Featured Image', 'yatra')}
                       <Badge variant="outline" className="ml-1 text-[10px] px-1.5 py-0 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-                        {__('Recommended', 'Recommended')}
+                        {__('Recommended', 'yatra')}
                       </Badge>
                       <button
                         type="button"
                         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-auto"
-                        title={__('The main image that represents your trip. This appears in listings and as the hero image on the trip page.', 'The main image that represents your trip. This appears in listings and as the hero image on the trip page.')}
+                        title={__('The main image that represents your trip. This appears in listings and as the hero image on the trip page.', 'yatra')}
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
                       </button>
                     </label>
                     <HelpText
-                      text={__('💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special.', '💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special.')}
+                      text={__('💡 Choose your best photo! This is the first thing travelers see. Use a high-quality image (1200x800px recommended) that shows what makes your trip special.', 'yatra')}
                       className="mb-2"
                     />
                     {formData.featured_image ? (
@@ -2969,12 +2969,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           {featuredImagePreview ? (
                             <img
                               src={featuredImagePreview}
-                              alt={__('Featured Image', 'Featured Image')}
+                              alt={__('Featured Image', 'yatra')}
                               className="w-full h-full object-cover"
                             />
                           ) : (
                             <div className="flex items-center justify-center w-full h-full text-sm text-gray-500 dark:text-gray-400">
-                              {isResolvingFeaturedImage ? __('Loading image...', 'Loading image...') : __('Preview unavailable', 'Preview unavailable')}
+                              {isResolvingFeaturedImage ? __('Loading image...', 'yatra') : __('Preview unavailable', 'yatra')}
                             </div>
                           )}
                         </div>
@@ -2982,7 +2982,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           type="button"
                           onClick={() => handleFieldChange('featured_image', null)}
                           className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
-                          title={__('Remove image', 'Remove image')}
+                          title={__('Remove image', 'yatra')}
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -2994,8 +2994,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           // Use WordPress media library
                           if (window.wp && window.wp.media) {
                             const mediaUploader = window.wp.media({
-                              title: __('Select Featured Image', 'Select Featured Image'),
-                              button: { text: __('Use this image', 'Use this image') },
+                              title: __('Select Featured Image', 'yatra'),
+                              button: { text: __('Use this image', 'yatra') },
                               multiple: false
                             });
                             mediaUploader.on('select', () => {
@@ -3013,10 +3013,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       >
                         <Upload className={`w-10 h-10 mb-2 ${errors.featured_image ? 'text-red-400' : 'text-gray-400'}`} />
                         <span className={`text-sm font-medium ${errors.featured_image ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
-                          {__('Upload Featured Image', 'Upload Featured Image')}
+                          {__('Upload Featured Image', 'yatra')}
                         </span>
                         <span className={`text-xs mt-1 ${errors.featured_image ? 'text-red-500 dark:text-red-500' : 'text-gray-500 dark:text-gray-500'}`}>
-                          {__('Recommended: 1200x800px', 'Recommended: 1200x800px')}
+                          {__('Recommended: 1200x800px', 'yatra')}
                         </span>
                       </button>
                     )}
@@ -3031,9 +3031,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Trip Highlights */}
                   <Card className="mt-6">
                     <CardHeader>
-                      <CardTitle>{__('Trip Highlights', 'Trip Highlights')}</CardTitle>
+                      <CardTitle>{__('Trip Highlights', 'yatra')}</CardTitle>
                       <CardDescription>
-                        {__('Add key highlights that make your trip special. These will be displayed prominently on your trip page.', 'Add key highlights that make your trip special. These will be displayed prominently on your trip page.')}
+                        {__('Add key highlights that make your trip special. These will be displayed prominently on your trip page.', 'yatra')}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -3059,10 +3059,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                           <Sparkles className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                            {__('No highlights added yet', 'No highlights added yet')}
+                            {__('No highlights added yet', 'yatra')}
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
-                            {__('Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"', 'Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"')}
+                            {__('Add key selling points like "Private guide", "All meals included", or "Skip-the-line tickets"', 'yatra')}
                           </p>
                         </div>
                       )}
@@ -3073,7 +3073,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         className="w-full"
                       >
                         <Plus className="w-4 h-4 mr-2" />
-                        {__('Add Highlight', 'Add Highlight')}
+                        {__('Add Highlight', 'yatra')}
                       </Button>
                     </CardContent>
                   </Card>
@@ -3081,12 +3081,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   {/* Trip Type & Duration - Moved from Duration section */}
                   <div className="mt-6 space-y-4">
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{__('Trip Type & Duration', 'Trip Type & Duration')}</h3>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">{__('Trip Type & Duration', 'yatra')}</h3>
                       
                       {/* Trip Type */}
                       <div className="mb-4">
                         <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
-                        {__('Trip Type', 'Trip Type')}
+                        {__('Trip Type', 'yatra')}
                         </label>
                         <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${
                           errors.trip_type ? 'mb-2' : ''
@@ -3126,14 +3126,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                     ? 'text-blue-900 dark:text-blue-300'
                                     : 'text-gray-900 dark:text-white'
                                 }`}>
-                                  {__('Single Day Trip', 'Single Day Trip')}
+                                  {__('Single Day Trip', 'yatra')}
                                 </span>
                                 <span className={`mt-1 flex items-center text-sm ${
                                   formData.trip_type === 'single_day'
                                     ? 'text-blue-700 dark:text-blue-400'
                                     : 'text-gray-500 dark:text-gray-400'
                                 }`}>
-                                  {__('Trip completed within one day (no overnight stay)', 'Trip completed within one day (no overnight stay)')}
+                                  {__('Trip completed within one day (no overnight stay)', 'yatra')}
                                 </span>
                               </div>
                             </div>
@@ -3166,14 +3166,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                     ? 'text-blue-900 dark:text-blue-300'
                                     : 'text-gray-900 dark:text-white'
                                 }`}>
-                                  {__('Multi-Day Trip', 'Multi-Day Trip')}
+                                  {__('Multi-Day Trip', 'yatra')}
                                 </span>
                                 <span className={`mt-1 flex items-center text-sm ${
                                   formData.trip_type === 'multi_day'
                                     ? 'text-blue-700 dark:text-blue-400'
                                     : 'text-gray-500 dark:text-gray-400'
                                 }`}>
-                                  {__('Trip spans multiple days with overnight stays', 'Trip spans multiple days with overnight stays')}
+                                  {__('Trip spans multiple days with overnight stays', 'yatra')}
                                 </span>
                               </div>
                             </div>
@@ -3196,7 +3196,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="duration_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                            {__('Duration (Days)', 'Duration (Days)')}
+                            {__('Duration (Days)', 'yatra')}
                           </label>
                           <Input
                             id="duration_days"
@@ -3215,14 +3215,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 setFormData(prev => ({ ...prev, duration_nights: nights }));
                               }
                             }}
-                            placeholder={formData.trip_type === 'single_day' ? '1' : __('e.g., 7', 'e.g., 7')}
+                            placeholder={formData.trip_type === 'single_day' ? '1' : __('e.g., 7', 'yatra')}
                             className={errors.duration_days ? 'border-red-500' : ''}
                             disabled={formData.trip_type === 'single_day'}
                           />
                           <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                             {formData.trip_type === 'single_day' 
-                              ? __('Single day trips are always 1 day', 'Single day trips are always 1 day')
-                              : __('Enter the number of days for your trip', 'Enter the number of days for your trip')
+                              ? __('Single day trips are always 1 day', 'yatra')
+                              : __('Enter the number of days for your trip', 'yatra')
                             }
                           </p>
                           {errors.duration_days && (
@@ -3234,7 +3234,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         </div>
                         <div>
                           <label htmlFor="duration_nights" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                            {__('Duration (Nights)', 'Duration (Nights)')}
+                            {__('Duration (Nights)', 'yatra')}
                           </label>
                           <Input
                             id="duration_nights"
@@ -3242,14 +3242,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             min="0"
                             value={formData.duration_nights}
                             onChange={(e) => handleFieldChange('duration_nights', e.target.value)}
-                            placeholder={formData.trip_type === 'single_day' ? '0' : __('e.g., 6', 'e.g., 6')}
+                            placeholder={formData.trip_type === 'single_day' ? '0' : __('e.g., 6', 'yatra')}
                             className={errors.duration_nights ? 'border-red-500' : ''}
                             disabled={formData.trip_type === 'single_day'}
                           />
                           <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
                             {formData.trip_type === 'single_day'
-                              ? __('Single day trips have 0 nights (no overnight stay)', 'Single day trips have 0 nights (no overnight stay)')
-                              : __('Enter the number of nights (typically days - 1)', 'Enter the number of nights (typically days - 1)')
+                              ? __('Single day trips have 0 nights (no overnight stay)', 'yatra')
+                              : __('Enter the number of nights (typically days - 1)', 'yatra')
                             }
                           </p>
                           {errors.duration_nights && (
@@ -3271,31 +3271,31 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <MapPin className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Geography', 'Location & Geography')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Location & Geography', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 dark:border-amber-400 p-3 rounded-r-md">
               <p className="text-sm font-medium text-amber-900 dark:text-amber-100 mb-1">
-                {__('Specify where your trip takes place, including destinations, coordinates, and key landmarks.', 'Specify where your trip takes place, including destinations, coordinates, and key landmarks.')}
+                {__('Specify where your trip takes place, including destinations, coordinates, and key landmarks.', 'yatra')}
               </p>
               <p className="text-xs text-amber-800 dark:text-amber-200">
-                {__('Optional but highly recommended to help travelers understand the experience.', 'Optional but highly recommended to help travelers understand the experience.')}
+                {__('Optional but highly recommended to help travelers understand the experience.', 'yatra')}
               </p>
             </div>
 
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Optimize how your trip appears in search engines and social shares', 'Optimize how your trip appears in search engines and social shares')}
+              {__('Optimize how your trip appears in search engines and social shares', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but completing these fields improves SEO and click-through rates.', 'Optional, but completing these fields improves SEO and click-through rates.')}
+                {__('Optional, but completing these fields improves SEO and click-through rates.', 'yatra')}
               </span>
             </p>
             <div className="space-y-4">
               {/* Destinations - Multiple Selection */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Destinations', 'Destinations')}
+                  {__('Destinations', 'yatra')}
                 </label>
                 {destinationsData && destinationsData.length > 0 ? (
                   <MultiSelect
@@ -3305,19 +3305,19 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       value: destination.id,
                       label: destination.name,
                     }))}
-                    placeholder={__('Select destinations...', 'Select destinations...')}
-                    searchPlaceholder={__('Search destinations...', 'Search destinations...')}
+                    placeholder={__('Select destinations...', 'yatra')}
+                    searchPlaceholder={__('Search destinations...', 'yatra')}
                     error={!!errors.destinations}
                   />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__('No destinations available. Please create destinations first.', 'No destinations available. Please create destinations first.')}
+                      {__('No destinations available. Please create destinations first.', 'yatra')}
                     </p>
                   </div>
                 )}
                 <HelpText
-                  text={__('Select all destinations included in this trip', 'Select all destinations included in this trip')}
+                  text={__('Select all destinations included in this trip', 'yatra')}
                   className="mt-2"
                 />
                 {errors.destinations && (
@@ -3332,26 +3332,26 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="starting_location" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Starting Location', 'Starting Location')}
+                    {__('Starting Location', 'yatra')}
                   </label>
                   <Input
                     id="starting_location"
                     type="text"
                     value={formData.starting_location}
                     onChange={(e) => handleFieldChange('starting_location', e.target.value)}
-                    placeholder={__('e.g., Denpasar Airport', 'e.g., Denpasar Airport')}
+                    placeholder={__('e.g., Denpasar Airport', 'yatra')}
                   />
                 </div>
                 <div>
                   <label htmlFor="ending_location" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Ending Location', 'Ending Location')}
+                    {__('Ending Location', 'yatra')}
                   </label>
                   <Input
                     id="ending_location"
                     type="text"
                     value={formData.ending_location}
                     onChange={(e) => handleFieldChange('ending_location', e.target.value)}
-                    placeholder={__('e.g., Ubud Hotel', 'e.g., Ubud Hotel')}
+                    placeholder={__('e.g., Ubud Hotel', 'yatra')}
                   />
                 </div>
               </div>
@@ -3360,33 +3360,33 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="latitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Latitude', 'Latitude')}
+                    {__('Latitude', 'yatra')}
                   </label>
                   <Input
                     id="latitude"
                     type="text"
                     value={formData.latitude}
                     onChange={(e) => handleFieldChange('latitude', e.target.value)}
-                    placeholder={__('e.g., -8.3405', 'e.g., -8.3405')}
+                    placeholder={__('e.g., -8.3405', 'yatra')}
                   />
                   <HelpText
-                    text={__('GPS latitude coordinate for map integration', 'GPS latitude coordinate for map integration')}
+                    text={__('GPS latitude coordinate for map integration', 'yatra')}
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <label htmlFor="longitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Longitude', 'Longitude')}
+                    {__('Longitude', 'yatra')}
                   </label>
                   <Input
                     id="longitude"
                     type="text"
                     value={formData.longitude}
                     onChange={(e) => handleFieldChange('longitude', e.target.value)}
-                    placeholder={__('e.g., 115.0920', 'e.g., 115.0920')}
+                    placeholder={__('e.g., 115.0920', 'yatra')}
                   />
                   <HelpText
-                    text={__('GPS longitude coordinate for map integration', 'GPS longitude coordinate for map integration')}
+                    text={__('GPS longitude coordinate for map integration', 'yatra')}
                     className="mt-2"
                   />
                 </div>
@@ -3395,10 +3395,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Landmarks */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Key Landmarks / Points of Interest', 'Key Landmarks / Points of Interest')}
+                  {__('Key Landmarks / Points of Interest', 'yatra')}
                 </label>
                 <HelpText
-                  text={__('Add notable landmarks or points of interest visited during this trip', 'Add notable landmarks or points of interest visited during this trip')}
+                  text={__('Add notable landmarks or points of interest visited during this trip', 'yatra')}
                   className="mb-2"
                 />
                 {formData.landmarks.length > 0 ? (
@@ -3427,7 +3427,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center mb-2">
                     <MapPin className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {__('No landmarks added yet', 'No landmarks added yet')}
+                      {__('No landmarks added yet', 'yatra')}
                     </p>
                   </div>
                 )}
@@ -3435,7 +3435,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    const text = prompt(__('Enter landmark name:', 'Enter landmark name:'));
+                    const text = prompt(__('Enter landmark name:', 'yatra'));
                     if (text && text.trim()) {
                       handleFieldChange('landmarks', [...formData.landmarks, text.trim()]);
                     }
@@ -3443,7 +3443,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   className="w-full"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  {__('Add Landmark', 'Add Landmark')}
+                  {__('Add Landmark', 'yatra')}
                 </Button>
               </div>
             </div>
@@ -3455,15 +3455,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Calendar className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Schedule & Availability', 'Schedule & Availability')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Schedule & Availability', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Set when your trip is available for booking and any seasonal information', 'Set when your trip is available for booking and any seasonal information')}
+              {__('Set when your trip is available for booking and any seasonal information', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but completing this helps automate calendar availability and booking rules.', 'Optional, but completing this helps automate calendar availability and booking rules.')}
+                {__('Optional, but completing this helps automate calendar availability and booking rules.', 'yatra')}
               </span>
             </p>
 
@@ -3472,29 +3472,29 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="available_from" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Available From', 'Available From')}
+                    {__('Available From', 'yatra')}
                   </label>
                   <DatePicker
                     value={formData.available_from}
                     onChange={(val) => handleFieldChange('available_from', val)}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                   />
                   <HelpText
-                    text={__('Earliest date this trip becomes available for booking', 'Earliest date this trip becomes available for booking')}
+                    text={__('Earliest date this trip becomes available for booking', 'yatra')}
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <label htmlFor="available_to" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Available To', 'Available To')}
+                    {__('Available To', 'yatra')}
                   </label>
                   <DatePicker
                     value={formData.available_to}
                     onChange={(val) => handleFieldChange('available_to', val)}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                   />
                   <HelpText
-                    text={__('Latest date this trip is available for booking', 'Latest date this trip is available for booking')}
+                    text={__('Latest date this trip is available for booking', 'yatra')}
                     className="mt-2"
                   />
                 </div>
@@ -3503,7 +3503,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Booking Window */}
               <div>
                 <label htmlFor="booking_window_days" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Booking Window (Days in Advance)', 'Booking Window (Days in Advance)')}
+                  {__('Booking Window (Days in Advance)', 'yatra')}
                 </label>
                 <Input
                   id="booking_window_days"
@@ -3511,10 +3511,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   min="0"
                   value={formData.booking_window_days}
                   onChange={(e) => handleFieldChange('booking_window_days', e.target.value)}
-                  placeholder={__('e.g., 30', 'e.g., 30')}
+                  placeholder={__('e.g., 30', 'yatra')}
                 />
                 <HelpText
-                  text={__('Minimum days in advance customers can book this trip', 'Minimum days in advance customers can book this trip')}
+                  text={__('Minimum days in advance customers can book this trip', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3522,17 +3522,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Seasonal Availability */}
               <div>
                 <label htmlFor="seasonal_availability" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Seasonal Availability Notes', 'Seasonal Availability Notes')}
+                  {__('Seasonal Availability Notes', 'yatra')}
                 </label>
                 <Input
                   id="seasonal_availability"
                   type="text"
                   value={formData.seasonal_availability}
                   onChange={(e) => handleFieldChange('seasonal_availability', e.target.value)}
-                  placeholder={__('e.g., Available year-round except monsoon season', 'e.g., Available year-round except monsoon season')}
+                  placeholder={__('e.g., Available year-round except monsoon season', 'yatra')}
                 />
                 <HelpText
-                  text={__('General notes about when this trip is typically available', 'General notes about when this trip is typically available')}
+                  text={__('General notes about when this trip is typically available', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3545,15 +3545,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization', 'Categorization')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Categorization', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Organize and classify your trip for better discoverability and filtering', 'Organize and classify your trip for better discoverability and filtering')}
+              {__('Organize and classify your trip for better discoverability and filtering', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but completing this helps your trip appear in the right categories and search results.', 'Optional, but completing this helps your trip appear in the right categories and search results.')}
+                {__('Optional, but completing this helps your trip appear in the right categories and search results.', 'yatra')}
               </span>
             </p>
 
@@ -3561,7 +3561,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Trip Category */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Trip Categories', 'Trip Categories')}
+                  {__('Trip Categories', 'yatra')}
                 </label>
                 {tripCategories && tripCategories.length > 0 ? (
                   <MultiSelect
@@ -3584,20 +3584,20 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       };
                       return flattenCategories(tripCategories);
                     })()}
-                    placeholder={__('Select categories...', 'Select categories...')}
-                    searchPlaceholder={__('Search categories...', 'Search categories...')}
+                    placeholder={__('Select categories...', 'yatra')}
+                    searchPlaceholder={__('Search categories...', 'yatra')}
                   />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
                       {isLoadingTripCategories 
-                        ? __('Loading categories...', 'Loading categories...') 
-                        : __('No categories available. Please create categories first.', 'No categories available. Please create categories first.')}
+                        ? __('Loading categories...', 'yatra') 
+                        : __('No categories available. Please create categories first.', 'yatra')}
                     </p>
                   </div>
                 )}
                 <HelpText
-                  text={__('Select one or more categories for this trip', 'Select one or more categories for this trip')}
+                  text={__('Select one or more categories for this trip', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3605,7 +3605,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Difficulty Level */}
               <div>
                 <label htmlFor="difficulty_level" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Difficulty Level', 'Difficulty Level')}
+                  {__('Difficulty Level', 'yatra')}
                 </label>
                 <Select
                   id="difficulty_level"
@@ -3613,15 +3613,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   onChange={(e) => handleFieldChange('difficulty_level', e.target.value)}
                   disabled={isLoadingDifficultyLevels}
                 >
-                  <option value="">{__('Select difficulty', 'Select difficulty')}</option>
+                  <option value="">{__('Select difficulty', 'yatra')}</option>
                   {isLoadingDifficultyLevels && (
                     <option value="" disabled>
-                      {__('Loading difficulty levels...', 'Loading difficulty levels...')}
+                      {__('Loading difficulty levels...', 'yatra')}
                     </option>
                   )}
                   {!isLoadingDifficultyLevels && difficultyLevels.length === 0 && (
                     <option value="" disabled>
-                      {__('No published difficulty levels available', 'No published difficulty levels available')}
+                      {__('No published difficulty levels available', 'yatra')}
                     </option>
                   )}
                   {!isLoadingDifficultyLevels &&
@@ -3635,7 +3635,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     ))}
                 </Select>
                 <HelpText
-                  text={__('Physical difficulty level required for this trip', 'Physical difficulty level required for this trip')}
+                  text={__('Physical difficulty level required for this trip', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3643,7 +3643,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Activity Types */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Activity Types', 'Activity Types')}
+                  {__('Activity Types', 'yatra')}
                 </label>
                 {activitiesData && activitiesData.length > 0 ? (
                   <MultiSelect
@@ -3653,18 +3653,18 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       value: activity.id,
                       label: activity.name,
                     }))}
-                    placeholder={__('Select activities...', 'Select activities...')}
-                    searchPlaceholder={__('Search activities...', 'Search activities...')}
+                    placeholder={__('Select activities...', 'yatra')}
+                    searchPlaceholder={__('Search activities...', 'yatra')}
                   />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__('No activities available. Please create activities first.', 'No activities available. Please create activities first.')}
+                      {__('No activities available. Please create activities first.', 'yatra')}
                     </p>
                   </div>
                 )}
                 <HelpText
-                  text={__('Select all activities included in this trip', 'Select all activities included in this trip')}
+                  text={__('Select all activities included in this trip', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3672,21 +3672,21 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Featured Priority */}
               <div>
                 <label htmlFor="featured_priority" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Featured Priority', 'Featured Priority')}
+                  {__('Featured Priority', 'yatra')}
                 </label>
                 <Select
                   id="featured_priority"
                   value={formData.featured_priority}
                   onChange={(e) => handleFieldChange('featured_priority', e.target.value as TripFormData['featured_priority'])}
                 >
-                  <option value="none">{__('None', 'None')}</option>
-                  <option value="featured">{__('Featured', 'Featured')}</option>
-                  <option value="popular">{__('Popular', 'Popular')}</option>
-                  <option value="new">{__('New', 'New')}</option>
-                  <option value="limited">{__('Limited Time', 'Limited Time')}</option>
+                  <option value="none">{__('None', 'yatra')}</option>
+                  <option value="featured">{__('Featured', 'yatra')}</option>
+                  <option value="popular">{__('Popular', 'yatra')}</option>
+                  <option value="new">{__('New', 'yatra')}</option>
+                  <option value="limited">{__('Limited Time', 'yatra')}</option>
                 </Select>
                 <HelpText
-                  text={__('Special designation for frontend display and promotion', 'Special designation for frontend display and promotion')}
+                  text={__('Special designation for frontend display and promotion', 'yatra')}
                   className="mt-2"
                 />
               </div>
@@ -3699,15 +3699,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Image className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Media & Content', 'Media & Content')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Media & Content', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              {__('Add visual content, videos, stories, and testimonials to showcase your trip', 'Add visual content, videos, stories, and testimonials to showcase your trip')}
+              {__('Add visual content, videos, stories, and testimonials to showcase your trip', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but adding rich media greatly increases engagement and conversions.', 'Optional, but adding rich media greatly increases engagement and conversions.')}
+                {__('Optional, but adding rich media greatly increases engagement and conversions.', 'yatra')}
               </span>
             </p>
 
@@ -3715,9 +3715,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Photo Gallery */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Photo Gallery', 'Photo Gallery')}</CardTitle>
+                  <CardTitle>{__('Photo Gallery', 'yatra')}</CardTitle>
                   <CardDescription>
-                    {__('Upload images to showcase your trip. These will be displayed on the trip page.', 'Upload images to showcase your trip. These will be displayed on the trip page.')}
+                    {__('Upload images to showcase your trip. These will be displayed on the trip page.', 'yatra')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -3734,7 +3734,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               type="button"
                               onClick={() => handleGalleryReorder(index, index - 1)}
                               className="bg-black/60 text-white rounded p-1 hover:bg-black/80"
-                              title={__('Move left', 'Move left')}
+                              title={__('Move left', 'yatra')}
                             >
                               <ChevronLeft className="w-4 h-4" />
                             </button>
@@ -3744,7 +3744,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               type="button"
                               onClick={() => handleGalleryReorder(index, index + 1)}
                               className="bg-black/60 text-white rounded p-1 hover:bg-black/80"
-                              title={__('Move right', 'Move right')}
+                              title={__('Move right', 'yatra')}
                             >
                               <ChevronRight className="w-4 h-4" />
                             </button>
@@ -3775,7 +3775,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     >
                       <Upload className={`w-8 h-8 mb-2 ${errors.gallery_images ? 'text-red-400' : 'text-gray-400'}`} />
                       <span className={`text-sm ${errors.gallery_images ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-400'}`}>
-                        {__('Add Image', 'Add Image')}
+                        {__('Add Image', 'yatra')}
                       </span>
                     </button>
                   </div>
@@ -3790,18 +3790,18 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Video & Virtual Tour */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Video & Virtual Tour', 'Video & Virtual Tour')}</CardTitle>
+                  <CardTitle>{__('Video & Virtual Tour', 'yatra')}</CardTitle>
                   <CardDescription>
-                    {__('Add video content to showcase your trip visually', 'Add video content to showcase your trip visually')}
+                    {__('Add video content to showcase your trip visually', 'yatra')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Video URL', 'Video URL')} (YouTube/Vimeo)
+                      {__('Video URL', 'yatra')} (YouTube/Vimeo)
                     </label>
                     <HelpText
-                      text={__('Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.', 'Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.')}
+                      text={__('Paste the full URL from YouTube or Vimeo. The video will be embedded on your trip page.', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -3820,10 +3820,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   </div>
                   <div>
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('360° Virtual Tour URL', '360° Virtual Tour URL')}
+                      {__('360° Virtual Tour URL', 'yatra')}
                     </label>
                     <HelpText
-                      text={__('Add a link to an interactive 360° virtual tour if available', 'Add a link to an interactive 360° virtual tour if available')}
+                      text={__('Add a link to an interactive 360° virtual tour if available', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -3846,40 +3846,40 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Trip Story & What Makes Special */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Trip Story & Special Features', 'Trip Story & Special Features')}</CardTitle>
+                  <CardTitle>{__('Trip Story & Special Features', 'yatra')}</CardTitle>
                   <CardDescription>
-                    {__('Tell an engaging story and highlight what makes this trip unique', 'Tell an engaging story and highlight what makes this trip unique')}
+                    {__('Tell an engaging story and highlight what makes this trip unique', 'yatra')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('What Makes This Trip Special', 'What Makes This Trip Special')}
+                      {__('What Makes This Trip Special', 'yatra')}
                     </label>
                     <HelpText
-                      text={__('Highlight the unique selling points and what sets this trip apart from others', 'Highlight the unique selling points and what sets this trip apart from others')}
+                      text={__('Highlight the unique selling points and what sets this trip apart from others', 'yatra')}
                       className="mb-2"
                     />
                     <textarea
                       value={formData.what_makes_special}
                       onChange={(e) => handleFieldChange('what_makes_special', e.target.value)}
-                      placeholder={__('Describe what makes this trip unique and special...', 'Describe what makes this trip unique and special...')}
+                      placeholder={__('Describe what makes this trip unique and special...', 'yatra')}
                       rows={5}
                       className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
                     <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Trip Story / Narrative', 'Trip Story / Narrative')}
+                      {__('Trip Story / Narrative', 'yatra')}
                     </label>
                     <HelpText
-                      text={__('Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally', 'Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally')}
+                      text={__('Tell an engaging story about this trip. Use storytelling to connect with potential travelers emotionally', 'yatra')}
                       className="mb-2"
                     />
                     <textarea
                       value={formData.trip_story}
                       onChange={(e) => handleFieldChange('trip_story', e.target.value)}
-                      placeholder={__('Write an engaging narrative about this trip...', 'Write an engaging narrative about this trip...')}
+                      placeholder={__('Write an engaging narrative about this trip...', 'yatra')}
                       rows={8}
                       className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
@@ -3890,9 +3890,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Testimonials */}
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Testimonials', 'Testimonials')}</CardTitle>
+                  <CardTitle>{__('Testimonials', 'yatra')}</CardTitle>
                   <CardDescription>
-                    {__('Add customer testimonials or reviews to build trust', 'Add customer testimonials or reviews to build trust')}
+                    {__('Add customer testimonials or reviews to build trust', 'yatra')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -3921,7 +3921,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                       <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {__('No testimonials added yet', 'No testimonials added yet')}
+                        {__('No testimonials added yet', 'yatra')}
                       </p>
                     </div>
                   )}
@@ -3929,7 +3929,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     type="button"
                     variant="outline"
                     onClick={() => {
-                      const text = prompt(__('Enter testimonial text:', 'Enter testimonial text:'));
+                      const text = prompt(__('Enter testimonial text:', 'yatra'));
                       if (text && text.trim()) {
                         handleFieldChange('testimonials', [...formData.testimonials, text.trim()]);
                       }
@@ -3937,7 +3937,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     className="w-full"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Testimonial', 'Add Testimonial')}
+                    {__('Add Testimonial', 'yatra')}
                   </Button>
                 </CardContent>
               </Card>
@@ -3950,7 +3950,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           return (
             <div className="space-y-6">
               <Alert variant="info">
-                {__('Downloads module is not enabled.', 'Downloads module is not enabled.')}
+                {__('Downloads module is not enabled.', 'yatra')}
               </Alert>
             </div>
           );
@@ -3960,17 +3960,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Download className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Downloads', 'Downloads')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Downloads', 'yatra')}</h2>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-              {__('Attach files to this trip and control who can access them.', 'Attach files to this trip and control who can access them.')}
+              {__('Attach files to this trip and control who can access them.', 'yatra')}
             </p>
 
             <Card>
               <CardHeader>
-                <CardTitle>{__('Downloads', 'Downloads')}</CardTitle>
+                <CardTitle>{__('Downloads', 'yatra')}</CardTitle>
                 <CardDescription>
-                  {__('Attach files to this trip and control who can access them.', 'Attach files to this trip and control who can access them.')}
+                  {__('Attach files to this trip and control who can access them.', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -3981,27 +3981,27 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                              {__('Title', 'Title')}
+                              {__('Title', 'yatra')}
                             </label>
                             <Input
                               value={item.title}
                               onChange={(e) => handleDownloadableItemChange(index, 'title', e.target.value)}
-                              placeholder={__('E.g. Packing list, itinerary PDF, waiver form...', 'E.g. Packing list, itinerary PDF, waiver form...')}
+                              placeholder={__('E.g. Packing list, itinerary PDF, waiver form...', 'yatra')}
                             />
                           </div>
 
                           <div className="flex gap-1 pt-7">
                             {index > 0 && (
-                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index - 1)} title={__('Move up', 'Move up')}>
+                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index - 1)} title={__('Move up', 'yatra')}>
                                 <ChevronUp className="w-4 h-4" />
                               </Button>
                             )}
                             {index < (formData.downloadable_items || []).length - 1 && (
-                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index + 1)} title={__('Move down', 'Move down')}>
+                              <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemMove(index, index + 1)} title={__('Move down', 'yatra')}>
                                 <ChevronDown className="w-4 h-4" />
                               </Button>
                             )}
-                            <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemRemove(index)} className="text-red-600 hover:text-red-700" title={__('Remove', 'Remove')}>
+                            <Button type="button" variant="ghost" size="sm" onClick={() => handleDownloadableItemRemove(index)} className="text-red-600 hover:text-red-700" title={__('Remove', 'yatra')}>
                               <X className="w-4 h-4" />
                             </Button>
                           </div>
@@ -4009,7 +4009,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                         <div>
                           <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                            {__('Description', 'Description')} ({__('Optional', 'Optional')})
+                            {__('Description', 'yatra')} ({__('Optional', 'yatra')})
                           </label>
                           <textarea
                             value={item.description}
@@ -4021,15 +4021,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('Visibility', 'Visibility')}</label>
+                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('Visibility', 'yatra')}</label>
                             <Select value={item.visibility} onChange={(e) => handleDownloadableItemChange(index, 'visibility', e.target.value)}>
-                              <option value="public">{__('Public', 'Public')}</option>
-                              <option value="logged_in">{__('Private (My Account only)', 'Private (My Account only)')}</option>
-                              <option value="booked_only">{__('Private (Booking confirmation only)', 'Private (Booking confirmation only)')}</option>
+                              <option value="public">{__('Public', 'yatra')}</option>
+                              <option value="logged_in">{__('Private (My Account only)', 'yatra')}</option>
+                              <option value="booked_only">{__('Private (Booking confirmation only)', 'yatra')}</option>
                             </Select>
                           </div>
                           <div>
-                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('File', 'File')}</label>
+                            <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">{__('File', 'yatra')}</label>
                             <div className="flex items-center gap-2">
                               {item.attachment_url ? (
                                 <a
@@ -4037,12 +4037,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                   target="_blank"
                                   rel="noreferrer"
                                   className="flex-shrink-0"
-                                  title={__('View file', 'View file')}
+                                  title={__('View file', 'yatra')}
                                 >
                                   {/\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(item.attachment_url) ? (
                                     <img
                                       src={item.attachment_url}
-                                      alt={item.attachment_title || __('Selected file', 'Selected file')}
+                                      alt={item.attachment_title || __('Selected file', 'yatra')}
                                       className="w-9 h-9 rounded border border-gray-200 dark:border-gray-700 object-cover bg-white dark:bg-gray-900"
                                     />
                                   ) : (
@@ -4061,10 +4061,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 <div className="flex items-center gap-2 min-w-0">
                                   <Button type="button" variant="outline" onClick={() => handleDownloadableItemSelectFile(index)} className="flex items-center gap-2 flex-shrink-0">
                                     <Upload className="w-4 h-4" />
-                                    {item.attachment_id ? __('Change File', 'Change File') : __('Select File', 'Select File')}
+                                    {item.attachment_id ? __('Change File', 'yatra') : __('Select File', 'yatra')}
                                   </Button>
                                   <span className="text-xs text-gray-600 dark:text-gray-400 truncate min-w-0">
-                                    {item.attachment_title || (item.attachment_id ? `#${item.attachment_id}` : __('No file selected', 'No file selected'))}
+                                    {item.attachment_title || (item.attachment_id ? `#${item.attachment_id}` : __('No file selected', 'yatra'))}
                                   </span>
                                   {item.attachment_url && (
                                     <a
@@ -4074,7 +4074,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                       className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 flex-shrink-0"
                                     >
                                       <Eye className="w-3 h-3" />
-                                      {__('View', 'View')}
+                                      {__('View', 'yatra')}
                                     </a>
                                   )}
                                 </div>
@@ -4085,7 +4085,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                         <div className="flex items-center gap-2">
                           <input type="checkbox" checked={item.enabled} onChange={(e) => handleDownloadableItemChange(index, 'enabled', e.target.checked)} className="h-4 w-4" />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{__('Enabled', 'Enabled')}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{__('Enabled', 'yatra')}</span>
                         </div>
                       </div>
                     ))}
@@ -4093,13 +4093,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 ) : (
                   <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{__('No downloads added yet', 'No downloads added yet')}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{__('No downloads added yet', 'yatra')}</p>
                   </div>
                 )}
 
                 <Button type="button" variant="outline" onClick={handleDownloadableItemAdd} className="w-full">
                   <Plus className="w-4 h-4 mr-2" />
-                  {__('Add Download', 'Add Download')}
+                  {__('Add Download', 'yatra')}
                 </Button>
               </CardContent>
             </Card>
@@ -4111,15 +4111,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <DollarSign className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Pricing & Payment', 'Pricing & Payment')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Pricing & Payment', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Set pricing for different traveler types and payment options', 'Set pricing for different traveler types and payment options')}
+              {__('Set pricing for different traveler types and payment options', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional for drafts, but adding pricing now makes publishing and selling much easier later.', 'Optional for drafts, but adding pricing now makes publishing and selling much easier later.')}
+                {__('Optional for drafts, but adding pricing now makes publishing and selling much easier later.', 'yatra')}
               </span>
             </p>
 
@@ -4127,7 +4127,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {/* Pricing Type Selection */}
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-3">
-                  {__('Pricing Type', 'Pricing Type')}
+                  {__('Pricing Type', 'yatra')}
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <label className={`relative flex cursor-pointer rounded-lg border p-4 focus:outline-none ${
@@ -4150,14 +4150,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
                         }`}>
-                          {__('Regular Pricing', 'Regular Pricing')}
+                          {__('Regular Pricing', 'yatra')}
                         </span>
                         <span className={`mt-1 flex items-center text-sm ${
                           formData.pricing_type === 'regular'
                             ? 'text-blue-700 dark:text-blue-400'
                             : 'text-gray-500 dark:text-gray-400'
                         }`}>
-                          {__('Set a single price for all travelers', 'Set a single price for all travelers')}
+                          {__('Set a single price for all travelers', 'yatra')}
                         </span>
                       </div>
                     </div>
@@ -4188,14 +4188,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             ? 'text-blue-900 dark:text-blue-300'
                             : 'text-gray-900 dark:text-white'
                         }`}>
-                          {__('Traveler-Based Pricing', 'Traveler-Based Pricing')}
+                          {__('Traveler-Based Pricing', 'yatra')}
                         </span>
                         <span className={`mt-1 flex items-center text-sm ${
                           formData.pricing_type === 'traveler_based'
                             ? 'text-blue-700 dark:text-blue-400'
                             : 'text-gray-500 dark:text-gray-400'
                         }`}>
-                          {__('Set different prices for each traveler category', 'Set different prices for each traveler category')}
+                          {__('Set different prices for each traveler category', 'yatra')}
                         </span>
                       </div>
                     </div>
@@ -4214,7 +4214,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Original Price', 'Original Price')}
+                        {__('Original Price', 'yatra')}
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -4237,7 +4237,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                        {__('Discounted Price', 'yatra')} ({__('Optional', 'yatra')})
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -4266,11 +4266,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400">
-                    {__('Traveler Category Pricing', 'Traveler Category Pricing')}
+                    {__('Traveler Category Pricing', 'yatra')}
                   </label>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                  {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'yatra')}
                 </p>
                 {isLoadingCategories ? (
                   <div className="flex items-center justify-center py-8">
@@ -4279,7 +4279,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 ) : activeCategories.length === 0 ? (
                   <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      {__('No active traveler categories found.', 'No active traveler categories found.')}
+                      {__('No active traveler categories found.', 'yatra')}
                     </p>
                     <Button
                       type="button"
@@ -4288,7 +4288,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       className="flex items-center gap-2 mx-auto"
                     >
                       <Plus className="w-4 h-4" />
-                      {__('Create Category', 'Create Category')}
+                      {__('Create Category', 'yatra')}
                     </Button>
                   </div>
                 ) : (
@@ -4303,7 +4303,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                         disabled={activeCategories.filter(cat => !formData.price_types.some(pt => Number(pt.category_id) === Number(cat.id))).length === 0}
                       >
                         <Plus className="w-4 h-4" />
-                        {__('Add Pricing', 'Add Pricing')}
+                        {__('Add Pricing', 'yatra')}
                       </Button>
                       
                       {/* Category Selection Dropdown */}
@@ -4316,13 +4316,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                             <div className="p-2">
                               <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
-                                {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                {__('Select a category to add pricing', 'yatra')}
                               </div>
                               {activeCategories
                                 .filter(cat => !formData.price_types.some(pt => Number(pt.category_id) === Number(cat.id)))
                                 .length === 0 ? (
                                 <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-                                  {__('All categories have pricing added', 'All categories have pricing added')}
+                                  {__('All categories have pricing added', 'yatra')}
                                 </div>
                               ) : (
                                 <div className="space-y-1">
@@ -4331,11 +4331,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                     .map(category => {
                                       const ageRange = category.age_min !== undefined || category.age_max !== undefined
                                         ? category.age_min !== undefined && category.age_max !== undefined
-                                          ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                          ? `${category.age_min}-${category.age_max} ${__('years', 'yatra')}`
                                           : category.age_min !== undefined
-                                          ? `${category.age_min}+ ${__('years', 'years')}`
+                                          ? `${category.age_min}+ ${__('years', 'yatra')}`
                                           : category.age_max !== undefined
-                                          ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                          ? `${__('Under', 'yatra')} ${category.age_max} ${__('years', 'yatra')}`
                                           : ''
                                         : null;
 
@@ -4346,16 +4346,16 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                       let pricingLabel = '';
                                       if (pricingMode === 'per_group') {
                                         if (hasMin && hasMax) {
-                                          pricingLabel = `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+                                          pricingLabel = `${__('Per group', 'yatra')} (${category.min_pax}-${category.max_pax})`;
                                         } else if (hasMin) {
-                                          pricingLabel = `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+                                          pricingLabel = `${__('Per group', 'yatra')} (${__('From', 'yatra')} ${category.min_pax})`;
                                         } else if (hasMax) {
-                                          pricingLabel = `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+                                          pricingLabel = `${__('Per group', 'yatra')} (${__('Up to', 'yatra')} ${category.max_pax})`;
                                         } else {
-                                          pricingLabel = __('Per group', 'Per group');
+                                          pricingLabel = __('Per group', 'yatra');
                                         }
                                       } else {
-                                        pricingLabel = __('Per person', 'Per person');
+                                        pricingLabel = __('Per person', 'yatra');
                                       }
 
                                       return (
@@ -4416,11 +4416,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                     <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                                       (
                                       {category.age_min !== undefined && category.age_max !== undefined
-                                        ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                        ? `${category.age_min}-${category.age_max} ${__('years', 'yatra')}`
                                         : category.age_min !== undefined
-                                        ? `${category.age_min}+ ${__('years', 'years')}`
+                                        ? `${category.age_min}+ ${__('years', 'yatra')}`
                                         : category.age_max !== undefined
-                                        ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                        ? `${__('Under', 'yatra')} ${category.age_max} ${__('years', 'yatra')}`
                                         : ''}
                                       )
                                     </span>
@@ -4435,18 +4435,18 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
                                       if (pricingMode === 'per_group') {
                                         if (hasMin && hasMax) {
-                                          return `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+                                          return `${__('Per group', 'yatra')} (${category.min_pax}-${category.max_pax})`;
                                         }
                                         if (hasMin) {
-                                          return `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+                                          return `${__('Per group', 'yatra')} (${__('From', 'yatra')} ${category.min_pax})`;
                                         }
                                         if (hasMax) {
-                                          return `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+                                          return `${__('Per group', 'yatra')} (${__('Up to', 'yatra')} ${category.max_pax})`;
                                         }
-                                        return __('Per group', 'Per group');
+                                        return __('Per group', 'yatra');
                                       }
 
-                                      return __('Per person', 'Per person');
+                                      return __('Per person', 'yatra');
                                     })()}
                                   </span>
                                 </h4>
@@ -4459,7 +4459,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                   type="button"
                                   onClick={() => handlePriceTypeRemove(category.id)}
                                   className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                  title={__('Remove Pricing', 'Remove Pricing')}
+                                  title={__('Remove Pricing', 'yatra')}
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -4467,7 +4467,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Original Price', 'Original Price')}
+                                    {__('Original Price', 'yatra')}
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -4491,7 +4491,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                                    {__('Discounted Price', 'yatra')} ({__('Optional', 'yatra')})
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -4525,7 +4525,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                         <Tag className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {__('No pricing added yet. Select a category above to add pricing.', 'No pricing added yet. Select a category above to add pricing.')}
+                          {__('No pricing added yet. Select a category above to add pricing.', 'yatra')}
                         </p>
                       </div>
                     )}
@@ -4543,11 +4543,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
               {/* Deposit */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Deposit & Payment Terms', 'Deposit & Payment Terms')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Deposit & Payment Terms', 'yatra')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="deposit_amount" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Deposit Amount', 'Deposit Amount')}
+                      {__('Deposit Amount', 'yatra')}
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{getCurrencySymbol(globalCurrency)}</span>
@@ -4565,7 +4565,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   </div>
                   <div>
                     <label htmlFor="deposit_percentage" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Deposit Percentage', 'Deposit Percentage')}
+                      {__('Deposit Percentage', 'yatra')}
                     </label>
                     <div className="relative">
                       <Input
@@ -4585,13 +4585,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 </div>
                 <div className="mt-4">
                   <label htmlFor="payment_terms" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Payment Terms', 'Payment Terms')}
+                    {__('Payment Terms', 'yatra')}
                   </label>
                   <textarea
                     id="payment_terms"
                     value={formData.payment_terms}
                     onChange={(e) => handleFieldChange('payment_terms', e.target.value)}
-                    placeholder={__('e.g., 50% deposit required at booking, balance due 30 days before departure', 'e.g., 50% deposit required at booking, balance due 30 days before departure')}
+                    placeholder={__('e.g., 50% deposit required at booking, balance due 30 days before departure', 'yatra')}
                     rows={2}
                     className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                   />
@@ -4610,26 +4610,26 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Mail className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Requirements', 'Booking Requirements')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Requirements', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Configure booking limits, deadlines, and traveler requirements', 'Configure booking limits, deadlines, and traveler requirements')}
+              {__('Configure booking limits, deadlines, and traveler requirements', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional today, but setting these helps automate capacity and avoid overbookings later.', 'Optional today, but setting these helps automate capacity and avoid overbookings later.')}
+                {__('Optional today, but setting these helps automate capacity and avoid overbookings later.', 'yatra')}
               </span>
             </p>
 
             <div className="space-y-6">
               {/* Group Size */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Group Size', 'Group Size')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Group Size', 'yatra')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="min_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Minimum Travelers', 'Minimum Travelers')}
+                      {__('Minimum Travelers', 'yatra')}
                     </label>
                     <Input
                       id="min_travelers"
@@ -4648,7 +4648,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   </div>
                   <div>
                     <label htmlFor="max_travelers" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Maximum Travelers', 'Maximum Travelers')}
+                      {__('Maximum Travelers', 'yatra')}
                     </label>
                     <Input
                       id="max_travelers"
@@ -4670,11 +4670,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
               {/* Age Restrictions */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Age Restrictions', 'Age Restrictions')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Age Restrictions', 'yatra')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label htmlFor="age_min" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Minimum Age', 'Minimum Age')}
+                      {__('Minimum Age', 'yatra')}
                     </label>
                     <Input
                       id="age_min"
@@ -4682,7 +4682,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       min="0"
                       value={formData.age_min}
                       onChange={(e) => handleFieldChange('age_min', e.target.value)}
-                      placeholder={__('e.g., 18', 'e.g., 18')}
+                      placeholder={__('e.g., 18', 'yatra')}
                       className={errors.age_min ? 'border-red-500' : ''}
                     />
                     {errors.age_min && (
@@ -4694,7 +4694,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   </div>
                   <div>
                     <label htmlFor="age_max" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Maximum Age', 'Maximum Age')}
+                      {__('Maximum Age', 'yatra')}
                     </label>
                     <Input
                       id="age_max"
@@ -4702,7 +4702,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       min="0"
                       value={formData.age_max}
                       onChange={(e) => handleFieldChange('age_max', e.target.value)}
-                      placeholder={__('e.g., 65', 'e.g., 65')}
+                      placeholder={__('e.g., 65', 'yatra')}
                       className={errors.age_max ? 'border-red-500' : ''}
                     />
                     {errors.age_max && (
@@ -4717,61 +4717,61 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
               {/* Booking Deadlines */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Booking Deadlines', 'Booking Deadlines')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Booking Deadlines', 'yatra')}</h3>
                 <div>
                   <label htmlFor="booking_deadline" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Booking Deadline', 'Booking Deadline')}
+                    {__('Booking Deadline', 'yatra')}
                   </label>
                   <DatePicker
                     value={formData.booking_deadline}
                     onChange={(val) => handleFieldChange('booking_deadline', val)}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                   />
                   <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {__('Last date customers can book this trip', 'Last date customers can book this trip')}
+                    {__('Last date customers can book this trip', 'yatra')}
                   </p>
                 </div>
               </div>
 
               {/* Travel Requirements */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Travel Requirements', 'Travel Requirements')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Travel Requirements', 'yatra')}</h3>
                 <div className="space-y-4">
                   <div>
                     <label htmlFor="physical_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Physical Requirements', 'Physical Requirements')}
+                      {__('Physical Requirements', 'yatra')}
                     </label>
                     <textarea
                       id="physical_requirements"
                       value={formData.physical_requirements}
                       onChange={(e) => handleFieldChange('physical_requirements', e.target.value)}
-                      placeholder={__('e.g., Moderate fitness level required, ability to walk 5km per day', 'e.g., Moderate fitness level required, ability to walk 5km per day')}
+                      placeholder={__('e.g., Moderate fitness level required, ability to walk 5km per day', 'yatra')}
                       rows={2}
                       className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
                     <label htmlFor="visa_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Visa Requirements', 'Visa Requirements')}
+                      {__('Visa Requirements', 'yatra')}
                     </label>
                     <textarea
                       id="visa_requirements"
                       value={formData.visa_requirements}
                       onChange={(e) => handleFieldChange('visa_requirements', e.target.value)}
-                      placeholder={__('e.g., Valid passport required, visa on arrival available for most nationalities', 'e.g., Valid passport required, visa on arrival available for most nationalities')}
+                      placeholder={__('e.g., Valid passport required, visa on arrival available for most nationalities', 'yatra')}
                       rows={2}
                       className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
                   </div>
                   <div>
                     <label htmlFor="vaccination_requirements" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                      {__('Vaccination Requirements', 'Vaccination Requirements')}
+                      {__('Vaccination Requirements', 'yatra')}
                     </label>
                     <textarea
                       id="vaccination_requirements"
                       value={formData.vaccination_requirements}
                       onChange={(e) => handleFieldChange('vaccination_requirements', e.target.value)}
-                      placeholder={__('e.g., Yellow fever vaccination required for entry', 'e.g., Yellow fever vaccination required for entry')}
+                      placeholder={__('e.g., Yellow fever vaccination required for entry', 'yatra')}
                       rows={2}
                       className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                     />
@@ -4781,16 +4781,16 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
               {/* Cancellation Policy */}
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Cancellation Policy', 'Cancellation Policy')}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Cancellation Policy', 'yatra')}</h3>
                 <div>
                   <label htmlFor="cancellation_policy" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Cancellation Policy Details', 'Cancellation Policy Details')}
+                    {__('Cancellation Policy Details', 'yatra')}
                   </label>
                   <textarea
                     id="cancellation_policy"
                     value={formData.cancellation_policy}
                     onChange={(e) => handleFieldChange('cancellation_policy', e.target.value)}
-                    placeholder={__('e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days', 'e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days')}
+                    placeholder={__('e.g., Full refund 30 days before departure, 50% refund 15-29 days before, no refund within 14 days', 'yatra')}
                     rows={3}
                     className="flex w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 resize-none transition-colors"
                   />
@@ -4805,15 +4805,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Attributes & Properties', 'Attributes & Properties')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Attributes & Properties', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-300 border-green-200 dark:border-green-800">
-                {__('Optional', 'Optional')}
+                {__('Optional', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Add custom attributes and properties to describe your trip', 'Add custom attributes and properties to describe your trip')}
+              {__('Add custom attributes and properties to describe your trip', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('These attributes can be used for filtering and search on the frontend', 'These attributes can be used for filtering and search on the frontend')}
+                {__('These attributes can be used for filtering and search on the frontend', 'yatra')}
               </span>
             </p>
 
@@ -4863,15 +4863,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <HelpCircle className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frequently Asked Questions', 'Frequently Asked Questions')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Frequently Asked Questions', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Add common questions and answers about your trip', 'Add common questions and answers about your trip')}
+              {__('Add common questions and answers about your trip', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but addressing FAQs up front reduces support questions later.', 'Optional, but addressing FAQs up front reduces support questions later.')}
+                {__('Optional, but addressing FAQs up front reduces support questions later.', 'yatra')}
               </span>
             </p>
             <div className="space-y-4">
@@ -4879,7 +4879,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                   <div className="flex items-start justify-between mb-3">
                     <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-                      {__('FAQ', 'FAQ')} {index + 1}
+                      {__('FAQ', 'yatra')} {index + 1}
                     </h3>
                     <button
                       type="button"
@@ -4892,23 +4892,23 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Question', 'Question')}
+                        {__('Question', 'yatra')}
                       </label>
                       <Input
                         type="text"
                         value={faq.question}
                         onChange={(e) => handleFAQChange(index, 'question', e.target.value)}
-                        placeholder={__('Enter question...', 'Enter question...')}
+                        placeholder={__('Enter question...', 'yatra')}
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Answer', 'Answer')}
+                        {__('Answer', 'yatra')}
                       </label>
                       <textarea
                         value={faq.answer}
                         onChange={(e) => handleFAQChange(index, 'answer', e.target.value)}
-                        placeholder={__('Enter answer...', 'Enter answer...')}
+                        placeholder={__('Enter answer...', 'yatra')}
                         rows={3}
                         className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                       />
@@ -4923,7 +4923,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 className="w-full"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {__('Add FAQ', 'Add FAQ')}
+                {__('Add FAQ', 'yatra')}
               </Button>
             </div>
           </div>
@@ -4936,27 +4936,27 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Search className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('SEO Settings', 'SEO Settings')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('SEO Settings', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <div className="space-y-4">
               <div>
                 <label htmlFor="meta_title" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Meta Title', 'Meta Title')}
+                  {__('Meta Title', 'yatra')}
                 </label>
                 <Input
                   id="meta_title"
                   type="text"
                   value={formData.meta_title}
                   onChange={(e) => handleFieldChange('meta_title', e.target.value)}
-                  placeholder={formData.title || __('Trip Title', 'Trip Title')}
+                  placeholder={formData.title || __('Trip Title', 'yatra')}
                 />
               </div>
               <div>
                 <label htmlFor="meta_description" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Meta Description', 'Meta Description')}
+                  {__('Meta Description', 'yatra')}
                 </label>
                 <textarea
                   id="meta_description"
@@ -4968,14 +4968,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               </div>
               <div>
                 <label htmlFor="meta_keywords" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                  {__('Meta Keywords', 'Meta Keywords')}
+                  {__('Meta Keywords', 'yatra')}
                 </label>
                 <Input
                   id="meta_keywords"
                   type="text"
                   value={formData.meta_keywords}
                   onChange={(e) => handleFieldChange('meta_keywords', e.target.value)}
-                  placeholder={__('e.g., bali, beach, retreat, vacation', 'e.g., bali, beach, retreat, vacation')}
+                  placeholder={__('e.g., bali, beach, retreat, vacation', 'yatra')}
                 />
               </div>
             </div>
@@ -4987,29 +4987,29 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-6">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Settings className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Lifecycle Management', 'Lifecycle Management')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Lifecycle Management', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-300 border-amber-200 dark:border-amber-800">
-                {__('Recommended', 'Recommended')}
+                {__('Recommended', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Manage publishing schedule and lifecycle settings', 'Manage publishing schedule and lifecycle settings')}
+              {__('Manage publishing schedule and lifecycle settings', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {__('Optional, but scheduling ahead saves time when launching seasonal trips.', 'Optional, but scheduling ahead saves time when launching seasonal trips.')}
+                {__('Optional, but scheduling ahead saves time when launching seasonal trips.', 'yatra')}
               </span>
             </p>
 
             <Card>
               <CardHeader>
-                <CardTitle>{__('Version Control', 'Version Control')}</CardTitle>
+                <CardTitle>{__('Version Control', 'yatra')}</CardTitle>
                 <CardDescription>
-                  {__('Track changes and version history', 'Track changes and version history')}
+                  {__('Track changes and version history', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Version', 'Version')}
+                    {__('Version', 'yatra')}
                   </label>
                   <Input
                     type="number"
@@ -5020,7 +5020,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     className="bg-gray-50 dark:bg-gray-800"
                   />
                   <HelpText
-                    text={__('Version number is automatically incremented when changes are saved', 'Version number is automatically incremented when changes are saved')}
+                    text={__('Version number is automatically incremented when changes are saved', 'yatra')}
                     className="mt-2"
                   />
                 </div>
@@ -5029,37 +5029,37 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
             <Card>
               <CardHeader>
-                <CardTitle>{__('Scheduled Publishing', 'Scheduled Publishing')}</CardTitle>
+                <CardTitle>{__('Scheduled Publishing', 'yatra')}</CardTitle>
                 <CardDescription>
-                  {__('Automatically publish or unpublish your trip on specific dates', 'Automatically publish or unpublish your trip on specific dates')}
+                  {__('Automatically publish or unpublish your trip on specific dates', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Schedule Publish Date', 'Schedule Publish Date')}
+                    {__('Schedule Publish Date', 'yatra')}
                   </label>
                   <DatePicker
                     value={formData.scheduled_publish_date}
                     onChange={(val) => handleFieldChange('scheduled_publish_date', val)}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                   />
                   <HelpText
-                    text={__('Trip will be automatically published on this date and time', 'Trip will be automatically published on this date and time')}
+                    text={__('Trip will be automatically published on this date and time', 'yatra')}
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Schedule Unpublish Date', 'Schedule Unpublish Date')}
+                    {__('Schedule Unpublish Date', 'yatra')}
                   </label>
                   <DatePicker
                     value={formData.scheduled_unpublish_date}
                     onChange={(val) => handleFieldChange('scheduled_unpublish_date', val)}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                   />
                   <HelpText
-                    text={__('Trip will be automatically unpublished (archived) on this date and time', 'Trip will be automatically unpublished (archived) on this date and time')}
+                    text={__('Trip will be automatically unpublished (archived) on this date and time', 'yatra')}
                     className="mt-2"
                   />
                 </div>
@@ -5068,9 +5068,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
             <Card>
               <CardHeader>
-                <CardTitle>{__('Seasonal Auto-Enable/Disable', 'Seasonal Auto-Enable/Disable')}</CardTitle>
+                <CardTitle>{__('Seasonal Auto-Enable/Disable', 'yatra')}</CardTitle>
                 <CardDescription>
-                  {__('Automatically enable or disable trip availability based on seasonal dates', 'Automatically enable or disable trip availability based on seasonal dates')}
+                  {__('Automatically enable or disable trip availability based on seasonal dates', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -5083,36 +5083,36 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <label htmlFor="seasonal_auto_enable" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {__('Enable seasonal auto-management', 'Enable seasonal auto-management')}
+                    {__('Enable seasonal auto-management', 'yatra')}
                   </label>
                 </div>
                 {formData.seasonal_auto_enable && (
                   <>
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Auto-Enable Date', 'Auto-Enable Date')}
+                        {__('Auto-Enable Date', 'yatra')}
                       </label>
                       <DatePicker
                         value={formData.seasonal_enable_date}
                         onChange={(val) => handleFieldChange('seasonal_enable_date', val)}
-                        placeholder={__('Select date', 'Select date')}
+                        placeholder={__('Select date', 'yatra')}
                       />
                       <HelpText
-                        text={__('Trip will become available for booking on this date', 'Trip will become available for booking on this date')}
+                        text={__('Trip will become available for booking on this date', 'yatra')}
                         className="mt-2"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                        {__('Auto-Disable Date', 'Auto-Disable Date')}
+                        {__('Auto-Disable Date', 'yatra')}
                       </label>
                       <DatePicker
                         value={formData.seasonal_disable_date}
                         onChange={(val) => handleFieldChange('seasonal_disable_date', val)}
-                        placeholder={__('Select date', 'Select date')}
+                        placeholder={__('Select date', 'yatra')}
                       />
                       <HelpText
-                        text={__('Trip will become unavailable for booking on this date', 'Trip will become unavailable for booking on this date')}
+                        text={__('Trip will become unavailable for booking on this date', 'yatra')}
                         className="mt-2"
                       />
                     </div>
@@ -5124,9 +5124,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             {/* Frontend Tabs Management */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Frontend Tabs Management', 'Frontend Tabs Management')}</CardTitle>
+                <CardTitle>{__('Frontend Tabs Management', 'yatra')}</CardTitle>
                 <CardDescription>
-                  {__('Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.', 'Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.')}
+                  {__('Manage which tabs appear on the trip single page and in what order. Enable or disable tabs, customize labels, and reorder them.', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -5152,7 +5152,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 onChange={(e) => handleTabLabelChange(tab.id, e.target.value)}
                                 className="text-sm font-medium flex-1"
                                 disabled={!tab.enabled}
-                                placeholder={__('Tab Label', 'Tab Label')}
+                                placeholder={__('Tab Label', 'yatra')}
                               />
                               <Badge variant="outline" className="text-xs">
                                 {tab.content_type}
@@ -5161,14 +5161,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             {tab.content_type === 'custom' && (
                               <div className="mt-2">
                                 <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                  {__('Custom Content', 'Custom Content')}
+                                  {__('Custom Content', 'yatra')}
                                 </label>
                                 <textarea
                                   value={tab.custom_content || ''}
                                   onChange={(e) => handleTabCustomContentChange(tab.id, e.target.value)}
                                   rows={3}
                                   disabled={!tab.enabled}
-                                  placeholder={__('Enter custom content for this tab...', 'Enter custom content for this tab...')}
+                                  placeholder={__('Enter custom content for this tab...', 'yatra')}
                                   className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                                 />
                               </div>
@@ -5181,17 +5181,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                   disabled={!tab.enabled}
                                   className="text-xs"
                                 >
-                                  <option value="general">{__('General', 'General')}</option>
-                                  <option value="pricing">{__('Pricing', 'Pricing')}</option>
-                                  <option value="itinerary">{__('Itinerary', 'Itinerary')}</option>
-                                  <option value="included_excluded">{__('Included/Excluded', 'Included/Excluded')}</option>
-                                  <option value="gallery">{__('Gallery', 'Gallery')}</option>
+                                  <option value="general">{__('General', 'yatra')}</option>
+                                  <option value="pricing">{__('Pricing', 'yatra')}</option>
+                                  <option value="itinerary">{__('Itinerary', 'yatra')}</option>
+                                  <option value="included_excluded">{__('Included/Excluded', 'yatra')}</option>
+                                  <option value="gallery">{__('Gallery', 'yatra')}</option>
                                   {showDownloadsUI && (
-                                    <option value="downloads">{__('Downloads', 'Downloads')}</option>
+                                    <option value="downloads">{__('Downloads', 'yatra')}</option>
                                   )}
-                                  <option value="faqs">{__('FAQs', 'FAQs')}</option>
-                                  <option value="reviews">{__('Reviews', 'Reviews')}</option>
-                                  <option value="custom">{__('Custom Content', 'Custom Content')}</option>
+                                  <option value="faqs">{__('FAQs', 'yatra')}</option>
+                                  <option value="reviews">{__('Reviews', 'yatra')}</option>
+                                  <option value="custom">{__('Custom Content', 'yatra')}</option>
                                 </Select>
                               </div>
                             )}
@@ -5204,7 +5204,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               onClick={() => handleTabMove(tab.id, 'up')}
                               disabled={index === 0}
                               className="h-8 w-8 p-0"
-                              title={__('Move up', 'Move up')}
+                              title={__('Move up', 'yatra')}
                             >
                               <ChevronUp className="w-4 h-4" />
                             </Button>
@@ -5215,7 +5215,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               onClick={() => handleTabMove(tab.id, 'down')}
                               disabled={index === formData.frontend_tabs.length - 1}
                               className="h-8 w-8 p-0"
-                              title={__('Move down', 'Move down')}
+                              title={__('Move down', 'yatra')}
                             >
                               <ChevronDown className="w-4 h-4" />
                             </Button>
@@ -5226,7 +5226,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 size="sm"
                                 onClick={() => handleTabRemove(tab.id)}
                                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                title={__('Delete tab', 'Delete tab')}
+                                title={__('Delete tab', 'yatra')}
                               >
                                 <X className="w-4 h-4" />
                               </Button>
@@ -5239,7 +5239,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                               />
                               <span className="text-sm text-gray-700 dark:text-gray-300">
-                                {tab.enabled ? __('Enabled', 'Enabled') : __('Disabled', 'Disabled')}
+                                {tab.enabled ? __('Enabled', 'yatra') : __('Disabled', 'yatra')}
                               </span>
                             </label>
                           </div>
@@ -5255,7 +5255,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     className="w-full"
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Custom Tab', 'Add Custom Tab')}
+                    {__('Add Custom Tab', 'yatra')}
                   </Button>
                 </div>
               </CardContent>
@@ -5266,7 +5266,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       default:
         return (
           <div className="text-center py-8 text-gray-500">
-            {__('Section content coming soon...', 'Section content coming soon...')}
+            {__('Section content coming soon...', 'yatra')}
           </div>
         );
     }
@@ -5279,7 +5279,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         {/* Left Side - Title, Status, Saved Time */}
         <div className="flex items-center gap-4 min-w-0 flex-1">
           <div className="min-w-0">
-            <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">{formData.title || __('New Trip', 'New Trip')}</h1>
+            <h1 className="text-base font-semibold text-gray-900 dark:text-white truncate">{formData.title || __('New Trip', 'yatra')}</h1>
             <div className="flex items-center gap-2 mt-1">
               <Badge 
                 variant="outline" 
@@ -5297,12 +5297,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     : 'text-gray-700 dark:text-gray-300'
                 }`}
               >
-                {formData.status === 'draft' ? __('Draft', 'Draft') 
-                  : formData.status === 'review' ? __('Review', 'Review')
-                  : formData.status === 'approved' ? __('Approved', 'Approved')
-                  : formData.status === 'publish' ? __('Published', 'Published')
-                  : formData.status === 'suspended' ? __('Suspended', 'Suspended')
-                  : __('Archived', 'Archived')}
+                {formData.status === 'draft' ? __('Draft', 'yatra') 
+                  : formData.status === 'review' ? __('Review', 'yatra')
+                  : formData.status === 'approved' ? __('Approved', 'yatra')
+                  : formData.status === 'publish' ? __('Published', 'yatra')
+                  : formData.status === 'suspended' ? __('Suspended', 'yatra')
+                  : __('Archived', 'yatra')}
               </Badge>
             </div>
           </div>
@@ -5313,10 +5313,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <button
                 onClick={() => setSimpleMode(!simpleMode)}
                 className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                title={simpleMode ? __('Switch to Advanced Mode', 'Switch to Advanced Mode') : __('Switch to Simple Mode', 'Switch to Simple Mode')}
+                title={simpleMode ? __('Switch to Advanced Mode', 'yatra') : __('Switch to Simple Mode', 'yatra')}
               >
                 <Lightbulb className={`w-3.5 h-3.5 ${simpleMode ? 'text-yellow-500' : ''}`} />
-                <span>{simpleMode ? __('Simple', 'Simple') : __('Advanced', 'Advanced')}</span>
+                <span>{simpleMode ? __('Simple', 'yatra') : __('Advanced', 'yatra')}</span>
               </button>
             </div>
           )}
@@ -5327,12 +5327,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               variant="ghost"
               size="sm"
               onClick={() => {
-                showToast(__('Guided tour feature coming soon!', 'Guided tour feature coming soon!'), 'info');
+                showToast(__('Guided tour feature coming soon!', 'yatra'), 'info');
               }}
               className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex-shrink-0"
             >
               <BookOpen className="w-3.5 h-3.5 mr-1" />
-              {__('Take a Tour', 'Take a Tour')}
+              {__('Take a Tour', 'yatra')}
             </Button>
           )}
           
@@ -5343,10 +5343,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               size="sm"
               onClick={handleFillDummyData}
               className="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 flex-shrink-0"
-              title={__('Fill form with dummy data', 'Fill form with dummy data')}
+              title={__('Fill form with dummy data', 'yatra')}
             >
               <Database className="w-3.5 h-3.5 mr-1" />
-              {__('Fill Dummy Data', 'Fill Dummy Data')} ({dummyDataIndex + 1}/{dummyTripsData.length})
+              {__('Fill Dummy Data', 'yatra')} ({dummyDataIndex + 1}/{dummyTripsData.length})
             </Button>
           )}
         </div>
@@ -5360,7 +5360,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
             >
               <History className="w-4 h-4 mr-2" />
-              {__('Revisions', 'Revisions')}
+              {__('Revisions', 'yatra')}
             </Button>
           )}
           <Button
@@ -5370,7 +5370,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             disabled={!formData.slug}
           >
             <Eye className="w-4 h-4 mr-2" />
-            {__('Preview', 'Preview')}
+            {__('Preview', 'yatra')}
           </Button>
           <Button
             variant="outline"
@@ -5379,7 +5379,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             className="text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700"
           >
             <Save className="w-4 h-4 mr-2" />
-            {isEditMode ? __('Update Draft', 'Update Draft') : __('Save Draft', 'Save Draft')}
+            {isEditMode ? __('Update Draft', 'yatra') : __('Save Draft', 'yatra')}
           </Button>
           <div className="relative group">
             <Button
@@ -5392,7 +5392,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               ) : (
                 <>
                   <Sparkles className="w-4 h-4 mr-2" />
-                  {isEditMode ? __('Update Trip', 'Update Trip') : __('Publish Trip', 'Publish Trip')}
+                  {isEditMode ? __('Update Trip', 'yatra') : __('Publish Trip', 'yatra')}
                   <ChevronDown className="w-4 h-4 ml-2" />
                 </>
               )}
@@ -5408,7 +5408,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <span>{__('Save as Draft', 'Save as Draft')}</span>
+                    <span>{__('Save as Draft', 'yatra')}</span>
                   </button>
                   <button
                     type="button"
@@ -5418,7 +5418,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <span>{__('Save for Review', 'Save for Review')}</span>
+                    <span>{__('Save for Review', 'yatra')}</span>
                   </button>
                   <button
                     type="button"
@@ -5428,7 +5428,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <span>{__('Mark as Approved', 'Mark as Approved')}</span>
+                    <span>{__('Mark as Approved', 'yatra')}</span>
                   </button>
                   <button
                     type="button"
@@ -5436,7 +5436,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     className="w-full text-left px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 font-medium flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>{isEditMode ? __('Update & Publish', 'Update & Publish') : __('Publish', 'Publish')}</span>
+                    <span>{isEditMode ? __('Update & Publish', 'yatra') : __('Publish', 'yatra')}</span>
                   </button>
                   <button
                     type="button"
@@ -5446,7 +5446,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <span>{__('Suspend', 'Suspend')}</span>
+                    <span>{__('Suspend', 'yatra')}</span>
                   </button>
                   <button
                     type="button"
@@ -5456,7 +5456,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     }}
                     className="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                   >
-                    <span>{__('Archive', 'Archive')}</span>
+                    <span>{__('Archive', 'yatra')}</span>
                   </button>
                 </div>
               </div>
@@ -5477,14 +5477,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             className="flex items-center gap-2 text-sm font-semibold border-2 border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:border-blue-500 dark:hover:border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 px-4 py-2"
           >
             <ChevronLeft className="w-4 h-4" />
-            {__('Previous', 'Previous')}
+            {__('Previous', 'yatra')}
           </Button>
 
           {/* Progress Indicator - Compact */}
           <div className="flex-1 flex flex-col items-center gap-1 min-w-0 max-w-md mx-4">
             <div className="flex items-center gap-1.5 text-[10px] font-medium w-full">
               <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                {__('Step', 'Step')} {currentStepNumber}/{totalSteps}
+                {__('Step', 'yatra')} {currentStepNumber}/{totalSteps}
               </span>
               <span className="text-gray-400 dark:text-gray-500">•</span>
               <span className="text-blue-600 dark:text-blue-400 font-semibold whitespace-nowrap">{completionPercentage}%</span>
@@ -5496,7 +5496,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               />
             </div>
             <div className="text-[9px] font-medium text-gray-600 dark:text-gray-400 truncate w-full text-center">
-              {allSections[currentStepIndex]?.label || __('Overview', 'Overview')}
+              {allSections[currentStepIndex]?.label || __('Overview', 'yatra')}
             </div>
           </div>
 
@@ -5508,7 +5508,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             disabled={currentStepIndex >= allSections.length - 1}
             className="flex items-center gap-2 text-sm font-semibold border-2 border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:border-blue-500 dark:hover:border-blue-500 text-blue-700 dark:text-blue-300 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0 px-4 py-2"
           >
-            {__('Next', 'Next')}
+            {__('Next', 'yatra')}
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>
@@ -5523,7 +5523,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="flex items-center gap-2 mb-3 px-1">
                 <Box className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                 <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__('ESSENTIALS', 'ESSENTIALS')}
+                  {__('ESSENTIALS', 'yatra')}
                 </h3>
               </div>
               <div className="space-y-0.5">
@@ -5570,7 +5570,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       </div>
                       <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
                       {section.hasErrors && (
-                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'This section has errors')} />
+                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'yatra')} />
                       )}
                     </button>
                   );
@@ -5583,7 +5583,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="flex items-center gap-2 mb-3 px-1">
                 <BarChart3 className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                 <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__('MARKETING', 'MARKETING')}
+                  {__('MARKETING', 'yatra')}
                 </h3>
               </div>
               <div className="space-y-0.5">
@@ -5612,7 +5612,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       }`} />
                       <span className="flex-1 min-w-0 break-words leading-snug">{section.label}</span>
                       {section.hasErrors && (
-                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'This section has errors')} />
+                        <span className="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full" title={__('This section has errors', 'yatra')} />
                       )}
                     </button>
                   );
@@ -5625,7 +5625,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="flex items-center gap-2 mb-3 px-1">
                 <Settings className="w-3.5 h-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                 <h3 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-widest">
-                  {__('ADVANCED', 'ADVANCED')}
+                  {__('ADVANCED', 'yatra')}
                 </h3>
               </div>
               <div className="space-y-0.5">
@@ -5643,7 +5643,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       ? 'text-blue-600 dark:text-blue-400' 
                       : 'text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-400'
                   }`} />
-                  <span className="flex-1 min-w-0 break-words leading-snug">{__('Lifecycle', 'Lifecycle')}</span>
+                  <span className="flex-1 min-w-0 break-words leading-snug">{__('Lifecycle', 'yatra')}</span>
                 </button>
               </div>
             </div>
@@ -5668,17 +5668,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       {showHighlightModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowHighlightModal(false)}>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Highlight', 'Add Highlight')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Add Highlight', 'yatra')}</h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                {__('Highlight Text', 'Highlight Text')}
+                {__('Highlight Text', 'yatra')}
                 </label>
                 <Input
                   type="text"
                   value={modalInput.text}
                   onChange={(e) => setModalInput({ ...modalInput, text: e.target.value })}
-                  placeholder={__('e.g., Private guide included', 'e.g., Private guide included')}
+                  placeholder={__('e.g., Private guide included', 'yatra')}
                   autoFocus
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -5688,16 +5688,16 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   }}
                 />
                 <HelpText
-                  text={__('Keep it short and impactful. Examples: "All meals included", "Skip-the-line tickets", "Free airport transfer"', 'Keep it short and impactful. Examples: "All meals included", "Skip-the-line tickets", "Free airport transfer"')}
+                  text={__('Keep it short and impactful. Examples: "All meals included", "Skip-the-line tickets", "Free airport transfer"', 'yatra')}
                   className="mt-2"
                 />
               </div>
               <div className="flex items-center justify-end gap-2">
                 <Button variant="outline" onClick={() => setShowHighlightModal(false)}>
-                  {__('Cancel', 'Cancel')}
+                  {__('Cancel', 'yatra')}
                 </Button>
                 <Button onClick={handleHighlightSave} disabled={!modalInput.text.trim()}>
-                  {__('Add', 'Add')}
+                  {__('Add', 'yatra')}
                 </Button>
               </div>
             </div>
@@ -5717,12 +5717,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <History className="w-5 h-5" />
-                  {__('Trip Revisions', 'Trip Revisions')}
+                  {__('Trip Revisions', 'yatra')}
                 </CardTitle>
                 <button
                   onClick={() => setShowRevisionsDialog(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                  aria-label={__('Close', 'Close')}
+                  aria-label={__('Close', 'yatra')}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -5732,11 +5732,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               {isLoadingRevisions ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-                  <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading revisions...', 'Loading revisions...')}</span>
+                  <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading revisions...', 'yatra')}</span>
                 </div>
               ) : revisions.length === 0 ? (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  {__('No revisions found', 'No revisions found')}
+                  {__('No revisions found', 'yatra')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -5751,11 +5751,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                           <div className="flex items-center gap-2 mb-1">
                             <Badge variant="outline">v{revision.version}</Badge>
                             <span className="text-sm font-medium text-gray-900 dark:text-white">
-                              {__('Revision', 'Revision')} {revision.version}
+                              {__('Revision', 'yatra')} {revision.version}
                             </span>
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('Created by', 'Created by')} {revision.created_by_name} • {new Date(revision.created_at).toLocaleString()}
+                            {__('Created by', 'yatra')} {revision.created_by_name} • {new Date(revision.created_at).toLocaleString()}
                           </div>
                         </div>
                         <Button
@@ -5766,7 +5766,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                             handleRevisionClick(revision.id);
                           }}
                         >
-                          {__('Use This Revision', 'Use This Revision')}
+                          {__('Use This Revision', 'yatra')}
                         </Button>
                       </div>
                     </div>
@@ -5786,10 +5786,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           setSelectedRevisionId(null);
         }}
         onConfirm={handleRevisionConfirm}
-        title={__('Use This Revision?', 'Use This Revision?')}
-        message={__('Do you want to use this revision? This will replace all current form data with the revision data.', 'Do you want to use this revision? This will replace all current form data with the revision data.')}
-        confirmText={__('Yes, Use This Revision', 'Yes, Use This Revision')}
-        cancelText={__('Cancel', 'Cancel')}
+        title={__('Use This Revision?', 'yatra')}
+        message={__('Do you want to use this revision? This will replace all current form data with the revision data.', 'yatra')}
+        confirmText={__('Yes, Use This Revision', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="info"
         isLoading={false}
       />

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-09T13:33:03+00:00\n"
+"POT-Creation-Date: 2026-01-09T13:38:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -867,6 +867,7 @@ msgid "Use this file"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:32256
+#: assets/admin/dist/js/app.js:32172
 msgid "Media library not available. Please ensure you are logged in as admin."
 msgstr ""
 
@@ -964,6 +965,7 @@ msgid "Payload:"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:32921
+#: assets/admin/dist/js/app.js:31575
 msgid "Failed to load trip data"
 msgstr ""
 
@@ -1072,6 +1074,7 @@ msgid "💡 Choose your best photo! This is the first thing travelers see. Use a
 msgstr ""
 
 #: assets/admin/dist/js/app.js:33177
+#: assets/admin/dist/js/app.js:33153
 msgid "Featured Image"
 msgstr ""
 
@@ -1172,6 +1175,7 @@ msgid "Enter the number of nights (typically days - 1)"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:33382
+#: assets/admin/dist/js/app.js:31944
 msgid "Location & Geography"
 msgstr ""
 
@@ -1256,6 +1260,7 @@ msgid "Add Landmark"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:33548
+#: assets/admin/dist/js/app.js:31953
 msgid "Schedule & Availability"
 msgstr ""
 
@@ -1308,6 +1313,7 @@ msgid "General notes about when this trip is typically available"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:33641
+#: assets/admin/dist/js/app.js:32017
 msgid "Categorization"
 msgstr ""
 
@@ -1395,6 +1401,7 @@ msgid "Special designation for frontend display and promotion"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:33773
+#: assets/admin/dist/js/app.js:31999
 msgid "Media & Content"
 msgstr ""
 
@@ -1505,6 +1512,7 @@ msgid "Add Testimonial"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34008
+#: assets/admin/dist/js/app.js:34004
 msgid "Attach files to this trip and control who can access them."
 msgstr ""
 
@@ -1541,6 +1549,7 @@ msgid "Selected file"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34080
+#: assets/admin/dist/js/app.js:32241
 msgid "Select File"
 msgstr ""
 
@@ -1561,6 +1570,7 @@ msgid "Add Download"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34119
+#: assets/admin/dist/js/app.js:31962
 msgid "Pricing & Payment"
 msgstr ""
 
@@ -1605,6 +1615,7 @@ msgid "e.g., 50% deposit required at booking, balance due 30 days before departu
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34477
+#: assets/admin/dist/js/app.js:31971
 msgid "Booking Requirements"
 msgstr ""
 
@@ -1695,6 +1706,7 @@ msgid "e.g., Full refund 30 days before departure, 50% refund 15-29 days before,
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34654
+#: assets/admin/dist/js/app.js:31980
 msgid "Attributes & Properties"
 msgstr ""
 
@@ -1749,6 +1761,7 @@ msgid "Add FAQ"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:34771
+#: assets/admin/dist/js/app.js:32033
 msgid "SEO Settings"
 msgstr ""
 
@@ -1758,6 +1771,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:34784
 #: assets/admin/dist/js/app.js:24823
+#: assets/admin/dist/js/app.js:32950
 msgid "Trip Title"
 msgstr ""
 
@@ -1782,6 +1796,17 @@ msgstr ""
 #: templates/setup-wizard/theme-old.php:31
 #: templates/setup-wizard/theme.php:47
 #: templates/single-taxonomy.php:197
+#: assets/admin/dist/js/app.js:33088
+#: assets/admin/dist/js/app.js:33128
+#: assets/admin/dist/js/app.js:33154
+#: assets/admin/dist/js/app.js:33383
+#: assets/admin/dist/js/app.js:33549
+#: assets/admin/dist/js/app.js:33642
+#: assets/admin/dist/js/app.js:33774
+#: assets/admin/dist/js/app.js:34120
+#: assets/admin/dist/js/app.js:34478
+#: assets/admin/dist/js/app.js:34700
+#: assets/admin/dist/js/app.js:34772
 msgid "Recommended"
 msgstr ""
 
@@ -1890,15 +1915,21 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:35011
 #: assets/dist/js/account-page.js:1585
+#: assets/admin/dist/js/app.js:32008
+#: assets/admin/dist/js/app.js:34002
+#: assets/admin/dist/js/app.js:34007
+#: assets/dist/js/account-page.js:956
 #: assets/dist/js/account-page.js:1565
 msgid "Downloads"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35012
+#: assets/admin/dist/js/app.js:32025
 msgid "FAQs"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35014
+#: assets/admin/dist/js/app.js:34985
 msgid "Custom Content"
 msgstr ""
 
@@ -2046,6 +2077,7 @@ msgid "MARKETING"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35387
+#: assets/admin/dist/js/app.js:35363
 msgid "This section has errors"
 msgstr ""
 
@@ -2058,10 +2090,12 @@ msgid "Failed to regenerate tables."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35407
+#: assets/admin/dist/js/app.js:32043
 msgid "Lifecycle"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35419
+#: assets/admin/dist/js/app.js:33256
 msgid "Add Highlight"
 msgstr ""
 
@@ -2110,6 +2144,7 @@ msgid "Yes, Use This Revision"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35732
+#: assets/admin/dist/js/app.js:31466
 msgid "Failed to load activities"
 msgstr ""
 
@@ -2150,6 +2185,7 @@ msgid "Manage your travel activities and experiences"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:35914
+#: assets/admin/dist/js/app.js:33731
 msgid "Search activities..."
 msgstr ""
 
@@ -2187,6 +2223,7 @@ msgid "Select or Upload Image"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:36387
+#: assets/admin/dist/js/app.js:33199
 msgid "Use this image"
 msgstr ""
 
@@ -2282,6 +2319,7 @@ msgid "Update Activity"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:37077
+#: assets/admin/dist/js/app.js:31554
 msgid "Failed to load destinations"
 msgstr ""
 
@@ -2311,6 +2349,7 @@ msgstr ""
 #: app/Providers/FrontendAssetsProvider.php:402
 #: templates/listing-trip.php:621
 #: templates/single-taxonomy.php:72
+#: assets/admin/dist/js/app.js:33395
 msgid "Destinations"
 msgstr ""
 
@@ -2319,6 +2358,7 @@ msgid "Manage your travel destinations"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:37252
+#: assets/admin/dist/js/app.js:33406
 msgid "Search destinations..."
 msgstr ""
 
@@ -2721,6 +2761,7 @@ msgid "Search difficulty levels"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:39381
+#: assets/admin/dist/js/app.js:31511
 #: assets/admin/dist/js/app.js:39040
 msgid "Failed to load difficulty levels"
 msgstr ""
@@ -2815,6 +2856,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:39737
 #: assets/admin/dist/js/app.js:36463
 #: assets/admin/dist/js/app.js:36964
+#: assets/admin/dist/js/app.js:37793
 #: assets/admin/dist/js/app.js:38847
 msgid "Select Icon or Upload Image"
 msgstr ""
@@ -2933,6 +2975,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:42112
 #: assets/dist/js/account-page.js:785
+#: assets/dist/js/account-page.js:745
 msgid "Back to Bookings"
 msgstr ""
 
@@ -2946,6 +2989,8 @@ msgstr ""
 #: app/Services/BookingService.php:864
 #: templates/pdf/voucher.php:110
 #: assets/admin/dist/js/app.js:41114
+#: assets/dist/js/account-page.js:724
+#: assets/dist/js/account-page.js:735
 msgid "Booking Details"
 msgstr ""
 
@@ -3021,6 +3066,8 @@ msgid "Event ID"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:42341
+#: assets/admin/dist/js/app.js:42333
+#: assets/admin/dist/js/app.js:42337
 msgid "—"
 msgstr ""
 
@@ -3423,6 +3470,7 @@ msgid "Opted out"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:44437
+#: assets/admin/dist/js/app.js:35243
 msgid "Mark as Approved"
 msgstr ""
 
@@ -3450,6 +3498,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44565
 #: templates/partials/single-trip/reviews.php:15
 #: templates/partials/single-trip/sticky-nav.php:41
+#: assets/admin/dist/js/app.js:35013
 msgid "Reviews"
 msgstr ""
 
@@ -3600,6 +3649,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24038
 #: assets/admin/dist/js/app.js:24274
 #: assets/admin/dist/js/app.js:24677
+#: assets/admin/dist/js/app.js:35105
 #: assets/admin/dist/js/app.js:44359
 #: assets/admin/dist/js/app.js:44596
 #: assets/admin/dist/js/app.js:44677
@@ -3704,6 +3754,7 @@ msgstr ""
 #: app/Controllers/BookingSessionController.php:2108
 #: assets/admin/dist/js/app.js:22139
 #: assets/admin/dist/js/app.js:41563
+#: assets/admin/dist/js/app.js:41962
 #: assets/admin/dist/js/app.js:43823
 msgid "Confirmed"
 msgstr ""
@@ -3816,6 +3867,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:46229
 #: assets/dist/js/account-page.js:794
+#: assets/admin/dist/js/app.js:42155
 msgid "Booking Overview"
 msgstr ""
 
@@ -3960,10 +4012,13 @@ msgid "Add this to your OAuth client under \"Authorized redirect URIs\" in"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:48548
+#: assets/admin/dist/js/app.js:48496
+#: assets/admin/dist/js/app.js:48522
 msgid "Google Cloud Credentials"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:48549
+#: assets/admin/dist/js/app.js:48523
 msgid "."
 msgstr ""
 
@@ -4051,6 +4106,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:936
 #: templates/pdf/itinerary.php:308
 #: assets/admin/dist/js/app.js:41312
+#: assets/admin/dist/js/app.js:42301
 #: assets/admin/dist/js/app.js:43522
 #: assets/admin/dist/js/app.js:44073
 msgid "Emergency Contact"
@@ -4113,6 +4169,7 @@ msgid "Click \"Add Option\" to add dropdown choices."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:49198
+#: assets/admin/dist/js/app.js:49041
 msgid "Add Field"
 msgstr ""
 
@@ -4129,6 +4186,7 @@ msgid "(locked)"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:49299
+#: assets/admin/dist/js/app.js:49120
 msgid "Dropdown Options"
 msgstr ""
 
@@ -4181,6 +4239,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24034
 #: assets/admin/dist/js/app.js:24273
 #: assets/admin/dist/js/app.js:24676
+#: assets/admin/dist/js/app.js:35105
 #: assets/admin/dist/js/app.js:44475
 #: assets/admin/dist/js/app.js:44727
 #: assets/admin/dist/js/app.js:44788
@@ -4212,6 +4271,7 @@ msgid "Permalink"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50041
+#: assets/admin/dist/js/app.js:35117
 msgid "Advanced"
 msgstr ""
 
@@ -4271,6 +4331,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:50143
 #: assets/dist/js/account-page.js:1755
 #: assets/admin/dist/js/app.js:43436
+#: assets/admin/dist/js/app.js:50135
 msgid "City"
 msgstr ""
 
@@ -4409,6 +4470,7 @@ msgid "Require a deposit to confirm bookings"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50454
+#: assets/admin/dist/js/app.js:34436
 msgid "Deposit Percentage"
 msgstr ""
 
@@ -4426,6 +4488,7 @@ msgid "Enable the Flexible Payments module in Yatra Pro to offer deposit and par
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50487
+#: assets/admin/dist/js/app.js:48949
 msgid "Learn More"
 msgstr ""
 
@@ -4458,10 +4521,14 @@ msgid "Drag and drop to reorder gateways. Use arrows for precise positioning."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50565
+#: assets/admin/dist/js/app.js:34025
+#: assets/admin/dist/js/app.js:35029
 msgid "Move up"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50576
+#: assets/admin/dist/js/app.js:34026
+#: assets/admin/dist/js/app.js:35042
 msgid "Move down"
 msgstr ""
 
@@ -4544,6 +4611,7 @@ msgid "Select options..."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:50876
+#: assets/admin/dist/js/app.js:50789
 msgid "Learn more →"
 msgstr ""
 
@@ -4590,6 +4658,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:50970
 #: templates/partials/booking-content.php:720
 #: templates/partials/single-trip/content-important-info.php:50
+#: assets/admin/dist/js/app.js:34632
 msgid "Cancellation Policy"
 msgstr ""
 
@@ -4746,6 +4815,7 @@ msgid "SSL"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:51233
+#: assets/admin/dist/js/app.js:33751
 msgid "None"
 msgstr ""
 
@@ -4921,6 +4991,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: assets/admin/dist/js/app.js:51653
+#: assets/admin/dist/js/app.js:51641
+#: assets/admin/dist/js/app.js:51645
+#: assets/admin/dist/js/app.js:51649
 msgid "Stars"
 msgstr ""
 
@@ -5025,6 +5098,7 @@ msgid "Send email when new booking is created"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:51852
+#: assets/admin/dist/js/app.js:51138
 msgid "Send email when payment is received"
 msgstr ""
 
@@ -5033,6 +5107,7 @@ msgid "Notify on Payment"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:51853
+#: assets/admin/dist/js/app.js:51139
 msgid "Send email when booking is cancelled"
 msgstr ""
 
@@ -5207,6 +5282,8 @@ msgstr ""
 #: assets/dist/js/account-page.js:1781
 #: assets/admin/dist/js/app.js:43464
 #: assets/admin/dist/js/app.js:44055
+#: assets/admin/dist/js/app.js:50171
+#: assets/admin/dist/js/app.js:50179
 msgid "Country"
 msgstr ""
 
@@ -5219,6 +5296,9 @@ msgid "Billing Country"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:52125
+#: assets/admin/dist/js/app.js:52062
+#: assets/admin/dist/js/app.js:52083
+#: assets/admin/dist/js/app.js:52104
 msgid "Do not sync"
 msgstr ""
 
@@ -5244,6 +5324,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:52190
 #: app/Core/Modules/ModuleManager.php:148
+#: assets/admin/dist/js/app.js:52185
 msgid "Facebook Pixel"
 msgstr ""
 
@@ -5294,14 +5375,21 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:52326
 #: app/Core/Modules/ModuleManager.php:163
+#: assets/admin/dist/js/app.js:52321
 msgid "Google Analytics 4 Enhanced"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:52331
+#: assets/admin/dist/js/app.js:48479
+#: assets/admin/dist/js/app.js:51955
+#: assets/admin/dist/js/app.js:52195
 msgid "Connected"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:52334
+#: assets/admin/dist/js/app.js:48482
+#: assets/admin/dist/js/app.js:51958
+#: assets/admin/dist/js/app.js:52198
 msgid "Not Connected"
 msgstr ""
 
@@ -5466,6 +5554,10 @@ msgid "URL slug for the booking page (e.g., \"book\" will create URLs like /book
 msgstr ""
 
 #: assets/admin/dist/js/app.js:52739
+#: assets/admin/dist/js/app.js:52566
+#: assets/admin/dist/js/app.js:52608
+#: assets/admin/dist/js/app.js:52650
+#: assets/admin/dist/js/app.js:52692
 msgid "Example URL:"
 msgstr ""
 
@@ -5563,6 +5655,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:52944
 #: app/PaymentGateways/Gateways/Mollie/MollieGateway.php:32
+#: assets/admin/dist/js/app.js:51968
 msgid "API Key"
 msgstr ""
 
@@ -5991,6 +6084,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:55169
 #: assets/admin/dist/js/app.js:36921
+#: assets/admin/dist/js/app.js:37749
 #: assets/admin/dist/js/app.js:38797
 #: assets/admin/dist/js/app.js:39683
 #: assets/admin/dist/js/app.js:54092
@@ -6144,6 +6238,7 @@ msgid "Error details copied to clipboard"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:56273
+#: assets/admin/dist/js/app.js:48573
 msgid "Copy"
 msgstr ""
 
@@ -6328,6 +6423,7 @@ msgstr ""
 #: app/Services/ItineraryService.php:44
 #: app/Validators/TripValidator.php:25
 #: assets/admin/dist/js/app.js:29816
+#: assets/admin/dist/js/app.js:32471
 msgid "Title is required"
 msgstr ""
 
@@ -6584,6 +6680,7 @@ msgid "Published entries are visible in trip schedules. Draft entries are saved 
 msgstr ""
 
 #: assets/admin/dist/js/app.js:58536
+#: assets/admin/dist/js/app.js:42344
 msgid "Error"
 msgstr ""
 
@@ -6660,6 +6757,7 @@ msgid "Failed to perform bulk action on discounts"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59001
+#: assets/admin/dist/js/app.js:42389
 msgid "Code"
 msgstr ""
 
@@ -6675,6 +6773,7 @@ msgstr ""
 #: templates/partials/booking-content.php:587
 #: templates/partials/booking-content.php:652
 #: templates/partials/pricing-summary.php:66
+#: assets/admin/dist/js/app.js:59021
 msgid "Discount"
 msgstr ""
 
@@ -6686,6 +6785,7 @@ msgid "pax"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59107
+#: assets/admin/dist/js/app.js:59081
 msgid "off"
 msgstr ""
 
@@ -6696,10 +6796,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:59121
 #: assets/admin/dist/js/app.js:54398
 #: assets/admin/dist/js/app.js:54546
+#: assets/admin/dist/js/app.js:59004
+#: assets/admin/dist/js/app.js:59026
 msgid "Usage"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59161
+#: assets/admin/dist/js/app.js:58963
 msgid "Mark as Publish"
 msgstr ""
 
@@ -6715,6 +6818,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:54679
 #: assets/admin/dist/js/app.js:54710
 #: assets/admin/dist/js/app.js:56137
+#: assets/admin/dist/js/app.js:58964
 msgid "Mark as Draft"
 msgstr ""
 
@@ -6727,14 +6831,19 @@ msgid "Failed to move discount to trash"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59233
+#: assets/admin/dist/js/app.js:58966
 msgid "Mark as Expired"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59241
+#: assets/admin/dist/js/app.js:59169
+#: assets/admin/dist/js/app.js:59193
 msgid "Discount status updated"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59246
+#: assets/admin/dist/js/app.js:59174
+#: assets/admin/dist/js/app.js:59198
 msgid "Failed to update discount status"
 msgstr ""
 
@@ -6747,6 +6856,8 @@ msgid "Choose the discount type that best fits your needs"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59288
+#: assets/admin/dist/js/app.js:59053
+#: assets/admin/dist/js/app.js:59060
 msgid "Promo Code"
 msgstr ""
 
@@ -6759,10 +6870,12 @@ msgid "Auto-applies when booking multiple travelers. No code needed."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59329
+#: assets/admin/dist/js/app.js:59306
 msgid "Pro"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:59337
+#: assets/admin/dist/js/app.js:59057
 msgid "Promo + Group"
 msgstr ""
 
@@ -6983,6 +7096,9 @@ msgstr ""
 #: app/Services/DiscountService.php:897
 #: templates/booking-confirmation.php:314
 #: templates/partials/booking-content.php:50
+#: assets/admin/dist/js/app.js:42386
+#: assets/admin/dist/js/app.js:58856
+#: assets/admin/dist/js/app.js:59311
 msgid "Group Discount"
 msgstr ""
 
@@ -7035,6 +7151,7 @@ msgid "Group Discount Information"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:60474
+#: assets/admin/dist/js/app.js:59011
 msgid "Coupon Code"
 msgstr ""
 
@@ -7133,6 +7250,9 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:60787
 #: assets/admin/dist/js/app.js:44204
+#: assets/admin/dist/js/app.js:59005
+#: assets/admin/dist/js/app.js:59031
+#: assets/admin/dist/js/app.js:59133
 msgid "Expiry Date"
 msgstr ""
 
@@ -7239,6 +7359,7 @@ msgid "Range"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:61143
+#: assets/admin/dist/js/app.js:34027
 #: assets/admin/dist/js/app.js:36602
 #: assets/admin/dist/js/app.js:41462
 #: assets/admin/dist/js/app.js:60892
@@ -7252,6 +7373,7 @@ msgid "Leave empty for unlimited"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:61193
+#: assets/admin/dist/js/app.js:42385
 #: assets/admin/dist/js/app.js:60558
 #: assets/admin/dist/js/app.js:60942
 msgid "Discount Type"
@@ -7302,6 +7424,7 @@ msgid "Selected payments deleted successfully"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:61561
+#: assets/admin/dist/js/app.js:58946
 msgid "Bulk status updated successfully"
 msgstr ""
 
@@ -7310,11 +7433,13 @@ msgid "Failed to perform bulk action on payments"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:61581
+#: assets/admin/dist/js/app.js:58967
 msgid "Delete permanently"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:61642
 #: assets/dist/js/account-page.js:1274
+#: assets/admin/dist/js/app.js:50031
 #: assets/admin/dist/js/app.js:61631
 msgid "Payment"
 msgstr ""
@@ -7537,6 +7662,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:988
 #: app/Providers/FrontendAssetsProvider.php:379
 #: assets/admin/dist/js/app.js:41573
+#: assets/admin/dist/js/app.js:42354
 msgid "Payment Status"
 msgstr ""
 
@@ -7572,6 +7698,7 @@ msgstr ""
 #: assets/dist/js/account-page.js:1169
 #: assets/admin/dist/js/app.js:22140
 #: assets/admin/dist/js/app.js:41565
+#: assets/admin/dist/js/app.js:41974
 #: assets/admin/dist/js/app.js:43827
 #: assets/admin/dist/js/app.js:61449
 #: assets/admin/dist/js/app.js:61616
@@ -7583,6 +7710,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:62428
 #: assets/admin/dist/js/app.js:41582
+#: assets/admin/dist/js/app.js:41995
 #: assets/admin/dist/js/app.js:61457
 #: assets/admin/dist/js/app.js:61617
 #: assets/admin/dist/js/app.js:61904
@@ -7603,6 +7731,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:22142
 #: assets/admin/dist/js/app.js:41566
 #: assets/admin/dist/js/app.js:41584
+#: assets/admin/dist/js/app.js:41999
 #: assets/admin/dist/js/app.js:61465
 #: assets/admin/dist/js/app.js:61619
 #: assets/admin/dist/js/app.js:61906
@@ -7639,6 +7768,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:62538
 #: assets/dist/js/account-page.js:985
 #: templates/partials/booking-content.php:783
+#: assets/admin/dist/js/app.js:42351
 #: assets/admin/dist/js/app.js:62116
 msgid "Payment Information"
 msgstr ""
@@ -7657,8 +7787,10 @@ msgstr ""
 #: assets/dist/js/account-page.js:1451
 #: templates/partials/booking-form-fields.php:513
 #: assets/admin/dist/js/app.js:41590
+#: assets/admin/dist/js/app.js:42360
 #: assets/admin/dist/js/app.js:61627
 #: assets/admin/dist/js/app.js:62186
+#: assets/dist/js/account-page.js:994
 msgid "Payment Method"
 msgstr ""
 
@@ -7680,10 +7812,12 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:62595
 #: assets/dist/js/account-page.js:802
+#: assets/admin/dist/js/app.js:42163
 msgid "Booking Number"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:62686
+#: assets/admin/dist/js/app.js:31426
 msgid "Failed to load traveler categories"
 msgstr ""
 
@@ -7699,10 +7833,12 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:62713
 #: assets/dist/js/account-page.js:5
+#: assets/admin/dist/js/app.js:32912
 #: assets/admin/dist/js/app.js:38077
 #: assets/admin/dist/js/app.js:39112
 #: assets/admin/dist/js/app.js:53211
 #: assets/admin/dist/js/app.js:54300
+#: assets/admin/dist/js/app.js:58788
 msgid "N/A"
 msgstr ""
 
@@ -7722,11 +7858,15 @@ msgstr ""
 #: templates/partials/single-trip/content-sidebar.php:187
 #: templates/single-activity.php:132
 #: templates/single-destination.php:132
+#: assets/admin/dist/js/app.js:34267
+#: assets/admin/dist/js/app.js:34333
 msgid "From"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:62776
 #: assets/admin/dist/js/app.js:23946
+#: assets/admin/dist/js/app.js:34269
+#: assets/admin/dist/js/app.js:34336
 msgid "Up to"
 msgstr ""
 
@@ -7833,6 +7973,7 @@ msgid "Add New Category"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63127
+#: assets/admin/dist/js/app.js:33673
 msgid "Search categories..."
 msgstr ""
 
@@ -7875,7 +8016,9 @@ msgid "Label is required"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63330
+#: assets/admin/dist/js/app.js:32474
 #: assets/admin/dist/js/app.js:36749
+#: assets/admin/dist/js/app.js:37576
 #: assets/admin/dist/js/app.js:38625
 #: assets/admin/dist/js/app.js:39525
 #: assets/admin/dist/js/app.js:53901
@@ -7891,7 +8034,9 @@ msgstr ""
 #: app/Validators/TripValidator.php:90
 #: app/Validators/TripValidator.php:151
 #: assets/admin/dist/js/app.js:24145
+#: assets/admin/dist/js/app.js:32476
 #: assets/admin/dist/js/app.js:36751
+#: assets/admin/dist/js/app.js:37578
 #: assets/admin/dist/js/app.js:38627
 #: assets/admin/dist/js/app.js:39527
 #: assets/admin/dist/js/app.js:53903
@@ -7943,6 +8088,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:63433
 #: assets/admin/dist/js/app.js:36800
+#: assets/admin/dist/js/app.js:37628
 #: assets/admin/dist/js/app.js:38680
 #: assets/admin/dist/js/app.js:39580
 #: assets/admin/dist/js/app.js:53953
@@ -7994,6 +8140,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:63555
 #: assets/admin/dist/js/app.js:36915
+#: assets/admin/dist/js/app.js:37743
 #: assets/admin/dist/js/app.js:38791
 #: assets/admin/dist/js/app.js:39677
 #: assets/admin/dist/js/app.js:54086
@@ -8003,6 +8150,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:63555
 #: assets/admin/dist/js/app.js:36915
+#: assets/admin/dist/js/app.js:37743
 #: assets/admin/dist/js/app.js:38791
 #: assets/admin/dist/js/app.js:39677
 #: assets/admin/dist/js/app.js:54086
@@ -8037,6 +8185,7 @@ msgid "Specify the age range for this category (e.g., 0-4 for Infant, 5-17 for C
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63604
+#: assets/admin/dist/js/app.js:34530
 msgid "Minimum Age"
 msgstr ""
 
@@ -8045,6 +8194,7 @@ msgid "e.g., 0, 5, 18"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63623
+#: assets/admin/dist/js/app.js:34549
 msgid "Maximum Age"
 msgstr ""
 
@@ -8066,11 +8216,21 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:63663
 #: assets/dist/js/account-page.js:2278
+#: assets/admin/dist/js/app.js:34274
+#: assets/admin/dist/js/app.js:34340
 #: assets/admin/dist/js/app.js:62780
 msgid "Per person"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63664
+#: assets/admin/dist/js/app.js:34265
+#: assets/admin/dist/js/app.js:34267
+#: assets/admin/dist/js/app.js:34269
+#: assets/admin/dist/js/app.js:34271
+#: assets/admin/dist/js/app.js:34330
+#: assets/admin/dist/js/app.js:34333
+#: assets/admin/dist/js/app.js:34336
+#: assets/admin/dist/js/app.js:34338
 #: assets/admin/dist/js/app.js:62770
 #: assets/admin/dist/js/app.js:62773
 #: assets/admin/dist/js/app.js:62776
@@ -8083,6 +8243,7 @@ msgid "Optional group size limits for this category. These are used to validate 
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63678
+#: assets/admin/dist/js/app.js:51344
 #: assets/admin/dist/js/app.js:60900
 #: assets/admin/dist/js/app.js:61151
 msgid "Minimum Group Size"
@@ -8097,6 +8258,7 @@ msgid "e.g., 10"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:63697
+#: assets/admin/dist/js/app.js:51325
 #: assets/admin/dist/js/app.js:60921
 #: assets/admin/dist/js/app.js:61172
 msgid "Maximum Group Size"
@@ -8134,6 +8296,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:64104
 #: assets/dist/js/account-page.js:1624
+#: assets/dist/js/account-page.js:966
 msgid "Not Available"
 msgstr ""
 
@@ -8406,6 +8569,7 @@ msgid "List"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:65525
+#: assets/admin/dist/js/app.js:42336
 msgid "Calendar"
 msgstr ""
 
@@ -8596,6 +8760,7 @@ msgid "Availability date created successfully"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:66249
+#: assets/admin/dist/js/app.js:32648
 #: assets/admin/dist/js/app.js:57441
 msgid "An error occurred while saving"
 msgstr ""
@@ -8715,6 +8880,8 @@ msgid "Add pricing to override trip default pricing for specific traveler catego
 msgstr ""
 
 #: assets/admin/dist/js/app.js:66732
+#: assets/admin/dist/js/app.js:34190
+#: assets/admin/dist/js/app.js:34378
 #: assets/admin/dist/js/app.js:66569
 msgid "Discounted Price"
 msgstr ""
@@ -8805,6 +8972,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:67216
 #: assets/admin/dist/js/app.js:30678
+#: assets/admin/dist/js/app.js:35449
 #: assets/admin/dist/js/app.js:67214
 msgid "Add"
 msgstr ""
@@ -9022,12 +9190,14 @@ msgid "Leave pricing fields empty to use the trip's default pricing. Fill them i
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67676
+#: assets/admin/dist/js/app.js:34143
 #: assets/admin/dist/js/app.js:64486
 #: assets/admin/dist/js/app.js:66529
 msgid "Regular Pricing"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67676
+#: assets/admin/dist/js/app.js:34161
 #: assets/admin/dist/js/app.js:64486
 #: assets/admin/dist/js/app.js:66529
 msgid "Traveler-Based Pricing"
@@ -9048,15 +9218,18 @@ msgid "Leave empty if no discount"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67726
+#: assets/admin/dist/js/app.js:34215
 msgid "Add pricing for traveler categories. Categories are managed in Traveler Categories page."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67734
+#: assets/admin/dist/js/app.js:34217
 #: assets/admin/dist/js/app.js:66606
 msgid "No active traveler categories found."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67744
+#: assets/admin/dist/js/app.js:34227
 #: assets/admin/dist/js/app.js:38861
 #: assets/admin/dist/js/app.js:63775
 #: assets/admin/dist/js/app.js:66616
@@ -9064,11 +9237,14 @@ msgid "Create Category"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67855
+#: assets/admin/dist/js/app.js:34351
 #: assets/admin/dist/js/app.js:66697
 msgid "Remove Pricing"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67863
+#: assets/admin/dist/js/app.js:34170
+#: assets/admin/dist/js/app.js:34358
 #: assets/admin/dist/js/app.js:66536
 #: assets/admin/dist/js/app.js:66705
 #: assets/admin/dist/js/app.js:67683
@@ -9103,6 +9279,7 @@ msgid "Time & Location"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:67961
+#: assets/admin/dist/js/app.js:33311
 #: assets/admin/dist/js/app.js:64485
 msgid "Multi-Day Trip"
 msgstr ""
@@ -9154,6 +9331,7 @@ msgid "Seats"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68141
+#: assets/admin/dist/js/app.js:34214
 #: assets/admin/dist/js/app.js:66595
 #: assets/admin/dist/js/app.js:67722
 msgid "Traveler Category Pricing"
@@ -9164,12 +9342,14 @@ msgid "Set pricing for each traveler category for this time slot"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68170
+#: assets/admin/dist/js/app.js:34243
 #: assets/admin/dist/js/app.js:66632
 #: assets/admin/dist/js/app.js:67765
 msgid "Add Pricing"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68180
+#: assets/admin/dist/js/app.js:34256
 #: assets/admin/dist/js/app.js:61007
 #: assets/admin/dist/js/app.js:66645
 #: assets/admin/dist/js/app.js:67778
@@ -9177,12 +9357,15 @@ msgid "Select a category to add pricing"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68181
+#: assets/admin/dist/js/app.js:34257
 #: assets/admin/dist/js/app.js:66646
 #: assets/admin/dist/js/app.js:67782
 msgid "All categories have pricing added"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68184
+#: assets/admin/dist/js/app.js:34258
+#: assets/admin/dist/js/app.js:34321
 #: assets/admin/dist/js/app.js:62760
 #: assets/admin/dist/js/app.js:66647
 #: assets/admin/dist/js/app.js:66685
@@ -9192,6 +9375,8 @@ msgid "Under"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:68238
+#: assets/admin/dist/js/app.js:34258
+#: assets/admin/dist/js/app.js:34321
 #: assets/admin/dist/js/app.js:61024
 #: assets/admin/dist/js/app.js:66647
 #: assets/admin/dist/js/app.js:66685
@@ -9479,6 +9664,7 @@ msgstr ""
 #: templates/partials/availability-section.php:211
 #: assets/admin/dist/js/app.js:22141
 #: assets/admin/dist/js/app.js:41564
+#: assets/admin/dist/js/app.js:41970
 #: assets/admin/dist/js/app.js:43835
 #: assets/admin/dist/js/app.js:45867
 #: assets/admin/dist/js/app.js:61469
@@ -9736,16 +9922,19 @@ msgid "Trip Details"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:69998
+#: assets/admin/dist/js/app.js:33424
 msgid "Starting Location"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:70005
+#: assets/admin/dist/js/app.js:33437
 msgid "Ending Location"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:70012
 #: templates/listing-trip.php:486
 #: templates/pdf/itinerary.php:155
+#: assets/admin/dist/js/app.js:33685
 msgid "Difficulty Level"
 msgstr ""
 
@@ -9875,6 +10064,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:70213
 #: assets/dist/js/account-page.js:1020
+#: assets/admin/dist/js/app.js:42467
 #: assets/admin/dist/js/app.js:45470
 #: assets/admin/dist/js/app.js:62628
 msgid "Last Updated"
@@ -9912,8 +10102,14 @@ msgstr ""
 #: assets/admin/dist/js/app.js:70413
 #: assets/dist/js/account-page.js:2134
 #: assets/admin/dist/js/app.js:21917
+#: assets/admin/dist/js/app.js:34092
 #: assets/admin/dist/js/app.js:44119
 #: assets/admin/dist/js/app.js:44498
+#: assets/admin/dist/js/app.js:52580
+#: assets/admin/dist/js/app.js:52622
+#: assets/admin/dist/js/app.js:52664
+#: assets/admin/dist/js/app.js:52706
+#: assets/admin/dist/js/app.js:52753
 #: assets/admin/dist/js/app.js:61718
 #: assets/admin/dist/js/app.js:64060
 #: assets/admin/dist/js/app.js:69227
@@ -10074,6 +10270,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:71255
 #: assets/dist/js/account-page.js:1013
+#: assets/admin/dist/js/app.js:42460
 #: assets/admin/dist/js/app.js:44210
 #: assets/admin/dist/js/app.js:45460
 #: assets/admin/dist/js/app.js:62621
@@ -10194,6 +10391,7 @@ msgstr ""
 #: templates/partials/single-trip/enquiry-modal.php:61
 #: templates/pdf/itinerary.php:159
 #: assets/admin/dist/js/app.js:41246
+#: assets/admin/dist/js/app.js:42192
 #: assets/admin/dist/js/app.js:71193
 msgid "Number of Travelers"
 msgstr ""
@@ -10208,6 +10406,13 @@ msgstr ""
 #: templates/partials/single-trip/content-sidebar.php:221
 #: templates/partials/single-trip/content-sidebar.php:407
 #: templates/partials/single-trip/enquiry-modal.php:53
+#: assets/admin/dist/js/app.js:33564
+#: assets/admin/dist/js/app.js:33582
+#: assets/admin/dist/js/app.js:34578
+#: assets/admin/dist/js/app.js:34867
+#: assets/admin/dist/js/app.js:34885
+#: assets/admin/dist/js/app.js:34925
+#: assets/admin/dist/js/app.js:34943
 #: assets/admin/dist/js/app.js:41526
 #: assets/admin/dist/js/app.js:65354
 #: assets/admin/dist/js/app.js:66330
@@ -10224,6 +10429,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:71619
 #: assets/admin/dist/js/app.js:24400
+#: assets/admin/dist/js/app.js:33754
 #: assets/admin/dist/js/app.js:70504
 #: assets/admin/dist/js/app.js:70617
 #: assets/admin/dist/js/app.js:70685
@@ -10467,8 +10673,13 @@ msgstr ""
 #: templates/partials/single-trip/content-sidebar.php:423
 #: templates/partials/single-trip/content-sidebar.php:475
 #: assets/admin/dist/js/app.js:41440
+#: assets/admin/dist/js/app.js:42197
+#: assets/admin/dist/js/app.js:42255
 #: assets/admin/dist/js/app.js:69483
 #: assets/admin/dist/js/app.js:72446
+#: assets/dist/js/account-page.js:152
+#: assets/dist/js/account-page.js:309
+#: assets/dist/js/account-page.js:842
 msgid "Traveler"
 msgstr ""
 
@@ -10488,8 +10699,10 @@ msgstr ""
 #: templates/pdf/invoice.php:128
 #: templates/pdf/itinerary.php:176
 #: assets/admin/dist/js/app.js:41227
+#: assets/admin/dist/js/app.js:42185
 #: assets/admin/dist/js/app.js:44101
 #: assets/admin/dist/js/app.js:72448
+#: assets/dist/js/account-page.js:830
 msgid "Travel Date"
 msgstr ""
 
@@ -10768,6 +10981,7 @@ msgid "If enabled, customers must select this service when booking."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:73910
+#: assets/admin/dist/js/app.js:35007
 #: assets/admin/dist/js/app.js:62986
 #: assets/admin/dist/js/app.js:63158
 msgid "Pricing"
@@ -10917,6 +11131,7 @@ msgid "Average Sign Time"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:74193
+#: assets/admin/dist/js/app.js:51221
 msgid "Encryption"
 msgstr ""
 
@@ -10965,6 +11180,10 @@ msgid "Consent Form Types"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:74286
+#: assets/admin/dist/js/app.js:34034
+#: assets/admin/dist/js/app.js:34192
+#: assets/admin/dist/js/app.js:34380
+#: assets/admin/dist/js/app.js:34655
 #: assets/admin/dist/js/app.js:66540
 #: assets/admin/dist/js/app.js:66571
 #: assets/admin/dist/js/app.js:66599
@@ -11069,6 +11288,7 @@ msgid "Signatures"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:74619
+#: assets/admin/dist/js/app.js:34833
 msgid "Version"
 msgstr ""
 
@@ -11095,6 +11315,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:22138
 #: assets/admin/dist/js/app.js:41562
 #: assets/admin/dist/js/app.js:41581
+#: assets/admin/dist/js/app.js:41966
+#: assets/admin/dist/js/app.js:41991
+#: assets/admin/dist/js/app.js:42430
 #: assets/admin/dist/js/app.js:43831
 #: assets/admin/dist/js/app.js:44363
 #: assets/admin/dist/js/app.js:44597
@@ -11140,6 +11363,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:74882
 #: assets/dist/js/account-page.js:1425
 #: templates/partials/availability-section.php:83
+#: assets/admin/dist/js/app.js:50029
 #: assets/admin/dist/js/app.js:61633
 #: assets/admin/dist/js/app.js:61678
 #: assets/admin/dist/js/app.js:62120
@@ -11151,6 +11375,7 @@ msgid "Booking"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:74910
+#: assets/admin/dist/js/app.js:42415
 msgid "Signed"
 msgstr ""
 
@@ -11393,6 +11618,8 @@ msgid "Update Form"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:75703
+#: assets/admin/dist/js/app.js:35006
+#: assets/admin/dist/js/app.js:50028
 #: assets/admin/dist/js/app.js:71706
 #: assets/admin/dist/js/app.js:72018
 msgid "General"
@@ -11418,6 +11645,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24030
 #: assets/admin/dist/js/app.js:24275
 #: assets/admin/dist/js/app.js:24678
+#: assets/admin/dist/js/app.js:35105
 msgid "Archived"
 msgstr ""
 
@@ -11442,6 +11670,7 @@ msgid "Trips shown with ID for quick identification."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:75812
+#: assets/admin/dist/js/app.js:49031
 msgid "Form Fields"
 msgstr ""
 
@@ -11459,6 +11688,8 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:75908
 #: assets/admin/dist/js/app.js:746
+#: assets/admin/dist/js/app.js:34102
+#: assets/admin/dist/js/app.js:35068
 #: assets/admin/dist/js/app.js:71981
 msgid "Enabled"
 msgstr ""
@@ -11480,11 +11711,14 @@ msgid "Value"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:75948
+#: assets/admin/dist/js/app.js:49064
 #: assets/admin/dist/js/app.js:63120
 msgid "Label"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:75979
+#: assets/admin/dist/js/app.js:49134
+#: assets/admin/dist/js/app.js:49313
 msgid "Add Option"
 msgstr ""
 
@@ -11514,6 +11748,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:76038
 #: assets/admin/dist/js/app.js:24690
+#: assets/admin/dist/js/app.js:34014
 msgid "Title"
 msgstr ""
 
@@ -11582,6 +11817,7 @@ msgid "Link expiry (hours)"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:76155
+#: assets/admin/dist/js/app.js:59136
 msgid "No expiry"
 msgstr ""
 
@@ -11874,6 +12110,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:76927
 #: assets/admin/dist/js/app.js:24528
 #: assets/admin/dist/js/app.js:30581
+#: assets/admin/dist/js/app.js:59149
 #: assets/admin/dist/js/app.js:64434
 #: assets/admin/dist/js/app.js:64477
 #: assets/admin/dist/js/app.js:65294
@@ -12077,6 +12314,7 @@ msgid "This email will be triggered when the selected event occurs"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:77720
+#: assets/admin/dist/js/app.js:51119
 msgid "From Name"
 msgstr ""
 
@@ -12085,6 +12323,7 @@ msgid "e.g., Your Company Name"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:77732
+#: assets/admin/dist/js/app.js:51099
 msgid "From Email"
 msgstr ""
 
@@ -12206,6 +12445,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:54395
 #: assets/admin/dist/js/app.js:54513
 #: assets/admin/dist/js/app.js:54782
+#: assets/admin/dist/js/app.js:59002
+#: assets/admin/dist/js/app.js:59016
 msgid "Type"
 msgstr ""
 
@@ -12315,6 +12556,7 @@ msgid "Add Step"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:78330
+#: assets/admin/dist/js/app.js:35304
 msgid "Step"
 msgstr ""
 
@@ -12563,6 +12805,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44473
 #: assets/admin/dist/js/app.js:44628
 #: assets/admin/dist/js/app.js:44713
+#: assets/admin/dist/js/app.js:50034
 #: assets/admin/dist/js/app.js:61625
 #: assets/admin/dist/js/app.js:61632
 #: assets/admin/dist/js/app.js:61668
@@ -12582,12 +12825,14 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24220
 #: assets/admin/dist/js/app.js:24326
 #: assets/admin/dist/js/app.js:41118
+#: assets/admin/dist/js/app.js:42167
 #: assets/admin/dist/js/app.js:44100
 #: assets/admin/dist/js/app.js:44472
 #: assets/admin/dist/js/app.js:44627
 #: assets/admin/dist/js/app.js:44698
 #: assets/admin/dist/js/app.js:45002
 #: assets/admin/dist/js/app.js:45410
+#: assets/admin/dist/js/app.js:50033
 #: assets/admin/dist/js/app.js:56164
 #: assets/admin/dist/js/app.js:57462
 #: assets/admin/dist/js/app.js:62599
@@ -12611,6 +12856,7 @@ msgstr[1] ""
 #: assets/dist/js/account-page.js:1444
 #: templates/pdf/invoice.php:129
 #: assets/admin/dist/js/app.js:44102
+#: assets/admin/dist/js/app.js:59003
 #: assets/admin/dist/js/app.js:61626
 #: assets/admin/dist/js/app.js:61634
 #: assets/admin/dist/js/app.js:61688
@@ -12633,6 +12879,7 @@ msgid "View Details"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:79022
+#: assets/admin/dist/js/app.js:49916
 msgid "Failed to save settings"
 msgstr ""
 
@@ -12641,6 +12888,7 @@ msgid "Loading Booking Details..."
 msgstr ""
 
 #: assets/admin/dist/js/app.js:79057
+#: assets/admin/dist/js/app.js:42102
 msgid "Booking Not Found"
 msgstr ""
 
@@ -12663,6 +12911,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:79099
 #: assets/dist/js/account-page.js:855
 #: assets/admin/dist/js/app.js:41054
+#: assets/admin/dist/js/app.js:42210
 #: assets/admin/dist/js/app.js:45074
 #: assets/admin/dist/js/app.js:45436
 #: assets/admin/dist/js/app.js:71496
@@ -12684,6 +12933,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:79110
 #: assets/admin/dist/js/app.js:44081
+#: assets/admin/dist/js/app.js:52089
 #: assets/admin/dist/js/app.js:69486
 #: assets/admin/dist/js/app.js:71534
 msgid "Phone"
@@ -12714,11 +12964,14 @@ msgstr ""
 #: templates/partials/booking-content.php:378
 #: templates/partials/remaining-checkout-content.php:88
 #: templates/partials/remaining-checkout-content.php:147
+#: assets/admin/dist/js/app.js:42197
 #: assets/admin/dist/js/app.js:69130
 #: assets/admin/dist/js/app.js:70115
 #: assets/admin/dist/js/app.js:70405
 #: assets/admin/dist/js/app.js:70742
 #: assets/admin/dist/js/app.js:72497
+#: assets/dist/js/account-page.js:309
+#: assets/dist/js/account-page.js:842
 msgid "Travelers"
 msgstr ""
 
@@ -12729,6 +12982,10 @@ msgstr ""
 #: templates/partials/remaining-checkout-content.php:154
 #: templates/pdf/voucher.php:182
 #: assets/admin/dist/js/app.js:41266
+#: assets/admin/dist/js/app.js:42203
+#: assets/admin/dist/js/app.js:42369
+#: assets/dist/js/account-page.js:848
+#: assets/dist/js/account-page.js:999
 msgid "Total Amount"
 msgstr ""
 
@@ -12814,6 +13071,8 @@ msgstr ""
 #: templates/partials/availability-section.php:75
 #: templates/partials/availability-section.php:414
 #: assets/admin/dist/js/app.js:41392
+#: assets/admin/dist/js/app.js:42233
+#: assets/admin/dist/js/app.js:59114
 #: assets/admin/dist/js/app.js:70120
 #: assets/admin/dist/js/app.js:72676
 msgid "travelers"
@@ -12844,6 +13103,9 @@ msgid "Recovered"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:79380
+#: assets/admin/dist/js/app.js:58823
+#: assets/admin/dist/js/app.js:58997
+#: assets/admin/dist/js/app.js:59463
 msgid "Expired"
 msgstr ""
 
@@ -12860,10 +13122,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:38991
 #: assets/admin/dist/js/app.js:39282
 #: assets/admin/dist/js/app.js:44556
+#: assets/admin/dist/js/app.js:49442
 #: assets/admin/dist/js/app.js:53583
 #: assets/admin/dist/js/app.js:54650
 #: assets/admin/dist/js/app.js:56838
 #: assets/admin/dist/js/app.js:56884
+#: assets/admin/dist/js/app.js:59257
+#: assets/admin/dist/js/app.js:59353
 #: assets/admin/dist/js/app.js:61806
 #: assets/admin/dist/js/app.js:61821
 #: assets/admin/dist/js/app.js:63073
@@ -12933,6 +13198,7 @@ msgid "Send final recovery email after this many hours"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:79540
+#: assets/admin/dist/js/app.js:51135
 msgid "Email Templates"
 msgstr ""
 
@@ -12979,6 +13245,8 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:79650
 #: assets/dist/js/account-page.js:1635
+#: assets/admin/dist/js/app.js:35178
+#: assets/admin/dist/js/app.js:49448
 #: assets/admin/dist/js/app.js:68439
 msgid "Preview"
 msgstr ""
@@ -13029,6 +13297,7 @@ msgstr ""
 #: assets/dist/js/index-CqbqWdVq.js:898
 #: assets/dist/js/index-DJ2aWQ7w.js:902
 #: assets/dist/js/index-JhHGhN8T.js:902
+#: assets/admin/dist/js/app.js:35469
 #: assets/admin/dist/js/app.js:36648
 #: assets/admin/dist/js/app.js:69479
 msgid "Close"
@@ -13259,6 +13528,9 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:80061
 #: templates/setup-wizard/complete-old.php:149
+#: assets/admin/dist/js/app.js:52177
+#: assets/admin/dist/js/app.js:52313
+#: assets/admin/dist/js/app.js:52451
 #: assets/admin/dist/js/app.js:58683
 msgid "Upgrade to Pro"
 msgstr ""
@@ -13268,6 +13540,7 @@ msgid "14-day money-back guarantee"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:80110
+#: assets/admin/dist/js/app.js:49922
 msgid "Settings saved successfully"
 msgstr ""
 
@@ -13303,6 +13576,8 @@ msgid "Analytics"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:80291
+#: assets/admin/dist/js/app.js:53048
+#: assets/admin/dist/js/app.js:53090
 #: assets/admin/dist/js/app.js:72047
 #: assets/admin/dist/js/app.js:72053
 msgid "Settings"
@@ -13606,6 +13881,8 @@ msgid "Display messages like \"Price increases soon\" for demand-based rules"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:80939
+#: assets/admin/dist/js/app.js:53061
+#: assets/admin/dist/js/app.js:53105
 msgid "Save Settings"
 msgstr ""
 
@@ -13726,6 +14003,7 @@ msgid "Choose the type of dynamic pricing rule you want to create"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:81302
+#: assets/admin/dist/js/app.js:48499
 msgid "Example:"
 msgstr ""
 
@@ -13770,6 +14048,7 @@ msgid "Adjustment Type"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:81375
+#: assets/admin/dist/js/app.js:59420
 #: assets/admin/dist/js/app.js:60572
 #: assets/admin/dist/js/app.js:60953
 #: assets/admin/dist/js/app.js:61204
@@ -13777,6 +14056,7 @@ msgid "Percentage"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:81376
+#: assets/admin/dist/js/app.js:59421
 #: assets/admin/dist/js/app.js:60573
 #: assets/admin/dist/js/app.js:60954
 #: assets/admin/dist/js/app.js:61205
@@ -13903,6 +14183,8 @@ msgstr ""
 #: templates/setup-wizard/theme.php:56
 #: assets/admin/dist/js/app.js:43638
 #: assets/admin/dist/js/app.js:43802
+#: assets/admin/dist/js/app.js:50596
+#: assets/admin/dist/js/app.js:51296
 #: assets/admin/dist/js/app.js:64291
 #: assets/admin/dist/js/app.js:64520
 #: assets/admin/dist/js/app.js:64554
@@ -13914,6 +14196,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:81625
 #: assets/admin/dist/js/app.js:43639
 #: assets/admin/dist/js/app.js:43806
+#: assets/admin/dist/js/app.js:51297
 #: assets/admin/dist/js/app.js:64296
 #: assets/admin/dist/js/app.js:64521
 #: assets/admin/dist/js/app.js:64555
@@ -13953,6 +14236,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:81703
 #: assets/admin/dist/js/app.js:214
 #: assets/admin/dist/js/app.js:30412
+#: assets/admin/dist/js/app.js:42440
 #: assets/admin/dist/js/app.js:64072
 #: assets/admin/dist/js/app.js:65590
 msgid "more"
@@ -14018,6 +14302,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37278
 #: assets/admin/dist/js/app.js:37361
 #: assets/admin/dist/js/app.js:38424
+#: assets/admin/dist/js/app.js:59000
 msgid "Created Date"
 msgstr ""
 
@@ -14057,6 +14342,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:53688
 #: assets/admin/dist/js/app.js:54435
 #: assets/admin/dist/js/app.js:56123
+#: assets/admin/dist/js/app.js:59443
 #: assets/admin/dist/js/app.js:61901
 #: assets/admin/dist/js/app.js:63147
 #: assets/admin/dist/js/app.js:64553
@@ -14120,6 +14406,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:39311
 #: assets/admin/dist/js/app.js:44595
 #: assets/admin/dist/js/app.js:54767
+#: assets/admin/dist/js/app.js:58993
 #: assets/admin/dist/js/app.js:61615
 #: assets/admin/dist/js/app.js:63102
 #: assets/admin/dist/js/app.js:64519
@@ -14133,6 +14420,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24022
 #: assets/admin/dist/js/app.js:24271
 #: assets/admin/dist/js/app.js:24674
+#: assets/admin/dist/js/app.js:35105
 #: assets/admin/dist/js/app.js:35815
 #: assets/admin/dist/js/app.js:35898
 #: assets/admin/dist/js/app.js:36020
@@ -14188,6 +14476,10 @@ msgstr ""
 #: assets/admin/dist/js/app.js:82216
 #: templates/partials/pricing-summary.php:125
 #: assets/admin/dist/js/app.js:28963
+#: assets/admin/dist/js/app.js:32951
+#: assets/admin/dist/js/app.js:32999
+#: assets/admin/dist/js/app.js:49194
+#: assets/admin/dist/js/app.js:49374
 #: assets/admin/dist/js/app.js:82007
 msgid "Required"
 msgstr ""
@@ -14212,6 +14504,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:38961
 #: assets/admin/dist/js/app.js:39329
 #: assets/admin/dist/js/app.js:39365
+#: assets/admin/dist/js/app.js:42463
 #: assets/admin/dist/js/app.js:45465
 #: assets/admin/dist/js/app.js:62624
 #: assets/admin/dist/js/app.js:70206
@@ -14237,6 +14530,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:44519
 #: assets/admin/dist/js/app.js:53521
 #: assets/admin/dist/js/app.js:54588
+#: assets/admin/dist/js/app.js:59155
 #: assets/admin/dist/js/app.js:61724
 #: assets/admin/dist/js/app.js:63028
 #: assets/admin/dist/js/app.js:64047
@@ -14287,6 +14581,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:54681
 #: assets/admin/dist/js/app.js:54712
 #: assets/admin/dist/js/app.js:56138
+#: assets/admin/dist/js/app.js:58965
+#: assets/admin/dist/js/app.js:59209
 #: assets/admin/dist/js/app.js:63049
 #: assets/admin/dist/js/app.js:68910
 #: assets/admin/dist/js/app.js:69255
@@ -14349,6 +14645,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:36107
 #: assets/admin/dist/js/app.js:37444
 #: assets/admin/dist/js/app.js:54853
+#: assets/admin/dist/js/app.js:59490
 #: assets/admin/dist/js/app.js:61935
 #: assets/admin/dist/js/app.js:63186
 msgid "Try adjusting your filters to see more results."
@@ -14364,6 +14661,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:82416
 #: assets/admin/dist/js/app.js:36746
+#: assets/admin/dist/js/app.js:37573
 #: assets/admin/dist/js/app.js:38622
 #: assets/admin/dist/js/app.js:39522
 #: assets/admin/dist/js/app.js:53898
@@ -14439,9 +14737,11 @@ msgstr ""
 #: templates/setup-wizard/pages.php:77
 #: templates/setup-wizard/theme.php:79
 #: assets/admin/dist/js/app.js:36859
+#: assets/admin/dist/js/app.js:37687
 #: assets/admin/dist/js/app.js:38737
 #: assets/admin/dist/js/app.js:39623
 #: assets/admin/dist/js/app.js:41045
+#: assets/admin/dist/js/app.js:42144
 #: assets/admin/dist/js/app.js:43256
 #: assets/admin/dist/js/app.js:43277
 #: assets/admin/dist/js/app.js:43925
@@ -14461,12 +14761,16 @@ msgstr ""
 #: assets/admin/dist/js/app.js:69613
 #: assets/admin/dist/js/app.js:71153
 #: assets/admin/dist/js/app.js:71474
+#: assets/admin/dist/js/app.js:82629
 msgid "Back"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:82671
 #: assets/admin/dist/js/app.js:29069
+#: assets/admin/dist/js/app.js:31935
+#: assets/admin/dist/js/app.js:32939
 #: assets/admin/dist/js/app.js:36867
+#: assets/admin/dist/js/app.js:37695
 #: assets/admin/dist/js/app.js:38743
 #: assets/admin/dist/js/app.js:39629
 #: assets/admin/dist/js/app.js:54038
@@ -14481,6 +14785,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:35907
 #: assets/admin/dist/js/app.js:36871
 #: assets/admin/dist/js/app.js:37245
+#: assets/admin/dist/js/app.js:37699
 #: assets/admin/dist/js/app.js:38172
 #: assets/admin/dist/js/app.js:38373
 #: assets/admin/dist/js/app.js:38747
@@ -14503,6 +14808,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:82692
 #: assets/admin/dist/js/app.js:36891
+#: assets/admin/dist/js/app.js:37719
 #: assets/admin/dist/js/app.js:38767
 #: assets/admin/dist/js/app.js:39362
 #: assets/admin/dist/js/app.js:39653
@@ -14518,6 +14824,7 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:82717
 #: assets/admin/dist/js/app.js:36921
+#: assets/admin/dist/js/app.js:37749
 #: assets/admin/dist/js/app.js:38797
 #: assets/admin/dist/js/app.js:39683
 #: assets/admin/dist/js/app.js:54092
@@ -14532,11 +14839,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:82720
 #: templates/pdf/invoice.php:126
 #: assets/admin/dist/js/app.js:29189
+#: assets/admin/dist/js/app.js:34032
 #: assets/admin/dist/js/app.js:35938
 #: assets/admin/dist/js/app.js:36011
 #: assets/admin/dist/js/app.js:36926
 #: assets/admin/dist/js/app.js:37275
 #: assets/admin/dist/js/app.js:37348
+#: assets/admin/dist/js/app.js:37754
 #: assets/admin/dist/js/app.js:38184
 #: assets/admin/dist/js/app.js:38421
 #: assets/admin/dist/js/app.js:38942
@@ -14566,6 +14875,7 @@ msgid "Field Configuration"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:82741
+#: assets/admin/dist/js/app.js:49051
 #: assets/admin/dist/js/app.js:81997
 #: assets/admin/dist/js/app.js:82184
 #: assets/admin/dist/js/app.js:82215
@@ -14591,6 +14901,7 @@ msgid "Default value for the field"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:82803
+#: assets/admin/dist/js/app.js:49094
 msgid "Placeholder"
 msgstr ""
 
@@ -14613,6 +14924,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37246
 #: assets/admin/dist/js/app.js:37277
 #: assets/admin/dist/js/app.js:37354
+#: assets/admin/dist/js/app.js:37767
+#: assets/admin/dist/js/app.js:37769
 #: assets/admin/dist/js/app.js:38189
 #: assets/admin/dist/js/app.js:38374
 #: assets/admin/dist/js/app.js:38423
@@ -14620,6 +14933,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:38954
 #: assets/admin/dist/js/app.js:39364
 #: assets/admin/dist/js/app.js:39721
+#: assets/admin/dist/js/app.js:42328
 #: assets/admin/dist/js/app.js:43628
 #: assets/admin/dist/js/app.js:44103
 #: assets/admin/dist/js/app.js:44476
@@ -14635,6 +14949,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:54783
 #: assets/admin/dist/js/app.js:55189
 #: assets/admin/dist/js/app.js:58509
+#: assets/admin/dist/js/app.js:59006
+#: assets/admin/dist/js/app.js:59036
+#: assets/admin/dist/js/app.js:59140
 #: assets/admin/dist/js/app.js:61252
 #: assets/admin/dist/js/app.js:61628
 #: assets/admin/dist/js/app.js:61636
@@ -14661,6 +14978,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:82035
 #: assets/admin/dist/js/app.js:82185
 #: assets/admin/dist/js/app.js:82220
+#: assets/admin/dist/js/app.js:82819
 msgid "Status"
 msgstr ""
 
@@ -14668,6 +14986,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24026
 #: assets/admin/dist/js/app.js:24272
 #: assets/admin/dist/js/app.js:24675
+#: assets/admin/dist/js/app.js:35105
 #: assets/admin/dist/js/app.js:35816
 #: assets/admin/dist/js/app.js:35899
 #: assets/admin/dist/js/app.js:36020
@@ -14675,6 +14994,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37191
 #: assets/admin/dist/js/app.js:37237
 #: assets/admin/dist/js/app.js:37357
+#: assets/admin/dist/js/app.js:37778
 #: assets/admin/dist/js/app.js:38099
 #: assets/admin/dist/js/app.js:38358
 #: assets/admin/dist/js/app.js:38414
@@ -14683,6 +15003,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:39313
 #: assets/admin/dist/js/app.js:39354
 #: assets/admin/dist/js/app.js:39723
+#: assets/admin/dist/js/app.js:51295
 #: assets/admin/dist/js/app.js:53233
 #: assets/admin/dist/js/app.js:53384
 #: assets/admin/dist/js/app.js:53689
@@ -14696,6 +15017,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:56038
 #: assets/admin/dist/js/app.js:56125
 #: assets/admin/dist/js/app.js:58528
+#: assets/admin/dist/js/app.js:58815
+#: assets/admin/dist/js/app.js:58995
+#: assets/admin/dist/js/app.js:59453
 #: assets/admin/dist/js/app.js:61260
 #: assets/admin/dist/js/app.js:62735
 #: assets/admin/dist/js/app.js:63104
@@ -14709,7 +15033,9 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:82830
 #: assets/admin/dist/js/app.js:23718
+#: assets/admin/dist/js/app.js:35254
 #: assets/admin/dist/js/app.js:36950
+#: assets/admin/dist/js/app.js:37779
 #: assets/admin/dist/js/app.js:38095
 #: assets/admin/dist/js/app.js:38357
 #: assets/admin/dist/js/app.js:38834
@@ -14725,6 +15051,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:54769
 #: assets/admin/dist/js/app.js:55199
 #: assets/admin/dist/js/app.js:58527
+#: assets/admin/dist/js/app.js:58811
+#: assets/admin/dist/js/app.js:58994
+#: assets/admin/dist/js/app.js:59448
 #: assets/admin/dist/js/app.js:61261
 #: assets/admin/dist/js/app.js:62731
 #: assets/admin/dist/js/app.js:63103
@@ -14743,6 +15072,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:37192
 #: assets/admin/dist/js/app.js:37238
 #: assets/admin/dist/js/app.js:37357
+#: assets/admin/dist/js/app.js:37780
 #: assets/admin/dist/js/app.js:38103
 #: assets/admin/dist/js/app.js:38359
 #: assets/admin/dist/js/app.js:38415
@@ -14768,6 +15098,9 @@ msgstr ""
 #: assets/admin/dist/js/app.js:56041
 #: assets/admin/dist/js/app.js:56126
 #: assets/admin/dist/js/app.js:58529
+#: assets/admin/dist/js/app.js:58819
+#: assets/admin/dist/js/app.js:58996
+#: assets/admin/dist/js/app.js:59458
 #: assets/admin/dist/js/app.js:61262
 #: assets/admin/dist/js/app.js:62739
 #: assets/admin/dist/js/app.js:63105
@@ -14786,6 +15119,7 @@ msgid "Trash"
 msgstr ""
 
 #: assets/admin/dist/js/app.js:82838
+#: assets/admin/dist/js/app.js:82773
 msgid "Field Options"
 msgstr ""
 
@@ -14821,11 +15155,14 @@ msgstr ""
 
 #: assets/admin/dist/js/app.js:82906
 #: assets/admin/dist/js/app.js:36981
+#: assets/admin/dist/js/app.js:37810
 #: assets/admin/dist/js/app.js:38858
 #: assets/admin/dist/js/app.js:39748
 #: assets/admin/dist/js/app.js:41623
 #: assets/admin/dist/js/app.js:43721
 #: assets/admin/dist/js/app.js:45166
+#: assets/admin/dist/js/app.js:53058
+#: assets/admin/dist/js/app.js:53102
 #: assets/admin/dist/js/app.js:54168
 #: assets/admin/dist/js/app.js:55216
 #: assets/admin/dist/js/app.js:58546
@@ -14856,10 +15193,13 @@ msgstr ""
 #: assets/admin/dist/js/app.js:24922
 #: assets/admin/dist/js/app.js:30677
 #: assets/admin/dist/js/app.js:30725
+#: assets/admin/dist/js/app.js:35448
+#: assets/admin/dist/js/app.js:35531
 #: assets/admin/dist/js/app.js:35853
 #: assets/admin/dist/js/app.js:35867
 #: assets/admin/dist/js/app.js:36995
 #: assets/admin/dist/js/app.js:37205
+#: assets/admin/dist/js/app.js:37824
 #: assets/admin/dist/js/app.js:38327
 #: assets/admin/dist/js/app.js:38863
 #: assets/admin/dist/js/app.js:39283
@@ -14868,6 +15208,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:43735
 #: assets/admin/dist/js/app.js:44557
 #: assets/admin/dist/js/app.js:45180
+#: assets/admin/dist/js/app.js:49197
+#: assets/admin/dist/js/app.js:49443
 #: assets/admin/dist/js/app.js:53584
 #: assets/admin/dist/js/app.js:53650
 #: assets/admin/dist/js/app.js:54182
@@ -14876,6 +15218,8 @@ msgstr ""
 #: assets/admin/dist/js/app.js:55230
 #: assets/admin/dist/js/app.js:57751
 #: assets/admin/dist/js/app.js:58560
+#: assets/admin/dist/js/app.js:59277
+#: assets/admin/dist/js/app.js:59354
 #: assets/admin/dist/js/app.js:61308
 #: assets/admin/dist/js/app.js:61822
 #: assets/admin/dist/js/app.js:62337
@@ -14927,6 +15271,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:83322
 #: templates/pdf/consent.php:135
 #: templates/pdf/itinerary.php:208
+#: assets/admin/dist/js/app.js:50032
 #: assets/admin/dist/js/app.js:69485
 #: assets/admin/dist/js/app.js:70636
 #: assets/admin/dist/js/app.js:71517
@@ -14989,6 +15334,7 @@ msgid "Try adjusting your filters or check back later."
 msgstr ""
 
 #: assets/dist/js/account-page.js:1208
+#: assets/dist/js/account-page.js:298
 msgid "Multiple destinations"
 msgstr ""
 
@@ -15111,6 +15457,7 @@ msgid "You have"
 msgstr ""
 
 #: assets/dist/js/account-page.js:1632
+#: assets/dist/js/account-page.js:976
 msgid "Download"
 msgstr ""
 
@@ -15342,6 +15689,7 @@ msgid "Support"
 msgstr ""
 
 #: assets/dist/js/account-page.js:2491
+#: assets/dist/js/account-page.js:267
 msgid "Upcoming Trips"
 msgstr ""
 
@@ -15395,6 +15743,7 @@ msgid "Make Payment"
 msgstr ""
 
 #: assets/dist/js/account-page.js:372
+#: assets/dist/js/account-page.js:206
 msgid "My Documents"
 msgstr ""
 

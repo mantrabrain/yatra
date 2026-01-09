@@ -146,7 +146,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
   };
 
   const handleDisconnect = async () => {
-    if (!confirm(__('Are you sure you want to disconnect from Google Calendar?', 'Are you sure you want to disconnect from Google Calendar?'))) {
+    if (!confirm(__('Are you sure you want to disconnect from Google Calendar?', 'yatra'))) {
       return;
     }
     try {
@@ -181,37 +181,37 @@ const GoogleCalendarIntegrationSection: React.FC<{
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-lg flex items-center gap-2">
             <Calendar className="w-5 h-5 text-blue-500" />
-            {__('Google Calendar Settings', 'Google Calendar Settings')}
+            {__('Google Calendar Settings', 'yatra')}
           </CardTitle>
           <div className="flex items-center gap-2">
             {connected ? (
               <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                 <CheckCircle className="w-4 h-4" />
-                {__('Connected', 'Connected')}
+                {__('Connected', 'yatra')}
               </div>
             ) : (
               <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                 <XCircle className="w-4 h-4" />
-                {__('Not Connected', 'Not Connected')}
+                {__('Not Connected', 'yatra')}
               </div>
             )}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-gray-600 dark:text-gray-300">
-            {__('Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.', 'Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.')}
+            {__('Connect your Google Calendar to automatically sync bookings and departures. Events will be created for each booking with trip details, traveler information, and departure dates.', 'yatra')}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField 
               id="gc_client_id" 
-              label={__('Client ID', 'Client ID')} 
+              label={__('Client ID', 'yatra')} 
               description={(
                 <>
-                  {__('Create an OAuth client in', 'Create an OAuth client in')}{' '}
-                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
-                  {__(', then paste the OAuth 2.0 Client ID here.', ', then paste the OAuth 2.0 Client ID here.')}{' '}
-                  {__('Example:', 'Example:')}{' '}
+                  {__('Create an OAuth client in', 'yatra')}{' '}
+                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'yatra')}</a>
+                  {__(', then paste the OAuth 2.0 Client ID here.', 'yatra')}{' '}
+                  {__('Example:', 'yatra')}{' '}
                   <code className="font-mono">123...apps.googleusercontent.com</code>
                 </>
               )}
@@ -225,13 +225,13 @@ const GoogleCalendarIntegrationSection: React.FC<{
             </FormField>
             <FormField 
               id="gc_client_secret" 
-              label={__('Client Secret', 'Client Secret')}
+              label={__('Client Secret', 'yatra')}
               description={(
                 <>
-                  {__('Copy the Client Secret from the same OAuth client in', 'Copy the Client Secret from the same OAuth client in')}{' '}
-                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
-                  {__('.', '.')}{' '}
-                  {__('Keep this private.', 'Keep this private.')}
+                  {__('Copy the Client Secret from the same OAuth client in', 'yatra')}{' '}
+                  <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'yatra')}</a>
+                  {__('.', 'yatra')}{' '}
+                  {__('Keep this private.', 'yatra')}
                 </>
               )}
             >
@@ -247,15 +247,15 @@ const GoogleCalendarIntegrationSection: React.FC<{
 
           <FormField 
             id="gc_redirect_uri" 
-            label={__('Redirect URI (OAuth Callback URL)', 'Redirect URI (OAuth Callback URL)')} 
+            label={__('Redirect URI (OAuth Callback URL)', 'yatra')} 
             description={(
               <>
-                {__('Add this to your OAuth client under "Authorized redirect URIs" in', 'Add this to your OAuth client under "Authorized redirect URIs" in')}{' '}
-                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'Google Cloud Credentials')}</a>
-                {__('.', '.')}{' '}
-                {__('Make sure the', 'Make sure the')}{' '}
-                <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Calendar API', 'Google Calendar API')}</a>
-                {' '}{__('is enabled.', 'is enabled.')}
+                {__('Add this to your OAuth client under "Authorized redirect URIs" in', 'yatra')}{' '}
+                <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Cloud Credentials', 'yatra')}</a>
+                {__('.', 'yatra')}{' '}
+                {__('Make sure the', 'yatra')}{' '}
+                <a href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">{__('Google Calendar API', 'yatra')}</a>
+                {' '}{__('is enabled.', 'yatra')}
               </>
             )}
           >
@@ -271,7 +271,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 size="sm"
                 onClick={() => navigator.clipboard.writeText(redirectUri)}
               >
-                {__('Copy', 'Copy')}
+                {__('Copy', 'yatra')}
               </Button>
             </div>
           </FormField>
@@ -280,8 +280,8 @@ const GoogleCalendarIntegrationSection: React.FC<{
             <p className="text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2">
               <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
               <span className="min-w-0 leading-relaxed">
-                {__('OAuth scopes required (add these on the Google OAuth consent screen):', 'OAuth scopes required (add these on the Google OAuth consent screen):')}{' '}
-                <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer" className="text-amber-900 dark:text-amber-200 underline">{__('OAuth Consent Screen', 'OAuth Consent Screen')}</a>
+                {__('OAuth scopes required (add these on the Google OAuth consent screen):', 'yatra')}{' '}
+                <a href="https://console.cloud.google.com/apis/credentials/consent" target="_blank" rel="noopener noreferrer" className="text-amber-900 dark:text-amber-200 underline">{__('OAuth Consent Screen', 'yatra')}</a>
               </span>
             </p>
             <div className="mt-2 space-y-1">
@@ -300,13 +300,13 @@ const GoogleCalendarIntegrationSection: React.FC<{
             <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md space-y-4">
               <h4 className="font-medium text-sm text-green-800 dark:text-green-400 flex items-center gap-2">
                 <CheckCircle className="w-4 h-4" />
-                {__('Connected Calendar', 'Connected Calendar')}
+                {__('Connected Calendar', 'yatra')}
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField 
                   id="gc_calendar_id" 
-                  label={__('Calendar ID', 'Calendar ID')}
-                  description={__('The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.', 'The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.')}
+                  label={__('Calendar ID', 'yatra')}
+                  description={__('The ID of the Google Calendar to sync events to. Use "primary" for your main calendar, or enter a specific calendar ID.', 'yatra')}
                 >
                   <Input
                     id="gc_calendar_id"
@@ -317,14 +317,14 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 </FormField>
                 <FormField 
                   id="gc_calendar_name" 
-                  label={__('Calendar Name', 'Calendar Name')}
-                  description={__('A friendly name for this calendar connection (for your reference only).', 'A friendly name for this calendar connection (for your reference only).')}
+                  label={__('Calendar Name', 'yatra')}
+                  description={__('A friendly name for this calendar connection (for your reference only).', 'yatra')}
                 >
                   <Input
                     id="gc_calendar_name"
                     value={calendarName}
                     onChange={(e) => setCalendarName(e.target.value)}
-                    placeholder={__('My Booking Calendar', 'My Booking Calendar')}
+                    placeholder={__('My Booking Calendar', 'yatra')}
                   />
                 </FormField>
               </div>
@@ -332,14 +332,14 @@ const GoogleCalendarIntegrationSection: React.FC<{
               <div className="flex items-center justify-between pt-2 border-t border-green-200 dark:border-green-800">
                 <p className="text-xs text-green-700 dark:text-green-400">
                   {lastSync ? (
-                    <>{__('Last sync:', 'Last sync:')} {new Date(lastSync).toLocaleString()}</>
+                    <>{__('Last sync:', 'yatra')} {new Date(lastSync).toLocaleString()}</>
                   ) : (
-                    __('Never synced', 'Never synced')
+                    __('Never synced', 'yatra')
                   )}
                 </p>
                 <Button variant="outline" size="sm" onClick={handleSync} disabled={syncing} className="flex items-center gap-2">
                   <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                  {__('Sync Now', 'Sync Now')}
+                  {__('Sync Now', 'yatra')}
                 </Button>
               </div>
             </div>
@@ -354,7 +354,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
               >
                 <ExternalLink className="w-3 h-3" />
-                {__('Credentials', 'Credentials')}
+                {__('Credentials', 'yatra')}
               </a>
               <a
                 href="https://console.cloud.google.com/apis/library/calendar-json.googleapis.com"
@@ -363,7 +363,7 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
               >
                 <ExternalLink className="w-3 h-3" />
-                {__('Calendar API', 'Calendar API')}
+                {__('Calendar API', 'yatra')}
               </a>
               <a
                 href="https://console.cloud.google.com/apis/credentials/consent"
@@ -372,19 +372,19 @@ const GoogleCalendarIntegrationSection: React.FC<{
                 className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-sm"
               >
                 <ExternalLink className="w-3 h-3" />
-                {__('OAuth Consent', 'OAuth Consent')}
+                {__('OAuth Consent', 'yatra')}
               </a>
             </div>
             
             {connected ? (
               <Button variant="destructive" onClick={handleDisconnect} className="flex items-center gap-2">
                 <XCircle className="w-4 h-4" />
-                {__('Disconnect', 'Disconnect')}
+                {__('Disconnect', 'yatra')}
               </Button>
             ) : (
               <Button onClick={handleConnect} disabled={connecting || !clientId || !clientSecret} className="flex items-center gap-2">
                 {connecting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Calendar className="w-4 h-4" />}
-                {__('Connect to Google Calendar', 'Connect to Google Calendar')}
+                {__('Connect to Google Calendar', 'yatra')}
               </Button>
             )}
           </div>
@@ -760,9 +760,9 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
   };
 
   const formTabs = [
-    { id: 'contact_form' as const, label: __('Contact Form', 'Contact Form'), description: 'Lead traveler contact details' },
-    { id: 'emergency_contact_form' as const, label: __('Emergency Contact', 'Emergency Contact'), description: 'Emergency contact information' },
-    { id: 'traveler_form' as const, label: __('Traveler Form', 'Traveler Form'), description: 'Individual traveler details' },
+    { id: 'contact_form' as const, label: __('Contact Form', 'yatra'), description: 'Lead traveler contact details' },
+    { id: 'emergency_contact_form' as const, label: __('Emergency Contact', 'yatra'), description: 'Emergency contact information' },
+    { id: 'traveler_form' as const, label: __('Traveler Form', 'yatra'), description: 'Individual traveler details' },
   ];
 
   const fieldTypes = [
@@ -956,10 +956,10 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100 mb-2">
-                  {__('Dynamic Form Field Module Required', 'Dynamic Form Field Module Required')}
+                  {__('Dynamic Form Field Module Required', 'yatra')}
                 </h3>
                 <p className="text-sm text-amber-700 dark:text-amber-300 mb-4">
-                  {__('Customize your booking forms with drag-and-drop field builder. Add custom fields for traveler information, emergency contacts, and more. This feature requires the Dynamic Form Field module.', 'Customize your booking forms with drag-and-drop field builder.')}
+                  {__('Customize your booking forms with drag-and-drop field builder. Add custom fields for traveler information, emergency contacts, and more. This feature requires the Dynamic Form Field module.', 'yatra')}
                 </p>
                 <div className="flex items-center gap-3">
                   <Button
@@ -968,7 +968,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                     onClick={() => window.location.href = '#/modules'}
                     className="bg-amber-600 hover:bg-amber-700 text-white"
                   >
-                    {__('Enable Module', 'Enable Module')}
+                    {__('Enable Module', 'yatra')}
                   </Button>
                   <a
                     href="https://wpyatra.com/pricing?module=dynamic-form-field"
@@ -976,7 +976,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                     rel="noopener noreferrer"
                     className="text-sm text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1"
                   >
-                    {__('Learn More', 'Learn More')}
+                    {__('Learn More', 'yatra')}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 </div>
@@ -990,7 +990,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Lock className="w-4 h-4 text-gray-400" />
-              {__('Form Builder Preview', 'Form Builder Preview')}
+              {__('Form Builder Preview', 'yatra')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -1032,7 +1032,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
       {/* Form Section Settings */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{__('Form Section Settings', 'Form Section Settings')}</CardTitle>
+          <CardTitle className="text-base">{__('Form Section Settings', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -1044,13 +1044,13 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
               className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
             <Label htmlFor="form_section_enabled" className="font-medium cursor-pointer">
-              {__('Enable this form section', 'Enable this form section')}
+              {__('Enable this form section', 'yatra')}
             </Label>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="form_title">{__('Section Title', 'Section Title')}</Label>
+              <Label htmlFor="form_title">{__('Section Title', 'yatra')}</Label>
               <Input
                 id="form_title"
                 value={currentConfig.title || ''}
@@ -1060,7 +1060,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
               />
             </div>
             <div>
-              <Label htmlFor="form_description">{__('Section Description', 'Section Description')}</Label>
+              <Label htmlFor="form_description">{__('Section Description', 'yatra')}</Label>
               <Input
                 id="form_description"
                 value={currentConfig.description || ''}
@@ -1076,7 +1076,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
       {/* Form Fields */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-base">{__('Form Fields', 'Form Fields')}</CardTitle>
+          <CardTitle className="text-base">{__('Form Fields', 'yatra')}</CardTitle>
           <Button
             variant="outline"
             size="sm"
@@ -1084,17 +1084,17 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
             className="flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            {__('Add Field', 'Add Field')}
+            {__('Add Field', 'yatra')}
           </Button>
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Add New Field Form */}
           {showAddField && (
             <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
-              <h4 className="font-medium text-sm mb-3">{__('Add New Field', 'Add New Field')}</h4>
+              <h4 className="font-medium text-sm mb-3">{__('Add New Field', 'yatra')}</h4>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <div>
-                  <Label className="text-xs">{__('Field Type', 'Field Type')}</Label>
+                  <Label className="text-xs">{__('Field Type', 'yatra')}</Label>
                   <Select
                     value={newField.type || 'text'}
                     onChange={(e) => setNewField(prev => ({ ...prev, type: e.target.value as FormFieldConfig['type'] }))}
@@ -1106,7 +1106,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                   </Select>
                 </div>
                 <div>
-                  <Label className="text-xs">{__('Label', 'Label')} *</Label>
+                  <Label className="text-xs">{__('Label', 'yatra')} *</Label>
                   <Input
                     value={newField.label || ''}
                     onChange={(e) => handleNewFieldLabelChange(e.target.value)}
@@ -1115,17 +1115,17 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                   />
                 </div>
                 <div>
-                  <Label className="text-xs">{__('Field ID', 'Field ID')} *</Label>
+                  <Label className="text-xs">{__('Field ID', 'yatra')} *</Label>
                   <Input
                     value={newField.id || ''}
                     onChange={(e) => setNewField(prev => ({ ...prev, id: sanitizeId(e.target.value) }))}
                     placeholder="field_id"
                     className="mt-1 font-mono text-xs"
                   />
-                  <p className="text-[10px] text-gray-400 mt-0.5">{__('Lowercase, no spaces', 'Lowercase, no spaces')}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{__('Lowercase, no spaces', 'yatra')}</p>
                 </div>
                 <div>
-                  <Label className="text-xs">{__('Placeholder', 'Placeholder')}</Label>
+                  <Label className="text-xs">{__('Placeholder', 'yatra')}</Label>
                   <Input
                     value={newField.placeholder || ''}
                     onChange={(e) => setNewField(prev => ({ ...prev, placeholder: e.target.value }))}
@@ -1134,7 +1134,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                   />
                 </div>
                 <div>
-                  <Label className="text-xs">{__('Width', 'Width')}</Label>
+                  <Label className="text-xs">{__('Width', 'yatra')}</Label>
                   <Select
                     value={newField.width || 'full'}
                     onChange={(e) => setNewField(prev => ({ ...prev, width: e.target.value as FormFieldConfig['width'] }))}
@@ -1150,7 +1150,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
               {newField.type === 'select' && (
                 <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-100 dark:border-blue-900">
                   <div className="flex items-center justify-between mb-2">
-                    <Label className="text-xs font-medium">{__('Dropdown Options', 'Dropdown Options')}</Label>
+                    <Label className="text-xs font-medium">{__('Dropdown Options', 'yatra')}</Label>
                     <Button
                       type="button"
                       variant="ghost"
@@ -1162,7 +1162,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                       className="h-6 text-xs"
                     >
                       <Plus className="w-3 h-3 mr-1" />
-                      {__('Add Option', 'Add Option')}
+                      {__('Add Option', 'yatra')}
                     </Button>
                   </div>
                   <div className="space-y-2">
@@ -1201,7 +1201,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                       </div>
                     ))}
                     {(!newField.options || newField.options.length === 0) && (
-                      <p className="text-xs text-gray-400 italic">{__('Click "Add Option" to add dropdown choices.', 'No options')}</p>
+                      <p className="text-xs text-gray-400 italic">{__('Click "Add Option" to add dropdown choices.', 'yatra')}</p>
                     )}
                   </div>
                 </div>
@@ -1215,14 +1215,14 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                     onChange={(e) => setNewField(prev => ({ ...prev, required: e.target.checked }))}
                     className="w-4 h-4 rounded border-gray-300 text-blue-600"
                   />
-                  {__('Required', 'Required')}
+                  {__('Required', 'yatra')}
                 </label>
                 <div className="flex-1"></div>
                 <Button variant="ghost" size="sm" onClick={() => setShowAddField(false)}>
-                  {__('Cancel', 'Cancel')}
+                  {__('Cancel', 'yatra')}
                 </Button>
                 <Button size="sm" onClick={addNewField} disabled={!newField.label || !newField.id}>
-                  {__('Add Field', 'Add Field')}
+                  {__('Add Field', 'yatra')}
                 </Button>
               </div>
             </div>
@@ -1231,7 +1231,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
           {/* Field List */}
           {currentConfig.fields?.length === 0 ? (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <p>{__('No fields configured. Click "Add Field" to get started.', 'No fields configured.')}</p>
+              <p>{__('No fields configured. Click "Add Field" to get started.', 'yatra')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -1316,7 +1316,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                         
                         {/* Field ID - Below other fields */}
                         <div className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-900 rounded">
-                          <Label className="text-xs text-gray-500 whitespace-nowrap">{__('Field ID:', 'Field ID:')}</Label>
+                          <Label className="text-xs text-gray-500 whitespace-nowrap">{__('Field ID:', 'yatra')}</Label>
                           <Input
                             value={field.id}
                             onChange={(e) => {
@@ -1330,7 +1330,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                             title={field.locked ? 'Locked fields cannot change ID' : 'Field ID (lowercase, no spaces)'}
                           />
                           {field.locked && (
-                            <span className="text-xs text-amber-600">{__('(locked)', '(locked)')}</span>
+                            <span className="text-xs text-amber-600">{__('(locked)', 'yatra')}</span>
                           )}
                         </div>
                         
@@ -1338,7 +1338,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                         {field.type === 'select' && (
                           <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center justify-between mb-2">
-                              <Label className="text-xs font-medium">{__('Dropdown Options', 'Dropdown Options')}</Label>
+                              <Label className="text-xs font-medium">{__('Dropdown Options', 'yatra')}</Label>
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -1350,7 +1350,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                                 className="h-6 text-xs"
                               >
                                 <Plus className="w-3 h-3 mr-1" />
-                                {__('Add Option', 'Add Option')}
+                                {__('Add Option', 'yatra')}
                               </Button>
                             </div>
                             <div className="space-y-2">
@@ -1389,7 +1389,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                                 </div>
                               ))}
                               {(!field.options || field.options.length === 0) && (
-                                <p className="text-xs text-gray-400 italic">{__('No options. Click "Add Option" to add dropdown choices.', 'No options')}</p>
+                                <p className="text-xs text-gray-400 italic">{__('No options. Click "Add Option" to add dropdown choices.', 'yatra')}</p>
                               )}
                             </div>
                           </div>
@@ -1413,7 +1413,7 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
                           </span>
                         )}
                         {field.required && (
-                          <span className="text-xs text-red-500 font-medium">{__('Required', 'Required')}</span>
+                          <span className="text-xs text-red-500 font-medium">{__('Required', 'yatra')}</span>
                         )}
                         {field.locked && (
                           <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400 px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/20 rounded" title="This field is protected and cannot be deleted">
@@ -1483,17 +1483,17 @@ const BookingFormBuilder: React.FC<BookingFormBuilderProps> = ({ formData, setFo
             deleteField(deleteConfirm.fieldId);
           }
         }}
-        title={__('Delete Field', 'Delete Field')}
+        title={__('Delete Field', 'yatra')}
         message={`Are you sure you want to delete the field "${deleteConfirm.fieldLabel}"? This action cannot be undone.`}
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
       />
 
       {/* Preview */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">{__('Preview', 'Preview')}</CardTitle>
+          <CardTitle className="text-base">{__('Preview', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -1575,7 +1575,7 @@ const Settings: React.FC = () => {
         const response = await apiClient.get('/settings');
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load settings', 'Failed to load settings'), 'error');
+        showToast(error?.message || __('Failed to load settings', 'yatra'), 'error');
         throw error;
       }
     },
@@ -2010,20 +2010,20 @@ const Settings: React.FC = () => {
         await apiClient.put('/settings', data);
         return data;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to save settings', 'Failed to save settings'), 'error');
+        showToast(error?.message || __('Failed to save settings', 'yatra'), 'error');
         throw error;
       }
     },
     onSuccess: (savedData) => {
       queryClient.setQueryData(['settings'], savedData);
-      showToast(__('Settings saved successfully', 'Settings saved successfully'), 'success');
+      showToast(__('Settings saved successfully', 'yatra'), 'success');
       setIsSaving(false);
       setFormData(savedData);
       isInitializedRef.current = true; // Keep initialized after save
     },
     onError: (error: any) => {
       setIsSaving(false);
-      const errorMessage = error?.message || __('Error saving settings', 'Error saving settings');
+      const errorMessage = error?.message || __('Error saving settings', 'yatra');
       showToast(errorMessage, 'error');
     },
   });
@@ -2035,10 +2035,10 @@ const Settings: React.FC = () => {
       return response;
     },
     onSuccess: () => {
-      showToast(__('Rewrite rules flushed successfully', 'Rewrite rules flushed successfully'), 'success');
+      showToast(__('Rewrite rules flushed successfully', 'yatra'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to flush rewrite rules', 'Failed to flush rewrite rules'), 'error');
+      showToast(error?.message || __('Failed to flush rewrite rules', 'yatra'), 'error');
     },
   });
 
@@ -2067,11 +2067,11 @@ const Settings: React.FC = () => {
       return response;
     },
     onSuccess: () => {
-      showToast(__('Shortcode added successfully', 'Shortcode added successfully'), 'success');
+      showToast(__('Shortcode added successfully', 'yatra'), 'success');
       queryClient.invalidateQueries({ queryKey: ['wordpress-pages'] });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to add shortcode', 'Failed to add shortcode'), 'error');
+      showToast(error?.message || __('Failed to add shortcode', 'yatra'), 'error');
     },
   });
 
@@ -2100,14 +2100,14 @@ const Settings: React.FC = () => {
         // Page has shortcode - save directly
         handleFieldChange({ target: { name: 'booking_page_id', value: pageId } } as any);
         handleFieldChange({ target: { name: 'use_booking_page', value: true } } as any);
-        showToast(__('Booking page selected successfully', 'Booking page selected successfully'), 'success');
+        showToast(__('Booking page selected successfully', 'yatra'), 'success');
       } else {
         // Page doesn't have shortcode - show dialog
         setSelectedPageForShortcode({ id: pageId, title: page.title });
         setShowShortcodeDialog(true);
       }
     } catch (error: any) {
-      showToast(error?.message || __('Failed to check page', 'Failed to check page'), 'error');
+      showToast(error?.message || __('Failed to check page', 'yatra'), 'error');
     } finally {
       setIsCheckingShortcode(false);
     }
@@ -2147,20 +2147,20 @@ const Settings: React.FC = () => {
   };
 
   const settingsSections = [
-    { id: 'general' as SettingsSection, label: __('General', 'General'), icon: Building2 },
-    { id: 'booking' as SettingsSection, label: __('Booking', 'Booking'), icon: Calendar },
-    { id: 'booking_form' as SettingsSection, label: __('Booking Form', 'Booking Form'), icon: ClipboardList },
-    { id: 'payment' as SettingsSection, label: __('Payment', 'Payment'), icon: DollarSign },
-    { id: 'email' as SettingsSection, label: __('Email', 'Email'), icon: Mail },
-    { id: 'trip' as SettingsSection, label: __('Trip', 'Trip'), icon: MapPin },
-    { id: 'customer' as SettingsSection, label: __('Customer', 'Customer'), icon: Users },
-    { id: 'review' as SettingsSection, label: __('Review', 'Review'), icon: Star },
-    { id: 'tax' as SettingsSection, label: __('Tax', 'Tax'), icon: Receipt },
-    { id: 'currency' as SettingsSection, label: __('Currency', 'Currency'), icon: Globe },
-    { id: 'notification' as SettingsSection, label: __('Notification', 'Notification'), icon: Bell },
-    { id: 'integration' as SettingsSection, label: __('Integration', 'Integration'), icon: Plug },
-    { id: 'permalink' as SettingsSection, label: __('Permalink', 'Permalink'), icon: Globe },
-    { id: 'advanced' as SettingsSection, label: __('Advanced', 'Advanced'), icon: Shield },
+    { id: 'general' as SettingsSection, label: __('General', 'yatra'), icon: Building2 },
+    { id: 'booking' as SettingsSection, label: __('Booking', 'yatra'), icon: Calendar },
+    { id: 'booking_form' as SettingsSection, label: __('Booking Form', 'yatra'), icon: ClipboardList },
+    { id: 'payment' as SettingsSection, label: __('Payment', 'yatra'), icon: DollarSign },
+    { id: 'email' as SettingsSection, label: __('Email', 'yatra'), icon: Mail },
+    { id: 'trip' as SettingsSection, label: __('Trip', 'yatra'), icon: MapPin },
+    { id: 'customer' as SettingsSection, label: __('Customer', 'yatra'), icon: Users },
+    { id: 'review' as SettingsSection, label: __('Review', 'yatra'), icon: Star },
+    { id: 'tax' as SettingsSection, label: __('Tax', 'yatra'), icon: Receipt },
+    { id: 'currency' as SettingsSection, label: __('Currency', 'yatra'), icon: Globe },
+    { id: 'notification' as SettingsSection, label: __('Notification', 'yatra'), icon: Bell },
+    { id: 'integration' as SettingsSection, label: __('Integration', 'yatra'), icon: Plug },
+    { id: 'permalink' as SettingsSection, label: __('Permalink', 'yatra'), icon: Globe },
+    { id: 'advanced' as SettingsSection, label: __('Advanced', 'yatra'), icon: Shield },
   ];
 
   // Helper component for section divider
@@ -2179,13 +2179,13 @@ const Settings: React.FC = () => {
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Company Information', 'Company Information')}
+                {__('Company Information', 'yatra')}
               </h3>
               <div className="space-y-4">
                 <FormField
                   id="company_name"
-                  label={__('Company Name', 'Company Name')}
-                  description={__('Your travel agency or company name', 'Your travel agency or company name')}
+                  label={__('Company Name', 'yatra')}
+                  description={__('Your travel agency or company name', 'yatra')}
                   required
                 >
                     <Input
@@ -2193,15 +2193,15 @@ const Settings: React.FC = () => {
                       name="company_name"
                       value={formData.company_name || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('Enter company name', 'Enter company name')}
+                      placeholder={__('Enter company name', 'yatra')}
                     />
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     id="company_email"
-                    label={__('Company Email', 'Company Email')}
-                    description={__('Primary contact email address', 'Primary contact email address')}
+                    label={__('Company Email', 'yatra')}
+                    description={__('Primary contact email address', 'yatra')}
                     required
                   >
                     <Input
@@ -2210,63 +2210,63 @@ const Settings: React.FC = () => {
                       type="email"
                       value={formData.company_email || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('company@example.com', 'company@example.com')}
+                      placeholder={__('company@example.com', 'yatra')}
                     />
                   </FormField>
 
                   <FormField
                     id="company_phone"
-                    label={__('Company Phone', 'Company Phone')}
-                    description={__('Primary contact phone number', 'Primary contact phone number')}
+                    label={__('Company Phone', 'yatra')}
+                    description={__('Primary contact phone number', 'yatra')}
                   >
                     <Input
                       id="company_phone"
                       name="company_phone"
                       value={formData.company_phone || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('+1-234-567-8900', '+1-234-567-8900')}
+                      placeholder={__('+1-234-567-8900', 'yatra')}
                     />
                   </FormField>
                 </div>
 
                 <FormField
                   id="company_address"
-                  label={__('Street Address', 'Street Address')}
-                  description={__('Street address of your company', 'Street address of your company')}
+                  label={__('Street Address', 'yatra')}
+                  description={__('Street address of your company', 'yatra')}
                 >
                     <Input
                       id="company_address"
                       name="company_address"
                       value={formData.company_address || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('123 Main Street', '123 Main Street')}
+                      placeholder={__('123 Main Street', 'yatra')}
                     />
                 </FormField>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     id="company_city"
-                    label={__('City', 'City')}
+                    label={__('City', 'yatra')}
                   >
                     <Input
                       id="company_city"
                       name="company_city"
                       value={formData.company_city || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('City', 'City')}
+                      placeholder={__('City', 'yatra')}
                     />
                   </FormField>
 
                   <FormField
                     id="company_state"
-                    label={__('State/Province', 'State/Province')}
+                    label={__('State/Province', 'yatra')}
                   >
                     <Input
                       id="company_state"
                       name="company_state"
                       value={formData.company_state || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('State or Province', 'State or Province')}
+                      placeholder={__('State or Province', 'yatra')}
                     />
                   </FormField>
                 </div>
@@ -2274,35 +2274,35 @@ const Settings: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
                     id="company_country"
-                    label={__('Country', 'Country')}
+                    label={__('Country', 'yatra')}
                   >
                     <Input
                       id="company_country"
                       name="company_country"
                       value={formData.company_country || ''}
                       onChange={handleFieldChange}
-                      placeholder={__('Country', 'Country')}
+                      placeholder={__('Country', 'yatra')}
                     />
                   </FormField>
 
                   <FormField
                     id="company_zip"
-                    label={__('ZIP/Postal Code', 'ZIP/Postal Code')}
+                    label={__('ZIP/Postal Code', 'yatra')}
                   >
                     <Input
                       id="company_zip"
                       value={formData.company_zip}
                       name="company_zip"
 onChange={handleFieldChange}
-                      placeholder={__('ZIP Code', 'ZIP Code')}
+                      placeholder={__('ZIP Code', 'yatra')}
                     />
                   </FormField>
                 </div>
 
                 <FormField
                   id="company_website"
-                  label={__('Website URL', 'Website URL')}
-                  description={__('Your company website address', 'Your company website address')}
+                  label={__('Website URL', 'yatra')}
+                  description={__('Your company website address', 'yatra')}
                 >
                   <Input
                     id="company_website"
@@ -2310,20 +2310,20 @@ onChange={handleFieldChange}
                     value={formData.company_website}
                     name="company_website"
 onChange={handleFieldChange}
-                    placeholder={__('https://example.com', 'https://example.com')}
+                    placeholder={__('https://example.com', 'yatra')}
                   />
                 </FormField>
               </div>
             </div>
 
-            <SectionDivider title={__('Regional Settings', 'Regional Settings')} />
+            <SectionDivider title={__('Regional Settings', 'yatra')} />
 
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <FormField
                   id="timezone"
-                  label={__('Timezone', 'Timezone')}
-                  description={__('Select your local timezone', 'Select your local timezone')}
+                  label={__('Timezone', 'yatra')}
+                  description={__('Select your local timezone', 'yatra')}
                 >
                   <Select
                     id="timezone"
@@ -2331,10 +2331,10 @@ onChange={handleFieldChange}
                     name="timezone"
 onChange={handleFieldChange}
                   >
-                    <option value="UTC">{__('UTC', 'UTC')}</option>
-                    <option value="America/New_York">{__('America/New_York', 'America/New_York')}</option>
-                    <option value="Europe/London">{__('Europe/London', 'Europe/London')}</option>
-                    <option value="Asia/Kathmandu">{__('Asia/Kathmandu', 'Asia/Kathmandu')}</option>
+                    <option value="UTC">{__('UTC', 'yatra')}</option>
+                    <option value="America/New_York">{__('America/New_York', 'yatra')}</option>
+                    <option value="Europe/London">{__('Europe/London', 'yatra')}</option>
+                    <option value="Asia/Kathmandu">{__('Asia/Kathmandu', 'yatra')}</option>
                     <option value="Asia/Dubai">Asia/Dubai</option>
                     <option value="Asia/Kolkata">Asia/Kolkata</option>
                   </Select>
@@ -2342,8 +2342,8 @@ onChange={handleFieldChange}
 
                 <FormField
                   id="date_format"
-                  label={__('Date Format', 'Date Format')}
-                  description={__('How dates are displayed', 'How dates are displayed')}
+                  label={__('Date Format', 'yatra')}
+                  description={__('How dates are displayed', 'yatra')}
                 >
                   <Select
                     id="date_format"
@@ -2370,8 +2370,8 @@ onChange={handleFieldChange}
 
                 <FormField
                   id="time_format"
-                  label={__('Time Format', 'Time Format')}
-                  description={__('12-hour or 24-hour format', '12-hour or 24-hour format')}
+                  label={__('Time Format', 'yatra')}
+                  description={__('12-hour or 24-hour format', 'yatra')}
                 >
                   <Select
                     id="time_format"
@@ -2387,8 +2387,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="language"
-                label={__('Default Language', 'Default Language')}
-                description={__('Default language for your website', 'Default language for your website')}
+                label={__('Default Language', 'yatra')}
+                description={__('Default language for your website', 'yatra')}
               >
                 <Select
                   id="language"
@@ -2396,11 +2396,11 @@ onChange={handleFieldChange}
                   name="language"
 onChange={handleFieldChange}
                 >
-                  <option value="en">{__('English', 'English')}</option>
-                  <option value="es">{__('Spanish', 'Spanish')}</option>
-                  <option value="fr">{__('French', 'French')}</option>
-                  <option value="de">{__('German', 'German')}</option>
-                  <option value="ne">{__('Nepali', 'Nepali')}</option>
+                  <option value="en">{__('English', 'yatra')}</option>
+                  <option value="es">{__('Spanish', 'yatra')}</option>
+                  <option value="fr">{__('French', 'yatra')}</option>
+                  <option value="de">{__('German', 'yatra')}</option>
+                  <option value="ne">{__('Nepali', 'yatra')}</option>
                 </Select>
               </FormField>
             </div>
@@ -2421,13 +2421,13 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Flexible Payments', 'Flexible Payments')}
+                {__('Flexible Payments', 'yatra')}
                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
                   PRO
                 </span>
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                {__('Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later.', 'Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later.')}
+                {__('Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later.', 'yatra')}
               </p>
               
               {(window as any).yatraAdmin?.isProActive && (window as any).yatraAdmin?.flexiblePaymentsEnabled ? (
@@ -2443,10 +2443,10 @@ onChange={handleFieldChange}
                   />
                   <div className="flex-1">
                     <Label htmlFor="partial_payment" className="font-medium cursor-pointer">
-                      {__('Enable Partial Payment', 'Enable Partial Payment')}
+                      {__('Enable Partial Payment', 'yatra')}
                     </Label>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {__('Allow customers to pay a portion now and the rest later', 'Allow customers to pay a portion now and the rest later')}
+                      {__('Allow customers to pay a portion now and the rest later', 'yatra')}
                     </p>
                   </div>
                 </div>
@@ -2454,8 +2454,8 @@ onChange={handleFieldChange}
                 {formData.partial_payment && (
                   <FormField
                     id="partial_payment_percentage"
-                    label={__('Partial Payment Percentage', 'Partial Payment Percentage')}
-                    description={__('Percentage of total amount required for partial payment', 'Percentage of total amount required for partial payment')}
+                    label={__('Partial Payment Percentage', 'yatra')}
+                    description={__('Percentage of total amount required for partial payment', 'yatra')}
                   >
                     <div className="flex items-center gap-2">
                       <Input
@@ -2484,10 +2484,10 @@ onChange={handleFieldChange}
                   />
                   <div className="flex-1">
                     <Label htmlFor="deposit_required" className="font-medium cursor-pointer">
-                      {__('Require Deposit', 'Require Deposit')}
+                      {__('Require Deposit', 'yatra')}
                     </Label>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                      {__('Require a deposit to confirm bookings', 'Require a deposit to confirm bookings')}
+                      {__('Require a deposit to confirm bookings', 'yatra')}
                     </p>
                   </div>
                 </div>
@@ -2495,8 +2495,8 @@ onChange={handleFieldChange}
                 {formData.deposit_required && (
                   <FormField
                     id="deposit_percentage"
-                    label={__('Deposit Percentage', 'Deposit Percentage')}
-                    description={__('Percentage of total amount required as deposit', 'Percentage of total amount required as deposit')}
+                    label={__('Deposit Percentage', 'yatra')}
+                    description={__('Percentage of total amount required as deposit', 'yatra')}
                   >
                     <div className="flex items-center gap-2">
                       <Input
@@ -2524,10 +2524,10 @@ onChange={handleFieldChange}
                     </div>
                     <div className="flex-1">
                       <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
-                        {__('Upgrade to Pro for Flexible Payments', 'Upgrade to Pro for Flexible Payments')}
+                        {__('Upgrade to Pro for Flexible Payments', 'yatra')}
                       </h4>
                       <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
-                        {__('Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.', 'Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.')}
+                        {__('Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.', 'yatra')}
                       </p>
                       <a
                         href="https://wpyatra.com/pricing?module=flexible-payments"
@@ -2535,7 +2535,7 @@ onChange={handleFieldChange}
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400"
                       >
-                        {__('Learn More', 'Learn More')}
+                        {__('Learn More', 'yatra')}
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
@@ -2558,17 +2558,17 @@ onChange={handleFieldChange}
               />
               <div className="flex-1">
                 <Label htmlFor="auto_confirm_pay_later" className="font-medium cursor-pointer">
-                  {__('Auto-confirm "Pay Later" Bookings', 'Auto-confirm "Pay Later" Bookings')}
+                  {__('Auto-confirm "Pay Later" Bookings', 'yatra')}
                 </Label>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                  {__('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.')}
+                  {__('Automatically confirm bookings when "Book Now, Pay Later" is selected. If disabled, bookings will remain pending until payment is received.', 'yatra')}
                 </p>
               </div>
             </div>
           </div>
 
           <div>
-            <SectionDivider title={__('Payment Gateways', 'Payment Gateways')} />
+            <SectionDivider title={__('Payment Gateways', 'yatra')} />
 
             {/* Global Test Mode Toggle */}
             <div className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg mb-4">
@@ -2582,22 +2582,22 @@ onChange={handleFieldChange}
               />
               <div className="flex-1">
                 <Label htmlFor="payment_test_mode" className="font-semibold cursor-pointer text-amber-800 dark:text-amber-200">
-                  {__('Test Mode', 'Test Mode')}
+                  {__('Test Mode', 'yatra')}
                 </Label>
                 <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
-                  {__('Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments.', 'Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments.')}
+                  {__('Enable test/sandbox mode for all payment gateways. Use test API keys for development and testing. Disable this for live payments.', 'yatra')}
                 </p>
               </div>
               {formData.payment_test_mode && (
                 <span className="px-2 py-1 text-xs font-semibold bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200 rounded">
-                  {__('TEST', 'TEST')}
+                  {__('TEST', 'yatra')}
                 </span>
               )}
             </div>
 
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-1">
               <Info className="w-3.5 h-3.5" />
-              {__('Drag and drop to reorder gateways. Use arrows for precise positioning.', 'Drag and drop to reorder gateways. Use arrows for precise positioning.')}
+              {__('Drag and drop to reorder gateways. Use arrows for precise positioning.', 'yatra')}
             </p>
 
             <div className="space-y-3">
@@ -2641,7 +2641,7 @@ onChange={handleFieldChange}
                               onClick={() => moveGatewayUp(gatewayId)}
                               disabled={index === 0}
                               className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                              title={__('Move up', 'Move up')}
+                              title={__('Move up', 'yatra')}
                             >
                               <ArrowUp className="w-3 h-3" />
                             </button>
@@ -2650,7 +2650,7 @@ onChange={handleFieldChange}
                               onClick={() => moveGatewayDown(gatewayId)}
                               disabled={index === gatewayOrder.length - 1}
                               className="p-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                              title={__('Move down', 'Move down')}
+                              title={__('Move down', 'yatra')}
                             >
                               <ArrowDown className="w-3 h-3" />
                             </button>
@@ -2672,7 +2672,7 @@ onChange={handleFieldChange}
                                 {gateway.title}
                                 {config.enabled && (
                                   <span className="text-xs font-normal px-1.5 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded">
-                                    {__('Active', 'Active')}
+                                    {__('Active', 'yatra')}
                                   </span>
                                 )}
                                 {formData.payment_test_mode && gateway.sandbox_url && (
@@ -2683,7 +2683,7 @@ onChange={handleFieldChange}
                                     className="text-xs font-normal px-1.5 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded hover:bg-amber-200 dark:hover:bg-amber-800/40 transition-colors"
                                     onClick={(e) => e.stopPropagation()}
                                   >
-                                    {__('Sandbox Docs →', 'Sandbox Docs →')}
+                                    {__('Sandbox Docs →', 'yatra')}
                                   </a>
                                 )}
                               </CardTitle>
@@ -2713,8 +2713,8 @@ onChange={handleFieldChange}
                           <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md mb-4">
                             <p className="text-sm text-blue-700 dark:text-blue-300">
                               {gateway.id === 'pay_later' 
-                                ? __('Allow customers to book now and pay later. Payment must be completed before the trip date.', 'Allow customers to book now and pay later. Payment must be completed before the trip date.')
-                                : __('This is an offline payment method. Customers will be shown these details after booking.', 'This is an offline payment method. Customers will be shown these details after booking.')
+                                ? __('Allow customers to book now and pay later. Payment must be completed before the trip date.', 'yatra')
+                                : __('This is an offline payment method. Customers will be shown these details after booking.', 'yatra')
                               }
                             </p>
                           </div>
@@ -2723,20 +2723,20 @@ onChange={handleFieldChange}
                         {/* Frontend Display Settings */}
                         <div className="space-y-4 pb-4 border-b border-gray-200 dark:border-gray-700">
                           <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {__('Frontend Display Settings', 'Frontend Display Settings')}
+                            {__('Frontend Display Settings', 'yatra')}
                           </h4>
                           
                           <FormField
                             id={`${gatewayId}_icon`}
-                            label={__('Gateway Icon', 'Gateway Icon')}
-                            description={__('Icon URL or path displayed on the booking page', 'Icon URL or path displayed on the booking page')}
+                            label={__('Gateway Icon', 'yatra')}
+                            description={__('Icon URL or path displayed on the booking page', 'yatra')}
                           >
                             <div className="flex items-center gap-3">
                               <Input
                                 type="text"
                                 value={config.icon || gateway.icon || ''}
                                 onChange={(e) => handleGatewayConfigChange(gatewayId, 'icon', e.target.value)}
-                                placeholder={__('Enter icon URL or leave empty to use default', 'Enter icon URL or leave empty to use default')}
+                                placeholder={__('Enter icon URL or leave empty to use default', 'yatra')}
                                 className="flex-1"
                               />
                               {config.icon || gateway.icon ? (
@@ -2754,26 +2754,26 @@ onChange={handleFieldChange}
                           
                           <FormField
                             id={`${gatewayId}_title`}
-                            label={__('Gateway Title', 'Gateway Title')}
-                            description={__('Title displayed on the booking page', 'Title displayed on the booking page')}
+                            label={__('Gateway Title', 'yatra')}
+                            description={__('Title displayed on the booking page', 'yatra')}
                           >
                             <Input
                               type="text"
                               value={config.title || gateway.title || ''}
                               onChange={(e) => handleGatewayConfigChange(gatewayId, 'title', e.target.value)}
-                              placeholder={gateway.title || __('Enter gateway title', 'Enter gateway title')}
+                              placeholder={gateway.title || __('Enter gateway title', 'yatra')}
                             />
                           </FormField>
                           
                           <FormField
                             id={`${gatewayId}_description`}
-                            label={__('Gateway Description', 'Gateway Description')}
-                            description={__('Description displayed below the title on the booking page', 'Description displayed below the title on the booking page')}
+                            label={__('Gateway Description', 'yatra')}
+                            description={__('Description displayed below the title on the booking page', 'yatra')}
                           >
                             <textarea
                               value={config.description || gateway.description || ''}
                               onChange={(e) => handleGatewayConfigChange(gatewayId, 'description', e.target.value)}
-                              placeholder={gateway.description || __('Enter gateway description', 'Enter gateway description')}
+                              placeholder={gateway.description || __('Enter gateway description', 'yatra')}
                               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                               rows={2}
                             />
@@ -2847,9 +2847,9 @@ onChange={handleFieldChange}
                                 : ['card', 'google_pay', 'apple_pay'];
 
                             const methodOptions: MultiSelectOption[] = [
-                              { value: 'card', label: __('Card (Stripe Elements)', 'Card (Stripe Elements)') },
-                              { value: 'google_pay', label: __('Google Pay (Payment Request Button)', 'Google Pay (Payment Request Button)') },
-                              { value: 'apple_pay', label: __('Apple Pay (Payment Request Button)', 'Apple Pay (Payment Request Button)') },
+                              { value: 'card', label: __('Card (Stripe Elements)', 'yatra') },
+                              { value: 'google_pay', label: __('Google Pay (Payment Request Button)', 'yatra') },
+                              { value: 'apple_pay', label: __('Apple Pay (Payment Request Button)', 'yatra') },
                             ];
 
                             const handleStripeMethodsChange = (values: (string | number)[]) => {
@@ -2867,11 +2867,11 @@ onChange={handleFieldChange}
                                     value={selectedValues}
                                     onChange={handleStripeMethodsChange}
                                     options={methodOptions}
-                                    placeholder={__('Select payment methods...', 'Select payment methods...')}
+                                    placeholder={__('Select payment methods...', 'yatra')}
                                   />
                                 </FormField>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                                  {__('Apple Pay requires domain verification inside your Stripe Dashboard.', 'Apple Pay requires domain verification inside your Stripe Dashboard.')}
+                                  {__('Apple Pay requires domain verification inside your Stripe Dashboard.', 'yatra')}
                                   {(field.help_url || field.help_url_test || field.help_url_live) && (
                                     <a
                                       href={formData.payment_test_mode 
@@ -2881,7 +2881,7 @@ onChange={handleFieldChange}
                                       rel="noopener noreferrer"
                                       className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent"
                                     >
-                                      {__('Learn more →', 'Learn more →')}
+                                      {__('Learn more →', 'yatra')}
                                     </a>
                                   )}
                                 </p>
@@ -2918,7 +2918,7 @@ onChange={handleFieldChange}
                                     value={selectedValues}
                                     onChange={handleMultiSelectChange}
                                     options={methodOptions}
-                                    placeholder={__('Select options...', 'Select options...')}
+                                    placeholder={__('Select options...', 'yatra')}
                                   />
                                 </FormField>
                                 {field.help_text && (
@@ -2988,7 +2988,7 @@ onChange={handleFieldChange}
                                       rel="noopener noreferrer"
                                       className="ml-1 border-b border-blue-600 dark:border-blue-400 hover:border-transparent transition-colors"
                                     >
-                                      {__('Learn more →', 'Learn more →')}
+                                      {__('Learn more →', 'yatra')}
                                     </a>
                                   )}
                                 </p>
@@ -3007,7 +3007,7 @@ onChange={handleFieldChange}
               {/* Show message if no gateways loaded */}
               {(!gatewayDefinitions || Object.keys(gatewayDefinitions).length === 0) && (
                 <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <p>{__('Loading payment gateways...', 'Loading payment gateways...')}</p>
+                  <p>{__('Loading payment gateways...', 'yatra')}</p>
                 </div>
               )}
             </div>
@@ -3031,10 +3031,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="booking_confirmation" className="font-medium cursor-pointer">
-                    {__('Enable Booking Confirmation', 'Enable Booking Confirmation')}
+                    {__('Enable Booking Confirmation', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Send confirmation emails when bookings are made', 'Send confirmation emails when bookings are made')}
+                    {__('Send confirmation emails when bookings are made', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3050,10 +3050,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="auto_confirm_bookings" className="font-medium cursor-pointer">
-                    {__('Auto-Confirm Bookings', 'Auto-Confirm Bookings')}
+                    {__('Auto-Confirm Bookings', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Automatically confirm bookings without manual approval', 'Automatically confirm bookings without manual approval')}
+                    {__('Automatically confirm bookings without manual approval', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3069,10 +3069,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="require_login" className="font-medium cursor-pointer">
-                    {__('Require Login for Booking', 'Require Login for Booking')}
+                    {__('Require Login for Booking', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Customers must create an account to make bookings', 'Customers must create an account to make bookings')}
+                    {__('Customers must create an account to make bookings', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3088,22 +3088,22 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="allow_guest_checkout" className="font-medium cursor-pointer">
-                    {__('Allow Guest Checkout', 'Allow Guest Checkout')}
+                    {__('Allow Guest Checkout', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Allow customers to book without creating an account', 'Allow customers to book without creating an account')}
+                    {__('Allow customers to book without creating an account', 'yatra')}
                   </p>
                 </div>
               </div>
             </div>
 
-            <SectionDivider title={__('Cancellation & Refund Policy', 'Cancellation & Refund Policy')} />
+            <SectionDivider title={__('Cancellation & Refund Policy', 'yatra')} />
 
             <div className="space-y-4">
               <FormField
                 id="cancellation_policy"
-                label={__('Cancellation Policy', 'Cancellation Policy')}
-                description={__('What happens when a booking is cancelled', 'What happens when a booking is cancelled')}
+                label={__('Cancellation Policy', 'yatra')}
+                description={__('What happens when a booking is cancelled', 'yatra')}
               >
                 <Select
                   id="cancellation_policy"
@@ -3111,16 +3111,16 @@ onChange={handleFieldChange}
                   name='cancellation_policy'
                       onChange={handleFieldChange}
                 >
-                  <option value="no_refund">{__('No Refund', 'No Refund')}</option>
-                  <option value="full_refund">{__('Full Refund', 'Full Refund')}</option>
-                  <option value="partial_refund">{__('Partial Refund', 'Partial Refund')}</option>
+                  <option value="no_refund">{__('No Refund', 'yatra')}</option>
+                  <option value="full_refund">{__('Full Refund', 'yatra')}</option>
+                  <option value="partial_refund">{__('Partial Refund', 'yatra')}</option>
                 </Select>
               </FormField>
 
               <FormField
                 id="cancellation_days"
-                label={__('Cancellation Days Before Departure', 'Cancellation Days Before Departure')}
-                description={__('Number of days before departure when cancellation is allowed', 'Number of days before departure when cancellation is allowed')}
+                label={__('Cancellation Days Before Departure', 'yatra')}
+                description={__('Number of days before departure when cancellation is allowed', 'yatra')}
               >
                 <Input
                   id="cancellation_days"
@@ -3134,8 +3134,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="refund_policy"
-                label={__('Refund Policy', 'Refund Policy')}
-                description={__('Detailed refund policy description shown to customers', 'Detailed refund policy description shown to customers')}
+                label={__('Refund Policy', 'yatra')}
+                description={__('Detailed refund policy description shown to customers', 'yatra')}
               >
                 <textarea
                   id="refund_policy"
@@ -3144,18 +3144,18 @@ onChange={handleFieldChange}
                       onChange={handleFieldChange}
                   rows={4}
                   className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
-                  placeholder={__('Enter your refund policy details...', 'Enter your refund policy details...')}
+                  placeholder={__('Enter your refund policy details...', 'yatra')}
                 />
               </FormField>
             </div>
 
-            <SectionDivider title={__('Booking Expiry & Reminders', 'Booking Expiry & Reminders')} />
+            <SectionDivider title={__('Booking Expiry & Reminders', 'yatra')} />
 
             <div className="space-y-4">
               <FormField
                 id="booking_expiry_hours"
-                label={__('Booking Expiry Hours', 'Booking Expiry Hours')}
-                description={__('Hours before unpaid bookings expire and are cancelled', 'Hours before unpaid bookings expire and are cancelled')}
+                label={__('Booking Expiry Hours', 'yatra')}
+                description={__('Hours before unpaid bookings expire and are cancelled', 'yatra')}
               >
                 <Input
                   id="booking_expiry_hours"
@@ -3169,8 +3169,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="booking_reminder_days"
-                label={__('Booking Reminder Days', 'Booking Reminder Days')}
-                description={__('Send reminder emails this many days before departure', 'Send reminder emails this many days before departure')}
+                label={__('Booking Reminder Days', 'yatra')}
+                description={__('Send reminder emails this many days before departure', 'yatra')}
               >
                 <Input
                   id="booking_reminder_days"
@@ -3190,13 +3190,13 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Email Configuration', 'Email Configuration')}
+                {__('Email Configuration', 'yatra')}
               </h3>
               <div className="space-y-4">
                 <FormField
                   id="admin_email"
-                  label={__('Admin Email', 'Admin Email')}
-                  description={__('Email address to receive admin notifications', 'Email address to receive admin notifications')}
+                  label={__('Admin Email', 'yatra')}
+                  description={__('Email address to receive admin notifications', 'yatra')}
                   required
                 >
                   <Input
@@ -3205,14 +3205,14 @@ onChange={handleFieldChange}
                     value={formData.admin_email}
                     name='admin_email'
                       onChange={handleFieldChange}
-                    placeholder={__('admin@example.com', 'admin@example.com')}
+                    placeholder={__('admin@example.com', 'yatra')}
                   />
                 </FormField>
 
                 <FormField
                   id="from_email"
-                  label={__('From Email', 'From Email')}
-                  description={__('Email address used as sender for customer emails', 'Email address used as sender for customer emails')}
+                  label={__('From Email', 'yatra')}
+                  description={__('Email address used as sender for customer emails', 'yatra')}
                   required
                 >
                   <Input
@@ -3221,34 +3221,34 @@ onChange={handleFieldChange}
                     value={formData.from_email}
                     name='from_email'
                       onChange={handleFieldChange}
-                    placeholder={__('noreply@example.com', 'noreply@example.com')}
+                    placeholder={__('noreply@example.com', 'yatra')}
                   />
                 </FormField>
 
                 <FormField
                   id="from_name"
-                  label={__('From Name', 'From Name')}
-                  description={__('Name displayed as sender in customer emails', 'Name displayed as sender in customer emails')}
+                  label={__('From Name', 'yatra')}
+                  description={__('Name displayed as sender in customer emails', 'yatra')}
                 >
                   <Input
                     id="from_name"
                     value={formData.from_name}
                     name='from_name'
                       onChange={handleFieldChange}
-                    placeholder={__('Your Company Name', 'Your Company Name')}
+                    placeholder={__('Your Company Name', 'yatra')}
                   />
                 </FormField>
               </div>
             </div>
 
-            <SectionDivider title={__('Email Templates', 'Email Templates')} />
+            <SectionDivider title={__('Email Templates', 'yatra')} />
 
             <div className="space-y-3">
               {[
-                { id: 'email_template_booking', label: __('Booking Confirmation Email', 'Booking Confirmation Email'), desc: __('Send email when booking is confirmed', 'Send email when booking is confirmed') },
-                { id: 'email_template_confirmation', label: __('Payment Confirmation Email', 'Payment Confirmation Email'), desc: __('Send email when payment is received', 'Send email when payment is received') },
-                { id: 'email_template_cancellation', label: __('Cancellation Email', 'Cancellation Email'), desc: __('Send email when booking is cancelled', 'Send email when booking is cancelled') },
-                { id: 'email_template_reminder', label: __('Booking Reminder Email', 'Booking Reminder Email'), desc: __('Send reminder email before departure', 'Send reminder email before departure') },
+                { id: 'email_template_booking', label: __('Booking Confirmation Email', 'yatra'), desc: __('Send email when booking is confirmed', 'yatra') },
+                { id: 'email_template_confirmation', label: __('Payment Confirmation Email', 'yatra'), desc: __('Send email when payment is received', 'yatra') },
+                { id: 'email_template_cancellation', label: __('Cancellation Email', 'yatra'), desc: __('Send email when booking is cancelled', 'yatra') },
+                { id: 'email_template_reminder', label: __('Booking Reminder Email', 'yatra'), desc: __('Send reminder email before departure', 'yatra') },
               ].map((template) => (
                 <div key={template.id} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                   <input
@@ -3269,7 +3269,7 @@ onChange={handleFieldChange}
               ))}
             </div>
 
-            <SectionDivider title={__('SMTP Settings (Optional)', 'SMTP Settings (Optional)')} />
+            <SectionDivider title={__('SMTP Settings (Optional)', 'yatra')} />
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -3283,10 +3283,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="smtp_enabled" className="font-medium cursor-pointer">
-                    {__('Enable SMTP', 'Enable SMTP')}
+                    {__('Enable SMTP', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Use custom SMTP server instead of default WordPress mail', 'Use custom SMTP server instead of default WordPress mail')}
+                    {__('Use custom SMTP server instead of default WordPress mail', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3296,8 +3296,8 @@ onChange={handleFieldChange}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       id="smtp_host"
-                      label={__('SMTP Host', 'SMTP Host')}
-                      description={__('SMTP server address', 'SMTP server address')}
+                      label={__('SMTP Host', 'yatra')}
+                      description={__('SMTP server address', 'yatra')}
                     >
                       <Input
                         id="smtp_host"
@@ -3310,8 +3310,8 @@ onChange={handleFieldChange}
 
                     <FormField
                       id="smtp_port"
-                      label={__('SMTP Port', 'SMTP Port')}
-                      description={__('SMTP server port (usually 587 or 465)', 'SMTP server port (usually 587 or 465)')}
+                      label={__('SMTP Port', 'yatra')}
+                      description={__('SMTP server port (usually 587 or 465)', 'yatra')}
                     >
                       <Input
                         id="smtp_port"
@@ -3326,8 +3326,8 @@ onChange={handleFieldChange}
 
                   <FormField
                     id="smtp_encryption"
-                    label={__('Encryption', 'Encryption')}
-                    description={__('Connection encryption type', 'Connection encryption type')}
+                    label={__('Encryption', 'yatra')}
+                    description={__('Connection encryption type', 'yatra')}
                   >
                     <Select
                       id="smtp_encryption"
@@ -3335,30 +3335,30 @@ onChange={handleFieldChange}
                       name='smtp_encryption'
                       onChange={handleFieldChange}
                     >
-                      <option value="tls">{__('TLS', 'TLS')}</option>
-                      <option value="ssl">{__('SSL', 'SSL')}</option>
-                      <option value="none">{__('None', 'None')}</option>
+                      <option value="tls">{__('TLS', 'yatra')}</option>
+                      <option value="ssl">{__('SSL', 'yatra')}</option>
+                      <option value="none">{__('None', 'yatra')}</option>
                     </Select>
                   </FormField>
 
                   <FormField
                     id="smtp_username"
-                    label={__('SMTP Username', 'SMTP Username')}
-                    description={__('Your SMTP account username', 'Your SMTP account username')}
+                    label={__('SMTP Username', 'yatra')}
+                    description={__('Your SMTP account username', 'yatra')}
                   >
                     <Input
                       id="smtp_username"
                       value={formData.smtp_username}
                       name='smtp_username'
                       onChange={handleFieldChange}
-                      placeholder={__('your-email@gmail.com', 'your-email@gmail.com')}
+                      placeholder={__('your-email@gmail.com', 'yatra')}
                     />
                   </FormField>
 
                   <FormField
                     id="smtp_password"
-                    label={__('SMTP Password', 'SMTP Password')}
-                    description={__('Your SMTP account password or app password', 'Your SMTP account password or app password')}
+                    label={__('SMTP Password', 'yatra')}
+                    description={__('Your SMTP account password or app password', 'yatra')}
                   >
                     <Input
                       id="smtp_password"
@@ -3366,7 +3366,7 @@ onChange={handleFieldChange}
                       value={formData.smtp_password}
                       name='smtp_password'
                       onChange={handleFieldChange}
-                      placeholder={__('Enter SMTP password', 'Enter SMTP password')}
+                      placeholder={__('Enter SMTP password', 'yatra')}
                     />
                   </FormField>
                 </>
@@ -3381,8 +3381,8 @@ onChange={handleFieldChange}
             <div className="space-y-4">
               <FormField
                 id="default_trip_status"
-                label={__('Default Trip Status', 'Default Trip Status')}
-                description={__('Status assigned to new trips by default', 'Status assigned to new trips by default')}
+                label={__('Default Trip Status', 'yatra')}
+                description={__('Status assigned to new trips by default', 'yatra')}
               >
                 <Select
                   id="default_trip_status"
@@ -3390,9 +3390,9 @@ onChange={handleFieldChange}
                   name='default_trip_status'
                       onChange={handleFieldChange}
                 >
-                  <option value="draft">{__('Draft', 'Draft')}</option>
-                  <option value="active">{__('Active', 'Active')}</option>
-                  <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                  <option value="draft">{__('Draft', 'yatra')}</option>
+                  <option value="active">{__('Active', 'yatra')}</option>
+                  <option value="inactive">{__('Inactive', 'yatra')}</option>
                 </Select>
               </FormField>
 
@@ -3407,10 +3407,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="require_availability" className="font-medium cursor-pointer">
-                    {__('Require Availability Check', 'Require Availability Check')}
+                    {__('Require Availability Check', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Check trip availability before allowing bookings', 'Check trip availability before allowing bookings')}
+                    {__('Check trip availability before allowing bookings', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3418,8 +3418,8 @@ onChange={handleFieldChange}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   id="max_group_size"
-                  label={__('Maximum Group Size', 'Maximum Group Size')}
-                  description={__('Maximum number of participants per booking', 'Maximum number of participants per booking')}
+                  label={__('Maximum Group Size', 'yatra')}
+                  description={__('Maximum number of participants per booking', 'yatra')}
                 >
                   <Input
                     id="max_group_size"
@@ -3433,8 +3433,8 @@ onChange={handleFieldChange}
 
                 <FormField
                   id="min_group_size"
-                  label={__('Minimum Group Size', 'Minimum Group Size')}
-                  description={__('Minimum number of participants required', 'Minimum number of participants required')}
+                  label={__('Minimum Group Size', 'yatra')}
+                  description={__('Minimum number of participants required', 'yatra')}
                 >
                   <Input
                     id="min_group_size"
@@ -3449,8 +3449,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="booking_advance_days"
-                label={__('Maximum Booking Advance Days', 'Maximum Booking Advance Days')}
-                description={__('How many days in advance customers can book', 'How many days in advance customers can book')}
+                label={__('Maximum Booking Advance Days', 'yatra')}
+                description={__('How many days in advance customers can book', 'yatra')}
               >
                 <Input
                   id="booking_advance_days"
@@ -3473,10 +3473,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="allow_custom_dates" className="font-medium cursor-pointer">
-                    {__('Allow Custom Dates', 'Allow Custom Dates')}
+                    {__('Allow Custom Dates', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Allow customers to request custom departure dates', 'Allow customers to request custom departure dates')}
+                    {__('Allow customers to request custom departure dates', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3492,10 +3492,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="require_minimum_participants" className="font-medium cursor-pointer">
-                    {__('Require Minimum Participants', 'Require Minimum Participants')}
+                    {__('Require Minimum Participants', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Trip requires minimum participants to proceed', 'Trip requires minimum participants to proceed')}
+                    {__('Trip requires minimum participants to proceed', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3503,8 +3503,8 @@ onChange={handleFieldChange}
               {formData.require_minimum_participants && (
                 <FormField
                   id="minimum_participants"
-                  label={__('Minimum Participants', 'Minimum Participants')}
-                  description={__('Minimum number of participants required for trip to proceed', 'Minimum number of participants required for trip to proceed')}
+                  label={__('Minimum Participants', 'yatra')}
+                  description={__('Minimum number of participants required for trip to proceed', 'yatra')}
                 >
                   <Input
                     id="minimum_participants"
@@ -3535,18 +3535,18 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="customer_registration" className="font-medium cursor-pointer">
-                    {__('Enable Customer Registration', 'Enable Customer Registration')}
+                    {__('Enable Customer Registration', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Allow customers to create accounts on your website', 'Allow customers to create accounts on your website')}
+                    {__('Allow customers to create accounts on your website', 'yatra')}
                   </p>
                 </div>
               </div>
 
               <FormField
                 id="customer_account_page"
-                label={__('Customer Account Page', 'Customer Account Page')}
-                description={__('URL slug for customer account page (e.g., /my-account)', 'URL slug for customer account page (e.g., /my-account)')}
+                label={__('Customer Account Page', 'yatra')}
+                description={__('URL slug for customer account page (e.g., /my-account)', 'yatra')}
               >
                 <div className="flex items-center gap-2">
                   <Input
@@ -3571,7 +3571,7 @@ onChange={handleFieldChange}
                         rel="noopener noreferrer"
                         className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 whitespace-nowrap border border-blue-300 dark:border-blue-600 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                       >
-                        {__('View Page', 'View Page')} →
+                        {__('View Page', 'yatra')} →
                       </a>
                     );
                   })()}
@@ -3589,10 +3589,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="require_email_verification" className="font-medium cursor-pointer">
-                    {__('Require Email Verification', 'Require Email Verification')}
+                    {__('Require Email Verification', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Customers must verify their email before account activation', 'Customers must verify their email before account activation')}
+                    {__('Customers must verify their email before account activation', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3608,20 +3608,20 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="customer_dashboard_enabled" className="font-medium cursor-pointer">
-                    {__('Enable Customer Dashboard', 'Enable Customer Dashboard')}
+                    {__('Enable Customer Dashboard', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Show dashboard with bookings and account information', 'Show dashboard with bookings and account information')}
+                    {__('Show dashboard with bookings and account information', 'yatra')}
                   </p>
                 </div>
               </div>
             </div>
 
-            <SectionDivider title={__('Customer Fields', 'Customer Fields')} />
+            <SectionDivider title={__('Customer Fields', 'yatra')} />
 
             <div className="space-y-2">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                {__('Select which fields to collect from customers during registration', 'Select which fields to collect from customers during registration')}
+                {__('Select which fields to collect from customers during registration', 'yatra')}
               </p>
               {['name', 'email', 'phone', 'address', 'city', 'country', 'date_of_birth'].map((field) => (
                 <div key={field} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -3661,10 +3661,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="enable_reviews" className="font-medium cursor-pointer">
-                    {__('Enable Reviews', 'Enable Reviews')}
+                    {__('Enable Reviews', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Allow customers to leave reviews and ratings', 'Allow customers to leave reviews and ratings')}
+                    {__('Allow customers to leave reviews and ratings', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3682,10 +3682,10 @@ onChange={handleFieldChange}
                     />
                     <div className="flex-1">
                       <Label htmlFor="require_booking" className="font-medium cursor-pointer">
-                        {__('Require Booking to Review', 'Require Booking to Review')}
+                        {__('Require Booking to Review', 'yatra')}
                       </Label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {__('Only customers who have booked can leave reviews', 'Only customers who have booked can leave reviews')}
+                        {__('Only customers who have booked can leave reviews', 'yatra')}
                       </p>
                     </div>
                   </div>
@@ -3701,10 +3701,10 @@ onChange={handleFieldChange}
                     />
                     <div className="flex-1">
                       <Label htmlFor="auto_approve_reviews" className="font-medium cursor-pointer">
-                        {__('Auto-Approve Reviews', 'Auto-Approve Reviews')}
+                        {__('Auto-Approve Reviews', 'yatra')}
                       </Label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {__('Automatically publish reviews without moderation', 'Automatically publish reviews without moderation')}
+                        {__('Automatically publish reviews without moderation', 'yatra')}
                       </p>
                     </div>
                   </div>
@@ -3720,18 +3720,18 @@ onChange={handleFieldChange}
                     />
                     <div className="flex-1">
                       <Label htmlFor="review_moderation" className="font-medium cursor-pointer">
-                        {__('Enable Review Moderation', 'Enable Review Moderation')}
+                        {__('Enable Review Moderation', 'yatra')}
                       </Label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {__('Manually approve reviews before they are published', 'Manually approve reviews before they are published')}
+                        {__('Manually approve reviews before they are published', 'yatra')}
                       </p>
                     </div>
                   </div>
 
                   <FormField
                     id="min_rating"
-                    label={__('Minimum Rating', 'Minimum Rating')}
-                    description={__('Lowest rating value allowed (1-5 stars)', 'Lowest rating value allowed (1-5 stars)')}
+                    label={__('Minimum Rating', 'yatra')}
+                    description={__('Lowest rating value allowed (1-5 stars)', 'yatra')}
                   >
                     <Select
                       id="min_rating"
@@ -3739,18 +3739,18 @@ onChange={handleFieldChange}
                       name='min_rating'
                       onChange={handleFieldChange}
                     >
-                      <option value="1">1 {__('Star', 'Star')}</option>
-                      <option value="2">2 {__('Stars', 'Stars')}</option>
-                      <option value="3">3 {__('Stars', 'Stars')}</option>
-                      <option value="4">4 {__('Stars', 'Stars')}</option>
-                      <option value="5">5 {__('Stars', 'Stars')}</option>
+                      <option value="1">1 {__('Star', 'yatra')}</option>
+                      <option value="2">2 {__('Stars', 'yatra')}</option>
+                      <option value="3">3 {__('Stars', 'yatra')}</option>
+                      <option value="4">4 {__('Stars', 'yatra')}</option>
+                      <option value="5">5 {__('Stars', 'yatra')}</option>
                     </Select>
                   </FormField>
 
                   <FormField
                     id="review_reminder_days"
-                    label={__('Review Reminder Days', 'Review Reminder Days')}
-                    description={__('Send review reminder email this many days after trip completion', 'Send review reminder email this many days after trip completion')}
+                    label={__('Review Reminder Days', 'yatra')}
+                    description={__('Send review reminder email this many days after trip completion', 'yatra')}
                   >
                     <Input
                       id="review_reminder_days"
@@ -3782,10 +3782,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="enable_tax" className="font-medium cursor-pointer">
-                    {__('Enable Tax', 'Enable Tax')}
+                    {__('Enable Tax', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Add tax to booking prices', 'Add tax to booking prices')}
+                    {__('Add tax to booking prices', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3794,8 +3794,8 @@ onChange={handleFieldChange}
                 <>
                   <FormField
                     id="tax_rate"
-                    label={__('Tax Rate (%)', 'Tax Rate (%)')}
-                    description={__('Default tax rate percentage', 'Default tax rate percentage')}
+                    label={__('Tax Rate (%)', 'yatra')}
+                    description={__('Default tax rate percentage', 'yatra')}
                   >
                     <div className="flex items-center gap-2">
                       <Input
@@ -3824,25 +3824,25 @@ onChange={handleFieldChange}
                     />
                     <div className="flex-1">
                       <Label htmlFor="tax_inclusive" className="font-medium cursor-pointer">
-                        {__('Tax Inclusive Pricing', 'Tax Inclusive Pricing')}
+                        {__('Tax Inclusive Pricing', 'yatra')}
                       </Label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        {__('Tax is included in displayed prices', 'Tax is included in displayed prices')}
+                        {__('Tax is included in displayed prices', 'yatra')}
                       </p>
                     </div>
                   </div>
 
                   <FormField
                     id="vat_number"
-                    label={__('VAT Number', 'VAT Number')}
-                    description={__('Your company VAT or tax identification number', 'Your company VAT or tax identification number')}
+                    label={__('VAT Number', 'yatra')}
+                    description={__('Your company VAT or tax identification number', 'yatra')}
                   >
                     <Input
                       id="vat_number"
                       value={formData.vat_number}
                       name='vat_number'
                       onChange={handleFieldChange}
-                      placeholder={__('Enter VAT number', 'Enter VAT number')}
+                      placeholder={__('Enter VAT number', 'yatra')}
                     />
                   </FormField>
                 </>
@@ -3857,16 +3857,16 @@ onChange={handleFieldChange}
             <div className="space-y-4">
               <FormField
                 id="currency"
-                label={__('Default Currency', 'Default Currency')}
-                description={__('Primary currency for all transactions', 'Primary currency for all transactions')}
+                label={__('Default Currency', 'yatra')}
+                description={__('Primary currency for all transactions', 'yatra')}
                 required
               >
                 <SearchableSelect
                   value={formData.currency}
                   onChange={(val) => setFormData(prev => prev ? { ...prev, currency: val } : prev)}
                   options={getCurrencyOptions()}
-                  placeholder={__('Select currency...', 'Select currency...')}
-                  searchPlaceholder={__('Search currencies...', 'Search currencies...')}
+                  placeholder={__('Select currency...', 'yatra')}
+                  searchPlaceholder={__('Search currencies...', 'yatra')}
                   showValueId={false}
                 />
               </FormField>
@@ -3882,18 +3882,18 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="multi_currency" className="font-medium cursor-pointer">
-                    {__('Enable Multi-Currency', 'Enable Multi-Currency')}
+                    {__('Enable Multi-Currency', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Allow customers to view prices in different currencies', 'Allow customers to view prices in different currencies')}
+                    {__('Allow customers to view prices in different currencies', 'yatra')}
                   </p>
                 </div>
               </div>
 
               <FormField
                 id="currency_position"
-                label={__('Currency Position', 'Currency Position')}
-                description={__('Where to display currency symbol relative to amount', 'Where to display currency symbol relative to amount')}
+                label={__('Currency Position', 'yatra')}
+                description={__('Where to display currency symbol relative to amount', 'yatra')}
               >
                 <Select
                   id="currency_position"
@@ -3910,8 +3910,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="currency_decimals"
-                label={__('Decimal Places', 'Decimal Places')}
-                description={__('Number of decimal places to show in prices', 'Number of decimal places to show in prices')}
+                label={__('Decimal Places', 'yatra')}
+                description={__('Number of decimal places to show in prices', 'yatra')}
               >
                 <Input
                   id="currency_decimals"
@@ -3932,16 +3932,16 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Email Notifications', 'Email Notifications')}
+                {__('Email Notifications', 'yatra')}
               </h3>
               <div className="space-y-3">
                 {[
-                  { id: 'notify_new_booking', label: __('Notify on New Booking', 'Notify on New Booking'), desc: __('Send email when new booking is created', 'Send email when new booking is created') },
-                  { id: 'notify_payment', label: __('Notify on Payment', 'Notify on Payment'), desc: __('Send email when payment is received', 'Send email when payment is received') },
-                  { id: 'notify_cancellation', label: __('Notify on Cancellation', 'Notify on Cancellation'), desc: __('Send email when booking is cancelled', 'Send email when booking is cancelled') },
-                  { id: 'notify_admin', label: __('Notify Admin on All Events', 'Notify Admin on All Events'), desc: __('Admin receives notifications for all booking events', 'Admin receives notifications for all booking events') },
-                  { id: 'notify_customer_booking', label: __('Notify Customer on Booking', 'Notify Customer on Booking'), desc: __('Send confirmation email to customer', 'Send confirmation email to customer') },
-                  { id: 'notify_customer_payment', label: __('Notify Customer on Payment', 'Notify Customer on Payment'), desc: __('Send payment confirmation to customer', 'Send payment confirmation to customer') },
+                  { id: 'notify_new_booking', label: __('Notify on New Booking', 'yatra'), desc: __('Send email when new booking is created', 'yatra') },
+                  { id: 'notify_payment', label: __('Notify on Payment', 'yatra'), desc: __('Send email when payment is received', 'yatra') },
+                  { id: 'notify_cancellation', label: __('Notify on Cancellation', 'yatra'), desc: __('Send email when booking is cancelled', 'yatra') },
+                  { id: 'notify_admin', label: __('Notify Admin on All Events', 'yatra'), desc: __('Admin receives notifications for all booking events', 'yatra') },
+                  { id: 'notify_customer_booking', label: __('Notify Customer on Booking', 'yatra'), desc: __('Send confirmation email to customer', 'yatra') },
+                  { id: 'notify_customer_payment', label: __('Notify Customer on Payment', 'yatra'), desc: __('Send payment confirmation to customer', 'yatra') },
                 ].map((notif) => (
                   <div key={notif.id} className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                     <input
@@ -3963,7 +3963,7 @@ onChange={handleFieldChange}
               </div>
             </div>
 
-            <SectionDivider title={__('SMS Notifications (Optional)', 'SMS Notifications (Optional)')} />
+            <SectionDivider title={__('SMS Notifications (Optional)', 'yatra')} />
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -3977,10 +3977,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="sms_notifications" className="font-medium cursor-pointer">
-                    {__('Enable SMS Notifications', 'Enable SMS Notifications')}
+                    {__('Enable SMS Notifications', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Send SMS notifications for bookings and payments', 'Send SMS notifications for bookings and payments')}
+                    {__('Send SMS notifications for bookings and payments', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -3989,8 +3989,8 @@ onChange={handleFieldChange}
                 <>
                   <FormField
                     id="sms_provider"
-                    label={__('SMS Provider', 'SMS Provider')}
-                    description={__('Select your SMS service provider', 'Select your SMS service provider')}
+                    label={__('SMS Provider', 'yatra')}
+                    description={__('Select your SMS service provider', 'yatra')}
                   >
                     <Select
                       id="sms_provider"
@@ -3998,16 +3998,16 @@ onChange={handleFieldChange}
                       name='sms_provider'
                       onChange={handleFieldChange}
                     >
-                      <option value="twilio">{__('Twilio', 'Twilio')}</option>
-                      <option value="nexmo">{__('Nexmo (Vonage)', 'Nexmo (Vonage)')}</option>
-                      <option value="aws_sns">{__('AWS SNS', 'AWS SNS')}</option>
+                      <option value="twilio">{__('Twilio', 'yatra')}</option>
+                      <option value="nexmo">{__('Nexmo (Vonage)', 'yatra')}</option>
+                      <option value="aws_sns">{__('AWS SNS', 'yatra')}</option>
                     </Select>
                   </FormField>
 
                   <FormField
                     id="sms_api_key"
-                    label={__('SMS API Key', 'SMS API Key')}
-                    description={__('API key from your SMS provider', 'API key from your SMS provider')}
+                    label={__('SMS API Key', 'yatra')}
+                    description={__('API key from your SMS provider', 'yatra')}
                   >
                     <Input
                       id="sms_api_key"
@@ -4015,7 +4015,7 @@ onChange={handleFieldChange}
                       value={formData.sms_api_key}
                       name='sms_api_key'
                       onChange={handleFieldChange}
-                      placeholder={__('Enter SMS API key', 'Enter SMS API key')}
+                      placeholder={__('Enter SMS API key', 'yatra')}
                     />
                   </FormField>
                 </>
@@ -4030,47 +4030,47 @@ onChange={handleFieldChange}
             {/* Google Calendar Integration - Only show if Pro is active */}
             {window.yatraAdmin && (window as any).yatraAdmin.showGoogleCalendarSettingsUI && (
               <>
-                <SectionDivider title={__('Google Calendar Integration', 'Google Calendar Integration')} />
+                <SectionDivider title={__('Google Calendar Integration', 'yatra')} />
                 <GoogleCalendarIntegrationSection formData={formData} setFormData={setFormData} />
               </>
             )}
 
             {/* Mailchimp Integration - Pro Feature */}
-            <SectionDivider title={__('Mailchimp Integration', 'Mailchimp Integration')} />
+            <SectionDivider title={__('Mailchimp Integration', 'yatra')} />
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Mail className="w-5 h-5 text-yellow-500" />
-                  {__('Mailchimp', 'Mailchimp')}
+                  {__('Mailchimp', 'yatra')}
                   <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
                 </CardTitle>
                 {(window as any).yatraAdmin?.mailchimpConnected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
-                    {__('Connected', 'Connected')}
+                    {__('Connected', 'yatra')}
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                     <XCircle className="w-4 h-4" />
-                    {__('Not Connected', 'Not Connected')}
+                    {__('Not Connected', 'yatra')}
                   </div>
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__('Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.', 'Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.')}
+                  {__('Automatically sync customers to Mailchimp lists when they book. Add tags based on trips booked and build targeted email campaigns.', 'yatra')}
                 </p>
                 
                 {(window as any).yatraAdmin?.isProActive ? (
                   <div className="space-y-4">
                     <FormField
                       id="mailchimp_api_key"
-                      label={__('API Key', 'API Key')}
+                      label={__('API Key', 'yatra')}
                       description={(
                         <>
-                          {__('Get your API key from', 'Get your API key from')}{' '}
+                          {__('Get your API key from', 'yatra')}{' '}
                           <a href="https://admin.mailchimp.com/account/api/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
-                            {__('Mailchimp Account Settings', 'Mailchimp Account Settings')}
+                            {__('Mailchimp Account Settings', 'yatra')}
                           </a>
                         </>
                       )}
@@ -4087,8 +4087,8 @@ onChange={handleFieldChange}
                     
                     <FormField
                       id="mailchimp_list_id"
-                      label={__('Audience/List ID', 'Audience/List ID')}
-                      description={__('The ID of the Mailchimp audience to sync subscribers to.', 'The ID of the Mailchimp audience to sync subscribers to.')}
+                      label={__('Audience/List ID', 'yatra')}
+                      description={__('The ID of the Mailchimp audience to sync subscribers to.', 'yatra')}
                     >
                       <Input
                         id="mailchimp_list_id"
@@ -4110,10 +4110,10 @@ onChange={handleFieldChange}
                       />
                       <div className="flex-1">
                         <Label htmlFor="mailchimp_sync_on_booking" className="font-medium cursor-pointer">
-                          {__('Sync on Booking', 'Sync on Booking')}
+                          {__('Sync on Booking', 'yatra')}
                         </Label>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Automatically add customers to Mailchimp when they make a booking', 'Automatically add customers to Mailchimp when they make a booking')}
+                          {__('Automatically add customers to Mailchimp when they make a booking', 'yatra')}
                         </p>
                       </div>
                     </div>
@@ -4129,10 +4129,10 @@ onChange={handleFieldChange}
                       />
                       <div className="flex-1">
                         <Label htmlFor="mailchimp_double_optin" className="font-medium cursor-pointer">
-                          {__('Double Opt-in', 'Double Opt-in')}
+                          {__('Double Opt-in', 'yatra')}
                         </Label>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Require email confirmation before adding to list (recommended for GDPR)', 'Require email confirmation before adding to list (recommended for GDPR)')}
+                          {__('Require email confirmation before adding to list (recommended for GDPR)', 'yatra')}
                         </p>
                       </div>
                     </div>
@@ -4142,17 +4142,17 @@ onChange={handleFieldChange}
                       <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                           <ClipboardList className="w-4 h-4" />
-                          {__('Field Mapping', 'Field Mapping')}
+                          {__('Field Mapping', 'yatra')}
                         </h4>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                          {__('Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.', 'Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.')}
+                          {__('Map Yatra customer fields to Mailchimp merge fields. This controls what data is synced when a customer is added to your list.', 'yatra')}
                         </p>
                         
                         <div className="space-y-3">
                           {/* First Name Mapping */}
                           <div className="grid grid-cols-2 gap-3 items-center">
                             <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                              {__('First Name', 'First Name')}
+                              {__('First Name', 'yatra')}
                             </div>
                             <Select
                               value={(formData as any).mailchimp_field_mapping?.FNAME || 'first_name'}
@@ -4164,16 +4164,16 @@ onChange={handleFieldChange}
                                 }));
                               }}
                             >
-                              <option value="first_name">{__('Customer First Name', 'Customer First Name')}</option>
-                              <option value="billing_first_name">{__('Billing First Name', 'Billing First Name')}</option>
-                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                              <option value="first_name">{__('Customer First Name', 'yatra')}</option>
+                              <option value="billing_first_name">{__('Billing First Name', 'yatra')}</option>
+                              <option value="">{__('Do not sync', 'yatra')}</option>
                             </Select>
                           </div>
                           
                           {/* Last Name Mapping */}
                           <div className="grid grid-cols-2 gap-3 items-center">
                             <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                              {__('Last Name', 'Last Name')}
+                              {__('Last Name', 'yatra')}
                             </div>
                             <Select
                               value={(formData as any).mailchimp_field_mapping?.LNAME || 'last_name'}
@@ -4185,16 +4185,16 @@ onChange={handleFieldChange}
                                 }));
                               }}
                             >
-                              <option value="last_name">{__('Customer Last Name', 'Customer Last Name')}</option>
-                              <option value="billing_last_name">{__('Billing Last Name', 'Billing Last Name')}</option>
-                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                              <option value="last_name">{__('Customer Last Name', 'yatra')}</option>
+                              <option value="billing_last_name">{__('Billing Last Name', 'yatra')}</option>
+                              <option value="">{__('Do not sync', 'yatra')}</option>
                             </Select>
                           </div>
                           
                           {/* Phone Mapping */}
                           <div className="grid grid-cols-2 gap-3 items-center">
                             <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                              {__('Phone', 'Phone')}
+                              {__('Phone', 'yatra')}
                             </div>
                             <Select
                               value={(formData as any).mailchimp_field_mapping?.PHONE || 'phone'}
@@ -4206,16 +4206,16 @@ onChange={handleFieldChange}
                                 }));
                               }}
                             >
-                              <option value="phone">{__('Customer Phone', 'Customer Phone')}</option>
-                              <option value="billing_phone">{__('Billing Phone', 'Billing Phone')}</option>
-                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                              <option value="phone">{__('Customer Phone', 'yatra')}</option>
+                              <option value="billing_phone">{__('Billing Phone', 'yatra')}</option>
+                              <option value="">{__('Do not sync', 'yatra')}</option>
                             </Select>
                           </div>
                           
                           {/* Country Mapping */}
                           <div className="grid grid-cols-2 gap-3 items-center">
                             <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                              {__('Country', 'Country')}
+                              {__('Country', 'yatra')}
                             </div>
                             <Select
                               value={(formData as any).mailchimp_field_mapping?.COUNTRY || 'country'}
@@ -4227,9 +4227,9 @@ onChange={handleFieldChange}
                                 }));
                               }}
                             >
-                              <option value="country">{__('Customer Country', 'Customer Country')}</option>
-                              <option value="billing_country">{__('Billing Country', 'Billing Country')}</option>
-                              <option value="">{__('Do not sync', 'Do not sync')}</option>
+                              <option value="country">{__('Customer Country', 'yatra')}</option>
+                              <option value="billing_country">{__('Billing Country', 'yatra')}</option>
+                              <option value="">{__('Do not sync', 'yatra')}</option>
                             </Select>
                           </div>
                         </div>
@@ -4246,18 +4246,18 @@ onChange={handleFieldChange}
                             />
                             <div className="flex-1">
                               <Label htmlFor="mailchimp_add_tags" className="font-medium cursor-pointer">
-                                {__('Add Trip Tags', 'Add Trip Tags')}
+                                {__('Add Trip Tags', 'yatra')}
                               </Label>
                               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                {__('Automatically tag subscribers with the trip name they booked', 'Automatically tag subscribers with the trip name they booked')}
+                                {__('Automatically tag subscribers with the trip name they booked', 'yatra')}
                               </p>
                             </div>
                           </div>
                           
                           <FormField
                             id="mailchimp_default_tags"
-                            label={__('Default Tags', 'Default Tags')}
-                            description={__('Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")', 'Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")')}
+                            label={__('Default Tags', 'yatra')}
+                            description={__('Comma-separated tags to add to all synced subscribers (e.g., "yatra, booking")', 'yatra')}
                           >
                             <Input
                               id="mailchimp_default_tags"
@@ -4273,7 +4273,7 @@ onChange={handleFieldChange}
                 ) : (
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                     <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__('Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.', 'Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.')}
+                      {__('Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.', 'yatra')}
                     </p>
                     <a
                       href="https://wpyatra.com/pricing?module=mailchimp"
@@ -4281,7 +4281,7 @@ onChange={handleFieldChange}
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
                     >
-                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      {__('Upgrade to Pro', 'yatra')}
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -4290,43 +4290,43 @@ onChange={handleFieldChange}
             </Card>
 
             {/* Facebook Pixel Integration - Pro Feature */}
-            <SectionDivider title={__('Facebook Pixel', 'Facebook Pixel')} />
+            <SectionDivider title={__('Facebook Pixel', 'yatra')} />
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <svg className="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
-                  {__('Facebook Pixel', 'Facebook Pixel')}
+                  {__('Facebook Pixel', 'yatra')}
                   <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
                 </CardTitle>
                 {(window as any).yatraAdmin?.facebookPixel?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
-                    {__('Connected', 'Connected')}
+                    {__('Connected', 'yatra')}
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                     <XCircle className="w-4 h-4" />
-                    {__('Not Connected', 'Not Connected')}
+                    {__('Not Connected', 'yatra')}
                   </div>
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__('Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.', 'Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.')}
+                  {__('Track booking conversions with Facebook Pixel. Retarget visitors who viewed trips and optimize ad campaigns with accurate conversion data.', 'yatra')}
                 </p>
                 
                 {(window as any).yatraAdmin?.isProActive ? (
                   <div className="space-y-4">
                     <FormField
                       id="facebook_pixel_id"
-                      label={__('Pixel ID', 'Pixel ID')}
+                      label={__('Pixel ID', 'yatra')}
                       description={(
                         <>
-                          {__('Get your Pixel ID from', 'Get your Pixel ID from')}{' '}
+                          {__('Get your Pixel ID from', 'yatra')}{' '}
                           <a href="https://business.facebook.com/events_manager" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
-                            {__('Facebook Events Manager', 'Facebook Events Manager')}
+                            {__('Facebook Events Manager', 'yatra')}
                           </a>
                         </>
                       )}
@@ -4351,7 +4351,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="fb_track_view_content" className="text-sm cursor-pointer">
-                          {__('Track ViewContent', 'Track ViewContent')}
+                          {__('Track ViewContent', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4365,7 +4365,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="fb_track_initiate_checkout" className="text-sm cursor-pointer">
-                          {__('Track InitiateCheckout', 'Track InitiateCheckout')}
+                          {__('Track InitiateCheckout', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4379,7 +4379,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="fb_track_purchase" className="text-sm cursor-pointer">
-                          {__('Track Purchase', 'Track Purchase')}
+                          {__('Track Purchase', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4393,7 +4393,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="fb_use_conversions_api" className="text-sm cursor-pointer">
-                          {__('Use Conversions API', 'Use Conversions API')}
+                          {__('Use Conversions API', 'yatra')}
                         </Label>
                       </div>
                     </div>
@@ -4401,8 +4401,8 @@ onChange={handleFieldChange}
                     {formData.fb_use_conversions_api && (
                       <FormField
                         id="facebook_access_token"
-                        label={__('Access Token', 'Access Token')}
-                        description={__('Required for server-side Conversions API tracking.', 'Required for server-side Conversions API tracking.')}
+                        label={__('Access Token', 'yatra')}
+                        description={__('Required for server-side Conversions API tracking.', 'yatra')}
                       >
                         <Input
                           id="facebook_access_token"
@@ -4418,7 +4418,7 @@ onChange={handleFieldChange}
                 ) : (
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                     <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__('Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.', 'Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.')}
+                      {__('Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.', 'yatra')}
                     </p>
                     <a
                       href="https://wpyatra.com/pricing?module=facebook-pixel"
@@ -4426,7 +4426,7 @@ onChange={handleFieldChange}
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
                     >
-                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      {__('Upgrade to Pro', 'yatra')}
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -4435,45 +4435,45 @@ onChange={handleFieldChange}
             </Card>
 
             {/* Google Analytics 4 Enhanced - Pro Feature */}
-            <SectionDivider title={__('Google Analytics 4 Enhanced', 'Google Analytics 4 Enhanced')} />
+            <SectionDivider title={__('Google Analytics 4 Enhanced', 'yatra')} />
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                   <svg className="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/>
                   </svg>
-                  {__('Google Analytics 4 Enhanced', 'Google Analytics 4 Enhanced')}
+                  {__('Google Analytics 4 Enhanced', 'yatra')}
                   <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">PRO</span>
                 </CardTitle>
                 {(window as any).yatraAdmin?.googleAnalytics?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
-                    {__('Connected', 'Connected')}
+                    {__('Connected', 'yatra')}
                   </div>
                 ) : (
                   <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                     <XCircle className="w-4 h-4" />
-                    {__('Not Connected', 'Not Connected')}
+                    {__('Not Connected', 'yatra')}
                   </div>
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__('Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.', 'Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.')}
+                  {__('Enhanced e-commerce tracking for GA4. Track view_item, begin_checkout, and purchase events with server-side Measurement Protocol support.', 'yatra')}
                 </p>
                 
                 {(window as any).yatraAdmin?.isProActive ? (
                   <div className="space-y-4">
                     <FormField
                       id="ga4_measurement_id"
-                      label={__('Measurement ID', 'Measurement ID')}
+                      label={__('Measurement ID', 'yatra')}
                       description={(
                         <>
-                          {__('Get your Measurement ID from', 'Get your Measurement ID from')}{' '}
+                          {__('Get your Measurement ID from', 'yatra')}{' '}
                           <a href="https://analytics.google.com/analytics/web/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline">
-                            {__('Google Analytics', 'Google Analytics')}
+                            {__('Google Analytics', 'yatra')}
                           </a>
-                          {' '}{__('(Admin > Data Streams)', '(Admin > Data Streams)')}
+                          {' '}{__('(Admin > Data Streams)', 'yatra')}
                         </>
                       )}
                     >
@@ -4497,7 +4497,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="ga4_track_view_item" className="text-sm cursor-pointer">
-                          {__('Track view_item', 'Track view_item')}
+                          {__('Track view_item', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4511,7 +4511,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="ga4_track_begin_checkout" className="text-sm cursor-pointer">
-                          {__('Track begin_checkout', 'Track begin_checkout')}
+                          {__('Track begin_checkout', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4525,7 +4525,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="ga4_track_purchase" className="text-sm cursor-pointer">
-                          {__('Track purchase', 'Track purchase')}
+                          {__('Track purchase', 'yatra')}
                         </Label>
                       </div>
                       
@@ -4539,7 +4539,7 @@ onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
                         <Label htmlFor="ga4_use_measurement_protocol" className="text-sm cursor-pointer">
-                          {__('Use Measurement Protocol', 'Use Measurement Protocol')}
+                          {__('Use Measurement Protocol', 'yatra')}
                         </Label>
                       </div>
                     </div>
@@ -4547,8 +4547,8 @@ onChange={handleFieldChange}
                     {formData.ga4_use_measurement_protocol && (
                       <FormField
                         id="ga4_api_secret"
-                        label={__('API Secret', 'API Secret')}
-                        description={__('Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.', 'Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.')}
+                        label={__('API Secret', 'yatra')}
+                        description={__('Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.', 'yatra')}
                       >
                         <Input
                           id="ga4_api_secret"
@@ -4564,7 +4564,7 @@ onChange={handleFieldChange}
                 ) : (
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                     <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__('Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.', 'Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.')}
+                      {__('Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.', 'yatra')}
                     </p>
                     <a
                       href="https://wpyatra.com/pricing?module=google-analytics"
@@ -4572,7 +4572,7 @@ onChange={handleFieldChange}
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
                     >
-                      {__('Upgrade to Pro', 'Upgrade to Pro')}
+                      {__('Upgrade to Pro', 'yatra')}
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
@@ -4581,12 +4581,12 @@ onChange={handleFieldChange}
             </Card>
 
             {/* Google Maps API - Free Feature */}
-            <SectionDivider title={__('Google Maps', 'Google Maps')} />
+            <SectionDivider title={__('Google Maps', 'yatra')} />
             <div className="space-y-4">
               <FormField
                 id="google_maps_api"
-                label={__('Google Maps API Key', 'Google Maps API Key')}
-                description={__('API key for displaying maps and location features', 'API key for displaying maps and location features')}
+                label={__('Google Maps API Key', 'yatra')}
+                description={__('API key for displaying maps and location features', 'yatra')}
               >
                 <Input
                   id="google_maps_api"
@@ -4594,12 +4594,12 @@ onChange={handleFieldChange}
                   value={formData.google_maps_api}
                   name='google_maps_api'
                       onChange={handleFieldChange}
-                  placeholder={__('Enter Google Maps API Key', 'Enter Google Maps API Key')}
+                  placeholder={__('Enter Google Maps API Key', 'yatra')}
                 />
               </FormField>
             </div>
 
-            <SectionDivider title={__('reCAPTCHA Settings', 'reCAPTCHA Settings')} />
+            <SectionDivider title={__('reCAPTCHA Settings', 'yatra')} />
 
             <div className="space-y-4">
               <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -4613,10 +4613,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="recaptcha_enabled" className="font-medium cursor-pointer">
-                    {__('Enable reCAPTCHA', 'Enable reCAPTCHA')}
+                    {__('Enable reCAPTCHA', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Protect forms from spam and bots', 'Protect forms from spam and bots')}
+                    {__('Protect forms from spam and bots', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -4625,22 +4625,22 @@ onChange={handleFieldChange}
                 <>
                   <FormField
                     id="recaptcha_site_key"
-                    label={__('Site Key', 'Site Key')}
-                    description={__('Your reCAPTCHA site key', 'Your reCAPTCHA site key')}
+                    label={__('Site Key', 'yatra')}
+                    description={__('Your reCAPTCHA site key', 'yatra')}
                   >
                     <Input
                       id="recaptcha_site_key"
                       value={formData.recaptcha_site_key}
                       name='recaptcha_site_key'
                       onChange={handleFieldChange}
-                      placeholder={__('Enter site key', 'Enter site key')}
+                      placeholder={__('Enter site key', 'yatra')}
                     />
                   </FormField>
 
                   <FormField
                     id="recaptcha_secret_key"
-                    label={__('Secret Key', 'Secret Key')}
-                    description={__('Your reCAPTCHA secret key (keep this secure)', 'Your reCAPTCHA secret key (keep this secure)')}
+                    label={__('Secret Key', 'yatra')}
+                    description={__('Your reCAPTCHA secret key (keep this secure)', 'yatra')}
                   >
                     <Input
                       id="recaptcha_secret_key"
@@ -4648,7 +4648,7 @@ onChange={handleFieldChange}
                       value={formData.recaptcha_secret_key}
                       name='recaptcha_secret_key'
                       onChange={handleFieldChange}
-                      placeholder={__('Enter secret key', 'Enter secret key')}
+                      placeholder={__('Enter secret key', 'yatra')}
                     />
                   </FormField>
                 </>
@@ -4662,18 +4662,18 @@ onChange={handleFieldChange}
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Permalink Settings', 'Permalink Settings')}
+                {__('Permalink Settings', 'yatra')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                {__('Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs.', 'Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs.')}
+                {__('Configure URL slugs for your Yatra content types. These settings control how your trips, destinations, and activities appear in URLs.', 'yatra')}
               </p>
             </div>
 
             <div className="space-y-4">
               <FormField
                 id="trip_base"
-                label={__('Trip Base', 'Trip Base')}
-                description={__('URL slug for trip single pages (e.g., "trip" will create URLs like /trip/everest-base-camp)', 'URL slug for trip single pages (e.g., "trip" will create URLs like /trip/everest-base-camp)')}
+                label={__('Trip Base', 'yatra')}
+                description={__('URL slug for trip single pages (e.g., "trip" will create URLs like /trip/everest-base-camp)', 'yatra')}
               >
                 <Input
                   id="trip_base"
@@ -4686,7 +4686,7 @@ onChange={handleFieldChange}
                 {formData.trip_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                     <span>
-                      {__('Example URL:', 'Example URL:')}{' '}
+                      {__('Example URL:', 'yatra')}{' '}
                       <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                         {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
                           ? `?yatra_trip_slug=trip-name`
@@ -4707,7 +4707,7 @@ onChange={handleFieldChange}
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'yatra')}
                     </a>
                   </div>
                 )}
@@ -4715,8 +4715,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="destination_base"
-                label={__('Destination Base', 'Destination Base')}
-                description={__('URL slug for destination archive pages (e.g., "destination" will create URLs like /destination/nepal)', 'URL slug for destination archive pages (e.g., "destination" will create URLs like /destination/nepal)')}
+                label={__('Destination Base', 'yatra')}
+                description={__('URL slug for destination archive pages (e.g., "destination" will create URLs like /destination/nepal)', 'yatra')}
               >
                 <Input
                   id="destination_base"
@@ -4729,7 +4729,7 @@ onChange={handleFieldChange}
                 {formData.destination_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                     <span>
-                      {__('Example URL:', 'Example URL:')}{' '}
+                      {__('Example URL:', 'yatra')}{' '}
                       <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                         {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
                           ? `?yatra_destination_slug=nepal`
@@ -4750,7 +4750,7 @@ onChange={handleFieldChange}
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'yatra')}
                     </a>
                   </div>
                 )}
@@ -4758,8 +4758,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="activity_base"
-                label={__('Activity Base', 'Activity Base')}
-                description={__('URL slug for activity archive pages (e.g., "activity" will create URLs like /activity/trekking)', 'URL slug for activity archive pages (e.g., "activity" will create URLs like /activity/trekking)')}
+                label={__('Activity Base', 'yatra')}
+                description={__('URL slug for activity archive pages (e.g., "activity" will create URLs like /activity/trekking)', 'yatra')}
               >
                 <Input
                   id="activity_base"
@@ -4772,7 +4772,7 @@ onChange={handleFieldChange}
                 {formData.activity_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                     <span>
-                      {__('Example URL:', 'Example URL:')}{' '}
+                      {__('Example URL:', 'yatra')}{' '}
                       <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                         {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
                           ? `?yatra_activity_slug=trekking`
@@ -4793,7 +4793,7 @@ onChange={handleFieldChange}
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'yatra')}
                     </a>
                   </div>
                 )}
@@ -4801,8 +4801,8 @@ onChange={handleFieldChange}
 
               <FormField
                 id="trip_category_base"
-                label={__('Trip Category Base', 'Trip Category Base')}
-                description={__('URL slug for trip category archive pages (e.g., "trip-category" will create URLs like /trip-category/adventure)', 'URL slug for trip category archive pages (e.g., "trip-category" will create URLs like /trip-category/adventure)')}
+                label={__('Trip Category Base', 'yatra')}
+                description={__('URL slug for trip category archive pages (e.g., "trip-category" will create URLs like /trip-category/adventure)', 'yatra')}
               >
                 <Input
                   id="trip_category_base"
@@ -4815,7 +4815,7 @@ onChange={handleFieldChange}
                 {formData.trip_category_base && (
                   <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                     <span>
-                      {__('Example URL:', 'Example URL:')}{' '}
+                      {__('Example URL:', 'yatra')}{' '}
                       <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                         {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
                           ? `?yatra_category_slug=adventure`
@@ -4836,7 +4836,7 @@ onChange={handleFieldChange}
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
                     >
-                      <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                      <ExternalLink className="w-3 h-3" /> {__('View', 'yatra')}
                     </a>
                   </div>
                 )}
@@ -4847,17 +4847,17 @@ onChange={handleFieldChange}
             {/* Booking Page Settings */}
             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Booking Page Settings', 'Booking Page Settings')}
+                {__('Booking Page Settings', 'yatra')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                {__('Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.', 'Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.')}
+                {__('Configure the booking page URL. By default, bookings use /book/{trip-slug}. You can customize the URL base or use a custom WordPress page.', 'yatra')}
               </p>
 
               <div className="space-y-4">
                 <FormField
                   id="booking_base"
-                  label={__('Default Booking URL Base', 'Default Booking URL Base')}
-                  description={__('URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)', 'URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)')}
+                  label={__('Default Booking URL Base', 'yatra')}
+                  description={__('URL slug for the booking page (e.g., "book" will create URLs like /book/trip-name)', 'yatra')}
                 >
                   <Input
                     id="booking_base"
@@ -4870,7 +4870,7 @@ onChange={handleFieldChange}
                   {formData.booking_base && (
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                       <span>
-                        {__('Example URL:', 'Example URL:')}{' '}
+                        {__('Example URL:', 'yatra')}{' '}
                         <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">
                           {(window as any)?.yatraAdmin?.permalinkStructure === 'plain'
                             ? `?yatra_booking_page=main`
@@ -4891,7 +4891,7 @@ onChange={handleFieldChange}
                         rel="noreferrer"
                         className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
                       >
-                        <ExternalLink className="w-3 h-3" /> {__('View', 'View')}
+                        <ExternalLink className="w-3 h-3" /> {__('View', 'yatra')}
                       </a>
                     </div>
                   )}
@@ -4900,7 +4900,7 @@ onChange={handleFieldChange}
                 {formData.use_booking_page && (
                   <FormField
                     id="booking_page_id"
-                    label={__('Select Booking Page', 'Select Booking Page')}
+                    label={__('Select Booking Page', 'yatra')}
                     description={__('Choose a page that contains the [yatra_booking] shortcode. If the page doesn\'t have the shortcode, you\'ll be prompted to add it.', 'Choose a page that contains the [yatra_booking] shortcode. If the page doesn\'t have the shortcode, you\'ll be prompted to add it.')}
                   >
                     <div className="relative">
@@ -4912,7 +4912,7 @@ onChange={handleFieldChange}
                         disabled={isCheckingShortcode}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-wait"
                       >
-                        <option value={0}>{__('-- Select a page --', '-- Select a page --')}</option>
+                        <option value={0}>{__('-- Select a page --', 'yatra')}</option>
                         {pagesData?.map((page) => (
                           <option key={page.id} value={page.id}>
                             {page.title}
@@ -4927,7 +4927,7 @@ onChange={handleFieldChange}
                     </div>
                     {formData.booking_page_id > 0 && pagesData && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {__('Booking URL:', 'Booking URL:')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">{pagesData.find(p => p.id === formData.booking_page_id)?.url || ''}</code>
+                        {__('Booking URL:', 'yatra')} <code className="bg-gray-100 dark:bg-gray-800 px-1 rounded">{pagesData.find(p => p.id === formData.booking_page_id)?.url || ''}</code>
                       </p>
                     )}
                   </FormField>
@@ -4940,14 +4940,14 @@ onChange={handleFieldChange}
               <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {__('Shortcode Required', 'Shortcode Required')}
+                    {__('Shortcode Required', 'yatra')}
                   </h3>
                   <div className="mb-6">
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-                      {__('The page', 'The page')} <strong>"{selectedPageForShortcode.title}"</strong> {__('doesn\'t have the', 'doesn\'t have the')} <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">[yatra_booking]</code> {__('shortcode.', 'shortcode.')}
+                      {__('The page', 'yatra')} <strong>"{selectedPageForShortcode.title}"</strong> {__('doesn\'t have the', 'doesn\'t have the')} <code className="bg-gray-100 dark:bg-gray-700 px-1 rounded">[yatra_booking]</code> {__('shortcode.', 'yatra')}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {__('Would you like to add it automatically, or edit the page manually to place it where you want?', 'Would you like to add it automatically, or edit the page manually to place it where you want?')}
+                      {__('Would you like to add it automatically, or edit the page manually to place it where you want?', 'yatra')}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2">
@@ -4959,10 +4959,10 @@ onChange={handleFieldChange}
                       {insertShortcodeMutation.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                          {__('Adding...', 'Adding...')}
+                          {__('Adding...', 'yatra')}
                         </>
                       ) : (
-                        __('Add Shortcode Automatically', 'Add Shortcode Automatically')
+                        __('Add Shortcode Automatically', 'yatra')
                       )}
                     </Button>
                     <Button
@@ -4977,7 +4977,7 @@ onChange={handleFieldChange}
                       }}
                       className="w-full justify-center"
                     >
-                      {__('Edit Page Manually', 'Edit Page Manually')}
+                      {__('Edit Page Manually', 'yatra')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -4988,7 +4988,7 @@ onChange={handleFieldChange}
                       }}
                       className="w-full justify-center"
                     >
-                      {__('Skip for now', 'Skip for now')}
+                      {__('Skip for now', 'yatra')}
                     </Button>
                   </div>
                 </div>
@@ -4999,8 +4999,8 @@ onChange={handleFieldChange}
               <div className="flex items-start gap-2">
                 <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1 text-sm text-blue-800 dark:text-blue-200">
-                  <p className="font-medium mb-1">{__('Important:', 'Important:')}</p>
-                  <p className="mb-3">{__('After changing permalink settings, you must flush rewrite rules for the changes to take effect.', 'After changing permalink settings, you must flush rewrite rules for the changes to take effect.')}</p>
+                  <p className="font-medium mb-1">{__('Important:', 'yatra')}</p>
+                  <p className="mb-3">{__('After changing permalink settings, you must flush rewrite rules for the changes to take effect.', 'yatra')}</p>
                   <Button
                     type="button"
                     onClick={() => flushRewriteRulesMutation.mutate()}
@@ -5012,12 +5012,12 @@ onChange={handleFieldChange}
                     {flushRewriteRulesMutation.isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        {__('Flushing...', 'Flushing...')}
+                        {__('Flushing...', 'yatra')}
                       </>
                     ) : (
                       <>
                         <Globe className="w-4 h-4" />
-                        {__('Flush Rewrite Rules', 'Flush Rewrite Rules')}
+                        {__('Flush Rewrite Rules', 'yatra')}
                       </>
                     )}
                   </Button>
@@ -5042,10 +5042,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="debug_mode" className="font-medium cursor-pointer">
-                    {__('Enable Debug Mode', 'Enable Debug Mode')}
+                    {__('Enable Debug Mode', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Show detailed error messages (disable in production)', 'Show detailed error messages (disable in production)')}
+                    {__('Show detailed error messages (disable in production)', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -5061,10 +5061,10 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="enable_logging" className="font-medium cursor-pointer">
-                    {__('Enable Logging', 'Enable Logging')}
+                    {__('Enable Logging', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Log system events and errors for troubleshooting', 'Log system events and errors for troubleshooting')}
+                    {__('Log system events and errors for troubleshooting', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -5080,18 +5080,18 @@ onChange={handleFieldChange}
                 />
                 <div className="flex-1">
                   <Label htmlFor="cache_enabled" className="font-medium cursor-pointer">
-                    {__('Enable Cache', 'Enable Cache')}
+                    {__('Enable Cache', 'yatra')}
                   </Label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__('Cache data to improve performance', 'Cache data to improve performance')}
+                    {__('Cache data to improve performance', 'yatra')}
                   </p>
                 </div>
               </div>
 
               <FormField
                 id="api_key"
-                label={__('API Key', 'API Key')}
-                description={__('API key for external integrations and webhooks', 'API key for external integrations and webhooks')}
+                label={__('API Key', 'yatra')}
+                description={__('API key for external integrations and webhooks', 'yatra')}
               >
                 <Input
                   id="api_key"
@@ -5099,15 +5099,15 @@ onChange={handleFieldChange}
                   value={formData.api_key}
                   name='api_key'
                       onChange={handleFieldChange}
-                  placeholder={__('Enter API Key', 'Enter API Key')}
+                  placeholder={__('Enter API Key', 'yatra')}
                 />
               </FormField>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   id="api_rate_limit"
-                  label={__('API Rate Limit', 'API Rate Limit')}
-                  description={__('Maximum API requests per hour', 'Maximum API requests per hour')}
+                  label={__('API Rate Limit', 'yatra')}
+                  description={__('Maximum API requests per hour', 'yatra')}
                 >
                   <Input
                     id="api_rate_limit"
@@ -5121,8 +5121,8 @@ onChange={handleFieldChange}
 
                 <FormField
                   id="session_timeout"
-                  label={__('Session Timeout (seconds)', 'Session Timeout (seconds)')}
-                  description={__('User session timeout in seconds', 'User session timeout in seconds')}
+                  label={__('Session Timeout (seconds)', 'yatra')}
+                  description={__('User session timeout in seconds', 'yatra')}
                 >
                   <Input
                     id="session_timeout"
@@ -5141,7 +5141,7 @@ onChange={handleFieldChange}
       default:
         return (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            {__('Settings section coming soon', 'Settings section coming soon')}
+            {__('Settings section coming soon', 'yatra')}
           </div>
         );
     }
@@ -5216,8 +5216,8 @@ onChange={handleFieldChange}
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Settings', 'Settings')}
-        description={__('Configure your travel booking plugin settings', 'Configure your travel booking plugin settings')}
+        title={__('Settings', 'yatra')}
+        description={__('Configure your travel booking plugin settings', 'yatra')}
         actions={
           <Button
             onClick={handleSave}
@@ -5227,12 +5227,12 @@ onChange={handleFieldChange}
             {isSaving ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {__('Saving...', 'Saving...')}
+                {__('Saving...', 'yatra')}
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                {__('Save Settings', 'Save Settings')}
+                {__('Save Settings', 'yatra')}
               </>
             )}
           </Button>
@@ -5280,7 +5280,7 @@ onChange={handleFieldChange}
                     return (
                       <>
                         <Icon className="w-4 h-4" />
-                        {section?.label || __('Settings', 'Settings')}
+                        {section?.label || __('Settings', 'yatra')}
                       </>
                     );
                   })()}
@@ -5298,12 +5298,12 @@ onChange={handleFieldChange}
                   {isSaving ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      {__('Saving...', 'Saving...')}
+                      {__('Saving...', 'yatra')}
                     </>
                   ) : (
                     <>
                       <Save className="w-4 h-4" />
-                      {__('Save Settings', 'Save Settings')}
+                      {__('Save Settings', 'yatra')}
                     </>
                   )}
                 </Button>

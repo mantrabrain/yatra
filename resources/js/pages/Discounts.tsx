@@ -159,11 +159,11 @@ const Discounts: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['discounts'] });
-      showToast(__('Discount deleted successfully', 'Discount deleted successfully'), 'success');
+      showToast(__('Discount deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, discount: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete discount', 'Failed to delete discount'), 'error');
+      showToast(error?.message || __('Failed to delete discount', 'yatra'), 'error');
     },
   });
 
@@ -182,7 +182,7 @@ const Discounts: React.FC = () => {
   const isDiscountsError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -193,7 +193,7 @@ const Discounts: React.FC = () => {
         minute: '2-digit',
       });
     } catch (e) {
-      return __('Invalid date', 'Invalid date');
+      return __('Invalid date', 'yatra');
     }
   };
 
@@ -209,22 +209,22 @@ const Discounts: React.FC = () => {
       publish: {
         className:
           'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        label: __('Publish', 'yatra'),
       },
       draft: {
         className:
           'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       trash: {
         className:
           'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
       expired: {
         className:
           'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Expired', 'Expired'),
+        label: __('Expired', 'yatra'),
       },
     };
 
@@ -273,14 +273,14 @@ const Discounts: React.FC = () => {
   const getPremiumDialogContent = () => {
     if (premiumDialog.type === 'group') {
       return {
-        name: __('Group Discount', 'Group Discount'),
-        description: __('Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.', 'Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.'),
+        name: __('Group Discount', 'yatra'),
+        description: __('Create powerful group discounts that automatically apply when customers book for multiple travelers. Set tiered pricing based on group size, offer category-specific discounts, and boost your group bookings without requiring promo codes.', 'yatra'),
         purchaseUrl: 'https://wpyatra.com/pricing?module=advanced-discount',
       };
     }
     return {
-      name: __('Promo + Group Discount', 'Promo + Group Discount'),
-      description: __('Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.', 'Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.'),
+      name: __('Promo + Group Discount', 'yatra'),
+      description: __('Combine the power of promo codes with automatic group discounts. Customers get a base discount with their promo code, plus additional savings when booking for groups. Perfect for maximizing conversions and encouraging larger bookings.', 'yatra'),
       purchaseUrl: 'https://wpyatra.com/pricing?module=advanced-discount',
     };
   };
@@ -376,14 +376,14 @@ const Discounts: React.FC = () => {
           selectedIds.map((id) => apiClient.delete(`/discounts/${id}`))
         );
         showToast(
-          __('Selected discounts deleted successfully', 'Selected discounts deleted successfully'),
+          __('Selected discounts deleted successfully', 'yatra'),
           'success'
         );
       } else {
         const newStatus = bulkAction as Discount['status'];
         await updateStatusForIds(selectedIds, newStatus);
         showToast(
-          __('Bulk status updated successfully', 'Bulk status updated successfully'),
+          __('Bulk status updated successfully', 'yatra'),
           'success'
         );
       }
@@ -394,7 +394,7 @@ const Discounts: React.FC = () => {
     } catch (error: any) {
       showToast(
         error?.message ||
-          __('Failed to perform bulk action on discounts', 'Failed to perform bulk action on discounts'),
+          __('Failed to perform bulk action on discounts', 'yatra'),
         'error'
       );
     } finally {
@@ -403,11 +403,11 @@ const Discounts: React.FC = () => {
   };
 
   const allBulkActionOptions = [
-    { value: 'publish', label: __('Mark as Publish', 'Mark as Publish') },
-    { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
-    { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
-    { value: 'expired', label: __('Mark as Expired', 'Mark as Expired') },
-    { value: 'delete', label: __('Delete permanently', 'Delete permanently') },
+    { value: 'publish', label: __('Mark as Publish', 'yatra') },
+    { value: 'draft', label: __('Mark as Draft', 'yatra') },
+    { value: 'trash', label: __('Move to Trash', 'yatra') },
+    { value: 'expired', label: __('Mark as Expired', 'yatra') },
+    { value: 'delete', label: __('Delete permanently', 'yatra') },
   ];
 
   const getBulkActionOptionsForStatus = (view: string) => {
@@ -437,52 +437,52 @@ const Discounts: React.FC = () => {
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
   const statusOptions = [
-    { value: 'all', label: __('All Status', 'All Status') },
-    { value: 'publish', label: __('Publish', 'Publish') },
-    { value: 'draft', label: __('Draft', 'Draft') },
-    { value: 'trash', label: __('Trash', 'Trash') },
-    { value: 'expired', label: __('Expired', 'Expired') },
+    { value: 'all', label: __('All Status', 'yatra') },
+    { value: 'publish', label: __('Publish', 'yatra') },
+    { value: 'draft', label: __('Draft', 'yatra') },
+    { value: 'trash', label: __('Trash', 'yatra') },
+    { value: 'expired', label: __('Expired', 'yatra') },
   ];
 
   const sortOptions = [
-    { value: 'created_at', label: __('Created Date', 'Created Date') },
-    { value: 'code', label: __('Code', 'Code') },
-    { value: 'type', label: __('Type', 'Type') },
-    { value: 'amount', label: __('Amount', 'Amount') },
-    { value: 'usage_count', label: __('Usage', 'Usage') },
-    { value: 'expiry_date', label: __('Expiry Date', 'Expiry Date') },
-    { value: 'status', label: __('Status', 'Status') },
+    { value: 'created_at', label: __('Created Date', 'yatra') },
+    { value: 'code', label: __('Code', 'yatra') },
+    { value: 'type', label: __('Type', 'yatra') },
+    { value: 'amount', label: __('Amount', 'yatra') },
+    { value: 'usage_count', label: __('Usage', 'yatra') },
+    { value: 'expiry_date', label: __('Expiry Date', 'yatra') },
+    { value: 'status', label: __('Status', 'yatra') },
   ];
 
   const columnOptions = [
     {
       key: 'code',
-      label: __('Coupon Code', 'Coupon Code'),
+      label: __('Coupon Code', 'yatra'),
       visible: visibleColumns.code,
     },
     {
       key: 'type',
-      label: __('Type', 'Type'),
+      label: __('Type', 'yatra'),
       visible: visibleColumns.type,
     },
     {
       key: 'discount',
-      label: __('Discount', 'Discount'),
+      label: __('Discount', 'yatra'),
       visible: visibleColumns.discount,
     },
     {
       key: 'usage',
-      label: __('Usage', 'Usage'),
+      label: __('Usage', 'yatra'),
       visible: visibleColumns.usage,
     },
     {
       key: 'expiry_date',
-      label: __('Expiry Date', 'Expiry Date'),
+      label: __('Expiry Date', 'yatra'),
       visible: visibleColumns.expiry_date,
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       visible: visibleColumns.status,
     },
   ];
@@ -490,7 +490,7 @@ const Discounts: React.FC = () => {
   const columns = [
     {
       key: 'code',
-      label: __('Name / Code', 'Name / Code'),
+      label: __('Name / Code', 'yatra'),
       sortable: true,
       visible: visibleColumns.code,
       width: 'w-[280px]',
@@ -501,23 +501,23 @@ const Discounts: React.FC = () => {
             {discount.discount_mode === 'group' ? (
               <Badge variant="success" className="text-xs flex items-center gap-1">
                 <Users className="w-3 h-3" />
-                {__('Group Only', 'Group Only')}
+                {__('Group Only', 'yatra')}
               </Badge>
             ) : discount.discount_mode === 'promo' ? (
               <Badge variant="info" className="text-xs flex items-center gap-1">
                 <Tag className="w-3 h-3" />
-                {__('Promo Code', 'Promo Code')}
+                {__('Promo Code', 'yatra')}
               </Badge>
             ) : discount.is_group_discount ? (
               <Badge variant="warning" className="text-xs flex items-center gap-1">
                 <Tag className="w-3 h-3" />
                 <Users className="w-3 h-3" />
-                {__('Promo + Group', 'Promo + Group')}
+                {__('Promo + Group', 'yatra')}
               </Badge>
             ) : (
               <Badge variant="info" className="text-xs flex items-center gap-1">
                 <Tag className="w-3 h-3" />
-                {__('Promo Code', 'Promo Code')}
+                {__('Promo Code', 'yatra')}
               </Badge>
             )}
           </div>
@@ -539,7 +539,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'type',
-      label: __('Discount', 'Discount'),
+      label: __('Discount', 'yatra'),
       sortable: true,
       visible: visibleColumns.type,
       render: (discount: Discount) => (
@@ -551,7 +551,7 @@ const Discounts: React.FC = () => {
                 {discount.type === 'percentage' ? `${discount.amount}%` : `$${discount.amount}`}
               </span>
               <span className="text-xs text-gray-500">
-                {__('off', 'off')}
+                {__('off', 'yatra')}
               </span>
             </div>
           )}
@@ -585,8 +585,8 @@ const Discounts: React.FC = () => {
                     <div key={idx} className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                       <Users className="w-3 h-3" />
                       <span>
-                        {range.min_group_size}{range.max_group_size ? `-${range.max_group_size}` : '+'} {__('pax', 'pax')}: 
-                        {range.discount_type === 'percentage' ? ` ${range.discount_amount}%` : ` $${range.discount_amount}`} {__('off', 'off')}
+                        {range.min_group_size}{range.max_group_size ? `-${range.max_group_size}` : '+'} {__('pax', 'yatra')}: 
+                        {range.discount_type === 'percentage' ? ` ${range.discount_amount}%` : ` $${range.discount_amount}`} {__('off', 'yatra')}
                       </span>
                     </div>
                   ))}
@@ -596,8 +596,8 @@ const Discounts: React.FC = () => {
                 <div className="text-xs text-green-600 dark:text-green-400 flex items-center gap-1">
                   <Users className="w-3 h-3" />
                   {discount.min_group_size 
-                    ? `${discount.min_group_size}+ ${__('travelers', 'travelers')}: ${discount.group_discount_type === 'percentage' ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`}`
-                    : __('Group pricing', 'Group pricing')
+                    ? `${discount.min_group_size}+ ${__('travelers', 'yatra')}: ${discount.group_discount_type === 'percentage' ? `${discount.group_discount_amount}%` : `$${discount.group_discount_amount}`}`
+                    : __('Group pricing', 'yatra')
                   }
                 </div>
               )}
@@ -608,7 +608,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'usage',
-      label: __('Usage', 'Usage'),
+      label: __('Usage', 'yatra'),
       sortable: true,
       visible: visibleColumns.usage,
       render: (discount: Discount) => (
@@ -622,20 +622,20 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'expiry_date',
-      label: __('Expiry Date', 'Expiry Date'),
+      label: __('Expiry Date', 'yatra'),
       sortable: true,
       visible: visibleColumns.expiry_date,
       render: (discount: Discount) => (
         <span className="text-gray-500 dark:text-gray-400 text-sm">
           {discount.expiry_date
             ? formatDate(discount.expiry_date)
-            : __('No expiry', 'No expiry')}
+            : __('No expiry', 'yatra')}
         </span>
       ),
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       visible: visibleColumns.status,
       render: (discount: Discount) => getStatusBadge(discount.status),
@@ -645,19 +645,19 @@ const Discounts: React.FC = () => {
   const actions = [
     {
       key: 'duplicate',
-      label: __('Duplicate', 'Duplicate'),
+      label: __('Duplicate', 'yatra'),
       icon: <Copy className="w-4 h-4" />,
       onClick: (discount: Discount) => handleDuplicate(discount),
     },
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (discount: Discount) => handleEdit(discount),
     },
     {
       key: 'mark_publish',
-      label: __('Mark as Publish', 'Mark as Publish'),
+      label: __('Mark as Publish', 'yatra'),
       icon: <ArrowUp className="w-4 h-4" />,
       onClick: async (discount: Discount) => {
         setIsBulkPending(true);
@@ -665,13 +665,13 @@ const Discounts: React.FC = () => {
           await updateStatusForIds([discount.id], 'publish');
           queryClient.invalidateQueries({ queryKey: ['discounts'] });
           showToast(
-            __('Discount status updated', 'Discount status updated'),
+            __('Discount status updated', 'yatra'),
             'success'
           );
         } catch (error: any) {
           showToast(
             error?.message ||
-              __('Failed to update discount status', 'Failed to update discount status'),
+              __('Failed to update discount status', 'yatra'),
             'error'
           );
         } finally {
@@ -682,7 +682,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'mark_draft',
-      label: __('Mark as Draft', 'Mark as Draft'),
+      label: __('Mark as Draft', 'yatra'),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (discount: Discount) => {
         setIsBulkPending(true);
@@ -690,13 +690,13 @@ const Discounts: React.FC = () => {
           await updateStatusForIds([discount.id], 'draft');
           queryClient.invalidateQueries({ queryKey: ['discounts'] });
           showToast(
-            __('Discount status updated', 'Discount status updated'),
+            __('Discount status updated', 'yatra'),
             'success'
           );
         } catch (error: any) {
           showToast(
             error?.message ||
-              __('Failed to update discount status', 'Failed to update discount status'),
+              __('Failed to update discount status', 'yatra'),
             'error'
           );
         } finally {
@@ -707,7 +707,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'move_trash',
-      label: __('Move to Trash', 'Move to Trash'),
+      label: __('Move to Trash', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: async (discount: Discount) => {
         setIsBulkPending(true);
@@ -715,13 +715,13 @@ const Discounts: React.FC = () => {
           await updateStatusForIds([discount.id], 'trash');
           queryClient.invalidateQueries({ queryKey: ['discounts'] });
           showToast(
-            __('Discount moved to trash', 'Discount moved to trash'),
+            __('Discount moved to trash', 'yatra'),
             'success'
           );
         } catch (error: any) {
           showToast(
             error?.message ||
-              __('Failed to move discount to trash', 'Failed to move discount to trash'),
+              __('Failed to move discount to trash', 'yatra'),
             'error'
           );
         } finally {
@@ -732,7 +732,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'mark_expired',
-      label: __('Mark as Expired', 'Mark as Expired'),
+      label: __('Mark as Expired', 'yatra'),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (discount: Discount) => {
         setIsBulkPending(true);
@@ -740,13 +740,13 @@ const Discounts: React.FC = () => {
           await updateStatusForIds([discount.id], 'expired');
           queryClient.invalidateQueries({ queryKey: ['discounts'] });
           showToast(
-            __('Discount status updated', 'Discount status updated'),
+            __('Discount status updated', 'yatra'),
             'success'
           );
         } catch (error: any) {
           showToast(
             error?.message ||
-              __('Failed to update discount status', 'Failed to update discount status'),
+              __('Failed to update discount status', 'yatra'),
             'error'
           );
         } finally {
@@ -757,7 +757,7 @@ const Discounts: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (discount: Discount) => handleDelete(discount),
       variant: 'destructive' as const,
@@ -770,8 +770,8 @@ const Discounts: React.FC = () => {
       <Modal
         isOpen={showDiscountTypeModal}
         onClose={() => setShowDiscountTypeModal(false)}
-        title={__('What type of discount do you want to create?', 'What type of discount do you want to create?')}
-        description={__('Choose the discount type that best fits your needs', 'Choose the discount type that best fits your needs')}
+        title={__('What type of discount do you want to create?', 'yatra')}
+        description={__('Choose the discount type that best fits your needs', 'yatra')}
         size="lg"
         footer={
           <div className="flex justify-end">
@@ -779,7 +779,7 @@ const Discounts: React.FC = () => {
               variant="outline" 
               onClick={() => setShowDiscountTypeModal(false)}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
           </div>
         }
@@ -794,10 +794,10 @@ const Discounts: React.FC = () => {
               <Tag className="w-7 h-7 text-blue-600 dark:text-blue-400" />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-              {__('Promo Code', 'Promo Code')}
+              {__('Promo Code', 'yatra')}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              {__('Customer enters a code to get a percentage or fixed discount', 'Customer enters a code to get a percentage or fixed discount')}
+              {__('Customer enters a code to get a percentage or fixed discount', 'yatra')}
             </p>
           </button>
 
@@ -812,17 +812,17 @@ const Discounts: React.FC = () => {
                 style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
               >
                 <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
-                <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+                <span style={{ color: '#ffffff' }}>{__('Pro', 'yatra')}</span>
               </div>
             )}
             <div className="w-14 h-14 bg-green-100 dark:bg-green-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-green-200 dark:group-hover:bg-green-800 transition-colors">
               <Users className="w-7 h-7 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-              {__('Group Discount', 'Group Discount')}
+              {__('Group Discount', 'yatra')}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              {__('Auto-applies when booking multiple travelers. No code needed.', 'Auto-applies when booking multiple travelers. No code needed.')}
+              {__('Auto-applies when booking multiple travelers. No code needed.', 'yatra')}
             </p>
           </button>
 
@@ -837,7 +837,7 @@ const Discounts: React.FC = () => {
                 style={{ background: 'linear-gradient(to right, #f59e0b, #f97316)', color: '#ffffff', border: '1px solid #fbbf24' }}
               >
                 <Lock className="w-3 h-3" style={{ color: '#ffffff' }} />
-                <span style={{ color: '#ffffff' }}>{__('Pro', 'Pro')}</span>
+                <span style={{ color: '#ffffff' }}>{__('Pro', 'yatra')}</span>
               </div>
             )}
             <div className="w-14 h-14 bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
@@ -847,10 +847,10 @@ const Discounts: React.FC = () => {
               </div>
             </div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-              {__('Promo + Group', 'Promo + Group')}
+              {__('Promo + Group', 'yatra')}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              {__('Promo code gives base discount + extra savings for groups', 'Promo code gives base discount + extra savings for groups')}
+              {__('Promo code gives base discount + extra savings for groups', 'yatra')}
             </p>
           </button>
         </div>
@@ -860,13 +860,13 @@ const Discounts: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, discount: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Discount', 'Delete Discount')}
+        title={__('Delete Discount', 'yatra')}
         message={deleteConfirm.discount 
-          ? __('Are you sure you want to delete discount code "{code}"? This action cannot be undone.', 'Are you sure you want to delete discount code "{code}"? This action cannot be undone.').replace('{code}', deleteConfirm.discount.code)
-          : __('Are you sure you want to delete this discount? This action cannot be undone.', 'Are you sure you want to delete this discount? This action cannot be undone.')
+          ? __('Are you sure you want to delete discount code "{code}"? This action cannot be undone.', 'yatra').replace('{code}', deleteConfirm.discount.code)
+          : __('Are you sure you want to delete this discount? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -881,13 +881,13 @@ const Discounts: React.FC = () => {
       />
 
       <PageHeader
-        title={__('Discounts', 'Discounts')}
-        description={__('Create and manage discount coupons for your trips', 'Create and manage discount coupons for your trips')}
+        title={__('Discounts', 'yatra')}
+        description={__('Create and manage discount coupons for your trips', 'yatra')}
         actionCapability="yatra_edit_bookings"
         actions={
           <Button onClick={handleCreateDiscount} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Create Discount', 'Create Discount')}
+            {__('Create Discount', 'yatra')}
           </Button>
         }
       />
@@ -918,7 +918,7 @@ const Discounts: React.FC = () => {
                 sortOptions={sortOptions}
                 onResetFilters={handleResetFilters}
                 hasFilters={!!hasFilters}
-                placeholder={__('Search by code...', 'Search by code...')}
+                placeholder={__('Search by code...', 'yatra')}
               />
             </div>
 
@@ -931,9 +931,9 @@ const Discounts: React.FC = () => {
                 }}
                 className="w-full lg:w-48 max-w-xs"
               >
-                <option value="all">{__('All Types', 'All Types')}</option>
-                <option value="percentage">{__('Percentage', 'Percentage')}</option>
-                <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+                <option value="all">{__('All Types', 'yatra')}</option>
+                <option value="percentage">{__('Percentage', 'yatra')}</option>
+                <option value="fixed">{__('Fixed Amount', 'yatra')}</option>
               </Select>
             </div>
           </div>
@@ -956,27 +956,27 @@ const Discounts: React.FC = () => {
             statusOptions={[
               {
                 key: 'all',
-                label: __('All', 'All'),
+                label: __('All', 'yatra'),
                 count: 0,
               },
               {
                 key: 'publish',
-                label: __('Publish', 'Publish'),
+                label: __('Publish', 'yatra'),
                 count: 0,
               },
               {
                 key: 'draft',
-                label: __('Draft', 'Draft'),
+                label: __('Draft', 'yatra'),
                 count: 0,
               },
               {
                 key: 'trash',
-                label: __('Trash', 'Trash'),
+                label: __('Trash', 'yatra'),
                 count: 0,
               },
               {
                 key: 'expired',
-                label: __('Expired', 'Expired'),
+                label: __('Expired', 'yatra'),
                 count: 0,
               },
             ]}
@@ -997,16 +997,16 @@ const Discounts: React.FC = () => {
                 actions={actions}
                 isLoading={isLoading}
                 isError={isDiscountsError}
-                errorText={__('Error loading discounts', 'Error loading discounts')}
+                errorText={__('Error loading discounts', 'yatra')}
                 errorDescription={__('We couldn\'t connect to the discounts service. Please refresh or try again shortly.', 'We couldn\'t connect to the discounts service. Please refresh or try again shortly.')}
                 errorDetails={derivedErrorDetails}
                 errorRequestInfo={errorContext.requestInfo}
                 onRetry={() => refetch()}
-                emptyText={__('No discounts found', 'No discounts found')}
+                emptyText={__('No discounts found', 'yatra')}
                 emptyDescription={
                   hasFilters
-                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                    : __('Get started by creating your first discount coupon.', 'Get started by creating your first discount coupon.')
+                    ? __('Try adjusting your filters to see more results.', 'yatra')
+                    : __('Get started by creating your first discount coupon.', 'yatra')
                 }
                 onCreateClick={
                   can('yatra_edit_bookings') ? handleCreateDiscount : undefined
@@ -1032,7 +1032,7 @@ const Discounts: React.FC = () => {
                 totalItems={total}
                 itemsPerPage={itemsPerPage}
                 onPageChange={(newPage) => setPage(newPage)}
-                itemName={__('coupons', 'coupons')}
+                itemName={__('coupons', 'yatra')}
               />
             </div>
           )}

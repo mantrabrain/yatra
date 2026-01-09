@@ -177,19 +177,19 @@ const AttributeForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.field_type) {
-      newErrors.field_type = __('Field type is required', 'Field type is required');
+      newErrors.field_type = __('Field type is required', 'yatra');
     }
 
     // Validate field options for select/radio/checkbox
     if ((formData.field_type === 'select' || formData.field_type === 'radio' || formData.field_type === 'checkbox')) {
       if (!formData.field_options.trim()) {
-        newErrors.field_options = __('Field options are required for this field type', 'Field options are required for this field type');
+        newErrors.field_options = __('Field options are required for this field type', 'yatra');
       } else if (!validateFieldOptions(formData.field_options)) {
-        newErrors.field_options = __('Invalid JSON format. Use: [{"label": "Name", "value": "value"}]', 'Invalid JSON format. Use: [{"label": "Name", "value": "value"}]');
+        newErrors.field_options = __('Invalid JSON format. Use: [{"label": "Name", "value": "value"}]', 'yatra');
       }
     }
 
@@ -271,7 +271,7 @@ const AttributeForm: React.FC = () => {
   // Handle attribute loading error
   useEffect(() => {
     if (attributeError) {
-      showToast(__('Failed to load attribute data', 'Failed to load attribute data'), 'error');
+      showToast(__('Failed to load attribute data', 'yatra'), 'error');
     }
   }, [attributeError, showToast]);
 
@@ -331,8 +331,8 @@ const AttributeForm: React.FC = () => {
       setIsSubmitting(false);
       showToast(
         isEditMode 
-          ? __('Attribute updated successfully', 'Attribute updated successfully')
-          : __('Attribute created successfully', 'Attribute created successfully'),
+          ? __('Attribute updated successfully', 'yatra')
+          : __('Attribute created successfully', 'yatra'),
         'success'
       );
       
@@ -357,7 +357,7 @@ const AttributeForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the attribute', 'An error occurred while saving the attribute');
+      const errorMessage = error?.message || __('An error occurred while saving the attribute', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -433,8 +433,8 @@ const AttributeForm: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Error Loading Attribute', 'Error Loading Attribute')}
-          description={__('Unable to load attribute data. Please try again.', 'Unable to load attribute data. Please try again.')}
+          title={__('Error Loading Attribute', 'yatra')}
+          description={__('Unable to load attribute data. Please try again.', 'yatra')}
           actions={
             <Button
               variant="outline"
@@ -442,20 +442,20 @@ const AttributeForm: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-6 text-center">
             <div className="text-red-500 mb-4">
-              {__('Failed to load attribute data. The attribute may not exist or there might be a server error.', 'Failed to load attribute data. The attribute may not exist or there might be a server error.')}
+              {__('Failed to load attribute data. The attribute may not exist or there might be a server error.', 'yatra')}
             </div>
             <Button
               variant="outline"
               onClick={() => window.location.reload()}
             >
-              {__('Try Again', 'Try Again')}
+              {__('Try Again', 'yatra')}
             </Button>
           </CardContent>
         </Card>
@@ -466,8 +466,8 @@ const AttributeForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Attribute', 'Edit Attribute') : __('Add New Attribute', 'Add New Attribute')}
-        description={isEditMode ? __('Update attribute information', 'Update attribute information') : __('Create a new trip attribute', 'Create a new trip attribute')}
+        title={isEditMode ? __('Edit Attribute', 'yatra') : __('Add New Attribute', 'yatra')}
+        description={isEditMode ? __('Update attribute information', 'yatra') : __('Create a new trip attribute', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -475,7 +475,7 @@ const AttributeForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -488,19 +488,19 @@ const AttributeForm: React.FC = () => {
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'Name')} <span className="text-red-500">*</span>
+                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) => handleFieldChange('name', e.target.value)}
-                      placeholder={__('Enter attribute name', 'Enter attribute name')}
+                      placeholder={__('Enter attribute name', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                     />
                     {errors.name && (
@@ -511,14 +511,14 @@ const AttributeForm: React.FC = () => {
                   {/* Slug */}
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')}
+                      {__('Slug', 'yatra')}
                     </label>
                     <div className="flex gap-2">
                       <Input
                         id="slug"
                         value={formData.slug}
                         onChange={(e) => handleFieldChange('slug', e.target.value)}
-                        placeholder={__('attribute-slug', 'attribute-slug')}
+                        placeholder={__('attribute-slug', 'yatra')}
                         disabled={!isSlugEditable}
                         className={`flex-1 ${errors.slug ? 'border-red-500' : ''}`}
                       />
@@ -538,11 +538,11 @@ const AttributeForm: React.FC = () => {
                     </div>
                     {isSlugEditable ? (
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {__('Click the save icon to preserve your custom slug.', 'Click the save icon to preserve your custom slug.')}
+                        {__('Click the save icon to preserve your custom slug.', 'yatra')}
                       </p>
                     ) : (
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {__('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')}
+                        {__('Auto-generated from name. Click edit icon to customize.', 'yatra')}
                       </p>
                     )}
                   </div>
@@ -550,13 +550,13 @@ const AttributeForm: React.FC = () => {
                   {/* Description */}
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
+                      {__('Description', 'yatra')}
                     </label>
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Enter attribute description', 'Enter attribute description')}
+                      placeholder={__('Enter attribute description', 'yatra')}
                       rows={6}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -567,14 +567,14 @@ const AttributeForm: React.FC = () => {
               {/* Field Configuration */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Field Configuration', 'Field Configuration')}</CardTitle>
+                  <CardTitle className="text-base">{__('Field Configuration', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Field Type */}
                     <div>
                       <label htmlFor="field_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Field Type', 'Field Type')} <span className="text-red-500">*</span>
+                        {__('Field Type', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Select
                         id="field_type"
@@ -596,7 +596,7 @@ const AttributeForm: React.FC = () => {
                     {/* Display Order */}
                     <div>
                       <label htmlFor="display_order" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Display Order', 'Display Order')}
+                        {__('Display Order', 'yatra')}
                       </label>
                       <Input
                         id="display_order"
@@ -612,7 +612,7 @@ const AttributeForm: React.FC = () => {
                   {(formData.field_type === 'select' || formData.field_type === 'radio' || formData.field_type === 'checkbox') && (
                     <div>
                       <label htmlFor="field_options" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Field Options', 'Field Options')} <span className="text-red-500">*</span>
+                        {__('Field Options', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="field_options"
@@ -622,7 +622,7 @@ const AttributeForm: React.FC = () => {
                         className={errors.field_options ? 'border-red-500' : ''}
                       />
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                        {__('Format: [{"label": "Display Name", "value": "value"}]', 'Format: [{"label": "Display Name", "value": "value"}]')}
+                        {__('Format: [{"label": "Display Name", "value": "value"}]', 'yatra')}
                       </p>
                       {errors.field_options && (
                         <p className="mt-1 text-sm text-red-500">{errors.field_options}</p>
@@ -633,26 +633,26 @@ const AttributeForm: React.FC = () => {
                   {/* Default Value */}
                   <div>
                     <label htmlFor="default_value" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Default Value', 'Default Value')}
+                      {__('Default Value', 'yatra')}
                     </label>
                     <Input
                       id="default_value"
                       value={formData.default_value}
                       onChange={(e) => handleFieldChange('default_value', e.target.value)}
-                      placeholder={__('Default value for the field', 'Default value for the field')}
+                      placeholder={__('Default value for the field', 'yatra')}
                     />
                   </div>
 
                   {/* Placeholder */}
                   <div>
                     <label htmlFor="placeholder" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Placeholder', 'Placeholder')}
+                      {__('Placeholder', 'yatra')}
                     </label>
                     <Input
                       id="placeholder"
                       value={formData.placeholder}
                       onChange={(e) => handleFieldChange('placeholder', e.target.value)}
-                      placeholder={__('Placeholder text for input field', 'Placeholder text for input field')}
+                      placeholder={__('Placeholder text for input field', 'yatra')}
                     />
                   </div>
                 </CardContent>
@@ -664,21 +664,21 @@ const AttributeForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -687,12 +687,12 @@ const AttributeForm: React.FC = () => {
               {/* Field Options */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Field Options', 'Field Options')}</CardTitle>
+                  <CardTitle className="text-base">{__('Field Options', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center justify-between">
                     <label htmlFor="show_on_frontend" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                      {__('Show on Frontend', 'Show on Frontend')}
+                      {__('Show on Frontend', 'yatra')}
                     </label>
                     <Switch
                       checked={formData.show_on_frontend}
@@ -702,7 +702,7 @@ const AttributeForm: React.FC = () => {
 
                   <div className="flex items-center justify-between">
                     <label htmlFor="show_in_filters" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                      {__('Show in Filters', 'Show in Filters')}
+                      {__('Show in Filters', 'yatra')}
                     </label>
                     <Switch
                       checked={formData.show_in_filters}
@@ -712,7 +712,7 @@ const AttributeForm: React.FC = () => {
 
                   <div className="flex items-center justify-between">
                     <label htmlFor="searchable" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                      {__('Searchable', 'Searchable')}
+                      {__('Searchable', 'yatra')}
                     </label>
                     <Switch
                       checked={formData.searchable}
@@ -722,7 +722,7 @@ const AttributeForm: React.FC = () => {
 
                   <div className="flex items-center justify-between">
                     <label htmlFor="required" className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                      {__('Required Field', 'Required Field')}
+                      {__('Required Field', 'yatra')}
                     </label>
                     <Switch
                       checked={formData.required}
@@ -735,14 +735,14 @@ const AttributeForm: React.FC = () => {
               {/* Icon/Image Picker */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Attribute Icon', 'Attribute Icon')}</CardTitle>
+                  <CardTitle className="text-base">{__('Attribute Icon', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
                     onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Icon or Image', 'Icon or Image')}
-                    helpText={__('Select an icon from the library or upload a custom image for this attribute.', 'Select an icon from the library or upload a custom image for this attribute.')}
+                    label={__('Icon or Image', 'yatra')}
+                    helpText={__('Select an icon from the library or upload a custom image for this attribute.', 'yatra')}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -763,12 +763,12 @@ const AttributeForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Attribute', 'Update Attribute') : __('Create Attribute', 'Create Attribute')}
+                            {isEditMode ? __('Update Attribute', 'yatra') : __('Create Attribute', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -778,7 +778,7 @@ const AttributeForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

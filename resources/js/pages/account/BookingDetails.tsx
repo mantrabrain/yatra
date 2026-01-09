@@ -119,7 +119,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
@@ -138,7 +138,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
           </div>
           <div
             role="button"
@@ -147,11 +147,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
           >
             <ArrowRight className="w-4 h-4 rotate-180" />
-            {__('Back to Bookings', 'Back to Bookings')}
+            {__('Back to Bookings', 'yatra')}
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6 text-center text-red-500">
-          {__('Booking not found or error loading booking', 'Booking not found or error loading booking')}
+          {__('Booking not found or error loading booking', 'yatra')}
         </div>
       </div>
     );
@@ -180,9 +180,9 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'Booking Details')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {__('Complete booking information', 'Complete booking information')}
+            {__('Complete booking information', 'yatra')}
           </p>
         </div>
         <div
@@ -192,7 +192,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         >
           <ArrowRight className="w-4 h-4 rotate-180" />
-          {__('Back to Bookings', 'Back to Bookings')}
+          {__('Back to Bookings', 'yatra')}
         </div>
       </div>
 
@@ -202,7 +202,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           {/* Booking Overview */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Overview', 'Booking Overview')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Overview', 'yatra')}</h3>
               <div className="flex items-center gap-2">
                 <span className={getBadge(booking.booking_status)}>{__(booking.booking_status || 'pending', booking.booking_status || 'pending')}</span>
                 <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
@@ -211,7 +211,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Booking Number', 'Booking Number')}
+                  {__('Booking Number', 'yatra')}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {booking.booking_number || `#${booking.id}`}
@@ -219,7 +219,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Trip', 'Trip')}
+                  {__('Trip', 'yatra')}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {booking.trip_title}
@@ -230,14 +230,14 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                     className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    {__('View Trip', 'View Trip')}
+                    {__('View Trip', 'yatra')}
                   </a>
                 ) : null}
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <CalendarIcon className="w-3 h-3" />
-                  {__('Booking Date', 'Booking Date')}
+                  {__('Booking Date', 'yatra')}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.booking_date || booking.created_at)}
@@ -246,7 +246,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <CalendarIcon className="w-3 h-3" />
-                  {__('Travel Date', 'Travel Date')}
+                  {__('Travel Date', 'yatra')}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.travel_date)}
@@ -255,16 +255,16 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  {__('Number of Travelers', 'Number of Travelers')}
+                  {__('Number of Travelers', 'yatra')}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'Traveler') : __('Travelers', 'Travelers')}
+                  {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'yatra') : __('Travelers', 'yatra')}
                 </div>
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <DollarSignIcon className="w-3 h-3" />
-                  {__('Total Amount', 'Total Amount')}
+                  {__('Total Amount', 'yatra')}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {formatPriceForBooking(booking.total_amount, booking.currency)}
@@ -275,7 +275,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 
           {/* Customer Information */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Customer Information', 'Customer Information')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Customer Information', 'yatra')}</h3>
             <div className="space-y-3">
               <div>
                 <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
@@ -304,9 +304,9 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                {__('Travelers Information', 'Travelers Information')}
+                {__('Travelers Information', 'yatra')}
                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                  ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'yatra') : __('travelers', 'yatra')})
                 </span>
               </h3>
               <div className="space-y-4">
@@ -338,7 +338,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
+                          {index === 0 ? __('Lead Traveler', 'yatra') : `${__('Traveler', 'yatra')} ${index + 1}`}
                           {(firstName || lastName) && (
                             <span className="font-normal text-gray-500 dark:text-gray-400 ml-2">
                               - {[firstName, lastName].filter(Boolean).join(' ')}
@@ -347,7 +347,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                         </h4>
                         {index === 0 && (
                           <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
-                            {__('Primary Contact', 'Primary Contact')}
+                            {__('Primary Contact', 'yatra')}
                           </span>
                         )}
                       </div>
@@ -390,7 +390,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5" />
-                {__('Emergency Contact', 'Emergency Contact')}
+                {__('Emergency Contact', 'yatra')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {Object.entries(emergencyContact)
@@ -415,7 +415,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <FileTextIcon className="w-5 h-5" />
-                {__('Special Requests', 'Special Requests')}
+                {__('Special Requests', 'yatra')}
               </h3>
               <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {booking.notes}
@@ -428,7 +428,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Download className="w-5 h-5" />
-                {__('Downloads', 'Downloads')}
+                {__('Downloads', 'yatra')}
               </h3>
               <div className="space-y-3">
                 {(booking as any).downloads.map((d: any) => (
@@ -445,7 +445,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                     {d.locked || !d.url ? (
                       <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium cursor-not-allowed">
                         <Download className="w-4 h-4" />
-                        {__('Not Available', 'Not Available')}
+                        {__('Not Available', 'yatra')}
                       </div>
                     ) : (
                       <a
@@ -455,7 +455,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                         className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
                       >
                         <Download className="w-4 h-4" />
-                        {__('Download', 'Download')}
+                        {__('Download', 'yatra')}
                       </a>
                     )}
                   </div>
@@ -469,11 +469,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
         <div className="space-y-6">
           {/* Payment Information */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Payment Information', 'Payment Information')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Payment Information', 'yatra')}</h3>
             <div className="space-y-3">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Payment Status', 'Payment Status')}
+                  {__('Payment Status', 'yatra')}
                 </div>
                 <div className="mt-1">
                   <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
@@ -483,7 +483,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <CreditCard className="w-3 h-3" />
-                    {__('Payment Method', 'Payment Method')}
+                    {__('Payment Method', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {booking.payment_method}
@@ -492,7 +492,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               )}
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Total Amount', 'Total Amount')}
+                  {__('Total Amount', 'yatra')}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {formatPriceForBooking(booking.total_amount, booking.currency)}
@@ -501,7 +501,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               {booking.amount_paid > 0 && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Amount Paid', 'Amount Paid')}
+                    {__('Amount Paid', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatPriceForBooking(booking.amount_paid, booking.currency)}
@@ -511,7 +511,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               {booking.amount_due > 0 && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Amount Due', 'Amount Due')}
+                    {__('Amount Due', 'yatra')}
                   </div>
                   <div className="text-sm font-semibold text-amber-600 dark:text-amber-400">
                     {formatPriceForBooking(booking.amount_due, booking.currency)}
@@ -523,11 +523,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 
           {/* Timeline */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Timeline', 'Timeline')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Timeline', 'yatra')}</h3>
             <div className="space-y-3">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Created', 'Created')}
+                  {__('Created', 'yatra')}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.created_at || booking.booking_date)}
@@ -536,7 +536,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               {booking.updated_at && booking.updated_at !== booking.created_at && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Last Updated', 'Last Updated')}
+                    {__('Last Updated', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatDate(booking.updated_at)}

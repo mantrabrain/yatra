@@ -239,19 +239,19 @@ const ViewBooking: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'confirmed': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Confirmed', 'Confirmed'),
+        label: __('Confirmed', 'yatra'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'cancelled': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Cancelled', 'Cancelled'),
+        label: __('Cancelled', 'yatra'),
       },
       'completed': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Completed', 'Completed'),
+        label: __('Completed', 'yatra'),
       },
     };
 
@@ -271,19 +271,19 @@ const ViewBooking: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'paid': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Paid', 'Paid'),
+        label: __('Paid', 'yatra'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'partial': {
         className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Partial', 'Partial'),
+        label: __('Partial', 'yatra'),
       },
       'refunded': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Refunded', 'Refunded'),
+        label: __('Refunded', 'yatra'),
       },
     };
 
@@ -426,8 +426,8 @@ const ViewBooking: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Booking Not Found', 'Booking Not Found')}
-          description={__('The booking you are looking for does not exist', 'The booking you are looking for does not exist')}
+          title={__('Booking Not Found', 'yatra')}
+          description={__('The booking you are looking for does not exist', 'yatra')}
           actions={
             <Button
               variant="outline"
@@ -435,13 +435,13 @@ const ViewBooking: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Bookings', 'Back to Bookings')}
+              {__('Back to Bookings', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center text-red-500">
-            {__('Error loading booking or booking not found', 'Error loading booking or booking not found')}
+            {__('Error loading booking or booking not found', 'yatra')}
           </CardContent>
         </Card>
       </div>
@@ -451,8 +451,8 @@ const ViewBooking: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Booking Details', 'Booking Details')}
-        description={__('View complete booking information', 'View complete booking information')}
+        title={__('Booking Details', 'yatra')}
+        description={__('View complete booking information', 'yatra')}
         actions={
           <div className="flex gap-2">
             <ConditionalRender capability="yatra_edit_bookings">
@@ -460,7 +460,7 @@ const ViewBooking: React.FC = () => {
                 onClick={handleEdit}
                 className="flex items-center gap-2"
               >
-                {__('Edit Booking', 'Edit Booking')}
+                {__('Edit Booking', 'yatra')}
               </Button>
             </ConditionalRender>
             <Button
@@ -469,7 +469,7 @@ const ViewBooking: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           </div>
         }
@@ -483,7 +483,7 @@ const ViewBooking: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Booking Overview', 'Booking Overview')}</CardTitle>
+                  <CardTitle className="text-base">{__('Booking Overview', 'yatra')}</CardTitle>
                   <div className="flex items-center gap-2">
                     {getBookingStatusBadge(booking.booking_status)}
                     {getPaymentStatusBadge(booking.payment_status)}
@@ -494,7 +494,7 @@ const ViewBooking: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Booking Number', 'Booking Number')}
+                      {__('Booking Number', 'yatra')}
                     </div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {booking.booking_number}
@@ -502,19 +502,19 @@ const ViewBooking: React.FC = () => {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Trip', 'Trip')}
+                      {__('Trip', 'yatra')}
                     </div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {booking.trip_title}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      {__('Trip ID', 'Trip ID')}: #{booking.trip_id}
+                      {__('Trip ID', 'yatra')}: #{booking.trip_id}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {__('Booking Date', 'Booking Date')}
+                      {__('Booking Date', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatDate(booking.booking_date)}
@@ -523,7 +523,7 @@ const ViewBooking: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
-                      {__('Travel Date', 'Travel Date')}
+                      {__('Travel Date', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatDate(booking.travel_date)}
@@ -532,16 +532,16 @@ const ViewBooking: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      {__('Number of Travelers', 'Number of Travelers')}
+                      {__('Number of Travelers', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
-                      {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'Traveler') : __('Travelers', 'Travelers')}
+                      {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'yatra') : __('Travelers', 'yatra')}
                     </div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <DollarSign className="w-3 h-3" />
-                      {__('Total Amount', 'Total Amount')}
+                      {__('Total Amount', 'yatra')}
                     </div>
                     <div className="text-lg font-semibold text-gray-900 dark:text-white">
                       {formatPrice(booking.total_amount || 0, booking.currency)}
@@ -554,7 +554,7 @@ const ViewBooking: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Customer Information', 'Customer Information')}</CardTitle>
+                <CardTitle className="text-base">{__('Customer Information', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
@@ -583,9 +583,9 @@ const ViewBooking: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    {formConfig?.traveler_form?.title || __('Travelers Information', 'Travelers Information')}
+                    {formConfig?.traveler_form?.title || __('Travelers Information', 'yatra')}
                     <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
-                      ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                      ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'yatra') : __('travelers', 'yatra')})
                     </span>
                   </CardTitle>
                 </CardHeader>
@@ -618,7 +618,7 @@ const ViewBooking: React.FC = () => {
                       >
                         <div className="flex items-center justify-between mb-3">
                           <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {index === 0 ? __('Lead Traveler', 'Lead Traveler') : `${__('Traveler', 'Traveler')} ${index + 1}`}
+                            {index === 0 ? __('Lead Traveler', 'yatra') : `${__('Traveler', 'yatra')} ${index + 1}`}
                             {/* Show name if available */}
                             {(firstName || lastName) && (
                               <span className="font-normal text-gray-500 dark:text-gray-400 ml-2">
@@ -628,7 +628,7 @@ const ViewBooking: React.FC = () => {
                           </h4>
                           {index === 0 && (
                             <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
-                              {__('Primary Contact', 'Primary Contact')}
+                              {__('Primary Contact', 'yatra')}
                             </span>
                           )}
                         </div>
@@ -674,7 +674,7 @@ const ViewBooking: React.FC = () => {
                         
                         {travelerEntries.length <= 2 && (
                           <div className="text-sm text-gray-400 dark:text-gray-500 italic mt-2">
-                            {__('Limited traveler information provided', 'Limited traveler information provided')}
+                            {__('Limited traveler information provided', 'yatra')}
                           </div>
                         )}
                       </div>
@@ -690,7 +690,7 @@ const ViewBooking: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <AlertCircle className="w-4 h-4" />
-                    {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'Emergency Contact')}
+                    {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -719,7 +719,7 @@ const ViewBooking: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    {__('Special Requests', 'Special Requests')}
+                    {__('Special Requests', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -739,7 +739,7 @@ const ViewBooking: React.FC = () => {
               (booking as any).google_calendar && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Google Calendar Sync', 'Google Calendar Sync')}</CardTitle>
+                  <CardTitle className="text-base">{__('Google Calendar Sync', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {(() => {
@@ -755,36 +755,36 @@ const ViewBooking: React.FC = () => {
                     return (
                       <>
                         <div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Status', 'Status')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Status', 'yatra')}</div>
                           <span className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${statusClass}`}>
                             {status}
                           </span>
                         </div>
 
                         <div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Last Synced', 'Last Synced')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Last Synced', 'yatra')}</div>
                           <div className="text-sm text-gray-900 dark:text-white">
-                            {gc.last_synced_at ? formatDate(gc.last_synced_at) : __('—', '—')}
+                            {gc.last_synced_at ? formatDate(gc.last_synced_at) : __('—', 'yatra')}
                           </div>
                         </div>
 
                         <div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Calendar', 'Calendar')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Calendar', 'yatra')}</div>
                           <div className="text-sm text-gray-900 dark:text-white break-all">
-                            {gc.calendar_id || __('—', '—')}
+                            {gc.calendar_id || __('—', 'yatra')}
                           </div>
                         </div>
 
                         <div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Event ID', 'Event ID')}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Event ID', 'yatra')}</div>
                           <div className="text-sm text-gray-900 dark:text-white font-mono break-all">
-                            {gc.event_id || __('—', '—')}
+                            {gc.event_id || __('—', 'yatra')}
                           </div>
                         </div>
 
                         {gc.error_message && (
                           <div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Error', 'Error')}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{__('Error', 'yatra')}</div>
                             <div className="text-sm text-red-600 dark:text-red-400 whitespace-pre-wrap">{gc.error_message}</div>
                           </div>
                         )}
@@ -798,12 +798,12 @@ const ViewBooking: React.FC = () => {
             {/* Payment Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Payment Information', 'Payment Information')}</CardTitle>
+                <CardTitle className="text-base">{__('Payment Information', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Payment Status', 'Payment Status')}
+                    {__('Payment Status', 'yatra')}
                   </div>
                   <div className="mt-1">
                     {getPaymentStatusBadge(booking.payment_status)}
@@ -813,7 +813,7 @@ const ViewBooking: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <CreditCard className="w-3 h-3" />
-                      {__('Payment Method', 'Payment Method')}
+                      {__('Payment Method', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {booking.payment_method}
@@ -822,7 +822,7 @@ const ViewBooking: React.FC = () => {
                 )}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Trip Price per Person', 'Trip Price per Person')}
+                    {__('Trip Price per Person', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatPrice(booking.trip_price)}
@@ -830,7 +830,7 @@ const ViewBooking: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Total Amount', 'Total Amount')}
+                    {__('Total Amount', 'yatra')}
                   </div>
                   <div className="text-lg font-semibold text-gray-900 dark:text-white">
                     {formatPrice(booking.total_amount || 0, booking.currency)}
@@ -849,24 +849,24 @@ const ViewBooking: React.FC = () => {
                       <path d="M2 17l10 5 10-5"></path>
                       <path d="M2 12l10 5 10-5"></path>
                     </svg>
-                    {__('Discount Applied', 'Discount Applied')}
+                    {__('Discount Applied', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
-                      {__('Discount Type', 'Discount Type')}
+                      {__('Discount Type', 'yatra')}
                     </div>
                     <div className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
                       {booking.discount_code?.toLowerCase().includes('group') || booking.discount_code?.includes('GROUP') 
-                        ? __('Group Discount', 'Group Discount')
-                        : __('Coupon Discount', 'Coupon Discount')}
+                        ? __('Group Discount', 'yatra')
+                        : __('Coupon Discount', 'yatra')}
                     </div>
                   </div>
                   {booking.discount_code && (
                     <div>
                       <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
-                        {__('Code', 'Code')}
+                        {__('Code', 'yatra')}
                       </div>
                       <div className="text-sm font-mono font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-1 rounded inline-block">
                         {booking.discount_code}
@@ -875,7 +875,7 @@ const ViewBooking: React.FC = () => {
                   )}
                   <div>
                     <div className="text-xs text-emerald-600 dark:text-emerald-400 uppercase tracking-wide mb-1">
-                      {__('Savings', 'Savings')}
+                      {__('Savings', 'yatra')}
                     </div>
                     <div className="text-xl font-bold text-emerald-700 dark:text-emerald-300">
                       -{formatPrice(booking.discount_amount, booking.currency)}
@@ -898,7 +898,7 @@ const ViewBooking: React.FC = () => {
                       : "text-amber-700 dark:text-amber-400"
                   }`}>
                     <FileSignature className="w-4 h-4" />
-                    {__('Consent Status', 'Consent Status')}
+                    {__('Consent Status', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -907,19 +907,19 @@ const ViewBooking: React.FC = () => {
                       {consentStatus.all_signed ? (
                         <span className="flex items-center gap-1">
                           <CheckCircle className="w-4 h-4" />
-                          {__('All Consents Signed', 'All Consents Signed')}
+                          {__('All Consents Signed', 'yatra')}
                         </span>
                       ) : (
                         <span className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          {__('Pending Signatures', 'Pending Signatures')}
+                          {__('Pending Signatures', 'yatra')}
                         </span>
                       )}
                     </span>
                   </div>
                   
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 dark:text-gray-400">{__('Signed', 'Signed')}</span>
+                    <span className="text-gray-600 dark:text-gray-400">{__('Signed', 'yatra')}</span>
                     <span className="font-medium text-gray-900 dark:text-white">
                       {consentStatus.total_signed} / {consentStatus.total_required}
                     </span>
@@ -937,7 +937,7 @@ const ViewBooking: React.FC = () => {
                   {consentStatus.pending_requests && consentStatus.pending_requests.length > 0 && (
                     <div className="pt-2 border-t border-amber-200 dark:border-amber-700">
                       <div className="text-xs text-amber-600 dark:text-amber-400 uppercase tracking-wide mb-2">
-                        {__('Pending', 'Pending')}
+                        {__('Pending', 'yatra')}
                       </div>
                       <div className="space-y-1">
                         {consentStatus.pending_requests.slice(0, 3).map((req: any, idx: number) => (
@@ -948,7 +948,7 @@ const ViewBooking: React.FC = () => {
                         ))}
                         {consentStatus.pending_requests.length > 3 && (
                           <div className="text-xs text-gray-500">
-                            +{consentStatus.pending_requests.length - 3} {__('more', 'more')}
+                            +{consentStatus.pending_requests.length - 3} {__('more', 'yatra')}
                           </div>
                         )}
                       </div>
@@ -964,7 +964,7 @@ const ViewBooking: React.FC = () => {
                       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=trip-consent`;
                     }}
                   >
-                    {__('Manage Consents', 'Manage Consents')}
+                    {__('Manage Consents', 'yatra')}
                   </Button>
                 </CardContent>
               </Card>
@@ -973,12 +973,12 @@ const ViewBooking: React.FC = () => {
             {/* Booking Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'Timeline')}</CardTitle>
+                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Created', 'Created')}
+                    {__('Created', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatDate(booking.created_at)}
@@ -987,7 +987,7 @@ const ViewBooking: React.FC = () => {
                 {booking.updated_at && booking.updated_at !== booking.created_at && (
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Last Updated', 'Last Updated')}
+                      {__('Last Updated', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatDate(booking.updated_at)}

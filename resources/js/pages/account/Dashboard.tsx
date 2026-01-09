@@ -97,13 +97,13 @@ const Dashboard: React.FC<DashboardProps> = ({
                 className="text-lg font-bold mb-2"
                 style={{ color: '#ffffff' }}
               >
-                {__('Welcome back,', 'Welcome back,')} {displayProfile?.name?.split(' ')[0] || __('Traveler', 'Traveler')}! 👋
+                {__('Welcome back,', 'yatra')} {displayProfile?.name?.split(' ')[0] || __('Traveler', 'yatra')}! 👋
               </h2>
               <p 
                 className="text-sm mb-4"
                 style={{ color: '#e0e7ff' }}
               >
-                {__('You have', 'You have')} {upcomingBookings.length} {upcomingBookings.length === 1 ? __('upcoming adventure', 'upcoming adventure') : __('upcoming adventures', 'upcoming adventures')} {__('coming up', 'coming up')}
+                {__('You have', 'yatra')} {upcomingBookings.length} {upcomingBookings.length === 1 ? __('upcoming adventure', 'yatra') : __('upcoming adventures', 'yatra')} {__('coming up', 'yatra')}
               </p>
               <div className="flex flex-wrap gap-3 mt-4">
                 <div 
@@ -118,7 +118,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   }}
                 >
                   <Calendar className="w-4 h-4" style={{ color: '#ffffff' }} />
-                  {__('View Calendar', 'View Calendar')}
+                  {__('View Calendar', 'yatra')}
                 </div>
                 <div 
                   role="button"
@@ -132,7 +132,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   }}
                 >
                   <FileText className="w-4 h-4" style={{ color: '#ffffff' }} />
-                  {__('My Documents', 'My Documents')}
+                  {__('My Documents', 'yatra')}
                 </div>
               </div>
             </div>
@@ -198,8 +198,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Upcoming Trips', 'Upcoming Trips')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{__('Your next adventures', 'Your next adventures')}</p>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Upcoming Trips', 'yatra')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{__('Your next adventures', 'yatra')}</p>
                 </div>
               </div>
               {upcomingBookings.length > 0 && (
@@ -209,7 +209,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   onClick={() => onSectionChange('bookings')}
                   className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors cursor-pointer"
                 >
-                  {__('View all', 'View all')}
+                  {__('View all', 'yatra')}
                   <ArrowRight className="w-4 h-4" />
                 </div>
               )}
@@ -238,7 +238,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                         </div>
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
-                          {booking.destination || __('Multiple destinations', 'Multiple destinations')}
+                          {booking.destination || __('Multiple destinations', 'yatra')}
                         </p>
                         <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
@@ -247,7 +247,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                           </span>
                           <span className="flex items-center gap-1">
                             <User className="w-3.5 h-3.5" />
-                            {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'Traveler') : __('Travelers', 'Travelers')}
+                            {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'yatra') : __('Travelers', 'yatra')}
                           </span>
                         </div>
                       </div>
@@ -261,8 +261,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Calendar className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No upcoming trips', 'No upcoming trips')}</p>
-                <p className="text-sm text-gray-400 dark:text-gray-500">{__('Start planning your next adventure!', 'Start planning your next adventure!')}</p>
+                <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No upcoming trips', 'yatra')}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-500">{__('Start planning your next adventure!', 'yatra')}</p>
               </div>
             )}
           </div>
@@ -277,7 +277,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                   <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Quick Actions', 'Quick Actions')}</h3>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Quick Actions', 'yatra')}</h3>
               </div>
             </div>
             <div className="p-6 space-y-3">
@@ -290,7 +290,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center gap-3">
                   <Package className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                   <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {__('View Bookings', 'View Bookings')}
+                    {__('View Bookings', 'yatra')}
                   </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -304,7 +304,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center gap-3">
                   <CreditCard className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                   <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {__('Make Payment', 'Make Payment')}
+                    {__('Make Payment', 'yatra')}
                   </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -318,7 +318,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center gap-3">
                   <FileText className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                   <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {__('My Documents', 'My Documents')}
+                    {__('My Documents', 'yatra')}
                   </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -332,7 +332,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <div className="flex items-center gap-3">
                   <LifeBuoy className="w-5 h-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                   <span className="font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                    {__('Get Support', 'Get Support')}
+                    {__('Get Support', 'yatra')}
                   </span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
@@ -348,8 +348,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                   <Bell className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Notifications', 'Notifications')}</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{__('Updates & reminders', 'Updates & reminders')}</p>
+                  <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Notifications', 'yatra')}</h3>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{__('Updates & reminders', 'yatra')}</p>
                 </div>
               </div>
             </div>
@@ -380,7 +380,7 @@ const Dashboard: React.FC<DashboardProps> = ({
               ) : (
                 <div className="text-center py-6">
                   <Bell className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-400 dark:text-gray-500">{__('No new notifications', 'No new notifications')}</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-500">{__('No new notifications', 'yatra')}</p>
                 </div>
               )}
             </div>
@@ -397,8 +397,8 @@ const Dashboard: React.FC<DashboardProps> = ({
                 <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Recent Activity', 'Recent Activity')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{__('Your latest updates', 'Your latest updates')}</p>
+                <h3 className="text-base font-semibold text-gray-900 dark:text-white">{__('Recent Activity', 'yatra')}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{__('Your latest updates', 'yatra')}</p>
               </div>
             </div>
           </div>
@@ -410,7 +410,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                     <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{__('Booking confirmed:', 'Booking confirmed:')} {booking.trip_title}</p>
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">{__('Booking confirmed:', 'yatra')} {booking.trip_title}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(booking.booking_date || booking.created_at)}</p>
                   </div>
                   <span className={getBadge(booking.booking_status)}>{__(booking.booking_status, booking.booking_status)}</span>
@@ -423,7 +423,7 @@ const Dashboard: React.FC<DashboardProps> = ({
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {__('Payment pending:', 'Payment pending:')} {currency(payment.amount)}
+                      {__('Payment pending:', 'yatra')} {currency(payment.amount)}
                     </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(payment.date)}</p>
                   </div>

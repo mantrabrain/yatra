@@ -68,7 +68,7 @@ const DestinationForm: React.FC = () => {
         const response = await apiClient.get(`/destinations/${destinationId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load destination', 'Failed to load destination'), 'error');
+        showToast(error?.message || __('Failed to load destination', 'yatra'), 'error');
         throw error;
       }
     },
@@ -139,13 +139,13 @@ const DestinationForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     setErrors(newErrors);
@@ -179,8 +179,8 @@ const DestinationForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['destination', destinationId] });
       showToast(
         isEditMode 
-          ? __('Destination updated successfully', 'Destination updated successfully')
-          : __('Destination created successfully', 'Destination created successfully'),
+          ? __('Destination updated successfully', 'yatra')
+          : __('Destination created successfully', 'yatra'),
         'success'
       );
       setIsSubmitting(false);
@@ -196,7 +196,7 @@ const DestinationForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the destination', 'An error occurred while saving the destination');
+      const errorMessage = error?.message || __('An error occurred while saving the destination', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -206,7 +206,7 @@ const DestinationForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -276,8 +276,8 @@ const DestinationForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Destination', 'Edit Destination') : __('Add New Destination', 'Add New Destination')}
-        description={isEditMode ? __('Update destination information', 'Update destination information') : __('Create a new travel destination', 'Create a new travel destination')}
+        title={isEditMode ? __('Edit Destination', 'yatra') : __('Add New Destination', 'yatra')}
+        description={isEditMode ? __('Update destination information', 'yatra') : __('Create a new travel destination', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -285,7 +285,7 @@ const DestinationForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -298,20 +298,20 @@ const DestinationForm: React.FC = () => {
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'Name')} <span className="text-red-500">*</span>
+                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('Enter destination name', 'Enter destination name')}
+                      placeholder={__('Enter destination name', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -323,7 +323,7 @@ const DestinationForm: React.FC = () => {
                   {/* Slug */}
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -331,7 +331,7 @@ const DestinationForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('destination-slug', 'destination-slug')}
+                        placeholder={__('destination-slug', 'yatra')}
                         className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                         disabled={!isSlugEditable}
                         required
@@ -340,7 +340,7 @@ const DestinationForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                       >
                         {isSlugEditable ? (
                           <X className="w-4 h-4" />
@@ -354,19 +354,19 @@ const DestinationForm: React.FC = () => {
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {isSlugEditable 
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')
                       }
                     </p>
                   </div>
 
                   {/* Description */}
                   <RichTextEditor
-                    label={__('Description', 'Description')}
+                    label={__('Description', 'yatra')}
                     value={formData.description || ''}
                     onChange={(value) => handleFieldChange('description', value)}
-                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'Write a rich description (supports formatting, lists, links...)')}
-                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'Use formatting, bullet lists, and links to create a compelling description. HTML is supported.')}
+                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'yatra')}
+                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'yatra')}
                     minHeight={360}
                     maxHeight={720}
                   />
@@ -380,12 +380,12 @@ const DestinationForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
@@ -393,9 +393,9 @@ const DestinationForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                       className="w-full h-10"
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -404,14 +404,14 @@ const DestinationForm: React.FC = () => {
               {/* Icon/Image Picker */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Destination Icon or Image', 'Destination Icon or Image')}</CardTitle>
+                  <CardTitle className="text-base">{__('Destination Icon or Image', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
                     onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
-                    helpText={__('Choose a library icon or upload a custom image to visually represent this destination.', 'Choose a library icon or upload a custom image to visually represent this destination.')}
+                    label={__('Select Icon or Upload Image', 'yatra')}
+                    helpText={__('Choose a library icon or upload a custom image to visually represent this destination.', 'yatra')}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -432,12 +432,12 @@ const DestinationForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Destination', 'Update Destination') : __('Create Destination', 'Create Destination')}
+                            {isEditMode ? __('Update Destination', 'yatra') : __('Create Destination', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -447,7 +447,7 @@ const DestinationForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

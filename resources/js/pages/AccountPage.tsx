@@ -26,13 +26,13 @@ import Support from './account/Support';
 import SavedTrips from './account/SavedTrips';
 
 const navigation: Array<{ id: Section; label: string; icon: React.ElementType }> = [
-  { id: 'dashboard', label: __('Dashboard', 'Dashboard'), icon: LayoutDashboard },
-  { id: 'bookings', label: __('Bookings', 'Bookings'), icon: Calendar },
-  { id: 'payments', label: __('Payments', 'Payments'), icon: CreditCard },
-  { id: 'documents', label: __('Documents', 'Documents'), icon: FileText },
-  { id: 'saved-trips', label: __('Saved Trips', 'Saved Trips'), icon: Heart },
-  { id: 'profile', label: __('Profile', 'Profile'), icon: User },
-  { id: 'support', label: __('Support', 'Support'), icon: LifeBuoy },
+  { id: 'dashboard', label: __('Dashboard', 'yatra'), icon: LayoutDashboard },
+  { id: 'bookings', label: __('Bookings', 'yatra'), icon: Calendar },
+  { id: 'payments', label: __('Payments', 'yatra'), icon: CreditCard },
+  { id: 'documents', label: __('Documents', 'yatra'), icon: FileText },
+  { id: 'saved-trips', label: __('Saved Trips', 'yatra'), icon: Heart },
+  { id: 'profile', label: __('Profile', 'yatra'), icon: User },
+  { id: 'support', label: __('Support', 'yatra'), icon: LifeBuoy },
 ];
 
 const AccountPage: React.FC = () => {
@@ -302,23 +302,23 @@ const AccountPage: React.FC = () => {
     
     return [
       {
-        label: __('Total Bookings', 'Total Bookings'),
+        label: __('Total Bookings', 'yatra'),
         value: displayProfile?.total_bookings ?? totalBookings,
         icon: Package,
         badge: displayProfile?.loyalty_tier || '',
       },
       {
-        label: __('Upcoming Trips', 'Upcoming Trips'),
+        label: __('Upcoming Trips', 'yatra'),
         value: upcoming,
         icon: Calendar,
       },
       {
-        label: __('Outstanding Balance', 'Outstanding Balance'),
+        label: __('Outstanding Balance', 'yatra'),
         value: currency(outstanding),
         icon: DollarSign,
       },
       {
-        label: __('Total Spent', 'Total Spent'),
+        label: __('Total Spent', 'yatra'),
         value: currency(totalSpent),
         icon: ShieldCheck,
       },
@@ -397,15 +397,15 @@ const AccountPage: React.FC = () => {
             <div>
               <p className="text-sm text-gray-500 dark:text-gray-400">{displayProfile?.registered_at ? formatDate(displayProfile.registered_at) : ''}</p>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {__('Hello,', 'Hello,')} {displayProfile?.name || __('Guest', 'Guest')}
+                {__('Hello,', 'yatra')} {displayProfile?.name || __('Guest', 'yatra')}
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('Manage bookings, payments, and documents – everything for your adventures in one place.', 'Manage bookings, payments, and documents – everything for your adventures in one place.')}
+                {__('Manage bookings, payments, and documents – everything for your adventures in one place.', 'yatra')}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
               <div role="button" tabIndex={0} onClick={() => {}} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer text-sm">
-                <LogOut className="w-4 h-4" /> {__('Logout', 'Logout')}
+                <LogOut className="w-4 h-4" /> {__('Logout', 'yatra')}
               </div>
             </div>
           </div>
@@ -436,8 +436,8 @@ const AccountPage: React.FC = () => {
 
             <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 text-white space-y-2 shadow-xl" style={{ backgroundColor: '#2563eb', backgroundImage: 'linear-gradient(to bottom right, #2563eb, #4f46e5)' }}>
               <ShieldCheck className="w-6 h-6 text-white" />
-              <p className="text-sm font-medium text-white">{__('Need help right away?', 'Need help right away?')}</p>
-              <p className="font-semibold text-lg text-white">{__('Concierge Desk', 'Concierge Desk')}</p>
+              <p className="text-sm font-medium text-white">{__('Need help right away?', 'yatra')}</p>
+              <p className="font-semibold text-lg text-white">{__('Concierge Desk', 'yatra')}</p>
               <p className="text-sm font-medium text-white">+1-800-555-0199</p>
             </div>
           </aside>
