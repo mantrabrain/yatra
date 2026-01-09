@@ -137,6 +137,9 @@ export const API_ENDPOINTS = {
   
   // Availability
   AVAILABILITY: (tripId: string | number) => `/trips/${tripId}/availability`,
+  
+  // Saved Trips
+  SAVED_TRIPS: '/saved-trips',
 } as const;
 
 // Type for endpoint keys

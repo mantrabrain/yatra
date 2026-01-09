@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-01-09T13:38:11+00:00\n"
+"POT-Creation-Date: 2026-01-09T13:41:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -13288,6 +13288,7 @@ msgstr ""
 #: assets/admin/dist/js/app.js:79717
 #: assets/dist/js/index-B3F_wdPj.js:103
 #: assets/dist/js/index-BId2ZWKw.js:902
+#: assets/dist/js/index-BR2i8ReK.js:902
 #: assets/dist/js/index-BXqWjmYY.js:898
 #: assets/dist/js/index-BmVLLpoQ.js:898
 #: assets/dist/js/index-CJHBeKuZ.js:898
@@ -15797,6 +15798,7 @@ msgid "Complete booking information"
 msgstr ""
 
 #: assets/dist/js/index-BId2ZWKw.js:522
+#: assets/dist/js/index-BR2i8ReK.js:522
 #: assets/dist/js/index-BXqWjmYY.js:522
 #: assets/dist/js/index-BmVLLpoQ.js:522
 #: assets/dist/js/index-CJHBeKuZ.js:522

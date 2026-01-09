@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
+import { API_ENDPOINTS } from '../lib/api-endpoints';
 import { __ } from '../lib/i18n';
 import {
   LayoutDashboard,
@@ -145,7 +146,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-profile'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/customers/me');
+        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_ME);
         // WP_REST_Response returns data directly when serialized
         // Check if response has the expected profile structure
         if (response && typeof response === 'object' && ('id' in response || 'name' in response || 'email' in response)) {
@@ -171,7 +172,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-bookings'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/customers/my-bookings');
+        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_BOOKINGS);
         return unwrapArrayResponse(response) as Booking[];
       } catch (error) {
         console.error('Error fetching bookings:', error);
@@ -186,7 +187,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-payments'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/customers/my-payments');
+        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_PAYMENTS);
         return unwrapArrayResponse(response) as Payment[];
       } catch (error) {
         console.error('Error fetching payments:', error);
@@ -201,7 +202,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-documents'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/customers/my-documents');
+        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_DOCUMENTS);
         return unwrapArrayResponse(response) as TravelDocument[];
       } catch (error) {
         console.error('Error fetching documents:', error);
@@ -216,7 +217,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-support'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/customers/my-support-tickets');
+        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_SUPPORT_TICKETS);
         return unwrapArrayResponse(response) as SupportTicket[];
       } catch (error) {
         console.error('Error fetching support tickets:', error);
@@ -234,7 +235,7 @@ const AccountPage: React.FC = () => {
     queryKey: ['account-saved-trips'],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/saved-trips');
+        const response = await apiClient.get(API_ENDPOINTS.SAVED_TRIPS);
         // WordPress REST API returns: {success: true, data: [...]}
         // apiClient might wrap it in response.data
         let trips = [];
