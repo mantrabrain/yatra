@@ -292,21 +292,21 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 
                                 {tripType === 'single_day' && availability.departure_time && (
                                   <div className="text-xs text-gray-600 dark:text-gray-400">
-                                    {__('Time', 'Time')}: {formatTimeForDisplay(availability.departure_time)} - {availability.arrival_time ? formatTimeForDisplay(availability.arrival_time) : ''}
+                                    {__('Time', 'yatra')}: {formatTimeForDisplay(availability.departure_time)} - {availability.arrival_time ? formatTimeForDisplay(availability.arrival_time) : ''}
                                   </div>
                                 )}
 
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Capacity', 'Capacity')}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Capacity', 'yatra')}</div>
                                     <div className="font-semibold text-gray-900 dark:text-white">{availability.total_seats}</div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Booked', 'Booked')}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Booked', 'yatra')}</div>
                                     <div className="font-semibold text-orange-600 dark:text-orange-400">{availability.booked_seats}</div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Available', 'Available')}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Available', 'yatra')}</div>
                                     <div className={`font-semibold ${
                                       availability.available_seats === 0
                                         ? 'text-red-600 dark:text-red-400'
@@ -318,7 +318,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                     </div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Price', 'Price')}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Price', 'yatra')}</div>
                                     <div className="font-semibold text-gray-900 dark:text-white">
                                       {getCurrencySymbol(currency)}{parseFloat(availability.discounted_price || availability.original_price).toLocaleString()}
                                     </div>
@@ -329,7 +329,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                   <div className="flex items-center gap-2 text-xs">
                                     <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                     <span className="text-gray-600 dark:text-gray-400">
-                                      {availability.waitlist_count} {__('people on waitlist', 'people on waitlist')}
+                                      {availability.waitlist_count} {__('people on waitlist', 'yatra')}
                                     </span>
                                   </div>
                                 )}
@@ -337,7 +337,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 {availability.is_blocked && availability.block_reason && (
                                   <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
                                     <Ban className="w-4 h-4" />
-                                    <span>{__('Blocked', 'Blocked')}: {availability.block_reason}</span>
+                                    <span>{__('Blocked', 'yatra')}: {availability.block_reason}</span>
                                   </div>
                                 )}
 
@@ -355,7 +355,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                     className="flex-1 text-xs h-7"
                                   >
                                     <Edit className="w-3 h-3 mr-1" />
-                                    {__('Edit', 'Edit')}
+                                    {__('Edit', 'yatra')}
                                   </Button>
                                   <Button
                                     variant="outline"
@@ -364,7 +364,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                     className="flex-1 text-xs h-7"
                                   >
                                     <Eye className="w-3 h-3 mr-1" />
-                                    {__('View', 'View')}
+                                    {__('View', 'yatra')}
                                   </Button>
                                 </div>
                               </div>
@@ -374,7 +374,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                       })}
                       {dateAvailabilities.length > 2 && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-1">
-                          +{dateAvailabilities.length - 2} {__('more', 'more')}
+                          +{dateAvailabilities.length - 2} {__('more', 'yatra')}
                         </div>
                       )}
                     </div>
@@ -390,23 +390,27 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
       <div className="flex flex-wrap items-center gap-4 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-green-300 dark:border-green-800 bg-green-100 dark:bg-green-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Available', 'Available')}</span>
+          <span className="text-gray-600 dark:text-gray-400">{__('Available', 'yatra')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-yellow-300 dark:border-yellow-800 bg-yellow-100 dark:bg-yellow-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Low Availability', 'Low Availability')}</span>
+          <span className="text-gray-600 dark:text-gray-400">{__('Low Availability', 'yatra')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-orange-300 dark:border-orange-800 bg-orange-100 dark:bg-orange-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Limited', 'Limited')}</span>
+          <span className="text-gray-600 dark:text-gray-400">{__('Limited', 'yatra')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Sold Out', 'Sold Out')}</span>
+          <span className="text-gray-600 dark:text-gray-400">{__('Sold Out', 'yatra')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-red-300 dark:border-red-800 bg-red-100 dark:bg-red-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Blocked', 'Blocked')}</span>
+          <span className="text-gray-600 dark:text-gray-400">{__('Blocked', 'yatra')}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
+          <span className="text-gray-600 dark:text-gray-400">{__('Not Available', 'yatra')}</span>
         </div>
       </div>
     </div>

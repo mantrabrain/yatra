@@ -132,7 +132,7 @@ const Items: React.FC = () => {
         const response = await apiClient.get('/items', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load items', 'Failed to load items'), 'error');
+        showToast(error?.message || __('Failed to load items', 'yatra'), 'error');
         throw error;
       }
     },
@@ -146,11 +146,11 @@ const Items: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['items'] });
       queryClient.invalidateQueries({ queryKey: ['items-stats'] });
-      showToast(__('Item deleted successfully', 'Item deleted successfully'), 'success');
+      showToast(__('Item deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, item: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete item', 'Failed to delete item'), 'error');
+      showToast(error?.message || __('Failed to delete item', 'yatra'), 'error');
     },
   });
 
@@ -175,7 +175,7 @@ const Items: React.FC = () => {
   const types = availableTypes;
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -194,15 +194,15 @@ const Items: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        label: __('Publish', 'yatra'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -290,13 +290,13 @@ const Items: React.FC = () => {
   };
 
   const columnOptions = [
-    { key: 'item', label: __('Item', 'Item'), visible: visibleColumns.item },
-    { key: 'type', label: __('Type', 'Type'), visible: visibleColumns.type },
-    { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-    { key: 'usage', label: __('Usage', 'Usage'), visible: visibleColumns.usage },
-    { key: 'date', label: __('Date', 'Date'), visible: visibleColumns.date },
-    { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
+    { key: 'item', label: __('Item', 'yatra'), visible: visibleColumns.item },
+    { key: 'type', label: __('Type', 'yatra'), visible: visibleColumns.type },
+    { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+    { key: 'usage', label: __('Usage', 'yatra'), visible: visibleColumns.usage },
+    { key: 'date', label: __('Date', 'yatra'), visible: visibleColumns.date },
+    { key: 'author', label: __('Author', 'yatra'), visible: visibleColumns.author },
   ];
 
   const isAllSelected = items.length > 0 && selectedIds.length === items.length;
@@ -339,31 +339,31 @@ const Items: React.FC = () => {
   }, [statsData]);
 
   const statusOptions = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-    { key: 'publish', label: __('Publish', 'Publish'), count: statusCounts.publish },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+    { key: 'publish', label: __('Publish', 'yatra'), count: statusCounts.publish },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
   ];
 
   const bulkActionOptions = useMemo(() => {
     if (statusFilter === 'trash') {
       return [
-        { value: 'restore', label: __('Restore to Draft', 'Restore to Draft') },
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'restore', label: __('Restore to Draft', 'yatra') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     return [
-      { value: 'publish', label: __('Mark as Published', 'Mark as Published') },
-      { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
-      { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
-      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      { value: 'publish', label: __('Mark as Published', 'yatra') },
+      { value: 'draft', label: __('Mark as Draft', 'yatra') },
+      { value: 'trash', label: __('Move to Trash', 'yatra') },
+      { value: 'delete', label: __('Delete Permanently', 'yatra') },
     ];
   }, [statusFilter]);
 
   const handleBulkApply = async () => {
     if (!bulkAction || selectedIds.length === 0) {
-      showToast(__('Please select items and a bulk action first.', 'Please select items and a bulk action first.'), 'error');
+      showToast(__('Please select items and a bulk action first.', 'yatra'), 'error');
       return;
     }
 
@@ -374,25 +374,25 @@ const Items: React.FC = () => {
 
       if (bulkAction === 'delete') {
         await Promise.all(selectedIds.map(id => apiClient.delete(`/items/${id}`)));
-        showToast(__('Items deleted successfully', 'Items deleted successfully'), 'success');
+        showToast(__('Items deleted successfully', 'yatra'), 'success');
       } else if (bulkAction === 'publish') {
         await Promise.all(selectedItems.map((item: Item) => updateItemStatus(item, 'publish')));
-        showToast(__('Items marked as published', 'Items marked as published'), 'success');
+        showToast(__('Items marked as published', 'yatra'), 'success');
       } else if (bulkAction === 'draft') {
         const targetStatus: 'draft' = 'draft';
         await Promise.all(selectedItems.map((item: Item) => updateItemStatus(item, targetStatus)));
         showToast(
           statusFilter === 'trash'
-            ? __('Items restored to draft', 'Items restored to draft')
-            : __('Items marked as draft', 'Items marked as draft'),
+            ? __('Items restored to draft', 'yatra')
+            : __('Items marked as draft', 'yatra'),
           'success'
         );
       } else if (bulkAction === 'trash') {
         await Promise.all(selectedItems.map((item: Item) => updateItemStatus(item, 'trash')));
-        showToast(__('Items moved to trash', 'Items moved to trash'), 'success');
+        showToast(__('Items moved to trash', 'yatra'), 'success');
       } else if (bulkAction === 'restore') {
         await Promise.all(selectedItems.map((item: Item) => updateItemStatus(item, 'draft')));
-        showToast(__('Items restored to draft', 'Items restored to draft'), 'success');
+        showToast(__('Items restored to draft', 'yatra'), 'success');
       }
 
       await queryClient.invalidateQueries({ queryKey: ['items'] });
@@ -400,7 +400,7 @@ const Items: React.FC = () => {
       setSelectedIds([]);
       setBulkAction('');
     } catch (error) {
-      showToast(__('Bulk action failed', 'Bulk action failed'), 'error');
+      showToast(__('Bulk action failed', 'yatra'), 'error');
     } finally {
       setBulkMutationPending(false);
     }
@@ -409,7 +409,7 @@ const Items: React.FC = () => {
   const columns = [
     {
       key: 'item',
-      label: __('Item', 'Item'),
+      label: __('Item', 'yatra'),
       sortable: true,
       width: 'w-[200px]',
       visible: visibleColumns.item,
@@ -431,7 +431,7 @@ const Items: React.FC = () => {
     },
     {
       key: 'type',
-      label: __('Type', 'Type'),
+      label: __('Type', 'yatra'),
       sortable: true,
       width: 'w-[150px]',
       visible: visibleColumns.type,
@@ -446,26 +446,26 @@ const Items: React.FC = () => {
             </div>
           )}
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            {item.type_name || __('Unknown', 'Unknown')}
+            {item.type_name || __('Unknown', 'yatra')}
           </span>
         </div>
       ),
     },
     {
       key: 'description',
-      label: __('Description', 'Description'),
+      label: __('Description', 'yatra'),
       sortable: false,
       width: 'w-[200px]',
       visible: visibleColumns.description,
       render: (item: Item) => (
         <span className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-          {item.description || __('No description', 'No description')}
+          {item.description || __('No description', 'yatra')}
         </span>
       ),
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       width: 'w-[100px]',
       visible: visibleColumns.status,
@@ -473,7 +473,7 @@ const Items: React.FC = () => {
     },
     {
       key: 'usage',
-      label: __('Usage', 'Usage'),
+      label: __('Usage', 'yatra'),
       sortable: false,
       width: 'w-[100px]',
       visible: visibleColumns.usage,
@@ -487,7 +487,7 @@ const Items: React.FC = () => {
     },
     {
       key: 'date',
-      label: __('Date', 'Date'),
+      label: __('Date', 'yatra'),
       sortable: true,
       width: 'w-[150px]',
       visible: visibleColumns.date,
@@ -495,14 +495,14 @@ const Items: React.FC = () => {
         <div className="text-gray-500 dark:text-gray-400 text-sm">
           <div>{formatDate(item.created_at)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated', 'Updated')}: {formatDate(item.updated_at)}
+            {__('Updated', 'yatra')}: {formatDate(item.updated_at)}
           </div>
         </div>
       ),
     },
     {
       key: 'author',
-      label: __('Author', 'Author'),
+      label: __('Author', 'yatra'),
       sortable: false,
       width: 'w-[150px]',
       visible: visibleColumns.author,
@@ -510,7 +510,7 @@ const Items: React.FC = () => {
         <div className="text-gray-600 dark:text-gray-400 text-sm">
           <div>{formatUser(item.created_by, item.created_by_name)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated by', 'Updated by')}: {formatUser(item.updated_by, item.updated_by_name)}
+            {__('Updated by', 'yatra')}: {formatUser(item.updated_by, item.updated_by_name)}
           </div>
         </div>
       ),
@@ -523,14 +523,14 @@ const Items: React.FC = () => {
     if (can('yatra_edit_trips')) {
       actions.push({
         key: 'edit',
-        label: __('Edit', 'Edit'),
+        label: __('Edit', 'yatra'),
         icon: <Edit className="w-4 h-4" />,
         onClick: (item: Item) => handleEdit(item),
       });
 
       actions.push({
         key: 'publish',
-        label: __('Mark as Published', 'Mark as Published'),
+        label: __('Mark as Published', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: (item: Item) => {
           setStatusActionConfirm({ isOpen: true, item, action: 'publish' });
@@ -540,7 +540,7 @@ const Items: React.FC = () => {
 
       actions.push({
         key: 'draft',
-        label: __('Mark as Draft', 'Mark as Draft'),
+        label: __('Mark as Draft', 'yatra'),
         icon: <ArrowDown className="w-4 h-4" />,
         onClick: (item: Item) => {
           setStatusActionConfirm({ isOpen: true, item, action: 'draft' });
@@ -550,7 +550,7 @@ const Items: React.FC = () => {
 
       actions.push({
         key: 'trash',
-        label: __('Move to Trash', 'Move to Trash'),
+        label: __('Move to Trash', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (item: Item) => {
           setStatusActionConfirm({ isOpen: true, item, action: 'trash' });
@@ -560,7 +560,7 @@ const Items: React.FC = () => {
 
       actions.push({
         key: 'restore',
-        label: __('Restore to Draft', 'Restore to Draft'),
+        label: __('Restore to Draft', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: (item: Item) => {
           setStatusActionConfirm({ isOpen: true, item, action: 'restore' });
@@ -572,7 +572,7 @@ const Items: React.FC = () => {
     if (can('yatra_delete_trips')) {
       actions.push({
         key: 'delete',
-        label: __('Delete Permanently', 'Delete Permanently'),
+        label: __('Delete Permanently', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (item: Item) => handleDelete(item),
         variant: 'destructive' as const,
@@ -589,13 +589,13 @@ const Items: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, item: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Item', 'Delete Item')}
+        title={__('Delete Item', 'yatra')}
         message={deleteConfirm.item 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.item.name)
-          : __('Are you sure you want to delete this item? This action cannot be undone.', 'Are you sure you want to delete this item? This action cannot be undone.')
+          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.item.name)
+          : __('Are you sure you want to delete this item? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -615,10 +615,10 @@ const Items: React.FC = () => {
 
           const successMessage =
             action === 'publish'
-              ? __('Item marked as published.', 'Item marked as published.')
+              ? __('Item marked as published.', 'yatra')
               : action === 'draft' || action === 'restore'
-                ? __('Item marked as draft.', 'Item marked as draft.')
-                : __('Item moved to trash.', 'Item moved to trash.');
+                ? __('Item marked as draft.', 'yatra')
+                : __('Item moved to trash.', 'yatra');
 
           showToast(successMessage, 'success');
           queryClient.invalidateQueries({ queryKey: ['items'] });
@@ -628,58 +628,58 @@ const Items: React.FC = () => {
         title={(() => {
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Publish Item', 'Publish Item');
+              return __('Publish Item', 'yatra');
             case 'draft':
-              return __('Mark as Draft', 'Mark as Draft');
+              return __('Mark as Draft', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             case 'restore':
-              return __('Restore Item', 'Restore Item');
+              return __('Restore Item', 'yatra');
             default:
-              return __('Confirm Action', 'Confirm Action');
+              return __('Confirm Action', 'yatra');
           }
         })()}
         message={(() => {
           const name = statusActionConfirm.item?.name || '';
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Are you sure you want to publish "{name}"?', 'Are you sure you want to publish "{name}"?').replace('{name}', name);
+              return __('Are you sure you want to publish "{name}"?', 'yatra').replace('{name}', name);
             case 'draft':
-              return __('Are you sure you want to mark "{name}" as draft?', 'Are you sure you want to mark "{name}" as draft?').replace('{name}', name);
+              return __('Are you sure you want to mark "{name}" as draft?', 'yatra').replace('{name}', name);
             case 'trash':
-              return __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', name);
+              return __('Are you sure you want to move "{name}" to trash?', 'yatra').replace('{name}', name);
             case 'restore':
-              return __('Are you sure you want to restore "{name}" to draft?', 'Are you sure you want to restore "{name}" to draft?').replace('{name}', name);
+              return __('Are you sure you want to restore "{name}" to draft?', 'yatra').replace('{name}', name);
             default:
-              return __('Are you sure you want to perform this action?', 'Are you sure you want to perform this action?');
+              return __('Are you sure you want to perform this action?', 'yatra');
           }
         })()}
         confirmText={(() => {
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Publish', 'Publish');
+              return __('Publish', 'yatra');
             case 'draft':
             case 'restore':
-              return __('Mark as Draft', 'Mark as Draft');
+              return __('Mark as Draft', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             default:
-              return __('Confirm', 'Confirm');
+              return __('Confirm', 'yatra');
           }
         })()}
-        cancelText={__('Cancel', 'Cancel')}
+        cancelText={__('Cancel', 'yatra')}
         variant="warning"
         isLoading={false}
       />
 
       <PageHeader
-        title={__('Items', 'Items')}
-        description={__('Manage specific items (subtypes) under item types. Examples: Hiking (under Activity), Lunch (under Meal), Bus (under Transportation).', 'Manage specific items (subtypes) under item types. Examples: Hiking (under Activity), Lunch (under Meal), Bus (under Transportation).')}
+        title={__('Items', 'yatra')}
+        description={__('Manage specific items (subtypes) under item types. Examples: Hiking (under Activity), Lunch (under Meal), Bus (under Transportation).', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreate} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Item', 'Add New Item')}
+            {__('Add New Item', 'yatra')}
           </Button>
         }
       />
@@ -691,7 +691,7 @@ const Items: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search items...', 'Search items...')}
+                placeholder={__('Search items...', 'yatra')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -703,7 +703,7 @@ const Items: React.FC = () => {
               onChange={(e) => setTypeFilter(e.target.value)}
               className="w-full md:w-48"
             >
-              <option value="all">{__('All Types', 'All Types')}</option>
+              <option value="all">{__('All Types', 'yatra')}</option>
               {types.map((type: any) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
@@ -716,10 +716,10 @@ const Items: React.FC = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
+              <option value="all">{__('All Status', 'yatra')}</option>
+              <option value="draft">{__('Draft', 'yatra')}</option>
+              <option value="publish">{__('Publish', 'yatra')}</option>
+              <option value="trash">{__('Trash', 'yatra')}</option>
             </Select>
 
             <Select
@@ -727,25 +727,25 @@ const Items: React.FC = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="type_id">{__('Type', 'Type')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-              <option value="created_at">{__('Created At', 'Created At')}</option>
-              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
+              <option value="name">{__('Name', 'yatra')}</option>
+              <option value="type_id">{__('Type', 'yatra')}</option>
+              <option value="status">{__('Status', 'yatra')}</option>
+              <option value="created_at">{__('Created At', 'yatra')}</option>
+              <option value="updated_at">{__('Updated At', 'yatra')}</option>
             </Select>
 
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
               className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+              title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
             >
               {sortOrder === 'asc' ? (
                 <ArrowUp className="w-4 h-4" />
               ) : (
                 <ArrowDown className="w-4 h-4" />
               )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
             </Button>
 
             {hasFilters && (
@@ -755,7 +755,7 @@ const Items: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
+                {__('Reset', 'yatra')}
               </Button>
             )}
           </div>
@@ -792,7 +792,7 @@ const Items: React.FC = () => {
                 actions={tableActions}
                 isLoading={isLoading}
                 isError={isItemsError}
-                errorText={__('Error loading items', 'Error loading items')}
+                errorText={__('Error loading items', 'yatra')}
                 errorDescription={
                   __('We couldn\'t connect to the items service. Please refresh or try again shortly.',
                     'We couldn\'t connect to the items service. Please refresh or try again shortly.'
@@ -801,10 +801,10 @@ const Items: React.FC = () => {
                 errorDetails={derivedErrorDetails}
                 errorRequestInfo={errorContext.requestInfo}
                 onRetry={() => queryClient.invalidateQueries({ queryKey: ['items'] })}
-                emptyText={__('No items found', 'No items found')}
+                emptyText={__('No items found', 'yatra')}
                 emptyDescription={hasFilters
-                  ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                  : __('Get started by creating your first item.', 'Get started by creating your first item.')
+                  ? __('Try adjusting your filters to see more results.', 'yatra')
+                  : __('Get started by creating your first item.', 'yatra')
                 }
                 onCreateClick={can('yatra_edit_trips') ? handleCreate : undefined}
                 onSort={handleSort}
@@ -829,7 +829,7 @@ const Items: React.FC = () => {
                 totalItems={total}
                 itemsPerPage={10}
                 onPageChange={setPage}
-                itemName={__('items', 'items')}
+                itemName={__('items', 'yatra')}
               />
             </div>
           )}

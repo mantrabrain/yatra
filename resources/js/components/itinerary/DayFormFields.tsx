@@ -37,24 +37,23 @@ interface DayFormFieldsProps {
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-base">{__('Day Information', 'Day Information')}</CardTitle>
+        <CardTitle className="text-base">{__('Day Information', 'yatra')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label htmlFor="trip_id" className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+              {__('Trip', 'yatra')} <span className="text-red-500">*</span>
               {isEditMode && (
-                <span title={__('This field cannot be changed in edit mode', 'This field cannot be changed in edit mode')}>
+                <span title={__('This field cannot be changed in edit mode', 'yatra')}>
                   <Lock className="w-4 h-4 text-gray-400" />
                 </span>
               )}
             </label>
             <HelpText 
               text={isEditMode 
-                ? __('The trip cannot be changed when editing a day.', 'The trip cannot be changed when editing a day.')
-                : __('Select the trip this day belongs to.', 'Select the trip this day belongs to.')
-              }
+                ? __('The trip cannot be changed when editing a day.', 'yatra')
+                : __('Select the trip this day belongs to.', 'yatra')}
               className="mb-2"
             />
             <div className="relative">
@@ -62,14 +61,14 @@ interface DayFormFieldsProps {
                 value={formData.trip_id}
                 onChange={(value) => onFieldChange('trip_id', value)}
                 options={[
-                  { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                  { value: '', label: __('-- Select a Trip --', 'yatra') },
                   ...((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
                     value: trip.id.toString(),
                     label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
                   })) || [])
                 ]}
-                placeholder={__('Search or select a trip...', 'Search or select a trip...')}
-                searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+                placeholder={__('Search or select a trip...', 'yatra')}
+                searchPlaceholder={__('Search by trip name or ID...', 'yatra')}
                 className={errors.trip_id ? 'border-red-500' : ''}
                 error={!!errors.trip_id}
                 required
@@ -92,10 +91,10 @@ interface DayFormFieldsProps {
           {!isSingleDayTrip && (
             <div>
               <label htmlFor="day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Day Number', 'Day Number')} <span className="text-red-500">*</span>
+                {__('Day Number', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <HelpText 
-                text={__('Which day number is this in the itinerary?', 'Which day number is this in the itinerary?')}
+                text={__('Which day number is this in the itinerary?', 'yatra')}
                 className="mb-2"
               />
               <Input
@@ -118,10 +117,10 @@ interface DayFormFieldsProps {
           {isSingleDayTrip && (
             <div>
               <label htmlFor="day" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Entry Number', 'Entry Number')} <span className="text-red-500">*</span>
+                {__('Entry Number', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <HelpText 
-                text={__('Entry number for ordering entries in this single-day trip.', 'Entry number for ordering entries in this single-day trip.')}
+                text={__('Entry number for ordering entries in this single-day trip.', 'yatra')}
                 className="mb-2"
               />
               <Input
@@ -145,10 +144,10 @@ interface DayFormFieldsProps {
 
         <div>
           <label htmlFor="day_title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            {__('Day Title (Optional)', 'Day Title (Optional)')}
+            {__('Day Title (Optional)', 'yatra')}
           </label>
           <HelpText 
-            text={__('A descriptive title for this day (e.g., "Arrival & Welcome to Paradise").', 'A descriptive title for this day (e.g., "Arrival & Welcome to Paradise").')}
+            text={__('A descriptive title for this day (e.g., "Arrival & Welcome to Paradise").', 'yatra')}
             className="mb-2"
           />
           <Input
@@ -156,23 +155,23 @@ interface DayFormFieldsProps {
             type="text"
             value={formData.day_title}
             onChange={(e) => onFieldChange('day_title', e.target.value)}
-            placeholder={__('e.g., Arrival & Welcome to Paradise', 'e.g., Arrival & Welcome to Paradise')}
+            placeholder={__('e.g., Arrival & Welcome to Paradise', 'yatra')}
           />
         </div>
 
         <div>
           <label htmlFor="day_description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-            {__('Day Description (Optional)', 'Day Description (Optional)')}
+            {__('Day Description (Optional)', 'yatra')}
           </label>
           <HelpText 
-            text={__('A detailed description of what happens on this day, activities, highlights, etc.', 'A detailed description of what happens on this day, activities, highlights, etc.')}
+            text={__('A detailed description of what happens on this day, activities, highlights, etc.', 'yatra')}
             className="mb-2"
           />
           <textarea
             id="day_description"
             value={formData.day_description}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => onFieldChange('day_description', e.target.value)}
-            placeholder={__('Describe the activities, highlights, and details for this day...', 'Describe the activities, highlights, and details for this day...')}
+            placeholder={__('Describe the activities, highlights, and details for this day...', 'yatra')}
             rows={4}
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${errors.day_description ? 'border-red-500' : ''}`}
           />

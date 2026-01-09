@@ -98,14 +98,14 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
         variant="outline"
         onClick={() => onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')}
         className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
-        title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+        title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
       >
         {sortOrder === 'asc' ? (
           <ArrowUp className="w-4 h-4" />
         ) : (
           <ArrowDown className="w-4 h-4" />
         )}
-        <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+        <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
       </Button>
 
       {/* Reset Button */}
@@ -116,7 +116,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
           className="h-11 flex items-center gap-2 flex-shrink-0"
         >
           <X className="w-4 h-4" />
-          {__('Reset', 'Reset')}
+          {__('Reset', 'yatra')}
         </Button>
       )}
     </div>

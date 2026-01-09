@@ -30,7 +30,14 @@ declare global {
       showMailchimpSettingsUI?: boolean;
       showFacebookPixelSettingsUI?: boolean;
       showGoogleAnalyticsSettingsUI?: boolean;
-      mailchimpConnected?: boolean;
+      currency?: string;
+      date_format?: string;
+      time_format?: string;
+      calendar_name?: string;
+      connected?: boolean;
+      redirect_uri?: string;
+      last_sync?: string | null;
+      googleCalendarRedirectUri?: string;
       mailchimp?: {
         connected?: boolean;
         listId?: string;
@@ -75,34 +82,40 @@ declare global {
         redirect_uri?: string;
         last_sync?: string | null;
       };
-      googleCalendarRedirectUri?: string;
     };
   }
 }
 
 /**
- * Get translated string
- * @param key - Translation key
- * @param defaultValue - Default value if translation not found
- * @returns Translated string
+ * Internationalization (i18n) utility
+ * Handles translations for UI text
  */
-export const __ = (key: string, defaultValue: string = ''): string => {
-  const translations = window.yatraAdmin?.translations || {};
-  return translations[key] || defaultValue || key;
-};
 
-/**
- * Get translated string with context
- * @param key - Translation key
- * @param context - Context for translation
- * @param defaultValue - Default value if translation not found
- * @returns Translated string
- */
-export const _x = (key: string, context: string, defaultValue: string = ''): string => {
-  const contextKey = `${key}_${context}`;
-  const translations = window.yatraAdmin?.translations || {};
-  return translations[contextKey] || translations[key] || defaultValue || key;
-};
+import { __ as wpI18n__, _x as wpI18n_x } from '@wordpress/i18n';
+
+function __(key: string): string;
+function __(key: string, textDomain: string): string;
+function __(key: string, textDomain?: string): string {
+    // Use direct WordPress i18n function which is working correctly
+    if (typeof window !== 'undefined' && (window as any).wp?.i18n?.__) {
+        return (window as any).wp.i18n.__(key, textDomain || 'yatra');
+    }
+    // Fallback to @wordpress/i18n
+    return wpI18n__(key, textDomain || 'yatra');
+}
+
+function _x(key: string, context: string): string;
+function _x(key: string, context: string, textDomain: string): string;
+function _x(key: string, context: string, textDomain?: string): string {
+    // Use direct WordPress i18n function which is working correctly
+    if (typeof window !== 'undefined' && (window as any).wp?.i18n?._x) {
+        return (window as any).wp.i18n._x(key, context, textDomain || 'yatra');
+    }
+    // Fallback to @wordpress/i18n
+    return wpI18n_x(key, context, textDomain || 'yatra');
+}
+
+export { __, _x };
 
 /**
  * Get translated string with number
@@ -112,6 +125,6 @@ export const _x = (key: string, context: string, defaultValue: string = ''): str
  * @returns Translated string
  */
 export const _n = (single: string, plural: string, number: number): string => {
-  return number === 1 ? __(single, single) : __(plural, plural);
+  return number === 1 ? __(single) : __(plural);
 };
 

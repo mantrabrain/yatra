@@ -398,19 +398,19 @@ const ItineraryForm: React.FC = () => {
     if (isEditMode) {
       if (isAddDayMode) {
         return isSingleDayTrip
-          ? __('Update Entry', 'Update Entry')
-          : __('Update Day', 'Update Day');
+          ? __('Update Entry', 'yatra')
+          : __('Update Day', 'yatra');
       }
-      return __('Update Itinerary Activity', 'Update Itinerary Activity');
+      return __('Update Itinerary Activity', 'yatra');
     }
 
     if (isAddDayMode) {
       return isSingleDayTrip
-        ? __('Create Entry', 'Create Entry')
-        : __('Create Day', 'Create Day');
+        ? __('Create Entry', 'yatra')
+        : __('Create Day', 'yatra');
     }
 
-    return __('Create Itinerary Activity', 'Create Itinerary Activity');
+    return __('Create Itinerary Activity', 'yatra');
   }, [isEditMode, isAddDayMode, isSingleDayTrip]);
 
   // Get existing day numbers for the trip
@@ -744,19 +744,19 @@ const ItineraryForm: React.FC = () => {
       <PageHeader
         title={
           isEditMode 
-            ? __('Edit Itinerary Entry', 'Edit Itinerary Entry') 
+            ? __('Edit Itinerary Entry', 'yatra') 
             : isAddDayMode
-            ? (isSingleDayTrip ? __('Add New Entry', 'Add New Entry') : __('Add New Day', 'Add New Day'))
-            : __('Add New Activity', 'Add New Activity')
+            ? (isSingleDayTrip ? __('Add New Entry', 'yatra') : __('Add New Day', 'yatra'))
+            : __('Add New Activity', 'yatra')
         }
         description={
           isEditMode 
-            ? __('Update itinerary entry information', 'Update itinerary entry information') 
+            ? __('Update itinerary entry information', 'yatra') 
             : isAddDayMode
             ? (isSingleDayTrip 
-                ? __('Create a new entry for your single-day trip itinerary.', 'Create a new entry for your single-day trip itinerary.')
-                : __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'Create a new day entry for your trip itinerary. This will be the first activity of the new day.'))
-            : __('Add a new activity, meal, or accommodation to this day of the trip itinerary.', 'Add a new activity, meal, or accommodation to this day of the trip itinerary.')
+                ? __('Create a new entry for your single-day trip itinerary.', 'yatra')
+                : __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'yatra'))
+            : __('Add a new activity, meal, or accommodation to this day of the trip itinerary.', 'yatra')
         }
         actions={
           <Button
@@ -765,7 +765,7 @@ const ItineraryForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -823,18 +823,18 @@ const ItineraryForm: React.FC = () => {
                       <CardContent className="p-3">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">{__('Trip:', 'Trip:')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">{__('Trip:', 'yatra')}</span>
                             <span className="ml-2 font-medium">
                               {tripsData?.find((t: any) => t.id.toString() === tripIdParam)?.title || tripIdParam}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">{__('Day:', 'Day:')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">{__('Day:', 'yatra')}</span>
                             <span className="ml-2 font-medium">{dayParam}</span>
                           </div>
                           {dayTitle && (
                             <div>
-                              <span className="text-gray-500 dark:text-gray-400">{__('Day Title:', 'Day Title:')}</span>
+                              <span className="text-gray-500 dark:text-gray-400">{__('Day Title:', 'yatra')}</span>
                               <span className="ml-2 font-medium">{dayTitle}</span>
                             </div>
                           )}
@@ -883,15 +883,15 @@ const ItineraryForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Entry Status', 'Entry Status')}
+                      {__('Entry Status', 'yatra')}
                     </label>
                     <HelpText 
-                      text={__('Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.', 'Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.')}
+                      text={__('Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.', 'yatra')}
                       className="mb-2"
                     />
                     <Select
@@ -900,9 +900,9 @@ const ItineraryForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                       className="w-full"
                     >
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -912,7 +912,7 @@ const ItineraryForm: React.FC = () => {
                 <CardContent className="p-3">
                   <div className="space-y-2">
                     {errors.submit && (
-                      <Alert variant="error" title={__('Error', 'Error')}>
+                      <Alert variant="error" title={__('Error', 'yatra')}>
                         {errors.submit}
                       </Alert>
                     )}
@@ -925,7 +925,7 @@ const ItineraryForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
@@ -934,16 +934,14 @@ const ItineraryForm: React.FC = () => {
                           </>
                         )}
                       </Button>
-                      {!isAddDayMode && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={handleCancel}
-                          disabled={isSubmitting}
-                        >
-                          {__('Cancel', 'Cancel')}
-                        </Button>
-                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCancel}
+                        disabled={isSubmitting}
+                      >
+                        {__('Cancel', 'yatra')}
+                      </Button>
                     </div>
                   </div>
                 </CardContent>

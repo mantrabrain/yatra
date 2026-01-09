@@ -37,7 +37,7 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             type="text"
-            placeholder={__('Search trips...', 'Search trips...')}
+            placeholder={__('Search trips...', 'yatra')}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"
@@ -49,10 +49,10 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
           onChange={(e) => onStatusChange(e.target.value)}
           className="w-full md:w-48"
         >
-          <option value="all">{__('All Status', 'All Status')}</option>
-          <option value="active">{__('Active', 'Active')}</option>
-          <option value="draft">{__('Draft', 'Draft')}</option>
-          <option value="inactive">{__('Inactive', 'Inactive')}</option>
+          <option value="all">{__('All Status', 'yatra')}</option>
+          <option value="active">{__('Active', 'yatra')}</option>
+          <option value="draft">{__('Draft', 'yatra')}</option>
+          <option value="inactive">{__('Inactive', 'yatra')}</option>
         </Select>
 
         {hasFilters && (
@@ -62,7 +62,7 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
             className="flex items-center gap-2"
           >
             <X className="w-4 h-4" />
-            {__('Reset', 'Reset')}
+            {__('Reset', 'yatra')}
           </Button>
         )}
       </div>

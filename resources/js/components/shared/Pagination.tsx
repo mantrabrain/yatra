@@ -96,7 +96,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="flex items-center justify-between">
       <div className="text-sm text-gray-600 dark:text-gray-400">
-        {__('Showing', 'Showing')}{' '}
+        {__('Showing', 'yatra')}{' '}
         <span className="font-medium text-gray-900 dark:text-white">
           {(currentPage - 1) * itemsPerPage + 1}
         </span>
@@ -104,7 +104,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         <span className="font-medium text-gray-900 dark:text-white">
           {Math.min(currentPage * itemsPerPage, totalItems)}
         </span>
-        {' '}{__('of', 'of')}{' '}
+        {' '}{__('of', 'yatra')}{' '}
         <span className="font-medium text-gray-900 dark:text-white">
           {totalItems}
         </span>
@@ -119,7 +119,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
           className="h-8 px-3"
         >
-          {__('Previous', 'Previous')}
+          {__('Previous', 'yatra')}
         </Button>
 
         {/* Page Numbers */}
@@ -133,7 +133,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage >= totalPages}
           className="h-8 px-3"
         >
-          {__('Next', 'Next')}
+          {__('Next', 'yatra')}
         </Button>
       </div>
     </div>

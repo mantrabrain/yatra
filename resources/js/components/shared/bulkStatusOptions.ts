@@ -10,23 +10,23 @@ export const getDefaultBulkStatusOptions = (statusFilter: string): BulkActionOpt
 
   switch (statusFilter) {
     case 'publish':
-      options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
-      options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
+      options.push({ value: 'trash', label: __('Move to Trash', 'yatra') });
+      options.push({ value: 'draft', label: __('Make Draft', 'yatra') });
       break;
     case 'draft':
-      options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-      options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+      options.push({ value: 'publish', label: __('Make Published', 'yatra') });
+      options.push({ value: 'trash', label: __('Move to Trash', 'yatra') });
       break;
     case 'trash':
-      options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-      options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
-      options.push({ value: 'delete', label: __('Delete Permanently', 'Delete Permanently') });
+      options.push({ value: 'publish', label: __('Make Published', 'yatra') });
+      options.push({ value: 'draft', label: __('Make Draft', 'yatra') });
+      options.push({ value: 'delete', label: __('Delete Permanently', 'yatra') });
       break;
     case 'all':
     default:
-      options.push({ value: 'publish', label: __('Make Published', 'Make Published') });
-      options.push({ value: 'draft', label: __('Make Draft', 'Make Draft') });
-      options.push({ value: 'trash', label: __('Move to Trash', 'Move to Trash') });
+      options.push({ value: 'publish', label: __('Make Published', 'yatra') });
+      options.push({ value: 'draft', label: __('Make Draft', 'yatra') });
+      options.push({ value: 'trash', label: __('Move to Trash', 'yatra') });
       break;
   }
 

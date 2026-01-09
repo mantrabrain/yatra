@@ -85,10 +85,10 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
               <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                 <CreditCard className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
-              {__('Payments & Invoices', 'Payments & Invoices')}
+              {__('Payments & Invoices', 'yatra')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {__('Track deposits, balances, and installment schedules with secure payment links.', 'Track deposits, balances, and installment schedules with secure payment links.')}
+              {__('Track deposits, balances, and installment schedules with secure payment links.', 'yatra')}
             </p>
           </div>
         </div>
@@ -99,7 +99,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
         <div className="yatra-payment-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Payments', 'Total Payments')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Payments', 'yatra')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{paymentStats.total}</p>
             </div>
             <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -110,7 +110,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
         <div className="yatra-payment-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Paid', 'Paid')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Paid', 'yatra')}</p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{paymentStats.paid}</p>
               <p className="text-xs text-gray-400 dark:text-gray-500">{currency(paymentStats.totalPaidAmount)}</p>
             </div>
@@ -122,7 +122,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
         <div className="yatra-payment-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Pending', 'Pending')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Pending', 'yatra')}</p>
               <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{paymentStats.pending}</p>
             </div>
             <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
@@ -133,7 +133,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
         <div className="yatra-payment-stat-card bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Outstanding', 'Outstanding')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Outstanding', 'yatra')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{currency(paymentStats.outstandingAmount)}</p>
             </div>
             <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -147,8 +147,8 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
       {displayPayments.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-12 text-center">
           <CreditCard className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No payments found', 'No payments found')}</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">{__('Payment history will appear here once you make a booking.', 'Payment history will appear here once you make a booking.')}</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No payments found', 'yatra')}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{__('Payment history will appear here once you make a booking.', 'yatra')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -190,7 +190,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                             {payment.reference}
                           </p>
                           <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">
-                            {__('Booking', 'Booking')}: {payment.booking_number}
+                            {__('Booking', 'yatra')}: {payment.booking_number}
                           </h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                             <CalendarIcon className="w-4 h-4" />
@@ -212,21 +212,21 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
                         <DollarSignIcon className="w-3.5 h-3.5" />
-                        {__('Amount', 'Amount')}
+                        {__('Amount', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{currency(payment.amount)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
                         <CreditCard className="w-3.5 h-3.5" />
-                        {__('Payment Method', 'Payment Method')}
+                        {__('Payment Method', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{payment.method}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 flex items-center gap-1">
                         <CalendarIcon className="w-3.5 h-3.5" />
-                        {__('Payment Date', 'Payment Date')}
+                        {__('Payment Date', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(payment.date)}</p>
                     </div>
@@ -242,7 +242,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                         style={{ backgroundColor: '#059669', color: '#ffffff' }}
                       >
                         <Download className="w-4 h-4" />
-                        {__('Download Invoice', 'Download Invoice')}
+                        {__('Download Invoice', 'yatra')}
                       </button>
                     )}
                     {isPaid && (
@@ -254,13 +254,13 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                         style={{ backgroundColor: '#2563eb', color: '#ffffff' }}
                       >
                         <FileTextIcon className="w-4 h-4" />
-                        {__('View Receipt', 'View Receipt')}
+                        {__('View Receipt', 'yatra')}
                       </a>
                     )}
                     {isPending && !canPayRemaining && (
                       <button type="button" className="yatra-payment-action inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium">
                         <ClockIcon className="w-4 h-4" />
-                        {__('Pending approval', 'Pending approval')}
+                        {__('Pending approval', 'yatra')}
                       </button>
                     )}
                     <button
@@ -269,7 +269,7 @@ const Payments: React.FC<PaymentsProps> = ({ payments, onSectionChange }) => {
                       className="yatra-payment-action yatra-payment-action-booking inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
                     >
                       <Eye className="w-4 h-4" />
-                      {__('View Booking', 'View Booking')}
+                        {__('View Booking Details', 'yatra')}
                     </button>
                   </div>
                 </div>

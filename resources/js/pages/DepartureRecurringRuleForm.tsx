@@ -28,13 +28,13 @@ interface RecurringRuleFormData {
 }
 
 const dayOptions = [
-  { value: 0, label: __('Sunday', 'Sunday') },
-  { value: 1, label: __('Monday', 'Monday') },
-  { value: 2, label: __('Tuesday', 'Tuesday') },
-  { value: 3, label: __('Wednesday', 'Wednesday') },
-  { value: 4, label: __('Thursday', 'Thursday') },
-  { value: 5, label: __('Friday', 'Friday') },
-  { value: 6, label: __('Saturday', 'Saturday') },
+  { value: 0, label: __('Sunday', 'yatra') },
+  { value: 1, label: __('Monday', 'yatra') },
+  { value: 2, label: __('Tuesday', 'yatra') },
+  { value: 3, label: __('Wednesday', 'yatra') },
+  { value: 4, label: __('Thursday', 'yatra') },
+  { value: 5, label: __('Friday', 'yatra') },
+  { value: 6, label: __('Saturday', 'yatra') },
 ];
 
 const DepartureRecurringRuleForm: React.FC = () => {
@@ -115,14 +115,14 @@ const DepartureRecurringRuleForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-rules', tripId] });
       showToast(
         isEditMode 
-          ? __('Recurring rule updated successfully', 'Recurring rule updated successfully')
-          : __('Recurring rule created successfully', 'Recurring rule created successfully'),
+          ? __('Recurring rule updated successfully', 'yatra')
+          : __('Recurring rule created successfully', 'yatra'),
         'success'
       );
       window.location.href = `?page=yatra&subpage=trips&tab=departures&action=rules&trip_id=${tripId}`;
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to save rule', 'Failed to save rule'), 'error');
+      showToast(error?.message || __('Failed to save rule', 'yatra'), 'error');
     },
   });
 
@@ -130,13 +130,13 @@ const DepartureRecurringRuleForm: React.FC = () => {
     const newErrors: Partial<Record<keyof RecurringRuleFormData, string>> = {};
 
     if (!formData.max_capacity) {
-      newErrors.max_capacity = __('Max capacity is required', 'Max capacity is required');
+      newErrors.max_capacity = __('Max capacity is required', 'yatra');
     } else if (parseInt(formData.max_capacity) < 1) {
-      newErrors.max_capacity = __('Max capacity must be at least 1', 'Max capacity must be at least 1');
+      newErrors.max_capacity = __('Max capacity must be at least 1', 'yatra');
     }
 
     if ((formData.recurrence_type === 'weekly' || formData.recurrence_type === 'custom_days') && formData.weekdays.length === 0) {
-      newErrors.weekdays = __('At least one weekday must be selected', 'At least one weekday must be selected');
+      newErrors.weekdays = __('At least one weekday must be selected', 'yatra');
     }
 
     setErrors(newErrors);
@@ -177,12 +177,12 @@ const DepartureRecurringRuleForm: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditMode ? __('Edit Recurring Rule', 'Edit Recurring Rule') : __('Add Recurring Rule', 'Add Recurring Rule')}
-        description={__('Create a recurring pattern for automatic departure date generation', 'Create a recurring pattern for automatic departure date generation')}
+        title={isEditMode ? __('Edit Recurring Rule', 'yatra') : __('Add Recurring Rule', 'yatra')}
+        description={__('Create a recurring pattern for automatic departure date generation', 'yatra')}
         actions={
           <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -193,7 +193,7 @@ const DepartureRecurringRuleForm: React.FC = () => {
             {/* Recurrence Type */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Recurrence Type', 'Recurrence Type')} <span className="text-red-500">*</span>
+                {__('Recurrence Type', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <Select
                 value={formData.recurrence_type}
@@ -201,19 +201,19 @@ const DepartureRecurringRuleForm: React.FC = () => {
                   setFormData({ ...formData, recurrence_type: e.target.value as any, weekdays: [] });
                 }}
               >
-                <option value="daily">{__('Daily', 'Daily')}</option>
-                <option value="weekly">{__('Weekly', 'Weekly')}</option>
-                <option value="monthly">{__('Monthly', 'Monthly')}</option>
-                <option value="custom_days">{__('Custom Days', 'Custom Days')}</option>
+                <option value="daily">{__('Daily', 'yatra')}</option>
+                <option value="weekly">{__('Weekly', 'yatra')}</option>
+                <option value="monthly">{__('Monthly', 'yatra')}</option>
+                <option value="custom_days">{__('Custom Days', 'yatra')}</option>
               </Select>
-              <HelpText text={__('Select how often departures should be generated', 'Select how often departures should be generated')} />
+              <HelpText text={__('Select how often departures should be generated', 'yatra')} />
             </div>
 
             {/* Weekdays (for weekly/custom_days) */}
             {(formData.recurrence_type === 'weekly' || formData.recurrence_type === 'custom_days') && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {__('Days of Week', 'Days of Week')} <span className="text-red-500">*</span>
+                  {__('Days of Week', 'yatra')} <span className="text-red-500">*</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {dayOptions.map((day) => (
@@ -234,57 +234,57 @@ const DepartureRecurringRuleForm: React.FC = () => {
                 {errors.weekdays && (
                   <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.weekdays}</p>
                 )}
-                <HelpText text={__('Select which days of the week departures should be generated', 'Select which days of the week departures should be generated')} />
+                <HelpText text={__('Select which days of the week departures should be generated', 'yatra')} />
               </div>
             )}
 
             {/* Start Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Start Date', 'Start Date')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('Start Date', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <DatePicker
                 value={formData.start_date || ''}
                 onChange={(value) => setFormData({ ...formData, start_date: value })}
               />
-              <HelpText text={__('When should this rule start generating dates?', 'When should this rule start generating dates?')} />
+              <HelpText text={__('When should this rule start generating dates?', 'yatra')} />
             </div>
 
             {/* End Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('End Date', 'End Date')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('End Date', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <DatePicker
                 value={formData.end_date || ''}
                 onChange={(value) => setFormData({ ...formData, end_date: value })}
                 minDate={formData.start_date ? new Date(formData.start_date) : undefined}
               />
-              <HelpText text={__('When should this rule stop generating dates? Leave empty for no end date', 'When should this rule stop generating dates? Leave empty for no end date')} />
+              <HelpText text={__('When should this rule stop generating dates? Leave empty for no end date', 'yatra')} />
             </div>
 
             {/* Max Capacity */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Max Capacity', 'Max Capacity')} <span className="text-red-500">*</span>
+                {__('Max Capacity', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <Input
                 type="number"
                 min="1"
                 value={formData.max_capacity}
                 onChange={(e) => setFormData({ ...formData, max_capacity: e.target.value })}
-                placeholder={__('e.g., 20', 'e.g., 20')}
+                placeholder={__('e.g., 20', 'yatra')}
               />
               {errors.max_capacity && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.max_capacity}</p>
               )}
-              <HelpText text={__('Maximum number of travelers for generated departures', 'Maximum number of travelers for generated departures')} />
+              <HelpText text={__('Maximum number of travelers for generated departures', 'yatra')} />
             </div>
 
             {/* Base Price (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Base Price', 'Base Price')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('Base Price', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <Input
                 type="number"
@@ -292,9 +292,9 @@ const DepartureRecurringRuleForm: React.FC = () => {
                 min="0"
                 value={formData.base_price || ''}
                 onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
-                placeholder={__('e.g., 150.00', 'e.g., 150.00')}
+                placeholder={__('e.g., 150.00', 'yatra')}
               />
-              <HelpText text={__('Base price per person for generated departures (optional)', 'Base price per person for generated departures (optional)')} />
+              <HelpText text={__('Base price per person for generated departures (optional)', 'yatra')} />
             </div>
 
             {/* Active Status */}
@@ -307,27 +307,27 @@ const DepartureRecurringRuleForm: React.FC = () => {
                   className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {__('Active', 'Active')}
+                  {__('Active', 'yatra')}
                 </span>
               </label>
-              <HelpText text={__('Only active rules will generate departure dates', 'Only active rules will generate departure dates')} />
+              <HelpText text={__('Only active rules will generate departure dates', 'yatra')} />
             </div>
 
             {/* Submit Button */}
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Button type="button" variant="outline" onClick={handleBack}>
-                {__('Cancel', 'Cancel')}
+                {__('Cancel', 'yatra')}
               </Button>
               <Button type="submit" disabled={saveMutation.isPending}>
                 {saveMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {__('Saving...', 'Saving...')}
+                    {__('Saving...', 'yatra')}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    {__('Save Rule', 'Save Rule')}
+                    {__('Save Rule', 'yatra')}
                   </>
                 )}
               </Button>

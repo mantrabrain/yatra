@@ -76,10 +76,10 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Zap className="w-4 h-4 text-orange-500" />
-                    {__('What This Module Does', 'What This Module Does')}
+                    {__('What This Module Does', 'yatra')}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-                    {moduleDescription || __('This premium module adds advanced functionality to your Yatra booking system, helping you grow your business and streamline operations.', 'This premium module adds advanced functionality to your Yatra booking system, helping you grow your business and streamline operations.')}
+                    {moduleDescription || __('This premium module adds advanced functionality to your Yatra booking system, helping you grow your business and streamline operations.', 'yatra')}
                   </p>
                 </div>
 
@@ -87,24 +87,24 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                 <div>
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-orange-500" />
-                    {__('Key Features', 'Key Features')}
+                    {__('Key Features', 'yatra')}
                   </h4>
                   <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>{__('Advanced analytics and reporting', 'Advanced analytics and reporting')}</span>
+                      <span>{__('Advanced analytics and reporting', 'yatra')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>{__('Automated workflows and notifications', 'Automated workflows and notifications')}</span>
+                      <span>{__('Automated workflows and notifications', 'yatra')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>{__('Enhanced customer management tools', 'Enhanced customer management tools')}</span>
+                      <span>{__('Enhanced customer management tools', 'yatra')}</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span>{__('Priority support and updates', 'Priority support and updates')}</span>
+                      <span>{__('Priority support and updates', 'yatra')}</span>
                     </li>
                   </ul>
                 </div>
@@ -116,13 +116,13 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                 <div>
                   <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
                     <Play className="w-4 h-4 text-orange-500" />
-                    {__('See It In Action', 'See It In Action')}
+                    {__('See It In Action', 'yatra')}
                   </h4>
                   <div className="aspect-video bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600">
                     <div className="text-center">
                       <Play className="w-12 h-12 text-gray-400 mx-auto mb-2" />
                       <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {__('Click to watch demo video', 'Click to watch demo video')}
+                        {__('Click to watch demo video', 'yatra')}
                       </p>
                     </div>
                   </div>
@@ -143,7 +143,7 @@ export const PremiumUpgradeDialog: React.FC<PremiumUpgradeDialogProps> = ({
                 onClick={() => window.open(purchaseUrl || 'https://wpyatra.com/pricing', '_blank')}
               >
                 <Sparkles className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
-                {__('Upgrade to Pro', 'Upgrade to Pro')}
+                {__('Upgrade to Pro', 'yatra')}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>

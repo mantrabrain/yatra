@@ -65,7 +65,7 @@ const DifficultyLevelForm: React.FC = () => {
         const response = await apiClient.get(`/difficulty-levels/${levelId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load difficulty level', 'Failed to load difficulty level'), 'error');
+        showToast(error?.message || __('Failed to load difficulty level', 'yatra'), 'error');
         throw error;
       }
     },
@@ -130,17 +130,17 @@ const DifficultyLevelForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     if (formData.sorting !== '' && Number(formData.sorting) < 0) {
-      newErrors.sorting = __('Order must be a positive number', 'Order must be a positive number');
+      newErrors.sorting = __('Order must be a positive number', 'yatra');
     }
 
     setErrors(newErrors);
@@ -172,8 +172,8 @@ const DifficultyLevelForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-level', levelId] });
       showToast(
         isEditMode
-          ? __('Difficulty level updated successfully', 'Difficulty level updated successfully')
-          : __('Difficulty level created successfully', 'Difficulty level created successfully'),
+          ? __('Difficulty level updated successfully', 'yatra')
+          : __('Difficulty level created successfully', 'yatra'),
         'success'
       );
       setIsSubmitting(false);
@@ -188,7 +188,7 @@ const DifficultyLevelForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the difficulty level', 'An error occurred while saving the difficulty level');
+      const errorMessage = error?.message || __('An error occurred while saving the difficulty level', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -198,7 +198,7 @@ const DifficultyLevelForm: React.FC = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -259,12 +259,12 @@ const DifficultyLevelForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Difficulty Level', 'Edit Difficulty Level') : __('Add Difficulty Level', 'Add Difficulty Level')}
-        description={isEditMode ? __('Update difficulty level information', 'Update difficulty level information') : __('Create a new trip difficulty level', 'Create a new trip difficulty level')}
+        title={isEditMode ? __('Edit Difficulty Level', 'yatra') : __('Add Difficulty Level', 'yatra')}
+        description={isEditMode ? __('Update difficulty level information', 'yatra') : __('Create a new trip difficulty level', 'yatra')}
         actions={
           <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -275,19 +275,19 @@ const DifficultyLevelForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'Name')} <span className="text-red-500">*</span>
+                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('Enter difficulty level name', 'Enter difficulty level name')}
+                      placeholder={__('Enter difficulty level name', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -296,7 +296,7 @@ const DifficultyLevelForm: React.FC = () => {
 
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -304,7 +304,7 @@ const DifficultyLevelForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('difficulty-slug', 'difficulty-slug')}
+                        placeholder={__('difficulty-slug', 'yatra')}
                         className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                         disabled={!isSlugEditable}
                         required
@@ -313,7 +313,7 @@ const DifficultyLevelForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                       >
                         {isSlugEditable ? <X className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                       </button>
@@ -321,17 +321,17 @@ const DifficultyLevelForm: React.FC = () => {
                     {errors.slug && <p className="mt-1 text-sm text-red-500">{errors.slug}</p>}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {isSlugEditable
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')}
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')}
                     </p>
                   </div>
 
                   <RichTextEditor
-                    label={__('Description', 'Description')}
+                    label={__('Description', 'yatra')}
                     value={formData.description || ''}
                     onChange={(value) => handleFieldChange('description', value)}
-                    placeholder={__('Describe this difficulty level (supports formatting, lists, links...)', 'Describe this difficulty level (supports formatting, lists, links...)')}
-                    helperText={__('Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported.', 'Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported.')}
+                    placeholder={__('Describe this difficulty level (supports formatting, lists, links...)', 'yatra')}
+                    helperText={__('Use formatting, bullet lists, and links to explain this difficulty level. HTML is supported.', 'yatra')}
                     minHeight={260}
                     maxHeight={600}
                   />
@@ -342,12 +342,12 @@ const DifficultyLevelForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Ordering & Status', 'Ordering & Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Ordering & Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="sorting" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Display Order', 'Display Order')}
+                      {__('Display Order', 'yatra')}
                     </label>
                     <Input
                       id="sorting"
@@ -355,23 +355,23 @@ const DifficultyLevelForm: React.FC = () => {
                       min={0}
                       value={formData.sorting}
                       onChange={(e) => handleFieldChange('sorting', e.target.value === '' ? '' : Number(e.target.value))}
-                      placeholder={__('Auto', 'Auto')}
+                      placeholder={__('Auto', 'yatra')}
                       className={errors.sorting ? 'border-red-500' : ''}
                     />
                     {errors.sorting && <p className="mt-1 text-sm text-red-500">{errors.sorting}</p>}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {__('Lower numbers appear first. Leave blank to auto-assign.', 'Lower numbers appear first. Leave blank to auto-assign.')}
+                      {__('Lower numbers appear first. Leave blank to auto-assign.', 'yatra')}
                     </p>
                   </div>
 
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Status', 'yatra')}
                     </label>
                     <Select id="status" value={formData.status} onChange={(e) => handleFieldChange('status', e.target.value)} className="w-full">
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -379,14 +379,14 @@ const DifficultyLevelForm: React.FC = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Difficulty Level Icon or Image', 'Difficulty Level Icon or Image')}</CardTitle>
+                  <CardTitle className="text-base">{__('Difficulty Level Icon or Image', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
                     onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
-                    helpText={__('Choose a library icon or upload a custom image for this difficulty level.', 'Choose a library icon or upload a custom image for this difficulty level.')}
+                    label={__('Select Icon or Upload Image', 'yatra')}
+                    helpText={__('Choose a library icon or upload a custom image for this difficulty level.', 'yatra')}
                     allowImageUpload
                     allowIconSelection
                     size="md"
@@ -402,17 +402,17 @@ const DifficultyLevelForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Difficulty Level', 'Update Difficulty Level') : __('Create Difficulty Level', 'Create Difficulty Level')}
+                            {isEditMode ? __('Update Difficulty Level', 'yatra') : __('Create Difficulty Level', 'yatra')}
                           </>
                         )}
                       </Button>
                       <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

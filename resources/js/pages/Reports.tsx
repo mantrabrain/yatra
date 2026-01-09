@@ -257,10 +257,10 @@ const DetailedBreakdownChart: React.FC<{
     <div className="space-y-4">
       <div className="text-center">
         <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
-          {selectedCategory === 'booking-overview' && __('Bookings Trend', 'Bookings Trend')}
-          {selectedCategory === 'revenue-analysis' && __('Revenue Trend', 'Revenue Trend')}
-          {selectedCategory === 'departure-management' && __('Departures Trend', 'Departures Trend')}
-          {!['booking-overview', 'revenue-analysis', 'departure-management'].includes(selectedCategory) && __('Performance Trend', 'Performance Trend')}
+          {selectedCategory === 'booking-overview' && __('Bookings Trend', 'yatra')}
+          {selectedCategory === 'revenue-analysis' && __('Revenue Trend', 'yatra')}
+          {selectedCategory === 'departure-management' && __('Departures Trend', 'yatra')}
+          {!['booking-overview', 'revenue-analysis', 'departure-management'].includes(selectedCategory) && __('Performance Trend', 'yatra')}
         </h4>
       </div>
       
@@ -317,19 +317,19 @@ const DetailedBreakdownChart: React.FC<{
         {selectedCategory === 'revenue-analysis' && (
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">{__('Revenue', 'Revenue')}</span>
+            <span className="text-gray-600 dark:text-gray-400">{__('Revenue', 'yatra')}</span>
           </div>
         )}
         {(selectedCategory === 'booking-overview' || !['revenue-analysis', 'departure-management'].includes(selectedCategory)) && (
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-blue-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">{__('Bookings', 'Bookings')}</span>
+            <span className="text-gray-600 dark:text-gray-400">{__('Bookings', 'yatra')}</span>
           </div>
         )}
         {selectedCategory === 'departure-management' && (
           <div className="flex items-center gap-1">
             <div className="w-3 h-3 bg-purple-500 rounded"></div>
-            <span className="text-gray-600 dark:text-gray-400">{__('Departures', 'Departures')}</span>
+            <span className="text-gray-600 dark:text-gray-400">{__('Departures', 'yatra')}</span>
           </div>
         )}
       </div>
@@ -548,19 +548,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Total Bookings', 'Total Bookings')}
+              {__('Total Bookings', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Confirmed', 'Confirmed')}
+              {__('Confirmed', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Pending', 'Pending')}
+              {__('Pending', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Cancelled', 'Cancelled')}
+              {__('Cancelled', 'yatra')}
             </th>
           </tr>
         );
@@ -568,19 +568,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Total Revenue', 'Total Revenue')}
+              {__('Total Revenue', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Collected', 'Collected')}
+              {__('Collected', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Outstanding', 'Outstanding')}
+              {__('Outstanding', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Avg Booking Value', 'Avg Booking Value')}
+              {__('Avg Booking Value', 'yatra')}
             </th>
           </tr>
         );
@@ -588,19 +588,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Trip Bookings', 'Trip Bookings')}
+              {__('Trip Bookings', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Top Trip', 'Top Trip')}
+              {__('Top Trip', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Occupancy Rate', 'Occupancy Rate')}
+              {__('Occupancy Rate', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Revenue', 'Revenue')}
+              {__('Revenue', 'yatra')}
             </th>
           </tr>
         );
@@ -608,19 +608,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Departures', 'Departures')}
+              {__('Departures', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Total Capacity', 'Total Capacity')}
+              {__('Total Capacity', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Booked', 'Booked')}
+              {__('Booked', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Utilization', 'Utilization')}
+              {__('Utilization', 'yatra')}
             </th>
           </tr>
         );
@@ -628,19 +628,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('New Customers', 'New Customers')}
+              {__('New Customers', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Returning Customers', 'Returning Customers')}
+              {__('Returning Customers', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Satisfaction', 'Satisfaction')}
+              {__('Satisfaction', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Total Revenue', 'Total Revenue')}
+              {__('Total Revenue', 'yatra')}
             </th>
           </tr>
         );
@@ -648,19 +648,19 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Lead Time (days)', 'Lead Time (days)')}
+              {__('Lead Time (days)', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Cancellation Rate', 'Cancellation Rate')}
+              {__('Cancellation Rate', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Efficiency', 'Efficiency')}
+              {__('Efficiency', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Bookings', 'Bookings')}
+              {__('Bookings', 'yatra')}
             </th>
           </tr>
         );
@@ -668,13 +668,13 @@ const DetailedBreakdownTable: React.FC<{
         return (
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Period', 'Period')}
+              {__('Period', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Bookings', 'Bookings')}
+              {__('Bookings', 'yatra')}
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {__('Revenue', 'Revenue')}
+              {__('Revenue', 'yatra')}
             </th>
           </tr>
         );
@@ -862,25 +862,25 @@ const DetailedBreakdownTable: React.FC<{
       <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Bookings', 'Total Bookings')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Bookings', 'yatra')}</p>
             <p className="text-lg font-bold text-blue-600 dark:text-blue-400">
               {breakdownData.reduce((sum, row) => sum + row.bookings, 0)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Revenue', 'Total Revenue')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Revenue', 'yatra')}</p>
             <p className="text-lg font-bold text-green-600 dark:text-green-400">
               {formatCurrencyAmount(breakdownData.reduce((sum, row) => sum + row.revenue, 0))}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Departures', 'Total Departures')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Departures', 'yatra')}</p>
             <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
               {breakdownData.reduce((sum, row) => sum + row.departures, 0)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Avg Occupancy', 'Avg Occupancy')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{__('Avg Occupancy', 'yatra')}</p>
             <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
               {(breakdownData.reduce((sum, row) => sum + row.occupancyRate, 0) / breakdownData.length).toFixed(1)}%
             </p>
@@ -1022,10 +1022,10 @@ const TravelBookingReports: React.FC = () => {
             onChange={(e) => setViewType(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:border-blue-400"
           >
-            <option value="summary">{__('Summary View', 'Summary View')}</option>
-            <option value="daily">{__('Daily Breakdown', 'Daily Breakdown')}</option>
-            <option value="weekly">{__('Weekly Breakdown', 'Weekly Breakdown')}</option>
-            <option value="monthly">{__('Monthly Breakdown', 'Monthly Breakdown')}</option>
+            <option value="summary">{__('Summary View', 'yatra')}</option>
+            <option value="daily">{__('Daily Breakdown', 'yatra')}</option>
+            <option value="weekly">{__('Weekly Breakdown', 'yatra')}</option>
+            <option value="monthly">{__('Monthly Breakdown', 'yatra')}</option>
           </select>
         </div>
       </div>
@@ -1043,7 +1043,7 @@ const TravelBookingReports: React.FC = () => {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Bookings', 'Total Bookings')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Bookings', 'yatra')}</p>
                   <p className="text-xl font-bold text-gray-900 dark:text-white">{travelKPIs.totalBookings}</p>
                 </div>
                 <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -1055,7 +1055,7 @@ const TravelBookingReports: React.FC = () => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Revenue', 'Total Revenue')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Revenue', 'yatra')}</p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{formatCurrencyAmount(travelKPIs.totalRevenue)}</p>
             </div>
             <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
@@ -1067,7 +1067,7 @@ const TravelBookingReports: React.FC = () => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Occupancy Rate', 'Occupancy Rate')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Occupancy Rate', 'yatra')}</p>
               <p className="text-xl font-bold text-purple-600 dark:text-purple-400">{travelKPIs.occupancyRate.toFixed(1)}%</p>
             </div>
             <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -1079,7 +1079,7 @@ const TravelBookingReports: React.FC = () => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Avg Booking Value', 'Avg Booking Value')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Avg Booking Value', 'yatra')}</p>
               <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{formatCurrencyAmount(travelKPIs.avgBookingValue)}</p>
             </div>
             <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
@@ -1091,7 +1091,7 @@ const TravelBookingReports: React.FC = () => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Cancellation Rate', 'Cancellation Rate')}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Cancellation Rate', 'yatra')}</p>
               <p className="text-xl font-bold text-red-600 dark:text-red-400">{travelKPIs.cancellationRate.toFixed(1)}%</p>
             </div>
             <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
@@ -1103,7 +1103,7 @@ const TravelBookingReports: React.FC = () => {
         <Card className="p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Upcoming Departures', 'Upcoming Departures')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Upcoming Departures', 'yatra')}</p>
               <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{travelKPIs.upcomingDepartures}</p>
             </div>
             <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -1120,10 +1120,10 @@ const TravelBookingReports: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SVGIcons.BarChart />
-            {__('Travel Business Reports', 'Travel Business Reports')}
+            {__('Travel Business Reports', 'yatra')}
           </CardTitle>
           <CardDescription>
-            {__('Comprehensive analytics for your travel booking operations', 'Comprehensive analytics for your travel booking operations')}
+            {__('Comprehensive analytics for your travel booking operations', 'yatra')}
           </CardDescription>
         </CardHeader>
         
@@ -1160,31 +1160,31 @@ const TravelBookingReports: React.FC = () => {
               {selectedCategory === 'booking-overview' && (
                 <div className="space-y-6">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    {__('Booking Overview', 'Booking Overview')}
+                    {__('Booking Overview', 'yatra')}
                   </h3>
                   
                   {/* KPI Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Confirmed Bookings', 'Confirmed Bookings')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Confirmed Bookings', 'yatra')}</p>
                       <p className="text-xl font-bold text-green-600">
                         {reportData?.booking_stats?.confirmed || 0}
                       </p>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Pending Bookings', 'Pending Bookings')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Pending Bookings', 'yatra')}</p>
                       <p className="text-xl font-bold text-yellow-600">
                         {reportData?.booking_stats?.pending || 0}
                       </p>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Cancelled Bookings', 'Cancelled Bookings')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Cancelled Bookings', 'yatra')}</p>
                       <p className="text-xl font-bold text-red-600">
                         {reportData?.booking_stats?.cancelled || 0}
                       </p>
                     </div>
                     <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Completed Bookings', 'Completed Bookings')}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Completed Bookings', 'yatra')}</p>
                       <p className="text-xl font-bold text-blue-600">
                         {reportData?.booking_stats?.completed || 0}
                       </p>
@@ -1196,7 +1196,7 @@ const TravelBookingReports: React.FC = () => {
                     {/* Booking Status Chart */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>{__('Booking Status Distribution', 'Booking Status Distribution')}</CardTitle>
+                        <CardTitle>{__('Booking Status Distribution', 'yatra')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <BookingStatusChart 
@@ -1213,7 +1213,7 @@ const TravelBookingReports: React.FC = () => {
                     {/* Revenue Trend Chart */}
                     <Card>
                       <CardHeader>
-                        <CardTitle>{__('Revenue Trend', 'Revenue Trend')}</CardTitle>
+                        <CardTitle>{__('Revenue Trend', 'yatra')}</CardTitle>
                       </CardHeader>
                       <CardContent>
                         <BookingsOverviewChart 
@@ -1378,12 +1378,12 @@ const TravelBookingReports: React.FC = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              {__('Detailed', 'Detailed')} {viewType.charAt(0).toUpperCase() + viewType.slice(1)} {__('Report', 'Report')}
+              {__('Detailed', 'yatra')} {viewType.charAt(0).toUpperCase() + viewType.slice(1)} {__('Report', 'yatra')}
             </CardTitle>
             <CardDescription>
-              {viewType === 'daily' && __('Daily breakdown of bookings, revenue, and departures', 'Daily breakdown of bookings, revenue, and departures')}
-              {viewType === 'weekly' && __('Weekly breakdown of bookings, revenue, and departures', 'Weekly breakdown of bookings, revenue, and departures')}
-              {viewType === 'monthly' && __('Monthly breakdown of bookings, revenue, and departures', 'Monthly breakdown of bookings, revenue, and departures')}
+              {viewType === 'daily' && __('Daily breakdown of bookings, revenue, and departures', 'yatra')}
+              {viewType === 'weekly' && __('Weekly breakdown of bookings, revenue, and departures', 'yatra')}
+              {viewType === 'monthly' && __('Monthly breakdown of bookings, revenue, and departures', 'yatra')}
             </CardDescription>
           </CardHeader>
           <CardContent>

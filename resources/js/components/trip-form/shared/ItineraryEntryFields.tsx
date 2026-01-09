@@ -82,17 +82,17 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
       <div className="space-y-3">
         {!isCompact && (
           <h5 className={`${labelSize} font-semibold text-gray-900 dark:text-white`}>
-            {__('Basic Information', 'Basic Information')}
+            {__('Basic Information', 'yatra')}
           </h5>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-              {__('Item Type', 'Item Type')} <span className="text-red-500">*</span>
+              {__('Item Type', 'yatra')} <span className="text-red-500">*</span>
             </label>
             <HelpText 
-              text={__('Select the type of item (Activity, Meal, Accommodation, etc.).', 'Select the type of item (Activity, Meal, Accommodation, etc.).')}
+              text={__('Select the type of item (Activity, Meal, Accommodation, etc.).', 'yatra')}
               className="mb-2"
             />
             <Select
@@ -109,7 +109,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               }}
               required
             >
-              <option value="">{__('Select a type...', 'Select a type...')}</option>
+              <option value="">{__('Select a type...', 'yatra')}</option>
               {itemTypes.map((type: any) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
@@ -126,10 +126,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
           <div>
             <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-              {__('Item', 'Item')} <span className="text-red-500">*</span>
+              {__('Item', 'yatra')} <span className="text-red-500">*</span>
             </label>
             <HelpText 
-              text={__('Select the specific item (Hiking, Lunch, Bus, etc.).', 'Select the specific item (Hiking, Lunch, Bus, etc.).')}
+              text={__('Select the specific item (Hiking, Lunch, Bus, etc.).', 'yatra')}
               className="mb-2"
             />
             <Select
@@ -149,15 +149,15 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             >
               <option value="">
                 {!entry.item_type_id 
-                  ? __('Select type first...', 'Select type first...')
+                  ? __('Select type first...', 'yatra')
                   : items.filter((item: any) => {
                       // Filter items by the entry's item_type_id
                       const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
                       const itemTypeIdNum = item.type_id || item.item_type_id;
                       return String(itemTypeIdNum) === itemTypeId;
                     }).length === 0
-                  ? __('No items available', 'No items available')
-                  : __('Select an item...', 'Select an item...')}
+                  ? __('No items available', 'yatra')
+                  : __('Select an item...', 'yatra')}
               </option>
               {items
                 .filter((item: any) => {
@@ -184,17 +184,17 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Itinerary Activity Title', 'Itinerary Activity Title')} <span className="text-red-500">*</span>
+            {__('Itinerary Activity Title', 'yatra')} <span className="text-red-500">*</span>
           </label>
           <HelpText 
-            text={__('A descriptive title for this itinerary activity. Examples: "Arrival in Kathmandu", "Trek to Base Camp".', 'A descriptive title for this itinerary activity. Examples: "Arrival in Kathmandu", "Trek to Base Camp".')}
+            text={__('A descriptive title for this itinerary activity. Examples: "Arrival in Kathmandu", "Trek to Base Camp".', 'yatra')}
             className="mb-2"
           />
           <Input
             type="text"
             value={entry.title || ''}
             onChange={(e) => onFieldChange('title', e.target.value)}
-            placeholder={__('e.g., Arrival in Kathmandu', 'e.g., Arrival in Kathmandu')}
+            placeholder={__('e.g., Arrival in Kathmandu', 'yatra')}
             className={`${errors.title ? 'border-red-500' : ''} ${textSize}`}
             required
           />
@@ -208,16 +208,16 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Description', 'Description')}
+            {__('Description', 'yatra')}
           </label>
           <HelpText 
-            text={__('Detailed description of what happens during this itinerary entry.', 'Detailed description of what happens during this itinerary entry.')}
+            text={__('Detailed description of what happens during this itinerary entry.', 'yatra')}
             className="mb-2"
           />
           <textarea
             value={entry.description || ''}
             onChange={(e) => onFieldChange('description', e.target.value)}
-            placeholder={__('Describe what happens during this entry...', 'Describe what happens during this entry...')}
+            placeholder={__('Describe what happens during this entry...', 'yatra')}
             rows={isCompact ? 2 : 4}
             className={`flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 ${textSize} ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none`}
           />
@@ -228,16 +228,16 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
       <div className={`space-y-3 ${!isCompact ? 'pt-3 border-t border-gray-200 dark:border-gray-700' : ''}`}>
         {!isCompact && (
           <h5 className={`${labelSize} font-semibold text-gray-900 dark:text-white`}>
-            {__('Location & Time', 'Location & Time')}
+            {__('Location & Time', 'yatra')}
           </h5>
         )}
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Location', 'Location')}
+            {__('Location', 'yatra')}
           </label>
           <HelpText 
-            text={__('Where does this activity take place? (e.g., "Resort restaurant", "Private beach")', 'Where does this activity take place? (e.g., "Resort restaurant", "Private beach")')}
+            text={__('Where does this activity take place? (e.g., "Resort restaurant", "Private beach")', 'yatra')}
             className="mb-2"
           />
           <div className="relative">
@@ -246,7 +246,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               type="text"
               value={entry.location || ''}
               onChange={(e) => onFieldChange('location', e.target.value)}
-              placeholder={__('e.g., Resort restaurant', 'e.g., Resort restaurant')}
+              placeholder={__('e.g., Resort restaurant', 'yatra')}
               className={`pl-9 ${textSize}`}
             />
           </div>
@@ -254,10 +254,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Time Type', 'Time Type')}
+            {__('Time Type', 'yatra')}
           </label>
           <HelpText 
-            text={__('How should the time be displayed?', 'How should the time be displayed?')}
+            text={__('How should the time be displayed?', 'yatra')}
             className="mb-2"
           />
           <Select
@@ -265,10 +265,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             onChange={(e) => onFieldChange('time_type', e.target.value)}
             className={textSize}
           >
-            <option value="exact">{__('Exact Time', 'Exact Time')}</option>
-            <option value="approximate">{__('Approximate Time', 'Approximate Time')}</option>
-            <option value="all_day">{__('All Day', 'All Day')}</option>
-            <option value="flexible">{__('Flexible', 'Flexible')}</option>
+            <option value="exact">{__('Exact Time', 'yatra')}</option>
+            <option value="approximate">{__('Approximate Time', 'yatra')}</option>
+            <option value="all_day">{__('All Day', 'yatra')}</option>
+            <option value="flexible">{__('Flexible', 'yatra')}</option>
           </Select>
         </div>
 
@@ -276,10 +276,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-                {__('Start Time', 'Start Time')}
+                {__('Start Time', 'yatra')}
               </label>
               <HelpText 
-                text={__('When does this activity start?', 'When does this activity start?')}
+                text={__('When does this activity start?', 'yatra')}
                 className="mb-2"
               />
               <div className="relative">
@@ -310,10 +310,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
             <div>
               <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-                {__('End Time', 'End Time')}
+                {__('End Time', 'yatra')}
               </label>
               <HelpText 
-                text={__('When does this activity end?', 'When does this activity end?')}
+                text={__('When does this activity end?', 'yatra')}
                 className="mb-2"
               />
               <div className="relative">
@@ -346,10 +346,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Duration', 'Duration')}
+            {__('Duration', 'yatra')}
           </label>
           <HelpText 
-            text={__('How long does this activity take? (e.g., "3 hours", "1 hour 30 minutes"). Leave empty to auto-calculate from times.', 'How long does this activity take? (e.g., "3 hours", "1 hour 30 minutes"). Leave empty to auto-calculate from times.')}
+            text={__('How long does this activity take? (e.g., "3 hours", "1 hour 30 minutes"). Leave empty to auto-calculate from times.', 'yatra')}
             className="mb-2"
           />
           <div className="relative">
@@ -358,13 +358,13 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               type="text"
               value={entry.duration || ''}
               onChange={(e) => onFieldChange('duration', e.target.value)}
-              placeholder={autoDuration || __('e.g., 3 hours', 'e.g., 3 hours')}
+              placeholder={autoDuration || __('e.g., 3 hours', 'yatra')}
               className={`pl-9 ${textSize}`}
             />
           </div>
           {autoDuration && entry.time_type === 'exact' && !entry.duration && (
             <p className={`mt-1.5 ${isCompact ? 'text-xs' : 'text-xs'} text-gray-500 dark:text-gray-400`}>
-              {__('Auto-calculated:', 'Auto-calculated:')} {autoDuration}
+              {__('Auto-calculated:', 'yatra')} {autoDuration}
             </p>
           )}
         </div>
@@ -374,17 +374,17 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
       <div className={`space-y-3 ${!isCompact ? 'pt-3 border-t border-gray-200 dark:border-gray-700' : ''}`}>
         {!isCompact && (
           <h5 className={`${labelSize} font-semibold text-gray-900 dark:text-white`}>
-            {__('Cost & Additional Information', 'Cost & Additional Information')}
+            {__('Cost and Additional Information', 'yatra')}
           </h5>
         )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-              {__('Cost', 'Cost')}
+              {__('Cost', 'yatra')}
             </label>
             <HelpText 
-              text={__('Optional cost for this activity. Leave empty if included in trip price.', 'Optional cost for this activity. Leave empty if included in trip price.')}
+              text={__('Optional cost for this activity. Leave empty if included in trip price.', 'yatra')}
               className="mb-2"
             />
             <div className="relative">
@@ -412,7 +412,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className={`${textSize} text-gray-700 dark:text-gray-300`}>
-                {__('Cost per person', 'Cost per person')}
+                {__('Cost per person', 'yatra')}
               </span>
             </label>
           </div>
@@ -420,16 +420,16 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
         <div>
           <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}>
-            {__('Notes / Instructions', 'Notes / Instructions')}
+            {__('Notes / Instructions', 'yatra')}
           </label>
           <HelpText 
-            text={__('Additional notes or special instructions for this activity.', 'Additional notes or special instructions for this activity.')}
+            text={__('Additional notes or special instructions for this activity.', 'yatra')}
             className="mb-2"
           />
           <textarea
             value={entry.notes || ''}
             onChange={(e) => onFieldChange('notes', e.target.value)}
-            placeholder={__('e.g., Please arrive 15 minutes early, Bring comfortable shoes...', 'e.g., Please arrive 15 minutes early, Bring comfortable shoes...')}
+            placeholder={__('e.g., Please arrive 15 minutes early, Bring comfortable shoes...', 'yatra')}
             rows={isCompact ? 2 : 3}
             className={`flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 ${textSize} ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none`}
           />
@@ -439,10 +439,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-2`}>
-              {__('Included Items', 'Included Items')}
+              {__('Included Items', 'yatra')}
             </label>
             <HelpText 
-              text={__('Items or services included in this activity.', 'Items or services included in this activity.')}
+              text={__('Items or services included in this activity.', 'yatra')}
               className="mb-2"
             />
             <div className="space-y-2">
@@ -457,7 +457,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                       onAddIncludedItem?.();
                     }
                   }}
-                  placeholder={__('Add included item...', 'Add included item...')}
+                  placeholder={__('Add included item...', 'yatra')}
                   className={`flex-1 ${textSize}`}
                 />
                 <Button
@@ -496,10 +496,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
 
           <div>
             <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-2`}>
-              {__('Excluded Items', 'Excluded Items')}
+              {__('Excluded Items', 'yatra')}
             </label>
             <HelpText 
-              text={__('Items or services NOT included in this activity.', 'Items or services NOT included in this activity.')}
+              text={__('Items or services NOT included in this activity.', 'yatra')}
               className="mb-2"
             />
             <div className="space-y-2">
@@ -514,7 +514,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                       onAddExcludedItem?.();
                     }
                   }}
-                  placeholder={__('Add excluded item...', 'Add excluded item...')}
+                  placeholder={__('Add excluded item...', 'yatra')}
                   className={`flex-1 ${textSize}`}
                 />
                 <Button

@@ -133,7 +133,7 @@ const EnquiryForm: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['enquiries'] });
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
-      showToast(__('Enquiry saved successfully.', 'Enquiry saved successfully.'), 'success');
+      showToast(__('Enquiry saved successfully.', 'yatra'), 'success');
       navigate({ subpage: 'enquiries' });
     },
   });
@@ -155,7 +155,7 @@ const EnquiryForm: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Edit Enquiry', 'Edit Enquiry')}
+          title={__('Edit Enquiry', 'yatra')}
           actions={
             <div className="flex items-center gap-2">
               <Skeleton className="h-10 w-24" />
@@ -206,13 +206,13 @@ const EnquiryForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEdit ? __('Edit Enquiry', 'Edit Enquiry') : __('Create Enquiry', 'Create Enquiry')}
-        description={isEdit ? __('Update enquiry details', 'Update enquiry details') : __('Add a new enquiry', 'Add a new enquiry')}
+        title={isEdit ? __('Edit Enquiry', 'yatra') : __('Create Enquiry', 'yatra')}
+        description={isEdit ? __('Update enquiry details', 'yatra') : __('Add a new enquiry', 'yatra')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
             <Button 
               onClick={handleSubmit} 
@@ -224,7 +224,7 @@ const EnquiryForm: React.FC = () => {
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              {saveMutation.isPending ? __('Saving...', 'Saving...') : __('Save', 'Save')}
+              {saveMutation.isPending ? __('Saving...', 'yatra') : __('Save', 'yatra')}
             </Button>
           </div>
         }
@@ -234,7 +234,7 @@ const EnquiryForm: React.FC = () => {
         <form onSubmit={handleSubmit}>
           {saveMutation.isError && (
             <div className="mb-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-              {saveMutation.error?.message || __('Failed to save enquiry. Please try again.', 'Failed to save enquiry. Please try again.')}
+              {saveMutation.error?.message || __('Failed to save enquiry. Please try again.', 'yatra')}
             </div>
           )}
 
@@ -244,43 +244,43 @@ const EnquiryForm: React.FC = () => {
               {/* Customer Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Customer Information', 'Customer Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Customer Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Name', 'Name')} <span className="text-red-500">*</span>
+                        {__('Name', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         value={formData.name || ''}
                         onChange={(e) => handleChange('name', e.target.value)}
-                        placeholder={__('Customer name', 'Customer name')}
+                        placeholder={__('Customer name', 'yatra')}
                         required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Email', 'Email')} <span className="text-red-500">*</span>
+                        {__('Email', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         type="email"
                         value={formData.email || ''}
                         onChange={(e) => handleChange('email', e.target.value)}
-                        placeholder={__('customer@example.com', 'customer@example.com')}
+                        placeholder={__('customer@example.com', 'yatra')}
                         required
                       />
                     </div>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Phone', 'Phone')}
+                      {__('Phone', 'yatra')}
                     </label>
                     <Input
                       type="tel"
                       value={formData.phone || ''}
                       onChange={(e) => handleChange('phone', e.target.value)}
-                      placeholder={__('Phone number', 'Phone number')}
+                      placeholder={__('Phone number', 'yatra')}
                     />
                   </div>
                 </CardContent>
@@ -289,17 +289,17 @@ const EnquiryForm: React.FC = () => {
               {/* Enquiry Details */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Enquiry Details', 'Enquiry Details')}</CardTitle>
+                  <CardTitle className="text-base">{__('Enquiry Details', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Message', 'Message')} <span className="text-red-500">*</span>
+                      {__('Message', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       value={formData.message || ''}
                       onChange={(e) => handleChange('message', e.target.value)}
-                      placeholder={__('Enquiry message...', 'Enquiry message...')}
+                      placeholder={__('Enquiry message...', 'yatra')}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       rows={5}
                       required
@@ -308,7 +308,7 @@ const EnquiryForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Number of Travelers', 'Number of Travelers')}
+                        {__('Number of Travelers', 'yatra')}
                       </label>
                       <Input
                         type="number"
@@ -320,12 +320,12 @@ const EnquiryForm: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        {__('Preferred Travel Date', 'Preferred Travel Date')}
+                        {__('Preferred Travel Date', 'yatra')}
                       </label>
                       <DatePicker
                         value={formData.travel_date || ''}
                         onChange={(val) => handleChange('travel_date', val)}
-                        placeholder={__('Select date', 'Select date')}
+                        placeholder={__('Select date', 'yatra')}
                       />
                     </div>
                   </div>
@@ -336,13 +336,13 @@ const EnquiryForm: React.FC = () => {
               {isEdit && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{__('Response Notes', 'Response Notes')}</CardTitle>
+                    <CardTitle className="text-base">{__('Response Notes', 'yatra')}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <textarea
                       value={formData.response_notes || ''}
                       onChange={(e) => handleChange('response_notes', e.target.value)}
-                      placeholder={__('Internal notes about responses to this enquiry...', 'Internal notes about responses to this enquiry...')}
+                      placeholder={__('Internal notes about responses to this enquiry...', 'yatra')}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       rows={4}
                     />
@@ -356,20 +356,20 @@ const EnquiryForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Select
                     value={formData.status || 'new'}
                     onChange={(e) => handleChange('status', e.target.value)}
                   >
-                    <option value="new">{__('New', 'New')}</option>
-                    <option value="pending">{__('Pending', 'Pending')}</option>
-                    <option value="responded">{__('Responded', 'Responded')}</option>
-                    <option value="converted">{__('Converted', 'Converted')}</option>
-                    <option value="closed">{__('Closed', 'Closed')}</option>
-                    <option value="spam">{__('Spam', 'Spam')}</option>
-                    <option value="trash">{__('Trash', 'Trash')}</option>
+                    <option value="new">{__('New', 'yatra')}</option>
+                    <option value="pending">{__('Pending', 'yatra')}</option>
+                    <option value="responded">{__('Responded', 'yatra')}</option>
+                    <option value="converted">{__('Converted', 'yatra')}</option>
+                    <option value="closed">{__('Closed', 'yatra')}</option>
+                    <option value="spam">{__('Spam', 'yatra')}</option>
+                    <option value="trash">{__('Trash', 'yatra')}</option>
                   </Select>
                 </CardContent>
               </Card>
@@ -377,14 +377,14 @@ const EnquiryForm: React.FC = () => {
               {/* Related Trip */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Related Trip', 'Related Trip')}</CardTitle>
+                  <CardTitle className="text-base">{__('Related Trip', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Select
                     value={formData.trip_id?.toString() || ''}
                     onChange={(e) => handleChange('trip_id', e.target.value ? parseInt(e.target.value) : undefined)}
                   >
-                    <option value="">{__('No trip selected', 'No trip selected')}</option>
+                    <option value="">{__('No trip selected', 'yatra')}</option>
                     {trips.map((trip) => (
                       <option key={trip.id} value={trip.id.toString()}>
                         {trip.title}
@@ -398,11 +398,11 @@ const EnquiryForm: React.FC = () => {
               {isEdit && enquiry && (
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base">{__('Information', 'Information')}</CardTitle>
+                    <CardTitle className="text-base">{__('Information', 'yatra')}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div>
-                      <span className="text-gray-500 dark:text-gray-400">{__('Created:', 'Created:')}</span>
+                      <span className="text-gray-500 dark:text-gray-400">{__('Created:', 'yatra')}</span>
                       <p className="text-gray-900 dark:text-white mt-0.5">
                         {new Date(enquiry.created_at).toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -415,7 +415,7 @@ const EnquiryForm: React.FC = () => {
                     </div>
                     {enquiry.responded_at && (
                       <div>
-                        <span className="text-gray-500 dark:text-gray-400">{__('Responded:', 'Responded:')}</span>
+                        <span className="text-gray-500 dark:text-gray-400">{__('Responded:', 'yatra')}</span>
                         <p className="text-gray-900 dark:text-white mt-0.5">
                           {new Date(enquiry.responded_at).toLocaleDateString('en-US', {
                             year: 'numeric',

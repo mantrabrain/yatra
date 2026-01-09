@@ -67,7 +67,7 @@ const ItemTypeForm: React.FC = () => {
         const response = await apiClient.get(`/item-types/${typeId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item type', 'Failed to load item type'), 'error');
+        showToast(error?.message || __('Failed to load item type', 'yatra'), 'error');
         throw error;
       }
     },
@@ -150,13 +150,13 @@ const ItemTypeForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     setErrors(newErrors);
@@ -190,8 +190,8 @@ const ItemTypeForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['item-type', typeId] });
       showToast(
         isEditMode 
-          ? __('Item type updated successfully', 'Item type updated successfully')
-          : __('Item type created successfully', 'Item type created successfully'),
+          ? __('Item type updated successfully', 'yatra')
+          : __('Item type created successfully', 'yatra'),
         'success'
       );
       
@@ -207,7 +207,7 @@ const ItemTypeForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the item type', 'An error occurred while saving the item type');
+      const errorMessage = error?.message || __('An error occurred while saving the item type', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -217,7 +217,7 @@ const ItemTypeForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -231,13 +231,13 @@ const ItemTypeForm: React.FC = () => {
   };
 
   const colorOptions = [
-    { value: 'blue', label: __('Blue', 'Blue') },
-    { value: 'green', label: __('Green', 'Green') },
-    { value: 'purple', label: __('Purple', 'Purple') },
-    { value: 'orange', label: __('Orange', 'Orange') },
-    { value: 'red', label: __('Red', 'Red') },
-    { value: 'yellow', label: __('Yellow', 'Yellow') },
-    { value: 'gray', label: __('Gray', 'Gray') },
+    { value: 'blue', label: __('Blue', 'yatra') },
+    { value: 'green', label: __('Green', 'yatra') },
+    { value: 'purple', label: __('Purple', 'yatra') },
+    { value: 'orange', label: __('Orange', 'yatra') },
+    { value: 'red', label: __('Red', 'yatra') },
+    { value: 'yellow', label: __('Yellow', 'yatra') },
+    { value: 'gray', label: __('Gray', 'yatra') },
   ];
 
   if (isEditMode && isLoadingType) {
@@ -309,8 +309,8 @@ const ItemTypeForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Item Type', 'Edit Item Type') : __('Add New Item Type', 'Add New Item Type')}
-        description={isEditMode ? __('Update item type information', 'Update item type information') : __('Create a new category for organizing itinerary items', 'Create a new category for organizing itinerary items')}
+        title={isEditMode ? __('Edit Item Type', 'yatra') : __('Add New Item Type', 'yatra')}
+        description={isEditMode ? __('Update item type information', 'yatra') : __('Create a new category for organizing itinerary items', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -318,7 +318,7 @@ const ItemTypeForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -329,19 +329,19 @@ const ItemTypeForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Type Name', 'Type Name')} <span className="text-red-500">*</span>
+                      {__('Type Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('e.g., Activity', 'e.g., Activity')}
+                      placeholder={__('e.g., Activity', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -355,7 +355,7 @@ const ItemTypeForm: React.FC = () => {
                   <div>
                     <div>
                       <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                        {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <Input
@@ -363,7 +363,7 @@ const ItemTypeForm: React.FC = () => {
                           type="text"
                           value={formData.slug}
                           onChange={(e) => handleSlugChange(e.target.value)}
-                          placeholder={__('item-type-slug', 'item-type-slug')}
+                          placeholder={__('item-type-slug', 'yatra')}
                           className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                           disabled={!isSlugEditable}
                           required
@@ -372,7 +372,7 @@ const ItemTypeForm: React.FC = () => {
                           type="button"
                           onClick={handleToggleSlugEdit}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                          aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                          aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                         >
                           {isSlugEditable ? (
                             <X className="w-4 h-4" />
@@ -386,22 +386,21 @@ const ItemTypeForm: React.FC = () => {
                       )}
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {isSlugEditable
-                          ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                          : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
-                        }
+                          ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                          : __('Auto-generated from name. Click edit icon to customize.', 'yatra')}
                       </p>
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
+                      {__('Description', 'yatra')}
                     </label>
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Describe what this item type is used for...', 'Describe what this item type is used for...')}
+                      placeholder={__('Describe what this item type is used for...', 'yatra')}
                       rows={4}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -413,15 +412,15 @@ const ItemTypeForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Appearance', 'Appearance')}</CardTitle>
+                  <CardTitle className="text-base">{__('Appearance', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <IconPicker
                       value={formData.icon}
                       onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Icon', 'Icon')}
-                      helpText={__('Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.', 'Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.')}
+                      label={__('Icon', 'yatra')}
+                      helpText={__('Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.', 'yatra')}
                       allowImageUpload={true}
                       allowIconSelection={true}
                       size="md"
@@ -430,7 +429,7 @@ const ItemTypeForm: React.FC = () => {
 
                   <div>
                     <label htmlFor="color" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Color', 'Color')}
+                      {__('Color', 'yatra')}
                     </label>
                     <Select
                       id="color"
@@ -449,21 +448,21 @@ const ItemTypeForm: React.FC = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Item Type Status', 'Item Type Status')}
+                      {__('Item Type Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -481,12 +480,12 @@ const ItemTypeForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Type', 'Update Type') : __('Create Type', 'Create Type')}
+                            {isEditMode ? __('Update Type', 'yatra') : __('Create Type', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -496,7 +495,7 @@ const ItemTypeForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

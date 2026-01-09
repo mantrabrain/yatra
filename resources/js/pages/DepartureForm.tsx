@@ -95,14 +95,14 @@ const DepartureForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['departures', tripId] });
       showToast(
         isEditMode 
-          ? __('Departure updated successfully', 'Departure updated successfully')
-          : __('Departure created successfully', 'Departure created successfully'),
+          ? __('Departure updated successfully', 'yatra')
+          : __('Departure created successfully', 'yatra'),
         'success'
       );
       window.location.href = `?page=yatra&subpage=trips&tab=departures&trip_id=${tripId}`;
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to save departure', 'Failed to save departure'), 'error');
+      showToast(error?.message || __('Failed to save departure', 'yatra'), 'error');
     },
   });
 
@@ -110,13 +110,13 @@ const DepartureForm: React.FC = () => {
     const newErrors: Partial<Record<keyof DepartureFormData, string>> = {};
 
     if (!formData.date) {
-      newErrors.date = __('Date is required', 'Date is required');
+      newErrors.date = __('Date is required', 'yatra');
     }
 
     if (!formData.max_capacity) {
-      newErrors.max_capacity = __('Max capacity is required', 'Max capacity is required');
+      newErrors.max_capacity = __('Max capacity is required', 'yatra');
     } else if (parseInt(formData.max_capacity) < 1) {
-      newErrors.max_capacity = __('Max capacity must be at least 1', 'Max capacity must be at least 1');
+      newErrors.max_capacity = __('Max capacity must be at least 1', 'yatra');
     }
 
     setErrors(newErrors);
@@ -148,12 +148,12 @@ const DepartureForm: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditMode ? __('Edit Departure', 'Edit Departure') : __('Add Departure', 'Add Departure')}
-        description={__('Create or update a departure date for this trip', 'Create or update a departure date for this trip')}
+        title={isEditMode ? __('Edit Departure', 'yatra') : __('Add Departure', 'yatra')}
+        description={__('Create or update a departure date for this trip', 'yatra')}
         actions={
           <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -164,7 +164,7 @@ const DepartureForm: React.FC = () => {
             {/* Date */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Departure Date', 'Departure Date')} <span className="text-red-500">*</span>
+                {__('Departure Date', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <DatePicker
                 value={formData.date}
@@ -174,43 +174,43 @@ const DepartureForm: React.FC = () => {
               {errors.date && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date}</p>
               )}
-              <HelpText text={__('Select the departure date for this trip', 'Select the departure date for this trip')} />
+              <HelpText text={__('Select the departure date for this trip', 'yatra')} />
             </div>
 
             {/* Time (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Departure Time', 'Departure Time')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('Departure Time', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <TimePicker
                 value={formData.time || ''}
                 onChange={(value) => setFormData({ ...formData, time: value })}
               />
-              <HelpText text={__('Optional departure time (e.g., 09:00 AM)', 'Optional departure time (e.g., 09:00 AM)')} />
+              <HelpText text={__('Optional departure time (e.g., 09:00 AM)', 'yatra')} />
             </div>
 
             {/* Max Capacity */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Max Capacity', 'Max Capacity')} <span className="text-red-500">*</span>
+                {__('Max Capacity', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <Input
                 type="number"
                 min="1"
                 value={formData.max_capacity}
                 onChange={(e) => setFormData({ ...formData, max_capacity: e.target.value })}
-                placeholder={__('e.g., 20', 'e.g., 20')}
+                placeholder={__('e.g., 20', 'yatra')}
               />
               {errors.max_capacity && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.max_capacity}</p>
               )}
-              <HelpText text={__('Maximum number of travelers for this departure', 'Maximum number of travelers for this departure')} />
+              <HelpText text={__('Maximum number of travelers for this departure', 'yatra')} />
             </div>
 
             {/* Price Override (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Price Override', 'Price Override')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('Price Override', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <Input
                 type="number"
@@ -218,41 +218,41 @@ const DepartureForm: React.FC = () => {
                 min="0"
                 value={formData.price_override || ''}
                 onChange={(e) => setFormData({ ...formData, price_override: e.target.value })}
-                placeholder={__('e.g., 150.00', 'e.g., 150.00')}
+                placeholder={__('e.g., 150.00', 'yatra')}
               />
-              <HelpText text={__('Override the default trip price for this specific departure', 'Override the default trip price for this specific departure')} />
+              <HelpText text={__('Override the default trip price for this specific departure', 'yatra')} />
             </div>
 
             {/* Notes (Optional) */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Notes', 'Notes')} <span className="text-gray-400">({__('Optional', 'Optional')})</span>
+                {__('Notes', 'yatra')} <span className="text-gray-400">({__('Optional', 'yatra')})</span>
               </label>
               <textarea
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                 rows={4}
                 value={formData.notes || ''}
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                placeholder={__('Additional notes about this departure...', 'Additional notes about this departure...')}
+                placeholder={__('Additional notes about this departure...', 'yatra')}
               />
-              <HelpText text={__('Internal notes about this departure (not visible to customers)', 'Internal notes about this departure (not visible to customers)')} />
+              <HelpText text={__('Internal notes about this departure (not visible to customers)', 'yatra')} />
             </div>
 
             {/* Submit Button */}
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
               <Button type="button" variant="outline" onClick={handleBack}>
-                {__('Cancel', 'Cancel')}
+                {__('Cancel', 'yatra')}
               </Button>
               <Button type="submit" disabled={saveMutation.isPending}>
                 {saveMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {__('Saving...', 'Saving...')}
+                    {__('Saving...', 'yatra')}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4 mr-2" />
-                    {__('Save Departure', 'Save Departure')}
+                    {__('Save Departure', 'yatra')}
                   </>
                 )}
               </Button>

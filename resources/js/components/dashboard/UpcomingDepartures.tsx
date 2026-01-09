@@ -55,11 +55,11 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Upcoming Departures', 'Upcoming Departures')}</CardTitle>
+          <CardTitle>{__('Upcoming Departures', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'Loading...')}
+            {__('Loading...', 'yatra')}
           </div>
         </CardContent>
       </Card>
@@ -69,7 +69,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Upcoming Departures', 'Upcoming Departures')}</CardTitle>
+        <CardTitle>{__('Upcoming Departures', 'yatra')}</CardTitle>
       </CardHeader>
       <CardContent>
         {departures && departures.length > 0 ? (
@@ -115,10 +115,10 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                     {daysUntil >= 0 && daysUntil <= 7 && (
                       <Badge variant={daysUntil <= 3 ? 'error' : 'warning'}>
                         {daysUntil === 0 
-                          ? __('Today', 'Today')
+                          ? __('Today', 'yatra')
                           : daysUntil === 1
-                          ? __('Tomorrow', 'Tomorrow')
-                          : `${daysUntil} ${__('days', 'days')}`
+                          ? __('Tomorrow', 'yatra')
+                          : `${daysUntil} ${__('days', 'yatra')}`
                         }
                       </Badge>
                     )}
@@ -132,7 +132,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
                       <span>
-                        {departure.available_spots} / {departure.total_spots} {__('available', 'available')}
+                        {departure.available_spots} / {departure.total_spots} {__('available', 'yatra')}
                       </span>
                     </div>
                   </div>
@@ -145,7 +145,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                       />
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {occupancy.toFixed(0)}% {__('occupied', 'occupied')}
+                      {occupancy.toFixed(0)}% {__('occupied', 'yatra')}
                     </span>
                   </div>
                 </div>
@@ -154,7 +154,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No upcoming departures', 'No upcoming departures')}
+            {__('No upcoming departures', 'yatra')}
           </p>
         )}
       </CardContent>

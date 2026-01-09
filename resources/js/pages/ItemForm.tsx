@@ -67,7 +67,7 @@ const ItemForm: React.FC = () => {
         });
         return response.data || [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item types', 'Failed to load item types'), 'error');
+        showToast(error?.message || __('Failed to load item types', 'yatra'), 'error');
         return [];
       }
     },
@@ -82,7 +82,7 @@ const ItemForm: React.FC = () => {
         const response = await apiClient.get(`/items/${itemId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item', 'Failed to load item'), 'error');
+        showToast(error?.message || __('Failed to load item', 'yatra'), 'error');
         throw error;
       }
     },
@@ -152,17 +152,17 @@ const ItemForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     if (!formData.type_id) {
-      newErrors.type_id = __('Item type is required', 'Item type is required');
+      newErrors.type_id = __('Item type is required', 'yatra');
     }
 
     setErrors(newErrors);
@@ -195,8 +195,8 @@ const ItemForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['item', itemId] });
       showToast(
         isEditMode 
-          ? __('Item updated successfully', 'Item updated successfully')
-          : __('Item created successfully', 'Item created successfully'),
+          ? __('Item updated successfully', 'yatra')
+          : __('Item created successfully', 'yatra'),
         'success'
       );
       
@@ -216,7 +216,7 @@ const ItemForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the item', 'An error occurred while saving the item');
+      const errorMessage = error?.message || __('An error occurred while saving the item', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -226,7 +226,7 @@ const ItemForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -243,7 +243,7 @@ const ItemForm: React.FC = () => {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading...', 'Loading...')}</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading...', 'yatra')}</span>
       </div>
     );
   }
@@ -253,8 +253,8 @@ const ItemForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Item', 'Edit Item') : __('Add New Item', 'Add New Item')}
-        description={isEditMode ? __('Update item information', 'Update item information') : __('Create a specific item under an item type. Examples: Hiking (under Activity), Lunch (under Meal).', 'Create a specific item under an item type. Examples: Hiking (under Activity), Lunch (under Meal).')}
+        title={isEditMode ? __('Edit Item', 'yatra') : __('Add New Item', 'yatra')}
+        description={isEditMode ? __('Update item information', 'yatra') : __('Create a specific item under an item type. Examples: Hiking (under Activity), Lunch (under Meal).', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -262,7 +262,7 @@ const ItemForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -273,12 +273,12 @@ const ItemForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="type_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Item Type', 'Item Type')} <span className="text-red-500">*</span>
+                      {__('Item Type', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <SearchableSelect
                       value={formData.type_id}
@@ -288,8 +288,8 @@ const ItemForm: React.FC = () => {
                         label: type.name,
                         icon: type.icon,
                       }))}
-                      placeholder={__('Select a type...', 'Select a type...')}
-                      searchPlaceholder={__('Search item types...', 'Search item types...')}
+                      placeholder={__('Select a type...', 'yatra')}
+                      searchPlaceholder={__('Search item types...', 'yatra')}
                       className={errors.type_id ? 'border-red-500' : ''}
                       error={!!errors.type_id}
                     />
@@ -300,14 +300,14 @@ const ItemForm: React.FC = () => {
 
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Item Name', 'Item Name')} <span className="text-red-500">*</span>
+                      {__('Item Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('e.g., Hiking', 'e.g., Hiking')}
+                      placeholder={__('e.g., Hiking', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -318,7 +318,7 @@ const ItemForm: React.FC = () => {
 
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -326,7 +326,7 @@ const ItemForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('item-slug', 'item-slug')}
+                        placeholder={__('item-slug', 'yatra')}
                         className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                         disabled={!isSlugEditable}
                         required
@@ -335,7 +335,7 @@ const ItemForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                       >
                         {isSlugEditable ? (
                           <X className="w-4 h-4" />
@@ -349,21 +349,21 @@ const ItemForm: React.FC = () => {
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {isSlugEditable
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')
                       }
                     </p>
                   </div>
 
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
+                      {__('Description', 'yatra')}
                     </label>
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Describe this item...', 'Describe this item...')}
+                      placeholder={__('Describe this item...', 'yatra')}
                       rows={4}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -375,21 +375,21 @@ const ItemForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Item Status', 'Item Status')}
+                      {__('Item Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -407,12 +407,12 @@ const ItemForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Item', 'Update Item') : __('Create Item', 'Create Item')}
+                            {isEditMode ? __('Update Item', 'yatra') : __('Create Item', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -422,7 +422,7 @@ const ItemForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

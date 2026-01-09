@@ -23,7 +23,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
       window.location.reload();
     } catch (error) {
       console.error('Error removing trip:', error);
-      showToast(__('Failed to remove trip from wishlist.', 'Failed to remove trip from wishlist.'), 'error');
+      showToast(__('Failed to remove trip from wishlist.', 'yatra'), 'error');
     }
   };
 
@@ -31,9 +31,9 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Saved Trips', 'Saved Trips')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Saved Trips', 'yatra')}</h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {__('Your wishlist of favorite trips', 'Your wishlist of favorite trips')}
+            {__('Your wishlist of favorite trips', 'yatra')}
           </p>
         </div>
       </div>
@@ -59,17 +59,17 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
         <div className="text-center py-12">
           <Heart className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            {__('No saved trips yet', 'No saved trips yet')}
+            {__('No saved trips yet', 'yatra')}
           </h3>
           <p className="text-gray-500 dark:text-gray-400 mb-6">
-            {__('Start exploring and save your favorite trips to your wishlist!', 'Start exploring and save your favorite trips to your wishlist!')}
+            {__('Start exploring and save your favorite trips to your wishlist!', 'yatra')}
           </p>
           <a
             href="/trip/"
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <MapPinIcon className="w-4 h-4" />
-            {__('Browse Trips', 'Browse Trips')}
+            {__('Browse Trips', 'yatra')}
           </a>
         </div>
       ) : (
@@ -101,12 +101,12 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                   <img src={imageUrl} alt={trip.trip_title} />
                   {hasDiscount && (
                     <div className="yatra-discount-badge">
-                      {trip.discount_percent}% {__('OFF', 'OFF')}
+                      {trip.discount_percent}% {__('OFF', 'yatra')}
                     </div>
                   )}
                   <button
                     className="yatra-favorite-btn saved is-saved"
-                    title={__('Remove from favorites', 'Remove from favorites')}
+                    title={__('Remove from favorites', 'yatra')}
                     onClick={() => handleRemoveTrip(trip.trip_id)}
                     style={{ color: '#ef4444' }}
                   >
@@ -125,7 +125,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                       </>
                     )}
                     <span className="yatra-trip-duration">
-                      {trip.duration || __('Flexible', 'Flexible')}
+                      {trip.duration || __('Flexible', 'yatra')}
                     </span>
                     {trip.difficulty && (
                       <>
@@ -167,7 +167,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                       <span className="yatra-rating-value">{avgRating > 0 ? avgRating.toFixed(1) : '0.0'}</span>
                     </div>
                     {reviewCount > 0 && (
-                      <span className="yatra-reviews-count">({reviewCount} {__('reviews', 'reviews')})</span>
+                      <span className="yatra-reviews-count">({reviewCount} {__('reviews', 'yatra')})</span>
                     )}
                   </div>
                   
@@ -179,16 +179,16 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
                       <div className="yatra-current-price">
                         {trip.is_traveler_based ? (
                           <>
-                            <span className="yatra-starting-from" style={{ fontSize: '0.75rem', fontWeight: 'normal' }}>{__('Starting from', 'Starting from')} </span>
+                            <span className="yatra-starting-from" style={{ fontSize: '0.75rem', fontWeight: 'normal' }}>{__('Starting from', 'yatra')} </span>
                             {formatPrice(displayPrice)}
                           </>
                         ) : (
                           formatPrice(displayPrice)
                         )}
                       </div>
-                      <div className="yatra-price-note">{__('per person', 'per person')}</div>
+                      <div className="yatra-price-note">{__('Per person', 'yatra')}</div>
                     </div>
-                    <a href={tripUrl} className="yatra-card-view-btn">{__('View Details', 'View Details')}</a>
+                    <a href={tripUrl} className="yatra-card-view-btn">{__('View Details', 'yatra')}</a>
                   </div>
                 </div>
               </div>

@@ -204,12 +204,12 @@ const RecurringRuleForm: React.FC = () => {
     id: Number(fallbackTripData.id) || formData.trip_id,
     title: fallbackTripData.title,
   } : null);
-  const tripNameLabel = effectiveTrip?.title || __('Unnamed Trip', 'Unnamed Trip');
-  let headerDescription = __('Set up automatic availability patterns for your trips', 'Set up automatic availability patterns for your trips');
+  const tripNameLabel = effectiveTrip?.title || __('Unnamed Trip', 'yatra');
+  let headerDescription = __('Set up automatic availability patterns for your trips', 'yatra');
   if (effectiveTrip) {
-    headerDescription = `${isEditing ? __('Edit', 'Edit') : __('Add', 'Add')} ${__('availability rule for', 'availability rule for')} ${tripNameLabel} (Trip ID: ${effectiveTrip.id})`;
+    headerDescription = `${isEditing ? __('Edit', 'yatra') : __('Add', 'yatra')} ${__('availability rule for', 'yatra')} ${tripNameLabel} (Trip ID: ${effectiveTrip.id})`;
   } else if (formData.trip_id) {
-    headerDescription = `${isEditing ? __('Edit', 'Edit') : __('Add', 'Add')} ${__('availability rule for Trip ID:', 'availability rule for Trip ID:')} ${formData.trip_id}`;
+    headerDescription = `${isEditing ? __('Edit', 'yatra') : __('Add', 'yatra')} ${__('availability rule for Trip ID:', 'yatra')} ${formData.trip_id}`;
   }
   const isSingleDayTrip = selectedTrip?.trip_type === 'single_day' || (selectedTrip?.duration_days || 1) <= 1;
   // Use form's pricing_type which defaults to trip's pricing type but can be overridden
@@ -297,11 +297,11 @@ const RecurringRuleForm: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Recurring rule created successfully', 'Recurring rule created successfully'), 'success');
+      showToast(__('Recurring rule created successfully', 'yatra'), 'success');
       navigate({ subpage: 'trips', tab: 'availability', trip_id: formData.trip_id.toString() });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to create rule', 'Failed to create rule'), 'error');
+      showToast(error?.message || __('Failed to create rule', 'yatra'), 'error');
     },
   });
 
@@ -317,11 +317,11 @@ const RecurringRuleForm: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Recurring rule updated successfully', 'Recurring rule updated successfully'), 'success');
+      showToast(__('Recurring rule updated successfully', 'yatra'), 'success');
       navigate({ subpage: 'trips', tab: 'availability', trip_id: formData.trip_id.toString() });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to update rule', 'Failed to update rule'), 'error');
+      showToast(error?.message || __('Failed to update rule', 'yatra'), 'error');
     },
   });
 
@@ -342,7 +342,7 @@ const RecurringRuleForm: React.FC = () => {
       setPreviewData(previewResult);
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to generate preview', 'Failed to generate preview'), 'error');
+      showToast(error?.message || __('Failed to generate preview', 'yatra'), 'error');
     },
   });
 
@@ -351,12 +351,12 @@ const RecurringRuleForm: React.FC = () => {
     e.preventDefault();
     
     if (!formData.trip_id) {
-      showToast(__('Please select a trip', 'Please select a trip'), 'error');
+      showToast(__('Please select a trip', 'yatra'), 'error');
       return;
     }
 
     if (formData.rule_type === 'weekly' && formData.days_of_week.length === 0) {
-      showToast(__('Please select at least one day of the week', 'Please select at least one day of the week'), 'error');
+      showToast(__('Please select at least one day of the week', 'yatra'), 'error');
       return;
     }
 
@@ -405,7 +405,7 @@ const RecurringRuleForm: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditing ? __('Edit Recurring Rule', 'Edit Recurring Rule') : __('Create Recurring Rule', 'Create Recurring Rule')}
+        title={isEditing ? __('Edit Recurring Rule', 'yatra') : __('Create Recurring Rule', 'yatra')}
         description={headerDescription}
         actions={
           <Button
@@ -413,7 +413,7 @@ const RecurringRuleForm: React.FC = () => {
             onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: formData.trip_id?.toString() || tripIdFromUrl || '' })}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back to Availability', 'Back to Availability')}
+            {__('Back to Availability', 'yatra')}
           </Button>
         }
       />
@@ -425,13 +425,13 @@ const RecurringRuleForm: React.FC = () => {
             {/* Basic Info */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Basic Information', 'Basic Information')}</CardTitle>
+                <CardTitle>{__('Basic Information', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+                      {__('Trip', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <SearchableSelect
                       value={formData.trip_id?.toString() || ''}
@@ -445,40 +445,40 @@ const RecurringRuleForm: React.FC = () => {
                         sale_price: undefined,
                       }))}
                       options={[
-                        { value: '', label: __('-- Select Trip --', '-- Select Trip --') },
+                        { value: '', label: __('-- Select Trip --', 'yatra') },
                         ...(tripsData?.trips.map(trip => ({
                           value: trip.id.toString(),
                           label: `${trip.title} (${trip.pricing_type === 'traveler_based' ? 'Traveler-Based' : 'Regular'})`,
                         })) || [])
                       ]}
-                      placeholder={__('Select a trip', 'Select a trip')}
+                      placeholder={__('Select a trip', 'yatra')}
                       disabled={isEditing}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Rule Name', 'Rule Name')}
+                      {__('Rule Name', 'yatra')}
                     </label>
                     <Input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder={__('e.g., Weekend Departures', 'e.g., Weekend Departures')}
+                      placeholder={__('e.g., Weekend Departures', 'yatra')}
                     />
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Rule Type', 'Rule Type')} <span className="text-red-500">*</span>
+                    {__('Rule Type', 'yatra')} <span className="text-red-500">*</span>
                   </label>
                   <Select
                     value={formData.rule_type}
                     onChange={(e) => setFormData(prev => ({ ...prev, rule_type: e.target.value as 'weekly' | 'monthly' | 'interval' }))}
                   >
-                    <option value="weekly">{__('Weekly (specific days)', 'Weekly (specific days)')}</option>
-                    <option value="monthly">{__('Monthly (e.g., first Sunday)', 'Monthly (e.g., first Sunday)')}</option>
-                    <option value="interval">{__('Interval (every X days)', 'Interval (every X days)')}</option>
+                    <option value="weekly">{__('Weekly (specific days)', 'yatra')}</option>
+                    <option value="monthly">{__('Monthly (e.g., first Sunday)', 'yatra')}</option>
+                    <option value="interval">{__('Interval (every X days)', 'yatra')}</option>
                   </Select>
                 </div>
               </CardContent>
@@ -489,14 +489,14 @@ const RecurringRuleForm: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <RefreshCw className="w-5 h-5" />
-                  {__('Recurrence Pattern', 'Recurrence Pattern')}
+                  {__('Recurrence Pattern', 'yatra')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {formData.rule_type === 'weekly' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                      {__('Days of Week', 'Days of Week')} <span className="text-red-500">*</span>
+                      {__('Days of Week', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {dayOptions.map(day => (
@@ -521,7 +521,7 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Week of Month', 'Week of Month')}
+                        {__('Week of Month', 'yatra')}
                       </label>
                       <Select
                         value={formData.week_of_month || 'first'}
@@ -534,7 +534,7 @@ const RecurringRuleForm: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Day of Week', 'Day of Week')}
+                        {__('Day of Week', 'yatra')}
                       </label>
                       <Select
                         value={formData.day_of_week?.toString() || '0'}
@@ -551,7 +551,7 @@ const RecurringRuleForm: React.FC = () => {
                 {formData.rule_type === 'interval' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Every X Days', 'Every X Days')}
+                      {__('Every X Days', 'yatra')}
                     </label>
                     <Input
                       type="number"
@@ -567,23 +567,23 @@ const RecurringRuleForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Start Date', 'Start Date')} <span className="text-red-500">*</span>
+                      {__('Start Date', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <DatePicker
                       value={formData.start_date}
                       onChange={(value: string) => setFormData(prev => ({ ...prev, start_date: value }))}
-                      placeholder={__('Select start date', 'Select start date')}
+                      placeholder={__('Select start date', 'yatra')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('End Date', 'End Date')} <span className="text-gray-400">({__('optional', 'optional')})</span>
+                      {__('End Date', 'yatra')} <span className="text-gray-400">({__('optional', 'yatra')})</span>
                     </label>
                     <DatePicker
                       value={formData.end_date || ''}
                       onChange={(value: string) => setFormData(prev => ({ ...prev, end_date: value }))}
                       minDate={formData.start_date ? new Date(formData.start_date) : undefined}
-                      placeholder={__('Select end date (optional)', 'Select end date (optional)')}
+                      placeholder={__('Select end date (optional)', 'yatra')}
                     />
                   </div>
                 </div>
@@ -591,22 +591,22 @@ const RecurringRuleForm: React.FC = () => {
                 {/* Month Filter */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Specific Months', 'Specific Months')} <span className="text-gray-400">({__('optional - leave empty for all months', 'optional - leave empty for all months')})</span>
+                    {__('Specific Months', 'yatra')} <span className="text-gray-400">({__('optional - leave empty for all months', 'yatra')})</span>
                   </label>
                   <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                     {[
-                      { value: 1, label: __('January', 'January') },
-                      { value: 2, label: __('February', 'February') },
-                      { value: 3, label: __('March', 'March') },
-                      { value: 4, label: __('April', 'April') },
-                      { value: 5, label: __('May', 'May') },
-                      { value: 6, label: __('June', 'June') },
-                      { value: 7, label: __('July', 'July') },
-                      { value: 8, label: __('August', 'August') },
-                      { value: 9, label: __('September', 'September') },
-                      { value: 10, label: __('October', 'October') },
-                      { value: 11, label: __('November', 'November') },
-                      { value: 12, label: __('December', 'December') },
+                      { value: 1, label: __('January', 'yatra') },
+                      { value: 2, label: __('February', 'yatra') },
+                      { value: 3, label: __('March', 'yatra') },
+                      { value: 4, label: __('April', 'yatra') },
+                      { value: 5, label: __('May', 'yatra') },
+                      { value: 6, label: __('June', 'yatra') },
+                      { value: 7, label: __('July', 'yatra') },
+                      { value: 8, label: __('August', 'yatra') },
+                      { value: 9, label: __('September', 'yatra') },
+                      { value: 10, label: __('October', 'yatra') },
+                      { value: 11, label: __('November', 'yatra') },
+                      { value: 12, label: __('December', 'yatra') },
                     ].map((month) => (
                       <label
                         key={month.value}
@@ -636,7 +636,7 @@ const RecurringRuleForm: React.FC = () => {
                   </div>
                   {formData.months.length > 0 && (
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                      {__('Selected:', 'Selected:')} {formData.months.length} {formData.months.length === 1 ? __('month', 'month') : __('months', 'months')}
+                      {__('Selected:', 'yatra')} {formData.months.length} {formData.months.length === 1 ? __('month', 'yatra') : __('months', 'yatra')}
                     </p>
                   )}
                 </div>
@@ -644,14 +644,14 @@ const RecurringRuleForm: React.FC = () => {
                 {/* Excluded Dates */}
                 <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Excluded Dates', 'Excluded Dates')} <span className="text-gray-400">({__('holidays, etc.', 'holidays, etc.')})</span>
+                    {__('Excluded Dates', 'yatra')} <span className="text-gray-400">({__('holidays, etc.', 'yatra')})</span>
                   </label>
                   <div className="flex gap-2 mb-2">
                     <div className="flex-1">
                       <DatePicker
                         value={newExcludedDate}
                         onChange={(value: string) => setNewExcludedDate(value)}
-                        placeholder={__('Select date to exclude', 'Select date to exclude')}
+                        placeholder={__('Select date to exclude', 'yatra')}
                       />
                     </div>
                     <Button type="button" variant="outline" onClick={addExcludedDate} disabled={!newExcludedDate}>
@@ -684,10 +684,10 @@ const RecurringRuleForm: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <DollarSign className="w-5 h-5" />
-                  {__('Pricing & Availability', 'Pricing & Availability')}
+                  {__('Pricing & Availability', 'yatra')}
                 </CardTitle>
                 <CardDescription>
-                  {__('Set pricing for traveler categories and seat availability for this rule', 'Set pricing for traveler categories and seat availability for this rule')}
+                  {__('Set pricing for traveler categories and seat availability for this rule', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -701,10 +701,10 @@ const RecurringRuleForm: React.FC = () => {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                        {__('Pricing Override (Optional)', 'Pricing Override (Optional)')}
+                        {__('Pricing Override (Optional)', 'yatra')}
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {__('Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for dates generated by this rule.', 'Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for dates generated by this rule.')}
+                        {__('Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for dates generated by this rule.', 'yatra')}
                       </p>
                     </div>
                   </div>
@@ -727,18 +727,17 @@ const RecurringRuleForm: React.FC = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {isTravelerBasedPricing 
-                          ? __('Traveler-Based Pricing', 'Traveler-Based Pricing')
-                          : __('Regular Pricing', 'Regular Pricing')
+                          ? __('Traveler-Based Pricing', 'yatra')
+                          : __('Regular Pricing', 'yatra')
                         }
                       </p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
                         {isTravelerBasedPricing
-                          ? __('This trip uses traveler category pricing. Set prices for each category below.', 'This trip uses traveler category pricing. Set prices for each category below.')
-                          : __('This trip uses regular pricing. Set a single price for all travelers below.', 'This trip uses regular pricing. Set a single price for all travelers below.')
-                        }
+                          ? __('This trip uses traveler category pricing. Set prices for each category below.', 'yatra')
+                          : __('This trip uses regular pricing. Set a single price for all travelers below.', 'yatra')}
                       </p>
-                      </div>
-                        </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Regular Pricing Fields */}
@@ -747,7 +746,7 @@ const RecurringRuleForm: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('Original Price', 'Original Price')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
+                          {__('Original Price', 'yatra')} <span className="text-gray-400 text-xs">({__('Optional', 'yatra')})</span>
                         </label>
                         <Input
                           type="number"
@@ -760,7 +759,7 @@ const RecurringRuleForm: React.FC = () => {
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('Sale Price', 'Sale Price')}
+                          {__('Sale Price', 'yatra')}
                         </label>
                         <Input
                           type="number"
@@ -770,7 +769,7 @@ const RecurringRuleForm: React.FC = () => {
                           onChange={(e) => setFormData(prev => ({ ...prev, sale_price: parseFloat(e.target.value) || undefined }))}
                           placeholder="0.00"
                         />
-                        <p className="mt-1 text-xs text-gray-500">{__('Leave empty if no discount', 'Leave empty if no discount')}</p>
+                        <p className="mt-1 text-xs text-gray-500">{__('Leave empty if no discount', 'yatra')}</p>
                       </div>
                     </div>
                   </div>
@@ -781,10 +780,10 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-red-500">*</span>
+                        {__('Traveler Category Pricing', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                        {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'Add pricing for traveler categories. Categories are managed in Traveler Categories page.')}
+                        {__('Add pricing for traveler categories. Categories are managed in Traveler Categories page.', 'yatra')}
                       </p>
                     </div>
 
@@ -798,7 +797,7 @@ const RecurringRuleForm: React.FC = () => {
                         return (
                           <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                              {__('No active traveler categories found.', 'No active traveler categories found.')}
+                              {__('No active traveler categories found.', 'yatra')}
                             </p>
                         <Button
                           type="button"
@@ -807,7 +806,7 @@ const RecurringRuleForm: React.FC = () => {
                               className="flex items-center gap-2 mx-auto"
                             >
                               <Plus className="w-4 h-4" />
-                              {__('Create Category', 'Create Category')}
+                              {__('Create Category', 'yatra')}
                             </Button>
                           </div>
                         );
@@ -825,7 +824,7 @@ const RecurringRuleForm: React.FC = () => {
                               disabled={activeCategories.filter(cat => !formData.traveler_pricing?.some(tp => tp.category_id === cat.id)).length === 0}
                             >
                               <Plus className="w-4 h-4" />
-                              {__('Add Pricing', 'Add Pricing')}
+                              {__('Add Pricing', 'yatra')}
                             </Button>
                             
                             {/* Category Selection Dropdown */}
@@ -838,13 +837,13 @@ const RecurringRuleForm: React.FC = () => {
                                 <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                                   <div className="p-2">
                                     <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
-                                      {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                      {__('Select a category to add pricing', 'yatra')}
                                     </div>
                                     {activeCategories
                                       .filter(cat => !formData.traveler_pricing?.some(tp => tp.category_id === cat.id))
                                       .length === 0 ? (
                                       <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-                                        {__('All categories have pricing added', 'All categories have pricing added')}
+                                        {__('All categories have pricing added', 'yatra')}
                                       </div>
                                     ) : (
                                       <div className="space-y-1">
@@ -855,11 +854,11 @@ const RecurringRuleForm: React.FC = () => {
                                             const maxAge = category.age_max ?? category.max_age;
                                             const ageRange = minAge !== undefined || maxAge !== undefined
                                               ? minAge !== undefined && maxAge !== undefined
-                                                ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                ? `${minAge}-${maxAge} ${__('years', 'yatra')}`
                                                 : minAge !== undefined
-                                                ? `${minAge}+ ${__('years', 'years')}`
+                                                ? `${minAge}+ ${__('years', 'yatra')}`
                                                 : maxAge !== undefined
-                                                ? `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                ? `${__('Under', 'yatra')} ${maxAge} ${__('years', 'yatra')}`
                                                 : ''
                                               : null;
                                             const categoryName = category.label || category.name || `Category ${category.id}`;
@@ -927,11 +926,11 @@ const RecurringRuleForm: React.FC = () => {
                                               <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                                                 (
                                                 {minAge !== undefined && maxAge !== undefined
-                                                  ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                  ? `${minAge}-${maxAge} ${__('years', 'yatra')}`
                                                   : minAge !== undefined
-                                                  ? `${minAge}+ ${__('years', 'years')}`
+                                                  ? `${minAge}+ ${__('years', 'yatra')}`
                                                   : maxAge !== undefined
-                                                  ? `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                  ? `${__('Under', 'yatra')} ${maxAge} ${__('years', 'yatra')}`
                                                   : ''}
                                                 )
                                     </span>
@@ -951,7 +950,7 @@ const RecurringRuleForm: React.FC = () => {
                                     traveler_pricing: prev.traveler_pricing?.filter((_, i) => i !== index) || []
                                   }))}
                                         className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                        title={__('Remove Pricing', 'Remove Pricing')}
+                                        title={__('Remove Pricing', 'yatra')}
                                 >
                                   <X className="w-4 h-4" />
                                       </button>
@@ -959,7 +958,7 @@ const RecurringRuleForm: React.FC = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                          {__('Original Price', 'Original Price')} <span className="text-red-500">*</span>
+                                          {__('Original Price', 'yatra')} <span className="text-red-500">*</span>
                                   </label>
                                   <Input
                                     type="number"
@@ -976,7 +975,7 @@ const RecurringRuleForm: React.FC = () => {
                                 </div>
                                 <div>
                                         <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                          {__('Sale Price', 'Sale Price')} ({__('Optional', 'Optional')})
+                                          {__('Sale Price', 'yatra')} ({__('Optional', 'Optional')})
                                   </label>
                                   <Input
                                     type="number"
@@ -1008,12 +1007,12 @@ const RecurringRuleForm: React.FC = () => {
                 {selectedTrip && (
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                      {__('Inventory Management', 'Inventory Management')}
+                      {__('Inventory Management', 'yatra')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('Total Capacity', 'Total Capacity')} <span className="text-red-500">*</span>
+                          {__('Total Capacity', 'yatra')} <span className="text-red-500">*</span>
                         </label>
                         <Input
                           type="number"
@@ -1021,11 +1020,11 @@ const RecurringRuleForm: React.FC = () => {
                           value={formData.seats_total}
                           onChange={(e) => setFormData(prev => ({ ...prev, seats_total: parseInt(e.target.value) || 1 }))}
                         />
-                        <p className="mt-1 text-xs text-gray-500">{__('Maximum number of seats available for this rule', 'Maximum number of seats available for this rule')}</p>
+                        <p className="mt-1 text-xs text-gray-500">{__('Maximum number of seats available for this rule', 'yatra')}</p>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('Alert Threshold', 'Alert Threshold')}
+                          {__('Alert Threshold', 'yatra')}
                         </label>
                         <Input
                           type="number"
@@ -1033,7 +1032,7 @@ const RecurringRuleForm: React.FC = () => {
                           value={formData.alert_threshold}
                           onChange={(e) => setFormData(prev => ({ ...prev, alert_threshold: parseInt(e.target.value) || 0 }))}
                         />
-                        <p className="mt-1 text-xs text-gray-500">{__('Alert when available seats drop below this number', 'Alert when available seats drop below this number')}</p>
+                        <p className="mt-1 text-xs text-gray-500">{__('Alert when available seats drop below this number', 'yatra')}</p>
                       </div>
                     </div>
                   </div>
@@ -1044,7 +1043,7 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__('Select a trip above to configure pricing', 'Select a trip above to configure pricing')}
+                      {__('Select a trip above to configure pricing', 'yatra')}
                     </p>
                   </div>
                 )}
@@ -1056,15 +1055,15 @@ const RecurringRuleForm: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Clock className="w-5 h-5" />
-                  {__('Time & Location', 'Time & Location')}
+                  {__('Time & Location', 'yatra')}
                 </CardTitle>
                 {selectedTrip && (
                   <CardDescription>
                     <Badge variant={isSingleDayTrip ? 'default' : 'outline'} className="mr-2">
-                      {isSingleDayTrip ? __('Single-Day Trip', 'Single-Day Trip') : __('Multi-Day Trip', 'Multi-Day Trip')}
+                      {isSingleDayTrip ? __('Single-Day Trip', 'yatra') : __('Multi-Day Trip', 'yatra')}
                     </Badge>
                     {!isSingleDayTrip && selectedTrip.duration_days && (
-                      <span className="text-gray-500">({selectedTrip.duration_days} {__('days', 'days')})</span>
+                      <span className="text-gray-500">({selectedTrip.duration_days} {__('days', 'yatra')})</span>
                     )}
                   </CardDescription>
                 )}
@@ -1075,8 +1074,8 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {__('Time Slots', 'Time Slots')} 
-                        <span className="text-gray-400 ml-1">({__('for each recurring day', 'for each recurring day')})</span>
+                        {__('Time Slots', 'yatra')} 
+                        <span className="text-gray-400 ml-1">({__('for each recurring day', 'yatra')})</span>
                       </label>
                       <Button
                         type="button"
@@ -1094,7 +1093,7 @@ const RecurringRuleForm: React.FC = () => {
                         }))}
                       >
                         <Plus className="w-4 h-4 mr-1" />
-                        {__('Add Slot', 'Add Slot')}
+                        {__('Add Slot', 'yatra')}
                       </Button>
                     </div>
 
@@ -1102,10 +1101,10 @@ const RecurringRuleForm: React.FC = () => {
                       <div className="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
                         <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                          {__('No time slots added yet', 'No time slots added yet')}
+                          {__('No time slots added yet', 'yatra')}
                         </p>
                         <p className="text-xs text-gray-400 dark:text-gray-500">
-                          {__('Add multiple time slots for tours throughout the day (e.g., morning, afternoon, evening)', 'Add multiple time slots for tours throughout the day (e.g., morning, afternoon, evening)')}
+                          {__('Add multiple time slots for tours throughout the day (e.g., morning, afternoon, evening)', 'yatra')}
                         </p>
                       </div>
                     ) : (
@@ -1114,7 +1113,7 @@ const RecurringRuleForm: React.FC = () => {
                           <div key={index} className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center justify-between mb-3">
                               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {__('Slot', 'Slot')} {index + 1}
+                                {__('Slot', 'yatra')} {index + 1}
                               </span>
                               <Button
                                 type="button"
@@ -1134,7 +1133,7 @@ const RecurringRuleForm: React.FC = () => {
                               <div className="grid grid-cols-2 gap-3">
                                               <div>
                                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                  {__('Departure Time', 'Departure Time')}
+                                  {__('Departure Time', 'yatra')}
                                                 </label>
                                                 <TimePicker
                                   value={slot.departure_time || ''}
@@ -1148,7 +1147,7 @@ const RecurringRuleForm: React.FC = () => {
                                               </div>
                                               <div>
                                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                  {__('Arrival Time', 'Arrival Time')}
+                                  {__('Arrival Time', 'yatra')}
                                                 </label>
                                                 <TimePicker
                                   value={slot.arrival_time || ''}
@@ -1167,7 +1166,7 @@ const RecurringRuleForm: React.FC = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                               <div>
                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                  {__('Seats', 'Seats')}
+                                  {__('Seats', 'yatra')}
                                 </label>
                                 <Input
                                   type="number"
@@ -1183,7 +1182,7 @@ const RecurringRuleForm: React.FC = () => {
                               </div>
                               <div>
                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                  {__('Price', 'Price')}
+                                  {__('Price', 'yatra')}
                                 </label>
                                 <Input
                                   type="number"
@@ -1201,7 +1200,7 @@ const RecurringRuleForm: React.FC = () => {
                               </div>
                                   <div>
                                     <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                      {__('Sale Price', 'Sale Price')}
+                                      {__('Sale Price', 'yatra')}
                                     </label>
                                     <Input
                                       type="number"
@@ -1224,7 +1223,7 @@ const RecurringRuleForm: React.FC = () => {
                               {isTravelerBasedPricing && (
                                 <div>
                                   <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
-                                    {__('Seats', 'Seats')}
+                                    {__('Seats', 'yatra')}
                                   </label>
                                   <Input
                                     type="number"
@@ -1247,10 +1246,10 @@ const RecurringRuleForm: React.FC = () => {
                                 <div className="flex items-center justify-between mb-3">
                                   <div>
                                     <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                      {__('Traveler Category Pricing', 'Traveler Category Pricing')}
+                                      {__('Traveler Category Pricing', 'yatra')}
                                     </span>
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                                      {__('Set pricing for each traveler category for this time slot', 'Set pricing for each traveler category for this time slot')}
+                                      {__('Set pricing for each traveler category for this time slot', 'yatra')}
                                     </p>
                                   </div>
                                 </div>
@@ -1283,7 +1282,7 @@ const RecurringRuleForm: React.FC = () => {
                                           disabled={availableCategories.length === 0}
                                         >
                                           <Plus className="w-3 h-3 mr-1" />
-                                          {__('Add Pricing', 'Add Pricing')}
+                                          {__('Add Pricing', 'yatra')}
                                         </Button>
                                         
                                         {/* Category Selection Dropdown */}
@@ -1293,11 +1292,11 @@ const RecurringRuleForm: React.FC = () => {
                                         >
                                           <div className="p-2">
                                             <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
-                                              {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                              {__('Select a category to add pricing', 'yatra')}
                                             </div>
                                             {availableCategories.length === 0 ? (
                                               <div className="px-3 py-3 text-xs text-gray-500 dark:text-gray-400 text-center">
-                                                {__('All categories have pricing added', 'All categories have pricing added')}
+                                                {__('All categories have pricing added', 'yatra')}
                                               </div>
                                             ) : (
                                               <div className="space-y-1">
@@ -1306,10 +1305,10 @@ const RecurringRuleForm: React.FC = () => {
                                                   const maxAge = category.age_max ?? category.max_age;
                                                   const ageRange = minAge !== undefined || maxAge !== undefined
                                                     ? minAge !== undefined && maxAge !== undefined
-                                                      ? `${minAge}-${maxAge} ${__('years', 'years')}`
+                                                      ? `${minAge}-${maxAge} ${__('years', 'yatra')}`
                                                       : minAge !== undefined
-                                                      ? `${minAge}+ ${__('years', 'years')}`
-                                                      : `${__('Under', 'Under')} ${maxAge} ${__('years', 'years')}`
+                                                      ? `${minAge}+ ${__('years', 'yatra')}`
+                                                      : `${__('Under', 'yatra')} ${maxAge} ${__('years', 'yatra')}`
                                                     : null;
                                                   const categoryName = category.label || category.name || `Category ${category.id}`;
 
@@ -1379,7 +1378,7 @@ const RecurringRuleForm: React.FC = () => {
                                                             ? `${minAge}-${maxAge}`
                                                             : minAge !== undefined
                                                             ? `${minAge}+`
-                                                            : `<${maxAge}`} {__('yrs', 'yrs')})
+                                                            : `<${maxAge}`} {__('years', 'yatra')})
                                                         </span>
                                                       )}
                                                     </span>
@@ -1401,7 +1400,7 @@ const RecurringRuleForm: React.FC = () => {
                                                 <div className="grid grid-cols-2 gap-2">
                                                   <div>
                                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                                      {__('Price', 'Price')} <span className="text-red-500">*</span>
+                                                      {__('Price', 'yatra')} <span className="text-red-500">*</span>
                                                     </label>
                                                     <Input
                                                       type="number"
@@ -1421,7 +1420,7 @@ const RecurringRuleForm: React.FC = () => {
                                                   </div>
                                                   <div>
                                                     <label className="block text-xs text-gray-600 dark:text-gray-400 mb-1">
-                                                      {__('Sale', 'Sale')}
+                                                      {__('Sale', 'yatra')}
                                                     </label>
                                                     <Input
                                                       type="number"
@@ -1449,7 +1448,7 @@ const RecurringRuleForm: React.FC = () => {
                                       {slotTravelerPricing.length === 0 && (
                                         <div className="text-center py-3 bg-gray-100 dark:bg-gray-800 rounded border border-dashed border-gray-300 dark:border-gray-600">
                                           <p className="text-xs text-gray-500">
-                                            {__('Click "Add Pricing" to set prices for traveler categories', 'Click "Add Pricing" to set prices for traveler categories')}
+                                            {__('Click "Add Pricing" to set prices for traveler categories', 'yatra')}
                                           </p>
                                         </div>
                                       )}
@@ -1467,12 +1466,12 @@ const RecurringRuleForm: React.FC = () => {
                     {formData.time_slots.length === 0 && (
                       <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
-                          {__('Or use default time (applies to all generated dates):', 'Or use default time (applies to all generated dates):')}
+                          {__('Or use default time (applies to all generated dates):', 'yatra')}
                         </p>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                              {__('Default Start Time', 'Default Start Time')}
+                              {__('Default Start Time', 'yatra')}
                             </label>
                             <TimePicker
                               value={formData.departure_time || ''}
@@ -1482,7 +1481,7 @@ const RecurringRuleForm: React.FC = () => {
                           </div>
                           <div>
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                              {__('Default End Time', 'Default End Time')}
+                              {__('Default End Time', 'yatra')}
                             </label>
                             <TimePicker
                               value={formData.arrival_time || ''}
@@ -1501,7 +1500,7 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Departure Time', 'Departure Time')}
+                        {__('Departure Time', 'yatra')}
                       </label>
                       <TimePicker
                         value={formData.departure_time || ''}
@@ -1511,7 +1510,7 @@ const RecurringRuleForm: React.FC = () => {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Return Time', 'Return Time')} <span className="text-gray-400">({__('on final day', 'on final day')})</span>
+                        {__('Return Time', 'yatra')} <span className="text-gray-400">({__('on final day', 'yatra')})</span>
                       </label>
                       <TimePicker
                         value={formData.arrival_time || ''}
@@ -1527,7 +1526,7 @@ const RecurringRuleForm: React.FC = () => {
                   <div className="text-center py-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <AlertCircle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__('Select a trip above to configure time settings', 'Select a trip above to configure time settings')}
+                      {__('Select a trip above to configure time settings', 'yatra')}
                     </p>
                   </div>
                 )}
@@ -1538,30 +1537,30 @@ const RecurringRuleForm: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('From Location', 'From Location')}
+                          {__('From Location', 'yatra')}
                         </label>
                         <Input
                           type="text"
                           value={formData.from_location || selectedTrip?.starting_location || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, from_location: e.target.value }))}
-                          placeholder={selectedTrip?.starting_location || __('e.g., Airport', 'e.g., Airport')}
+                          placeholder={selectedTrip?.starting_location || __('e.g., Airport', 'yatra')}
                         />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                          {__('To Location', 'To Location')}
+                          {__('To Location', 'yatra')}
                         </label>
                         <Input
                           type="text"
                           value={formData.to_location || selectedTrip?.ending_location || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, to_location: e.target.value }))}
-                          placeholder={selectedTrip?.ending_location || __('e.g., Hotel', 'e.g., Hotel')}
+                          placeholder={selectedTrip?.ending_location || __('e.g., Hotel', 'yatra')}
                         />
                       </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {__('Booking Cutoff (hours before)', 'Booking Cutoff (hours before)')}
+                        {__('Booking Cutoff (hours before)', 'yatra')}
                       </label>
                       <Input
                         type="number"
@@ -1581,15 +1580,15 @@ const RecurringRuleForm: React.FC = () => {
             {/* Status */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Status', 'Status')}</CardTitle>
+                <CardTitle>{__('Status', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <Select
                   value={formData.status}
                   onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as 'active' | 'inactive' }))}
                 >
-                  <option value="active">{__('Active', 'Active')}</option>
-                  <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                  <option value="active">{__('Active', 'yatra')}</option>
+                  <option value="inactive">{__('Inactive', 'yatra')}</option>
                 </Select>
               </CardContent>
             </Card>
@@ -1599,10 +1598,10 @@ const RecurringRuleForm: React.FC = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Eye className="w-5 h-5" />
-                  {__('Preview', 'Preview')}
+                  {__('Preview', 'yatra')}
                 </CardTitle>
                 <CardDescription>
-                  {__('See which dates will be generated', 'See which dates will be generated')}
+                  {__('See which dates will be generated', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1618,13 +1617,13 @@ const RecurringRuleForm: React.FC = () => {
                   ) : (
                     <Eye className="w-4 h-4 mr-2" />
                   )}
-                  {__('Generate Preview', 'Generate Preview')}
+                  {__('Generate Preview', 'yatra')}
                 </Button>
 
                 {previewData && (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">{__('Total dates:', 'Total dates:')}</span>
+                      <span className="text-gray-600 dark:text-gray-400">{__('Total dates:', 'yatra')}</span>
                       <Badge variant="success">{previewData.total}</Badge>
                     </div>
                     <div className="max-h-48 overflow-y-auto space-y-1">
@@ -1648,7 +1647,7 @@ const RecurringRuleForm: React.FC = () => {
                       ))}
                       {previewData.total > 20 && (
                         <div className="text-xs text-gray-500 text-center py-1">
-                          +{previewData.total - 20} {__('more dates', 'more dates')}
+                          +{previewData.total - 20} {__('more dates', 'yatra')}
                         </div>
                       )}
                     </div>
@@ -1667,7 +1666,7 @@ const RecurringRuleForm: React.FC = () => {
                     ) : (
                       <Save className="w-4 h-4 mr-2" />
                     )}
-                    {isEditing ? __('Update Rule', 'Update Rule') : __('Create Rule', 'Create Rule')}
+                    {isEditing ? __('Update Rule', 'yatra') : __('Create Rule', 'yatra')}
                   </Button>
                   <Button
                     type="button"
@@ -1675,7 +1674,7 @@ const RecurringRuleForm: React.FC = () => {
                     className="w-full"
                     onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: formData.trip_id?.toString() || tripIdFromUrl || '' })}
                   >
-                    {__('Cancel', 'Cancel')}
+                    {__('Cancel', 'yatra')}
                   </Button>
                 </div>
               </CardContent>
@@ -1684,9 +1683,9 @@ const RecurringRuleForm: React.FC = () => {
             {/* Help */}
             <Alert>
               <div className="ml-2">
-                <h4 className="font-medium">{__('How it works', 'How it works')}</h4>
+                <h4 className="font-medium">{__('How it works', 'yatra')}</h4>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  {__('Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.', 'Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.')}
+                  {__('Dates are generated automatically based on your pattern. Manually added specific dates will take priority over generated dates.', 'yatra')}
                 </p>
               </div>
             </Alert>

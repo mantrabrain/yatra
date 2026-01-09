@@ -93,9 +93,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     try {
       setIsRegenerating(true);
       await apiClient.post('/maintenance/regenerate-tables');
-      showToast(__('Tables regenerated successfully.', 'Tables regenerated successfully.'), 'success');
+      showToast(__('Tables regenerated successfully.', 'yatra'), 'success');
     } catch (error: any) {
-      showToast(error?.message || __('Failed to regenerate tables.', 'Failed to regenerate tables.'), 'error');
+      showToast(error?.message || __('Failed to regenerate tables.', 'yatra'), 'error');
     } finally {
       setIsRegenerating(false);
     }
@@ -488,7 +488,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <span className="inline-flex items-center gap-2">
                 <ArrowLeft className="w-3 h-3" />
-                <span>{__('Back to WordPress', 'Back to WordPress')}</span>
+                <span>{__('Back to WordPress', 'yatra')}</span>
               </span>
             </a>
           </div>
@@ -524,7 +524,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     className="flex items-center gap-2"
                   >
                     <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
-                    {isRegenerating ? __('Regenerating...', 'Regenerating...') : __('Regenerate Tables', 'Regenerate Tables')}
+                    {isRegenerating ? __('Regenerating...', 'yatra') : __('Regenerate Tables', 'yatra')}
                   </Button>
                 </ConditionalRender>
                 <ConditionalRender capability="yatra_edit_trips">
@@ -542,7 +542,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     }`}
                   >
                     <Settings className="w-4 h-4" />
-                    {__('Tools', 'Tools')}
+                    {__('Tools', 'yatra')}
                   </Button>
                 </ConditionalRender>
                 <ConditionalRender capability="yatra_edit_trips">
@@ -550,7 +550,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     <button
                       onClick={() => setIsModulesPanelOpen(prev => !prev)}
                       className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                      aria-label={__('Toggle modules panel', 'Toggle modules panel')}
+                      aria-label={__('Toggle modules panel', 'yatra')}
                     >
                       <Puzzle className="w-5 h-5" />
                     </button>
@@ -563,9 +563,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <CardTitle className="text-base">{__('Modules', 'Modules')}</CardTitle>
+                                <CardTitle className="text-base">{__('Modules', 'yatra')}</CardTitle>
                                 <CardDescription>
-                                  {__('Quickly enable or disable feature packs.', 'Quickly enable or disable feature packs.')}
+                                  {__('Quickly enable or disable feature packs.', 'yatra')}
                                 </CardDescription>
                               </div>
                               <Button
@@ -576,7 +576,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                   window.location.href = modulesPageUrl;
                                 }}
                               >
-                                {__('Open', 'Open')}
+                                {__('Open', 'yatra')}
                               </Button>
                             </div>
                           </CardHeader>
@@ -584,12 +584,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             {isLoadingModules && (
                               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                {__('Loading modules…', 'Loading modules…')}
+                                {__('Loading modules…', 'yatra')}
                               </div>
                             )}
                             {!isLoadingModules && modulesPreview.length === 0 && (
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {__('No modules found.', 'No modules found.')}
+                                {__('No modules found.', 'yatra')}
                               </div>
                             )}
                             {!isLoadingModules && modulesPreview.length > 0 && (
@@ -604,14 +604,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                         {module.name}
                                         {module.is_core && (
                                           <Badge variant="outline" className="text-[10px]">
-                                            {__('Core', 'Core')}
+                                            {__('Core', 'yatra')}
                                           </Badge>
                                         )}
                                       </p>
                                       <p className="text-xs text-gray-500 dark:text-gray-400">
                                         {module.enabled
-                                          ? __('Enabled', 'Enabled')
-                                          : __('Disabled', 'Disabled')}
+                                          ? __('Enabled', 'yatra')
+                                          : __('Disabled', 'yatra')}
                                       </p>
                                     </div>
                                     <button
@@ -623,8 +623,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                       aria-pressed={module.enabled}
                                       aria-label={
                                         module.enabled
-                                          ? __('Disable module', 'Disable module')
-                                          : __('Enable module', 'Enable module')
+                                          ? __('Disable module', 'yatra')
+                                          : __('Enable module', 'yatra')
                                       }
                                     >
                                       <span
@@ -647,7 +647,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                   window.location.href = modulesPageUrl;
                                 }}
                               >
-                                {__('Manage all modules', 'Manage all modules')}
+                                {__('Manage all modules', 'yatra')}
                               </Button>
                             </div>
                           </CardContent>

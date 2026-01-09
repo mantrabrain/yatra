@@ -205,12 +205,12 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Recurring rule deleted successfully', 'Recurring rule deleted successfully'), 'success');
+      showToast(__('Recurring rule deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, rule: null });
       setSelectedIds([]);
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete rule', 'Failed to delete rule'), 'error');
+      showToast(error?.message || __('Failed to delete rule', 'yatra'), 'error');
     },
   });
   
@@ -221,11 +221,11 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Rules deleted successfully', 'Rules deleted successfully'), 'success');
+      showToast(__('Rules deleted successfully', 'yatra'), 'success');
       setSelectedIds([]);
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete rules', 'Failed to delete rules'), 'error');
+      showToast(error?.message || __('Failed to delete rules', 'yatra'), 'error');
     },
   });
   
@@ -237,24 +237,24 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Rule duplicated successfully', 'Rule duplicated successfully'), 'success');
+      showToast(__('Rule duplicated successfully', 'yatra'), 'success');
       setDuplicateConfirm({ isOpen: false, rule: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to duplicate rule', 'Failed to duplicate rule'), 'error');
+      showToast(error?.message || __('Failed to duplicate rule', 'yatra'), 'error');
     },
   });
 
   // Handle bulk actions
   const handleBulkApply = () => {
     if (!bulkAction || selectedIds.length === 0) {
-      showToast(__('Please select rules and an action', 'Please select rules and an action'), 'warning');
+      showToast(__('Please select rules and an action', 'yatra'), 'warning');
       return;
     }
     
     switch (bulkAction) {
       case 'delete':
-        if (confirm(__('Are you sure you want to delete {count} rule(s)?', 'Are you sure you want to delete {count} rule(s)?').replace('{count}', selectedIds.length.toString()))) {
+        if (confirm(__('Are you sure you want to delete {count} rule(s)?', 'yatra').replace('{count}', selectedIds.length.toString()))) {
           bulkDeleteMutation.mutate(selectedIds.map(id => id.toString()));
         }
         break;
@@ -286,12 +286,12 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
       active: {
-        label: __('Active', 'Active'),
+        label: __('Active', 'yatra'),
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
         icon: <CheckCircle className="w-3 h-3" />,
       },
       inactive: {
-        label: __('Inactive', 'Inactive'),
+        label: __('Inactive', 'yatra'),
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         icon: <XCircle className="w-3 h-3" />,
       },
@@ -313,7 +313,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.name) {
       cols.push({
         key: 'name',
-        label: __('Rule Name', 'Rule Name'),
+        label: __('Rule Name', 'yatra'),
         visible: visibleColumns.name,
         render: (rule: RecurringRule) => (
           <div className="flex flex-col">
@@ -324,9 +324,9 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
               {rule.name || formatRulePattern(rule)}
             </button>
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {rule.rule_type === 'weekly' ? __('Weekly', 'Weekly') : 
-               rule.rule_type === 'monthly' ? __('Monthly', 'Monthly') : 
-               __('Interval', 'Interval')}
+              {rule.rule_type === 'weekly' ? __('Weekly', 'yatra') : 
+               rule.rule_type === 'monthly' ? __('Monthly', 'yatra') : 
+               __('Interval', 'yatra')}
             </span>
           </div>
         ),
@@ -336,7 +336,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.pattern) {
       cols.push({
         key: 'pattern',
-        label: __('Pattern', 'Pattern'),
+        label: __('Pattern', 'yatra'),
         visible: visibleColumns.pattern,
         render: (rule: RecurringRule) => (
           <div className="flex items-center gap-1 text-sm text-gray-700 dark:text-gray-300">
@@ -350,7 +350,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.start_date) {
       cols.push({
         key: 'start_date',
-        label: __('Start Date', 'Start Date'),
+        label: __('Start Date', 'yatra'),
         visible: visibleColumns.start_date,
         render: (rule: RecurringRule) => (
           <div className="text-sm text-gray-900 dark:text-white">
@@ -363,11 +363,11 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.end_date) {
       cols.push({
         key: 'end_date',
-        label: __('End Date', 'End Date'),
+        label: __('End Date', 'yatra'),
         visible: visibleColumns.end_date,
         render: (rule: RecurringRule) => (
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {rule.end_date ? formatDate(rule.end_date) : __('Ongoing', 'Ongoing')}
+            {rule.end_date ? formatDate(rule.end_date) : __('Ongoing', 'yatra')}
           </div>
         ),
       });
@@ -376,14 +376,14 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.capacity) {
       cols.push({
         key: 'capacity',
-        label: __('Capacity', 'Capacity'),
+        label: __('Capacity', 'yatra'),
         visible: visibleColumns.capacity,
         render: (rule: RecurringRule) => (
           <div className="flex flex-col items-center">
             <span className="text-sm font-medium text-gray-900 dark:text-white">
               {rule.seats_total || 0}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'yatra')}</span>
           </div>
         ),
       });
@@ -392,14 +392,14 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.generated) {
       cols.push({
         key: 'generated',
-        label: __('Generated', 'Generated'),
+        label: __('Generated', 'yatra'),
         visible: visibleColumns.generated,
         render: (rule: RecurringRule) => (
           <div className="flex flex-col items-center">
             <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
               {rule.generated_count || 0}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">{__('dates', 'dates')}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{__('dates', 'yatra')}</span>
           </div>
         ),
       });
@@ -408,7 +408,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.price) {
       cols.push({
         key: 'price',
-        label: __('Price', 'Price'),
+        label: __('Price', 'yatra'),
         visible: visibleColumns.price,
         render: (rule: RecurringRule) => (
           <div className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -421,7 +421,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     if (visibleColumns.status) {
       cols.push({
         key: 'status',
-        label: __('Status', 'Status'),
+        label: __('Status', 'yatra'),
         visible: visibleColumns.status,
         render: (rule: RecurringRule) => getStatusBadge(rule.status),
       });
@@ -438,10 +438,10 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
       queryClient.invalidateQueries({ queryKey: ['recurring-availability-counts'] });
-      showToast(__('Rule status updated successfully', 'Rule status updated successfully'), 'success');
+      showToast(__('Rule status updated successfully', 'yatra'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to update rule status', 'Failed to update rule status'), 'error');
+      showToast(error?.message || __('Failed to update rule status', 'yatra'), 'error');
     },
   });
 
@@ -449,13 +449,13 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
   const tableActions = useMemo(() => [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => onEditRule(rule.id),
     },
     {
       key: 'set-inactive',
-      label: __('Set Inactive', 'Set Inactive'),
+      label: __('Set Inactive', 'yatra'),
       icon: <XCircle className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => {
         toggleStatusMutation.mutate({ id: rule.id, status: 'inactive' });
@@ -464,7 +464,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     },
     {
       key: 'set-active',
-      label: __('Set Active', 'Set Active'),
+      label: __('Set Active', 'yatra'),
       icon: <CheckCircle className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => {
         toggleStatusMutation.mutate({ id: rule.id, status: 'active' });
@@ -473,13 +473,13 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
     },
     {
       key: 'duplicate',
-      label: __('Duplicate', 'Duplicate'),
+      label: __('Duplicate', 'yatra'),
       icon: <Copy className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => setDuplicateConfirm({ isOpen: true, rule }),
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => setDeleteConfirm({ isOpen: true, rule }),
       variant: 'destructive' as const,
@@ -497,13 +497,12 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             deleteMutation.mutate(deleteConfirm.rule.id);
           }
         }}
-        title={__('Delete Recurring Rule', 'Delete Recurring Rule')}
+        title={__('Delete Recurring Rule', 'yatra')}
         message={deleteConfirm.rule
-          ? __('Are you sure you want to delete the rule "{name}"? This action cannot be undone.', 'Are you sure you want to delete the rule "{name}"? This action cannot be undone.')
-              .replace('{name}', deleteConfirm.rule.name || formatRulePattern(deleteConfirm.rule))
-          : __('Are you sure you want to delete this rule? This action cannot be undone.', 'Are you sure you want to delete this rule? This action cannot be undone.')}
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+          ? __('Are you sure you want to delete the rule "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.rule.name || formatRulePattern(deleteConfirm.rule))
+          : __('Are you sure you want to delete this rule? This action cannot be undone.', 'yatra')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -516,10 +515,10 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             duplicateMutation.mutate(duplicateConfirm.rule.id);
           }
         }}
-        title={__('Duplicate Recurring Rule', 'Duplicate Recurring Rule')}
-        message={__('This will create a copy of this rule. You can edit it after creation.', 'This will create a copy of this rule. You can edit it after creation.')}
-        confirmText={__('Duplicate', 'Duplicate')}
-        cancelText={__('Cancel', 'Cancel')}
+        title={__('Duplicate Recurring Rule', 'yatra')}
+        message={__('This will create a copy of this rule. You can edit it after creation.', 'yatra')}
+        confirmText={__('Duplicate', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         isLoading={duplicateMutation.isPending}
       />
       
@@ -527,31 +526,31 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            {__('Recurring Rules', 'Recurring Rules')}
+            {__('Recurring Rules', 'yatra')}
           </h3>
           <Badge className={isSingleDayTrip 
             ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400' 
             : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
           }>
-            {isSingleDayTrip ? __('Single-Day Trip', 'Single-Day Trip') : __('Multi-Day Trip', 'Multi-Day Trip')}
+            {isSingleDayTrip ? __('Single-Day Trip', 'yatra') : __('Multi-Day Trip', 'yatra')}
           </Badge>
           <Badge className={isTravelerBased 
             ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400' 
             : 'bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400'
           }>
-            {isTravelerBased ? __('Traveler-Based Pricing', 'Traveler-Based Pricing') : __('Regular Pricing', 'Regular Pricing')}
+            {isTravelerBased ? __('Traveler-Based Pricing', 'yatra') : __('Regular Pricing', 'yatra')}
           </Badge>
         </div>
         <Button variant="outline" onClick={onAddRule}>
           <Plus className="w-4 h-4 mr-2" />
-          {isSingleDayTrip ? __('Add Time Slots Rule', 'Add Time Slots Rule') : __('Add Recurring Rule', 'Add Recurring Rule')}
+          {isSingleDayTrip ? __('Add Time Slots Rule', 'yatra') : __('Add Recurring Rule', 'yatra')}
         </Button>
       </div>
       
       <div className="text-sm text-gray-500 dark:text-gray-400">
         {isSingleDayTrip 
-          ? __('Create recurring time slots for your single-day trip (supports multiple time slots per day)', 'Create recurring time slots for your single-day trip (supports multiple time slots per day)')
-          : __('Automatically generate availability dates based on patterns', 'Automatically generate availability dates based on patterns')}
+          ? __('Create recurring time slots for your single-day trip (supports multiple time slots per day)', 'yatra')
+          : __('Automatically generate availability dates based on patterns', 'yatra')}
       </div>
 
       {/* Filters - Matching Specific Dates */}
@@ -560,7 +559,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Search', 'Search')}
+                {__('Search', 'yatra')}
               </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -568,22 +567,22 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={__('Search rules...', 'Search rules...')}
+                  placeholder={__('Search rules...', 'yatra')}
                   className="pl-10"
                 />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                {__('Status', 'Status')}
+                {__('Status', 'yatra')}
               </label>
               <Select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
               >
-                <option value="all">{__('All Status', 'All Status')}</option>
-                <option value="active">{__('Active', 'Active')}</option>
-                <option value="inactive">{__('Inactive', 'Inactive')}</option>
+                <option value="all">{__('All Status', 'yatra')}</option>
+                <option value="active">{__('Active', 'yatra')}</option>
+                <option value="inactive">{__('Inactive', 'yatra')}</option>
               </Select>
             </div>
             <div className="flex items-end">
@@ -596,7 +595,7 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
                 className="w-full"
               >
                 <X className="w-4 h-4 mr-2" />
-                {__('Clear Filters', 'Clear Filters')}
+                {__('Clear Filters', 'yatra')}
               </Button>
             </div>
           </div>
@@ -613,27 +612,27 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         statusOptions={[
-          { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-          { key: 'active', label: __('Active', 'Active'), count: statusCounts.active },
-          { key: 'inactive', label: __('Inactive', 'Inactive'), count: statusCounts.inactive },
+          { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+          { key: 'active', label: __('Active', 'yatra'), count: statusCounts.active },
+          { key: 'inactive', label: __('Inactive', 'yatra'), count: statusCounts.inactive },
         ]}
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
         columnOptions={[
-          { key: 'name', label: __('Rule Name', 'Rule Name'), visible: visibleColumns.name },
-          { key: 'pattern', label: __('Pattern', 'Pattern'), visible: visibleColumns.pattern },
-          { key: 'start_date', label: __('Start Date', 'Start Date'), visible: visibleColumns.start_date },
-          { key: 'end_date', label: __('End Date', 'End Date'), visible: visibleColumns.end_date },
-          { key: 'capacity', label: __('Capacity', 'Capacity'), visible: visibleColumns.capacity },
-          { key: 'generated', label: __('Generated', 'Generated'), visible: visibleColumns.generated },
-          { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
-          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+          { key: 'name', label: __('Rule Name', 'yatra'), visible: visibleColumns.name },
+          { key: 'pattern', label: __('Pattern', 'yatra'), visible: visibleColumns.pattern },
+          { key: 'start_date', label: __('Start Date', 'yatra'), visible: visibleColumns.start_date },
+          { key: 'end_date', label: __('End Date', 'yatra'), visible: visibleColumns.end_date },
+          { key: 'capacity', label: __('Capacity', 'yatra'), visible: visibleColumns.capacity },
+          { key: 'generated', label: __('Generated', 'yatra'), visible: visibleColumns.generated },
+          { key: 'price', label: __('Price', 'yatra'), visible: visibleColumns.price },
+          { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
         ]}
         onToggleColumn={(columnKey: string) => toggleColumn(columnKey as keyof typeof visibleColumns)}
         bulkMutationPending={bulkDeleteMutation.isPending}
         totalItems={rules.length}
         bulkActionOptions={[
-          { value: 'delete', label: __('Delete', 'Delete') },
+          { value: 'delete', label: __('Delete', 'yatra') },
         ]}
       />
 
@@ -643,15 +642,15 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
           {/* Section Header */}
           <div className="mb-6">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {__('Recurring Rules', 'Recurring Rules')}
+              {__('Recurring Rules', 'yatra')}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               {tripName && (
                 <>
-                  {__('Managing availability for', 'Managing availability for')} <strong>{tripName}</strong>
+                  {__('Managing availability for', 'yatra')} <strong>{tripName}</strong>
                   {rules.length > 0 && (
                     <span className="ml-2">
-                      ({rules.length} {rules.length === 1 ? __('rule', 'rule') : __('rules', 'rules')})
+                      ({rules.length} {rules.length === 1 ? __('rule', 'yatra') : __('rules', 'yatra')})
                     </span>
                   )}
                 </>
@@ -682,8 +681,8 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             }}
             isAllSelected={selectedIds.length === rules.length && rules.length > 0}
             getItemId={(rule) => rule.id}
-            emptyText={__('No recurring rules found', 'No recurring rules found')}
-            emptyDescription={__('Create your first recurring rule to get started', 'Create your first recurring rule to get started')}
+            emptyText={__('No recurring rules found', 'yatra')}
+            emptyDescription={__('Create your first recurring rule to get started', 'yatra')}
             onCreateClick={onAddRule}
             skeletonRows={5}
             capability="yatra_view_trips"
@@ -698,13 +697,13 @@ export const RecurringRules: React.FC<RecurringRulesProps> = ({
             <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div>
               <h5 className="font-medium text-blue-900 dark:text-blue-200 mb-1">
-                {__('How Recurring Rules Work', 'How Recurring Rules Work')}
+                {__('How Recurring Rules Work', 'yatra')}
               </h5>
               <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-1">
-                <li>• {__('Dates are generated automatically based on your patterns', 'Dates are generated automatically based on your patterns')}</li>
-                <li>• {__('Specific dates (added manually) take priority over generated dates', 'Specific dates (added manually) take priority over generated dates')}</li>
-                <li>• {__('Use excluded dates to skip holidays or special occasions', 'Use excluded dates to skip holidays or special occasions')}</li>
-                <li>• {__('Bookings for generated dates create specific availability entries', 'Bookings for generated dates create specific availability entries')}</li>
+                <li>• {__('Dates are generated automatically based on your patterns', 'yatra')}</li>
+                <li>• {__('Specific dates (added manually) take priority over generated dates', 'yatra')}</li>
+                <li>• {__('Use excluded dates to skip holidays or special occasions', 'yatra')}</li>
+                <li>• {__('Bookings for generated dates create specific availability entries', 'yatra')}</li>
               </ul>
             </div>
           </div>

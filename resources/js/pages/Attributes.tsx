@@ -178,12 +178,12 @@ const Attributes: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['attributes'] });
       queryClient.invalidateQueries({ queryKey: ['attributes-stats'] });
-      showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
+      showToast(__('Bulk action completed successfully', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (err: any) => {
-      showToast(err?.message || __('Failed to perform bulk action', 'Failed to perform bulk action'), 'error');
+      showToast(err?.message || __('Failed to perform bulk action', 'yatra'), 'error');
     },
   });
 
@@ -197,11 +197,11 @@ const Attributes: React.FC = () => {
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one attribute.', 'Select at least one attribute.'), 'warning');
+      showToast(__('Select at least one attribute.', 'yatra'), 'warning');
       return;
     }
     bulkMutation.mutate({ action: bulkAction, ids: selectedIds });
@@ -236,7 +236,7 @@ const Attributes: React.FC = () => {
     return [
       {
         key: 'name',
-        label: __('Attribute', 'Attribute'),
+        label: __('Attribute', 'yatra'),
         sortable: true,
         visible: visibleColumns.name,
         render: (attribute: Attribute) => (
@@ -264,7 +264,7 @@ const Attributes: React.FC = () => {
               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                 <span>{attribute.slug}</span>
                 <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                  ({__('ID:', 'ID:')} {attribute.id})
+                  ({__('ID:', 'yatra')} {attribute.id})
                 </span>
               </div>
             </div>
@@ -273,42 +273,42 @@ const Attributes: React.FC = () => {
       },
       {
         key: 'field_type',
-        label: __('Field Type', 'Field Type'),
+        label: __('Field Type', 'yatra'),
         sortable: true,
         visible: visibleColumns.field_type,
         render: (attribute: Attribute) => <Badge variant="outline">{fieldTypeOptions.find((opt) => opt.value === attribute.field_type)?.label || attribute.field_type}</Badge>,
       },
       {
         key: 'required',
-        label: __('Required', 'Required'),
+        label: __('Required', 'yatra'),
         sortable: true,
         visible: visibleColumns.required,
         render: (attribute: Attribute) => <Badge variant={formatBoolean(attribute.required) ? 'default' : 'outline'}>{formatBoolean(attribute.required) ? 'Yes' : 'No'}</Badge>,
       },
       {
         key: 'show_on_frontend',
-        label: __('Frontend', 'Frontend'),
+        label: __('Frontend', 'yatra'),
         sortable: true,
         visible: visibleColumns.show_on_frontend,
         render: (attribute: Attribute) => <Badge variant={formatBoolean(attribute.show_on_frontend) ? 'default' : 'outline'}>{formatBoolean(attribute.show_on_frontend) ? 'Yes' : 'No'}</Badge>,
       },
       {
         key: 'show_in_filters',
-        label: __('Filters', 'Filters'),
+        label: __('Filters', 'yatra'),
         sortable: true,
         visible: visibleColumns.show_in_filters,
         render: (attribute: Attribute) => <Badge variant={formatBoolean(attribute.show_in_filters) ? 'default' : 'outline'}>{formatBoolean(attribute.show_in_filters) ? 'Yes' : 'No'}</Badge>,
       },
       {
         key: 'searchable',
-        label: __('Searchable', 'Searchable'),
+        label: __('Searchable', 'yatra'),
         sortable: true,
         visible: visibleColumns.searchable,
         render: (attribute: Attribute) => <Badge variant={formatBoolean(attribute.searchable) ? 'default' : 'outline'}>{formatBoolean(attribute.searchable) ? 'Yes' : 'No'}</Badge>,
       },
       {
         key: 'status',
-        label: __('Status', 'Status'),
+        label: __('Status', 'yatra'),
         sortable: true,
         visible: visibleColumns.status,
         render: (attribute: Attribute) => (
@@ -322,16 +322,16 @@ const Attributes: React.FC = () => {
             }`}
           >
             {attribute.status === 'trash' || statusFilter === 'trash'
-              ? __('Trash', 'Trash')
+              ? __('Trash', 'yatra')
               : attribute.status === 'publish'
-                ? __('Published', 'Published')
-                : __('Draft', 'Draft')}
+                ? __('Published', 'yatra')
+                : __('Draft', 'yatra')}
           </span>
         ),
       },
       {
         key: 'created_at',
-        label: __('Created Date', 'Created Date'),
+        label: __('Created Date', 'yatra'),
         sortable: true,
         visible: visibleColumns.created_at,
         render: (attribute: Attribute) => (
@@ -348,7 +348,7 @@ const Attributes: React.FC = () => {
       },
       {
         key: 'updated_at',
-        label: __('Updated Date', 'Updated Date'),
+        label: __('Updated Date', 'yatra'),
         sortable: true,
         visible: visibleColumns.updated_at,
         render: (attribute: Attribute) => (
@@ -365,17 +365,17 @@ const Attributes: React.FC = () => {
       },
       {
         key: 'description',
-        label: __('Description', 'Description'),
+        label: __('Description', 'yatra'),
         visible: visibleColumns.description,
         render: (attribute: Attribute) => (
           <span className={attribute.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-            {attribute.description || __('No description', 'No description')}
+            {attribute.description || __('No description', 'yatra')}
           </span>
         ),
       },
       {
         key: 'display_order',
-        label: __('Order', 'Order'),
+        label: __('Order', 'yatra'),
         sortable: true,
         visible: visibleColumns.display_order,
         render: (attribute: Attribute) => (
@@ -396,10 +396,10 @@ const Attributes: React.FC = () => {
   };
 
   const viewFilters = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all ?? 0 },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish ?? 0 },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft ?? 0 },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all ?? 0 },
+    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish ?? 0 },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft ?? 0 },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash ?? 0 },
   ];
 
   const handlePermanentDelete = (attribute: Attribute) => {
@@ -427,17 +427,17 @@ const Attributes: React.FC = () => {
         isOpen={permanentDeleteConfirm.isOpen}
         onClose={() => setPermanentDeleteConfirm({ isOpen: false, attribute: null })}
         onConfirm={confirmPermanentDelete}
-        title={__('Delete Attribute Permanently', 'Delete Attribute Permanently')}
+        title={__('Delete Attribute Permanently', 'yatra')}
         message={
           permanentDeleteConfirm.attribute
-            ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace(
+            ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'yatra').replace(
                 '{name}',
                 permanentDeleteConfirm.attribute.name
               )
-            : __('Are you sure you want to permanently delete this attribute? This action cannot be undone.', 'Are you sure you want to permanently delete this attribute? This action cannot be undone.')
+            : __('Are you sure you want to permanently delete this attribute? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete Permanently', 'Delete Permanently')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete Permanently', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={bulkMutation.isPending}
       />
@@ -446,30 +446,30 @@ const Attributes: React.FC = () => {
         isOpen={individualActionConfirm.isOpen}
         onClose={() => setIndividualActionConfirm({ isOpen: false, action: '', attribute: null })}
         onConfirm={confirmIndividualAction}
-        title={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore Attribute', 'Restore Attribute')}
+        title={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'yatra') : __('Restore Attribute', 'yatra')}
         message={
           individualActionConfirm.attribute
             ? individualActionConfirm.action === 'trash'
-              ? __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', individualActionConfirm.attribute.name)
-              : __('Are you sure you want to restore "{name}"?', 'Are you sure you want to restore "{name}"?').replace('{name}', individualActionConfirm.attribute.name)
+              ? __('Are you sure you want to move "{name}" to trash?', 'yatra').replace('{name}', individualActionConfirm.attribute.name)
+              : __('Are you sure you want to restore "{name}"?', 'yatra').replace('{name}', individualActionConfirm.attribute.name)
             : individualActionConfirm.action === 'trash'
-              ? __('Are you sure you want to move this attribute to trash?', 'Are you sure you want to move this attribute to trash?')
-              : __('Are you sure you want to restore this attribute?', 'Are you sure you want to restore this attribute?')
+              ? __('Are you sure you want to move this attribute to trash?', 'yatra')
+              : __('Are you sure you want to restore this attribute?', 'yatra')
         }
-        confirmText={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore', 'Restore')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'yatra') : __('Restore', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="warning"
         isLoading={bulkMutation.isPending}
       />
 
       <PageHeader
-        title={__('Attributes', 'Attributes')}
-        description={__('Manage your travel attributes and their properties', 'Manage your travel attributes and their properties')}
+        title={__('Attributes', 'yatra')}
+        description={__('Manage your travel attributes and their properties', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateAttribute} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Attribute', 'Add New Attribute')}
+            {__('Add New Attribute', 'yatra')}
           </Button>
         }
       />
@@ -487,26 +487,26 @@ const Attributes: React.FC = () => {
               setBulkAction('');
             }}
             statusOptions={[
-              { value: 'all', label: __('All Status', 'All Status') },
-              { value: 'publish', label: __('Published', 'Published') },
-              { value: 'draft', label: __('Draft', 'Draft') },
-              { value: 'trash', label: __('Trash', 'Trash') },
+              { value: 'all', label: __('All Status', 'yatra') },
+              { value: 'publish', label: __('Published', 'yatra') },
+              { value: 'draft', label: __('Draft', 'yatra') },
+              { value: 'trash', label: __('Trash', 'yatra') },
             ]}
             sortBy={sortBy}
             onSortByChange={setSortBy}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
             sortOptions={[
-              { value: 'id', label: __('ID', 'ID') },
-              { value: 'name', label: __('Name', 'Name') },
-              { value: 'field_type', label: __('Field Type', 'Field Type') },
-              { value: 'status', label: __('Status', 'Status') },
-              { value: 'created_at', label: __('Created At', 'Created At') },
-              { value: 'updated_at', label: __('Updated At', 'Updated At') },
+              { value: 'id', label: __('ID', 'yatra') },
+              { value: 'name', label: __('Name', 'yatra') },
+              { value: 'field_type', label: __('Field Type', 'yatra') },
+              { value: 'status', label: __('Status', 'yatra') },
+              { value: 'created_at', label: __('Created At', 'yatra') },
+              { value: 'updated_at', label: __('Updated At', 'yatra') },
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={hasFilters}
-            placeholder={__('Search attributes...', 'Search attributes...')}
+            placeholder={__('Search attributes...', 'yatra')}
           />
         </CardContent>
       </Card>
@@ -531,17 +531,17 @@ const Attributes: React.FC = () => {
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
               columnOptions={[
-                { key: 'name', label: __('Attribute', 'Attribute'), visible: visibleColumns.name },
-                { key: 'field_type', label: __('Field Type', 'Field Type'), visible: visibleColumns.field_type },
-                { key: 'required', label: __('Required', 'Required'), visible: visibleColumns.required },
-                { key: 'show_on_frontend', label: __('Frontend', 'Frontend'), visible: visibleColumns.show_on_frontend },
-                { key: 'show_in_filters', label: __('Filters', 'Filters'), visible: visibleColumns.show_in_filters },
-                { key: 'searchable', label: __('Searchable', 'Searchable'), visible: visibleColumns.searchable },
-                { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-                { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
-                { key: 'updated_at', label: __('Updated', 'Updated'), visible: visibleColumns.updated_at },
-                { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-                { key: 'display_order', label: __('Display Order', 'Display Order'), visible: visibleColumns.display_order },
+                { key: 'name', label: __('Attribute', 'yatra'), visible: visibleColumns.name },
+                { key: 'field_type', label: __('Field Type', 'yatra'), visible: visibleColumns.field_type },
+                { key: 'required', label: __('Required', 'yatra'), visible: visibleColumns.required },
+                { key: 'show_on_frontend', label: __('Frontend', 'yatra'), visible: visibleColumns.show_on_frontend },
+                { key: 'show_in_filters', label: __('Filters', 'yatra'), visible: visibleColumns.show_in_filters },
+                { key: 'searchable', label: __('Searchable', 'yatra'), visible: visibleColumns.searchable },
+                { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+                { key: 'created_at', label: __('Created', 'yatra'), visible: visibleColumns.created_at },
+                { key: 'updated_at', label: __('Updated', 'yatra'), visible: visibleColumns.updated_at },
+                { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+                { key: 'display_order', label: __('Display Order', 'yatra'), visible: visibleColumns.display_order },
               ]}
               onToggleColumn={toggleColumn}
               bulkMutationPending={bulkMutation.isPending}
@@ -558,28 +558,28 @@ const Attributes: React.FC = () => {
                 actions={[
                   {
                     key: 'edit',
-                    label: __('Edit', 'Edit'),
+                    label: __('Edit', 'yatra'),
                     icon: <Edit className="w-4 h-4" />,
                     onClick: handleEdit,
                     condition: () => can('yatra_view_trips'),
                   },
                   {
                     key: 'restore',
-                    label: __('Restore', 'Restore'),
+                    label: __('Restore', 'yatra'),
                     icon: <RotateCcw className="w-4 h-4" />,
                     onClick: (attribute: Attribute) => bulkMutation.mutate({ action: 'restore', ids: [attribute.id] }),
                     condition: (attribute: Attribute) => (attribute.status === 'trash' || statusFilter === 'trash') && can('yatra_view_trips'),
                   },
                   {
                     key: 'trash',
-                    label: __('Move to Trash', 'Move to Trash'),
+                    label: __('Move to Trash', 'yatra'),
                     icon: <Trash2 className="w-4 h-4" />,
                     onClick: (attribute: Attribute) => bulkMutation.mutate({ action: 'trash', ids: [attribute.id] }),
                     condition: (attribute: Attribute) => attribute.status !== 'trash' && statusFilter !== 'trash' && can('yatra_view_trips'),
                   },
                   {
                     key: 'delete',
-                    label: __('Delete Permanently', 'Delete Permanently'),
+                    label: __('Delete Permanently', 'yatra'),
                     icon: <Trash2 className="w-4 h-4" />,
                     onClick: handlePermanentDelete,
                     condition: (attribute: Attribute) => (attribute.status === 'trash' || statusFilter === 'trash') && can('yatra_view_trips'),
@@ -588,7 +588,7 @@ const Attributes: React.FC = () => {
                 ]}
                 isLoading={isLoading}
                 isError={isAttributesError}
-                errorText={__('Failed to load attributes', 'Failed to load attributes')}
+                errorText={__('Failed to load attributes', 'yatra')}
                 errorDescription={__(
                   'We couldn’t connect to the attributes service. Please refresh or try again shortly.',
                   'We couldn’t connect to the attributes service. Please refresh or try again shortly.'
@@ -596,11 +596,11 @@ const Attributes: React.FC = () => {
                 errorDetails={errorContext.details || apiErrorMessage}
                 errorRequestInfo={errorContext.requestInfo}
                 onRetry={() => queryClient.invalidateQueries({ queryKey: ['attributes'] })}
-                emptyText={__('No attributes found', 'No attributes found')}
+                emptyText={__('No attributes found', 'yatra')}
                 emptyDescription={
                   hasFilters
-                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                    : __('Get started by creating your first attribute.', 'Get started by creating your first attribute.')
+                    ? __('Try adjusting your filters to see more results.', 'yatra')
+                    : __('Get started by creating your first attribute.', 'yatra')
                 }
                 onCreateClick={can('yatra_view_trips') ? handleCreateAttribute : undefined}
                 onSort={handleSort}
@@ -639,7 +639,7 @@ const Attributes: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('attributes', 'attributes')}
+            itemName={__('attributes', 'yatra')}
           />
         </div>
       )}

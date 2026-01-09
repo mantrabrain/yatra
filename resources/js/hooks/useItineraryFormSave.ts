@@ -343,26 +343,26 @@ export const useItineraryFormSave = ({
           // Edit mode messages - dynamic based on trip type
           if (validActivitiesCount === 0) {
             const message = isSingleDay 
-              ? __('Entry updated successfully!', 'Entry updated successfully!')
-              : __('Day updated successfully!', 'Day updated successfully!');
+              ? __('Entry updated successfully!', 'yatra')
+              : __('Day updated successfully!', 'yatra');
             showToast(message, 'success');
           } else {
             const message = isSingleDay
-              ? __('Entry and activities updated successfully!', 'Entry and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
-              : __('Day and activities updated successfully!', 'Day and activities updated successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
+              ? __('Entry and activities updated successfully!', 'yatra').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
+              : __('Day and activities updated successfully!', 'yatra').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
             showToast(message, 'success');
           }
         } else {
           // Create mode messages - dynamic based on trip type
           if (validActivitiesCount === 0) {
             const message = isSingleDay 
-              ? __('Entry created successfully!', 'Entry created successfully!')
-              : __('Day created successfully!', 'Day created successfully!');
+              ? __('Entry created successfully!', 'yatra')
+              : __('Day created successfully!', 'yatra');
             showToast(message, 'success');
           } else {
             const message = isSingleDay
-              ? __('Entry and activities created successfully!', 'Entry and activities created successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
-              : __('Day and activities created successfully!', 'Day and activities created successfully!').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
+              ? __('Entry and activities created successfully!', 'yatra').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`)
+              : __('Day and activities created successfully!', 'yatra').replace('activities', `${validActivitiesCount} ${validActivitiesCount === 1 ? 'activity' : 'activities'}`);
             showToast(message, 'success');
           }
         }
@@ -399,8 +399,8 @@ export const useItineraryFormSave = ({
       // For activity mode or edit mode
       showToast(
         isEditMode 
-          ? __('Itinerary entry updated successfully!', 'Itinerary entry updated successfully!')
-          : __('Itinerary entry created successfully!', 'Itinerary entry created successfully!'),
+          ? __('Itinerary entry updated successfully!', 'yatra')
+          : __('Itinerary entry created successfully!', 'yatra'),
         'success'
       );
       
@@ -435,7 +435,7 @@ export const useItineraryFormSave = ({
       }, 1000);
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving', 'An error occurred while saving');
+      const errorMessage = error?.message || __('An error occurred while saving', 'yatra');
       showToast(errorMessage, 'error');
     },
   });

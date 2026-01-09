@@ -148,7 +148,7 @@ const Activities: React.FC = () => {
         const response = await apiClient.get('/activities', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load activities', 'Failed to load activities'), 'error');
+        showToast(error?.message || __('Failed to load activities', 'yatra'), 'error');
         throw error;
       }
     },
@@ -186,12 +186,12 @@ const Activities: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['activities'] });
       queryClient.invalidateQueries({ queryKey: ['activities-stats'] });
-      showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
+      showToast(__('Bulk action completed successfully', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to perform bulk action', 'Failed to perform bulk action'), 'error');
+      showToast(error?.message || __('Failed to perform bulk action', 'yatra'), 'error');
     },
   });
 
@@ -240,12 +240,12 @@ const Activities: React.FC = () => {
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one activity.', 'Select at least one activity.'), 'warning');
+      showToast(__('Select at least one activity.', 'yatra'), 'warning');
       return;
     }
 
@@ -254,10 +254,10 @@ const Activities: React.FC = () => {
   };
 
   const viewFilters = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all ?? 0 },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish ?? 0 },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft ?? 0 },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all ?? 0 },
+    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish ?? 0 },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft ?? 0 },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash ?? 0 },
   ];
 
   const handleResetFilters = () => {
@@ -297,13 +297,13 @@ const Activities: React.FC = () => {
         isOpen={permanentDeleteConfirm.isOpen}
         onClose={() => setPermanentDeleteConfirm({ isOpen: false, activity: null })}
         onConfirm={confirmPermanentDelete}
-        title={__('Delete Activity Permanently', 'Delete Activity Permanently')}
+        title={__('Delete Activity Permanently', 'yatra')}
         message={permanentDeleteConfirm.activity 
-          ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'Are you sure you want to permanently delete "{name}"? This action cannot be undone.').replace('{name}', permanentDeleteConfirm.activity.name)
-          : __('Are you sure you want to permanently delete this activity? This action cannot be undone.', 'Are you sure you want to permanently delete this activity? This action cannot be undone.')
+          ? __('Are you sure you want to permanently delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', permanentDeleteConfirm.activity.name)
+          : __('Are you sure you want to permanently delete this activity? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete Permanently', 'Delete Permanently')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete Permanently', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={bulkMutation.isPending}
       />
@@ -313,31 +313,31 @@ const Activities: React.FC = () => {
         isOpen={individualActionConfirm.isOpen}
         onClose={() => setIndividualActionConfirm({ isOpen: false, action: '', activity: null })}
         onConfirm={confirmIndividualAction}
-        title={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore Activity', 'Restore Activity')}
+        title={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'yatra') : __('Restore Activity', 'yatra')}
         message={individualActionConfirm.activity 
           ? (individualActionConfirm.action === 'trash' 
-              ? __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', individualActionConfirm.activity.name)
-              : __('Are you sure you want to restore "{name}"?', 'Are you sure you want to restore "{name}"?').replace('{name}', individualActionConfirm.activity.name)
+              ? __('Are you sure you want to move "{name}" to trash?', 'yatra').replace('{name}', individualActionConfirm.activity.name)
+              : __('Are you sure you want to restore "{name}"?', 'yatra').replace('{name}', individualActionConfirm.activity.name)
             )
           : (individualActionConfirm.action === 'trash' 
-              ? __('Are you sure you want to move this activity to trash?', 'Are you sure you want to move this activity to trash?')
-              : __('Are you sure you want to restore this activity?', 'Are you sure you want to restore this activity?')
+              ? __('Are you sure you want to move this activity to trash?', 'yatra')
+              : __('Are you sure you want to restore this activity?', 'yatra')
             )
         }
-        confirmText={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'Move to Trash') : __('Restore', 'Restore')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={individualActionConfirm.action === 'trash' ? __('Move to Trash', 'yatra') : __('Restore', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="warning"
         isLoading={bulkMutation.isPending}
       />
 
       <PageHeader
-        title={__('Activities', 'Activities')}
-        description={__('Manage your travel activities and experiences', 'Manage your travel activities and experiences')}
+        title={__('Activities', 'yatra')}
+        description={__('Manage your travel activities and experiences', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateActivity} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Activity', 'Add New Activity')}
+            {__('Add New Activity', 'yatra')}
           </Button>
         }
       />
@@ -357,24 +357,24 @@ const Activities: React.FC = () => {
               setBulkAction('');
             }}
             statusOptions={[
-              { value: "all", label: __('All Status', 'All Status') },
-              { value: "publish", label: __('Published', 'Published') },
-              { value: "draft", label: __('Draft', 'Draft') },
-              { value: "trash", label: __('Trash', 'Trash') }
+              { value: "all", label: __('All Status', 'yatra') },
+              { value: "publish", label: __('Published', 'yatra') },
+              { value: "draft", label: __('Draft', 'yatra') },
+              { value: "trash", label: __('Trash', 'yatra') }
             ]}
             sortBy={sortBy}
             onSortByChange={setSortBy}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
             sortOptions={[
-              { value: "name", label: __('Name', 'Name') },
-              { value: "status", label: __('Status', 'Status') },
-              { value: "created_at", label: __('Created At', 'Created At') },
-              { value: "updated_at", label: __('Updated At', 'Updated At') }
+              { value: "name", label: __('Name', 'yatra') },
+              { value: "status", label: __('Status', 'yatra') },
+              { value: "created_at", label: __('Created At', 'yatra') },
+              { value: "updated_at", label: __('Updated At', 'yatra') }
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={!!hasFilters}
-            placeholder={__('Search activities...', 'Search activities...')}
+            placeholder={__('Search activities...', 'yatra')}
           />
         </CardContent>
       </Card>
@@ -399,14 +399,14 @@ const Activities: React.FC = () => {
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
               columnOptions={[
-                { key: 'name', label: __('Activity', 'Activity'), visible: visibleColumns.name },
-                { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-                { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
-                { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-                { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
-                { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
-                { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
-                { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
+                { key: 'name', label: __('Activity', 'yatra'), visible: visibleColumns.name },
+                { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+                { key: 'trips', label: __('Trips', 'yatra'), visible: visibleColumns.trips },
+                { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+                { key: 'created_at', label: __('Created Date', 'yatra'), visible: visibleColumns.created_at },
+                { key: 'updated_at', label: __('Updated Date', 'yatra'), visible: visibleColumns.updated_at },
+                { key: 'created_by_name', label: __('Created By', 'yatra'), visible: visibleColumns.created_by_name },
+                { key: 'updated_by_name', label: __('Updated By', 'yatra'), visible: visibleColumns.updated_by_name }
               ]}
               onToggleColumn={toggleColumn}
               bulkMutationPending={bulkMutation.isPending}
@@ -422,7 +422,7 @@ const Activities: React.FC = () => {
                   columns={[
                     {
                       key: 'name',
-                      label: __('Activity', 'Activity'),
+                      label: __('Activity', 'yatra'),
                       sortable: true,
                       visible: visibleColumns.name,
                       render: (activity: Activity) => (
@@ -459,7 +459,7 @@ const Activities: React.FC = () => {
                               <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                                 <span>{activity.slug}</span>
                                 <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                                  ({__('ID:', 'ID:')} {activity.id})
+                                  ({__('ID:', 'yatra')} {activity.id})
                                 </span>
                               </div>
                             </div>
@@ -468,7 +468,7 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'trips',
-                        label: __('Trips', 'Trips'),
+                        label: __('Trips', 'yatra'),
                         sortable: false,
                         visible: visibleColumns.trips,
                         render: (activity: Activity) => (
@@ -479,17 +479,17 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'description',
-                        label: __('Description', 'Description'),
+                        label: __('Description', 'yatra'),
                         visible: visibleColumns.description,
                         render: (activity: Activity) => (
                           <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                            {activity.description || __('No description', 'No description')}
+                            {activity.description || __('No description', 'yatra')}
                           </span>
                         )
                       },
                       {
                         key: 'status',
-                        label: __('Status', 'Status'),
+                        label: __('Status', 'yatra'),
                         sortable: true,
                         visible: visibleColumns.status,
                         render: (activity: Activity) => (
@@ -501,17 +501,17 @@ const Activities: React.FC = () => {
                                 : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                           }`}>
                             {activity.status === 'trash' || statusFilter === 'trash'
-                              ? __('Trash', 'Trash')
+                              ? __('Trash', 'yatra')
                               : activity.status === 'publish'
-                                ? __('Published', 'Published')
-                                : __('Draft', 'Draft')
+                                ? __('Published', 'yatra')
+                                : __('Draft', 'yatra')
                             }
                           </span>
                         )
                       },
                       {
                         key: 'created_at',
-                        label: __('Created Date', 'Created Date'),
+                        label: __('Created Date', 'yatra'),
                         sortable: true,
                         visible: visibleColumns.created_at,
                         render: (activity: Activity) => (
@@ -528,7 +528,7 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'updated_at',
-                        label: __('Updated Date', 'Updated Date'),
+                        label: __('Updated Date', 'yatra'),
                         sortable: true,
                         visible: visibleColumns.updated_at,
                         render: (activity: Activity) => (
@@ -545,21 +545,21 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'created_by_name',
-                        label: __('Created By', 'Created By'),
+                        label: __('Created By', 'yatra'),
                         visible: visibleColumns.created_by_name,
                         render: (activity: Activity) => (
                           <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                            {activity.created_by_name || __('Unknown', 'Unknown')}
+                            {activity.created_by_name || __('Unknown', 'yatra')}
                           </span>
                         )
                       },
                       {
                         key: 'updated_by_name',
-                        label: __('Updated By', 'Updated By'),
+                        label: __('Updated By', 'yatra'),
                         visible: visibleColumns.updated_by_name,
                         render: (activity: Activity) => (
                           <span className={activity.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                            {activity.updated_by_name || __('Unknown', 'Unknown')}
+                            {activity.updated_by_name || __('Unknown', 'yatra')}
                           </span>
                         )
                       }
@@ -567,14 +567,14 @@ const Activities: React.FC = () => {
                     actions={[
                       {
                         key: 'edit',
-                        label: __('Edit', 'Edit'),
+                        label: __('Edit', 'yatra'),
                         icon: <Edit className="w-4 h-4" />,
                         onClick: handleEdit,
                         condition: () => can('yatra_edit_trips'),
                       },
                       {
                         key: 'restore',
-                        label: __('Restore', 'Restore'),
+                        label: __('Restore', 'yatra'),
                         icon: <RotateCcw className="w-4 h-4" />,
                         onClick: (activity: Activity) => {
                           bulkMutation.mutate({ action: 'restore', ids: [activity.id] });
@@ -583,7 +583,7 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'trash',
-                        label: __('Move to Trash', 'Move to Trash'),
+                        label: __('Move to Trash', 'yatra'),
                         icon: <Trash2 className="w-4 h-4" />,
                         onClick: (activity: Activity) => {
                           bulkMutation.mutate({ action: 'trash', ids: [activity.id] });
@@ -592,7 +592,7 @@ const Activities: React.FC = () => {
                       },
                       {
                         key: 'delete',
-                        label: __('Delete Permanently', 'Delete Permanently'),
+                        label: __('Delete Permanently', 'yatra'),
                         icon: <Trash2 className="w-4 h-4" />,
                         onClick: handlePermanentDelete,
                         condition: (activity: Activity) => (activity.status === 'trash' || statusFilter === 'trash') && can('yatra_delete_trips'),
@@ -601,7 +601,7 @@ const Activities: React.FC = () => {
                     ]}
                     isLoading={isLoading}
                     isError={!!error}
-                    errorText={__('Error loading activities', 'Error loading activities')}
+                    errorText={__('Error loading activities', 'yatra')}
                     errorDescription={__(
                       'We couldn’t connect to the activities service. Please refresh or try again shortly.',
                       'We couldn’t connect to the activities service. Please refresh or try again shortly.'
@@ -609,10 +609,10 @@ const Activities: React.FC = () => {
                     onRetry={() => queryClient.invalidateQueries({ queryKey: ['activities'] })}
                     errorDetails={errorContext.details}
                     errorRequestInfo={errorContext.requestInfo}
-                    emptyText={__('No activities found', 'No activities found')}
+                    emptyText={__('No activities found', 'yatra')}
                     emptyDescription={hasFilters 
-                      ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                      : __('Get started by creating your first activity.', 'Get started by creating your first activity.')
+                      ? __('Try adjusting your filters to see more results.', 'yatra')
+                      : __('Get started by creating your first activity.', 'yatra')
                     }
                     onCreateClick={can('yatra_edit_trips') ? handleCreateActivity : undefined}
                     onSort={handleSort}
@@ -652,7 +652,7 @@ const Activities: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('activities', 'activities')}
+            itemName={__('activities', 'yatra')}
           />
         </div>
       )}

@@ -204,11 +204,11 @@ const Dashboard: React.FC = () => {
     };
 
     return [
-      { label: __('Pending', 'Pending'), value: getCount('pending'), color: '#f59e0b' },
-      { label: __('Confirmed', 'Confirmed'), value: getCount('confirmed'), color: '#10b981' },
-      { label: __('Completed', 'Completed'), value: getCount('completed'), color: '#3b82f6' },
-      { label: __('Cancelled', 'Cancelled'), value: getCount('cancelled'), color: '#ef4444' },
-      { label: __('Refunded', 'Refunded'), value: getCount('refunded'), color: '#a855f7' },
+      { label: __('Pending', 'yatra'), value: getCount('pending'), color: '#f59e0b' },
+      { label: __('Confirmed', 'yatra'), value: getCount('confirmed'), color: '#10b981' },
+      { label: __('Completed', 'yatra'), value: getCount('completed'), color: '#3b82f6' },
+      { label: __('Cancelled', 'yatra'), value: getCount('cancelled'), color: '#ef4444' },
+      { label: __('Refunded', 'yatra'), value: getCount('refunded'), color: '#a855f7' },
     ];
   }, [bookingStats]);
 
@@ -429,16 +429,16 @@ const Dashboard: React.FC = () => {
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  {__('Welcome to Yatra Dashboard', 'Welcome to Yatra Dashboard')}
+                  {__('Welcome to Yatra Dashboard', 'yatra')}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__('Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.', 'Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.')}
+                  {__('Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.', 'yatra')}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <Activity className="w-4 h-4" />
-              <span>{__('Live Data', 'Live Data')}</span>
+              <span>{__('Live Data', 'yatra')}</span>
             </div>
           </div>
         </CardContent>
@@ -448,7 +448,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-nowrap gap-3 overflow-x-auto pb-1">
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Trips', 'Total Trips')}
+            title={__('Total Trips', 'yatra')}
             value={tripsSummary?.total || 0}
             icon={MapPin}
             color="blue"
@@ -458,7 +458,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Bookings', 'Total Bookings')}
+            title={__('Total Bookings', 'yatra')}
             value={bookingStats?.total || 0}
             icon={Calendar}
             color="green"
@@ -468,7 +468,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Booked Revenue', 'Booked Revenue')}
+            title={__('Booked Revenue', 'yatra')}
             value={formatCurrencyAmount(bookingStats?.total_revenue || 0)}
             icon={DollarSign}
             color="purple"
@@ -478,7 +478,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Collected Revenue', 'Collected Revenue')}
+            title={__('Collected Revenue', 'yatra')}
             value={formatCurrencyAmount(bookingStats?.total_collected || 0)}
             icon={DollarSign}
             color="green"
@@ -488,7 +488,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Customers', 'Total Customers')}
+            title={__('Total Customers', 'yatra')}
             value={customersSummary?.total || 0}
             icon={Users}
             color="orange"
@@ -498,7 +498,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Confirmed Bookings', 'Confirmed Bookings')}
+            title={__('Confirmed Bookings', 'yatra')}
             value={(bookingStats as any)?.by_status?.confirmed?.count || 0}
             icon={CheckCircle}
             color="green"
@@ -508,7 +508,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Pending Bookings', 'Pending Bookings')}
+            title={__('Pending Bookings', 'yatra')}
             value={(bookingStats as any)?.by_status?.pending?.count || 0}
             icon={Clock}
             color="orange"
@@ -525,7 +525,7 @@ const Dashboard: React.FC = () => {
           <ConditionalRender capability="yatra_view_bookings">
             <Card>
               <CardHeader>
-                <CardTitle>{__('Bookings Overview', 'Bookings Overview')}</CardTitle>
+                <CardTitle>{__('Bookings Overview', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
                 <BookingsOverviewChart
@@ -543,7 +543,7 @@ const Dashboard: React.FC = () => {
             <ConditionalRender capability="yatra_view_bookings">
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Booking Status', 'Booking Status')}</CardTitle>
+                  <CardTitle>{__('Booking Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
                   <BookingStatusChart data={statusData || []} />
@@ -554,7 +554,7 @@ const Dashboard: React.FC = () => {
             <ConditionalRender capability="yatra_view_trips">
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Popular Destinations', 'Popular Destinations')}</CardTitle>
+                  <CardTitle>{__('Popular Destinations', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
                   <SimpleBarChart
@@ -572,7 +572,7 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <ConditionalRender capability="yatra_view_bookings">
               <StatCard
-                title={__('Pending Bookings', 'Pending Bookings')}
+                title={__('Pending Bookings', 'yatra')}
                 value={(bookingStats as any)?.by_status?.pending?.count || 0}
                 icon={TrendingUp}
                 color="orange"
@@ -582,7 +582,7 @@ const Dashboard: React.FC = () => {
 
             <ConditionalRender capability="yatra_view_trips">
               <StatCard
-                title={__('Upcoming Departures', 'Upcoming Departures')}
+                title={__('Upcoming Departures', 'yatra')}
                 value={bookingStats?.upcoming || 0}
                 icon={Plane}
                 color="green"
@@ -609,7 +609,7 @@ const Dashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
-                {__('Quick Actions', 'Quick Actions')}
+                {__('Quick Actions', 'yatra')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -624,7 +624,7 @@ const Dashboard: React.FC = () => {
                   }}
                 >
                   <MapPin className="w-5 h-5" />
-                  <span className="text-xs">{__('Add Trip', 'Add Trip')}</span>
+                  <span className="text-xs">{__('Add Trip', 'yatra')}</span>
                 </Button>
                 
                 <Button
@@ -637,7 +637,7 @@ const Dashboard: React.FC = () => {
                   }}
                 >
                   <Calendar className="w-5 h-5" />
-                  <span className="text-xs">{__('View Bookings', 'View Bookings')}</span>
+                  <span className="text-xs">{__('View Bookings', 'yatra')}</span>
                 </Button>
                 
                 <Button
@@ -650,7 +650,7 @@ const Dashboard: React.FC = () => {
                   }}
                 >
                   <Users className="w-5 h-5" />
-                  <span className="text-xs">{__('Customers', 'Customers')}</span>
+                  <span className="text-xs">{__('Customers', 'yatra')}</span>
                 </Button>
                 
                 <Button
@@ -663,7 +663,7 @@ const Dashboard: React.FC = () => {
                   }}
                 >
                   <Activity className="w-5 h-5" />
-                  <span className="text-xs">{__('Reports', 'Reports')}</span>
+                  <span className="text-xs">{__('Reports', 'yatra')}</span>
                 </Button>
               </div>
             </CardContent>

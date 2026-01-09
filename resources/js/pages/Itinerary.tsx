@@ -150,7 +150,7 @@ const Itinerary: React.FC = () => {
         
         return Array.isArray(trips) ? trips : [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load trips', 'Failed to load trips'), 'error');
+        showToast(error?.message || __('Failed to load trips', 'yatra'), 'error');
         return [];
       }
     },
@@ -556,8 +556,8 @@ const Itinerary: React.FC = () => {
       const isDayDeletion = (entry as any)?._isDayDeletion;
       showToast(
         isDayDeletion
-          ? __('Day and all activities deleted successfully', 'Day and all activities deleted successfully')
-          : __('Itinerary entry deleted successfully', 'Itinerary entry deleted successfully'),
+          ? __('Day and all activities deleted successfully', 'yatra')
+          : __('Itinerary entry deleted successfully', 'yatra'),
         'success'
       );
       // Close confirmation dialog
@@ -570,7 +570,7 @@ const Itinerary: React.FC = () => {
       refetch();
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete itinerary entry', 'Failed to delete itinerary entry'), 'error');
+      showToast(error?.message || __('Failed to delete itinerary entry', 'yatra'), 'error');
     },
   });
 
@@ -589,14 +589,14 @@ const Itinerary: React.FC = () => {
       });
     },
     onSuccess: () => {
-      showToast(__('Item updated successfully', 'Item updated successfully'), 'success');
+      showToast(__('Item updated successfully', 'yatra'), 'success');
       queryClient.invalidateQueries({ queryKey: ['itinerary'] });
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
       refetch();
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to update item', 'Failed to update item'), 'error');
+      showToast(error?.message || __('Failed to update item', 'yatra'), 'error');
     },
   });
 
@@ -758,7 +758,7 @@ const Itinerary: React.FC = () => {
     const dayGroup = dayGroups.find((dg: DayGroup) => dg.trip_id === tripId && dg.day === day);
     
     if (!dayGroup) {
-      showToast(__('Day not found', 'Day not found'), 'error');
+      showToast(__('Day not found', 'yatra'), 'error');
       setDayMenuOpen(null);
       return;
     }
@@ -780,13 +780,13 @@ const Itinerary: React.FC = () => {
           
           setDeleteConfirm({ isOpen: true, entry: dayEntryForDeletion });
         } else {
-          showToast(__('Day entry not found', 'Day entry not found'), 'error');
+          showToast(__('Day entry not found', 'yatra'), 'error');
         }
       } catch (error: any) {
-        showToast(__('Failed to fetch day entry', 'Failed to fetch day entry'), 'error');
+        showToast(__('Failed to fetch day entry', 'yatra'), 'error');
       }
     } else {
-      showToast(__('Day ID not available', 'Day ID not available'), 'error');
+      showToast(__('Day ID not available', 'yatra'), 'error');
     }
     setDayMenuOpen(null);
   };
@@ -881,7 +881,7 @@ const Itinerary: React.FC = () => {
     const combinedDayKeys = new Set<string>([...emptyDayKeys, ...selectedDayKeysFromEntries]);
 
     if (!bulkAction || (ids.length === 0 && combinedDayKeys.size === 0)) {
-      showToast(__('Please select entries or days and a bulk action first.', 'Please select entries or days and a bulk action first.'), 'error');
+      showToast(__('Please select entries or days and a bulk action first.', 'yatra'), 'error');
       return;
     }
 
@@ -933,7 +933,7 @@ const Itinerary: React.FC = () => {
     const allIdsForAction = [...ids, ...dayEntryIds];
 
     if (allIdsForAction.length === 0) {
-      showToast(__('No valid entries or days found to apply this action.', 'No valid entries or days found to apply this action.'), 'error');
+      showToast(__('No valid entries or days found to apply this action.', 'yatra'), 'error');
       return;
     }
 
@@ -971,7 +971,7 @@ const Itinerary: React.FC = () => {
         })
       );
 
-      showToast(__('Bulk action applied successfully.', 'Bulk action applied successfully.'), 'success');
+      showToast(__('Bulk action applied successfully.', 'yatra'), 'success');
       setSelectedEntries(new Set());
       setSelectedEmptyDays(new Set());
       setBulkAction('');
@@ -980,7 +980,7 @@ const Itinerary: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['trips-simple'] });
       refetch();
     } catch (error: any) {
-      showToast(error?.message || __('Failed to apply bulk action. Please try again.', 'Failed to apply bulk action. Please try again.'), 'error');
+      showToast(error?.message || __('Failed to apply bulk action. Please try again.', 'yatra'), 'error');
     }
   };
 
@@ -1015,13 +1015,13 @@ const Itinerary: React.FC = () => {
     let className = '';
 
     if (explicitStatus === 'publish') {
-      label = __('Published', 'Published');
+      label = __('Published', 'yatra');
       className = 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
     } else if (explicitStatus === 'draft') {
-      label = __('Draft', 'Draft');
+      label = __('Draft', 'yatra');
       className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
     } else if (explicitStatus === 'trash') {
-      label = __('Trash', 'Trash');
+      label = __('Trash', 'yatra');
       className = 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
     } else {
       // Fallback: infer from activity entries when day_status is not set
@@ -1032,16 +1032,16 @@ const Itinerary: React.FC = () => {
       const hasTrash = statuses.some((s) => s === 'trash');
 
       if (hasPublished) {
-        label = __('Published', 'Published');
+        label = __('Published', 'yatra');
         className = 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
       } else if (hasDraft) {
-        label = __('Draft', 'Draft');
+        label = __('Draft', 'yatra');
         className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
       } else if (hasTrash) {
-        label = __('Trash', 'Trash');
+        label = __('Trash', 'yatra');
         className = 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
       } else {
-        label = __('No Status', 'No Status');
+        label = __('No Status', 'yatra');
         className = 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300';
       }
     }
@@ -1069,7 +1069,7 @@ const Itinerary: React.FC = () => {
     if (normalized === 'publish' || normalized === 'published') {
       return (
         <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 border border-green-200 dark:border-green-800">
-          {__('Published', 'Published')}
+          {__('Published', 'yatra')}
         </Badge>
       );
     }
@@ -1077,7 +1077,7 @@ const Itinerary: React.FC = () => {
     if (normalized === 'draft') {
       return (
         <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">
-          {__('Draft', 'Draft')}
+          {__('Draft', 'yatra')}
         </Badge>
       );
     }
@@ -1085,7 +1085,7 @@ const Itinerary: React.FC = () => {
     if (normalized === 'trash') {
       return (
         <Badge className="ml-2 text-[11px] px-2 py-0.5 bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300 border border-gray-400 dark:border-gray-700">
-          {__('Trash', 'Trash')}
+          {__('Trash', 'yatra')}
         </Badge>
       );
     }
@@ -1201,27 +1201,27 @@ const Itinerary: React.FC = () => {
   );
 
   const statusOptions = [
-    { key: 'all', label: __('All', 'All'), count: dayGroups.length },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+    { key: 'all', label: __('All', 'yatra'), count: dayGroups.length },
+    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
   ];
 
   const bulkActionOptions = useMemo(() => {
     // In Trash view: allow restore to Draft and permanent delete only
     if (statusFilter === 'trash') {
       return [
-        { value: 'restore', label: __('Restore to Draft', 'Restore to Draft') },
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'restore', label: __('Restore to Draft', 'yatra') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     // Other views: normal status changes + move to trash + delete
     return [
-      { value: 'publish', label: __('Mark as Published', 'Mark as Published') },
-      { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
-      { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
-      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      { value: 'publish', label: __('Mark as Published', 'yatra') },
+      { value: 'draft', label: __('Mark as Draft', 'yatra') },
+      { value: 'trash', label: __('Move to Trash', 'yatra') },
+      { value: 'delete', label: __('Delete Permanently', 'yatra') },
     ];
   }, [statusFilter]);
 
@@ -1241,7 +1241,7 @@ const Itinerary: React.FC = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Build your complete itinerary with activities, meals, and accommodations', 'Build your complete itinerary with activities, meals, and accommodations')}
+            {__('Build your complete itinerary with activities, meals, and accommodations', 'yatra')}
           </p>
         </div>
       </div>
@@ -1253,11 +1253,11 @@ const Itinerary: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Select Trip', 'Select Trip')}
+                {__('Select Trip', 'yatra')}
               </h3>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {__('Choose a trip to manage its itinerary entries and day-by-day schedule', 'Choose a trip to manage its itinerary entries and day-by-day schedule')}
+              {__('Choose a trip to manage its itinerary entries and day-by-day schedule', 'yatra')}
             </p>
           </div>
         </div>
@@ -1265,17 +1265,17 @@ const Itinerary: React.FC = () => {
         <div className="space-y-4 overflow-visible">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+              {__('Trip', 'yatra')} <span className="text-red-500">*</span>
             </label>
             <SearchableSelect
               value={tripFilter}
               onChange={(value) => setTripFilter(value)}
               options={((Array.isArray(tripsData) ? tripsData : []).map((trip: any) => ({
                 value: trip.id.toString(),
-                label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`,
+                label: `${trip.title || trip.name || ''}${trip.trip_type === 'single_day' ? __(' (Single Day)', 'yatra') : trip.trip_type === 'multi_day' ? __(' (Multi-Day)', 'yatra') : ''}`,
               })) || [])}
-              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
-              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              placeholder={__('Search or select a trip...', 'yatra')}
+              searchPlaceholder={__('Search by trip name or ID...', 'yatra')}
               className="w-full"
               required
             />
@@ -1298,7 +1298,7 @@ const Itinerary: React.FC = () => {
                       ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
                       : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
                   }>
-                    {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                    {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'yatra') : __('Multi-Day', 'yatra')}
                   </Badge>
                 )}
               </div>
@@ -1315,10 +1315,10 @@ const Itinerary: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                    {__('Get Started', 'Get Started')}
+                    {__('Get Started', 'yatra')}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {__('Select a trip from the dropdown above to view and manage its itinerary entries and day-by-day schedule.', 'Select a trip from the dropdown above to view and manage its itinerary entries and day-by-day schedule.')}
+                    {__('Select a trip from the dropdown above to view and manage its itinerary entries and day-by-day schedule.', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -1331,7 +1331,7 @@ const Itinerary: React.FC = () => {
       {tripFilter && (() => {
         const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
         const isSingleDay = selectedTrip?.trip_type === 'single_day';
-        const buttonLabel = isSingleDay ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
+        const buttonLabel = isSingleDay ? __('Add Entry', 'yatra') : __('Add Day', 'yatra');
 
         return (
           <div className="flex justify-end mt-4">
@@ -1383,7 +1383,7 @@ const Itinerary: React.FC = () => {
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {__('Error Loading Itinerary', 'Error Loading Itinerary')}
+                        {__('Error Loading Itinerary', 'yatra')}
                       </h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {__('We couldn\'t connect to the itinerary service. Please refresh or try again shortly.', 'We couldn\'t connect to the itinerary service. Please refresh or try again shortly.')}
@@ -1395,7 +1395,7 @@ const Itinerary: React.FC = () => {
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="text-sm font-medium text-gray-900 dark:text-white">
-                          {__('Error Details', 'Error Details')}
+                          {__('Error Details', 'yatra')}
                         </h4>
                         <button
                           onClick={() => {
@@ -1405,11 +1405,11 @@ const Itinerary: React.FC = () => {
                             }, null, 2);
                             navigator.clipboard.writeText(details);
                             // Show toast feedback
-                            showToast(__('Error details copied to clipboard', 'Error details copied to clipboard'), 'success');
+                            showToast(__('Error details copied to clipboard', 'yatra'), 'success');
                           }}
                           className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                         >
-                          {__('Copy', 'Copy')}
+                          {__('Copy', 'yatra')}
                         </button>
                       </div>
                       <div className="space-y-2 text-sm">
@@ -1418,9 +1418,9 @@ const Itinerary: React.FC = () => {
                         </div>
                         {errorContext.requestInfo && (
                           <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                            <div><strong>{__('Request', 'Request')}:</strong> {errorContext.requestInfo.method} {errorContext.requestInfo.url}</div>
+                            <div><strong>{__('Request', 'yatra')}:</strong> {errorContext.requestInfo.method} {errorContext.requestInfo.url}</div>
                             {errorContext.requestInfo.payload && (
-                              <div><strong>{__('Payload', 'Payload')}:</strong> <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-1 rounded overflow-auto max-h-20">{JSON.stringify(errorContext.requestInfo.payload, null, 2)}</pre></div>
+                              <div><strong>{__('Payload', 'yatra')}:</strong> <pre className="mt-1 text-xs bg-gray-100 dark:bg-gray-800 p-1 rounded overflow-auto max-h-20">{JSON.stringify(errorContext.requestInfo.payload, null, 2)}</pre></div>
                             )}
                           </div>
                         )}
@@ -1435,14 +1435,14 @@ const Itinerary: React.FC = () => {
                       className="flex items-center gap-2"
                     >
                       <AlertCircle className="w-4 h-4" />
-                      {__('Retry', 'Retry')}
+                      {__('Retry', 'yatra')}
                     </Button>
                     <Button
                       onClick={() => window.location.reload()}
                       variant="ghost"
                       className="text-gray-600 dark:text-gray-400"
                     >
-                      {__('Refresh Page', 'Refresh Page')}
+                      {__('Refresh Page', 'yatra')}
                     </Button>
                   </div>
                 </div>
@@ -1478,7 +1478,7 @@ const Itinerary: React.FC = () => {
                     {(() => {
                       const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
                       const isSingleDay = selectedTrip?.trip_type === 'single_day';
-                      return isSingleDay ? __('No itinerary entries yet', 'No itinerary entries yet') : __('No itinerary days yet', 'No itinerary days yet');
+                      return isSingleDay ? __('No itinerary entries yet', 'yatra') : __('No itinerary days yet', 'yatra');
                     })()}
                   </h3>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 max-w-md">
@@ -1486,8 +1486,8 @@ const Itinerary: React.FC = () => {
                       const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
                       const isSingleDay = selectedTrip?.trip_type === 'single_day';
                       return isSingleDay 
-                        ? __('Start building your itinerary by adding your first entry to create a detailed schedule for your trip.', 'Start building your itinerary by adding your first entry to create a detailed schedule for your trip.')
-                        : __('Start building your itinerary by adding your first day to organize your trip schedule.', 'Start building your itinerary by adding your first day to organize your trip schedule.');
+                        ? __('Start building your itinerary by adding your first entry to create a detailed schedule for your trip.', 'yatra')
+                        : __('Start building your itinerary by adding your first day to organize your trip schedule.', 'yatra');
                     })()}
                   </p>
                   {can('yatra_edit_trips') && (
@@ -1496,7 +1496,7 @@ const Itinerary: React.FC = () => {
                       {(() => {
                         const selectedTrip = tripsData?.find((t: any) => t.id.toString() === tripFilter);
                         const isSingleDay = selectedTrip?.trip_type === 'single_day';
-                        return isSingleDay ? __('Add Your First Entry', 'Add Your First Entry') : __('Add Your First Day', 'Add Your First Day');
+                        return isSingleDay ? __('Add Your First Entry', 'yatra') : __('Add Your First Day', 'yatra');
                       })()}
                     </Button>
                   )}
@@ -1520,11 +1520,11 @@ const Itinerary: React.FC = () => {
                           className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
                         />
                         <label className="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                          {__('Select All', 'Select All')}
+                          {__('Select All', 'yatra')}
                         </label>
                         {selectedEntries.size > 0 && (
                           <span className="text-sm text-gray-500 dark:text-gray-400">
-                            ({selectedEntries.size} {__('selected', 'selected')})
+                            ({selectedEntries.size} {__('selected', 'yatra')})
                           </span>
                         )}
                       </div>
@@ -1538,7 +1538,7 @@ const Itinerary: React.FC = () => {
                             setExpandedDays(new Set(allKeys));
                           }}
                         >
-                          {__('Expand all', 'Expand all')}
+                          {__('Expand all', 'yatra')}
                         </button>
                         <button
                           type="button"
@@ -1548,7 +1548,7 @@ const Itinerary: React.FC = () => {
                             setExpandedDays(new Set());
                           }}
                         >
-                          {__('Collapse all', 'Collapse all')}
+                          {__('Collapse all', 'yatra')}
                         </button>
                       </div>
                     </div>
@@ -1606,7 +1606,7 @@ const Itinerary: React.FC = () => {
                         }}
                         onClick={(e) => e.stopPropagation()}
                         className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                        title={__('Select all entries for this day', 'Select all entries for this day')}
+                        title={__('Select all entries for this day', 'yatra')}
                       />
                     </ConditionalRender>
                     <div 
@@ -1615,18 +1615,18 @@ const Itinerary: React.FC = () => {
                   >
                       <div className="flex items-center gap-3">
                         <div className="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-medium">
-                          {isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} {dayGroup.day}
+                          {isSingleDayTrip ? __('Entry', 'yatra') : __('Day', 'yatra')} {dayGroup.day}
                         </div>
                         <div>
                           <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center">
                             {dayGroup.day_title 
-                              ? `${isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} ${dayGroup.day}: ${dayGroup.day_title}`
-                              : `${isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day')} ${dayGroup.day}`
+                              ? `${isSingleDayTrip ? __('Entry', 'yatra') : __('Day', 'yatra')} ${dayGroup.day}: ${dayGroup.day_title}`
+                              : `${isSingleDayTrip ? __('Entry', 'yatra') : __('Day', 'yatra')} ${dayGroup.day}`
                             }
                             {getDayStatusBadge(dayGroup)}
                           </h3>
                           <div className="flex items-center gap-3 mt-1 text-sm text-gray-600 dark:text-gray-400">
-                            <span>{counts.total} {__('items', 'items')}</span>
+                            <span>{counts.total} {__('items', 'yatra')}</span>
                             {counts.meals > 0 && (
                               <div className="flex items-center gap-1">
                                 <UtensilsCrossed className="w-3.5 h-3.5" />
@@ -1642,7 +1642,7 @@ const Itinerary: React.FC = () => {
                             {counts.accommodations > 0 && (
                               <div className="flex items-center gap-1">
                                 <Hotel className="w-3.5 h-3.5" />
-                                <span>{__('Stay', 'Stay')}</span>
+                                <span>{__('Stay', 'yatra')}</span>
                               </div>
                             )}
                           </div>
@@ -1670,7 +1670,7 @@ const Itinerary: React.FC = () => {
                                 setDayMenuOpen({ tripId: dayGroup.trip_id, day: dayGroup.day });
                               }
                             }}
-                            title={__('Day Options', 'Day Options')}
+                            title={__('Day Options', 'yatra')}
                       >
                         <MoreVertical className="w-4 h-4" />
                       </Button>
@@ -1684,7 +1684,7 @@ const Itinerary: React.FC = () => {
                                 className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                               >
                                 <Pencil className="w-4 h-4" />
-                                {isSingleDayTrip ? __('Edit Entry', 'Edit Entry') : __('Edit Day', 'Edit Day')}
+                                {isSingleDayTrip ? __('Edit Entry', 'yatra') : __('Edit Day', 'yatra')}
                               </button>
                               <ConditionalRender capability="yatra_delete_trips">
                                 <button
@@ -1692,7 +1692,7 @@ const Itinerary: React.FC = () => {
                                   className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
                                 >
                                   <Trash2 className="w-4 h-4" />
-                                  {isSingleDayTrip ? __('Delete Entry', 'Delete Entry') : __('Delete Day', 'Delete Day')}
+                                  {isSingleDayTrip ? __('Delete Entry', 'yatra') : __('Delete Day', 'yatra')}
                                 </button>
                               </ConditionalRender>
                             </div>
@@ -1714,7 +1714,7 @@ const Itinerary: React.FC = () => {
                       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                         <div className="flex flex-wrap items-center gap-3">
                           <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                            {__('QUICK ADD', 'QUICK ADD')}
+                            {__('QUICK ADD', 'yatra')}
                           </div>
                           <div className="flex flex-wrap gap-2">
                             {quickAddOptions.length > 0 ? (
@@ -1768,7 +1768,7 @@ const Itinerary: React.FC = () => {
                               })
                             ) : (
                               <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {__('No item types available', 'No item types available')}
+                                {__('No item types available', 'yatra')}
                               </div>
                             )}
                           </div>
@@ -1793,7 +1793,7 @@ const Itinerary: React.FC = () => {
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                                 className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                                title={__('Select this entry', 'Select this entry')}
+                                title={__('Select this entry', 'yatra')}
                               />
                             </ConditionalRender>
                             {/* Time */}
@@ -1906,7 +1906,7 @@ const Itinerary: React.FC = () => {
                                           <span>{currencySymbol}</span>
                                           <span>
                                             {entry.cost}
-                                            {entry.cost_per_person ? ` / ${__('person', 'person')}` : ''}
+                                            {entry.cost_per_person ? ` / ${__('person', 'yatra')}` : ''}
                                           </span>
                                         </div>
                                       )}
@@ -1957,7 +1957,7 @@ const Itinerary: React.FC = () => {
                                           {included.length > 0 && (
                                             <span>
                                               <span className="font-medium text-green-600 dark:text-green-400">
-                                                {__('Includes', 'Includes')}:
+                                                {__('Includes', 'yatra')}:
                                               </span>{' '}
                                               <span>{included.join(', ')}</span>
                                             </span>
@@ -1968,7 +1968,7 @@ const Itinerary: React.FC = () => {
                                           {excluded.length > 0 && (
                                             <span>
                                               <span className="font-medium text-red-600 dark:text-red-400">
-                                                {__('Excludes', 'Excludes')}:
+                                                {__('Excludes', 'yatra')}:
                                               </span>{' '}
                                               <span>{excluded.join(', ')}</span>
                                             </span>
@@ -2049,8 +2049,8 @@ const Itinerary: React.FC = () => {
                                       console.log('[YATRA DEBUG] Filtered items result:', filteredItems);
                                       return filteredItems;
                                     })()}
-                                    placeholder={__('Select item...', 'Select item...')}
-                                    searchPlaceholder={__('Search items...', 'Search items...')}
+                                    placeholder={__('Select item...', 'yatra')}
+                                    searchPlaceholder={__('Search items...', 'yatra')}
                                     className="min-w-[140px]"
                                     disabled={updateItemMutation.isPending}
                                   />
@@ -2060,7 +2060,7 @@ const Itinerary: React.FC = () => {
                                       size="icon"
                                       onClick={() => handleEdit(entry)}
                                       className="h-8 w-8"
-                                      title={__('Edit Activity', 'Edit Activity')}
+                                      title={__('Edit Activity', 'yatra')}
                                     >
                                       <Pencil className="w-4 h-4" />
                                     </Button>
@@ -2071,7 +2071,7 @@ const Itinerary: React.FC = () => {
                                       size="icon"
                                       onClick={() => handleDelete(entry)}
                                       className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                      title={__('Delete', 'Delete')}
+                                      title={__('Delete', 'yatra')}
                                     >
                                       <Trash2 className="w-4 h-4" />
                                     </Button>
@@ -2095,7 +2095,7 @@ const Itinerary: React.FC = () => {
                             }}
                           >
                             <Plus className="w-4 h-4" />
-                            {__('Add Activity', 'Add Activity')}
+                            {__('Add Activity', 'yatra')}
                           </Button>
                         </ConditionalRender>
                       </div>
@@ -2116,15 +2116,15 @@ const Itinerary: React.FC = () => {
         onConfirm={handleDeleteConfirm}
         title={
           (deleteConfirm.entry as any)?._isDayDeletion
-            ? __('Delete Day', 'Delete Day')
-            : __('Delete Itinerary Entry', 'Delete Itinerary Entry')
+            ? __('Delete Day', 'yatra')
+            : __('Delete Itinerary Entry', 'yatra')
         }
         message={
           (deleteConfirm.entry as any)?._isDayDeletion
-            ? __('Are you sure you want to delete this day and all its activities? This action cannot be undone.', 'Are you sure you want to delete this day and all its activities? This action cannot be undone.')
-            : __('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'Are you sure you want to delete this itinerary entry? This action cannot be undone.')
+            ? __('Are you sure you want to delete this day and all its activities? This action cannot be undone.', 'yatra')
+            : __('Are you sure you want to delete this itinerary entry? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
+        confirmText={__('Delete', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />

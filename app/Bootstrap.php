@@ -267,10 +267,15 @@ class Bootstrap
         // Unload any existing text domain
         unload_textdomain('yatra');
         
-        // Load from WordPress language directory first
-        load_textdomain('yatra', WP_LANG_DIR . '/yatra/yatra-' . $locale . '.mo');
+        // Load from WordPress languages directory first (where Loco Translate saves files)
+        load_textdomain('yatra', WP_LANG_DIR . '/plugins/yatra-' . $locale . '.mo');
         
-        // Load from plugin directory
+        // Also check loco subdirectory
+        if (file_exists(WP_LANG_DIR . '/loco/plugins/yatra-' . $locale . '.mo')) {
+            load_textdomain('yatra', WP_LANG_DIR . '/loco/plugins/yatra-' . $locale . '.mo');
+        }
+        
+        // Load from plugin directory (fallback)
         load_plugin_textdomain('yatra', false, 'i18n/languages');
     }
 

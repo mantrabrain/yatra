@@ -21,8 +21,8 @@ interface PageHeaderProps {
  * 
  * @example
  * <PageHeader
- *   title={__('Trips', 'Trips')}
- *   description={__('Manage your travel packages', 'Manage your travel packages')}
+ *   title={__('Trips', 'yatra')}
+ *   description={__('Manage your travel packages', 'yatra')}
  *   actionCapability="yatra_edit_trips"
  *   actions={<Button>Add New</Button>}
  * />

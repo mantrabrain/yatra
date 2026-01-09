@@ -3,7 +3,7 @@ import { getCurrencySymbol, getCurrency } from '../../data/currencies';
 
 export const formatDate = (value: string | undefined | null) => {
   if (!value) {
-    return __('N/A', 'N/A');
+    return __('N/A', 'yatra');
   }
   
   try {
@@ -11,12 +11,12 @@ export const formatDate = (value: string | undefined | null) => {
     
     // Check if date is valid
     if (isNaN(date.getTime())) {
-      return __('Invalid date', 'Invalid date');
+      return __('Invalid date', 'yatra');
     }
     
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   } catch (error) {
-    return __('Invalid date', 'Invalid date');
+    return __('Invalid date', 'yatra');
   }
 };
 
@@ -53,7 +53,7 @@ export const formatPrice = (price: number) => {
   const decimalSeparator = (window as any).yatraAdmin?.decimalSeparator || '.';
   
   if (!price || price === 0) {
-    return __('Contact for pricing', 'Contact for pricing');
+    return __('Contact for pricing', 'yatra');
   }
   
   const formattedAmount = new Intl.NumberFormat(undefined, {

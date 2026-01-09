@@ -93,11 +93,11 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Recent Bookings', 'Recent Bookings')}</CardTitle>
+          <CardTitle>{__('Recent Bookings', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'Loading...')}
+            {__('Loading...', 'yatra')}
           </div>
         </CardContent>
       </Card>
@@ -107,7 +107,7 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Recent Bookings', 'Recent Bookings')}</CardTitle>
+        <CardTitle>{__('Recent Bookings', 'yatra')}</CardTitle>
       </CardHeader>
       <CardContent>
         {bookings && bookings.length > 0 ? (
@@ -156,7 +156,7 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No recent bookings', 'No recent bookings')}
+            {__('No recent bookings', 'yatra')}
           </p>
         )}
       </CardContent>

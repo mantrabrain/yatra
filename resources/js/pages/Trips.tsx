@@ -188,10 +188,10 @@ const Trips: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setIsDeleteDialogOpen(false);
       setTripToDelete(null);
-      showToast(__('Trip deleted permanently.', 'Trip deleted permanently.'), 'success');
+      showToast(__('Trip deleted permanently.', 'yatra'), 'success');
     },
     onError: () => {
-      showToast(__('Failed to delete trip. Please try again.', 'Failed to delete trip. Please try again.'), 'error');
+      showToast(__('Failed to delete trip. Please try again.', 'yatra'), 'error');
     },
   });
 
@@ -209,7 +209,7 @@ const Trips: React.FC = () => {
       return response?.data || response;
     },
     onSuccess: (data) => {
-      showToast(__('Trip created as draft. Redirecting to builder...', 'Trip created as draft. Redirecting to builder...'), 'success');
+      showToast(__('Trip created as draft. Redirecting to builder...', 'yatra'), 'success');
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setIsCreateModalOpen(false);
@@ -224,7 +224,7 @@ const Trips: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || __('Failed to create trip. Please try again.', 'Failed to create trip. Please try again.');
+      const message = error?.response?.data?.message || error?.message || __('Failed to create trip. Please try again.', 'yatra');
       setCreateTripError(message);
       showToast(message, 'error');
     },
@@ -299,13 +299,13 @@ const Trips: React.FC = () => {
   const summarizeTravelers = (trip: Trip) => {
     const { min_travelers, max_travelers } = trip;
     if (min_travelers && max_travelers) {
-      return `${min_travelers}-${max_travelers} ${__('pax', 'pax')}`;
+      return `${min_travelers}-${max_travelers} ${__('pax', 'yatra')}`;
     }
     if (min_travelers) {
-      return `${__('Min', 'Min')} ${min_travelers} ${__('pax', 'pax')}`;
+      return `${__('Min', 'yatra')} ${min_travelers} ${__('pax', 'yatra')}`;
     }
     if (max_travelers) {
-      return `${__('Up to', 'Up to')} ${max_travelers} ${__('pax', 'pax')}`;
+      return `${__('Up to', 'yatra')} ${max_travelers} ${__('pax', 'yatra')}`;
     }
     return null;
   };
@@ -404,27 +404,27 @@ const Trips: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Published', 'Published'),
+        label: __('Published', 'yatra'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       'archived': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Archived', 'Archived'),
+        label: __('Archived', 'yatra'),
       },
       'review': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Review', 'Review'),
+        label: __('Review', 'yatra'),
       },
       'approved': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Approved', 'Approved'),
+        label: __('Approved', 'yatra'),
       },
       'trash': {
         className: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -446,15 +446,15 @@ const Trips: React.FC = () => {
     const typeMap: Record<string, { className: string; label: string }> = {
       'single_day': {
         className: 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400',
-        label: __('Single Day', 'Single Day'),
+        label: __('Single Day', 'yatra'),
       },
       'multi_day': {
         className: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400',
-        label: __('Multi-Day', 'Multi-Day'),
+        label: __('Multi-Day', 'yatra'),
       },
       'flexible': {
         className: 'bg-teal-100 text-teal-700 dark:bg-teal-900/20 dark:text-teal-400',
-        label: __('Flexible', 'Flexible'),
+        label: __('Flexible', 'yatra'),
       },
     };
 
@@ -510,7 +510,7 @@ const Trips: React.FC = () => {
     const isPlainPermalink = permalinkStructure === 'plain';
 
     if (!tripSlug && !apiPermalink) {
-      showToast(__('Trip slug is missing', 'Trip slug is missing'), 'error');
+      showToast(__('Trip slug is missing', 'yatra'), 'error');
       return;
     }
 
@@ -551,17 +551,17 @@ const Trips: React.FC = () => {
   const handleCreateTripConfirm = () => {
     const title = newTripTitle.trim();
     if (!title) {
-      setCreateTripError(__('Trip title is required', 'Trip title is required'));
+      setCreateTripError(__('Trip title is required', 'yatra'));
       return;
     }
     const slugBase = isSlugManuallyEdited ? newTripSlug : generateSlug(title);
     const slug = slugBase.trim();
     if (!slug) {
-      setCreateTripError(__('Trip slug is required', 'Trip slug is required'));
+      setCreateTripError(__('Trip slug is required', 'yatra'));
       return;
     }
     if (!/^[a-z0-9-]+$/.test(slug)) {
-      setCreateTripError(__('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens'));
+      setCreateTripError(__('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra'));
       return;
     }
     setNewTripSlug(slug);
@@ -652,19 +652,19 @@ const Trips: React.FC = () => {
   };
 
   const columnOptions = [
-    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
-    { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
-    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-    { key: 'trip_type', label: __('Trip Type', 'Trip Type'), visible: visibleColumns.trip_type },
-    { key: 'duration', label: __('Duration', 'Duration'), visible: visibleColumns.duration },
-    { key: 'countries', label: __('Countries', 'Countries'), visible: visibleColumns.countries },
-    { key: 'difficulty', label: __('Difficulty', 'Difficulty'), visible: visibleColumns.difficulty },
+    { key: 'trip', label: __('Trip', 'yatra'), visible: visibleColumns.trip },
+    { key: 'price', label: __('Price', 'yatra'), visible: visibleColumns.price },
+    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+    { key: 'trip_type', label: __('Trip Type', 'yatra'), visible: visibleColumns.trip_type },
+    { key: 'duration', label: __('Duration', 'yatra'), visible: visibleColumns.duration },
+    { key: 'countries', label: __('Countries', 'yatra'), visible: visibleColumns.countries },
+    { key: 'difficulty', label: __('Difficulty', 'yatra'), visible: visibleColumns.difficulty },
     // These control which chips are shown inside the Trip column
-    { key: 'destinations', label: __('Destinations (chips)', 'Destinations (chips)'), visible: visibleColumns.destinations },
-    { key: 'activities', label: __('Activities (chips)', 'Activities (chips)'), visible: visibleColumns.activities },
-    { key: 'categories', label: __('Categories (chips)', 'Categories (chips)'), visible: visibleColumns.categories },
-    ...(isPro ? [{ key: 'bookings', label: __('Bookings', 'Bookings'), visible: visibleColumns.bookings }] : []),
-    { key: 'created', label: __('Created', 'Created'), visible: visibleColumns.created },
+    { key: 'destinations', label: __('Destinations (chips)', 'yatra'), visible: visibleColumns.destinations },
+    { key: 'activities', label: __('Activities (chips)', 'yatra'), visible: visibleColumns.activities },
+    { key: 'categories', label: __('Categories (chips)', 'yatra'), visible: visibleColumns.categories },
+    ...(isPro ? [{ key: 'bookings', label: __('Bookings', 'yatra'), visible: visibleColumns.bookings }] : []),
+    { key: 'created', label: __('Created', 'yatra'), visible: visibleColumns.created },
   ];
 
   // Selection helpers for shared table
@@ -710,13 +710,13 @@ const Trips: React.FC = () => {
   }, [statsData]);
 
   const statusOptions = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-    { key: 'review', label: __('Review', 'Review'), count: statusCounts.review },
-    { key: 'approved', label: __('Approved', 'Approved'), count: statusCounts.approved },
-    { key: 'archived', label: __('Archived', 'Archived'), count: statusCounts.archived },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+    { key: 'review', label: __('Review', 'yatra'), count: statusCounts.review },
+    { key: 'approved', label: __('Approved', 'yatra'), count: statusCounts.approved },
+    { key: 'archived', label: __('Archived', 'yatra'), count: statusCounts.archived },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
   ];
 
   // Bulk action options (status + delete)
@@ -724,18 +724,18 @@ const Trips: React.FC = () => {
     // In Trash view: allow restore to Draft and permanent delete only
     if (statusFilter === 'trash') {
       return [
-        { value: 'mark_draft', label: __('Restore to Draft', 'Restore to Draft') },
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'mark_draft', label: __('Restore to Draft', 'yatra') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     // Other views: normal status changes + move to trash + delete
     return [
-      { value: 'mark_publish', label: __('Mark as Published', 'Mark as Published') },
-      { value: 'mark_draft', label: __('Mark as Draft', 'Mark as Draft') },
-      { value: 'mark_archived', label: __('Archive', 'Archive') },
-      { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
-      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      { value: 'mark_publish', label: __('Mark as Published', 'yatra') },
+      { value: 'mark_draft', label: __('Mark as Draft', 'yatra') },
+      { value: 'mark_archived', label: __('Archive', 'yatra') },
+      { value: 'mark_trash', label: __('Move to Trash', 'yatra') },
+      { value: 'delete', label: __('Delete Permanently', 'yatra') },
     ];
   }, [statusFilter]);
 
@@ -744,13 +744,13 @@ const Trips: React.FC = () => {
     if (!bulkAction || selectedIds.length === 0) return;
 
     const confirmMessages: Record<string, string> = {
-      delete: __('Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.', 'Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.').replace('{count}', selectedIds.length.toString()),
-      mark_published: __('Mark {count} trip(s) as Published?', 'Mark {count} trip(s) as Published?').replace('{count}', selectedIds.length.toString()),
+      delete: __('Are you sure you want to permanently delete {count} trip(s)? This cannot be undone.', 'yatra').replace('{count}', selectedIds.length.toString()),
+      mark_published: __('Mark {count} trip(s) as Published?', 'yatra').replace('{count}', selectedIds.length.toString()),
       mark_draft: statusFilter === 'trash'
-        ? __('Restore {count} trip(s) to Draft?', 'Restore {count} trip(s) to Draft?').replace('{count}', selectedIds.length.toString())
-        : __('Mark {count} trip(s) as Draft?', 'Mark {count} trip(s) as Draft?').replace('{count}', selectedIds.length.toString()),
-      mark_archived: __('Archive {count} trip(s)?', 'Archive {count} trip(s)?').replace('{count}', selectedIds.length.toString()),
-      mark_trash: __('Move {count} trip(s) to Trash?', 'Move {count} trip(s) to Trash?').replace('{count}', selectedIds.length.toString()),
+        ? __('Restore {count} trip(s) to Draft?', 'yatra').replace('{count}', selectedIds.length.toString())
+        : __('Mark {count} trip(s) as Draft?', 'yatra').replace('{count}', selectedIds.length.toString()),
+      mark_archived: __('Archive {count} trip(s)?', 'yatra').replace('{count}', selectedIds.length.toString()),
+      mark_trash: __('Move {count} trip(s) to Trash?', 'yatra').replace('{count}', selectedIds.length.toString()),
     };
 
     const message = confirmMessages[bulkAction];
@@ -759,20 +759,20 @@ const Trips: React.FC = () => {
     try {
       if (bulkAction === 'delete') {
         await Promise.all(selectedIds.map(id => apiClient.delete(`/trips/${id}/permanent-delete`)));
-        showToast(__('Trips deleted permanently', 'Trips deleted permanently'), 'success');
+        showToast(__('Trips deleted permanently', 'yatra'), 'success');
       } else if (bulkAction.startsWith('mark_')) {
         const status = bulkAction.replace('mark_', '');
         // Only update trips that are currently loaded in this page
         const selectedTrips = trips.filter((trip: Trip) => selectedIds.includes(trip.id));
         await Promise.all(selectedTrips.map((trip: Trip) => updateTripStatus(trip, status)));
-        showToast(__('Trip status updated successfully', 'Trip status updated successfully'), 'success');
+        showToast(__('Trip status updated successfully', 'yatra'), 'success');
       }
       queryClient.invalidateQueries({ queryKey: ['trips'] });
       queryClient.invalidateQueries({ queryKey: ['trips-stats'] });
       setSelectedIds([]);
       setBulkAction('');
     } catch (error) {
-      showToast(__('Bulk action failed', 'Bulk action failed'), 'error');
+      showToast(__('Bulk action failed', 'yatra'), 'error');
     }
   };
 
@@ -782,7 +782,7 @@ const Trips: React.FC = () => {
 
     cols.push({
       key: 'title',
-      label: __('Trip', 'Trip'),
+      label: __('Trip', 'yatra'),
       sortable: true,
       visible: visibleColumns.trip,
       width: 'w-[300px]',
@@ -811,7 +811,7 @@ const Trips: React.FC = () => {
                       handleView(trip);
                     }}
                     className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                    title={__('View trip in new tab', 'View trip in new tab')}
+                    title={__('View trip in new tab', 'yatra')}
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
                   </button>
@@ -824,7 +824,7 @@ const Trips: React.FC = () => {
               {(() => {
                 const destinationLabel = summarizeDestinations(trip);
                 const durationLabel = trip.duration_days
-                  ? `${trip.duration_days}${__('d', 'd')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'n')}` : ''}`
+                  ? `${trip.duration_days}${__('d', 'yatra')}${trip.duration_nights ? ` / ${trip.duration_nights}${__('n', 'yatra')}` : ''}`
                   : null;
                 const travelerLabel = summarizeTravelers(trip);
                 const categoryLabel = summarizeCategories(trip);
@@ -856,11 +856,11 @@ const Trips: React.FC = () => {
             </div>
             {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
               <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                {trip.featured_priority === 'featured' ? __('Featured', 'Featured') :
-                 trip.featured_priority === 'popular' ? __('Popular', 'Popular') :
-                 trip.featured_priority === 'new' ? __('New', 'New') :
-                 trip.featured_priority === 'limited' ? __('Limited', 'Limited') :
-                 trip.featured_priority === 'bestseller' ? __('Bestseller', 'Bestseller') :
+                {trip.featured_priority === 'featured' ? __('Featured', 'yatra') :
+                 trip.featured_priority === 'popular' ? __('Popular', 'yatra') :
+                 trip.featured_priority === 'new' ? __('New', 'yatra') :
+                 trip.featured_priority === 'limited' ? __('Limited', 'yatra') :
+                 trip.featured_priority === 'bestseller' ? __('Bestseller', 'yatra') :
                  trip.featured_priority}
               </Badge>
             )}
@@ -871,7 +871,7 @@ const Trips: React.FC = () => {
 
     cols.push({
       key: 'price',
-      label: __('Price', 'Price'),
+      label: __('Price', 'yatra'),
       sortable: true,
       visible: visibleColumns.price,
       render: (trip: Trip) => (
@@ -881,7 +881,7 @@ const Trips: React.FC = () => {
 
     cols.push({
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       visible: visibleColumns.status,
       render: (trip: Trip) => getStatusBadge(trip.status),
@@ -889,7 +889,7 @@ const Trips: React.FC = () => {
 
     cols.push({
       key: 'trip_type',
-      label: __('Trip Type', 'Trip Type'),
+      label: __('Trip Type', 'yatra'),
       sortable: true,
       visible: visibleColumns.trip_type,
       render: (trip: Trip) => getTripTypeBadge(trip.trip_type),
@@ -898,13 +898,13 @@ const Trips: React.FC = () => {
     // Duration column (days / nights)
     cols.push({
       key: 'duration',
-      label: __('Duration', 'Duration'),
+      label: __('Duration', 'yatra'),
       sortable: false,
       visible: visibleColumns.duration,
       render: (trip: Trip) => {
         if (!trip.duration_days && !trip.duration_nights) return null;
-        const days = trip.duration_days ? `${trip.duration_days} ${__('days', 'days')}` : '';
-        const nights = trip.duration_nights ? `${trip.duration_nights} ${__('nights', 'nights')}` : '';
+        const days = trip.duration_days ? `${trip.duration_days} ${__('days', 'yatra')}` : '';
+        const nights = trip.duration_nights ? `${trip.duration_nights} ${__('nights', 'yatra')}` : '';
         const label = [days, nights].filter(Boolean).join(' / ');
         return <span className="text-sm text-gray-700 dark:text-gray-300">{label}</span>;
       },
@@ -913,7 +913,7 @@ const Trips: React.FC = () => {
     // Countries column
     cols.push({
       key: 'countries',
-      label: __('Countries', 'Countries'),
+      label: __('Countries', 'yatra'),
       sortable: false,
       visible: visibleColumns.countries,
       render: (trip: Trip) => {
@@ -926,7 +926,7 @@ const Trips: React.FC = () => {
     // Difficulty column (from difficulty_level)
     cols.push({
       key: 'difficulty',
-      label: __('Difficulty', 'Difficulty'),
+      label: __('Difficulty', 'yatra'),
       sortable: false,
       visible: visibleColumns.difficulty,
       render: (trip: Trip) => {
@@ -942,7 +942,7 @@ const Trips: React.FC = () => {
     if (isPro) {
       cols.push({
         key: 'bookings',
-        label: __('Bookings', 'Bookings'),
+        label: __('Bookings', 'yatra'),
         sortable: false,
         visible: visibleColumns.bookings,
         render: (trip: Trip) => (
@@ -953,7 +953,7 @@ const Trips: React.FC = () => {
 
     cols.push({
       key: 'date',
-      label: __('Created', 'Created'),
+      label: __('Created', 'yatra'),
       sortable: true,
       visible: visibleColumns.created,
       render: (trip: Trip) => (
@@ -989,7 +989,7 @@ const Trips: React.FC = () => {
     if (can('yatra_view_trips')) {
       actions.push({
         key: 'view',
-        label: __('View (frontend)', 'View (frontend)'),
+        label: __('View (frontend)', 'yatra'),
         icon: <ExternalLink className="w-4 h-4" />,
         onClick: (trip: Trip) => handleView(trip),
         condition: (trip: Trip) => trip.status !== 'trash', // Hide for trash trips
@@ -999,14 +999,14 @@ const Trips: React.FC = () => {
     // Availability / recurring quick links
     actions.push({
       key: 'view-availability',
-      label: __('View Availability', 'View Availability'),
+      label: __('View Availability', 'yatra'),
       icon: <Calendar className="w-4 h-4" />,
       onClick: (trip: Trip) => navigateToAvailability(trip),
     });
 
     actions.push({
       key: 'view-recurring',
-      label: __('View Recurring Rules', 'View Recurring Rules'),
+      label: __('View Recurring Rules', 'yatra'),
       icon: <RefreshCw className="w-4 h-4" />,
       onClick: (trip: Trip) => navigateToRecurringRules(trip),
     });
@@ -1015,7 +1015,7 @@ const Trips: React.FC = () => {
     if (can('yatra_edit_trips')) {
       actions.push({
         key: 'edit',
-        label: __('Edit', 'Edit'),
+        label: __('Edit', 'yatra'),
         icon: <Edit className="w-4 h-4" />,
         onClick: (trip: Trip) => handleEdit(trip),
       });
@@ -1023,20 +1023,20 @@ const Trips: React.FC = () => {
       // Duplicate trip as draft
       actions.push({
         key: 'duplicate',
-        label: __('Duplicate', 'Duplicate'),
+        label: __('Duplicate', 'yatra'),
         icon: <Copy className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           try {
             await apiClient.post(`/trips/${trip.id}/duplicate`);
             showToast(
-              __('Trip duplicated as draft.', 'Trip duplicated as draft.'),
+              __('Trip duplicated as draft.', 'yatra'),
               'success'
             );
             queryClient.invalidateQueries({ queryKey: ['trips'] });
           } catch (error) {
             console.error('Failed to duplicate trip', error);
             showToast(
-              __('Failed to duplicate trip.', 'Failed to duplicate trip.'),
+              __('Failed to duplicate trip.', 'yatra'),
               'error'
             );
           }
@@ -1046,11 +1046,11 @@ const Trips: React.FC = () => {
       // Status-based actions
       actions.push({
         key: 'publish',
-        label: __('Mark as Published', 'Mark as Published'),
+        label: __('Mark as Published', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           await updateTripStatus(trip, 'publish');
-          showToast(__('Trip marked as published.', 'Trip marked as published.'), 'success');
+          showToast(__('Trip marked as published.', 'yatra'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
         condition: (trip: Trip) => trip.status !== 'publish' && trip.status !== 'trash',
@@ -1058,11 +1058,11 @@ const Trips: React.FC = () => {
 
       actions.push({
         key: 'draft',
-        label: __('Mark as Draft', 'Mark as Draft'),
+        label: __('Mark as Draft', 'yatra'),
         icon: <ArrowDown className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           await updateTripStatus(trip, 'draft');
-          showToast(__('Trip marked as draft.', 'Trip marked as draft.'), 'success');
+          showToast(__('Trip marked as draft.', 'yatra'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
         condition: (trip: Trip) => trip.status !== 'draft' && trip.status !== 'trash',
@@ -1070,11 +1070,11 @@ const Trips: React.FC = () => {
 
       actions.push({
         key: 'archive',
-        label: __('Archive', 'Archive'),
+        label: __('Archive', 'yatra'),
         icon: <Archive className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           await updateTripStatus(trip, 'archived');
-          showToast(__('Trip archived.', 'Trip archived.'), 'success');
+          showToast(__('Trip archived.', 'yatra'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
         condition: (trip: Trip) => trip.status !== 'archived' && trip.status !== 'trash',
@@ -1082,11 +1082,11 @@ const Trips: React.FC = () => {
 
       actions.push({
         key: 'trash',
-        label: __('Move to Trash', 'Move to Trash'),
+        label: __('Move to Trash', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           await updateTripStatus(trip, 'trash');
-          showToast(__('Trip moved to trash.', 'Trip moved to trash.'), 'success');
+          showToast(__('Trip moved to trash.', 'yatra'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
         condition: (trip: Trip) => trip.status !== 'trash',
@@ -1094,11 +1094,11 @@ const Trips: React.FC = () => {
 
       actions.push({
         key: 'restore',
-        label: __('Restore to Draft', 'Restore to Draft'),
+        label: __('Restore to Draft', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: async (trip: Trip) => {
           await updateTripStatus(trip, 'draft');
-          showToast(__('Trip restored to draft.', 'Trip restored to draft.'), 'success');
+          showToast(__('Trip restored to draft.', 'yatra'), 'success');
           queryClient.invalidateQueries({ queryKey: ['trips'] });
         },
         condition: (trip: Trip) => trip.status === 'trash',
@@ -1109,7 +1109,7 @@ const Trips: React.FC = () => {
     if (can('yatra_delete_trips')) {
       actions.push({
         key: 'delete',
-        label: __('Delete Permanently', 'Delete Permanently'),
+        label: __('Delete Permanently', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (trip: Trip) => handleDelete(trip),
         variant: 'destructive' as const,
@@ -1124,8 +1124,8 @@ const Trips: React.FC = () => {
     <>
     <div className="space-y-3">
       <PageHeader
-        title={__('All Trips', 'All Trips')}
-        description={__('Manage your travel packages and tours. Create, edit, and organize all your trips in one place.', 'Manage your travel packages and tours. Create, edit, and organize all your trips in one place.')}
+        title={__('All Trips', 'yatra')}
+        description={__('Manage your travel packages and tours. Create, edit, and organize all your trips in one place.', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <div className="flex items-center gap-2">
@@ -1139,12 +1139,12 @@ const Trips: React.FC = () => {
                 variant="outline" 
                 className="text-xs"
               >
-                Refresh Data
+                {__('Refresh Data', 'yatra')}
               </Button>
             )}
             <Button onClick={handleCreateTrip} className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              {__('Add New Trip', 'Add New Trip')}
+              {__('Add New Trip', 'yatra')}
             </Button>
           </div>
         }
@@ -1155,7 +1155,7 @@ const Trips: React.FC = () => {
         <CardContent className="p-4">
           <div className="mb-3">
             <HelpText 
-              text={__('Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort.', 'Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort.')}
+              text={__('Use the search box to find trips by name. Use filters to show only published, draft, or other status trips. Click column headers to sort.', 'yatra')}
             />
           </div>
           <div className="flex flex-col lg:flex-row gap-3 items-stretch lg:items-center w-full">
@@ -1164,11 +1164,11 @@ const Trips: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
               <Input
                 type="text"
-                placeholder={__('Search by trip name...', 'Search by trip name...')}
+                placeholder={__('Search by trip name...', 'yatra')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-full"
-                title={__('Type to search for trips by name', 'Type to search for trips by name')}
+                title={__('Type to search for trips by name', 'yatra')}
               />
             </div>
 
@@ -1179,13 +1179,13 @@ const Trips: React.FC = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full"
               >
-                <option value="all">{__('All Status', 'All Status')}</option>
-                <option value="publish">{__('Published', 'Published')}</option>
-                <option value="draft">{__('Draft', 'Draft')}</option>
-                <option value="review">{__('Review', 'Review')}</option>
-                <option value="approved">{__('Approved', 'Approved')}</option>
-                <option value="archived">{__('Archived', 'Archived')}</option>
-                <option value="trash">{__('Trash', 'Trash')}</option>
+                <option value="all">{__('All Status', 'yatra')}</option>
+                <option value="publish">{__('Published', 'yatra')}</option>
+                <option value="draft">{__('Draft', 'yatra')}</option>
+                <option value="review">{__('Review', 'yatra')}</option>
+                <option value="approved">{__('Approved', 'yatra')}</option>
+                <option value="archived">{__('Archived', 'yatra')}</option>
+                <option value="trash">{__('Trash', 'yatra')}</option>
               </Select>
             </div>
 
@@ -1196,10 +1196,10 @@ const Trips: React.FC = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="w-full"
               >
-                <option value="title">{__('Title', 'Title')}</option>
-                <option value="price">{__('Price', 'Price')}</option>
-                <option value="date">{__('Date', 'Date')}</option>
-                <option value="status">{__('Status', 'Status')}</option>
+                <option value="title">{__('Title', 'yatra')}</option>
+                <option value="price">{__('Price', 'yatra')}</option>
+                <option value="date">{__('Date', 'yatra')}</option>
+                <option value="status">{__('Status', 'yatra')}</option>
               </Select>
             </div>
 
@@ -1209,14 +1209,14 @@ const Trips: React.FC = () => {
                 variant="outline"
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                 className="px-4 flex items-center gap-2 w-full lg:w-auto"
-                title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+                title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
               >
                 {sortOrder === 'asc' ? (
                   <ArrowUp className="w-4 h-4" />
                 ) : (
                   <ArrowDown className="w-4 h-4" />
                 )}
-                <span className="text-sm whitespace-nowrap">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+                <span className="text-sm whitespace-nowrap">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
               </Button>
             </div>
 
@@ -1229,7 +1229,7 @@ const Trips: React.FC = () => {
                   className="flex items-center gap-2 w-full lg:w-auto"
                 >
                   <X className="w-4 h-4" />
-                  <span className="text-sm">{__('Reset', 'Reset')}</span>
+                  <span className="text-sm">{__('Reset', 'yatra')}</span>
                 </Button>
               </div>
             )}
@@ -1269,7 +1269,7 @@ const Trips: React.FC = () => {
               actions={tableActions}
               isLoading={isLoading}
               isError={!!error}
-              errorText={__('Error Loading Trips', 'Error Loading Trips')}
+              errorText={__('Error Loading Trips', 'yatra')}
               errorDescription={__(
                 'We couldn’t connect to the trips service. Please refresh or try again shortly.',
                 'We couldn’t connect to the trips service. Please refresh or try again shortly.'
@@ -1278,11 +1278,11 @@ const Trips: React.FC = () => {
               errorDetails={errorContext.details}
               errorRequestInfo={errorContext.requestInfo}
               emptyText={searchTerm || statusFilter !== 'all'
-                ? __('No trips match your search', 'No trips match your search')
-                : __('No trips yet', 'No trips yet')}
+                ? __('No trips match your search', 'yatra')
+                : __('No trips yet', 'yatra')}
               emptyDescription={searchTerm || statusFilter !== 'all'
-                ? __('Try adjusting your search or filters to see more results.', 'Try adjusting your search or filters to see more results.')
-                : __('Get started by creating your first travel package. Click the button above to add a new trip.', 'Get started by creating your first travel package. Click the button above to add a new trip.')}
+                ? __('Try adjusting your search or filters to see more results.', 'yatra')
+                : __('Get started by creating your first travel package. Click the button above to add a new trip.', 'yatra')}
               onCreateClick={!searchTerm && statusFilter === 'all' ? handleCreateTrip : undefined}
               onSort={handleSort}
               getSortIcon={getSortIcon}
@@ -1304,7 +1304,7 @@ const Trips: React.FC = () => {
               totalItems={total}
               itemsPerPage={itemsPerPage}
               onPageChange={setPage}
-              itemName={__('trips', 'trips')}
+              itemName={__('trips', 'yatra')}
             />
           </div>
         )}
@@ -1328,7 +1328,7 @@ const Trips: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Create Trip Draft', 'Create Trip Draft')}
+                {__('Create Trip Draft', 'yatra')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 {__('Give your trip a name. We\'ll create a draft and take you to the builder.', 'Give your trip a name. We\'ll create a draft and take you to the builder.')}
@@ -1350,12 +1350,12 @@ const Trips: React.FC = () => {
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                {__('Trip Title', 'Trip Title')}
+                {__('Trip Title', 'yatra')}
               </label>
               <Input
                 value={newTripTitle}
                 onChange={(e) => handleNewTripTitleChange(e.target.value)}
-                placeholder={__('e.g., Bali Beach Retreat', 'e.g., Bali Beach Retreat')}
+                placeholder={__('e.g., Bali Beach Retreat', 'yatra')}
                 disabled={createTripMutation.isPending}
                 className="text-base"
               />
@@ -1363,8 +1363,8 @@ const Trips: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                  {__('Trip Slug', 'Trip Slug')}
-                  <span className="text-[10px] font-normal text-gray-400">{__('(URL friendly)', '(URL friendly)')}</span>
+                  {__('Trip Slug', 'yatra')}
+                  <span className="text-[10px] font-normal text-gray-400">{__('(URL friendly)', 'yatra')}</span>
                 </label>
                 {!isSlugManuallyEdited && (
                   <button
@@ -1372,22 +1372,22 @@ const Trips: React.FC = () => {
                     onClick={enableSlugEditing}
                     className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                   >
-                    {__('Customize URL', 'Customize URL')}
+                    {__('Customize URL', 'yatra')}
                   </button>
                 )}
               </div>
               <Input
                 value={newTripSlug}
                 onChange={(e) => handleNewTripSlugChange(e.target.value)}
-                placeholder={__('bali-beach-retreat', 'bali-beach-retreat')}
+                placeholder={__('bali-beach-retreat', 'yatra')}
                 disabled={createTripMutation.isPending}
                 readOnly={!isSlugManuallyEdited}
                 className={`font-mono text-sm ${!isSlugManuallyEdited ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''}`}
               />
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {isSlugManuallyEdited
-                  ? __('Editing slug manually. Keep it short, lowercase, and hyphen-separated.', 'Editing slug manually. Keep it short, lowercase, and hyphen-separated.')
-                  : __('Auto-generated from the title. Click "Customize URL" if you need a custom slug.', 'Auto-generated from the title. Click "Customize URL" if you need a custom slug.')}
+                  ? __('Editing slug manually. Keep it short, lowercase, and hyphen-separated.', 'yatra')
+                  : __('Auto-generated from the title. Click "Customize URL" if you need a custom slug.', 'yatra')}
               </p>
               {(newTripSlug || newTripTitle) && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
@@ -1413,7 +1413,7 @@ const Trips: React.FC = () => {
               }}
               disabled={createTripMutation.isPending}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button
               onClick={handleCreateTripConfirm}
@@ -1423,7 +1423,7 @@ const Trips: React.FC = () => {
               {createTripMutation.isPending && (
                 <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               )}
-              {createTripMutation.isPending ? __('Creating…', 'Creating…') : __('Create & Continue', 'Create & Continue')}
+              {createTripMutation.isPending ? __('Creating…', 'yatra') : __('Create & Continue', 'yatra')}
             </Button>
           </div>
         </div>
@@ -1444,12 +1444,12 @@ const Trips: React.FC = () => {
           deleteMutation.mutate(tripToDelete.id);
         }
       }}
-      title={__('Delete Trip Permanently', 'Delete Trip Permanently')}
+      title={__('Delete Trip Permanently', 'yatra')}
       message={tripToDelete
-        ? __('Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.', 'Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.').replace('{title}', tripToDelete.title)
+        ? __('Are you sure you want to permanently delete "{title}"? This cannot be undone and will remove all associated bookings.', 'yatra').replace('{title}', tripToDelete.title)
         : ''}
-      confirmText={__('Delete Permanently', 'Delete Permanently')}
-      cancelText={__('Cancel', 'Cancel')}
+      confirmText={__('Delete Permanently', 'yatra')}
+      cancelText={__('Cancel', 'yatra')}
       variant="danger"
       isLoading={deleteMutation.isPending}
     />

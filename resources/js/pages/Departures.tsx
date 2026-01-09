@@ -312,24 +312,24 @@ const Departures: React.FC = () => {
   }, [departuresStatsData]);
 
   const statusOptions = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-    { key: 'upcoming', label: __('Upcoming', 'Upcoming'), count: statusCounts.upcoming },
-    { key: 'full', label: __('Full', 'Full'), count: statusCounts.full },
-    { key: 'past', label: __('Past', 'Past'), count: statusCounts.past },
-    { key: 'cancelled', label: __('Cancelled', 'Cancelled'), count: statusCounts.cancelled },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+    { key: 'upcoming', label: __('Upcoming', 'yatra'), count: statusCounts.upcoming },
+    { key: 'full', label: __('Full', 'yatra'), count: statusCounts.full },
+    { key: 'past', label: __('Past', 'yatra'), count: statusCounts.past },
+    { key: 'cancelled', label: __('Cancelled', 'yatra'), count: statusCounts.cancelled },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
   ];
 
   const bulkActionOptions = useMemo(
     () => {
       if (statusFilter === 'trash') {
         return [
-          { value: 'restore', label: __('Restore', 'Restore') },
-          { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+          { value: 'restore', label: __('Restore', 'yatra') },
+          { value: 'delete', label: __('Delete Permanently', 'yatra') },
         ];
       }
       return [
-        { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
+        { value: 'trash', label: __('Move to Trash', 'yatra') },
       ];
     },
     [statusFilter]
@@ -340,14 +340,14 @@ const Departures: React.FC = () => {
 
     if (!bulkAction || ids.length === 0) {
       showToast(
-        __('Please select departures and a bulk action first.', 'Please select departures and a bulk action first.'),
+        __('Please select departures and a bulk action first.', 'yatra'),
         'error'
       );
       return;
     }
 
     if (!selectedTripId) {
-      showToast(__('Please select a trip first', 'Please select a trip first'), 'error');
+      showToast(__('Please select a trip first', 'yatra'), 'error');
       return;
     }
 
@@ -362,7 +362,7 @@ const Departures: React.FC = () => {
           )
         );
         showToast(
-          __('Selected departures moved to trash.', 'Selected departures moved to trash.'),
+          __('Selected departures moved to trash.', 'yatra'),
           'success'
         );
       } else if (bulkAction === 'restore') {
@@ -375,7 +375,7 @@ const Departures: React.FC = () => {
           )
         );
         showToast(
-          __('Selected departures restored.', 'Selected departures restored.'),
+          __('Selected departures restored.', 'yatra'),
           'success'
         );
       } else if (bulkAction === 'delete') {
@@ -405,7 +405,7 @@ const Departures: React.FC = () => {
           )
         );
         showToast(
-          __('Selected departures deleted permanently.', 'Selected departures deleted permanently.'),
+          __('Selected departures deleted permanently.', 'yatra'),
           'success'
         );
       }
@@ -432,15 +432,15 @@ const Departures: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
-      showToast(__('Departure deleted successfully', 'Departure deleted successfully'), 'success');
+      showToast(__('Departure deleted successfully', 'yatra'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete departure', 'Failed to delete departure'), 'error');
+      showToast(error?.message || __('Failed to delete departure', 'yatra'), 'error');
     },
   });
 
   const handleDelete = (id: number) => {
-    if (!confirm(__('Are you sure you want to delete this departure?', 'Are you sure you want to delete this departure?'))) {
+    if (!confirm(__('Are you sure you want to delete this departure?', 'yatra'))) {
       return;
     }
     deleteMutation.mutate(id);
@@ -464,11 +464,11 @@ const Departures: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; className: string }> = {
-      upcoming: { label: __('Upcoming', 'Upcoming'), className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
-      full: { label: __('Full', 'Full'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
-      past: { label: __('Past', 'Past'), className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400' },
-      cancelled: { label: __('Cancelled', 'Cancelled'), className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' },
-      trash: { label: __('Trash', 'Trash'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
+      upcoming: { label: __('Upcoming', 'yatra'), className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400' },
+      full: { label: __('Full', 'yatra'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
+      past: { label: __('Past', 'yatra'), className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400' },
+      cancelled: { label: __('Cancelled', 'yatra'), className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400' },
+      trash: { label: __('Trash', 'yatra'), className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400' },
     };
 
     const statusInfo = statusMap[status] || statusMap.upcoming;
@@ -482,14 +482,14 @@ const Departures: React.FC = () => {
 
   const getSourceBadge = (source: string) => {
     if (source === 'manual') {
-      return <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">{__('Manual', 'Manual')}</Badge>;
+      return <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">{__('Manual', 'yatra')}</Badge>;
     }
-    return <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">{__('Booking Created', 'Booking Created')}</Badge>;
+    return <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">{__('Booking Created', 'yatra')}</Badge>;
   };
 
   const navigateToAdd = () => {
     if (!selectedTripId) {
-      showToast(__('Please select a trip first', 'Please select a trip first'), 'error');
+      showToast(__('Please select a trip first', 'yatra'), 'error');
       return;
     }
     window.location.href = `?page=yatra&subpage=departures&action=create&trip_id=${selectedTripId}`;
@@ -523,14 +523,14 @@ const Departures: React.FC = () => {
     () => [
       {
         key: 'trip',
-        label: __('Trip', 'Trip'),
+        label: __('Trip', 'yatra'),
         visible: visibleColumns.trip,
         render: (departure: Departure) =>
           departure.trip?.title ? (
             <a
               href={`?page=yatra&subpage=trips&action=edit&id=${departure.trip.id}`}
               className="text-blue-600 hover:text-blue-800 hover:underline"
-              title={__('View trip', 'View trip')}
+              title={__('View trip', 'yatra')}
             >
               {departure.trip.title}
             </a>
@@ -540,14 +540,14 @@ const Departures: React.FC = () => {
       },
       {
         key: 'date',
-        label: __('Date', 'Date'),
+        label: __('Date', 'yatra'),
         visible: visibleColumns.date,
         render: (departure: Departure) =>
           formatDate(departure.start_date || departure.date),
       },
       {
         key: 'time',
-        label: __('Time', 'Time'),
+        label: __('Time', 'yatra'),
         visible: visibleColumns.time,
         render: (departure: Departure) =>
           departure.time ? (
@@ -558,32 +558,32 @@ const Departures: React.FC = () => {
       },
       {
         key: 'capacity',
-        label: __('Capacity', 'Capacity'),
+        label: __('Capacity', 'yatra'),
         visible: visibleColumns.capacity,
         render: (departure: Departure) => (
-          <span title={__('Max Capacity', 'Max Capacity')}>
+          <span title={__('Max Capacity', 'yatra')}>
             {departure.max_capacity}
           </span>
         ),
       },
       {
         key: 'booked',
-        label: __('Booked', 'Booked'),
+        label: __('Booked', 'yatra'),
         visible: visibleColumns.booked,
         render: (departure: Departure) => (
-          <span title={__('Booked Count', 'Booked Count')}>
+          <span title={__('Booked Count', 'yatra')}>
             {departure.booked_count}
           </span>
         ),
       },
       {
         key: 'available',
-        label: __('Available', 'Available'),
+        label: __('Available', 'yatra'),
         visible: visibleColumns.available,
         render: (departure: Departure) => (
           <span
             className={departure.available_capacity === 0 ? 'text-red-600 font-semibold' : ''}
-            title={__('Available Capacity', 'Available Capacity')}
+            title={__('Available Capacity', 'yatra')}
           >
             {departure.available_capacity}
           </span>
@@ -591,7 +591,7 @@ const Departures: React.FC = () => {
       },
       {
         key: 'revenue',
-        label: __('Revenue', 'Revenue'),
+        label: __('Revenue', 'yatra'),
         visible: visibleColumns.revenue,
         render: (departure: Departure) =>
           departure.total_revenue !== undefined && departure.total_revenue > 0 ? (
@@ -604,7 +604,7 @@ const Departures: React.FC = () => {
       },
       {
         key: 'travelers',
-        label: __('Travelers', 'Travelers'),
+        label: __('Travelers', 'yatra'),
         visible: visibleColumns.travelers,
         render: (departure: Departure) => (
           <Button
@@ -615,13 +615,13 @@ const Departures: React.FC = () => {
             className="px-3 py-1.5"
           >
             {departure.travelers_count || departure.travelers?.length || 0}{' '}
-            {__('Traveler(s)', 'Traveler(s)')}
+            {__('Traveler(s)', 'yatra')}
           </Button>
         ),
       },
       {
         key: 'bookings',
-        label: __('Bookings', 'Bookings'),
+        label: __('Bookings', 'yatra'),
         visible: visibleColumns.bookings,
         render: (departure: Departure) =>
           departure.booking_ids && departure.booking_ids.length > 0 ? (
@@ -631,7 +631,7 @@ const Departures: React.FC = () => {
                   key={bookingId}
                   href={`?page=yatra&subpage=bookings&action=view&id=${bookingId}`}
                   className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
-                  title={__('View booking', 'View booking')}
+                  title={__('View booking', 'yatra')}
                 >
                   #{bookingId}
                 </a>
@@ -648,13 +648,13 @@ const Departures: React.FC = () => {
       },
       {
         key: 'status',
-        label: __('Status', 'Status'),
+        label: __('Status', 'yatra'),
         visible: visibleColumns.status,
         render: (departure: Departure) => getStatusBadge(departure.status),
       },
       {
         key: 'source',
-        label: __('Source', 'Source'),
+        label: __('Source', 'yatra'),
         visible: visibleColumns.source,
         render: (departure: Departure) => getSourceBadge(departure.source),
       },
@@ -664,35 +664,35 @@ const Departures: React.FC = () => {
 
   const handleMoveToTrash = async (departure: Departure) => {
     if (!selectedTripId) return;
-    if (!window.confirm(__('Are you sure you want to move this departure to trash?', 'Are you sure you want to move this departure to trash?'))) {
+    if (!window.confirm(__('Are you sure you want to move this departure to trash?', 'yatra'))) {
       return;
     }
     try {
       await apiClient.patch(`/trips/${selectedTripId}/departures/${departure.id}`, {
         status: 'trash',
       });
-      showToast(__('Departure moved to trash.', 'Departure moved to trash.'), 'success');
+      showToast(__('Departure moved to trash.', 'yatra'), 'success');
       queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
       queryClient.invalidateQueries({ queryKey: ['departures-stats', selectedTripId] });
     } catch (error: any) {
-      showToast(error?.message || __('Failed to move departure to trash', 'Failed to move departure to trash'), 'error');
+      showToast(error?.message || __('Failed to move departure to trash', 'yatra'), 'error');
     }
   };
 
   const handleRestore = async (departure: Departure) => {
     if (!selectedTripId) return;
-    if (!window.confirm(__('Are you sure you want to restore this departure?', 'Are you sure you want to restore this departure?'))) {
+    if (!window.confirm(__('Are you sure you want to restore this departure?', 'yatra'))) {
       return;
     }
     try {
       await apiClient.patch(`/trips/${selectedTripId}/departures/${departure.id}`, {
         status: 'upcoming',
       });
-      showToast(__('Departure restored.', 'Departure restored.'), 'success');
+      showToast(__('Departure restored.', 'yatra'), 'success');
       queryClient.invalidateQueries({ queryKey: ['departures', selectedTripId] });
       queryClient.invalidateQueries({ queryKey: ['departures-stats', selectedTripId] });
     } catch (error: any) {
-      showToast(error?.message || __('Failed to restore departure', 'Failed to restore departure'), 'error');
+      showToast(error?.message || __('Failed to restore departure', 'yatra'), 'error');
     }
   };
 
@@ -701,13 +701,13 @@ const Departures: React.FC = () => {
       const actions = [
         {
           key: 'view',
-          label: __('View', 'View'),
+          label: __('View', 'yatra'),
           icon: <Eye className="w-4 h-4" />,
           onClick: (departure: Departure) => navigateToView(departure.id),
         },
         {
           key: 'edit',
-          label: __('Edit', 'Edit'),
+          label: __('Edit', 'yatra'),
           icon: <Edit className="w-4 h-4" />,
           onClick: (departure: Departure) => navigateToEdit(departure.id),
           condition: (departure: Departure) => departure.status !== 'trash',
@@ -717,20 +717,20 @@ const Departures: React.FC = () => {
       if (statusFilter === 'trash') {
         actions.push({
           key: 'restore',
-          label: __('Restore', 'Restore'),
+          label: __('Restore', 'yatra'),
           icon: <RotateCcw className="w-4 h-4" />,
           onClick: (departure: Departure) => handleRestore(departure),
         } as any);
         actions.push({
           key: 'delete',
-          label: __('Delete Permanently', 'Delete Permanently'),
+          label: __('Delete Permanently', 'yatra'),
           icon: <Trash2 className="w-4 h-4" />,
           onClick: (departure: Departure) => handleDelete(departure.id),
         } as any);
       } else {
         actions.push({
           key: 'trash',
-          label: __('Move to Trash', 'Move to Trash'),
+          label: __('Move to Trash', 'yatra'),
           icon: <Trash2 className="w-4 h-4" />,
           onClick: (departure: Departure) => handleMoveToTrash(departure),
           variant: 'destructive' as const,
@@ -746,14 +746,14 @@ const Departures: React.FC = () => {
     <>
       <div className="space-y-6">
       <PageHeader
-        title={__('Departures', 'Departures')}
-        description={__('Manage trip departure dates and capacity', 'Manage trip departure dates and capacity')}
+        title={__('Departures', 'yatra')}
+        description={__('Manage trip departure dates and capacity', 'yatra')}
         actions={
           <div className="flex gap-2">
             {selectedTripId && (
               <Button onClick={navigateToAdd} variant="default">
                 <Plus className="w-4 h-4 mr-2" />
-                {__('Add Departure', 'Add Departure')}
+                {__('Add Departure', 'yatra')}
               </Button>
             )}
           </div>
@@ -767,11 +767,11 @@ const Departures: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Select Trip', 'Select Trip')}
+                {__('Select Trip', 'yatra')}
               </h3>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {__('Choose a trip to manage its departures and capacity', 'Choose a trip to manage its departures and capacity')}
+              {__('Choose a trip to manage its departures and capacity', 'yatra')}
             </p>
           </div>
         </div>
@@ -779,7 +779,7 @@ const Departures: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+              {__('Trip', 'yatra')} <span className="text-red-500">*</span>
             </label>
             <SearchableSelect
               value={selectedTripId?.toString() || ''}
@@ -789,14 +789,14 @@ const Departures: React.FC = () => {
                 setPage(1);
               }}
               options={[
-                { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                { value: '', label: __('-- Select a Trip --', 'yatra') },
                 ...(tripsData?.map((trip: Trip) => ({
                   value: trip.id.toString(),
                   label: `${trip.title}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`
                 })) || [])
               ]}
-              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
-              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              placeholder={__('Search or select a trip...', 'yatra')}
+              searchPlaceholder={__('Search by trip name or ID...', 'yatra')}
               className="w-full"
               required
             />
@@ -818,7 +818,7 @@ const Departures: React.FC = () => {
                       ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
                       : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
                   }>
-                    {selectedTripData.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                    {selectedTripData.trip_type === 'single_day' ? __('Single Day', 'yatra') : __('Multi-Day', 'yatra')}
                   </Badge>
                 )}
               </div>
@@ -834,13 +834,13 @@ const Departures: React.FC = () => {
                 <div className="flex gap-4 items-end flex-wrap">
                   <div className="flex-1 min-w-[200px]">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Search', 'Search')}
+                      {__('Search', 'yatra')}
                     </label>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                       <Input
                         type="text"
-                        placeholder={__('Search by date or notes...', 'Search by date or notes...')}
+                        placeholder={__('Search by date or notes...', 'yatra')}
                         value={searchTerm}
                         onChange={(e) => {
                           setSearchTerm(e.target.value);
@@ -852,7 +852,7 @@ const Departures: React.FC = () => {
                   </div>
                   <div className="w-48">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Status', 'Status')}
+                      {__('Status', 'yatra')}
                     </label>
                     <Select
                       value={statusFilter}
@@ -861,16 +861,16 @@ const Departures: React.FC = () => {
                         setPage(1);
                       }}
                     >
-                      <option value="all">{__('All Status', 'All Status')}</option>
-                      <option value="upcoming">{__('Upcoming', 'Upcoming')}</option>
-                      <option value="full">{__('Full', 'Full')}</option>
-                      <option value="past">{__('Past', 'Past')}</option>
-                      <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
+                      <option value="all">{__('All Status', 'yatra')}</option>
+                      <option value="upcoming">{__('Upcoming', 'yatra')}</option>
+                      <option value="full">{__('Full', 'yatra')}</option>
+                      <option value="past">{__('Past', 'yatra')}</option>
+                      <option value="cancelled">{__('Cancelled', 'yatra')}</option>
                     </Select>
                   </div>
                   <div className="w-48">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Source', 'Source')}
+                      {__('Source', 'yatra')}
                     </label>
                     <Select
                       value={sourceFilter}
@@ -879,14 +879,14 @@ const Departures: React.FC = () => {
                         setPage(1);
                       }}
                     >
-                      <option value="all">{__('All Sources', 'All Sources')}</option>
-                      <option value="manual">{__('Manual', 'Manual')}</option>
-                      <option value="booking_created">{__('Booking Created', 'Booking Created')}</option>
+                      <option value="all">{__('All Sources', 'yatra')}</option>
+                      <option value="manual">{__('Manual', 'yatra')}</option>
+                      <option value="booking_created">{__('Booking Created', 'yatra')}</option>
                     </Select>
                   </div>
                   <div className="w-80">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Date Range', 'Date Range')}
+                      {__('Date Range', 'yatra')}
                     </label>
                     <DateRangePicker
                       dateFrom={dateFrom}
@@ -900,7 +900,7 @@ const Departures: React.FC = () => {
                         setPage(1);
                       }}
                       onClear={clearDateFilters}
-                      placeholder={__('Select date range...', 'Select date range...')}
+                      placeholder={__('Select date range...', 'yatra')}
                     />
                   </div>
                 </div>
@@ -941,17 +941,13 @@ const Departures: React.FC = () => {
                 actions={tableActions}
                 isLoading={isLoading}
                 isError={isDeparturesError}
-                errorText={__('Error loading departures', 'Error loading departures')}
-                errorDescription={
-                  __('We couldn\'t connect to the departures service. Please refresh or try again shortly.',
-                    'We couldn\'t connect to the departures service. Please refresh or try again shortly.'
-                  )
-                }
+                errorText={__('Error loading departures', 'yatra')}
+                errorDescription={__('We couldn\'t connect to the departures service. Please refresh or try again shortly.', 'yatra')}
                 errorDetails={derivedErrorDetails}
                 errorRequestInfo={errorContext.requestInfo}
                 onRetry={() => refetch()}
-                emptyText={__('No departures found', 'No departures found')}
-                emptyDescription={__('Get started by creating your first departure.', 'Get started by creating your first departure.')}
+                emptyText={__('No departures found', 'yatra')}
+                emptyDescription={__('Get started by creating your first departure.', 'yatra')}
                 onCreateClick={navigateToAdd}
                 selectedItemIds={selectedIds}
                 onSelectItem={(id, checked) => handleSelectRow(id as number, checked)}
@@ -972,7 +968,7 @@ const Departures: React.FC = () => {
                 totalItems={totalItems}
                 itemsPerPage={itemsPerPage}
                 onPageChange={(newPage) => setPage(newPage)}
-                itemName={__('departures', 'departures')}
+                itemName={__('departures', 'yatra')}
               />
             </div>
           )}
@@ -984,26 +980,26 @@ const Departures: React.FC = () => {
             <div className="mb-4 flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                  {__('Travelers for', 'Travelers for')}{' '}
-                  {travelerModalDeparture.trip?.title || __('Trip', 'Trip')}
+                  {__('Travelers for', 'yatra')}{' '}
+                  {travelerModalDeparture.trip?.title || __('Trip', 'yatra')}
                 </h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   {formatDate(travelerModalDeparture.start_date || travelerModalDeparture.date)}
                 </p>
               </div>
               <Button variant="outline" onClick={closeTravelerModal}>
-                {__('Close', 'Close')}
+                {__('Close', 'yatra')}
               </Button>
             </div>
             <div className="max-h-[60vh] overflow-y-auto pr-2">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{__('Traveler', 'Traveler')}</TableHead>
-                    <TableHead>{__('Lead', 'Lead')}</TableHead>
-                    <TableHead>{__('Email', 'Email')}</TableHead>
-                    <TableHead>{__('Phone', 'Phone')}</TableHead>
-                    <TableHead>{__('Booking', 'Booking')}</TableHead>
+                    <TableHead>{__('Traveler', 'yatra')}</TableHead>
+                    <TableHead>{__('Lead', 'yatra')}</TableHead>
+                    <TableHead>{__('Email', 'yatra')}</TableHead>
+                    <TableHead>{__('Phone', 'yatra')}</TableHead>
+                    <TableHead>{__('Booking', 'yatra')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -1015,7 +1011,7 @@ const Departures: React.FC = () => {
                       <TableCell>
                         {traveler.is_lead ? (
                           <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
-                            {__('Lead', 'Lead')}
+                            {__('Lead', 'yatra')}
                           </Badge>
                         ) : (
                           <span className="text-gray-400">—</span>

@@ -880,7 +880,7 @@ const TripConsentForm: React.FC = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Applicable To', 'Applicable To')}</CardTitle>
+                  <CardTitle className="text-base">{__('Applicable To', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ApplicableTripSelector

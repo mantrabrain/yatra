@@ -145,15 +145,15 @@ const ViewCustomer: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'active': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Active', 'Active'),
+        label: __('Active', 'yatra'),
       },
       'inactive': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Inactive', 'Inactive'),
+        label: __('Inactive', 'yatra'),
       },
       'blocked': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Blocked', 'Blocked'),
+        label: __('Blocked', 'yatra'),
       },
     };
 
@@ -173,19 +173,19 @@ const ViewCustomer: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'confirmed': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Confirmed', 'Confirmed'),
+        label: __('Confirmed', 'yatra'),
       },
       'completed': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Completed', 'Completed'),
+        label: __('Completed', 'yatra'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'cancelled': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Cancelled', 'Cancelled'),
+        label: __('Cancelled', 'yatra'),
       },
     };
 
@@ -297,12 +297,12 @@ const ViewCustomer: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Customer Details', 'Customer Details')}
-          description={__('Loading...', 'Loading...')}
+          title={__('Customer Details', 'yatra')}
+          description={__('Loading...', 'yatra')}
           actions={
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           }
         />
@@ -315,8 +315,8 @@ const ViewCustomer: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Customer Not Found', 'Customer Not Found')}
-          description={__('The customer you are looking for does not exist', 'The customer you are looking for does not exist')}
+          title={__('Customer Not Found', 'yatra')}
+          description={__('The customer you are looking for does not exist', 'yatra')}
           actions={
             <Button
               variant="outline"
@@ -324,14 +324,14 @@ const ViewCustomer: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Customers', 'Back to Customers')}
+              {__('Back to Customers', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center">
             <AlertCircle className="w-12 h-12 mx-auto mb-3 text-red-400" />
-            <p className="text-red-500">{__('Error loading customer or customer not found', 'Error loading customer or customer not found')}</p>
+            <p className="text-red-500">{__('Error loading customer or customer not found', 'yatra')}</p>
           </CardContent>
         </Card>
       </div>
@@ -341,8 +341,8 @@ const ViewCustomer: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Customer Details', 'Customer Details')}
-        description={__('View complete customer information', 'View complete customer information')}
+        title={__('Customer Details', 'yatra')}
+        description={__('View complete customer information', 'yatra')}
         actions={
           <div className="flex gap-2">
             <ConditionalRender capability="yatra_edit_bookings">
@@ -351,7 +351,7 @@ const ViewCustomer: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <Edit className="w-4 h-4" />
-                {__('Edit Customer', 'Edit Customer')}
+                {__('Edit Customer', 'yatra')}
               </Button>
             </ConditionalRender>
             <Button
@@ -360,7 +360,7 @@ const ViewCustomer: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           </div>
         }
@@ -374,7 +374,7 @@ const ViewCustomer: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Customer Overview', 'Customer Overview')}</CardTitle>
+                  <CardTitle className="text-base">{__('Customer Overview', 'yatra')}</CardTitle>
                   <div className="flex gap-2">
                     {getStatusBadge(customer.status)}
                     {getLoyaltyBadge(customer.loyalty_tier || 'bronze')}
@@ -385,7 +385,7 @@ const ViewCustomer: React.FC = () => {
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <User className="w-3 h-3" />
-                    {__('Full Name', 'Full Name')}
+                    {__('Full Name', 'yatra')}
                   </div>
                   <div className="text-lg font-semibold text-gray-900 dark:text-white">
                     <a
@@ -401,7 +401,7 @@ const ViewCustomer: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Mail className="w-3 h-3" />
-                      {__('Email Address', 'Email Address')}
+                      {__('Email Address', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {customer.email}
@@ -411,7 +411,7 @@ const ViewCustomer: React.FC = () => {
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                         <Phone className="w-3 h-3" />
-                        {__('Phone Number', 'Phone Number')}
+                        {__('Phone Number', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.phone}
@@ -427,7 +427,7 @@ const ViewCustomer: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
-                      {__('Address', 'Address')}
+                      {__('Address', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {customer.address}
@@ -443,7 +443,7 @@ const ViewCustomer: React.FC = () => {
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                         <Globe className="w-3 h-3" />
-                        {__('Country', 'Country')}
+                        {__('Country', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.country}
@@ -453,7 +453,7 @@ const ViewCustomer: React.FC = () => {
                   {customer.nationality && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Nationality', 'Nationality')}
+                        {__('Nationality', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.nationality}
@@ -463,7 +463,7 @@ const ViewCustomer: React.FC = () => {
                   {customer.date_of_birth && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Date of Birth', 'Date of Birth')}
+                        {__('Date of Birth', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {formatShortDate(customer.date_of_birth)}
@@ -480,14 +480,14 @@ const ViewCustomer: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-red-500" />
-                    {__('Emergency Contact', 'Emergency Contact')}
+                    {__('Emergency Contact', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Name', 'Name')}
+                        {__('Name', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.emergency_name}
@@ -496,7 +496,7 @@ const ViewCustomer: React.FC = () => {
                     {customer.emergency_phone && (
                       <div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                          {__('Phone', 'Phone')}
+                          {__('Phone', 'yatra')}
                         </div>
                         <div className="text-sm text-gray-900 dark:text-white">
                           {customer.emergency_phone}
@@ -506,7 +506,7 @@ const ViewCustomer: React.FC = () => {
                     {customer.emergency_relationship && (
                       <div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                          {__('Relationship', 'Relationship')}
+                          {__('Relationship', 'yatra')}
                         </div>
                         <div className="text-sm text-gray-900 dark:text-white">
                           {customer.emergency_relationship}
@@ -521,7 +521,7 @@ const ViewCustomer: React.FC = () => {
             {/* Recent Bookings */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Booking History', 'Booking History')}</CardTitle>
+                <CardTitle className="text-base">{__('Booking History', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 {isLoadingBookings ? (
@@ -537,18 +537,18 @@ const ViewCustomer: React.FC = () => {
                   </div>
                 ) : !bookings || bookings.length === 0 ? (
                   <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                    {__('No bookings yet', 'No bookings yet')}
+                    {__('No bookings yet', 'yatra')}
                   </div>
                 ) : (
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>{__('Reference', 'Reference')}</TableHead>
-                        <TableHead>{__('Trip', 'Trip')}</TableHead>
-                        <TableHead>{__('Travel Date', 'Travel Date')}</TableHead>
-                        <TableHead>{__('Amount', 'Amount')}</TableHead>
-                        <TableHead>{__('Status', 'Status')}</TableHead>
-                        <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
+                        <TableHead>{__('Reference', 'yatra')}</TableHead>
+                        <TableHead>{__('Trip', 'yatra')}</TableHead>
+                        <TableHead>{__('Travel Date', 'yatra')}</TableHead>
+                        <TableHead>{__('Amount', 'yatra')}</TableHead>
+                        <TableHead>{__('Status', 'yatra')}</TableHead>
+                        <TableHead className="text-right">{__('Actions', 'yatra')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -576,7 +576,7 @@ const ViewCustomer: React.FC = () => {
                               onClick={() => handleViewBooking(booking.id)}
                               className="h-8"
                             >
-                              {__('View', 'View')}
+                              {__('View', 'yatra')}
                             </Button>
                           </TableCell>
                         </TableRow>
@@ -593,7 +593,7 @@ const ViewCustomer: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    {__('Internal Notes', 'Internal Notes')}
+                    {__('Internal Notes', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -608,13 +608,13 @@ const ViewCustomer: React.FC = () => {
             {(customer.dietary_requirements || customer.medical_conditions || customer.special_needs) && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Special Requirements', 'Special Requirements')}</CardTitle>
+                  <CardTitle className="text-base">{__('Special Requirements', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {customer.dietary_requirements && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Dietary Requirements', 'Dietary Requirements')}
+                        {__('Dietary Requirements', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.dietary_requirements}
@@ -624,7 +624,7 @@ const ViewCustomer: React.FC = () => {
                   {customer.medical_conditions && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Medical Conditions', 'Medical Conditions')}
+                        {__('Medical Conditions', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.medical_conditions}
@@ -634,7 +634,7 @@ const ViewCustomer: React.FC = () => {
                   {customer.special_needs && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Special Needs', 'Special Needs')}
+                        {__('Special Needs', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {customer.special_needs}
@@ -652,13 +652,13 @@ const ViewCustomer: React.FC = () => {
             {isPro && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Statistics', 'Statistics')}</CardTitle>
+                  <CardTitle className="text-base">{__('Statistics', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      {__('Total Bookings', 'Total Bookings')}
+                      {__('Total Bookings', 'yatra')}
                     </div>
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {customer.total_bookings || 0}
@@ -667,7 +667,7 @@ const ViewCustomer: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <DollarSign className="w-3 h-3" />
-                      {__('Total Spent', 'Total Spent')}
+                      {__('Total Spent', 'yatra')}
                     </div>
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {formatPrice(customer.total_spent || 0)}
@@ -676,7 +676,7 @@ const ViewCustomer: React.FC = () => {
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <Users className="w-3 h-3" />
-                      {__('Total Travelers', 'Total Travelers')}
+                      {__('Total Travelers', 'yatra')}
                     </div>
                     <div className="text-2xl font-semibold text-gray-900 dark:text-white">
                       {customer.total_travelers || 0}
@@ -691,13 +691,13 @@ const ViewCustomer: React.FC = () => {
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Award className="w-4 h-4" />
-                  {__('Loyalty', 'Loyalty')}
+                  {__('Loyalty', 'yatra')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Current Tier', 'Current Tier')}
+                    {__('Current Tier', 'yatra')}
                   </div>
                   <div>
                     {getLoyaltyBadge(customer.loyalty_tier || 'bronze')}
@@ -705,7 +705,7 @@ const ViewCustomer: React.FC = () => {
                 </div>
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Points', 'Points')}
+                    {__('Points', 'yatra')}
                   </div>
                   <div className="text-xl font-semibold text-gray-900 dark:text-white">
                     {customer.loyalty_points || 0}
@@ -720,14 +720,14 @@ const ViewCustomer: React.FC = () => {
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base flex items-center gap-2">
                     <CreditCard className="w-4 h-4" />
-                    {__('Passport', 'Passport')}
+                    {__('Passport', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {customer.passport_number && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Number', 'Number')}
+                        {__('Number', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white font-mono">
                         {customer.passport_number}
@@ -737,7 +737,7 @@ const ViewCustomer: React.FC = () => {
                   {customer.passport_expiry && (
                     <div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                        {__('Expiry Date', 'Expiry Date')}
+                        {__('Expiry Date', 'yatra')}
                       </div>
                       <div className="text-sm text-gray-900 dark:text-white">
                         {formatShortDate(customer.passport_expiry)}
@@ -751,13 +751,13 @@ const ViewCustomer: React.FC = () => {
             {/* Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'Timeline')}</CardTitle>
+                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {__('Registered', 'Registered')}
+                    {__('Registered', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatDate(customer.created_at)}
@@ -766,7 +766,7 @@ const ViewCustomer: React.FC = () => {
                 {customer.last_booking_date && (
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Last Booking', 'Last Booking')}
+                      {__('Last Booking', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatShortDate(customer.last_booking_date)}
@@ -776,7 +776,7 @@ const ViewCustomer: React.FC = () => {
                 {customer.last_travel_date && (
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Last Travel', 'Last Travel')}
+                      {__('Last Travel', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatShortDate(customer.last_travel_date)}
@@ -789,19 +789,19 @@ const ViewCustomer: React.FC = () => {
             {/* Preferences */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Preferences', 'Preferences')}</CardTitle>
+                <CardTitle className="text-base">{__('Preferences', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">{__('Newsletter', 'Newsletter')}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{__('Newsletter', 'yatra')}</span>
                   <span className={customer.newsletter_optin ? 'text-green-600' : 'text-gray-400'}>
-                    {customer.newsletter_optin ? __('Subscribed', 'Subscribed') : __('Not subscribed', 'Not subscribed')}
+                    {customer.newsletter_optin ? __('Subscribed', 'yatra') : __('Not subscribed', 'yatra')}
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">{__('Marketing', 'Marketing')}</span>
+                  <span className="text-gray-600 dark:text-gray-400">{__('Marketing', 'yatra')}</span>
                   <span className={customer.marketing_optin ? 'text-green-600' : 'text-gray-400'}>
-                    {customer.marketing_optin ? __('Opted in', 'Opted in') : __('Opted out', 'Opted out')}
+                    {customer.marketing_optin ? __('Opted in', 'yatra') : __('Opted out', 'yatra')}
                   </span>
                 </div>
               </CardContent>

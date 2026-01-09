@@ -108,7 +108,7 @@ const Categories: React.FC = () => {
         const response = await apiClient.get('/trip-categories', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load categories', 'Failed to load categories'), 'error');
+        showToast(error?.message || __('Failed to load categories', 'yatra'), 'error');
         throw error;
       }
     },
@@ -122,11 +122,11 @@ const Categories: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
-      showToast(__('Category deleted successfully', 'Category deleted successfully'), 'success');
+      showToast(__('Category deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, category: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete category', 'Failed to delete category'), 'error');
+      showToast(error?.message || __('Failed to delete category', 'yatra'), 'error');
     },
   });
 
@@ -210,24 +210,24 @@ const Categories: React.FC = () => {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
       const msgMap: Record<string, string> = {
-        delete: __('Selected categories deleted successfully', 'Selected categories deleted successfully'),
-        trash: __('Selected categories moved to trash', 'Selected categories moved to trash'),
-        draft: __('Selected categories marked as draft', 'Selected categories marked as draft'),
-        publish: __('Selected categories published', 'Selected categories published'),
+        delete: __('Selected categories deleted successfully', 'yatra'),
+        trash: __('Selected categories moved to trash', 'yatra'),
+        draft: __('Selected categories marked as draft', 'yatra'),
+        publish: __('Selected categories published', 'yatra'),
       };
-      showToast(msgMap[variables.action] || __('Bulk action completed', 'Bulk action completed'), 'success');
+      showToast(msgMap[variables.action] || __('Bulk action completed', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (error: any, variables) => {
       const msgMapError: Record<string, string> = {
-        delete: __('Failed to delete selected categories', 'Failed to delete selected categories'),
-        trash: __('Failed to move categories to trash', 'Failed to move categories to trash'),
-        draft: __('Failed to mark categories as draft', 'Failed to mark categories as draft'),
-        publish: __('Failed to publish categories', 'Failed to publish categories'),
+        delete: __('Failed to delete selected categories', 'yatra'),
+        trash: __('Failed to move categories to trash', 'yatra'),
+        draft: __('Failed to mark categories as draft', 'yatra'),
+        publish: __('Failed to publish categories', 'yatra'),
       };
       showToast(
-        error?.message || msgMapError[variables.action] || __('Bulk action failed', 'Bulk action failed'),
+        error?.message || msgMapError[variables.action] || __('Bulk action failed', 'yatra'),
         'error'
       );
     },
@@ -235,12 +235,12 @@ const Categories: React.FC = () => {
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one category.', 'Select at least one category.'), 'warning');
+      showToast(__('Select at least one category.', 'yatra'), 'warning');
       return;
     }
 
@@ -342,7 +342,7 @@ const Categories: React.FC = () => {
   }, [processedCategories, expandedCategories.size]);
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -361,15 +361,15 @@ const Categories: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        label: __('Publish', 'yatra'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -461,13 +461,13 @@ const Categories: React.FC = () => {
   const columns = [
     {
       key: 'name',
-      label: __('Name', 'Name'),
+      label: __('Name', 'yatra'),
       sortable: true,
       visible: visibleColumns.name,
     },
     {
       key: 'trips',
-      label: __('Trips', 'Trips'),
+      label: __('Trips', 'yatra'),
       visible: visibleColumns.trips,
       render: (category: Category) => (
         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
@@ -477,18 +477,18 @@ const Categories: React.FC = () => {
     },
     {
       key: 'description',
-      label: __('Description', 'Description'),
+      label: __('Description', 'yatra'),
       visible: visibleColumns.description,
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       visible: visibleColumns.status,
     },
     {
       key: 'created_at',
-      label: __('Created', 'Created'),
+      label: __('Created', 'yatra'),
       sortable: true,
       visible: visibleColumns.created_at,
     },
@@ -512,20 +512,20 @@ const Categories: React.FC = () => {
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['trip-categories'] });
       const msgMap: Record<string, string> = {
-        trash: __('Category moved to trash', 'Category moved to trash'),
-        draft: __('Category marked as draft', 'Category marked as draft'),
-        publish: __('Category published', 'Category published'),
+        trash: __('Category moved to trash', 'yatra'),
+        draft: __('Category marked as draft', 'yatra'),
+        publish: __('Category published', 'yatra'),
       };
-      const msg = msgMap[variables.status] || __('Category updated successfully', 'Category updated successfully');
+      const msg = msgMap[variables.status] || __('Category updated successfully', 'yatra');
       showToast(msg, 'success');
     },
     onError: (error: any, variables) => {
       const msgMapError: Record<string, string> = {
-        trash: __('Failed to move category to trash', 'Failed to move category to trash'),
-        draft: __('Failed to mark category as draft', 'Failed to mark category as draft'),
-        publish: __('Failed to publish category', 'Failed to publish category'),
+        trash: __('Failed to move category to trash', 'yatra'),
+        draft: __('Failed to mark category as draft', 'yatra'),
+        publish: __('Failed to publish category', 'yatra'),
       };
-      const fallback = msgMapError[variables.status] || __('Failed to update category', 'Failed to update category');
+      const fallback = msgMapError[variables.status] || __('Failed to update category', 'yatra');
       showToast(error?.message || fallback, 'error');
     },
   });
@@ -534,14 +534,14 @@ const Categories: React.FC = () => {
   const actions = [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: Category) => handleEdit(category),
       condition: () => can('yatra_edit_trips'),
     },
     {
       key: 'publish',
-      label: __('Make Published', 'Make Published'),
+      label: __('Make Published', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'publish' }),
       condition: (category: Category) =>
@@ -549,7 +549,7 @@ const Categories: React.FC = () => {
     },
     {
       key: 'draft',
-      label: __('Make Draft', 'Make Draft'),
+      label: __('Make Draft', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'draft' }),
       condition: (category: Category) =>
@@ -557,7 +557,7 @@ const Categories: React.FC = () => {
     },
     {
       key: 'trash',
-      label: __('Move to Trash', 'Move to Trash'),
+      label: __('Move to Trash', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (category: Category) => statusMutation.mutate({ id: category.id, status: 'trash' }),
       variant: 'destructive' as const,
@@ -566,7 +566,7 @@ const Categories: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete Permanently', 'Delete Permanently'),
+      label: __('Delete Permanently', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (category: Category) => setDeleteConfirm({ isOpen: true, category }),
       variant: 'destructive' as const,
@@ -593,12 +593,12 @@ const Categories: React.FC = () => {
           <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
             <span>{category.slug}</span>
             <span className="text-[11px] text-gray-400 dark:text-gray-500">
-              ({__('ID:', 'ID:')} {category.id})
+              ({__('ID:', 'yatra')} {category.id})
             </span>
           </div>
           {category.parent_name && (
             <div className="text-xs text-gray-500 dark:text-gray-400">
-              {__('Parent:', 'Parent:')} {category.parent_name}
+              {__('Parent:', 'yatra')} {category.parent_name}
             </div>
           )}
         </div>
@@ -626,25 +626,25 @@ const Categories: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, category: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Category', 'Delete Category')}
+        title={__('Delete Category', 'yatra')}
         message={deleteConfirm.category 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.category.name)
-          : __('Are you sure you want to delete this category? This action cannot be undone.', 'Are you sure you want to delete this category? This action cannot be undone.')
+          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.category.name)
+          : __('Are you sure you want to delete this category? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete Permanently', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
 
       <PageHeader
-        title={__('Categories', 'Categories')}
-        description={__('Manage trip categories and subcategories', 'Manage trip categories and subcategories')}
+        title={__('Categories', 'yatra')}
+        description={__('Manage trip categories and subcategories', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateCategory} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Category', 'Add New Category')}
+            {__('Add New Category', 'yatra')}
           </Button>
         }
       />
@@ -664,10 +664,10 @@ const Categories: React.FC = () => {
                   setPage(1);
                 }}
                 statusOptions={[
-                  { value: 'all', label: __('All Status', 'All Status') },
-                  { value: 'publish', label: __('Publish', 'Publish') },
-                  { value: 'draft', label: __('Draft', 'Draft') },
-                  { value: 'trash', label: __('Trash', 'Trash') },
+                  { value: 'all', label: __('All Status', 'yatra') },
+                  { value: 'publish', label: __('Publish', 'yatra') },
+                  { value: 'draft', label: __('Draft', 'yatra') },
+                  { value: 'trash', label: __('Trash', 'yatra') },
                 ]}
                 sortBy={sortBy}
                 onSortByChange={(value) => {
@@ -681,13 +681,13 @@ const Categories: React.FC = () => {
                   setPage(1);
                 }}
                 sortOptions={[
-                  { value: 'name', label: __('Name', 'Name') },
-                  { value: 'status', label: __('Status', 'Status') },
-                  { value: 'created_at', label: __('Created', 'Created') },
+                  { value: 'name', label: __('Name', 'yatra') },
+                  { value: 'status', label: __('Status', 'yatra') },
+                  { value: 'created_at', label: __('Created', 'yatra') },
                 ]}
                 onResetFilters={handleResetFilters}
                 hasFilters={!!hasFilters}
-                placeholder={__('Search categories...', 'Search categories...')}
+                placeholder={__('Search categories', 'yatra')}
               />
             </div>
 
@@ -698,9 +698,9 @@ const Categories: React.FC = () => {
                 onChange={(e) => setParentFilter(e.target.value as 'all' | 'top-level' | 'subcategories')}
                 className="w-full text-sm truncate"
               >
-                <option value="all">{__('All Categories', 'All Categories')}</option>
-                <option value="top-level">{__('Top Level Only', 'Top Level Only')}</option>
-                <option value="subcategories">{__('Subcategories Only', 'Subcategories Only')}</option>
+                <option value="all">{__('All Categories', 'yatra')}</option>
+                <option value="top-level">{__('Top Level Only', 'yatra')}</option>
+                <option value="subcategories">{__('Subcategories Only', 'yatra')}</option>
               </Select>
             </div>
           </div>
@@ -722,19 +722,19 @@ const Categories: React.FC = () => {
           setBulkAction('');
         }}
         statusOptions={[
-          { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-          { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-          { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-          { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+          { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+          { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish },
+          { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+          { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
         ]}
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
         columnOptions={[
-          { key: 'name', label: __('Category', 'Category'), visible: visibleColumns.name },
-          { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-          { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
-          { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-          { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
+          { key: 'name', label: __('Category', 'yatra'), visible: visibleColumns.name },
+          { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+          { key: 'trips', label: __('Trips', 'yatra'), visible: visibleColumns.trips },
+          { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+          { key: 'created_at', label: __('Created Date', 'yatra'), visible: visibleColumns.created_at },
         ]}
         onToggleColumn={toggleColumn}
         bulkMutationPending={bulkMutation.isPending}
@@ -751,7 +751,7 @@ const Categories: React.FC = () => {
             actions={actions}
             isLoading={isLoading}
             isError={!!error}
-            errorText={__('Error loading categories', 'Error loading categories')}
+            errorText={__('Error loading categories', 'yatra')}
             errorDescription={__(
               'We couldn’t connect to the categories service. Please refresh or try again shortly.',
               'We couldn’t connect to the categories service. Please refresh or try again shortly.'
@@ -759,7 +759,7 @@ const Categories: React.FC = () => {
             onRetry={() => queryClient.invalidateQueries({ queryKey: ['trip-categories'] })}
             errorDetails={errorContext.details}
             errorRequestInfo={errorContext.requestInfo}
-            emptyText={__('No categories found', 'No categories found')}
+            emptyText={__('No categories found', 'yatra')}
             emptyDescription={__(
               'Organize trips into categories to help travelers find the perfect fit.',
               'Organize trips into categories to help travelers find the perfect fit.'
@@ -805,7 +805,7 @@ const Categories: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('categories', 'categories')}
+            itemName={__('categories', 'yatra')}
           />
         </div>
       )}

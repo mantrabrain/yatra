@@ -75,7 +75,7 @@ const DifficultyLevels: React.FC = () => {
   const columns = [
     {
       key: 'sorting',
-      label: __('Order', 'Order'),
+      label: __('Order', 'yatra'),
       sortable: true,
       width: '100px',
       visible: visibleColumns.sorting,
@@ -87,7 +87,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'name',
-      label: __('Name', 'Name'),
+      label: __('Name', 'yatra'),
       sortable: true,
       visible: visibleColumns.name,
       render: (level: DifficultyLevel) => (
@@ -103,7 +103,7 @@ const DifficultyLevels: React.FC = () => {
             <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-2">
               <span>{level.slug || '—'}</span>
               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                ({__('ID:', 'ID:')} {level.id})
+                ({__('ID:', 'yatra')} {level.id})
               </span>
             </div>
           </div>
@@ -112,7 +112,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'description',
-      label: __('Description', 'Description'),
+      label: __('Description', 'yatra'),
       visible: visibleColumns.description,
       render: (level: DifficultyLevel) => (
         <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
@@ -122,7 +122,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'trips',
-      label: __('Trips', 'Trips'),
+      label: __('Trips', 'yatra'),
       visible: visibleColumns.trips,
       render: (level: DifficultyLevel) => (
         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
@@ -132,14 +132,14 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       visible: visibleColumns.status,
       render: (level: DifficultyLevel) => getStatusBadge(level.status),
     },
     {
       key: 'created_at',
-      label: __('Created', 'Created'),
+      label: __('Created', 'yatra'),
       sortable: true,
       visible: visibleColumns.created_at,
       render: (level: DifficultyLevel) => (
@@ -154,14 +154,14 @@ const DifficultyLevels: React.FC = () => {
   const actions = [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (level: DifficultyLevel) => handleEdit(level),
       condition: () => can('yatra_edit_trips'),
     },
     {
       key: 'publish',
-      label: __('Make Published', 'Make Published'),
+      label: __('Make Published', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'publish' }),
       condition: (level: DifficultyLevel) =>
@@ -169,7 +169,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'draft',
-      label: __('Make Draft', 'Make Draft'),
+      label: __('Make Draft', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'draft' }),
       condition: (level: DifficultyLevel) =>
@@ -177,7 +177,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (level: DifficultyLevel) =>
         setDeleteConfirm({ isOpen: true, level }),
@@ -186,7 +186,7 @@ const DifficultyLevels: React.FC = () => {
     },
     {
       key: 'trash',
-      label: __('Move to Trash', 'Move to Trash'),
+      label: __('Move to Trash', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (level: DifficultyLevel) => statusMutation.mutate({ id: level.id, status: 'trash' }),
       variant: 'destructive' as const,
@@ -233,7 +233,7 @@ const DifficultyLevels: React.FC = () => {
         const response = await apiClient.get('/difficulty-levels', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load difficulty levels', 'Failed to load difficulty levels'), 'error');
+        showToast(error?.message || __('Failed to load difficulty levels', 'yatra'), 'error');
         throw error;
       }
     },
@@ -245,10 +245,10 @@ const DifficultyLevels: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels-stats'] });
-      showToast(__('Difficulty level deleted successfully', 'Difficulty level deleted successfully'), 'success');
+      showToast(__('Difficulty level deleted successfully', 'yatra'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete difficulty level', 'Failed to delete difficulty level'), 'error');
+      showToast(error?.message || __('Failed to delete difficulty level', 'yatra'), 'error');
     },
   });
 
@@ -270,20 +270,20 @@ const DifficultyLevels: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] });
       queryClient.invalidateQueries({ queryKey: ['difficulty-levels-stats'] });
       const msgMap: Record<string, string> = {
-        trash: __('Difficulty level moved to trash', 'Difficulty level moved to trash'),
-        draft: __('Difficulty level marked as draft', 'Difficulty level marked as draft'),
-        publish: __('Difficulty level published', 'Difficulty level published'),
+        trash: __('Difficulty level moved to trash', 'yatra'),
+        draft: __('Difficulty level marked as draft', 'yatra'),
+        publish: __('Difficulty level published', 'yatra'),
       };
-      const msg = msgMap[variables.status] || __('Difficulty level updated successfully', 'Difficulty level updated successfully');
+      const msg = msgMap[variables.status] || __('Difficulty level updated successfully', 'yatra');
       showToast(msg, 'success');
     },
     onError: (error: any, variables) => {
       const msgMapError: Record<string, string> = {
-        trash: __('Failed to move difficulty level to trash', 'Failed to move difficulty level to trash'),
-        draft: __('Failed to mark difficulty level as draft', 'Failed to mark difficulty level as draft'),
-        publish: __('Failed to publish difficulty level', 'Failed to publish difficulty level'),
+        trash: __('Failed to move difficulty level to trash', 'yatra'),
+        draft: __('Failed to mark difficulty level as draft', 'yatra'),
+        publish: __('Failed to publish difficulty level', 'yatra'),
       };
-      const fallback = msgMapError[variables.status] || __('Failed to update difficulty level', 'Failed to update difficulty level');
+      const fallback = msgMapError[variables.status] || __('Failed to update difficulty level', 'yatra');
       showToast(error?.message || fallback, 'error');
     },
   });
@@ -313,7 +313,7 @@ const DifficultyLevels: React.FC = () => {
   }, [statsData]);
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -330,9 +330,9 @@ const DifficultyLevels: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const map: Record<string, { className: string; label: string }> = {
-      publish: { className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400', label: __('Publish', 'Publish') },
-      draft: { className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400', label: __('Draft', 'Draft') },
-      trash: { className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400', label: __('Trash', 'Trash') },
+      publish: { className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400', label: __('Publish', 'yatra') },
+      draft: { className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400', label: __('Draft', 'yatra') },
+      trash: { className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400', label: __('Trash', 'yatra') },
     };
     const info = map[status] || map.draft;
     return <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${info.className}`}>{info.label}</span>;
@@ -419,7 +419,7 @@ const DifficultyLevels: React.FC = () => {
   const handleBulkApply = () => {
     if (!bulkAction) {
       showToast(
-        __('Select a bulk action first.', 'Select a bulk action first.'),
+        __('Select a bulk action first.', 'yatra'),
         'warning'
       );
       return;
@@ -427,7 +427,7 @@ const DifficultyLevels: React.FC = () => {
 
     if (selectedIds.length === 0) {
       showToast(
-        __('Select at least one difficulty level.', 'Select at least one difficulty level.'),
+        __('Select at least one difficulty level.', 'yatra'),
         'warning'
       );
       return;
@@ -440,7 +440,7 @@ const DifficultyLevels: React.FC = () => {
             selectedIds.map((id) => apiClient.delete(`/difficulty-levels/${id}`))
           );
           showToast(
-            __('Selected difficulty levels deleted successfully', 'Selected difficulty levels deleted successfully'),
+            __('Selected difficulty levels deleted successfully', 'yatra'),
             'success'
           );
         } else if (bulkAction === 'trash' || bulkAction === 'draft' || bulkAction === 'publish') {
@@ -471,9 +471,9 @@ const DifficultyLevels: React.FC = () => {
             })
           );
           const msgMap: Record<string, string> = {
-            trash: __('Selected difficulty levels moved to trash', 'Selected difficulty levels moved to trash'),
-            draft: __('Selected difficulty levels marked as draft', 'Selected difficulty levels marked as draft'),
-            publish: __('Selected difficulty levels published', 'Selected difficulty levels published'),
+            trash: __('Selected difficulty levels moved to trash', 'yatra'),
+            draft: __('Selected difficulty levels marked as draft', 'yatra'),
+            publish: __('Selected difficulty levels published', 'yatra'),
           };
           showToast(msgMap[bulkAction], 'success');
         }
@@ -484,10 +484,10 @@ const DifficultyLevels: React.FC = () => {
         setBulkAction('');
       } catch (error: any) {
         const msgMapError: Record<string, string> = {
-          delete: __('Failed to delete selected difficulty levels', 'Failed to delete selected difficulty levels'),
-          trash: __('Failed to move selected difficulty levels to trash', 'Failed to move selected difficulty levels to trash'),
-          draft: __('Failed to mark selected difficulty levels as draft', 'Failed to mark selected difficulty levels as draft'),
-          publish: __('Failed to publish selected difficulty levels', 'Failed to publish selected difficulty levels'),
+          delete: __('Failed to delete selected difficulty levels', 'yatra'),
+          trash: __('Failed to move selected difficulty levels to trash', 'yatra'),
+          draft: __('Failed to mark selected difficulty levels as draft', 'yatra'),
+          publish: __('Failed to publish selected difficulty levels', 'yatra'),
         };
         showToast(
           error?.message || msgMapError[bulkAction],
@@ -510,31 +510,25 @@ const DifficultyLevels: React.FC = () => {
             setDeleteConfirm({ isOpen: false, level: null });
           }
         }}
-        title={__('Delete Difficulty Level', 'Delete Difficulty Level')}
+        title={__('Delete Difficulty Level', 'yatra')}
         message={
           deleteConfirm.level
-            ? __(
-                'Are you sure you want to delete "{name}"? This action cannot be undone.',
-                'Are you sure you want to delete "{name}"? This action cannot be undone.'
-              ).replace('{name}', deleteConfirm.level.name)
-            : __(
-                'Are you sure you want to delete this difficulty level? This action cannot be undone.',
-                'Are you sure you want to delete this difficulty level? This action cannot be undone.'
-              )
+            ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.level.name)
+            : __('Are you sure you want to delete this difficulty level? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
       <PageHeader
-        title={__('Difficulty Levels', 'Difficulty Levels')}
-        description={__('Manage trip difficulty levels and their ordering', 'Manage trip difficulty levels and their ordering')}
+        title={__('Difficulty Levels', 'yatra')}
+        description={__('Manage trip difficulty levels and their ordering', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreate}>
             <Plus className="w-4 h-4 mr-2" />
-            {__('Add New', 'Add New')}
+            {__('Add New', 'yatra')}
           </Button>
         }
       />
@@ -551,9 +545,9 @@ const DifficultyLevels: React.FC = () => {
               setPage(1);
             }}
             statusOptions={[
-              { value: 'all', label: __('All Status', 'All Status') },
-              { value: 'publish', label: __('Published', 'Published') },
-              { value: 'draft', label: __('Draft', 'Draft') },
+              { value: 'all', label: __('All Status', 'yatra') },
+              { value: 'publish', label: __('Published', 'yatra') },
+              { value: 'draft', label: __('Draft', 'yatra') },
             ]}
             sortBy={sortBy}
             onSortByChange={(value) => {
@@ -567,13 +561,13 @@ const DifficultyLevels: React.FC = () => {
               setPage(1);
             }}
             sortOptions={[
-              { value: 'sorting', label: __('Order', 'Order') },
-              { value: 'name', label: __('Name', 'Name') },
-              { value: 'created_at', label: __('Created', 'Created') },
+              { value: 'sorting', label: __('Order', 'yatra') },
+              { value: 'name', label: __('Name', 'yatra') },
+              { value: 'created_at', label: __('Created', 'yatra') },
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={hasFilters}
-            placeholder={__('Search difficulty levels...', 'Search difficulty levels...')}
+            placeholder={__('Search difficulty levels', 'yatra')}
           />
         </CardContent>
       </Card>
@@ -593,20 +587,20 @@ const DifficultyLevels: React.FC = () => {
             setBulkAction('');
           }}
           statusOptions={[
-            { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-            { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-            { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-            { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+            { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+            { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish },
+            { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+            { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
           ]}
           showColumnsDropdown={showColumnsDropdown}
           setShowColumnsDropdown={setShowColumnsDropdown}
           columnOptions={[
-            { key: 'sorting', label: __('Order', 'Order'), visible: visibleColumns.sorting },
-            { key: 'name', label: __('Name', 'Name'), visible: visibleColumns.name },
-            { key: 'slug', label: __('Slug', 'Slug'), visible: visibleColumns.slug },
-            { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-            { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-            { key: 'created_at', label: __('Created', 'Created'), visible: visibleColumns.created_at },
+            { key: 'sorting', label: __('Order', 'yatra'), visible: visibleColumns.sorting },
+            { key: 'name', label: __('Name', 'yatra'), visible: visibleColumns.name },
+            { key: 'slug', label: __('Slug', 'yatra'), visible: visibleColumns.slug },
+            { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+            { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+            { key: 'created_at', label: __('Created', 'yatra'), visible: visibleColumns.created_at },
           ]}
           onToggleColumn={toggleColumn}
           bulkMutationPending={false}
@@ -624,7 +618,7 @@ const DifficultyLevels: React.FC = () => {
             actions={actions}
             isLoading={isLoading}
             isError={!!error}
-            errorText={__('Failed to load difficulty levels', 'Failed to load difficulty levels')}
+            errorText={__('Failed to load difficulty levels', 'yatra')}
             errorDescription={__(
               'We couldn’t connect to the difficulty levels service. Please refresh or try again shortly.',
               'We couldn’t connect to the difficulty levels service. Please refresh or try again shortly.'
@@ -632,7 +626,7 @@ const DifficultyLevels: React.FC = () => {
             onRetry={() => queryClient.invalidateQueries({ queryKey: ['difficulty-levels'] })}
             errorDetails={errorContext.details}
             errorRequestInfo={errorContext.requestInfo}
-            emptyText={__('No difficulty levels found', 'No difficulty levels found')}
+            emptyText={__('No difficulty levels found', 'yatra')}
             emptyDescription={__(
               'Get started by creating your first difficulty level to categorize trips by their physical challenge level.',
               'Get started by creating your first difficulty level to categorize trips by their physical challenge level.'
@@ -674,7 +668,7 @@ const DifficultyLevels: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('difficulty levels', 'difficulty levels')}
+            itemName={__('difficulty levels', 'yatra')}
           />
         </div>
       )}

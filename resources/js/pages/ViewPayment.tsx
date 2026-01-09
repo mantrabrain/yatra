@@ -89,23 +89,23 @@ const ViewPayment: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'completed': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Completed', 'Completed'),
+        label: __('Completed', 'yatra'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'partial': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Partial', 'Partial'),
+        label: __('Partial', 'yatra'),
       },
       'failed': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Failed', 'Failed'),
+        label: __('Failed', 'yatra'),
       },
       'refunded': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Refunded', 'Refunded'),
+        label: __('Refunded', 'yatra'),
       },
     };
 
@@ -139,11 +139,11 @@ const ViewPayment: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Payment Details', 'Payment Details')}
+          title={__('Payment Details', 'yatra')}
           actions={
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           }
         />
@@ -195,17 +195,17 @@ const ViewPayment: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Payment Not Found', 'Payment Not Found')}
+          title={__('Payment Not Found', 'yatra')}
           actions={
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Payments', 'Back to Payments')}
+              {__('Back to Payments', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center text-red-500">
-            {__('Payment not found or you do not have permission to view it.', 'Payment not found or you do not have permission to view it.')}
+            {__('Payment not found or you do not have permission to view it.', 'yatra')}
           </CardContent>
         </Card>
       </div>
@@ -215,18 +215,18 @@ const ViewPayment: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Payment Details', 'Payment Details')}
-        description={__('View complete payment information', 'View complete payment information')}
+        title={__('Payment Details', 'yatra')}
+        description={__('View complete payment information', 'yatra')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
             <ConditionalRender capability="yatra_edit_bookings">
               <Button onClick={handleEdit} className="flex items-center gap-2">
                 <Edit className="w-4 h-4" />
-                {__('Edit Payment', 'Edit Payment')}
+                {__('Edit Payment', 'yatra')}
               </Button>
             </ConditionalRender>
           </div>
@@ -241,7 +241,7 @@ const ViewPayment: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Payment Information', 'Payment Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Payment Information', 'yatra')}</CardTitle>
                   {getPaymentStatusBadge(payment.payment_status)}
                 </div>
               </CardHeader>
@@ -249,7 +249,7 @@ const ViewPayment: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Payment Number', 'Payment Number')}
+                      {__('Payment Number', 'yatra')}
                     </label>
                     <p className="mt-1 text-sm font-mono font-semibold text-gray-900 dark:text-white">
                       {payment.payment_number}
@@ -257,7 +257,7 @@ const ViewPayment: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Payment Amount', 'Payment Amount')}
+                      {__('Payment Amount', 'yatra')}
                     </label>
                     <p className="mt-1 text-lg font-semibold text-gray-900 dark:text-white">
                       {formatPrice(payment.amount)}
@@ -265,7 +265,7 @@ const ViewPayment: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Payment Method', 'Payment Method')}
+                      {__('Payment Method', 'yatra')}
                     </label>
                     <div className="mt-1 flex items-center gap-2">
                       <CreditCard className="w-4 h-4 text-gray-400" />
@@ -276,7 +276,7 @@ const ViewPayment: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Payment Date', 'Payment Date')}
+                      {__('Payment Date', 'yatra')}
                     </label>
                     <div className="mt-1 flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
@@ -288,7 +288,7 @@ const ViewPayment: React.FC = () => {
                   {payment.transaction_id && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                        {__('Transaction ID', 'Transaction ID')}
+                        {__('Transaction ID', 'yatra')}
                       </label>
                       <p className="mt-1 text-sm font-mono text-gray-900 dark:text-white">
                         {payment.transaction_id}
@@ -300,7 +300,7 @@ const ViewPayment: React.FC = () => {
                 {payment.notes && (
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                      {__('Notes', 'Notes')}
+                      {__('Notes', 'yatra')}
                     </label>
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                       {payment.notes}
@@ -314,14 +314,14 @@ const ViewPayment: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Related Booking', 'Related Booking')}</CardTitle>
+                  <CardTitle className="text-base">{__('Related Booking', 'yatra')}</CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleViewBooking}
                     className="flex items-center gap-1.5 text-sm"
                   >
-                    {__('View Booking', 'View Booking')}
+                    {__('View Booking', 'yatra')}
                     <ExternalLink className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -330,7 +330,7 @@ const ViewPayment: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Booking Number', 'Booking Number')}
+                      {__('Booking Number', 'yatra')}
                     </label>
                     <p className="mt-1 text-sm font-mono font-semibold text-gray-900 dark:text-white">
                       {payment.booking_number}
@@ -338,7 +338,7 @@ const ViewPayment: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Trip', 'Trip')}
+                      {__('Trip', 'yatra')}
                     </label>
                     <p className="mt-1 text-sm font-medium text-gray-900 dark:text-white">
                       {payment.trip_title}
@@ -354,7 +354,7 @@ const ViewPayment: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Customer', 'Customer')}</CardTitle>
+                <CardTitle className="text-base">{__('Customer', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
@@ -378,12 +378,12 @@ const ViewPayment: React.FC = () => {
             {/* Payment Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'Timeline')}</CardTitle>
+                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                    {__('Created', 'Created')}
+                    {__('Created', 'yatra')}
                   </label>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
                     {formatDate(payment.created_at)}
@@ -392,7 +392,7 @@ const ViewPayment: React.FC = () => {
                 {payment.updated_at && payment.updated_at !== payment.created_at && (
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Last Updated', 'Last Updated')}
+                      {__('Last Updated', 'yatra')}
                     </label>
                     <p className="mt-1 text-sm text-gray-900 dark:text-white">
                       {formatDate(payment.updated_at)}

@@ -279,11 +279,11 @@ const Availability: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
-      showToast(__('Availability date deleted successfully', 'Availability date deleted successfully'), 'success');
+      showToast(__('Availability date deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, date: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete availability date', 'Failed to delete availability date'), 'error');
+      showToast(error?.message || __('Failed to delete availability date', 'yatra'), 'error');
     },
   });
 
@@ -324,21 +324,21 @@ const Availability: React.FC = () => {
     console.log('Status Badge:', { status, isBlocked });
     
     if (isBlocked) {
-      return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
+      return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'yatra')}</Badge>;
     }
     switch (status) {
       case 'available':
-        return <Badge variant="success" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">{__('Available', 'Available')}</Badge>;
+        return <Badge variant="success" className="text-xs bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">{__('Available', 'yatra')}</Badge>;
       case 'limited':
-        return <Badge variant="warning" className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400">{__('Limited', 'Limited')}</Badge>;
+        return <Badge variant="warning" className="text-xs bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400">{__('Limited', 'yatra')}</Badge>;
       case 'sold_out':
-        return <Badge variant="error" className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Sold Out', 'Sold Out')}</Badge>;
+        return <Badge variant="error" className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Sold Out', 'yatra')}</Badge>;
       case 'closed':
-        return <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">{__('Closed', 'Closed')}</Badge>;
+        return <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">{__('Closed', 'yatra')}</Badge>;
       case 'blocked':
-        return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'Blocked')}</Badge>;
+        return <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">{__('Blocked', 'yatra')}</Badge>;
       case 'cancelled':
-        return <Badge className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400">{__('Cancelled', 'Cancelled')}</Badge>;
+        return <Badge className="text-xs bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400">{__('Cancelled', 'yatra')}</Badge>;
       default:
         return <Badge variant="outline" className="text-xs border-gray-300 text-gray-600 dark:border-gray-600 dark:text-gray-400">{status || 'Unknown'}</Badge>;
     }
@@ -351,10 +351,10 @@ const Availability: React.FC = () => {
       // Refresh availability data
       await queryClient.invalidateQueries({ queryKey: ['availability'] });
       setLastSyncTime(new Date());
-      showToast(__('Availability data synced successfully', 'Availability data synced successfully'), 'success');
+      showToast(__('Availability data synced successfully', 'yatra'), 'success');
     } catch (error) {
       console.error('Sync failed:', error);
-      showToast(__('Failed to sync availability data', 'Failed to sync availability data'), 'error');
+      showToast(__('Failed to sync availability data', 'yatra'), 'error');
     } finally {
       setIsSyncing(false);
     }
@@ -468,35 +468,35 @@ const Availability: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
-      showToast(__('Selected availability dates deleted successfully', 'Selected availability dates deleted successfully'), 'success');
+      showToast(__('Selected availability dates deleted successfully', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete selected availability dates', 'Failed to delete selected availability dates'), 'error');
+      showToast(error?.message || __('Failed to delete selected availability dates', 'yatra'), 'error');
     },
   });
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one availability date.', 'Select at least one availability date.'), 'warning');
+      showToast(__('Select at least one availability date.', 'yatra'), 'warning');
       return;
     }
 
     if (bulkAction === 'delete') {
       bulkDeleteMutation.mutate(selectedIds);
     } else {
-      showToast(__('Unsupported bulk action for availability.', 'Unsupported bulk action for availability.'), 'warning');
+      showToast(__('Unsupported bulk action for availability.', 'yatra'), 'warning');
     }
   };
 
   const bulkStatusOptions = [
-    { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+    { value: 'delete', label: __('Delete Permanently', 'yatra') },
   ];
 
   const totalFiltered = filteredDates.length;
@@ -524,13 +524,13 @@ const Availability: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['availability'] });
-      showToast(__('Availability date duplicated successfully', 'Availability date duplicated successfully'), 'success');
+      showToast(__('Availability date duplicated successfully', 'yatra'), 'success');
       setDuplicateConfirm({ isOpen: false, date: null });
       setDuplicateDepartureDate('');
       setDuplicateDepartureTime('');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to duplicate availability date', 'Failed to duplicate availability date'), 'error');
+      showToast(error?.message || __('Failed to duplicate availability date', 'yatra'), 'error');
     },
   });
 
@@ -541,7 +541,7 @@ const Availability: React.FC = () => {
     // Departure
     cols.push({
       key: 'departure',
-      label: selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'Departure Time') : __('Departure', 'Departure'),
+      label: selectedTrip?.trip_type === 'single_day' ? __('Departure Time', 'yatra') : __('Departure', 'yatra'),
       visible: visibleColumns.departure,
       render: (date) => (
         selectedTrip?.trip_type === 'single_day' ? (
@@ -564,7 +564,7 @@ const Availability: React.FC = () => {
     // Arrival
     cols.push({
       key: 'arrival',
-      label: selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'Arrival Time') : __('Arrival', 'Arrival'),
+      label: selectedTrip?.trip_type === 'single_day' ? __('Arrival Time', 'yatra') : __('Arrival', 'yatra'),
       visible: visibleColumns.arrival,
       render: (date) => (
         selectedTrip?.trip_type === 'single_day' ? (
@@ -581,7 +581,7 @@ const Availability: React.FC = () => {
     // From/To
     cols.push({
       key: 'locations',
-      label: __('From/To', 'From/To'),
+      label: __('From/To', 'yatra'),
       visible: visibleColumns.locations,
       render: (date) => (
         <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
@@ -596,12 +596,12 @@ const Availability: React.FC = () => {
     // Capacity
     cols.push({
       key: 'capacity',
-      label: __('Capacity', 'Capacity'),
+      label: __('Capacity', 'yatra'),
       visible: visibleColumns.capacity,
       render: (date) => (
         <div className="flex flex-col items-center">
           <span className="text-sm font-medium text-gray-900 dark:text-white">{date.total_seats || 0}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'total')}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('total', 'yatra')}</span>
         </div>
       ),
     });
@@ -609,12 +609,12 @@ const Availability: React.FC = () => {
     // Booked
     cols.push({
       key: 'booked',
-      label: __('Booked', 'Booked'),
+      label: __('Booked', 'yatra'),
       visible: visibleColumns.booked,
       render: (date) => (
         <div className="flex flex-col items-center">
           <span className="text-sm font-medium text-orange-600 dark:text-orange-400">{date.booked_seats || 0}</span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{__('booked', 'booked')}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('booked', 'yatra')}</span>
         </div>
       ),
     });
@@ -622,7 +622,7 @@ const Availability: React.FC = () => {
     // Available
     cols.push({
       key: 'available',
-      label: __('Available', 'Available'),
+      label: __('Available', 'yatra'),
       visible: visibleColumns.available,
       render: (date) => (
         <div className="flex flex-col items-center">
@@ -637,7 +637,7 @@ const Availability: React.FC = () => {
           >
             {date.available_seats || 0}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400">{__('available', 'available')}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">{__('available', 'yatra')}</span>
           {date.available_seats <= (date.alert_threshold || 5) && date.available_seats > 0 && (
             <Bell className="w-3 h-3 text-yellow-500 mt-0.5" />
           )}
@@ -648,7 +648,7 @@ const Availability: React.FC = () => {
     // Waitlist
     cols.push({
       key: 'waitlist',
-      label: __('Waitlist', 'Waitlist'),
+      label: __('Waitlist', 'yatra'),
       visible: visibleColumns.waitlist,
       render: (date) => (
         date.waitlist_count > 0 ? (
@@ -656,7 +656,7 @@ const Availability: React.FC = () => {
             <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 text-xs">
               {date.waitlist_count}
             </Badge>
-            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('people', 'people')}</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">{__('people', 'yatra')}</span>
           </div>
         ) : (
           <span className="text-sm text-gray-400 dark:text-gray-500">-</span>
@@ -667,7 +667,7 @@ const Availability: React.FC = () => {
     // Price
     cols.push({
       key: 'price',
-      label: __('Price', 'Price'),
+      label: __('Price', 'yatra'),
       visible: visibleColumns.price,
       render: (date) => (
         <div className="flex flex-col gap-1">
@@ -682,7 +682,7 @@ const Availability: React.FC = () => {
                 </span>
                 {date.discount_percentage && parseFloat(date.discount_percentage) > 0 && (
                   <Badge variant="error" className="text-xs">
-                    {date.discount_percentage}% {__('OFF', 'OFF')}
+                    {date.discount_percentage}% {__('OFF', 'yatra')}
                   </Badge>
                 )}
               </div>
@@ -699,7 +699,7 @@ const Availability: React.FC = () => {
     // Status
     cols.push({
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       visible: visibleColumns.status,
       render: (date) => (
         <div className="flex flex-col gap-1">
@@ -725,13 +725,13 @@ const Availability: React.FC = () => {
   const tableActions = [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (date: AvailabilityDate) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: date.id }),
     },
     {
       key: 'duplicate',
-      label: __('Duplicate', 'Duplicate'),
+      label: __('Duplicate', 'yatra'),
       icon: <Copy className="w-4 h-4" />,
       onClick: (date: AvailabilityDate) => {
         setDuplicateConfirm({ isOpen: true, date });
@@ -741,7 +741,7 @@ const Availability: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (date: AvailabilityDate) => setDeleteConfirm({ isOpen: true, date }),
       variant: 'destructive' as const,
@@ -758,13 +758,13 @@ const Availability: React.FC = () => {
             deleteMutation.mutate(deleteConfirm.date.id);
           }
         }}
-        title={__('Delete Availability Date', 'Delete Availability Date')}
+        title={__('Delete Availability Date', 'yatra')}
         message={deleteConfirm.date
-          ? __('Are you sure you want to delete this availability date on {date}? This action cannot be undone.', 'Are you sure you want to delete this availability date on {date}? This action cannot be undone.')
+          ? __('Are you sure you want to delete this availability date on {date}? This action cannot be undone.', 'yatra')
               .replace('{date}', formatDate(deleteConfirm.date.departure_date))
-          : __('Are you sure you want to delete this availability date? This action cannot be undone.', 'Are you sure you want to delete this availability date? This action cannot be undone.')}
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+          : __('Are you sure you want to delete this availability date? This action cannot be undone.', 'yatra')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -782,33 +782,33 @@ const Availability: React.FC = () => {
           <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Duplicate Availability Date', 'Duplicate Availability Date')}
+                {__('Duplicate Availability Date', 'yatra')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {__('Select the new departure date. Arrival/return will be shifted automatically.', 'Select the new departure date. Arrival/return will be shifted automatically.')}
+                {__('Select the new departure date. Arrival/return will be shifted automatically.', 'yatra')}
               </p>
             </div>
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {__('Departure Date', 'Departure Date')}
+                  {__('Departure Date', 'yatra')}
                 </label>
                 <DatePicker
                   value={duplicateDepartureDate}
                   onChange={(value: string) => setDuplicateDepartureDate(value)}
-                  placeholder={__('Select date', 'Select date')}
+                  placeholder={__('Select date', 'yatra')}
                 />
               </div>
 
               {selectedTrip?.trip_type === 'single_day' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Departure Time', 'Departure Time')}
+                    {__('Departure Time', 'yatra')}
                   </label>
                   <TimePicker
                     value={duplicateDepartureTime}
                     onChange={(value: string) => setDuplicateDepartureTime(value)}
-                    placeholder={__('Select departure time', 'Select departure time')}
+                    placeholder={__('Select departure time', 'yatra')}
                   />
                 </div>
               )}
@@ -819,13 +819,13 @@ const Availability: React.FC = () => {
                 onClick={() => setDuplicateConfirm({ isOpen: false, date: null })}
                 disabled={duplicateMutation.isPending}
               >
-                {__('Cancel', 'Cancel')}
+                {__('Cancel', 'yatra')}
               </Button>
               <Button
                 onClick={() => {
                   if (!duplicateConfirm.date) return;
                   if (!duplicateDepartureDate) {
-                    showToast(__('Please select a departure date', 'Please select a departure date'), 'warning');
+                    showToast(__('Please select a departure date', 'yatra'), 'warning');
                     return;
                   }
                   duplicateMutation.mutate({
@@ -837,8 +837,8 @@ const Availability: React.FC = () => {
                 disabled={duplicateMutation.isPending}
               >
                 {duplicateMutation.isPending
-                  ? __('Duplicating...', 'Duplicating...')
-                  : __('Duplicate', 'Duplicate')}
+                  ? __('Duplicating...', 'yatra')
+                  : __('Duplicate', 'yatra')}
               </Button>
             </div>
           </div>
@@ -846,8 +846,8 @@ const Availability: React.FC = () => {
       )}
 
       <PageHeader
-        title={__('Availability Management', 'Availability Management')}
-        description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.')}
+        title={__('Availability Management', 'yatra')}
+        description={__('Manage departure dates and availability for your trips. Add dates for this month or plan ahead for the entire year.', 'yatra')}
       />
 
       {/* Trip Selector - Clean Design */}
@@ -857,11 +857,11 @@ const Availability: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <CalendarDays className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {__('Select Trip', 'Select Trip')}
+                {__('Select Trip', 'yatra')}
               </h3>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              {__('Choose a trip to manage its availability dates and departure schedules', 'Choose a trip to manage its availability dates and departure schedules')}
+              {__('Choose a trip to manage its availability dates and departure schedules', 'yatra')}
             </p>
           </div>
         </div>
@@ -869,7 +869,7 @@ const Availability: React.FC = () => {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+              {__('Trip', 'yatra')} <span className="text-red-500">*</span>
             </label>
             <SearchableSelect
               value={selectedTripId?.toString() || ''}
@@ -879,14 +879,14 @@ const Availability: React.FC = () => {
                 setPage(1);
               }}
               options={[
-                { value: '', label: __('-- Select a Trip --', '-- Select a Trip --') },
+                { value: '', label: __('-- Select a Trip --', 'yatra') },
                 ...(tripsData?.trips.map(trip => ({
                   value: trip.id.toString(),
                   label: `${trip.title}${trip.trip_type === 'single_day' ? ' (Single Day)' : trip.trip_type === 'multi_day' ? ' (Multi-Day)' : ''}`
                 })) || [])
               ]}
-              placeholder={__('Search or select a trip...', 'Search or select a trip...')}
-              searchPlaceholder={__('Search by trip name or ID...', 'Search by trip name or ID...')}
+              placeholder={__('Search or select a trip...', 'yatra')}
+              searchPlaceholder={__('Search by trip name or ID...', 'yatra')}
               className="w-full"
               required
             />
@@ -906,7 +906,7 @@ const Availability: React.FC = () => {
                     ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400'
                     : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
                 }>
-                  {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'Single Day') : __('Multi-Day', 'Multi-Day')}
+                  {selectedTrip.trip_type === 'single_day' ? __('Single Day', 'yatra') : __('Multi-Day', 'yatra')}
                 </Badge>
               )}
             </div>
@@ -922,10 +922,10 @@ const Availability: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                    {__('Get Started', 'Get Started')}
+                    {__('Get Started', 'yatra')}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {__('Select a trip from the dropdown above to view and manage its availability dates, pricing, and booking status.', 'Select a trip from the dropdown above to view and manage its availability dates, pricing, and booking status.')}
+                    {__('Select a trip from the dropdown above to view and manage its availability dates, pricing, and booking status.', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -949,7 +949,7 @@ const Availability: React.FC = () => {
               }`}
             >
               <CalendarDays className="w-4 h-4 inline mr-2" />
-              {__('Specific Dates', 'Specific Dates')}
+              {__('Specific Dates', 'yatra')}
             </button>
             <button
               onClick={() => setTabMode('recurring')}
@@ -960,7 +960,7 @@ const Availability: React.FC = () => {
               }`}
             >
               <RefreshCw className="w-4 h-4 inline mr-2" />
-              {__('Recurring Rules', 'Recurring Rules')}
+              {__('Recurring Rules', 'yatra')}
             </button>
               </div>
               
@@ -993,7 +993,7 @@ const Availability: React.FC = () => {
                       className="rounded-none border-0"
                     >
                       <List className="w-4 h-4 mr-1" />
-                      {__('List', 'List')}
+                      {__('List', 'yatra')}
                     </Button>
                     <Button
                       variant={viewMode === 'calendar' ? 'default' : 'ghost'}
@@ -1002,7 +1002,7 @@ const Availability: React.FC = () => {
                       className="rounded-none border-0"
                     >
                       <Calendar className="w-4 h-4 mr-1" />
-                      {__('Calendar', 'Calendar')}
+                      {__('Calendar', 'yatra')}
                     </Button>
                   </div>
                   
@@ -1012,10 +1012,10 @@ const Availability: React.FC = () => {
                     size="sm"
                     onClick={handleSync}
                     disabled={isSyncing}
-                    title={lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __('Sync availability', 'Sync availability')}
+                    title={lastSyncTime ? `Last synced: ${lastSyncTime.toLocaleTimeString()}` : __('Sync availability', 'yatra')}
                   >
                     <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
-                    {__('Sync', 'Sync')}
+                    {__('Sync', 'yatra')}
                   </Button>
                   
                   {/* Add Availability Button */}
@@ -1023,7 +1023,7 @@ const Availability: React.FC = () => {
                     onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create', trip_id: selectedTripId.toString() })}
                   >
                     <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Availability Date', 'Add Availability Date')}
+                    {__('Add Availability Date', 'yatra')}
                   </Button>
                 </div>
               )}
@@ -1037,14 +1037,14 @@ const Availability: React.FC = () => {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold text-yellow-900 dark:text-yellow-200">
-                        {__('Inventory Alerts', 'Inventory Alerts')}
+                        {__('Inventory Alerts', 'yatra')}
                       </h4>
                       <Badge className="bg-yellow-200 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200">
                         {inventoryAlerts.length}
                       </Badge>
                     </div>
                     <p className="text-sm text-yellow-800 dark:text-yellow-300 mb-2">
-                      {__('The following dates have low availability (below threshold)', 'The following dates have low availability (below threshold)')}
+                      {__('The following dates have low availability (below threshold).', 'yatra')}
                     </p>
                     <div className="flex flex-wrap gap-2">
                       {inventoryAlerts.slice(0, 5).map((alert) => (
@@ -1057,12 +1057,12 @@ const Availability: React.FC = () => {
                         >
                           {formatDate(alert.departure_date)}
                           {alert.departure_time && ` ${formatTime(alert.departure_time)}`}
-                          <span className="ml-1 font-semibold">({alert.available_seats} {__('seats', 'seats')})</span>
+                          <span className="ml-1 font-semibold">({alert.available_seats} {__('seats', 'yatra')})</span>
                         </Button>
                       ))}
                       {inventoryAlerts.length > 5 && (
                         <span className="text-xs text-yellow-700 dark:text-yellow-400 self-center">
-                          +{inventoryAlerts.length - 5} {__('more', 'more')}
+                          +{inventoryAlerts.length - 5} {__('more', 'yatra')}
                         </span>
                       )}
                     </div>
@@ -1087,9 +1087,9 @@ const Availability: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <CardTitle className="text-base">{__('Waitlist', 'Waitlist')}</CardTitle>
+                    <CardTitle className="text-base">{__('Waitlist', 'yatra')}</CardTitle>
                     <Badge className="bg-blue-200 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
-                      {waitlistEntries.reduce((sum, entry) => sum + entry.waitlist_count, 0)} {__('people', 'people')}
+                      {waitlistEntries.reduce((sum, entry) => sum + entry.waitlist_count, 0)} {__('people', 'yatra')}
                     </Badge>
                   </div>
                   <Button
@@ -1098,7 +1098,7 @@ const Availability: React.FC = () => {
                     onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'waitlist', trip_id: selectedTripId.toString() })}
                   >
                     <Eye className="w-4 h-4 mr-1" />
-                    {__('View All', 'View All')}
+                    {__('View All', 'yatra')}
                   </Button>
                 </div>
               </CardHeader>
@@ -1114,12 +1114,12 @@ const Availability: React.FC = () => {
                             {entry.departure_time && ` ${formatTime(entry.departure_time)}`}
                           </div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {entry.booked_seats}/{entry.total_seats} {__('booked', 'booked')}
+                            {entry.booked_seats}/{entry.total_seats} {__('booked', 'yatra')}
                           </div>
                         </div>
                       </div>
                       <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                        {entry.waitlist_count} {__('on waitlist', 'on waitlist')}
+                        {entry.waitlist_count} {__('on waitlist', 'yatra')}
                       </Badge>
                     </div>
                   ))}
@@ -1135,7 +1135,7 @@ const Availability: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Ban className="w-5 h-5 text-red-600 dark:text-red-400" />
-                    <CardTitle className="text-base">{__('Blocked Dates', 'Blocked Dates')}</CardTitle>
+                    <CardTitle className="text-base">{__('Blocked Dates', 'yatra')}</CardTitle>
                     <Badge className="bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200">
                       {blockedDates.length}
                     </Badge>
@@ -1155,7 +1155,7 @@ const Availability: React.FC = () => {
                           </div>
                           {entry.block_reason && (
                             <div className="text-xs text-gray-500 dark:text-gray-400">
-                              {__('Reason', 'Reason')}: {entry.block_reason}
+                              {__('Reason', 'yatra')}: {entry.block_reason}
                             </div>
                           )}
                         </div>
@@ -1180,7 +1180,7 @@ const Availability: React.FC = () => {
               <div className={`grid grid-cols-1 ${selectedTrip?.trip_type === 'single_day' ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-4`}>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Search', 'Search')}
+                    {__('Search', 'yatra')}
                   </label>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -1188,37 +1188,37 @@ const Availability: React.FC = () => {
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder={__('Search dates, locations...', 'Search dates, locations...')}
+                      placeholder={__('Search dates, locations...', 'yatra')}
                       className="pl-10"
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Status', 'Status')}
+                    {__('Status', 'yatra')}
                   </label>
                   <Select
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                   >
-                    <option value="all">{__('All Status', 'All Status')}</option>
-                    <option value="available">{__('Available', 'Available')}</option>
-                    <option value="limited">{__('Limited', 'Limited')}</option>
-                    <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
-                    <option value="closed">{__('Closed', 'Closed')}</option>
-                    <option value="blocked">{__('Blocked', 'Blocked')}</option>
+                    <option value="all">{__('All Status', 'yatra')}</option>
+                    <option value="available">{__('Available', 'yatra')}</option>
+                    <option value="limited">{__('Limited', 'yatra')}</option>
+                    <option value="sold_out">{__('Sold Out', 'yatra')}</option>
+                    <option value="closed">{__('Closed', 'yatra')}</option>
+                    <option value="blocked">{__('Blocked', 'yatra')}</option>
                   </Select>
                 </div>
                 {selectedTrip?.trip_type !== 'single_day' && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {__('Month', 'Month')}
+                      {__('Month', 'yatra')}
                     </label>
                     <Select
                       value={monthFilter}
                       onChange={(e) => setMonthFilter(e.target.value)}
                     >
-                      <option value="all">{__('All Months', 'All Months')}</option>
+                      <option value="all">{__('All Months', 'yatra')}</option>
                       {availableMonths.map(month => {
                         const [year, monthNum] = month.split('-');
                         const date = new Date(parseInt(year), parseInt(monthNum) - 1);
@@ -1242,7 +1242,7 @@ const Availability: React.FC = () => {
                     className="w-full"
                   >
                     <X className="w-4 h-4 mr-2" />
-                    {__('Clear Filters', 'Clear Filters')}
+                    {__('Clear Filters', 'yatra')}
                   </Button>
                 </div>
               </div>
@@ -1259,25 +1259,25 @@ const Availability: React.FC = () => {
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
             statusOptions={[
-              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-              { key: 'available', label: __('Available', 'Available'), count: statusCounts.available },
-              { key: 'limited', label: __('Limited', 'Limited'), count: statusCounts.limited },
-              { key: 'sold_out', label: __('Sold Out', 'Sold Out'), count: statusCounts.sold_out },
-              { key: 'closed', label: __('Closed', 'Closed'), count: statusCounts.closed },
-              { key: 'blocked', label: __('Blocked', 'Blocked'), count: statusCounts.blocked },
+              { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+              { key: 'available', label: __('Available', 'yatra'), count: statusCounts.available },
+              { key: 'limited', label: __('Limited', 'yatra'), count: statusCounts.limited },
+              { key: 'sold_out', label: __('Sold Out', 'yatra'), count: statusCounts.sold_out },
+              { key: 'closed', label: __('Closed', 'yatra'), count: statusCounts.closed },
+              { key: 'blocked', label: __('Blocked', 'yatra'), count: statusCounts.blocked },
             ]}
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
             columnOptions={[
-              { key: 'departure', label: __('Departure', 'Departure'), visible: visibleColumns.departure },
-              { key: 'arrival', label: __('Arrival', 'Arrival'), visible: visibleColumns.arrival },
-              { key: 'locations', label: __('From/To', 'From/To'), visible: visibleColumns.locations },
-              { key: 'capacity', label: __('Capacity', 'Capacity'), visible: visibleColumns.capacity },
-              { key: 'booked', label: __('Booked', 'Booked'), visible: visibleColumns.booked },
-              { key: 'available', label: __('Available', 'Available'), visible: visibleColumns.available },
-              { key: 'waitlist', label: __('Waitlist', 'Waitlist'), visible: visibleColumns.waitlist },
-              { key: 'price', label: __('Price', 'Price'), visible: visibleColumns.price },
-              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
+              { key: 'departure', label: __('Departure', 'yatra'), visible: visibleColumns.departure },
+              { key: 'arrival', label: __('Arrival', 'yatra'), visible: visibleColumns.arrival },
+              { key: 'locations', label: __('From/To', 'yatra'), visible: visibleColumns.locations },
+              { key: 'capacity', label: __('Capacity', 'yatra'), visible: visibleColumns.capacity },
+              { key: 'booked', label: __('Booked', 'yatra'), visible: visibleColumns.booked },
+              { key: 'available', label: __('Available', 'yatra'), visible: visibleColumns.available },
+              { key: 'waitlist', label: __('Waitlist', 'yatra'), visible: visibleColumns.waitlist },
+              { key: 'price', label: __('Price', 'yatra'), visible: visibleColumns.price },
+              { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
             ]}
             onToggleColumn={(key) => toggleColumn(key as keyof typeof visibleColumns)}
             bulkMutationPending={bulkDeleteMutation.isPending}
@@ -1288,14 +1288,14 @@ const Availability: React.FC = () => {
           {/* Availability Dates List */}
           <Card>
             <CardHeader>
-              <CardTitle>{__('Availability Dates', 'Availability Dates')}</CardTitle>
+              <CardTitle>{__('Availability Dates', 'yatra')}</CardTitle>
               <CardDescription>
                 {selectedTrip && (
                   <>
-                    {__('Managing availability for', 'Managing availability for')} <strong>{selectedTrip.title}</strong>
+                    {__('Managing availability for', 'yatra')} <strong>{selectedTrip.title}</strong>
                     {filteredDates.length > 0 && (
                       <span className="ml-2">
-                        ({filteredDates.length} {selectedTrip?.trip_type === 'single_day' ? __('time slots', 'time slots') : __('dates', 'dates')})
+                        ({filteredDates.length} {selectedTrip?.trip_type === 'single_day' ? __('time slots', 'yatra') : __('dates', 'yatra')})
                       </span>
                     )}
                   </>
@@ -1307,8 +1307,8 @@ const Availability: React.FC = () => {
                 filteredDates.length === 0 ? (
                   <div className="py-12 text-center text-gray-500 dark:text-gray-400">
                     <Calendar className="w-10 h-10 mx-auto mb-3 text-gray-400 dark:text-gray-600" />
-                    <p className="text-sm font-medium mb-1">{__('No availability dates found for this trip.', 'No availability dates found for this trip.')}</p>
-                    <p className="text-xs">{__('Try adjusting your filters or add a new availability date.', 'Try adjusting your filters or add a new availability date.')}</p>
+                    <p className="text-sm font-medium mb-1">{__('No availability dates found for this trip.', 'yatra')}</p>
+                    <p className="text-xs">{__('Try adjusting your filters or add a new availability date.', 'yatra')}</p>
                   </div>
                 ) : (
                   <div className="mt-4">
@@ -1329,7 +1329,7 @@ const Availability: React.FC = () => {
                   actions={tableActions}
                   isLoading={isLoading}
                   isError={!!availabilityError}
-                  errorText={__('Error loading availability', 'Error loading availability')}
+                  errorText={__('Error loading availability', 'yatra')}
                   errorDescription={__(
                     'We couldn’t connect to the availability service. Please refresh or try again shortly.',
                     'We couldn’t connect to the availability service. Please refresh or try again shortly.'
@@ -1337,8 +1337,8 @@ const Availability: React.FC = () => {
                   errorDetails={availabilityErrorContext?.details || ''}
                   errorRequestInfo={availabilityErrorContext?.requestInfo}
                   onRetry={() => queryClient.invalidateQueries({ queryKey: ['availability'] })}
-                  emptyText={__('No availability dates found for this trip.', 'No availability dates found for this trip.')}
-                  emptyDescription={__('Try adjusting your filters or add a new availability date.', 'Try adjusting your filters or add a new availability date.')}
+                  emptyText={__('No availability dates found for this trip.', 'yatra')}
+                  emptyDescription={__('Try adjusting your filters or add a new availability date.', 'yatra')}
                   selectedItemIds={selectedIds}
                   onSelectItem={(id, checked) => {
                     if (checked) {

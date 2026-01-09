@@ -90,20 +90,20 @@ const PastDepartures: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['past-departures', tripId] });
-      showToast(__('Departure deleted successfully', 'Departure deleted successfully'), 'success');
+      showToast(__('Departure deleted successfully', 'yatra'), 'success');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete departure', 'Failed to delete departure'), 'error');
+      showToast(error?.message || __('Failed to delete departure', 'yatra'), 'error');
     },
   });
 
   const handleDelete = (id: number, source: string, bookedCount: number) => {
     if (source !== 'recurring_generated' || bookedCount > 0) {
-      showToast(__('Only empty recurring-generated departures can be deleted', 'Only empty recurring-generated departures can be deleted'), 'error');
+      showToast(__('Only empty recurring-generated departures can be deleted', 'yatra'), 'error');
       return;
     }
 
-    if (!confirm(__('Are you sure you want to delete this departure?', 'Are you sure you want to delete this departure?'))) {
+    if (!confirm(__('Are you sure you want to delete this departure?', 'yatra'))) {
       return;
     }
     deleteMutation.mutate(id);
@@ -116,12 +116,12 @@ const PastDepartures: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={__('Past Departures', 'Past Departures')}
-        description={tripData ? `${__('Past departures for', 'Past departures for')}: ${tripData.title}` : __('View past trip departures', 'View past trip departures')}
+        title={__('Past Departures', 'yatra')}
+        description={tripData ? `${__('Past departures for', 'yatra')}: ${tripData.title}` : __('View past trip departures', 'yatra')}
         actions={
           <Button variant="ghost" onClick={handleBack}>
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -131,7 +131,7 @@ const PastDepartures: React.FC = () => {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{__('Trip ID is required', 'Trip ID is required')}</p>
+              <p className="text-gray-500">{__('Trip ID is required', 'yatra')}</p>
             </div>
           </CardContent>
         </Card>
@@ -143,11 +143,11 @@ const PastDepartures: React.FC = () => {
               <div className="flex gap-4 items-end">
                 <div className="flex-1">
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Search', 'Search')}
+                    {__('Search', 'yatra')}
                   </label>
                   <Input
                     type="text"
-                    placeholder={__('Search by date...', 'Search by date...')}
+                    placeholder={__('Search by date...', 'yatra')}
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -163,22 +163,22 @@ const PastDepartures: React.FC = () => {
           <Card>
             <CardContent className="pt-6">
               {isLoading ? (
-                <div className="text-center py-8 text-gray-500">{__('Loading...', 'Loading...')}</div>
+                <div className="text-center py-8 text-gray-500">{__('Loading...', 'yatra')}</div>
               ) : !departuresData?.data?.length ? (
                 <div className="text-center py-8">
                   <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">{__('No past departures found', 'No past departures found')}</p>
+                  <p className="text-gray-500">{__('No past departures found', 'yatra')}</p>
                 </div>
               ) : (
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{__('Date', 'Date')}</TableHead>
-                      <TableHead>{__('Time', 'Time')}</TableHead>
-                      <TableHead>{__('Capacity', 'Capacity')}</TableHead>
-                      <TableHead>{__('Booked', 'Booked')}</TableHead>
-                      <TableHead>{__('Source', 'Source')}</TableHead>
-                      <TableHead>{__('Actions', 'Actions')}</TableHead>
+                      <TableHead>{__('Date', 'yatra')}</TableHead>
+                      <TableHead>{__('Time', 'yatra')}</TableHead>
+                      <TableHead>{__('Capacity', 'yatra')}</TableHead>
+                      <TableHead>{__('Booked', 'yatra')}</TableHead>
+                      <TableHead>{__('Source', 'yatra')}</TableHead>
+                      <TableHead>{__('Actions', 'yatra')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -191,11 +191,11 @@ const PastDepartures: React.FC = () => {
                         <TableCell>
                           {departure.source === 'manual' ? (
                             <Badge className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                              {__('Manual', 'Manual')}
+                              {__('Manual', 'yatra')}
                             </Badge>
                           ) : (
                             <Badge className="bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:text-purple-400">
-                              {__('Recurring', 'Recurring')}
+                              {__('Recurring', 'yatra')}
                             </Badge>
                           )}
                         </TableCell>

@@ -18,7 +18,6 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
-import { RichTextEditor } from '../components/ui/rich-text-editor';
 
 interface CategoryFormData {
   name: string;
@@ -72,7 +71,7 @@ const CategoryForm: React.FC = () => {
         const response = await apiClient.get(`/trip-categories/${categoryId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load category', 'Failed to load category'), 'error');
+        showToast(error?.message || __('Failed to load category', 'yatra'), 'error');
         throw error;
       }
     },
@@ -181,17 +180,17 @@ const CategoryForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     if (formData.parent_id && categoryId && Number(formData.parent_id) === categoryId) {
-      newErrors.parent_id = __('Category cannot be its own parent', 'Category cannot be its own parent');
+      newErrors.parent_id = __('Category cannot be its own parent', 'yatra');
     }
 
     setErrors(newErrors);
@@ -223,8 +222,8 @@ const CategoryForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['trip-category', categoryId] });
       showToast(
         isEditMode
-          ? __('Category updated successfully', 'Category updated successfully')
-          : __('Category created successfully', 'Category created successfully'),
+          ? __('Category updated successfully', 'yatra')
+          : __('Category created successfully', 'yatra'),
         'success'
       );
       setIsSubmitting(false);
@@ -239,7 +238,7 @@ const CategoryForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the category', 'An error occurred while saving the category');
+      const errorMessage = error?.message || __('An error occurred while saving the category', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -249,7 +248,7 @@ const CategoryForm: React.FC = () => {
     e.preventDefault();
 
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -324,12 +323,12 @@ const CategoryForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Category', 'Edit Category') : __('Add New Category', 'Add New Category')}
-        description={isEditMode ? __('Update category information', 'Update category information') : __('Create a new trip category', 'Create a new trip category')}
+        title={isEditMode ? __('Edit Category', 'yatra') : __('Add New Category', 'yatra')}
+        description={isEditMode ? __('Update category information', 'yatra') : __('Create a new trip category', 'yatra')}
         actions={
           <Button variant="outline" onClick={handleCancel} className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -340,19 +339,19 @@ const CategoryForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'Name')} <span className="text-red-500">*</span>
+                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('Enter category name', 'Enter category name')}
+                      placeholder={__('Enter category name', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -361,7 +360,7 @@ const CategoryForm: React.FC = () => {
 
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -369,7 +368,7 @@ const CategoryForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('category-slug', 'category-slug')}
+                        placeholder={__('category-slug', 'yatra')}
                         className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                         disabled={!isSlugEditable}
                         required
@@ -378,7 +377,7 @@ const CategoryForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                       >
                         {isSlugEditable ? <X className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
                       </button>
@@ -386,20 +385,10 @@ const CategoryForm: React.FC = () => {
                     {errors.slug && <p className="mt-1 text-sm text-red-500">{errors.slug}</p>}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {isSlugEditable
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')}
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')}
                     </p>
                   </div>
-
-                  <RichTextEditor
-                    label={__('Description', 'Description')}
-                    value={formData.description || ''}
-                    onChange={(value) => handleFieldChange('description', value)}
-                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'Write a rich description (supports formatting, lists, links...)')}
-                    helperText={__('Use formatting, bullet lists, and links to describe this category. HTML is supported.', 'Use formatting, bullet lists, and links to describe this category. HTML is supported.')}
-                    minHeight={260}
-                    maxHeight={600}
-                  />
                 </CardContent>
               </Card>
             </div>
@@ -407,12 +396,12 @@ const CategoryForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Hierarchy', 'Hierarchy')}</CardTitle>
+                  <CardTitle className="text-base">{__('Hierarchy', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="parent_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Parent Category', 'Parent Category')}
+                      {__('Parent Category', 'yatra')}
                     </label>
                     <Select
                       id="parent_id"
@@ -420,7 +409,7 @@ const CategoryForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('parent_id', e.target.value === '' ? '' : Number(e.target.value))}
                       className="w-full h-10"
                     >
-                      <option value="">{__('None (Top Level)', 'None (Top Level)')}</option>
+                      <option value="">{__('None (Top Level)', 'yatra')}</option>
                       {parentOptions.map((cat) => (
                         <option key={cat.id} value={cat.id}>
                           {cat.name}
@@ -429,7 +418,7 @@ const CategoryForm: React.FC = () => {
                     </Select>
                     {errors.parent_id && <p className="mt-1 text-sm text-red-500">{errors.parent_id}</p>}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {__('Assign a parent category to create subcategories.', 'Assign a parent category to create subcategories.')}
+                      {__('Assign a parent category to create subcategories.', 'yatra')}
                     </p>
                   </div>
                 </CardContent>
@@ -437,7 +426,7 @@ const CategoryForm: React.FC = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Select
@@ -446,23 +435,23 @@ const CategoryForm: React.FC = () => {
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                       className="w-full h-10"
                     >
-                    <option value="draft">{__('Draft', 'Draft')}</option>
-                    <option value="publish">{__('Publish', 'Publish')}</option>
-                    <option value="trash">{__('Trash', 'Trash')}</option>
+                    <option value="draft">{__('Draft', 'yatra')}</option>
+                    <option value="publish">{__('Publish', 'yatra')}</option>
+                    <option value="trash">{__('Trash', 'yatra')}</option>
                   </Select>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Category Icon or Image', 'Category Icon or Image')}</CardTitle>
+                  <CardTitle className="text-base">{__('Category Icon or Image', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
                     onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
-                    helpText={__('Choose a library icon or upload a custom image for this category.', 'Choose a library icon or upload a custom image for this category.')}
+                    label={__('Select Icon or Upload Image', 'yatra')}
+                    helpText={__('Choose a library icon or upload a custom image for this category.', 'yatra')}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -478,17 +467,17 @@ const CategoryForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Category', 'Update Category') : __('Create Category', 'Create Category')}
+                            {isEditMode ? __('Update Category', 'yatra') : __('Create Category', 'yatra')}
                           </>
                         )}
                       </Button>
                       <Button type="button" variant="outline" onClick={handleCancel} disabled={isSubmitting}>
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

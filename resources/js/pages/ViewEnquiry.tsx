@@ -71,7 +71,7 @@ const ViewEnquiry: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
       setRespondDialogOpen(false);
       setResponseMessage('');
-      showToast(__('Response sent successfully.', 'Response sent successfully.'), 'success');
+      showToast(__('Response sent successfully.', 'yatra'), 'success');
     },
   });
 
@@ -88,23 +88,23 @@ const ViewEnquiry: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'new': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('New', 'New'),
+        label: __('New', 'yatra'),
       },
       'pending': {
         className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'responded': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Responded', 'Responded'),
+        label: __('Responded', 'yatra'),
       },
       'converted': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Converted', 'Converted'),
+        label: __('Converted', 'yatra'),
       },
       'closed': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Closed', 'Closed'),
+        label: __('Closed', 'yatra'),
       },
     };
 
@@ -154,7 +154,7 @@ const ViewEnquiry: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Enquiry Details', 'Enquiry Details')}
+          title={__('Enquiry Details', 'yatra')}
           actions={
             <div className="flex items-center gap-2">
               <Skeleton className="h-10 w-24" />
@@ -220,17 +220,17 @@ const ViewEnquiry: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Enquiry Not Found', 'Enquiry Not Found')}
+          title={__('Enquiry Not Found', 'yatra')}
           actions={
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Enquiries', 'Back to Enquiries')}
+              {__('Back to Enquiries', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center text-red-500">
-            {__('Enquiry not found or you do not have permission to view it.', 'Enquiry not found or you do not have permission to view it.')}
+            {__('Enquiry not found or you do not have permission to view it.', 'yatra')}
           </CardContent>
         </Card>
       </div>
@@ -240,13 +240,13 @@ const ViewEnquiry: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Enquiry Details', 'Enquiry Details')}
-        description={__('View complete enquiry information', 'View complete enquiry information')}
+        title={__('Enquiry Details', 'yatra')}
+        description={__('View complete enquiry information', 'yatra')}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
             <ConditionalRender capability="yatra_edit_bookings">
               <div className="flex items-center gap-2">
@@ -257,12 +257,12 @@ const ViewEnquiry: React.FC = () => {
                     className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
                   >
                     <Send className="w-4 h-4" />
-                    {__('Send Response', 'Send Response')}
+                    {__('Send Response', 'yatra')}
                   </Button>
                 )}
                 <Button onClick={handleEdit} className="flex items-center gap-2">
                   <Edit className="w-4 h-4" />
-                  {__('Edit Enquiry', 'Edit Enquiry')}
+                  {__('Edit Enquiry', 'yatra')}
                 </Button>
               </div>
             </ConditionalRender>
@@ -278,14 +278,14 @@ const ViewEnquiry: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Enquiry Information', 'Enquiry Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Enquiry Information', 'yatra')}</CardTitle>
                   {getStatusBadge(enquiry.status)}
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                    {__('Message', 'Message')}
+                    {__('Message', 'yatra')}
                   </label>
                   <div className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -299,7 +299,7 @@ const ViewEnquiry: React.FC = () => {
                   {enquiry.travelers_count && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                        {__('Number of Travelers', 'Number of Travelers')}
+                        {__('Number of Travelers', 'yatra')}
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
@@ -312,7 +312,7 @@ const ViewEnquiry: React.FC = () => {
                   {enquiry.travel_date && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                        {__('Preferred Travel Date', 'Preferred Travel Date')}
+                        {__('Preferred Travel Date', 'yatra')}
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
@@ -327,7 +327,7 @@ const ViewEnquiry: React.FC = () => {
                 {enquiry.response && (
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                      {__('Response', 'Response')}
+                      {__('Response', 'yatra')}
                     </label>
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                       {enquiry.response}
@@ -342,7 +342,7 @@ const ViewEnquiry: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{__('Related Trip', 'Related Trip')}</CardTitle>
+                    <CardTitle className="text-base">{__('Related Trip', 'yatra')}</CardTitle>
                     {enquiry.trip_id && (
                       <Button
                         variant="ghost"
@@ -350,7 +350,7 @@ const ViewEnquiry: React.FC = () => {
                         onClick={handleViewTrip}
                         className="flex items-center gap-1.5 text-sm"
                       >
-                        {__('View Trip', 'View Trip')}
+                        {__('View Trip', 'yatra')}
                         <ExternalLink className="w-3.5 h-3.5" />
                       </Button>
                     )}
@@ -359,7 +359,7 @@ const ViewEnquiry: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Trip', 'Trip')}
+                      {__('Trip', 'yatra')}
                     </label>
                     <div className="mt-1 flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-gray-400" />
@@ -378,7 +378,7 @@ const ViewEnquiry: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Customer', 'Customer')}</CardTitle>
+                <CardTitle className="text-base">{__('Customer', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
@@ -402,12 +402,12 @@ const ViewEnquiry: React.FC = () => {
             {/* Enquiry Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'Timeline')}</CardTitle>
+                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                    {__('Submitted', 'Submitted')}
+                    {__('Submitted', 'yatra')}
                   </label>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
                     {formatDate(enquiry.created_at)}
@@ -416,7 +416,7 @@ const ViewEnquiry: React.FC = () => {
                 {enquiry.responded_at && (
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Responded', 'Responded')}
+                      {__('Responded', 'yatra')}
                     </label>
                     <p className="mt-1 text-sm text-gray-900 dark:text-white">
                       {formatDate(enquiry.responded_at)}
@@ -435,11 +435,11 @@ const ViewEnquiry: React.FC = () => {
         onClose={() => {
           if (!respondMutation.isPending) setRespondDialogOpen(false);
         }}
-        title={__('Respond to Enquiry', 'Respond to Enquiry')}
+        title={__('Respond to Enquiry', 'yatra')}
         description={
           enquiry ? (
             <span>
-              {__('Send a response to', 'Send a response to')} <strong>{enquiry.name}</strong>
+              {__('Send a response to', 'yatra')} <strong>{enquiry.name}</strong>
             </span>
           ) : null
         }
@@ -451,7 +451,7 @@ const ViewEnquiry: React.FC = () => {
               onClick={() => setRespondDialogOpen(false)}
               disabled={respondMutation.isPending}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button
               onClick={sendResponse}
@@ -460,12 +460,12 @@ const ViewEnquiry: React.FC = () => {
               {respondMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Sending...', 'Sending...')}
+                  {__('Sending...', 'yatra')}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {__('Send Response', 'Send Response')}
+                  {__('Send Response', 'yatra')}
                 </>
               )}
             </Button>
@@ -487,7 +487,7 @@ const ViewEnquiry: React.FC = () => {
                 </div>
               )}
               <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <strong>{__('Original Message:', 'Original Message:')}</strong>
+                <strong>{__('Original Message:', 'yatra')}</strong>
                 <p className="mt-1 text-gray-600 dark:text-gray-400">{enquiry.message}</p>
               </div>
             </div>
@@ -495,12 +495,12 @@ const ViewEnquiry: React.FC = () => {
             {/* Response Message */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+                {__('Your Response', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}
-                placeholder={__('Type your response here...', 'Type your response here...')}
+                placeholder={__('Type your response here...', 'yatra')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={5}
                 disabled={respondMutation.isPending}
@@ -509,7 +509,7 @@ const ViewEnquiry: React.FC = () => {
 
             {respondMutation.isError && (
               <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'yatra')}
               </div>
             )}
           </div>

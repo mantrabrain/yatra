@@ -146,7 +146,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
             type={attribute.field_type === 'email' ? 'email' : attribute.field_type === 'url' ? 'url' : 'text'}
             value={value}
             onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
-            placeholder={attribute.placeholder || __('Enter value', 'Enter value')}
+            placeholder={attribute.placeholder || __('Enter value', 'yatra')}
             className="mt-2"
           />
         );
@@ -157,7 +157,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
             type="number"
             value={value}
             onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
-            placeholder={attribute.placeholder || __('Enter number', 'Enter number')}
+            placeholder={attribute.placeholder || __('Enter number', 'yatra')}
             className="mt-2"
           />
         );
@@ -167,7 +167,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           <textarea
             value={value}
             onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
-            placeholder={attribute.placeholder || __('Enter text', 'Enter text')}
+            placeholder={attribute.placeholder || __('Enter text', 'yatra')}
             rows={3}
             className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none mt-2"
           />
@@ -188,7 +188,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
             onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
             className="mt-2"
           >
-            <option value="">{__('Select an option', 'Select an option')}</option>
+            <option value="">{__('Select an option', 'yatra')}</option>
             {options.map((option: any, index: number) => (
               <option key={index} value={option.value}>
                 {option.label}
@@ -208,7 +208,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700 dark:text-gray-300">
-                {attribute.placeholder || __('Enable this option', 'Enable this option')}
+                {attribute.placeholder || __('Enable this option', 'yatra')}
               </span>
             </label>
           </div>
@@ -250,7 +250,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
             type="text"
             value={value}
             onChange={(e) => handleAttributeValueChange(attribute.id, e.target.value)}
-            placeholder={attribute.placeholder || __('Enter value', 'Enter value')}
+            placeholder={attribute.placeholder || __('Enter value', 'yatra')}
             className="mt-2"
           />
         );
@@ -287,7 +287,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           >
             <div className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              <span>{__('Add Attribute', 'Add Attribute')}</span>
+              <span>{__('Add Attribute', 'yatra')}</span>
             </div>
             {showAttributeDropdown ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </Button>
@@ -320,7 +320,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
                         </Badge>
                         {attribute.required && (
                           <Badge variant="error" className="text-xs">
-                            {__('Required', 'Required')}
+                            {__('Required', 'yatra')}
                           </Badge>
                         )}
                       </div>
@@ -334,7 +334,7 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           {showAttributeDropdown && availableAttributes.length === 0 && (
             <div className="mt-3 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('No more attributes available to add', 'No more attributes available to add')}
+                {__('No more attributes available to add', 'yatra')}
               </p>
             </div>
           )}

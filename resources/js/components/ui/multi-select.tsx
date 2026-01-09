@@ -23,8 +23,8 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
   value,
   onChange,
   options,
-  placeholder = __('Select options...', 'Select options...'),
-  searchPlaceholder = __('Search...', 'Search...'),
+  placeholder = __('Select options...', 'yatra'),
+  searchPlaceholder = __('Search...', 'yatra'),
   className = '',
   error = false,
   disabled = false,
@@ -123,7 +123,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
               type="button"
               onClick={handleClearAll}
               className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-              aria-label={__('Clear all', 'Clear all')}
+              aria-label={__('Clear all', 'yatra')}
             >
               <X className="w-4 h-4 text-gray-400" />
             </button>
@@ -156,7 +156,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           <div className="max-h-52 overflow-y-auto">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 text-center">
-                {__('No options found', 'No options found')}
+                {__('No options found', 'yatra')}
               </div>
             ) : (
               filteredOptions.map((option) => {
@@ -185,7 +185,7 @@ export const MultiSelect: React.FC<MultiSelectProps> = ({
           {/* Selected count */}
           {value.length > 0 && (
             <div className="px-3 py-2 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-500 dark:text-gray-400">
-              {value.length} {value.length === 1 ? __('selected', 'selected') : __('selected', 'selected')}
+              {value.length} {value.length === 1 ? __('selected', 'yatra') : __('selected', 'yatra')}
             </div>
           )}
         </div>

@@ -424,7 +424,7 @@ const AdditionalServices: React.FC = () => {
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                                ({__('ID:', 'ID:')} {service.id})
+                                ({__('ID:', 'yatra')} {service.id})
                               </span>
                             </div>
                           </div>

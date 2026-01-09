@@ -99,8 +99,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   
   // WordPress media library hook
   const { openMediaLibrary } = useWordPressMedia({
-    title: __('Select or Upload Image', 'Select or Upload Image'),
-    buttonText: __('Use this image', 'Use this image'),
+    title: __('Select or Upload Image', 'yatra'),
+    buttonText: __('Use this image', 'yatra'),
     multiple: false,
     library: { type: 'image' },
   });
@@ -204,10 +204,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             className="w-full justify-start"
           >
             {value?.type === 'icon' 
-              ? `${__('Icon', 'Icon')}: ${iconOptions.find(i => i.name === value.value)?.label || value.value}`
+              ? `${__('Icon', 'yatra')}: ${iconOptions.find(i => i.name === value.value)?.label || value.value}`
               : value?.type === 'image'
-              ? __('Custom Image', 'Custom Image')
-              : __('Select Icon or Upload Image', 'Select Icon or Upload Image')}
+              ? __('Custom Image', 'yatra')
+              : __('Select Icon or Upload Image', 'yatra')}
           </Button>
         </div>
 
@@ -252,7 +252,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                     }`}
                   >
                     <Sparkles className="w-4 h-4 inline mr-2" />
-                    {__('Icons', 'Icons')}
+                    {__('Icons', 'yatra')}
                   </button>
                 )}
                 {allowImageUpload && (
@@ -266,7 +266,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                     }`}
                   >
                     <Upload className="w-4 h-4 inline mr-2" />
-                    {__('Upload Image', 'Upload Image')}
+                    {__('Upload Image', 'yatra')}
                   </button>
                 )}
                 <button
@@ -287,7 +287,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         type="text"
-                        placeholder={__('Search icons...', 'Search icons...')}
+                        placeholder={__('Search icons...', 'yatra')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9"
@@ -303,7 +303,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                           className="cursor-pointer"
                           onClick={() => setSelectedCategory(category)}
                         >
-                          {category === 'all' ? __('All', 'All') : categoryLabels[category] || category}
+                          {category === 'all' ? __('All', 'yatra') : categoryLabels[category] || category}
                         </Badge>
                       ))}
                     </div>
@@ -338,7 +338,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
                     {filteredIcons.length === 0 && (
                       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                        {__('No icons found', 'No icons found')}
+                        {__('No icons found', 'yatra')}
                       </div>
                     )}
                   </div>
@@ -365,7 +365,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                                 className="bg-white/90 hover:bg-white text-gray-900 border-white"
                               >
                                 <Upload className="w-4 h-4 mr-2" />
-                                {__('Change Image', 'Change Image')}
+                                {__('Change Image', 'yatra')}
                               </Button>
                               <Button
                                 type="button"
@@ -375,7 +375,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                                 className="bg-red-500/90 hover:bg-red-600"
                               >
                                 <X className="w-4 h-4 mr-2" />
-                                {__('Remove', 'Remove')}
+                                {__('Remove', 'yatra')}
                               </Button>
                             </div>
                           </div>
@@ -394,13 +394,13 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                             </div>
                             <div className="space-y-2">
                               <p className="text-base font-semibold text-gray-900 dark:text-white">
-                                {__('Upload Image', 'Upload Image')}
+                                {__('Upload Image', 'yatra')}
                               </p>
                               <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {__('Click to open WordPress Media Library', 'Click to open WordPress Media Library')}
+                                {__('Click to open WordPress Media Library', 'yatra')}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-500">
-                                {__('Select from library or upload new image', 'Select from library or upload new image')}
+                                {__('Select from library or upload new image', 'yatra')}
                               </p>
                             </div>
                           </div>
@@ -413,7 +413,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                           </div>
                           <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-white dark:bg-gray-900 px-3 text-gray-500 dark:text-gray-400">
-                              {__('Or', 'Or')}
+                              {__('Or', 'yatra')}
                             </span>
                           </div>
                         </div>
@@ -421,11 +421,11 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                         {/* Image URL Input */}
                         <div className="space-y-3">
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {__('Enter Image URL', 'Enter Image URL')}
+                            {__('Enter Image URL', 'yatra')}
                           </label>
                           <Input
                             type="url"
-                            placeholder={__('https://example.com/image.png', 'https://example.com/image.png')}
+                            placeholder={__('https://example.com/image.png', 'yatra')}
                             value={value?.type === 'image' ? value.value : ''}
                             onChange={(e) => handleImageUrlChange(e.target.value)}
                             className="h-11"
@@ -444,7 +444,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                   variant="outline"
                   onClick={() => setIsOpen(false)}
                 >
-                  {__('Close', 'Close')}
+                  {__('Close', 'yatra')}
                 </Button>
               </div>
             </CardContent>

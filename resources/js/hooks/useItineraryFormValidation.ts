@@ -42,11 +42,11 @@ export const useItineraryFormValidation = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.trip_id) {
-      newErrors.trip_id = __('Trip is required', 'Trip is required');
+      newErrors.trip_id = __('Trip is required', 'yatra');
     }
 
     if (!formData.day || parseInt(formData.day) < 1) {
-      newErrors.day = __('Day must be at least 1', 'Day must be at least 1');
+      newErrors.day = __('Day must be at least 1', 'yatra');
     }
 
     // For day mode, validate trip and day, and all activity fields
@@ -54,13 +54,13 @@ export const useItineraryFormValidation = () => {
       // Validate all activity forms
       activityForms.forEach((activityForm, index) => {
         if (!activityForm.data.item_type_id) {
-          newErrors[`activity_${activityForm.id}_item_type_id`] = __('Item type is required for Activity', 'Item type is required for Activity') + ` ${index + 1}`;
+          newErrors[`activity_${activityForm.id}_item_type_id`] = __('Item type is required for Activity', 'yatra') + ` ${index + 1}`;
         }
         if (!activityForm.data.item_id) {
-          newErrors[`activity_${activityForm.id}_item_id`] = __('Item is required for Activity', 'Item is required for Activity') + ` ${index + 1}`;
+          newErrors[`activity_${activityForm.id}_item_id`] = __('Item is required for Activity', 'yatra') + ` ${index + 1}`;
         }
         if (!activityForm.data.title?.trim()) {
-          newErrors[`activity_${activityForm.id}_title`] = __('Title is required for Activity', 'Title is required for Activity') + ` ${index + 1}`;
+          newErrors[`activity_${activityForm.id}_title`] = __('Title is required for Activity', 'yatra') + ` ${index + 1}`;
         }
       });
       return { isValid: Object.keys(newErrors).length === 0, errors: newErrors };
@@ -68,15 +68,15 @@ export const useItineraryFormValidation = () => {
 
     // For activity mode, validate activity fields
     if (!formData.item_type_id) {
-      newErrors.item_type_id = __('Item type is required', 'Item type is required');
+      newErrors.item_type_id = __('Item type is required', 'yatra');
     }
 
     if (!formData.item_id) {
-      newErrors.item_id = __('Item is required', 'Item is required');
+      newErrors.item_id = __('Item is required', 'yatra');
     }
 
     if (!formData.title.trim()) {
-      newErrors.title = __('Title is required', 'Title is required');
+      newErrors.title = __('Title is required', 'yatra');
     }
 
     if (formData.time_type === 'exact' && formData.start_time && formData.end_time) {
@@ -85,7 +85,7 @@ export const useItineraryFormValidation = () => {
       const startMinutes = startHour * 60 + startMin;
       const endMinutes = endHour * 60 + endMin;
       if (endMinutes <= startMinutes && endMinutes < startMinutes + 60) {
-        newErrors.end_time = __('End time must be after start time', 'End time must be after start time');
+        newErrors.end_time = __('End time must be after start time', 'yatra');
       }
     }
 

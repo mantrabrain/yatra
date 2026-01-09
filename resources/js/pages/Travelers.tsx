@@ -266,11 +266,11 @@ const Travelers: React.FC = () => {
 
     try {
       await bulkMutation.mutateAsync({ action: 'delete', ids: [travelerToDelete.id] });
-      showToast(__('Traveler deleted successfully', 'Traveler deleted successfully'), 'success');
+      showToast(__('Traveler deleted successfully', 'yatra'), 'success');
       setDeleteDialogOpen(false);
       setTravelerToDelete(null);
     } catch (error: any) {
-      showToast(error?.message || __('Failed to delete traveler', 'Failed to delete traveler'), 'error');
+      showToast(error?.message || __('Failed to delete traveler', 'yatra'), 'error');
     }
   };
 
@@ -288,23 +288,23 @@ const Travelers: React.FC = () => {
 
   // Column options for the columns dropdown
   const columnOptions = [
-    { key: 'traveler_info', label: __('Traveler', 'Traveler'), visible: visibleColumns.traveler_info },
-    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
-    { key: 'travel_date', label: __('Travel Date', 'Travel Date'), visible: visibleColumns.travel_date },
-    { key: 'booking_reference', label: __('Booking', 'Booking'), visible: visibleColumns.booking_reference },
+    { key: 'traveler_info', label: __('Traveler', 'yatra'), visible: visibleColumns.traveler_info },
+    { key: 'trip', label: __('Trip', 'yatra'), visible: visibleColumns.trip },
+    { key: 'travel_date', label: __('Travel Date', 'yatra'), visible: visibleColumns.travel_date },
+    { key: 'booking_reference', label: __('Booking', 'yatra'), visible: visibleColumns.booking_reference },
   ];
 
   // Actions for the 3-dot menu
   const actions = [
     {
       key: 'view',
-      label: __('View Booking', 'View Booking'),
+      label: __('View Booking', 'yatra'),
       icon: <Eye className="w-4 h-4" />,
       onClick: (traveler: Traveler) => handleViewBooking(traveler.booking_id),
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (traveler: Traveler) => handleDelete(traveler),
       variant: 'destructive' as const,
@@ -350,8 +350,8 @@ const Travelers: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Travelers', 'Travelers')}
-        description={__('View all travelers from bookings', 'View all travelers from bookings')}
+        title={__('Travelers', 'yatra')}
+        description={__('View all travelers from bookings', 'yatra')}
       />
 
       {/* Filters */}
@@ -364,7 +364,7 @@ const Travelers: React.FC = () => {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
                   type="text"
-                  placeholder={__('Search by name, email, phone, passport...', 'Search by name, email, phone, passport...')}
+                  placeholder={__('Search by name, email, phone, passport...', 'yatra')}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -385,7 +385,7 @@ const Travelers: React.FC = () => {
                 }}
                 className="w-full"
               >
-                <option value="all">{__('All Trips', 'All Trips')}</option>
+                <option value="all">{__('All Trips', 'yatra')}</option>
                 {tripsData?.data?.map((trip: any) => (
                   <option key={trip.id} value={trip.id}>
                     {trip.title}
@@ -405,7 +405,7 @@ const Travelers: React.FC = () => {
               <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{__('Total Travelers', 'Total Travelers')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{__('Total Travelers', 'yatra')}</p>
               <p className="text-xl font-semibold text-gray-900 dark:text-white">
                 {isLoading ? <Skeleton className="h-6 w-16" /> : totalTravelers}
               </p>
@@ -424,7 +424,7 @@ const Travelers: React.FC = () => {
         statusFilter="all"
         setStatusFilter={() => {}}
         statusOptions={[
-          { key: 'all', label: __('All', 'All'), count: totalTravelers },
+          { key: 'all', label: __('All', 'yatra'), count: totalTravelers },
         ]}
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
@@ -433,7 +433,7 @@ const Travelers: React.FC = () => {
         bulkMutationPending={bulkMutation.isPending}
         totalItems={travelers.length}
         bulkActionOptions={[
-          { value: 'delete', label: __('Delete', 'Delete') },
+          { value: 'delete', label: __('Delete', 'yatra') },
         ]}
       />
 
@@ -444,18 +444,18 @@ const Travelers: React.FC = () => {
             data={travelers}
             isLoading={isLoading}
             isError={isTravelersError}
-            errorText={__('Error loading travelers')}
-            errorDescription={__('We couldn\'t connect to the travelers service. Please refresh or try again shortly.')}
+            errorText={__('Error loading travelers', 'yatra')}
+            errorDescription={__('We couldn\'t connect to the travelers service. Please refresh or try again shortly.', 'yatra')}
             errorDetails={derivedErrorDetails}
             errorRequestInfo={errorContext.requestInfo}
             onRetry={() => refetch()}
             skeletonRows={5}
             emptyText={
               (searchTerm || tripFilter)
-                ? __('No travelers found matching your criteria', 'No travelers found matching your criteria')
-                : __('No travelers found', 'No travelers found')
+                ? __('No travelers found matching your criteria', 'yatra')
+                : __('No travelers found', 'yatra')
             }
-            emptyDescription={__('View and manage travelers collected from your bookings.', 'View and manage travelers collected from your bookings.')}
+            emptyDescription={__('View and manage travelers collected from your bookings.', 'yatra')}
             capability="yatra_view_bookings"
             selectedItemIds={selectedIds}
             onSelectItem={(id: string | number, checked: boolean) => {
@@ -478,7 +478,7 @@ const Travelers: React.FC = () => {
             columns={[
               visibleColumns.traveler_info && {
                 key: 'traveler_info',
-                label: __('Traveler', 'Traveler'),
+                label: __('Traveler', 'yatra'),
                 render: (traveler: Traveler) => (
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -490,7 +490,7 @@ const Travelers: React.FC = () => {
                         {[traveler.first_name, traveler.last_name].filter(Boolean).join(' ') || 'N/A'}
                         {traveler.is_lead && (
                           <Badge variant="info" className="text-xs">
-                            {__('Lead', 'Lead')}
+                            {__('Lead', 'yatra')}
                           </Badge>
                         )}
                       </div>
@@ -522,7 +522,7 @@ const Travelers: React.FC = () => {
               })),
               visibleColumns.trip && {
                 key: 'trip',
-                label: __('Trip', 'Trip'),
+                label: __('Trip', 'yatra'),
                 render: (traveler: Traveler) => (
                   <div className="max-w-[200px] truncate" title={traveler.trip_title}>
                     {traveler.trip_title || `Trip #${traveler.trip_id}`}
@@ -531,7 +531,7 @@ const Travelers: React.FC = () => {
               },
               visibleColumns.travel_date && {
                 key: 'travel_date',
-                label: __('Travel Date', 'Travel Date'),
+                label: __('Travel Date', 'yatra'),
                 render: (traveler: Traveler) => (
                   <div className="flex items-center gap-1 text-sm">
                     <Calendar className="w-3 h-3 text-gray-400" />
@@ -541,7 +541,7 @@ const Travelers: React.FC = () => {
               },
               visibleColumns.booking_reference && {
                 key: 'booking_reference',
-                label: __('Booking', 'Booking'),
+                label: __('Booking', 'yatra'),
                 render: (traveler: Traveler) => (
                   <a
                     href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${traveler.booking_id}`}
@@ -564,7 +564,7 @@ const Travelers: React.FC = () => {
           totalItems={totalTravelers}
           itemsPerPage={perPage}
           onPageChange={setPage}
-          itemName={__('travelers', 'travelers')}
+          itemName={__('travelers', 'yatra')}
         />
       )}
 
@@ -576,14 +576,14 @@ const Travelers: React.FC = () => {
           setTravelerToDelete(null);
         }}
         onConfirm={confirmDelete}
-        title={__('Delete Traveler', 'Delete Traveler')}
+        title={__('Delete Traveler', 'yatra')}
         message={
           travelerToDelete
-            ? __(`Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(' ')}? This action cannot be undone.`, `Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(' ')}? This action cannot be undone.`)
-            : __('Are you sure you want to delete this traveler?', 'Are you sure you want to delete this traveler?')
+            ? __(`Are you sure you want to delete ${[travelerToDelete.first_name, travelerToDelete.last_name].filter(Boolean).join(' ')}? This action cannot be undone.`, 'yatra')
+            : __('Are you sure you want to delete this traveler?', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={bulkMutation.isPending}
       />

@@ -68,7 +68,7 @@ const ActivityForm: React.FC = () => {
         const response = await apiClient.get(`/activities/${activityId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load activity', 'Failed to load activity'), 'error');
+        showToast(error?.message || __('Failed to load activity', 'yatra'), 'error');
         throw error;
       }
     },
@@ -139,13 +139,13 @@ const ActivityForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'Name is required');
+      newErrors.name = __('Name is required', 'yatra');
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'Slug is required');
+      newErrors.slug = __('Slug is required', 'yatra');
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'Slug can only contain lowercase letters, numbers, and hyphens');
+      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
     }
 
     setErrors(newErrors);
@@ -179,8 +179,8 @@ const ActivityForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['activity', activityId] });
       showToast(
         isEditMode 
-          ? __('Activity updated successfully', 'Activity updated successfully')
-          : __('Activity created successfully', 'Activity created successfully'),
+          ? __('Activity updated successfully', 'yatra')
+          : __('Activity created successfully', 'yatra'),
         'success'
       );
       if (!isEditMode && response?.id) {
@@ -193,7 +193,7 @@ const ActivityForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the activity', 'An error occurred while saving the activity');
+      const errorMessage = error?.message || __('An error occurred while saving the activity', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -203,7 +203,7 @@ const ActivityForm: React.FC = () => {
     e.preventDefault();
     
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'Please fix the form errors'), 'warning');
+      showToast(__('Please fix the form errors', 'yatra'), 'warning');
       return;
     }
 
@@ -273,8 +273,8 @@ const ActivityForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Activity', 'Edit Activity') : __('Add New Activity', 'Add New Activity')}
-        description={isEditMode ? __('Update activity information', 'Update activity information') : __('Create a new travel activity', 'Create a new travel activity')}
+        title={isEditMode ? __('Edit Activity', 'yatra') : __('Add New Activity', 'yatra')}
+        description={isEditMode ? __('Update activity information', 'yatra') : __('Create a new travel activity', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -282,7 +282,7 @@ const ActivityForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -295,20 +295,20 @@ const ActivityForm: React.FC = () => {
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'Basic Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'Name')} <span className="text-red-500">*</span>
+                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('Enter activity name', 'Enter activity name')}
+                      placeholder={__('Enter activity name', 'yatra')}
                       className={errors.name ? 'border-red-500' : ''}
                       required
                     />
@@ -320,7 +320,7 @@ const ActivityForm: React.FC = () => {
                   {/* Slug */}
                   <div>
                     <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'Slug')} <span className="text-red-500">*</span>
+                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -328,7 +328,7 @@ const ActivityForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('activity-slug', 'activity-slug')}
+                        placeholder={__('activity-slug', 'yatra')}
                         className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
                         disabled={!isSlugEditable}
                         required
@@ -337,7 +337,7 @@ const ActivityForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'Cancel editing slug') : __('Edit slug', 'Edit slug')}
+                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
                       >
                         {isSlugEditable ? (
                           <X className="w-4 h-4" />
@@ -351,19 +351,19 @@ const ActivityForm: React.FC = () => {
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {isSlugEditable 
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'Manually editing slug. Click X to cancel and regenerate from name.')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'Auto-generated from name. Click edit icon to customize.')
+                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
+                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')
                       }
                     </p>
                   </div>
 
                   {/* Description */}
                   <RichTextEditor
-                    label={__('Description', 'Description')}
+                    label={__('Description', 'yatra')}
                     value={formData.description || ''}
                     onChange={(value) => handleFieldChange('description', value)}
-                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'Description placeholder')}
-                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'Description helper')}
+                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'yatra')}
+                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'yatra')}
                     minHeight={360}
                     maxHeight={720}
                   />
@@ -376,21 +376,21 @@ const ActivityForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'Status')}
+                      {__('Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="draft">{__('Draft', 'Draft')}</option>
-                      <option value="publish">{__('Publish', 'Publish')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="draft">{__('Draft', 'yatra')}</option>
+                      <option value="publish">{__('Publish', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -399,14 +399,14 @@ const ActivityForm: React.FC = () => {
               {/* Icon/Image Picker */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Activity Icon or Image', 'Activity Icon or Image')}</CardTitle>
+                  <CardTitle className="text-base">{__('Activity Icon or Image', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
                     onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Select Icon or Upload Image', 'Select Icon or Upload Image')}
-                    helpText={__('Choose a library icon or upload a custom image to visually represent this activity.', 'Choose a library icon or upload a custom image to visually represent this activity.')}
+                    label={__('Select Icon or Upload Image', 'yatra')}
+                    helpText={__('Choose a library icon or upload a custom image to visually represent this activity.', 'yatra')}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -427,12 +427,12 @@ const ActivityForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Activity', 'Update Activity') : __('Create Itinerary Activity', 'Create Itinerary Activity')}
+                            {isEditMode ? __('Update Activity', 'yatra') : __('Create Itinerary Activity', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -442,7 +442,7 @@ const ActivityForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

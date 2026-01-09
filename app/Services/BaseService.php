@@ -7,6 +7,7 @@ namespace Yatra\Services;
 use Yatra\Utils\Logger;
 use Yatra\Services\CacheService;
 use Yatra\Contracts\ServiceInterface;
+use Yatra\Utils\Cache;
 
 /**
  * Enhanced Base Service Class

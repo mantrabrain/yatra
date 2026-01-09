@@ -55,10 +55,10 @@ export const TripsTable: React.FC<TripsTableProps> = ({
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { variant: 'default' | 'success' | 'warning' | 'error' | 'info'; label: string }> = {
-      'active': { variant: 'success', label: __('Active', 'Active') },
-      'draft': { variant: 'default', label: __('Draft', 'Draft') },
-      'inactive': { variant: 'error', label: __('Inactive', 'Inactive') },
-      'pending': { variant: 'warning', label: __('Pending', 'Pending') },
+      'active': { variant: 'success', label: __('Active', 'yatra') },
+      'draft': { variant: 'default', label: __('Draft', 'yatra') },
+      'inactive': { variant: 'error', label: __('Inactive', 'yatra') },
+      'pending': { variant: 'warning', label: __('Pending', 'yatra') },
     };
 
     const statusInfo = statusMap[status] || { variant: 'default' as const, label: status };
@@ -68,7 +68,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   if (loading) {
     return (
       <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-        {__('Loading trips...', 'Loading trips...')}
+        {__('Loading trips...', 'yatra')}
       </div>
     );
   }
@@ -76,7 +76,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   if (trips.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-        {__('No trips found', 'No trips found')}
+        {__('No trips found', 'yatra')}
       </div>
     );
   }
@@ -86,15 +86,15 @@ export const TripsTable: React.FC<TripsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{__('Title', 'Title')}</TableHead>
-            <TableHead>{__('Slug', 'Slug')}</TableHead>
-            <TableHead>{__('Price', 'Price')}</TableHead>
-            <TableHead>{__('Status', 'Status')}</TableHead>
+            <TableHead>{__('Title', 'yatra')}</TableHead>
+            <TableHead>{__('Slug', 'yatra')}</TableHead>
+            <TableHead>{__('Price', 'yatra')}</TableHead>
+            <TableHead>{__('Status', 'yatra')}</TableHead>
             {showProFeatures && (
-              <TableHead>{__('Bookings', 'Bookings')}</TableHead>
+              <TableHead>{__('Bookings', 'yatra')}</TableHead>
             )}
-            <TableHead>{__('Created', 'Created')}</TableHead>
-            <TableHead className="text-right">{__('Actions', 'Actions')}</TableHead>
+            <TableHead>{__('Created', 'yatra')}</TableHead>
+            <TableHead className="text-right">{__('Actions', 'yatra')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +105,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                   {trip.title}
                   {trip.featured && showProFeatures && (
                     <Badge variant="info" className="text-xs">
-                      {__('Featured', 'Featured')}
+                      {__('Featured', 'yatra')}
                     </Badge>
                   )}
                 </div>
@@ -129,7 +129,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onView(trip)}
-                        aria-label={__('View trip', 'View trip')}
+                        aria-label={__('View trip', 'yatra')}
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
@@ -142,7 +142,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(trip)}
-                        aria-label={__('Edit trip', 'Edit trip')}
+                        aria-label={__('Edit trip', 'yatra')}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
@@ -155,11 +155,11 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          if (confirm(__('Are you sure you want to delete this trip?', 'Are you sure you want to delete this trip?'))) {
+                          if (confirm(__('Are you sure you want to delete this trip?', 'yatra'))) {
                             onDelete(trip);
                           }
                         }}
-                        aria-label={__('Delete trip', 'Delete trip')}
+                        aria-label={__('Delete trip', 'yatra')}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Button>

@@ -426,33 +426,33 @@ const BookingForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.customer_name.trim()) {
-      newErrors.customer_name = __('Customer name is required', 'Customer name is required');
+      newErrors.customer_name = __('Customer name is required', 'yatra');
     }
 
     if (!formData.customer_email.trim()) {
-      newErrors.customer_email = __('Customer email is required', 'Customer email is required');
+      newErrors.customer_email = __('Customer email is required', 'yatra');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customer_email)) {
-      newErrors.customer_email = __('Invalid email address', 'Invalid email address');
+      newErrors.customer_email = __('Invalid email address', 'yatra');
     }
 
     if (!formData.trip_id) {
-      newErrors.trip_id = __('Trip is required', 'Trip is required');
+      newErrors.trip_id = __('Trip is required', 'yatra');
     }
 
     if (!formData.booking_date) {
-      newErrors.booking_date = __('Booking date is required', 'Booking date is required');
+      newErrors.booking_date = __('Booking date is required', 'yatra');
     }
 
     if (!formData.travel_date) {
-      newErrors.travel_date = __('Travel date is required', 'Travel date is required');
+      newErrors.travel_date = __('Travel date is required', 'yatra');
     }
 
     if (!formData.travelers || parseInt(formData.travelers) < 1) {
-      newErrors.travelers = __('Number of travelers must be at least 1', 'Number of travelers must be at least 1');
+      newErrors.travelers = __('Number of travelers must be at least 1', 'yatra');
     }
 
     if (!formData.total_amount || parseFloat(formData.total_amount) <= 0) {
-      newErrors.total_amount = __('Total amount must be greater than 0', 'Total amount must be greater than 0');
+      newErrors.total_amount = __('Total amount must be greater than 0', 'yatra');
     }
 
     setErrors(newErrors);
@@ -496,7 +496,7 @@ const BookingForm: React.FC = () => {
       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=bookings`;
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the booking', 'An error occurred while saving the booking');
+      const errorMessage = error?.message || __('An error occurred while saving the booking', 'yatra');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
     },
@@ -633,8 +633,8 @@ const BookingForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Booking', 'Edit Booking') : __('Create Booking', 'Create Booking')}
-        description={isEditMode ? __('Update booking information', 'Update booking information') : __('Create a new customer booking', 'Create a new customer booking')}
+        title={isEditMode ? __('Edit Booking', 'yatra') : __('Create Booking', 'yatra')}
+        description={isEditMode ? __('Update booking information', 'yatra') : __('Create a new customer booking', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -642,7 +642,7 @@ const BookingForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -655,21 +655,21 @@ const BookingForm: React.FC = () => {
               {/* Customer Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Customer Information', 'Customer Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Customer Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Customer Name */}
                     <div>
                       <label htmlFor="customer_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Customer Name', 'Customer Name')} <span className="text-red-500">*</span>
+                        {__('Customer Name', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="customer_name"
                         type="text"
                         value={formData.customer_name}
                         onChange={(e) => handleFieldChange('customer_name', e.target.value)}
-                        placeholder={__('Enter customer name', 'Enter customer name')}
+                        placeholder={__('Enter customer name', 'yatra')}
                         className={errors.customer_name ? 'border-red-500' : ''}
                         required
                       />
@@ -681,14 +681,14 @@ const BookingForm: React.FC = () => {
                     {/* Customer Email */}
                     <div>
                       <label htmlFor="customer_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Customer Email', 'Customer Email')} <span className="text-red-500">*</span>
+                        {__('Customer Email', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="customer_email"
                         type="email"
                         value={formData.customer_email}
                         onChange={(e) => handleFieldChange('customer_email', e.target.value)}
-                        placeholder={__('customer@example.com', 'customer@example.com')}
+                        placeholder={__('customer@example.com', 'yatra')}
                         className={errors.customer_email ? 'border-red-500' : ''}
                         required
                       />
@@ -701,14 +701,14 @@ const BookingForm: React.FC = () => {
                   {/* Customer Phone */}
                   <div>
                     <label htmlFor="customer_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Customer Phone', 'Customer Phone')}
+                      {__('Customer Phone', 'yatra')}
                     </label>
                     <Input
                       id="customer_phone"
                       type="tel"
                       value={formData.customer_phone}
                       onChange={(e) => handleFieldChange('customer_phone', e.target.value)}
-                      placeholder={__('+1234567890', '+1234567890')}
+                      placeholder={__('+1234567890', 'yatra')}
                     />
                   </div>
                 </CardContent>
@@ -717,13 +717,13 @@ const BookingForm: React.FC = () => {
               {/* Booking Details */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Booking Details', 'Booking Details')}</CardTitle>
+                  <CardTitle className="text-base">{__('Booking Details', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Trip Selection - Searchable Dropdown */}
                   <div ref={tripDropdownRef} className="relative">
                     <label htmlFor="trip_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+                      {__('Trip', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div 
@@ -738,7 +738,7 @@ const BookingForm: React.FC = () => {
                                `Trip ID: ${formData.trip_id}`}
                             </span>
                           ) : (
-                            <span className="text-gray-500">{isLoadingTrips ? __('Loading trips...', 'Loading trips...') : __('Select a trip', 'Select a trip')}</span>
+                            <span className="text-gray-500">{isLoadingTrips ? __('Loading trips...', 'yatra') : __('Select a trip', 'yatra')}</span>
                           )}
                         </div>
                         {formData.trip_id && (
@@ -769,7 +769,7 @@ const BookingForm: React.FC = () => {
                               <input
                                 type="text"
                                 className="w-full pl-8 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder={__('Search trips...', 'Search trips...')}
+                                placeholder={__('Search trips...', 'yatra')}
                                 value={tripSearchQuery}
                                 onChange={(e) => setTripSearchQuery(e.target.value)}
                                 onClick={(e) => e.stopPropagation()}
@@ -807,7 +807,7 @@ const BookingForm: React.FC = () => {
                               if (filteredTrips.length === 0) {
                                 return (
                                   <div className="px-3 py-4 text-sm text-gray-500 text-center">
-                                    {__('No trips found', 'No trips found')}
+                                    {__('No trips found', 'yatra')}
                                   </div>
                                 );
                               }
@@ -844,12 +844,12 @@ const BookingForm: React.FC = () => {
                     {/* Booking Date */}
                     <div>
                       <label htmlFor="booking_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Booking Date', 'Booking Date')} <span className="text-red-500">*</span>
+                        {__('Booking Date', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <DatePicker
                         value={formData.booking_date}
                         onChange={(value: string) => handleFieldChange('booking_date', value)}
-                        placeholder={__('Select booking date', 'Select booking date')}
+                        placeholder={__('Select booking date', 'yatra')}
                         error={!!errors.booking_date}
                       />
                       {errors.booking_date && (
@@ -860,12 +860,12 @@ const BookingForm: React.FC = () => {
                     {/* Travel Date */}
                     <div>
                       <label htmlFor="travel_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Travel Date', 'Travel Date')} <span className="text-red-500">*</span>
+                        {__('Travel Date', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <DatePicker
                         value={formData.travel_date}
                         onChange={(value: string) => handleFieldChange('travel_date', value)}
-                        placeholder={__('Select travel date', 'Select travel date')}
+                        placeholder={__('Select travel date', 'yatra')}
                         error={!!errors.travel_date}
                       />
                       {errors.travel_date && (
@@ -878,7 +878,7 @@ const BookingForm: React.FC = () => {
                     {/* Number of Travelers */}
                     <div>
                       <label htmlFor="travelers" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Number of Travelers', 'Number of Travelers')} <span className="text-red-500">*</span>
+                        {__('Number of Travelers', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="travelers"
@@ -897,7 +897,7 @@ const BookingForm: React.FC = () => {
                     {/* Total Amount */}
                     <div>
                       <label htmlFor="total_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Total Amount', 'Total Amount')} ({globalCurrency}) <span className="text-red-500">*</span>
+                        {__('Total Amount', 'yatra')} ({globalCurrency}) <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">{currencySymbol}</span>
@@ -922,13 +922,13 @@ const BookingForm: React.FC = () => {
                   {/* Notes */}
                   <div>
                     <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Notes', 'Notes')}
+                      {__('Notes', 'yatra')}
                     </label>
                     <textarea
                       id="notes"
                       value={formData.notes}
                       onChange={(e) => handleFieldChange('notes', e.target.value)}
-                      placeholder={__('Additional notes or special requests', 'Additional notes or special requests')}
+                      placeholder={__('Additional notes or special requests', 'yatra')}
                       rows={3}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -942,7 +942,7 @@ const BookingForm: React.FC = () => {
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center gap-2">
                       <AlertCircle className="w-4 h-4" />
-                      {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'Emergency Contact')}
+                      {formConfig?.emergency_contact_form?.title || __('Emergency Contact', 'yatra')}
                     </CardTitle>
                     {formConfig?.emergency_contact_form?.description && (
                       <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -1020,9 +1020,9 @@ const BookingForm: React.FC = () => {
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-base flex items-center gap-2">
                         <Users className="w-4 h-4" />
-                        {formConfig?.traveler_form?.title || __('Travelers Information', 'Travelers Information')}
+                        {formConfig?.traveler_form?.title || __('Travelers Information', 'yatra')}
                         <span className="text-xs font-normal text-gray-500 dark:text-gray-400">
-                          ({travelersData.length} {travelersData.length === 1 ? __('traveler', 'traveler') : __('travelers', 'travelers')})
+                          ({travelersData.length} {travelersData.length === 1 ? __('traveler', 'yatra') : __('travelers', 'yatra')})
                         </span>
                       </CardTitle>
                       <div className="flex items-center gap-2">
@@ -1039,8 +1039,8 @@ const BookingForm: React.FC = () => {
                             className="text-gray-500 text-xs"
                           >
                             {expandedTravelers.length === travelersData.length 
-                              ? __('Collapse All', 'Collapse All')
-                              : __('Expand All', 'Expand All')
+                              ? __('Collapse All', 'yatra')
+                              : __('Expand All', 'yatra')
                             }
                           </Button>
                         )}
@@ -1052,7 +1052,7 @@ const BookingForm: React.FC = () => {
                           className="flex items-center gap-1"
                         >
                           <Plus className="w-3 h-3" />
-                          {__('Add Traveler', 'Add Traveler')}
+                          {__('Add Traveler', 'yatra')}
                         </Button>
                       </div>
                     </div>
@@ -1076,8 +1076,8 @@ const BookingForm: React.FC = () => {
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="font-medium text-sm text-gray-900 dark:text-white whitespace-nowrap">
                               {travelerIndex === 0 
-                                ? __('Lead Traveler', 'Lead Traveler')
-                                : `${__('Traveler', 'Traveler')} ${travelerIndex + 1}`
+                                ? __('Lead Traveler', 'yatra')
+                                : `${__('Traveler', 'yatra')} ${travelerIndex + 1}`
                               }
                             </span>
                             {traveler.first_name || traveler.last_name ? (
@@ -1087,7 +1087,7 @@ const BookingForm: React.FC = () => {
                             ) : null}
                             {travelerIndex === 0 && (
                               <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded whitespace-nowrap">
-                                {__('Primary', 'Primary')}
+                                {__('Primary', 'yatra')}
                               </span>
                             )}
                           </div>
@@ -1103,10 +1103,10 @@ const BookingForm: React.FC = () => {
                                   removeTraveler(travelerIndex);
                                 }}
                                 className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-8 px-2 flex items-center gap-1"
-                                title={__('Remove Traveler', 'Remove Traveler')}
+                                title={__('Remove Traveler', 'yatra')}
                               >
                                 <Trash2 className="w-4 h-4" />
-                                <span className="text-xs hidden sm:inline">{__('Remove', 'Remove')}</span>
+                                <span className="text-xs hidden sm:inline">{__('Remove', 'yatra')}</span>
                               </Button>
                             )}
                             {/* Expand/Collapse toggle */}
@@ -1174,7 +1174,7 @@ const BookingForm: React.FC = () => {
                                       <DatePicker
                                         value={traveler[field.id] || ''}
                                         onChange={(value: string) => handleTravelerChange(travelerIndex, field.id, value)}
-                                        placeholder={field.placeholder || __('Select date', 'Select date')}
+                                        placeholder={field.placeholder || __('Select date', 'yatra')}
                                       />
                                     ) : (
                                       <Input
@@ -1203,56 +1203,56 @@ const BookingForm: React.FC = () => {
               {/* Status & Payment */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status & Payment', 'Status & Payment')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status & Payment', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Booking Status */}
                   <div>
                     <label htmlFor="booking_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Booking Status', 'Booking Status')}
+                      {__('Booking Status', 'yatra')}
                     </label>
                     <Select
                       id="booking_status"
                       value={formData.booking_status}
                       onChange={(e) => handleFieldChange('booking_status', e.target.value)}
                     >
-                      <option value="pending">{__('Pending', 'Pending')}</option>
-                      <option value="confirmed">{__('Confirmed', 'Confirmed')}</option>
-                      <option value="cancelled">{__('Cancelled', 'Cancelled')}</option>
-                      <option value="completed">{__('Completed', 'Completed')}</option>
-                      <option value="refunded">{__('Refunded', 'Refunded')}</option>
-                      <option value="failed">{__('Failed', 'Failed')}</option>
+                      <option value="pending">{__('Pending', 'yatra')}</option>
+                      <option value="confirmed">{__('Confirmed', 'yatra')}</option>
+                      <option value="cancelled">{__('Cancelled', 'yatra')}</option>
+                      <option value="completed">{__('Completed', 'yatra')}</option>
+                      <option value="refunded">{__('Refunded', 'yatra')}</option>
+                      <option value="failed">{__('Failed', 'yatra')}</option>
                     </Select>
                   </div>
 
                   {/* Payment Status */}
                   <div>
                     <label htmlFor="payment_status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Payment Status', 'Payment Status')}
+                      {__('Payment Status', 'yatra')}
                     </label>
                     <Select
                       id="payment_status"
                       value={formData.payment_status}
                       onChange={(e) => handleFieldChange('payment_status', e.target.value)}
                     >
-                      <option value="pending">{__('Pending', 'Pending')}</option>
-                      <option value="partial">{__('Partial', 'Partial')}</option>
-                      <option value="paid">{__('Paid', 'Paid')}</option>
-                      <option value="refunded">{__('Refunded', 'Refunded')}</option>
+                      <option value="pending">{__('Pending', 'yatra')}</option>
+                      <option value="partial">{__('Partial', 'yatra')}</option>
+                      <option value="paid">{__('Paid', 'yatra')}</option>
+                      <option value="refunded">{__('Refunded', 'yatra')}</option>
                     </Select>
                   </div>
 
                   {/* Payment Method */}
                   <div>
                     <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Payment Method', 'Payment Method')}
+                      {__('Payment Method', 'yatra')}
                     </label>
                     <Select
                       id="payment_method"
                       value={formData.payment_method}
                       onChange={(e) => handleFieldChange('payment_method', e.target.value)}
                     >
-                      <option value="">{__('Select payment method', 'Select payment method')}</option>
+                      <option value="">{__('Select payment method', 'yatra')}</option>
                       {gatewaysData?.data?.map((gw: any) => (
                         <option key={gw.id} value={gw.id}>
                           {gw.title}
@@ -1261,10 +1261,10 @@ const BookingForm: React.FC = () => {
                       {/* Fallback options if no gateways loaded */}
                       {(!gatewaysData?.data || gatewaysData.data.length === 0) && (
                         <>
-                          <option value="pay_later">{__('Pay Later', 'Pay Later')}</option>
-                          <option value="bank_transfer">{__('Bank Transfer', 'Bank Transfer')}</option>
-                          <option value="stripe">{__('Stripe', 'Stripe')}</option>
-                          <option value="paypal">{__('PayPal', 'PayPal')}</option>
+                          <option value="pay_later">{__('Pay Later', 'yatra')}</option>
+                          <option value="bank_transfer">{__('Bank Transfer', 'yatra')}</option>
+                          <option value="stripe">{__('Stripe', 'yatra')}</option>
+                          <option value="paypal">{__('PayPal', 'yatra')}</option>
                         </>
                       )}
                     </Select>
@@ -1290,12 +1290,12 @@ const BookingForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Booking', 'Update Booking') : __('Create Booking', 'Create Booking')}
+                            {isEditMode ? __('Update Booking', 'yatra') : __('Create Booking', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -1305,7 +1305,7 @@ const BookingForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

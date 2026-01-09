@@ -56,7 +56,7 @@ const formatNamesList = (names: string[]) => {
   if (names.length <= 2) {
     return names.join(', ');
   }
-  return `${names.slice(0, 2).join(', ')} ${__('and', 'and')} ${names.length - 2} ${__('more', 'more')}`;
+  return `${names.slice(0, 2).join(', ')} ${__('and', 'yatra')} ${names.length - 2} ${__('more', 'yatra')}`;
 };
 
 export const useToggleModule = () => {
@@ -111,13 +111,13 @@ export const useToggleModule = () => {
       const label = variables.name || variables.slug;
       showToast(
         variables.enabled
-          ? __('{module} enabled successfully.', '{module} enabled successfully.').replace('{module}', label)
-          : __('{module} disabled successfully.', '{module} disabled successfully.').replace('{module}', label),
+          ? __('{module} enabled successfully.', 'yatra').replace('{module}', label)
+          : __('{module} disabled successfully.', 'yatra').replace('{module}', label),
         'success'
       );
     },
     onError: (error: Error) => {
-      showToast(error.message || __('Failed to update module.', 'Failed to update module.'), 'error');
+      showToast(error.message || __('Failed to update module.', 'yatra'), 'error');
     },
   });
 };
@@ -175,15 +175,15 @@ export const useBulkToggleModules = () => {
         const names = variables.map((item) => item.name || item.slug);
         const summary = formatNamesList(names);
         const message = variables[0].enabled
-          ? __('Enabled: {modules}', 'Enabled: {modules}').replace('{modules}', summary)
-          : __('Disabled: {modules}', 'Disabled: {modules}').replace('{modules}', summary);
+          ? __('Enabled: {modules}', 'yatra').replace('{modules}', summary)
+          : __('Disabled: {modules}', 'yatra').replace('{modules}', summary);
         showToast(message, 'success');
       } else {
-        showToast(__('Modules updated successfully.', 'Modules updated successfully.'), 'success');
+        showToast(__('Modules updated successfully.', 'yatra'), 'success');
       }
     },
     onError: (error: Error) => {
-      showToast(error.message || __('Failed to update modules.', 'Failed to update modules.'), 'error');
+      showToast(error.message || __('Failed to update modules.', 'yatra'), 'error');
     },
   });
 };

@@ -132,17 +132,17 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-              {__('Bookings', 'Bookings')}
+              {__('Bookings', 'yatra')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              {__('Manage and view all your travel bookings', 'Manage and view all your travel bookings')}
+              {__('Manage and view all your travel bookings', 'yatra')}
             </p>
           </div>
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-4">
             {/* Search Input */}
             <div className="relative">
               <input
-                placeholder={__('Search bookings...', 'Search bookings...')}
+                placeholder={__('Search bookings...', 'yatra')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full lg:w-64 pl-4 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -155,10 +155,10 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                 onChange={(e) => setBookingFilter(e.target.value as 'all' | 'upcoming' | 'pending' | 'completed')}
                 className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-2 pr-4 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer"
               >
-                <option value="all">{__('All Bookings', 'All Bookings')}</option>
-                <option value="upcoming">{__('Upcoming', 'Upcoming')}</option>
-                <option value="pending">{__('Pending', 'Pending')}</option>
-                <option value="completed">{__('Completed', 'Completed')}</option>
+                <option value="all">{__('All Bookings', 'yatra')}</option>
+                <option value="upcoming">{__('Upcoming', 'yatra')}</option>
+                <option value="pending">{__('Pending', 'yatra')}</option>
+                <option value="completed">{__('Completed', 'yatra')}</option>
               </select>
             </div>
           </div>
@@ -170,7 +170,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Bookings', 'Total Bookings')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Bookings', 'yatra')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{bookingStats.total}</p>
             </div>
             <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -181,7 +181,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Upcoming', 'Upcoming')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Upcoming', 'yatra')}</p>
               <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{bookingStats.upcoming}</p>
             </div>
             <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
@@ -192,7 +192,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Pending', 'Pending')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Pending', 'yatra')}</p>
               <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{bookingStats.pending}</p>
             </div>
             <div className="p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
@@ -203,7 +203,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Completed', 'Completed')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Completed', 'yatra')}</p>
               <p className="text-xl font-bold text-gray-600 dark:text-gray-400">{bookingStats.completed}</p>
             </div>
             <div className="p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -214,7 +214,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
         <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Spent', 'Total Spent')}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{__('Total Spent', 'yatra')}</p>
               <p className="text-xl font-bold text-gray-900 dark:text-white">{currency(bookingStats.totalSpent)}</p>
             </div>
             <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -228,8 +228,8 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
       {filteredDisplayBookings.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl p-12 text-center">
           <Package className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No bookings found', 'No bookings found')}</p>
-          <p className="text-sm text-gray-400 dark:text-gray-500">{__('Try adjusting your filters or check back later.', 'Try adjusting your filters or check back later.')}</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium mb-1">{__('No bookings found', 'yatra')}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-500">{__('Try adjusting your filters or check back later.', 'yatra')}</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -275,7 +275,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                           <h3 className="text-base font-bold text-gray-900 dark:text-white mb-1">{booking.trip_title}</h3>
                           <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                             <MapPin className="w-4 h-4 text-gray-600 dark:text-gray-400" />
-                            {booking.destination || __('Multiple destinations', 'Multiple destinations')}
+                            {booking.destination || __('Multiple destinations', 'yatra')}
                           </p>
                         </div>
                       </div>
@@ -290,38 +290,38 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                   <div className="yatra-booking-details grid grid-cols-2 md:grid-cols-5 gap-4 p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg mb-4">
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {__('Travel Date', 'Travel Date')}
+                        {__('Travel Date', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(booking.travel_date)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {__('Travelers', 'Travelers')}
+                        {__('Travelers', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{booking.travelers}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {__('Total Amount', 'Total Amount')}
+                        {__('Total Amount', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{currency(booking.total_amount)}</p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {__('Paid / Due', 'Paid / Due')}
+                        {__('Paid / Due', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">
                         {currency(totalPaid ?? 0)}
                         {amountDue !== null && (
                           <span className="text-xs font-normal text-gray-500 dark:text-gray-400 ml-1">
-                            {__('Due:', 'Due:')} {currency(amountDue)}
+                            {__('Due:', 'yatra')} {currency(amountDue)}
                           </span>
                         )}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
-                        {__('Booked On', 'Booked On')}
+                        {__('Booked On', 'yatra')}
                       </p>
                       <p className="text-sm font-semibold text-gray-900 dark:text-white">{formatDate(booking.booking_date || booking.created_at)}</p>
                     </div>
@@ -335,7 +335,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       onClick={() => handleBookingSelect(bookingId)} 
                       className="yatra-booking-action yatra-booking-action-view inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium cursor-pointer"
                     >
-                      {__('View Details', 'View Details')}
+                      {__('View Details', 'yatra')}
                     </div>
                     <div 
                       role="button" 
@@ -343,7 +343,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       onClick={() => handleDownloadClick(bookingId)} 
                       className="yatra-booking-action yatra-booking-action-download inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                     >
-                      {__('Download Voucher', 'Download Voucher')}
+                      {__('Download Voucher', 'yatra')}
                     </div>
                     <div 
                       role="button" 
@@ -351,7 +351,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       onClick={() => onSectionChange('payments')} 
                       className="yatra-booking-action yatra-booking-action-payment inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                     >
-                      {__('Payment', 'Payment')}
+                      {__('Payment', 'yatra')}
                     </div>
                     {canPayRemaining && (
                       <button
@@ -366,7 +366,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                             <path d="M4 12a8 8 0 0 1 8-8" />
                           </svg>
                         ) : null}
-                        {__('Pay Remaining Balance', 'Pay Remaining Balance')}
+                        {__('Pay Remaining Balance', 'yatra')}
                       </button>
                     )}
                     <div 
@@ -375,7 +375,7 @@ const Bookings: React.FC<BookingsProps> = ({ bookings, onSectionChange }) => {
                       onClick={() => onSectionChange('support')} 
                       className="yatra-booking-action yatra-booking-action-support inline-flex items-center px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium cursor-pointer"
                     >
-                      {__('Support', 'Support')}
+                      {__('Support', 'yatra')}
                     </div>
                   </div>
                 </div>

@@ -117,7 +117,7 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
               className="min-w-[140px]"
               disabled={totalItems === 0}
             >
-              <option value="">{__('Bulk actions', 'Bulk actions')}</option>
+              <option value="">{__('Bulk actions', 'yatra')}</option>
               {bulkActionOptions.map(option => (
                 <option key={option.value} value={option.value}>
                   {option.label}
@@ -130,19 +130,19 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
               disabled={bulkMutationPending || selectedIds.length === 0}
               className="h-11 px-4 flex-shrink-0"
             >
-              {__('Apply', 'Apply')}
+              {__('Apply', 'yatra')}
             </Button>
             
             {/* Selection info right after Apply button */}
             {selectedIds.length > 0 && (
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border border-blue-200 dark:border-blue-800 whitespace-nowrap">
-                <span className="font-medium text-xs">{`${__('Selected:', 'Selected:')} ${selectedIds.length}`}</span>
+                <span className="font-medium text-xs">{`${__('Selected:', 'yatra')} ${selectedIds.length}`}</span>
                 <button
                   type="button"
                   className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                   onClick={onClearSelection}
                 >
-                  {__('Clear', 'Clear')}
+                  {__('Clear', 'yatra')}
                 </button>
               </div>
             )}
@@ -196,7 +196,7 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                   data-columns-trigger
                 >
                   <Columns className="w-4 h-4" />
-                  {__('Columns', 'Columns')}
+                  {__('Columns', 'yatra')}
                 </Button>
                 
                 {/* Columns dropdown */}
@@ -208,7 +208,7 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <div className="px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
-                      {__('Show Columns', 'Show Columns')}
+                      {__('Show Columns', 'yatra')}
                     </div>
                     
                     <div className="py-1">
@@ -240,53 +240,53 @@ export const BulkActionToolbar: React.FC<BulkActionToolbarProps> = ({
         title={(() => {
           switch (confirmDialog.action) {
             case 'delete':
-              return __('Delete Permanently', 'Delete Permanently');
+              return __('Delete Permanently', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             case 'publish':
-              return __('Publish Items', 'Publish Items');
+              return __('Publish Items', 'yatra');
             case 'draft':
-              return __('Make Draft', 'Make Draft');
+              return __('Make Draft', 'yatra');
             case 'restore':
-              return __('Restore Items', 'Restore Items');
+              return __('Restore Items', 'yatra');
             default:
-              return __('Confirm Bulk Action', 'Confirm Bulk Action');
+              return __('Confirm Bulk Action', 'yatra');
           }
         })()}
         message={(() => {
           const count = confirmDialog.count;
           switch (confirmDialog.action) {
             case 'delete':
-              return __('Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.', 'Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.').replace('{count}', count.toString());
+              return __('Are you sure you want to permanently delete {count} item(s)? This action cannot be undone.', 'yatra').replace('{count}', count.toString());
             case 'trash':
-              return __('Are you sure you want to move {count} item(s) to trash?', 'Are you sure you want to move {count} item(s) to trash?').replace('{count}', count.toString());
+              return __('Are you sure you want to move {count} item(s) to trash?', 'yatra').replace('{count}', count.toString());
             case 'publish':
-              return __('Are you sure you want to publish {count} item(s)?', 'Are you sure you want to publish {count} item(s)?').replace('{count}', count.toString());
+              return __('Are you sure you want to publish {count} item(s)?', 'yatra').replace('{count}', count.toString());
             case 'draft':
-              return __('Are you sure you want to make {count} item(s) draft?', 'Are you sure you want to make {count} item(s) draft?').replace('{count}', count.toString());
+              return __('Are you sure you want to make {count} item(s) draft?', 'yatra').replace('{count}', count.toString());
             case 'restore':
-              return __('Are you sure you want to restore {count} item(s)?', 'Are you sure you want to restore {count} item(s)?').replace('{count}', count.toString());
+              return __('Are you sure you want to restore {count} item(s)?', 'yatra').replace('{count}', count.toString());
             default:
-              return __('Are you sure you want to perform this action on {count} item(s)?', 'Are you sure you want to perform this action on {count} item(s)?').replace('{count}', count.toString());
+              return __('Are you sure you want to perform this action on {count} item(s)?', 'yatra').replace('{count}', count.toString());
           }
         })()}
         confirmText={(() => {
           switch (confirmDialog.action) {
             case 'delete':
-              return __('Delete Permanently', 'Delete Permanently');
+              return __('Delete Permanently', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             case 'publish':
-              return __('Publish', 'Publish');
+              return __('Publish', 'yatra');
             case 'draft':
-              return __('Make Draft', 'Make Draft');
+              return __('Make Draft', 'yatra');
             case 'restore':
-              return __('Restore', 'Restore');
+              return __('Restore', 'yatra');
             default:
-              return __('Confirm', 'Confirm');
+              return __('Confirm', 'yatra');
           }
         })()}
-        cancelText={__('Cancel', 'Cancel')}
+        cancelText={__('Cancel', 'yatra')}
         variant={confirmDialog.action === 'delete' ? 'danger' : 'warning'}
         isLoading={bulkMutationPending}
       />

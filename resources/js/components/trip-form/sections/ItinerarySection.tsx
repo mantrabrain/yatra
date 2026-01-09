@@ -318,13 +318,13 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
     const entry = activityModalState.entryData;
     const errors: Record<string, string> = {};
     if (!entry.item_type_id) {
-      errors.item_type_id = __('Item type is required', 'Item type is required');
+      errors.item_type_id = __('Item type is required', 'yatra');
     }
     if (!entry.item_id) {
-      errors.item_id = __('Item is required', 'Item is required');
+      errors.item_id = __('Item is required', 'yatra');
     }
     if (!entry.title?.trim()) {
-      errors.title = __('Title is required', 'Title is required');
+      errors.title = __('Title is required', 'yatra');
     }
 
     if (Object.keys(errors).length > 0) {
@@ -360,7 +360,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
         const payload = response?.data?.data || response?.data || response || [];
         return Array.isArray(payload) ? payload : [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item types', 'Failed to load item types'), 'error');
+        showToast(error?.message || __('Failed to load item types', 'yatra'), 'error');
         return [];
       }
     },
@@ -380,7 +380,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
         const payload = response?.data?.data || response?.data || response || [];
         return Array.isArray(payload) ? payload : [];
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load itinerary items', 'Failed to load itinerary items'), 'error');
+        showToast(error?.message || __('Failed to load itinerary items', 'yatra'), 'error');
         return [];
       }
     },
@@ -439,7 +439,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
   const getEntryTypeName = (entry: ItineraryEntry) => {
     if (entry.item_type) return entry.item_type;
     const type = entry.item_type_id ? itemTypesLookup.get(entry.item_type_id.toString()) : null;
-    return type?.name || __('Activity', 'Activity');
+    return type?.name || __('Activity', 'yatra');
   };
 
   const getEntryTypeCategory = (entry: ItineraryEntry) => {
@@ -474,8 +474,8 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
         const item = entry.item_id ? itemsLookup.get(entry.item_id.toString()) : null;
         return {
           ...entry,
-          item_type: type?.name || entry.item_type || __('Activity', 'Activity'),
-          item_name: item?.name || entry.item_name || __('Activity', 'Activity'),
+          item_type: type?.name || entry.item_type || __('Activity', 'yatra'),
+          item_name: item?.name || entry.item_name || __('Activity', 'yatra'),
           item_icon: normalizeIconName(type?.icon) || entry.item_icon || 'footprints',
           start_time: entry.start_time || '08:00',
           end_time: entry.end_time || '10:00',
@@ -614,10 +614,10 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
 
   const types = itemTypesData || [];
   const items = itemsData || [];
-  const dayLabel = isSingleDayTrip ? __('Entry', 'Entry') : __('Day', 'Day');
-  const addDayButtonLabel = isSingleDayTrip ? __('Add Entry', 'Add Entry') : __('Add Day', 'Add Day');
-  const emptyStateButtonLabel = isSingleDayTrip ? __('Add First Entry', 'Add First Entry') : __('Add First Day', 'Add First Day');
-  const addActivityButtonLabel = __('Add Itinerary Activity', 'Add Itinerary Activity');
+  const dayLabel = isSingleDayTrip ? __('Entry', 'yatra') : __('Day', 'yatra');
+  const addDayButtonLabel = isSingleDayTrip ? __('Add Entry', 'yatra') : __('Add Day', 'yatra');
+  const emptyStateButtonLabel = isSingleDayTrip ? __('Add First Entry', 'yatra') : __('Add First Day', 'yatra');
+  const addActivityButtonLabel = __('Add Itinerary Activity', 'yatra');
   const itineraryLink = useMemo(() => {
     if (!isEditMode || !tripId) return null;
     return `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&trip_id=${tripId}`;
@@ -642,7 +642,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
               className="text-sm"
             >
               <ExternalLink className="w-4 h-4 mr-1" />
-              {__('Open Trip Itinerary', 'Open Trip Itinerary')}
+              {__('Open Trip Itinerary', 'yatra')}
             </Button>
           )}
           <Button
@@ -662,7 +662,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
           {__('Map out your trip day by day, or add quick included/excluded lists if you\'re still planning the details.', 'Map out your trip day by day, or add quick included/excluded lists if you\'re still planning the details.')}
         </p>
         <p className="text-xs text-amber-800 dark:text-amber-200">
-          {__('Optional but highly recommended—complete itineraries help travelers understand the flow of the experience.', 'Optional but highly recommended—complete itineraries help travelers understand the flow of the experience.')}
+          {__('Optional but highly recommended—complete itineraries help travelers understand the flow of the experience.', 'yatra')}
         </p>
       </div>
 
@@ -679,9 +679,9 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
             {/* Included Items */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">{__('Included Items', 'Included Items')}</CardTitle>
+                <CardTitle className="text-sm">{__('Included Items', 'yatra')}</CardTitle>
                 <CardDescription className="text-xs">
-                  {__('List everything included in the trip price', 'List everything included in the trip price')}
+                  {__('List everything included in the trip price', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -695,7 +695,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                             <Input
                               value={item.title}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateTripIncludedItem(index, 'title', e.target.value)}
-                              placeholder={__('Item title', 'Item title')}
+                              placeholder={__('Item title', 'yatra')}
                               className="text-sm"
                             />
                           </div>
@@ -712,7 +712,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                         <textarea
                           value={item.description}
                           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdateTripIncludedItem(index, 'description', e.target.value)}
-                          placeholder={__('Short description (optional)', 'Short description (optional)')}
+                          placeholder={__('Short description (optional)', 'yatra')}
                           rows={2}
                           className="text-xs w-full rounded-md border border-green-200 dark:border-green-800 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
                         />
@@ -723,7 +723,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <CheckCircle2 className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {__('No included items yet', 'No included items yet')}
+                      {__('No included items yet', 'yatra')}
                     </p>
                   </div>
                 )}
@@ -732,13 +732,13 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                     type="text"
                     value={newTripIncludedItem.title}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTripIncludedItem(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder={__('e.g., Accommodation', 'e.g., Accommodation')}
+                    placeholder={__('e.g., Accommodation', 'yatra')}
                     className="text-sm"
                   />
                   <textarea
                     value={newTripIncludedItem.description}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewTripIncludedItem(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder={__('Describe what is included', 'Describe what is included')}
+                    placeholder={__('Describe what is included', 'yatra')}
                     rows={2}
                     className="text-xs w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
                     onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -756,7 +756,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                     disabled={!newTripIncludedItem.title.trim()}
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    {__('Add Included Item', 'Add Included Item')}
+                    {__('Add Included Item', 'yatra')}
                   </Button>
                 </div>
               </CardContent>
@@ -765,9 +765,9 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
             {/* Excluded Items */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">{__('Excluded Items', 'Excluded Items')}</CardTitle>
+                <CardTitle className="text-sm">{__('Excluded Items', 'yatra')}</CardTitle>
                 <CardDescription className="text-xs">
-                  {__('List what is NOT included', 'List what is NOT included')}
+                  {__('List what is NOT included', 'yatra')}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -781,7 +781,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                             <Input
                               value={item.title}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleUpdateTripExcludedItem(index, 'title', e.target.value)}
-                              placeholder={__('Item title', 'Item title')}
+                              placeholder={__('Item title', 'yatra')}
                               className="text-sm"
                             />
                           </div>
@@ -798,7 +798,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                         <textarea
                           value={item.description}
                           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleUpdateTripExcludedItem(index, 'description', e.target.value)}
-                          placeholder={__('Short description (optional)', 'Short description (optional)')}
+                          placeholder={__('Short description (optional)', 'yatra')}
                           rows={2}
                           className="text-xs w-full rounded-md border border-red-200 dark:border-red-800 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
                         />
@@ -809,7 +809,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <X className="w-6 h-6 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {__('No excluded items yet', 'No excluded items yet')}
+                      {__('No excluded items yet', 'yatra')}
                     </p>
                   </div>
                 )}
@@ -818,13 +818,13 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                     type="text"
                     value={newTripExcludedItem.title}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewTripExcludedItem(prev => ({ ...prev, title: e.target.value }))}
-                    placeholder={__('e.g., Flights', 'e.g., Flights')}
+                    placeholder={__('e.g., Flights', 'yatra')}
                     className="text-sm"
                   />
                   <textarea
                     value={newTripExcludedItem.description}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setNewTripExcludedItem(prev => ({ ...prev, description: e.target.value }))}
-                    placeholder={__('Describe what is not included', 'Describe what is not included')}
+                    placeholder={__('Describe what is not included', 'yatra')}
                     rows={2}
                     className="text-xs w-full rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-gray-900 dark:text-gray-100"
                     onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -842,7 +842,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                     disabled={!newTripExcludedItem.title.trim()}
                   >
                     <Plus className="w-4 h-4 mr-1" />
-                    {__('Add Excluded Item', 'Add Excluded Item')}
+                    {__('Add Excluded Item', 'yatra')}
                   </Button>
                 </div>
               </CardContent>
@@ -856,13 +856,13 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
           <Calendar className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
             {isSingleDayTrip
-              ? __('No itinerary entries added yet', 'No itinerary entries added yet')
-              : __('No itinerary days added yet', 'No itinerary days added yet')}
+              ? __('No itinerary entries added yet', 'yatra')
+              : __('No itinerary days added yet', 'yatra')}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
             {isSingleDayTrip
-              ? __('Start by adding your first itinerary entry', 'Start by adding your first itinerary entry')
-              : __('Start by adding your first day', 'Start by adding your first day')}
+              ? __('Start by adding your first itinerary entry', 'yatra')
+              : __('Start by adding your first day', 'yatra')}
           </p>
           <Button
             type="button"
@@ -898,7 +898,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                           type="button"
                           onClick={() => toggleDay(dayData.day)}
                           className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                          aria-label={__('Toggle day visibility', 'Toggle day visibility')}
+                          aria-label={__('Toggle day visibility', 'yatra')}
                         >
                           {isExpanded ? (
                             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -914,10 +914,10 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                         </div>
                         <div className="flex flex-col">
                           <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                            {dayData.day_title || __('Untitled itinerary entry', 'Untitled itinerary entry')}
+                            {dayData.day_title || __('Untitled itinerary entry', 'yatra')}
                           </span>
                           <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <span>{counts.total} {__('items', 'items')}</span>
+                            <span>{counts.total} {__('items', 'yatra')}</span>
                             {counts.meals > 0 && (
                               <span className="flex items-center gap-1">
                                 <UtensilsCrossed className="w-3 h-3" />
@@ -946,12 +946,12 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                               key={entry.id}
                               className="px-2 py-0.5 rounded-full bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700"
                             >
-                              {entry.title?.trim() || __('Untitled activity', 'Untitled activity')}
+                              {entry.title?.trim() || __('Untitled activity', 'yatra')}
                             </span>
                           ))}
                           {remainingSummary > 0 && (
                             <span className="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-900 text-gray-500">
-                              +{remainingSummary} {__('more', 'more')}
+                              +{remainingSummary} {__('more', 'yatra')}
                             </span>
                           )}
                         </div>
@@ -966,7 +966,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                         className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                       >
                         <Pencil className="w-4 h-4 mr-1" />
-                        {__('Edit', 'Edit')}
+                        {__('Edit', 'yatra')}
                       </Button>
                       <Button
                         type="button"
@@ -996,7 +996,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                   <CardContent className="p-4">
                     <div className="p-4 bg-gray-50 dark:bg-gray-800/30 border border-dashed border-gray-300 dark:border-gray-700 rounded-lg mb-4">
                       <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-3">
-                        {__('Quick Add', 'Quick Add')}
+                        {__('Quick Add', 'yatra')}
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {quickAddOptions.length > 0 ? (
@@ -1031,7 +1031,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                           })
                         ) : (
                           <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {__('No item types available. Add item types first.', 'No item types available. Add item types first.')}
+                            {__('No item types available. Add item types first.', 'yatra')}
                           </p>
                         )}
                       </div>
@@ -1039,7 +1039,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                     {derivedEntries.length === 0 ? (
                       <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                          {__('No itinerary activities for this entry yet', 'No itinerary activities for this entry yet')}
+                          {__('No itinerary activities for this entry yet', 'yatra')}
                         </p>
                         <Button
                           type="button"
@@ -1095,13 +1095,13 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                           onClick={() => toggleEntryExpanded(entry.id)}
                                           className="text-xs text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
                                         >
-                                          {isEntryExpanded ? __('Hide details', 'Hide details') : __('Show details', 'Show details')}
+                                          {isEntryExpanded ? __('Hide details', 'yatra') : __('Show details', 'yatra')}
                                         </button>
                                       </div>
                                       <div className="flex items-center gap-2">
                                         <Icon className="w-4 h-4 text-gray-500" />
                                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                                          {entry.title?.trim() || __('Untitled activity', 'Untitled activity')}
+                                          {entry.title?.trim() || __('Untitled activity', 'yatra')}
                                         </h4>
                                       </div>
                                       <p className="text-xs text-gray-500 dark:text-gray-400">
@@ -1117,7 +1117,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                         className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                                       >
                                         <Pencil className="w-4 h-4 mr-1" />
-                                        {__('Edit', 'Edit')}
+                                        {__('Edit', 'yatra')}
                                       </Button>
                                       <Button
                                         type="button"
@@ -1127,7 +1127,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                         className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
                                       >
                                         <Copy className="w-4 h-4 mr-1" />
-                                        {__('Duplicate', 'Duplicate')}
+                                        {__('Duplicate', 'yatra')}
                                       </Button>
                                       <Button
                                         type="button"
@@ -1169,7 +1169,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                           {entry.included_items?.length ? (
                                             <div>
                                               <p className="text-xs font-semibold text-green-600 dark:text-green-400 mb-1">
-                                                {__('Included', 'Included')}
+                                                {__('Included', 'yatra')}
                                               </p>
                                               <ul className="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-0.5">
                                                 {entry.included_items.map((item, idx) => (
@@ -1181,7 +1181,7 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
                                           {entry.excluded_items?.length ? (
                                             <div>
                                               <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-1">
-                                                {__('Excluded', 'Excluded')}
+                                                {__('Excluded', 'yatra')}
                                               </p>
                                               <ul className="text-xs text-gray-600 dark:text-gray-400 list-disc list-inside space-y-0.5">
                                                 {entry.excluded_items.map((item, idx) => (
@@ -1221,10 +1221,10 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {dayModalState.mode === 'create' ? __('Add Day / Entry', 'Add Day / Entry') : __('Edit Day / Entry', 'Edit Day / Entry')}
+                {dayModalState.mode === 'create' ? __('Add Day / Entry', 'yatra') : __('Edit Day / Entry', 'yatra')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('Provide a title to help identify this itinerary section.', 'Provide a title to help identify this itinerary section.')}
+                {__('Provide a title to help identify this itinerary section.', 'yatra')}
               </p>
             </div>
             <button onClick={closeDayModal} className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
@@ -1240,22 +1240,22 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                {__('Display Title', 'Display Title')}
+                {__('Display Title', 'yatra')}
               </label>
               <Input
                 value={dayModalState.day_title}
                 onChange={(e) => setDayModalState(prev => ({ ...prev, day_title: e.target.value }))}
-                placeholder={__('e.g., Arrival & Welcome', 'e.g., Arrival & Welcome')}
+                placeholder={__('e.g., Arrival & Welcome', 'yatra')}
                 className="mt-1"
               />
             </div>
           </div>
           <div className="flex items-center justify-end gap-2">
             <Button variant="outline" onClick={closeDayModal}>
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button onClick={handleDayModalSave}>
-              {dayModalState.mode === 'create' ? __('Add', 'Add') : __('Save', 'Save')}
+              {dayModalState.mode === 'create' ? __('Add', 'yatra') : __('Save', 'yatra')}
             </Button>
           </div>
         </div>
@@ -1275,11 +1275,11 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {activityModalState.mode === 'create'
-                  ? __('Add Itinerary Activity', 'Add Itinerary Activity')
-                  : __('Edit Itinerary Activity', 'Edit Itinerary Activity')}
+                  ? __('Add Itinerary Entry', 'yatra')
+                  : __('Edit Itinerary Entry', 'yatra')}
               </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('Configure the activity details, timing, and notes.', 'Configure the activity details, timing, and notes.')}
+                {__('Configure the entry details, timing, and notes.', 'yatra')}
               </p>
             </div>
             <button onClick={closeActivityModal} className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white">
@@ -1306,10 +1306,10 @@ export const ItinerarySection: React.FC<ItinerarySectionProps> = ({
           />
           <div className="flex items-center justify-end gap-2">
             <Button variant="outline" onClick={closeActivityModal}>
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button onClick={handleActivityModalSave}>
-              {activityModalState.mode === 'create' ? __('Add Activity', 'Add Activity') : __('Save Changes', 'Save Changes')}
+              {activityModalState.mode === 'create' ? __('Add Activity', 'yatra') : __('Save Changes', 'yatra')}
             </Button>
           </div>
         </div>

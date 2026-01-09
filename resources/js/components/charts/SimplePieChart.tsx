@@ -33,7 +33,7 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-        {__('No data available', 'No data available')}
+        {__('No data available', 'yatra')}
       </div>
     );
   }
@@ -42,7 +42,7 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   if (total <= 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-        {__('No data available', 'No data available')}
+        {__('No data available', 'yatra')}
       </div>
     );
   }

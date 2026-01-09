@@ -50,11 +50,11 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('System Alerts', 'System Alerts')}</CardTitle>
+          <CardTitle>{__('System Alerts', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'Loading...')}
+            {__('Loading...', 'yatra')}
           </div>
         </CardContent>
       </Card>
@@ -68,10 +68,10 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{__('System Alerts', 'System Alerts')}</CardTitle>
+          <CardTitle>{__('System Alerts', 'yatra')}</CardTitle>
           {criticalAlerts.length > 0 && (
             <Badge variant="error">
-              {criticalAlerts.length} {__('critical', 'critical')}
+              {criticalAlerts.length} {__('critical', 'yatra')}
             </Badge>
           )}
         </div>
@@ -117,7 +117,7 @@ export const SystemAlerts: React.FC<SystemAlertsProps> = ({
         ) : (
           <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <CheckCircle className="w-4 h-4 text-green-500" />
-            <span>{__('All systems operational', 'All systems operational')}</span>
+            <span>{__('All systems operational', 'yatra')}</span>
           </div>
         )}
       </CardContent>

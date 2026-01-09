@@ -123,7 +123,7 @@ const Destinations: React.FC = () => {
         const response = await apiClient.get('/destinations', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load destinations', 'Failed to load destinations'), 'error');
+        showToast(error?.message || __('Failed to load destinations', 'yatra'), 'error');
         throw error;
       }
     },
@@ -138,11 +138,11 @@ const Destinations: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
-      showToast(__('Destination deleted successfully', 'Destination deleted successfully'), 'success');
+      showToast(__('Destination deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, destination: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete destination', 'Failed to delete destination'), 'error');
+      showToast(error?.message || __('Failed to delete destination', 'yatra'), 'error');
     },
   });
 
@@ -231,23 +231,23 @@ const Destinations: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['destinations'] });
       queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
-      showToast(__('Bulk action completed successfully', 'Bulk action completed successfully'), 'success');
+      showToast(__('Bulk action completed successfully', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to perform bulk action', 'Failed to perform bulk action'), 'error');
+      showToast(error?.message || __('Failed to perform bulk action', 'yatra'), 'error');
     },
   });
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one destination.', 'Select at least one destination.'), 'warning');
+      showToast(__('Select at least one destination.', 'yatra'), 'warning');
       return;
     }
 
@@ -256,10 +256,10 @@ const Destinations: React.FC = () => {
   };
 
   const viewFilters = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all ?? 0 },
-    { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish ?? 0 },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft ?? 0 },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash ?? 0 },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all ?? 0 },
+    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish ?? 0 },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft ?? 0 },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash ?? 0 },
   ];
 
   const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
@@ -271,25 +271,24 @@ const Destinations: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, destination: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Destination', 'Delete Destination')}
+        title={__('Delete Destination', 'yatra')}
         message={deleteConfirm.destination 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.destination.name)
-          : __('Are you sure you want to delete this destination? This action cannot be undone.', 'Are you sure you want to delete this destination? This action cannot be undone.')
-        }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.destination.name)
+          : __('Are you sure you want to delete this destination? This action cannot be undone.', 'yatra')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
 
       <PageHeader
-        title={__('Destinations', 'Destinations')}
-        description={__('Manage your travel destinations', 'Manage your travel destinations')}
+        title={__('Destinations', 'yatra')}
+        description={__('Manage your travel destinations', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateDestination} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Destination', 'Add New Destination')}
+            {__('Add New Destination', 'yatra')}
           </Button>
         }
       />
@@ -308,24 +307,24 @@ const Destinations: React.FC = () => {
               setBulkAction('');
             }}
             statusOptions={[
-              { value: "all", label: __('All Status', 'All Status') },
-              { value: "publish", label: __('Published', 'Published') },
-              { value: "draft", label: __('Draft', 'Draft') },
-              { value: "trash", label: __('Trash', 'Trash') }
+              { value: "all", label: __('All Status', 'yatra') },
+              { value: "publish", label: __('Published', 'yatra') },
+              { value: "draft", label: __('Draft', 'yatra') },
+              { value: "trash", label: __('Trash', 'yatra') }
             ]}
             sortBy={sortBy}
             onSortByChange={setSortBy}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
             sortOptions={[
-              { value: "name", label: __('Name', 'Name') },
-              { value: "status", label: __('Status', 'Status') },
-              { value: "created_at", label: __('Created At', 'Created At') },
-              { value: "updated_at", label: __('Updated At', 'Updated At') }
+              { value: "name", label: __('Name', 'yatra') },
+              { value: "status", label: __('Status', 'yatra') },
+              { value: "created_at", label: __('Created At', 'yatra') },
+              { value: "updated_at", label: __('Updated At', 'yatra') }
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={!!hasFilters}
-            placeholder={__('Search destinations...', 'Search destinations...')}
+            placeholder={__('Search destinations...', 'yatra')}
           />
         </CardContent>
       </Card>
@@ -348,14 +347,14 @@ const Destinations: React.FC = () => {
           showColumnsDropdown={showColumnsDropdown}
           setShowColumnsDropdown={setShowColumnsDropdown}
           columnOptions={[
-            { key: 'name', label: __('Destination', 'Destination'), visible: visibleColumns.name },
-            { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-            { key: 'trips', label: __('Trips', 'Trips'), visible: visibleColumns.trips },
-            { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-            { key: 'created_at', label: __('Created Date', 'Created Date'), visible: visibleColumns.created_at },
-            { key: 'updated_at', label: __('Updated Date', 'Updated Date'), visible: visibleColumns.updated_at },
-            { key: 'created_by_name', label: __('Created By', 'Created By'), visible: visibleColumns.created_by_name },
-            { key: 'updated_by_name', label: __('Updated By', 'Updated By'), visible: visibleColumns.updated_by_name }
+            { key: 'name', label: __('Destination', 'yatra'), visible: visibleColumns.name },
+            { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+            { key: 'trips', label: __('Trips', 'yatra'), visible: visibleColumns.trips },
+            { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+            { key: 'created_at', label: __('Created Date', 'yatra'), visible: visibleColumns.created_at },
+            { key: 'updated_at', label: __('Updated Date', 'yatra'), visible: visibleColumns.updated_at },
+            { key: 'created_by_name', label: __('Created By', 'yatra'), visible: visibleColumns.created_by_name },
+            { key: 'updated_by_name', label: __('Updated By', 'yatra'), visible: visibleColumns.updated_by_name }
           ]}
           onToggleColumn={toggleColumn}
           bulkMutationPending={bulkMutation.isPending}
@@ -373,7 +372,7 @@ const Destinations: React.FC = () => {
                   columns={[
                     {
                       key: 'name',
-                      label: __('Destination', 'Destination'),
+                      label: __('Destination', 'yatra'),
                       sortable: true,
                       visible: visibleColumns.name,
                       render: (destination: Destination) => (
@@ -410,7 +409,7 @@ const Destinations: React.FC = () => {
                             <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                               <span>{destination.slug}</span>
                               <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                                ({__('ID:', 'ID:')} {destination.id})
+                                ({__('ID:', 'yatra')} {destination.id})
                               </span>
                             </div>
                           </div>
@@ -419,7 +418,7 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'trips',
-                      label: __('Trips', 'Trips'),
+                      label: __('Trips', 'yatra'),
                       sortable: false,
                       visible: visibleColumns.trips,
                       render: (destination: Destination) => (
@@ -430,17 +429,17 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'description',
-                      label: __('Description', 'Description'),
+                      label: __('Description', 'yatra'),
                       visible: visibleColumns.description,
                       render: (destination: Destination) => (
                         <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.description || __('No description', 'No description')}
+                          {destination.description || __('No description', 'yatra')}
                         </span>
                       )
                     },
                     {
                       key: 'status',
-                      label: __('Status', 'Status'),
+                      label: __('Status', 'yatra'),
                       sortable: true,
                       visible: visibleColumns.status,
                       render: (destination: Destination) => (
@@ -452,17 +451,17 @@ const Destinations: React.FC = () => {
                               : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                         }`}>
                           {destination.status === 'trash' || statusFilter === 'trash'
-                            ? __('Trash', 'Trash')
+                            ? __('Trash', 'yatra')
                             : destination.status === 'publish'
-                              ? __('Published', 'Published')
-                              : __('Draft', 'Draft')
+                              ? __('Published', 'yatra')
+                              : __('Draft', 'yatra')
                           }
                         </span>
                       )
                     },
                     {
                       key: 'created_at',
-                      label: __('Created Date', 'Created Date'),
+                      label: __('Created Date', 'yatra'),
                       sortable: true,
                       visible: visibleColumns.created_at,
                       render: (destination: Destination) => (
@@ -479,7 +478,7 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'updated_at',
-                      label: __('Updated Date', 'Updated Date'),
+                      label: __('Updated Date', 'yatra'),
                       sortable: true,
                       visible: visibleColumns.updated_at,
                       render: (destination: Destination) => (
@@ -496,21 +495,21 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'created_by_name',
-                      label: __('Created By', 'Created By'),
+                      label: __('Created By', 'yatra'),
                       visible: visibleColumns.created_by_name,
                       render: (destination: Destination) => (
                         <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.created_by_name || __('Unknown', 'Unknown')}
+                          {destination.created_by_name || __('Unknown', 'yatra')}
                         </span>
                       )
                     },
                     {
                       key: 'updated_by_name',
-                      label: __('Updated By', 'Updated By'),
+                      label: __('Updated By', 'yatra'),
                       visible: visibleColumns.updated_by_name,
                       render: (destination: Destination) => (
                         <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.updated_by_name || __('Unknown', 'Unknown')}
+                          {destination.updated_by_name || __('Unknown', 'yatra')}
                         </span>
                       )
                     }
@@ -518,14 +517,14 @@ const Destinations: React.FC = () => {
                   actions={[
                     {
                       key: 'edit',
-                      label: __('Edit', 'Edit'),
+                      label: __('Edit', 'yatra'),
                       icon: <Edit className="w-4 h-4" />,
                       onClick: handleEdit,
                       condition: () => can('yatra_edit_trips'),
                     },
                     {
                       key: 'restore',
-                      label: __('Restore', 'Restore'),
+                      label: __('Restore', 'yatra'),
                       icon: <RotateCcw className="w-4 h-4" />,
                       onClick: (destination: Destination) => {
                         // Handle restore action
@@ -535,7 +534,7 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'trash',
-                      label: __('Move to Trash', 'Move to Trash'),
+                      label: __('Move to Trash', 'yatra'),
                       icon: <Trash2 className="w-4 h-4" />,
                       onClick: (destination: Destination) => {
                         bulkMutation.mutate({ action: 'trash', ids: [destination.id] });
@@ -544,7 +543,7 @@ const Destinations: React.FC = () => {
                     },
                     {
                       key: 'delete',
-                      label: __('Delete Permanently', 'Delete Permanently'),
+                      label: __('Delete Permanently', 'yatra'),
                       icon: <Trash2 className="w-4 h-4" />,
                       onClick: handleDelete,
                       condition: (destination: Destination) => (destination.status === 'trash' || statusFilter === 'trash') && can('yatra_delete_trips'),
@@ -553,18 +552,18 @@ const Destinations: React.FC = () => {
                   ]}
                   isLoading={isLoading}
                   isError={!!error}
-                  errorText={__('Error loading destinations', 'Error loading destinations')}
+                  errorText={__('Error loading destinations', 'yatra')}
                   errorDescription={__(
                     'We couldn’t connect to the destinations service. Please refresh or try again shortly.',
-                    'We couldn’t connect to the destinations service. Please refresh or try again shortly.'
+                    'yatra'
                   )}
                   onRetry={() => queryClient.invalidateQueries({ queryKey: ['destinations'] })}
                   errorDetails={errorContext.details}
                   errorRequestInfo={errorContext.requestInfo}
-                  emptyText={__('No destinations found', 'No destinations found')}
+                  emptyText={__('No destinations found', 'yatra')}
                   emptyDescription={hasFilters 
-                    ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                    : __('Get started by creating your first destination.', 'Get started by creating your first destination.')
+                    ? __('Try adjusting your filters to see more results.', 'yatra')
+                    : __('Get started by creating your first destination.', 'yatra')
                   }
                   onCreateClick={can('yatra_edit_trips') ? handleCreateDestination : undefined}
                   onSort={handleSort}
@@ -604,7 +603,7 @@ const Destinations: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('destinations', 'destinations')}
+            itemName={__('destinations', 'yatra')}
           />
         </div>
       )}

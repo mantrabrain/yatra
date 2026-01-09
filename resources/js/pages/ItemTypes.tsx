@@ -124,7 +124,7 @@ const ItemTypes: React.FC = () => {
         const response = await apiClient.get('/item-types', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item types', 'Failed to load item types'), 'error');
+        showToast(error?.message || __('Failed to load item types', 'yatra'), 'error');
         throw error;
       }
     },
@@ -138,11 +138,11 @@ const ItemTypes: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['item-types'] });
       queryClient.invalidateQueries({ queryKey: ['item-types-stats'] });
-      showToast(__('Item type deleted successfully', 'Item type deleted successfully'), 'success');
+      showToast(__('Item type deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, itemType: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete item type', 'Failed to delete item type'), 'error');
+      showToast(error?.message || __('Failed to delete item type', 'yatra'), 'error');
     },
   });
 
@@ -158,7 +158,7 @@ const ItemTypes: React.FC = () => {
   const isItemTypesError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -177,15 +177,15 @@ const ItemTypes: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        label: __('Publish', 'yatra'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -322,12 +322,12 @@ const ItemTypes: React.FC = () => {
   };
 
   const columnOptions = [
-    { key: 'type', label: __('Type', 'Type'), visible: visibleColumns.type },
-    { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-    { key: 'items', label: __('Items', 'Items'), visible: visibleColumns.items },
-    { key: 'date', label: __('Date', 'Date'), visible: visibleColumns.date },
-    { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
+    { key: 'type', label: __('Type', 'yatra'), visible: visibleColumns.type },
+    { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+    { key: 'items', label: __('Items', 'yatra'), visible: visibleColumns.items },
+    { key: 'date', label: __('Date', 'yatra'), visible: visibleColumns.date },
+    { key: 'author', label: __('Author', 'yatra'), visible: visibleColumns.author },
   ];
 
   const isAllSelected = itemTypes.length > 0 && selectedIds.length === itemTypes.length;
@@ -370,31 +370,31 @@ const ItemTypes: React.FC = () => {
   }, [statsData]);
 
   const statusOptions = [
-    { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-    { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-    { key: 'publish', label: __('Publish', 'Publish'), count: statusCounts.publish },
-    { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+    { key: 'publish', label: __('Publish', 'yatra'), count: statusCounts.publish },
+    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
   ];
 
   const bulkActionOptions = useMemo(() => {
     if (statusFilter === 'trash') {
       return [
-        { value: 'restore', label: __('Restore to Draft', 'Restore to Draft') },
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'restore', label: __('Restore to Draft', 'yatra') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     return [
-      { value: 'publish', label: __('Mark as Published', 'Mark as Published') },
-      { value: 'draft', label: __('Mark as Draft', 'Mark as Draft') },
-      { value: 'trash', label: __('Move to Trash', 'Move to Trash') },
-      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      { value: 'publish', label: __('Mark as Published', 'yatra') },
+      { value: 'draft', label: __('Mark as Draft', 'yatra') },
+      { value: 'trash', label: __('Move to Trash', 'yatra') },
+      { value: 'delete', label: __('Delete Permanently', 'yatra') },
     ];
   }, [statusFilter]);
 
   const handleBulkApply = async () => {
     if (!bulkAction || selectedIds.length === 0) {
-      showToast(__('Please select item types and a bulk action first.', 'Please select item types and a bulk action first.'), 'error');
+      showToast(__('Please select item types and a bulk action first.', 'yatra'), 'error');
       return;
     }
 
@@ -405,25 +405,25 @@ const ItemTypes: React.FC = () => {
 
       if (bulkAction === 'delete') {
         await Promise.all(selectedIds.map(id => apiClient.delete(`/item-types/${id}`)));
-        showToast(__('Item types deleted successfully', 'Item types deleted successfully'), 'success');
+        showToast(__('Item types deleted successfully', 'yatra'), 'success');
       } else if (bulkAction === 'publish') {
         await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'publish')));
-        showToast(__('Item types marked as published', 'Item types marked as published'), 'success');
+        showToast(__('Item types marked as published', 'yatra'), 'success');
       } else if (bulkAction === 'draft') {
         const targetStatus: 'draft' = 'draft';
         await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, targetStatus)));
         showToast(
           statusFilter === 'trash'
-            ? __('Item types restored to draft', 'Item types restored to draft')
-            : __('Item types marked as draft', 'Item types marked as draft'),
+            ? __('Item types restored to draft', 'yatra')
+            : __('Item types marked as draft', 'yatra'),
           'success'
         );
       } else if (bulkAction === 'trash') {
         await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'trash')));
-        showToast(__('Item types moved to trash', 'Item types moved to trash'), 'success');
+        showToast(__('Item types moved to trash', 'yatra'), 'success');
       } else if (bulkAction === 'restore') {
         await Promise.all(selectedItemTypes.map((itemType: ItemType) => updateItemTypeStatus(itemType, 'draft')));
-        showToast(__('Item types restored to draft', 'Item types restored to draft'), 'success');
+        showToast(__('Item types restored to draft', 'yatra'), 'success');
       }
 
       await queryClient.invalidateQueries({ queryKey: ['item-types'] });
@@ -431,7 +431,7 @@ const ItemTypes: React.FC = () => {
       setSelectedIds([]);
       setBulkAction('');
     } catch (error) {
-      showToast(__('Bulk action failed', 'Bulk action failed'), 'error');
+      showToast(__('Bulk action failed', 'yatra'), 'error');
     } finally {
       setBulkMutationPending(false);
     }
@@ -440,7 +440,7 @@ const ItemTypes: React.FC = () => {
   const columns = [
     {
       key: 'type',
-      label: __('Type', 'Type'),
+      label: __('Type', 'yatra'),
       sortable: true,
       width: 'w-[200px]',
       visible: visibleColumns.type,
@@ -465,18 +465,18 @@ const ItemTypes: React.FC = () => {
     },
     {
       key: 'description',
-      label: __('Description', 'Description'),
+      label: __('Description', 'yatra'),
       sortable: false,
       width: 'w-[200px]',
       render: (itemType: ItemType) => (
         <span className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-          {itemType.description || __('No description', 'No description')}
+          {itemType.description || __('No description', 'yatra')}
         </span>
       ),
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       width: 'w-[100px]',
       visible: visibleColumns.status,
@@ -484,7 +484,7 @@ const ItemTypes: React.FC = () => {
     },
     {
       key: 'items',
-      label: __('Items', 'Items'),
+      label: __('Items', 'yatra'),
       sortable: false,
       width: 'w-[100px]',
       visible: visibleColumns.items,
@@ -498,7 +498,7 @@ const ItemTypes: React.FC = () => {
     },
     {
       key: 'date',
-      label: __('Date', 'Date'),
+      label: __('Date', 'yatra'),
       sortable: true,
       width: 'w-[150px]',
       visible: visibleColumns.date,
@@ -506,14 +506,14 @@ const ItemTypes: React.FC = () => {
         <div className="text-gray-500 dark:text-gray-400 text-sm">
           <div>{formatDate(itemType.created_at)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated', 'Updated')}: {formatDate(itemType.updated_at)}
+            {__('Updated', 'yatra')}: {formatDate(itemType.updated_at)}
           </div>
         </div>
       ),
     },
     {
       key: 'author',
-      label: __('Author', 'Author'),
+      label: __('Author', 'yatra'),
       sortable: false,
       width: 'w-[150px]',
       visible: visibleColumns.author,
@@ -521,7 +521,7 @@ const ItemTypes: React.FC = () => {
         <div className="text-gray-600 dark:text-gray-400 text-sm">
           <div>{formatUser(itemType.created_by, itemType.created_by_name)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated by', 'Updated by')}: {formatUser(itemType.updated_by, itemType.updated_by_name)}
+            {__('Updated by', 'yatra')}: {formatUser(itemType.updated_by, itemType.updated_by_name)}
           </div>
         </div>
       ),
@@ -534,14 +534,14 @@ const ItemTypes: React.FC = () => {
     if (can('yatra_edit_trips')) {
       actions.push({
         key: 'edit',
-        label: __('Edit', 'Edit'),
+        label: __('Edit', 'yatra'),
         icon: <Edit className="w-4 h-4" />,
         onClick: (itemType: ItemType) => handleEdit(itemType),
       });
 
       actions.push({
         key: 'publish',
-        label: __('Mark as Published', 'Mark as Published'),
+        label: __('Mark as Published', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: (itemType: ItemType) => {
           setStatusActionConfirm({ isOpen: true, itemType, action: 'publish' });
@@ -551,7 +551,7 @@ const ItemTypes: React.FC = () => {
 
       actions.push({
         key: 'draft',
-        label: __('Mark as Draft', 'Mark as Draft'),
+        label: __('Mark as Draft', 'yatra'),
         icon: <ArrowDown className="w-4 h-4" />,
         onClick: (itemType: ItemType) => {
           setStatusActionConfirm({ isOpen: true, itemType, action: 'draft' });
@@ -561,7 +561,7 @@ const ItemTypes: React.FC = () => {
 
       actions.push({
         key: 'trash',
-        label: __('Move to Trash', 'Move to Trash'),
+        label: __('Move to Trash', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (itemType: ItemType) => {
           setStatusActionConfirm({ isOpen: true, itemType, action: 'trash' });
@@ -571,7 +571,7 @@ const ItemTypes: React.FC = () => {
 
       actions.push({
         key: 'restore',
-        label: __('Restore to Draft', 'Restore to Draft'),
+        label: __('Restore to Draft', 'yatra'),
         icon: <ArrowUp className="w-4 h-4" />,
         onClick: (itemType: ItemType) => {
           setStatusActionConfirm({ isOpen: true, itemType, action: 'restore' });
@@ -583,7 +583,7 @@ const ItemTypes: React.FC = () => {
     if (can('yatra_delete_trips')) {
       actions.push({
         key: 'delete',
-        label: __('Delete Permanently', 'Delete Permanently'),
+        label: __('Delete Permanently', 'yatra'),
         icon: <Trash2 className="w-4 h-4" />,
         onClick: (itemType: ItemType) => handleDelete(itemType),
         variant: 'destructive' as const,
@@ -600,13 +600,13 @@ const ItemTypes: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, itemType: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Item Type', 'Delete Item Type')}
+        title={__('Delete Item Type', 'yatra')}
         message={deleteConfirm.itemType 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'Are you sure you want to delete "{name}"? This action cannot be undone.').replace('{name}', deleteConfirm.itemType.name)
-          : __('Are you sure you want to delete this item type? This action cannot be undone.', 'Are you sure you want to delete this item type? This action cannot be undone.')
+          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.itemType.name)
+          : __('Are you sure you want to delete this item type? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -626,10 +626,10 @@ const ItemTypes: React.FC = () => {
 
           const successMessage =
             action === 'publish'
-              ? __('Item type marked as published.', 'Item type marked as published.')
+              ? __('Item type marked as published.', 'yatra')
               : action === 'draft' || action === 'restore'
-                ? __('Item type marked as draft.', 'Item type marked as draft.')
-                : __('Item type moved to trash.', 'Item type moved to trash.');
+                ? __('Item type marked as draft.', 'yatra')
+                : __('Item type moved to trash.', 'yatra');
 
           showToast(successMessage, 'success');
           queryClient.invalidateQueries({ queryKey: ['item-types'] });
@@ -639,58 +639,58 @@ const ItemTypes: React.FC = () => {
         title={(() => {
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Publish Item Type', 'Publish Item Type');
+              return __('Publish Item Type', 'yatra');
             case 'draft':
-              return __('Mark as Draft', 'Mark as Draft');
+              return __('Mark as Draft', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             case 'restore':
-              return __('Restore Item Type', 'Restore Item Type');
+              return __('Restore Item Type', 'yatra');
             default:
-              return __('Confirm Action', 'Confirm Action');
+              return __('Confirm Action', 'yatra');
           }
         })()}
         message={(() => {
           const name = statusActionConfirm.itemType?.name || '';
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Are you sure you want to publish "{name}"?', 'Are you sure you want to publish "{name}"?').replace('{name}', name);
+              return __('Are you sure you want to publish "{name}"?', 'yatra').replace('{name}', name);
             case 'draft':
-              return __('Are you sure you want to mark "{name}" as draft?', 'Are you sure you want to mark "{name}" as draft?').replace('{name}', name);
+              return __('Are you sure you want to mark "{name}" as draft?', 'yatra').replace('{name}', name);
             case 'trash':
-              return __('Are you sure you want to move "{name}" to trash?', 'Are you sure you want to move "{name}" to trash?').replace('{name}', name);
+              return __('Are you sure you want to move "{name}" to trash?', 'yatra').replace('{name}', name);
             case 'restore':
-              return __('Are you sure you want to restore "{name}" to draft?', 'Are you sure you want to restore "{name}" to draft?').replace('{name}', name);
+              return __('Are you sure you want to restore "{name}" to draft?', 'yatra').replace('{name}', name);
             default:
-              return __('Are you sure you want to perform this action?', 'Are you sure you want to perform this action?');
+              return __('Are you sure you want to perform this action?', 'yatra');
           }
         })()}
         confirmText={(() => {
           switch (statusActionConfirm.action) {
             case 'publish':
-              return __('Publish', 'Publish');
+              return __('Publish', 'yatra');
             case 'draft':
             case 'restore':
-              return __('Mark as Draft', 'Mark as Draft');
+              return __('Mark as Draft', 'yatra');
             case 'trash':
-              return __('Move to Trash', 'Move to Trash');
+              return __('Move to Trash', 'yatra');
             default:
-              return __('Confirm', 'Confirm');
+              return __('Confirm', 'yatra');
           }
         })()}
-        cancelText={__('Cancel', 'Cancel')}
+        cancelText={__('Cancel', 'yatra')}
         variant="warning"
         isLoading={false}
       />
 
       <PageHeader
-        title={__('Item Types', 'Item Types')}
-        description={__('Manage categories for itinerary items like Activity, Meal, Accommodation, etc.', 'Manage categories for itinerary items like Activity, Meal, Accommodation, etc.')}
+        title={__('Item Types', 'yatra')}
+        description={__('Manage categories for itinerary items like Activity, Meal, Accommodation, etc.', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreate} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Type', 'Add New Type')}
+            {__('Add New Type', 'yatra')}
           </Button>
         }
       />
@@ -702,7 +702,7 @@ const ItemTypes: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search item types...', 'Search item types...')}
+                placeholder={__('Search item types...', 'yatra')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -714,10 +714,10 @@ const ItemTypes: React.FC = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="draft">{__('Draft', 'Draft')}</option>
-              <option value="publish">{__('Publish', 'Publish')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
+              <option value="all">{__('All', 'yatra')}</option>
+              <option value="draft">{__('Draft', 'yatra')}</option>
+              <option value="publish">{__('Published', 'yatra')}</option>
+              <option value="trash">{__('Trash', 'yatra')}</option>
             </Select>
 
             <Select
@@ -725,24 +725,24 @@ const ItemTypes: React.FC = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
-              <option value="created_at">{__('Created At', 'Created At')}</option>
-              <option value="updated_at">{__('Updated At', 'Updated At')}</option>
+              <option value="name">{__('Name', 'yatra')}</option>
+              <option value="status">{__('Status', 'yatra')}</option>
+              <option value="created_at">{__('Created At', 'yatra')}</option>
+              <option value="updated_at">{__('Updated At', 'yatra')}</option>
             </Select>
 
             <Button
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
               className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+              title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
             >
               {sortOrder === 'asc' ? (
                 <ArrowUp className="w-4 h-4" />
               ) : (
                 <ArrowDown className="w-4 h-4" />
               )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
             </Button>
 
             {hasFilters && (
@@ -752,7 +752,7 @@ const ItemTypes: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
+                {__('Reset', 'yatra')}
               </Button>
             )}
           </div>
@@ -789,7 +789,7 @@ const ItemTypes: React.FC = () => {
                 actions={tableActions}
                 isLoading={isLoading}
                 isError={isItemTypesError}
-                errorText={__('Error loading item types', 'Error loading item types')}
+                errorText={__('Error loading item types', 'yatra')}
                 errorDescription={__(
                   'We couldn’t connect to the item types service. Please refresh or try again shortly.',
                   'We couldn’t connect to the item types service. Please refresh or try again shortly.'
@@ -819,7 +819,7 @@ const ItemTypes: React.FC = () => {
                 totalItems={total}
                 itemsPerPage={10}
                 onPageChange={setPage}
-                itemName={__('item types', 'item types')}
+                itemName={__('item types', 'yatra')}
               />
             </div>
           )}

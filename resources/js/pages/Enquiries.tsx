@@ -96,21 +96,21 @@ const Enquiries: React.FC = () => {
   const bulkActionOptions = useMemo(() => {
     if (statusFilter === 'trash') {
       return [
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     if (statusFilter === 'spam') {
       return [
-        { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
-        { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+        { value: 'mark_trash', label: __('Move to Trash', 'yatra') },
+        { value: 'delete', label: __('Delete Permanently', 'yatra') },
       ];
     }
 
     return [
-      { value: 'mark_spam', label: __('Mark as Spam', 'Mark as Spam') },
-      { value: 'mark_trash', label: __('Move to Trash', 'Move to Trash') },
-      { value: 'delete', label: __('Delete Permanently', 'Delete Permanently') },
+      { value: 'mark_spam', label: __('Mark as Spam', 'yatra') },
+      { value: 'mark_trash', label: __('Move to Trash', 'yatra') },
+      { value: 'delete', label: __('Delete Permanently', 'yatra') },
     ];
   }, [statusFilter]);
 
@@ -202,26 +202,26 @@ const Enquiries: React.FC = () => {
   };
 
   const columnOptions = [
-    { key: 'customer', label: __('Customer', 'Customer'), visible: visibleColumns.customer },
-    { key: 'trip', label: __('Trip', 'Trip'), visible: visibleColumns.trip },
-    { key: 'message', label: __('Message', 'Message'), visible: visibleColumns.message },
-    { key: 'travelers', label: __('Travelers', 'Travelers'), visible: visibleColumns.travelers },
-    { key: 'preferred_date', label: __('Preferred Date', 'Preferred Date'), visible: visibleColumns.preferred_date },
-    { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-    { key: 'date', label: __('Date', 'Date'), visible: visibleColumns.date },
+    { key: 'customer', label: __('Customer', 'yatra'), visible: visibleColumns.customer },
+    { key: 'trip', label: __('Trip', 'yatra'), visible: visibleColumns.trip },
+    { key: 'message', label: __('Message', 'yatra'), visible: visibleColumns.message },
+    { key: 'travelers', label: __('Travelers', 'yatra'), visible: visibleColumns.travelers },
+    { key: 'preferred_date', label: __('Preferred Date', 'yatra'), visible: visibleColumns.preferred_date },
+    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+    { key: 'date', label: __('Date', 'yatra'), visible: visibleColumns.date },
   ];
 
   const actions = [
     {
       key: 'view',
-      label: __('View', 'View'),
+      label: __('View', 'yatra'),
       icon: <Eye className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleView(enquiry),
       condition: () => can('yatra_view_bookings'),
     },
     {
       key: 'respond',
-      label: __('Respond', 'Respond'),
+      label: __('Respond', 'yatra'),
       icon: <Send className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleRespond(enquiry),
       // Only allow respond on active enquiries (not closed, spam, trash, or archived)
@@ -231,14 +231,14 @@ const Enquiries: React.FC = () => {
     },
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleEdit(enquiry),
       condition: () => can('yatra_edit_bookings'),
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleDelete(enquiry),
       variant: 'destructive' as const,
@@ -297,7 +297,7 @@ const Enquiries: React.FC = () => {
       setRespondDialogOpen(false);
       setSelectedEnquiry(null);
       setResponseMessage('');
-      showToast(__('Response sent successfully.', 'Response sent successfully.'), 'success');
+      showToast(__('Response sent successfully.', 'yatra'), 'success');
     },
   });
 
@@ -324,31 +324,31 @@ const Enquiries: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'new': {
         className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('New', 'New'),
+        label: __('New', 'yatra'),
       },
       'pending': {
         className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'responded': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Responded', 'Responded'),
+        label: __('Responded', 'yatra'),
       },
       'converted': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Converted', 'Converted'),
+        label: __('Converted', 'yatra'),
       },
       'closed': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Closed', 'Closed'),
+        label: __('Closed', 'yatra'),
       },
       'spam': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Spam', 'Spam'),
+        label: __('Spam', 'yatra'),
       },
       'trash': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 line-through',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -429,8 +429,8 @@ const Enquiries: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Enquiries', 'Enquiries')}
-        description={__('Manage customer enquiries and inquiries', 'Manage customer enquiries and inquiries')}
+        title={__('Enquiries', 'yatra')}
+        description={__('Manage customer enquiries and inquiries', 'yatra')}
       />
 
       {/* Filters, Search, and Sorting - Always Visible */}
@@ -442,7 +442,7 @@ const Enquiries: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search enquiries...', 'Search enquiries...')}
+                placeholder={__('Search enquiries...', 'yatra')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -455,14 +455,14 @@ const Enquiries: React.FC = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="all">{__('All Status', 'All Status')}</option>
-              <option value="new">{__('New', 'New')}</option>
-              <option value="pending">{__('Pending', 'Pending')}</option>
-              <option value="responded">{__('Responded', 'Responded')}</option>
-              <option value="converted">{__('Converted', 'Converted')}</option>
-              <option value="closed">{__('Closed', 'Closed')}</option>
-              <option value="spam">{__('Spam', 'Spam')}</option>
-              <option value="trash">{__('Trash', 'Trash')}</option>
+              <option value="all">{__('All Status', 'yatra')}</option>
+              <option value="new">{__('New', 'yatra')}</option>
+              <option value="pending">{__('Pending', 'yatra')}</option>
+              <option value="responded">{__('Responded', 'yatra')}</option>
+              <option value="converted">{__('Converted', 'yatra')}</option>
+              <option value="closed">{__('Closed', 'yatra')}</option>
+              <option value="spam">{__('Spam', 'yatra')}</option>
+              <option value="trash">{__('Trash', 'yatra')}</option>
             </Select>
 
             {/* Sort By */}
@@ -471,11 +471,11 @@ const Enquiries: React.FC = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="created_at">{__('Date', 'Date')}</option>
-              <option value="name">{__('Name', 'Name')}</option>
-              <option value="email">{__('Email', 'Email')}</option>
-              <option value="trip_title">{__('Trip', 'Trip')}</option>
-              <option value="status">{__('Status', 'Status')}</option>
+              <option value="created_at">{__('Date', 'yatra')}</option>
+              <option value="name">{__('Name', 'yatra')}</option>
+              <option value="email">{__('Email', 'yatra')}</option>
+              <option value="trip_title">{__('Trip', 'yatra')}</option>
+              <option value="status">{__('Status', 'yatra')}</option>
             </Select>
 
             {/* Sort Order */}
@@ -483,14 +483,14 @@ const Enquiries: React.FC = () => {
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
               className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'Ascending') : __('Descending', 'Descending')}
+              title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
             >
               {sortOrder === 'asc' ? (
                 <ArrowUp className="w-4 h-4" />
               ) : (
                 <ArrowDown className="w-4 h-4" />
               )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'Asc') : __('Desc', 'Desc')}</span>
+              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
             </Button>
 
             {/* Reset Button */}
@@ -501,7 +501,7 @@ const Enquiries: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
-                {__('Reset', 'Reset')}
+                {__('Reset', 'yatra')}
               </Button>
             )}
           </div>
@@ -523,14 +523,14 @@ const Enquiries: React.FC = () => {
           setBulkAction('');
         }}
         statusOptions={[
-          { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-          { key: 'new', label: __('New', 'New'), count: statusCounts.new },
-          { key: 'pending', label: __('Pending', 'Pending'), count: statusCounts.pending },
-          { key: 'responded', label: __('Responded', 'Responded'), count: statusCounts.responded },
-          { key: 'converted', label: __('Converted', 'Converted'), count: statusCounts.converted },
-          { key: 'closed', label: __('Closed', 'Closed'), count: statusCounts.closed },
-          { key: 'spam', label: __('Spam', 'Spam'), count: statusCounts.spam },
-          { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+          { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+          { key: 'new', label: __('New', 'yatra'), count: statusCounts.new },
+          { key: 'pending', label: __('Pending', 'yatra'), count: statusCounts.pending },
+          { key: 'responded', label: __('Responded', 'yatra'), count: statusCounts.responded },
+          { key: 'converted', label: __('Converted', 'yatra'), count: statusCounts.converted },
+          { key: 'closed', label: __('Closed', 'yatra'), count: statusCounts.closed },
+          { key: 'spam', label: __('Spam', 'yatra'), count: statusCounts.spam },
+          { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
         ]}
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
@@ -548,7 +548,7 @@ const Enquiries: React.FC = () => {
             columns={[
               visibleColumns.customer && {
                 key: 'customer',
-                label: __('Customer', 'Customer'),
+                label: __('Customer', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white text-sm">
@@ -571,7 +571,7 @@ const Enquiries: React.FC = () => {
               },
               visibleColumns.trip && {
                 key: 'trip',
-                label: __('Trip', 'Trip'),
+                label: __('Trip', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   enquiry.trip_title ? (
                     <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
@@ -580,14 +580,14 @@ const Enquiries: React.FC = () => {
                     </div>
                   ) : (
                     <span className="text-sm text-gray-400 dark:text-gray-500 italic">
-                      {__('General Inquiry', 'General Inquiry')}
+                      {__('General enquiry', 'yatra')}
                     </span>
                   )
                 ),
               },
               visibleColumns.message && {
                 key: 'message',
-                label: __('Message', 'Message'),
+                label: __('Message', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   <div className="flex items-start gap-2">
                     <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -599,7 +599,7 @@ const Enquiries: React.FC = () => {
               },
               visibleColumns.travelers && {
                 key: 'travelers',
-                label: __('Travelers', 'Travelers'),
+                label: __('Travelers', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-600 dark:text-gray-400 text-sm">
                     {enquiry.travelers_count || '-'}
@@ -608,7 +608,7 @@ const Enquiries: React.FC = () => {
               },
               visibleColumns.preferred_date && {
                 key: 'preferred_date',
-                label: __('Preferred Date', 'Preferred Date'),
+                label: __('Preferred Date', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-500 dark:text-gray-400 text-sm">
                     {enquiry.travel_date ? formatDate(enquiry.travel_date) : '-'}
@@ -617,12 +617,12 @@ const Enquiries: React.FC = () => {
               },
               visibleColumns.status && {
                 key: 'status',
-                label: __('Status', 'Status'),
+                label: __('Status', 'yatra'),
                 render: (enquiry: Enquiry) => getStatusBadge(enquiry.status),
               },
               visibleColumns.date && {
                 key: 'date',
-                label: __('Date', 'Date'),
+                label: __('Date', 'yatra'),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-500 dark:text-gray-400 text-sm">
                     {formatDate(enquiry.created_at)}
@@ -641,7 +641,7 @@ const Enquiries: React.FC = () => {
             emptyText={__('No enquiries found')}
             emptyDescription={hasFilters
               ? __('Try adjusting your search or filter criteria to find what you\'re looking for.', 'Try adjusting your search or filter criteria to find what you\'re looking for.')
-              : __('When customers submit enquiries, they will appear here.', 'When customers submit enquiries, they will appear here.')
+              : __('When customers submit enquiries, they will appear here.', 'yatra')
             }
             onSort={handleSort}
             getSortIcon={getSortIcon}
@@ -676,7 +676,7 @@ const Enquiries: React.FC = () => {
           totalItems={total}
           itemsPerPage={perPage}
           onPageChange={setPage}
-          itemName={__('enquiries', 'enquiries')}
+          itemName={__('enquiries', 'yatra')}
         />
       )}
 
@@ -689,7 +689,7 @@ const Enquiries: React.FC = () => {
             setPendingBulkAction(null);
           }
         }}
-        title={__('Apply Bulk Action', 'Apply Bulk Action')}
+        title={__('Apply Bulk Action', 'yatra')}
         description={
           pendingBulkAction
             ? __(
@@ -711,7 +711,7 @@ const Enquiries: React.FC = () => {
               }}
               disabled={bulkApplying}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button
               onClick={confirmBulkApply}
@@ -720,10 +720,10 @@ const Enquiries: React.FC = () => {
               {bulkApplying ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Applying...', 'Applying...')}
+                  {__('Applying...', 'yatra')}
                 </>
               ) : (
-                __('Apply', 'Apply')
+                __('Apply', 'yatra')
               )}
             </Button>
           </div>
@@ -741,14 +741,14 @@ const Enquiries: React.FC = () => {
             setEnquiryToDelete(null);
           }
         }}
-        title={__('Delete Enquiry', 'Delete Enquiry')}
+        title={__('Delete Enquiry', 'yatra')}
         description={
           enquiryToDelete
             ? __(
                 `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`,
                 `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`
               )
-            : __('Are you sure you want to delete this enquiry?', 'Are you sure you want to delete this enquiry?')
+            : __('Are you sure you want to delete this enquiry?', 'yatra')
         }
         size="sm"
         panelClassName="yatra-model-ui"
@@ -763,7 +763,7 @@ const Enquiries: React.FC = () => {
               }}
               disabled={deleteMutation.isPending}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button
               variant="destructive"
@@ -773,10 +773,10 @@ const Enquiries: React.FC = () => {
               {deleteMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Deleting...', 'Deleting...')}
+                  {__('Deleting...', 'yatra')}
                 </>
               ) : (
-                __('Delete', 'Delete')
+                __('Delete', 'yatra')
               )}
             </Button>
           </div>
@@ -791,11 +791,11 @@ const Enquiries: React.FC = () => {
         onClose={() => {
           if (!respondMutation.isPending) setRespondDialogOpen(false);
         }}
-        title={__('Respond to Enquiry', 'Respond to Enquiry')}
+        title={__('Respond to Enquiry', 'yatra')}
         description={
           selectedEnquiry ? (
             <span>
-              {__('Send a response to', 'Send a response to')} <strong>{selectedEnquiry.name}</strong>
+              {__('Send a response to', 'yatra')} <strong>{selectedEnquiry.name}</strong>
             </span>
           ) : null
         }
@@ -808,7 +808,7 @@ const Enquiries: React.FC = () => {
               onClick={() => setRespondDialogOpen(false)}
               disabled={respondMutation.isPending}
             >
-              {__('Cancel', 'Cancel')}
+              {__('Cancel', 'yatra')}
             </Button>
             <Button
               onClick={sendResponse}
@@ -817,12 +817,12 @@ const Enquiries: React.FC = () => {
               {respondMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Sending...', 'Sending...')}
+                  {__('Sending...', 'yatra')}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {__('Send Response', 'Send Response')}
+                  {__('Send Response', 'yatra')}
                 </>
               )}
             </Button>
@@ -844,7 +844,7 @@ const Enquiries: React.FC = () => {
                 </div>
               )}
               <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <strong>{__('Original Message:', 'Original Message:')}</strong>
+                <strong>{__('Original Message', 'yatra')}:</strong>
                 <p className="mt-1 text-gray-600 dark:text-gray-400">{selectedEnquiry.message}</p>
               </div>
             </div>
@@ -852,12 +852,12 @@ const Enquiries: React.FC = () => {
             {/* Response Message */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Your Response', 'Your Response')} <span className="text-red-500">*</span>
+                {__('Your Response', 'yatra')} <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}
-                placeholder={__('Type your response here...', 'Type your response here...')}
+                placeholder={__('Type your response here...', 'yatra')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={5}
                 disabled={respondMutation.isPending}
@@ -866,7 +866,7 @@ const Enquiries: React.FC = () => {
 
             {respondMutation.isError && (
               <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'Failed to send response. Please try again.')}
+                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'yatra')}
               </div>
             )}
           </div>

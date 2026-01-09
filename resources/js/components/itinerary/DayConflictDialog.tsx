@@ -32,20 +32,20 @@ export const DayConflictDialog: React.FC<DayConflictDialogProps> = ({
 
   if (isUpdateMode && conflictDayNumber !== null) {
     // Update mode: User is trying to change number to an existing day
-    title = __('Replace Existing Day?', 'Replace Existing Day?');
-    message = __('Day', 'Day') + ` ${conflictDayNumber} ` + __('already exists for this trip. Do you want to replace it with the current day\'s data?', 'already exists for this trip. Do you want to replace it with the current day\'s data?');
-    confirmText = __('Yes, Replace Day', 'Yes, Replace Day') + ` ${conflictDayNumber}`;
+    title = __('Replace Existing Day?', 'yatra');
+    message = __('Day', 'yatra') + ` ${conflictDayNumber} ` + __('already exists for this trip. Do you want to replace it with the current day\'s data?', 'yatra');
+    confirmText = __('Yes, Replace Day', 'yatra') + ` ${conflictDayNumber}`;
   } else if (!isUpdateMode && conflictDayNumber !== null && suggestedDayNumber !== null && existingDayNumbers.length > 0) {
     // Add mode: User is trying to create a day that already exists
-    title = __('Day Number Already Exists', 'Day Number Already Exists');
+    title = __('Day Number Already Exists', 'yatra');
     const existingDaysList = existingDayNumbers.join(', ');
-    message = __('Day', 'Day') + ` ${existingDaysList} ` + __('already exists for this trip. Do you want to use day', 'already exists for this trip. Do you want to use day') + ` ${suggestedDayNumber} ` + __('instead?', 'instead?');
-    confirmText = __('Use Day', 'Use Day') + ` ${suggestedDayNumber}`;
+    message = __('Day', 'yatra') + ` ${existingDaysList} ` + __('already exists for this trip. Do you want to use day', 'yatra') + ` ${suggestedDayNumber} ` + __('instead?', 'yatra');
+    confirmText = __('Use Day', 'yatra') + ` ${suggestedDayNumber}`;
   } else {
     // Fallback
-    title = __('Day Number Already Exists', 'Day Number Already Exists');
-    message = __('This day number already exists.', 'This day number already exists.');
-    confirmText = __('OK', 'OK');
+    title = __('Day Number Already Exists', 'yatra');
+    message = __('This day number already exists.', 'yatra');
+    confirmText = __('OK', 'yatra');
   }
 
   return (
@@ -56,7 +56,7 @@ export const DayConflictDialog: React.FC<DayConflictDialogProps> = ({
       title={title}
       message={message}
       confirmText={confirmText}
-      cancelText={__('Cancel', 'Cancel')}
+      cancelText={__('Cancel', 'yatra')}
       variant="warning"
     />
   );

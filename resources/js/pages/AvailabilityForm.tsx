@@ -248,11 +248,11 @@ const AvailabilityForm: React.FC = () => {
     const newErrors: Partial<Record<keyof AvailabilityFormData, string>> & { [key: string]: string } = {};
 
     if (!formData.departure_date) {
-      newErrors.departure_date = __('Departure date is required', 'Departure date is required');
+      newErrors.departure_date = __('Departure date is required', 'yatra');
     }
 
     if (!formData.arrival_date) {
-      newErrors.arrival_date = __('Arrival date is required', 'Arrival date is required');
+      newErrors.arrival_date = __('Arrival date is required', 'yatra');
     }
 
     // Validate dates and times based on trip type
@@ -261,14 +261,14 @@ const AvailabilityForm: React.FC = () => {
     if (isSingleDay) {
       // For single day trips, both dates should be the same
       if (formData.departure_date && formData.arrival_date && formData.departure_date !== formData.arrival_date) {
-        newErrors.arrival_date = __('For single day trips, departure and arrival must be on the same date', 'For single day trips, departure and arrival must be on the same date');
+        newErrors.arrival_date = __('For single day trips, departure and arrival must be on the same date', 'yatra');
       }
       // Validate times
       if (!formData.departure_time) {
-        newErrors.departure_time = __('Departure time is required for single day trips', 'Departure time is required for single day trips');
+        newErrors.departure_time = __('Departure time is required for single day trips', 'yatra');
       }
       if (!formData.arrival_time) {
-        newErrors.arrival_time = __('Arrival time is required for single day trips', 'Arrival time is required for single day trips');
+        newErrors.arrival_time = __('Arrival time is required for single day trips', 'yatra');
       }
       // Validate that arrival time is after departure time
       if (formData.departure_time && formData.arrival_time && formData.departure_date === formData.arrival_date) {
@@ -277,7 +277,7 @@ const AvailabilityForm: React.FC = () => {
         const depMinutes = depHour * 60 + depMin;
         const arrMinutes = arrHour * 60 + arrMin;
         if (arrMinutes <= depMinutes) {
-          newErrors.arrival_time = __('Arrival time must be after departure time', 'Arrival time must be after departure time');
+          newErrors.arrival_time = __('Arrival time must be after departure time', 'yatra');
         }
       }
     } else {
@@ -286,21 +286,21 @@ const AvailabilityForm: React.FC = () => {
         const departure = new Date(formData.departure_date);
         const arrival = new Date(formData.arrival_date);
         if (arrival <= departure) {
-          newErrors.arrival_date = __('Arrival date must be after departure date', 'Arrival date must be after departure date');
+          newErrors.arrival_date = __('Arrival date must be after departure date', 'yatra');
         }
       }
     }
 
     // Validate inventory
     if (!formData.total_seats || parseInt(formData.total_seats) <= 0) {
-      newErrors.total_seats = __('Total capacity is required and must be greater than 0', 'Total capacity is required and must be greater than 0');
+      newErrors.total_seats = __('Total capacity is required and must be greater than 0', 'yatra');
     }
     
     if (isEditMode && formData.booked_seats) {
       const total = parseInt(formData.total_seats) || 0;
       const booked = parseInt(formData.booked_seats) || 0;
       if (booked > total) {
-        newErrors.booked_seats = __('Booked seats cannot exceed total capacity', 'Booked seats cannot exceed total capacity');
+        newErrors.booked_seats = __('Booked seats cannot exceed total capacity', 'yatra');
       }
     }
 
@@ -308,23 +308,23 @@ const AvailabilityForm: React.FC = () => {
     if (formData.pricing_type === 'regular') {
       // Only validate if user has entered a price (optional override)
       if (formData.original_price && parseFloat(formData.original_price) <= 0) {
-        newErrors.original_price = __('Original price must be greater than 0', 'Original price must be greater than 0');
+        newErrors.original_price = __('Original price must be greater than 0', 'yatra');
       }
       if (formData.discounted_price && formData.original_price && parseFloat(formData.discounted_price) >= parseFloat(formData.original_price)) {
-        newErrors.discounted_price = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
+        newErrors.discounted_price = __('Discounted price must be less than original price', 'yatra');
       }
     } else {
       // Validate price types only if provided (optional override)
       if (formData.price_types.length > 0) {
         formData.price_types.forEach((priceType, index) => {
           if (priceType.original_price && (isNaN(parseFloat(priceType.original_price)) || parseFloat(priceType.original_price) < 0)) {
-            newErrors[`price_type_${index}_original`] = __('Original price must be a valid number', 'Original price must be a valid number');
+            newErrors[`price_type_${index}_original`] = __('Original price must be a valid number', 'yatra');
           }
           if (priceType.discounted_price && (isNaN(parseFloat(priceType.discounted_price)) || parseFloat(priceType.discounted_price) < 0)) {
-            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be a valid number', 'Discounted price must be a valid number');
+            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be a valid number', 'yatra');
           }
           if (priceType.discounted_price && priceType.original_price && parseFloat(priceType.discounted_price) >= parseFloat(priceType.original_price)) {
-            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be less than original price', 'Discounted price must be less than original price');
+            newErrors[`price_type_${index}_discounted`] = __('Discounted price must be less than original price', 'yatra');
           }
         });
       }
@@ -381,15 +381,15 @@ const AvailabilityForm: React.FC = () => {
       setTimeout(() => {
         showToast(
           isEditMode 
-            ? __('Availability date updated successfully', 'Availability date updated successfully')
-            : __('Availability date created successfully', 'Availability date created successfully'),
+            ? __('Availability date updated successfully', 'yatra')
+            : __('Availability date created successfully', 'yatra'),
           'success',
           3000 // Shorter duration
         );
       }, 100);
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || error?.data?.message || __('An error occurred while saving', 'An error occurred while saving');
+      const errorMessage = error?.message || error?.data?.message || __('An error occurred while saving', 'yatra');
       showToast(errorMessage, 'error');
       setErrors({ 
         submit: errorMessage
@@ -425,8 +425,8 @@ const AvailabilityForm: React.FC = () => {
       <Alert variant="error">
         <AlertCircle className="w-4 h-4" />
         <div>
-          <p className="font-medium">{__('Trip ID Required', 'Trip ID Required')}</p>
-          <p className="text-sm">{__('Please select a trip first.', 'Please select a trip first.')}</p>
+          <p className="font-medium">{__('Trip ID Required', 'yatra')}</p>
+          <p className="text-sm">{__('Please select a trip first.', 'yatra')}</p>
         </div>
       </Alert>
     );
@@ -440,11 +440,11 @@ const AvailabilityForm: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={isEditMode ? __('Edit Availability Date', 'Edit Availability Date') : __('Add Availability Date', 'Add Availability Date')}
+        title={isEditMode ? __('Edit Availability Date', 'yatra') : __('Add Availability Date', 'yatra')}
         description={
           tripData 
-            ? `${isEditMode ? __('Edit', 'Edit') : __('Add')} availability date for ${tripData.title} (Trip ID: ${tripId})`
-            : __('Add a new availability date for this trip', 'Add a new availability date for this trip')
+            ? `${isEditMode ? __('Edit', 'yatra') : __('Add')} availability date for ${tripData.title} (Trip ID: ${tripId})`
+            : __('Add a new availability date for this trip', 'yatra')
         }
         actions={
           tripId ? (
@@ -453,7 +453,7 @@ const AvailabilityForm: React.FC = () => {
             onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId.toString() })}
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
           ) : null
         }
@@ -462,9 +462,9 @@ const AvailabilityForm: React.FC = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{__('Date Information', 'Date Information')}</CardTitle>
+            <CardTitle>{__('Date Information', 'yatra')}</CardTitle>
             <CardDescription>
-              {__('Set the departure and arrival dates for this availability', 'Set the departure and arrival dates for this availability')}
+              {__('Set the departure and arrival dates for this availability', 'yatra')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -473,7 +473,7 @@ const AvailabilityForm: React.FC = () => {
               <>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Date', 'Date')} <span className="text-red-500">*</span>
+                    {__('Date', 'yatra')} <span className="text-red-500">*</span>
                   </label>
                   <DatePicker
                     value={formData.departure_date}
@@ -481,7 +481,7 @@ const AvailabilityForm: React.FC = () => {
                       handleFieldChange('departure_date', value);
                       handleFieldChange('arrival_date', value); // Same date for single day
                     }}
-                    placeholder={__('Select date', 'Select date')}
+                    placeholder={__('Select date', 'yatra')}
                     error={!!errors.departure_date}
                   />
                   {errors.departure_date && (
@@ -491,12 +491,12 @@ const AvailabilityForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Departure Time', 'Departure Time')} <span className="text-red-500">*</span>
+                      {__('Departure Time', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <TimePicker
                       value={formData.departure_time}
                       onChange={(value: string) => handleFieldChange('departure_time', value)}
-                      placeholder={__('Select departure time', 'Select departure time')}
+                      placeholder={__('Select departure time', 'yatra')}
                       error={!!errors.departure_time}
                     />
                     {errors.departure_time && (
@@ -505,12 +505,12 @@ const AvailabilityForm: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Arrival Time', 'Arrival Time')} <span className="text-red-500">*</span>
+                      {__('Arrival Time', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <TimePicker
                       value={formData.arrival_time}
                       onChange={(value: string) => handleFieldChange('arrival_time', value)}
-                      placeholder={__('Select arrival time', 'Select arrival time')}
+                      placeholder={__('Select arrival time', 'yatra')}
                       error={!!errors.arrival_time}
                     />
                     {errors.arrival_time && (
@@ -524,12 +524,12 @@ const AvailabilityForm: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Departure Date', 'Departure Date')} <span className="text-red-500">*</span>
+                    {__('Departure Date', 'yatra')} <span className="text-red-500">*</span>
                   </label>
                   <DatePicker
                     value={formData.departure_date}
                     onChange={(value: string) => handleFieldChange('departure_date', value)}
-                    placeholder={__('Select departure date', 'Select departure date')}
+                    placeholder={__('Select departure date', 'yatra')}
                     error={!!errors.departure_date}
                   />
                   {errors.departure_date && (
@@ -539,13 +539,13 @@ const AvailabilityForm: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Arrival Date', 'Arrival Date')} <span className="text-red-500">*</span>
+                    {__('Arrival Date', 'yatra')} <span className="text-red-500">*</span>
                   </label>
                   <DatePicker
                     value={formData.arrival_date}
                     onChange={(value: string) => handleFieldChange('arrival_date', value)}
                     minDate={formData.departure_date ? new Date(formData.departure_date) : undefined}
-                    placeholder={__('Select arrival date', 'Select arrival date')}
+                    placeholder={__('Select arrival date', 'yatra')}
                     error={!!errors.arrival_date}
                   />
                   {errors.arrival_date && (
@@ -563,19 +563,19 @@ const AvailabilityForm: React.FC = () => {
                         if (diff === 0) {
                           return (
                             <p className="text-xs text-green-600 dark:text-green-400">
-                              {__('Duration matches trip duration', 'Duration matches trip duration')} ({selectedDays} {__('days', 'days')})
+                              {__('Duration matches trip duration', 'yatra')} ({selectedDays} {__('days', 'yatra')})
                             </p>
                           );
                         } else if (diff < 0) {
                           return (
                             <p className="text-xs text-amber-600 dark:text-amber-400">
-                              {__('Shorter than trip duration', 'Shorter than trip duration')}: {selectedDays} {__('days', 'days')} ({Math.abs(diff)} {__('days shorter', 'days shorter')} than expected {expectedDays} {__('days', 'days')})
+                              {__('Shorter than trip duration', 'yatra')}: {selectedDays} {__('days', 'yatra')} ({Math.abs(diff)} {__('days shorter', 'yatra')} than expected {expectedDays} {__('days', 'yatra')})
                             </p>
                           );
                         } else {
                           return (
                             <p className="text-xs text-amber-600 dark:text-amber-400">
-                              {__('Longer than trip duration', 'Longer than trip duration')}: {selectedDays} {__('days', 'days')} ({diff} {__('days longer', 'days longer')} than expected {expectedDays} {__('days', 'days')})
+                              {__('Longer than trip duration', 'yatra')}: {selectedDays} {__('days', 'yatra')} ({diff} {__('days longer', 'yatra')} than expected {expectedDays} {__('days', 'yatra')})
                             </p>
                           );
                         }
@@ -584,7 +584,7 @@ const AvailabilityForm: React.FC = () => {
                   )}
                   {tripData?.duration_days && !formData.arrival_date && (
                     <HelpText
-                      text={`${__('Trip duration', 'Trip duration')}: ${tripData.duration_days} ${tripData.duration_days === 1 ? __('day', 'day') : __('days', 'days')}${tripData.duration_nights ? ` (${tripData.duration_nights} ${tripData.duration_nights === 1 ? __('night', 'night') : __('nights', 'nights')})` : ''}`}
+                      text={`${__('Trip duration', 'yatra')}: ${tripData.duration_days} ${tripData.duration_days === 1 ? __('day', 'yatra') : __('days', 'yatra')}${tripData.duration_nights ? ` (${tripData.duration_nights} ${tripData.duration_nights === 1 ? __('night', 'yatra') : __('nights', 'yatra')})` : ''}`}
                       className="mt-1"
                     />
                   )}
@@ -595,32 +595,32 @@ const AvailabilityForm: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('From Location', 'From Location')}
+                  {__('From Location', 'yatra')}
                 </label>
                 <Input
                   type="text"
                   value={formData.from_location}
                   onChange={(e) => handleFieldChange('from_location', e.target.value)}
-                  placeholder={tripData?.starting_location || __('e.g., Rome', 'e.g., Rome')}
+                  placeholder={tripData?.starting_location || __('e.g., Rome', 'yatra')}
                 />
                 <HelpText
-                  text={__('Leave empty to use trip default location', 'Leave empty to use trip default location')}
+                  text={__('Leave empty to use trip default location', 'yatra')}
                   className="mt-1"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  {__('To Location', 'To Location')}
+                  {__('To Location', 'yatra')}
                 </label>
                 <Input
                   type="text"
                   value={formData.to_location}
                   onChange={(e) => handleFieldChange('to_location', e.target.value)}
-                  placeholder={tripData?.ending_location || __('e.g., Rome', 'e.g., Rome')}
+                  placeholder={tripData?.ending_location || __('e.g., Rome', 'yatra')}
                 />
                 <HelpText
-                  text={__('Leave empty to use trip default location', 'Leave empty to use trip default location')}
+                  text={__('Leave empty to use trip default location', 'yatra')}
                   className="mt-1"
                 />
               </div>
@@ -630,9 +630,9 @@ const AvailabilityForm: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>{__('Pricing & Availability', 'Pricing & Availability')}</CardTitle>
+            <CardTitle>{__('Pricing & Availability', 'yatra')}</CardTitle>
             <CardDescription>
-              {__('Set pricing for traveler categories and seat availability for this date', 'Set pricing for traveler categories and seat availability for this date')}
+              {__('Set pricing for traveler categories and seat availability for this date', 'yatra')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -646,10 +646,10 @@ const AvailabilityForm: React.FC = () => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-900 dark:text-white mb-1">
-                    {__('Pricing Override (Optional)', 'Pricing Override (Optional)')}
+                    {__('Pricing Override (Optional)', 'yatra')}
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
-                    {__('Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for this specific date.', 'Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for this specific date.')}
+                    {__('Leave pricing fields empty to use the trip\'s default pricing. Fill them in only if you want to override the default pricing for this specific date.', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -672,14 +672,14 @@ const AvailabilityForm: React.FC = () => {
                 <div>
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
                     {formData.pricing_type === 'traveler_based' 
-                      ? __('Traveler-Based Pricing', 'Traveler-Based Pricing')
-                      : __('Regular Pricing', 'Regular Pricing')
+                      ? __('Traveler-Based Pricing', 'yatra')
+                      : __('Regular Pricing', 'yatra')
                     }
                   </p>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     {formData.pricing_type === 'traveler_based'
-                      ? __('This trip uses traveler category pricing. Set prices for each category below.', 'This trip uses traveler category pricing. Set prices for each category below.')
-                      : __('This trip uses regular pricing. Set a single price for all travelers below.', 'This trip uses regular pricing. Set a single price for all travelers below.')
+                      ? __('This trip uses traveler category pricing. Set prices for each category below.', 'yatra')
+                      : __('This trip uses regular pricing. Set a single price for all travelers below.', 'yatra')
                     }
                   </p>
                   </div>
@@ -692,7 +692,7 @@ const AvailabilityForm: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Original Price', 'Original Price')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
+                      {__('Original Price', 'yatra')} <span className="text-gray-400 text-xs">({__('Optional', 'yatra')})</span>
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -713,14 +713,14 @@ const AvailabilityForm: React.FC = () => {
                     )}
                     {!formData.original_price && tripData && (
                       <p className="mt-1 text-xs text-blue-600 dark:text-blue-400">
-                        {__('Using trip default', 'Using trip default')}: {getCurrencySymbol(tripData?.currency || 'USD')}{tripData.original_price || '0.00'}
+                        {__('Using trip default', 'yatra')}: {getCurrencySymbol(tripData?.currency || 'USD')}{tripData.original_price || '0.00'}
                       </p>
                     )}
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                      {__('Discounted Price', 'yatra')} ({__('Optional', 'yatra')})
                     </label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -749,10 +749,10 @@ const AvailabilityForm: React.FC = () => {
               <div className="space-y-4">
               <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Traveler Category Pricing', 'Traveler Category Pricing')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
+                    {__('Traveler Category Pricing', 'yatra')} <span className="text-gray-400 text-xs">({__('Optional', 'yatra')})</span>
                   </label>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-                  {__('Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing.', 'Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing.')}
+                  {__('Add pricing to override trip default pricing for specific traveler categories. Leave empty to use trip default pricing.', 'yatra')}
                 </p>
                 </div>
                 
@@ -763,7 +763,7 @@ const AvailabilityForm: React.FC = () => {
                 ) : activeCategories.length === 0 ? (
                   <div className="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                      {__('No active traveler categories found.', 'No active traveler categories found.')}
+                      {__('No active traveler categories found.', 'yatra')}
                     </p>
                     <Button
                       type="button"
@@ -772,7 +772,7 @@ const AvailabilityForm: React.FC = () => {
                       className="flex items-center gap-2 mx-auto"
                     >
                       <Plus className="w-4 h-4" />
-                      {__('Create Category', 'Create Category')}
+                      {__('Create Category', 'yatra')}
                     </Button>
                   </div>
                 ) : (
@@ -787,7 +787,7 @@ const AvailabilityForm: React.FC = () => {
                         disabled={activeCategories.filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id)).length === 0}
                       >
                         <Plus className="w-4 h-4" />
-                        {__('Add Pricing', 'Add Pricing')}
+                        {__('Add Pricing', 'yatra')}
                       </Button>
                       
                       {/* Category Selection Dropdown */}
@@ -800,13 +800,13 @@ const AvailabilityForm: React.FC = () => {
                           <div className="absolute top-full left-0 mt-2 w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto">
                             <div className="p-2">
                               <div className="text-xs font-medium text-gray-700 dark:text-gray-300 px-3 py-2 mb-1">
-                                {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                {__('Select a category to add pricing', 'yatra')}
                               </div>
                               {activeCategories
                                 .filter(cat => !formData.price_types.some(pt => pt.category_id === cat.id))
                                 .length === 0 ? (
                                 <div className="px-3 py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
-                                  {__('All categories have pricing added', 'All categories have pricing added')}
+                                  {__('All categories have pricing added', 'yatra')}
                                 </div>
                               ) : (
                                 <div className="space-y-1">
@@ -815,11 +815,11 @@ const AvailabilityForm: React.FC = () => {
                                     .map((category: TravelerCategory) => {
                                       const ageRange = category.age_min !== undefined || category.age_max !== undefined
                                         ? category.age_min !== undefined && category.age_max !== undefined
-                                          ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                          ? `${category.age_min}-${category.age_max} ${__('years', 'yatra')}`
                                           : category.age_min !== undefined
-                                          ? `${category.age_min}+ ${__('years', 'years')}`
+                                          ? `${category.age_min}+ ${__('years', 'yatra')}`
                                           : category.age_max !== undefined
-                                          ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                          ? `${__('Under', 'yatra')} ${category.age_max} ${__('years', 'yatra')}`
                                           : ''
                                         : null;
 
@@ -875,11 +875,11 @@ const AvailabilityForm: React.FC = () => {
                                         <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                                           (
                                           {category.age_min !== undefined && category.age_max !== undefined
-                                            ? `${category.age_min}-${category.age_max} ${__('years', 'years')}`
+                                            ? `${category.age_min}-${category.age_max} ${__('years', 'yatra')}`
                                             : category.age_min !== undefined
-                                            ? `${category.age_min}+ ${__('years', 'years')}`
+                                            ? `${category.age_min}+ ${__('years', 'yatra')}`
                                             : category.age_max !== undefined
-                                            ? `${__('Under', 'Under')} ${category.age_max} ${__('years', 'years')}`
+                                            ? `${__('Under', 'yatra')} ${category.age_max} ${__('years', 'yatra')}`
                                             : ''}
                                           )
                                         </span>
@@ -894,7 +894,7 @@ const AvailabilityForm: React.FC = () => {
                                   type="button"
                                   onClick={() => handlePriceTypeRemove(category.id)}
                                   className="p-1 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
-                                  title={__('Remove Pricing', 'Remove Pricing')}
+                                  title={__('Remove Pricing', 'yatra')}
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -902,7 +902,7 @@ const AvailabilityForm: React.FC = () => {
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Original Price', 'Original Price')} <span className="text-gray-400 text-xs">({__('Optional', 'Optional')})</span>
+                                    {__('Original Price', 'yatra')} <span className="text-gray-400 text-xs">({__('Optional', 'yatra')})</span>
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -926,7 +926,7 @@ const AvailabilityForm: React.FC = () => {
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                    {__('Discounted Price', 'Discounted Price')} ({__('Optional', 'Optional')})
+                                    {__('Discounted Price', 'yatra')} ({__('Optional', 'yatra')})
                                   </label>
                                   <div className="relative">
                                     <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
@@ -967,12 +967,12 @@ const AvailabilityForm: React.FC = () => {
             {/* Inventory Management */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
-                {__('Inventory Management', 'Inventory Management')}
+                {__('Inventory Management', 'yatra')}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Total Capacity', 'Total Capacity')} <span className="text-red-500">*</span>
+                    {__('Total Capacity', 'yatra')} <span className="text-red-500">*</span>
                   </label>
                   <Input
                     type="number"
@@ -986,14 +986,14 @@ const AvailabilityForm: React.FC = () => {
                     <p className="mt-1 text-xs text-red-600">{errors.total_seats}</p>
                   )}
                   <HelpText
-                    text={__('Maximum number of seats available for this date', 'Maximum number of seats available for this date')}
+                    text={__('Maximum number of seats available for this date', 'yatra')}
                     className="mt-1"
                   />
                 </div>
                 {isEditMode && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Booked Seats', 'Booked Seats')}
+                      {__('Booked Seats', 'yatra')}
                     </label>
                     <Input
                       type="number"
@@ -1003,14 +1003,14 @@ const AvailabilityForm: React.FC = () => {
                       className="bg-gray-50 dark:bg-gray-800 cursor-not-allowed"
                     />
                     <HelpText
-                      text={__('Currently booked seats (read-only)', 'Currently booked seats (read-only)')}
+                      text={__('Currently booked seats (read-only)', 'yatra')}
                       className="mt-1"
                     />
                   </div>
                 )}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Alert Threshold', 'Alert Threshold')}
+                    {__('Alert Threshold', 'yatra')}
                   </label>
                   <Input
                     type="number"
@@ -1020,7 +1020,7 @@ const AvailabilityForm: React.FC = () => {
                     placeholder="5"
                   />
                   <HelpText
-                    text={__('Alert when available seats drop below this number', 'Alert when available seats drop below this number')}
+                    text={__('Alert when available seats drop below this number', 'yatra')}
                     className="mt-1"
                   />
                 </div>
@@ -1031,7 +1031,7 @@ const AvailabilityForm: React.FC = () => {
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {__('Block Date', 'Block Date')}
+                  {__('Block Date', 'yatra')}
                 </h3>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -1048,23 +1048,23 @@ const AvailabilityForm: React.FC = () => {
                     className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {__('Block this date from bookings', 'Block this date from bookings')}
+                    {__('Block this date from bookings', 'yatra')}
                   </span>
                 </label>
               </div>
               {formData.is_blocked && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    {__('Block Reason', 'Block Reason')}
+                    {__('Block Reason', 'yatra')}
                   </label>
                   <Input
                     type="text"
                     value={formData.block_reason}
                     onChange={(e) => handleFieldChange('block_reason', e.target.value)}
-                    placeholder={__('e.g., Maintenance, Holiday, Special Event', 'e.g., Maintenance, Holiday, Special Event')}
+                    placeholder={__('e.g., Maintenance, Holiday, Special Event', 'yatra')}
                   />
                   <HelpText
-                    text={__('Reason for blocking this date (optional but recommended)', 'Reason for blocking this date (optional but recommended)')}
+                    text={__('Reason for blocking this date (optional but recommended)', 'yatra')}
                     className="mt-1"
                   />
                 </div>
@@ -1074,7 +1074,7 @@ const AvailabilityForm: React.FC = () => {
             {/* Status */}
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Status', 'Status')}
+                {__('Status', 'yatra')}
               </label>
               <Select
                 value={formData.status}
@@ -1088,15 +1088,15 @@ const AvailabilityForm: React.FC = () => {
                 }}
                 disabled={formData.is_blocked}
               >
-                <option value="available">{__('Available', 'Available')}</option>
-                <option value="limited">{__('Limited', 'Limited')}</option>
-                <option value="sold_out">{__('Sold Out', 'Sold Out')}</option>
-                <option value="closed">{__('Closed', 'Closed')}</option>
-                <option value="blocked">{__('Blocked', 'Blocked')}</option>
+                <option value="available">{__('Available', 'yatra')}</option>
+                <option value="limited">{__('Limited', 'yatra')}</option>
+                <option value="sold_out">{__('Sold Out', 'yatra')}</option>
+                <option value="closed">{__('Closed', 'yatra')}</option>
+                <option value="blocked">{__('Blocked', 'yatra')}</option>
               </Select>
               {formData.is_blocked && (
                 <HelpText
-                  text={__('Status is automatically set to "Blocked" when date is blocked', 'Status is automatically set to "Blocked" when date is blocked')}
+                  text={__('Status is automatically set to "Blocked" when date is blocked', 'yatra')}
                   className="mt-1"
                 />
               )}
@@ -1123,7 +1123,7 @@ const AvailabilityForm: React.FC = () => {
               }
             }}
           >
-            {__('Cancel', 'Cancel')}
+            {__('Cancel', 'yatra')}
           </Button>
           <Button
             type="submit"
@@ -1132,12 +1132,12 @@ const AvailabilityForm: React.FC = () => {
             {saveMutation.isPending ? (
               <>
                 <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                {__('Saving...', 'Saving...')}
+                {__('Saving...', 'yatra')}
               </>
             ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
-                {__('Save Availability', 'Save Availability')}
+                {__('Save Availability', 'yatra')}
               </>
             )}
           </Button>

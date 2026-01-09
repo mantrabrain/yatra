@@ -26,8 +26,8 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   value,
   onChange,
   options,
-  placeholder = __('Select an option...', 'Select an option...'),
-  searchPlaceholder = __('Search...', 'Search...'),
+  placeholder = __('Select an option...', 'yatra'),
+  searchPlaceholder = __('Search...', 'yatra'),
   className = '',
   error = false,
   disabled = false,
@@ -114,7 +114,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 type="button"
                 onClick={handleClear}
                 className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                aria-label={__('Clear selection', 'Clear selection')}
+                aria-label={__('Clear selection', 'yatra')}
               >
                 <X className="w-4 h-4 text-gray-400" />
               </button>
@@ -148,7 +148,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div className="max-h-48 overflow-y-auto overflow-x-visible">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-                {__('No options found', 'No options found')}
+                {__('No options found', 'yatra')}
               </div>
             ) : (
               filteredOptions.map((option) => (

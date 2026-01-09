@@ -63,9 +63,9 @@ export const Table: React.FC<TableProps> = ({
   actions = [],
   isLoading = false,
   isError = false,
-  errorText = __('Error loading data', 'Error loading data'),
-  emptyText = __('No items found', 'No items found'),
-  emptyDescription = __('Get started by creating your first item.', 'Get started by creating your first item'),
+  errorText = __('Error loading data', 'yatra'),
+  emptyText = __('No items found', 'yatra'),
+  emptyDescription = __('Get started by creating your first item.', 'yatra'),
   onCreateClick,
   onSort,
   getSortIcon,
@@ -78,7 +78,7 @@ export const Table: React.FC<TableProps> = ({
   statusFilter = '',
   capability = 'yatra_view_trips',
   skeletonRows = 5,
-  errorDescription = __('Something went wrong while loading this data. Please try again in a moment.', 'Something went wrong while loading this data. Please try again in a moment.'),
+  errorDescription = __('Something went wrong while loading this data. Please try again in a moment.', 'yatra'),
   onRetry,
   errorDetails,
   errorRequestInfo,
@@ -134,7 +134,7 @@ export const Table: React.FC<TableProps> = ({
             <TableHead key={column.key} className={column.width}>{column.label}</TableHead>
           ))}
           {actions.length > 0 && (
-            <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+            <TableHead className="text-right w-[100px]">{__('Actions', 'yatra')}</TableHead>
           )}
         </TableRow>
       </TableHeader>
@@ -220,7 +220,7 @@ export const Table: React.FC<TableProps> = ({
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <Button onClick={handleRetry} className="w-full sm:w-auto px-6">
-            {__('Try again', 'Try again')}
+            {__('Try again', 'yatra')}
           </Button>
           <Button
             variant="outline"
@@ -231,7 +231,7 @@ export const Table: React.FC<TableProps> = ({
             }}
             className="w-full sm:w-auto px-6 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-700"
           >
-            {__('Visit support center', 'Visit support center')}
+            {__('Visit support center', 'yatra')}
           </Button>
         </div>
 
@@ -239,7 +239,7 @@ export const Table: React.FC<TableProps> = ({
           <div className="relative w-full text-left rounded-2xl border border-red-100/80 dark:border-red-900/40 bg-white/90 dark:bg-gray-900/70 shadow-inner space-y-0">
             <div className="flex items-center justify-between px-4 py-3 border-b border-red-50 dark:border-red-900/30">
               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                {__('Technical details', 'Technical details')}
+                {__('Technical details', 'yatra')}
               </p>
               <Button
                 type="button"
@@ -259,12 +259,12 @@ export const Table: React.FC<TableProps> = ({
                 {copied ? (
                   <>
                     <Check className="w-4 h-4" />
-                    {__('Copied', 'Copied')}
+                    {__('Copied', 'yatra')}
                   </>
                 ) : (
                   <>
                     <Copy className="w-4 h-4" />
-                    {__('Copy details', 'Copy details')}
+                    {__('Copy details', 'yatra')}
                   </>
                 )}
               </Button>
@@ -273,19 +273,19 @@ export const Table: React.FC<TableProps> = ({
               <div className="px-4 py-3 border-b border-red-50 dark:border-red-900/20 space-y-2 text-sm text-left text-gray-700 dark:text-gray-200">
                 {errorRequestInfo.method && (
                   <div>
-                    <span className="font-medium">{__('Method:', 'Method:')}</span>{' '}
+                    <span className="font-medium">{__('Method:', 'yatra')}</span>{' '}
                     <span className="font-mono">{errorRequestInfo.method}</span>
                   </div>
                 )}
                 {errorRequestInfo.url && (
                   <div className="break-all">
-                    <span className="font-medium">{__('URL:', 'URL:')}</span>{' '}
+                    <span className="font-medium">{__('URL:', 'yatra')}</span>{' '}
                     <span className="font-mono">{errorRequestInfo.url}</span>
                   </div>
                 )}
                 {errorRequestInfo.payload && (
                   <div>
-                    <span className="font-medium block mb-1">{__('Payload:', 'Payload:')}</span>
+                    <span className="font-medium block mb-1">{__('Payload:', 'yatra')}</span>
                     <pre className="max-h-40 overflow-auto px-3 py-2 rounded bg-red-50/60 dark:bg-red-900/30 text-xs font-mono text-gray-800 dark:text-gray-100 whitespace-pre-wrap">
                       {errorRequestInfo.payload}
                     </pre>
@@ -364,7 +364,7 @@ export const Table: React.FC<TableProps> = ({
                   d="M12 4v16m8-8H4"
                 />
               </svg>
-              {__('Create New', 'Create New')}
+              {__('Create New', 'yatra')}
             </Button>
           </div>
         )}
@@ -410,7 +410,7 @@ export const Table: React.FC<TableProps> = ({
                 className="rounded border-gray-300 dark:border-gray-600"
                 checked={selectedItemIds.includes(itemId)}
                 onChange={(e) => onSelectItem(itemId, e.target.checked)}
-                aria-label={__('Select item', 'Select item')}
+                aria-label={__('Select item', 'yatra')}
               />
             </TableCell>
           )}
@@ -466,7 +466,7 @@ export const Table: React.FC<TableProps> = ({
                     setOpenDropdownId(openDropdownId === itemId ? null : itemId);
                   }}
                   className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  aria-label={__('More actions', 'More actions')}
+                  aria-label={__('More actions', 'yatra')}
                   data-dropdown-trigger
                 >
                   <MoreVertical className="w-4 h-4" />
@@ -541,7 +541,7 @@ export const Table: React.FC<TableProps> = ({
               className="rounded border-gray-300 dark:border-gray-600"
               checked={selectedItemIds.includes(itemId)}
               onChange={(e) => onSelectItem(itemId, e.target.checked)}
-              aria-label={__('Select item', 'Select item')}
+              aria-label={__('Select item', 'yatra')}
             />
           </TableCell>
         )}
@@ -582,7 +582,7 @@ export const Table: React.FC<TableProps> = ({
                   setOpenDropdownId(openDropdownId === itemId ? null : itemId);
                 }}
                 className="h-8 w-8 hover:bg-gray-100 dark:hover:bg-gray-700"
-                aria-label={__('More actions', 'More actions')}
+                aria-label={__('More actions', 'yatra')}
                 data-dropdown-trigger
               >
                 <MoreVertical className="w-4 h-4" />
@@ -654,7 +654,7 @@ export const Table: React.FC<TableProps> = ({
                   className="rounded border-gray-300 dark:border-gray-600"
                   checked={isAllSelected}
                   onChange={(e) => onSelectAll(e.target.checked)}
-                  aria-label={__('Select all items', 'Select all items')}
+                  aria-label={__('Select all items', 'yatra')}
                 />
               </TableHead>
             )}
@@ -677,7 +677,7 @@ export const Table: React.FC<TableProps> = ({
               </TableHead>
             ))}
             {actions.length > 0 && (
-              <TableHead className="text-right w-[100px]">{__('Actions', 'Actions')}</TableHead>
+              <TableHead className="text-right w-[100px]">{__('Actions', 'yatra')}</TableHead>
             )}
           </TableRow>
         </TableHeader>

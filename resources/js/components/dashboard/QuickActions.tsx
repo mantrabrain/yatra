@@ -31,35 +31,35 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
 
   const actions = [
     {
-      label: __('Create New Trip', 'Create New Trip'),
+      label: __('Create New Trip', 'yatra'),
       icon: Plus,
       onClick: onCreateTrip,
       capability: 'yatra_edit_trips',
       color: 'blue',
     },
     {
-      label: __('Generate Report', 'Generate Report'),
+      label: __('Generate Report', 'yatra'),
       icon: FileText,
       onClick: onGenerateReport,
       capability: 'yatra_view_reports',
       color: 'green',
     },
     {
-      label: __('View Calendar', 'View Calendar'),
+      label: __('View Calendar', 'yatra'),
       icon: Calendar,
       onClick: onViewCalendar,
       capability: 'yatra_view_bookings',
       color: 'purple',
     },
     {
-      label: __('View Analytics', 'View Analytics'),
+      label: __('View Analytics', 'yatra'),
       icon: BarChart3,
       onClick: onViewAnalytics,
       capability: 'yatra_view_reports',
       color: 'orange',
     },
     {
-      label: __('Settings', 'Settings'),
+      label: __('Settings', 'yatra'),
       icon: Settings,
       onClick: onViewSettings,
       capability: 'manage_yatra',
@@ -70,7 +70,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Quick Actions', 'Quick Actions')}</CardTitle>
+        <CardTitle>{__('Quick Actions', 'yatra')}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-2">

@@ -59,7 +59,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">
-                    {__('Activity', 'Activity')} {index + 1}
+                    {__('Activity', 'yatra')} {index + 1}
                   </CardTitle>
                   <div className="flex items-center gap-2">
                     <Button
@@ -81,7 +81,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                       size="icon"
                       onClick={() => onRemoveActivity(activityForm.id)}
                       className="h-8 w-8 text-red-600 hover:text-red-700 dark:text-red-400"
-                      title={__('Remove Activity', 'Remove Activity')}
+                      title={__('Remove Activity', 'yatra')}
                     >
                       <X className="w-4 h-4" />
                     </Button>
@@ -139,7 +139,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
           className="w-full flex items-center justify-center gap-2 border-dashed"
         >
           <Plus className="w-4 h-4" />
-          {__('Add Activity', 'Add Activity')}
+          {__('Add Activity', 'yatra')}
         </Button>
       </div>
     </>

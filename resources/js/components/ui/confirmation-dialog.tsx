@@ -80,7 +80,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
           <div className={`flex-shrink-0 mt-0.5 ${getVariantStyles()}`}>
             {icon || <AlertTriangle className="w-6 h-6" />}
           </div>
-          <div>{title || __('Confirm Action', 'Confirm Action')}</div>
+          <div>{title || __('Confirm Action', 'yatra')}</div>
         </div>
       }
       hideHeader={false}
@@ -91,7 +91,7 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
       footer={
         <div className="flex gap-2 justify-end pt-2 flex-wrap">
           <Button variant="outline" onClick={onClose} disabled={isLoading}>
-            {cancelText || __('Cancel', 'Cancel')}
+            {cancelText || __('Cancel', 'yatra')}
           </Button>
           {secondaryAction && (
             <Button
@@ -111,10 +111,10 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                {__('Deleting...', 'Deleting...')}
+                {__('Deleting...', 'yatra')}
               </>
             ) : (
-              confirmText || __('Confirm', 'Confirm')
+              confirmText || __('Confirm', 'yatra')
             )}
           </Button>
         </div>

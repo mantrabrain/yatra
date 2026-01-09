@@ -111,12 +111,12 @@ const RecurringRulesPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Recurring rule deleted successfully', 'Recurring rule deleted successfully'), 'success');
+      showToast(__('Recurring rule deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, rule: null });
       setSelectedIds([]);
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete rule', 'Failed to delete rule'), 'error');
+      showToast(error?.message || __('Failed to delete rule', 'yatra'), 'error');
     },
   });
   
@@ -127,11 +127,11 @@ const RecurringRulesPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Rules deleted successfully', 'Rules deleted successfully'), 'success');
+      showToast(__('Rules deleted successfully', 'yatra'), 'success');
       setSelectedIds([]);
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete rules', 'Failed to delete rules'), 'error');
+      showToast(error?.message || __('Failed to delete rules', 'yatra'), 'error');
     },
   });
   
@@ -143,11 +143,11 @@ const RecurringRulesPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-availability'] });
-      showToast(__('Rule duplicated successfully', 'Rule duplicated successfully'), 'success');
+      showToast(__('Rule duplicated successfully', 'yatra'), 'success');
       setDuplicateConfirm({ isOpen: false, rule: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to duplicate rule', 'Failed to duplicate rule'), 'error');
+      showToast(error?.message || __('Failed to duplicate rule', 'yatra'), 'error');
     },
   });
 
@@ -157,7 +157,7 @@ const RecurringRulesPage: React.FC = () => {
     
     switch (bulkAction) {
       case 'delete':
-        if (confirm(__('Are you sure you want to delete {count} rule(s)?', 'Are you sure you want to delete {count} rule(s)?').replace('{count}', selectedIds.length.toString()))) {
+        if (confirm(__('Are you sure you want to delete {count} rule(s)?', 'yatra').replace('{count}', selectedIds.length.toString()))) {
           bulkDeleteMutation.mutate(selectedIds);
         }
         break;
@@ -191,9 +191,9 @@ const RecurringRulesPage: React.FC = () => {
 
   const getRuleTypeLabel = (type: string): string => {
     const labels: Record<string, string> = {
-      weekly: __('Weekly', 'Weekly'),
-      monthly: __('Monthly', 'Monthly'),
-      interval: __('Interval', 'Interval'),
+      weekly: __('Weekly', 'yatra'),
+      monthly: __('Monthly', 'yatra'),
+      interval: __('Interval', 'yatra'),
     };
     return labels[type] || type;
   };
@@ -201,24 +201,24 @@ const RecurringRulesPage: React.FC = () => {
   const getWeekdaysLabel = (rule: RecurringRule): string => {
     const weekdays = rule.days_of_week_array || (rule.days_of_week ? rule.days_of_week.split(',').map(Number) : []);
     if (!weekdays || weekdays.length === 0) return '--';
-    const dayNames = [__('Sun', 'Sun'), __('Mon', 'Mon'), __('Tue', 'Tue'), __('Wed', 'Wed'), __('Thu', 'Thu'), __('Fri', 'Fri'), __('Sat', 'Sat')];
+    const dayNames = [__('Sun', 'yatra'), __('Mon', 'yatra'), __('Tue', 'yatra'), __('Wed', 'yatra'), __('Thu', 'yatra'), __('Fri', 'yatra'), __('Sat', 'yatra')];
     return weekdays.map(d => dayNames[d]).join(', ');
   };
   
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; className: string; icon: React.ReactNode }> = {
       active: {
-        label: __('Active', 'Active'),
+        label: __('Active', 'yatra'),
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
         icon: <CheckCircle className="w-3 h-3" />,
       },
       inactive: {
-        label: __('Inactive', 'Inactive'),
+        label: __('Inactive', 'yatra'),
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
         icon: <XCircle className="w-3 h-3" />,
       },
       paused: {
-        label: __('Paused', 'Paused'),
+        label: __('Paused', 'yatra'),
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
         icon: <Clock className="w-3 h-3" />,
       },
@@ -238,7 +238,7 @@ const RecurringRulesPage: React.FC = () => {
     return [
       {
         key: 'name',
-        label: __('Rule Name', 'Rule Name'),
+        label: __('Rule Name', 'yatra'),
         render: (rule: RecurringRule) => (
           <div className="flex flex-col">
             <span className="text-sm font-medium text-gray-900 dark:text-white">
@@ -252,7 +252,7 @@ const RecurringRulesPage: React.FC = () => {
       },
       {
         key: 'pattern',
-        label: __('Pattern', 'Pattern'),
+        label: __('Pattern', 'yatra'),
         render: (rule: RecurringRule) => (
           <div className="text-sm text-gray-700 dark:text-gray-300">
             {rule.rule_type === 'weekly' ? getWeekdaysLabel(rule) : 
@@ -263,7 +263,7 @@ const RecurringRulesPage: React.FC = () => {
       },
       {
         key: 'date_range',
-        label: __('Date Range', 'Date Range'),
+        label: __('Date Range', 'yatra'),
         render: (rule: RecurringRule) => (
           <div className="flex flex-col text-sm">
             <span className="text-gray-900 dark:text-white">{formatDate(rule.start_date)}</span>
@@ -275,7 +275,7 @@ const RecurringRulesPage: React.FC = () => {
       },
       {
         key: 'capacity',
-        label: __('Seats', 'Seats'),
+        label: __('Seats', 'yatra'),
         render: (rule: RecurringRule) => (
           <div className="text-center">
             <span className="text-sm font-semibold text-gray-900 dark:text-white">
@@ -286,18 +286,18 @@ const RecurringRulesPage: React.FC = () => {
       },
       {
         key: 'generated',
-        label: __('Generated', 'Generated'),
+        label: __('Generated', 'yatra'),
         render: (rule: RecurringRule) => (
           <div className="text-center">
             <Badge variant="default" className="text-xs">
-              {rule.generated_count || 0} {__('dates', 'dates')}
+              {rule.generated_count || 0} {__('dates', 'yatra')}
             </Badge>
           </div>
         ),
       },
       {
         key: 'status',
-        label: __('Status', 'Status'),
+        label: __('Status', 'yatra'),
         render: (rule: RecurringRule) => getStatusBadge(rule.status),
       },
     ];
@@ -306,19 +306,19 @@ const RecurringRulesPage: React.FC = () => {
   const tableActions = [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => navigate({ subpage: 'trips', tab: 'availability', action: 'edit-recurring', id: rule.id.toString(), trip_id: tripId?.toString() }),
     },
     {
       key: 'duplicate',
-      label: __('Duplicate', 'Duplicate'),
+      label: __('Duplicate', 'yatra'),
       icon: <Copy className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => setDuplicateConfirm({ isOpen: true, rule }),
     },
     {
       key: 'delete',
-      label: __('Delete', 'Delete'),
+      label: __('Delete', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (rule: RecurringRule) => setDeleteConfirm({ isOpen: true, rule }),
       variant: 'destructive' as const,
@@ -335,13 +335,13 @@ const RecurringRulesPage: React.FC = () => {
             deleteMutation.mutate(deleteConfirm.rule.id);
           }
         }}
-        title={__('Delete Recurring Rule', 'Delete Recurring Rule')}
+        title={__('Delete Recurring Rule', 'yatra')}
         message={deleteConfirm.rule
-          ? __('Are you sure you want to delete the rule "{name}"? This action cannot be undone.', 'Are you sure you want to delete the rule "{name}"? This action cannot be undone.')
+          ? __('Are you sure you want to delete the rule "{name}"? This action cannot be undone.', 'yatra')
               .replace('{name}', deleteConfirm.rule.name || `Rule #${deleteConfirm.rule.id}`)
-          : __('Are you sure you want to delete this rule? This action cannot be undone.', 'Are you sure you want to delete this rule? This action cannot be undone.')}
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+          : __('Are you sure you want to delete this rule? This action cannot be undone.', 'yatra')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
@@ -354,27 +354,27 @@ const RecurringRulesPage: React.FC = () => {
             duplicateMutation.mutate(duplicateConfirm.rule.id);
           }
         }}
-        title={__('Duplicate Recurring Rule', 'Duplicate Recurring Rule')}
-        message={__('This will create a copy of this rule. You can edit it after creation.', 'This will create a copy of this rule. You can edit it after creation.')}
-        confirmText={__('Duplicate', 'Duplicate')}
-        cancelText={__('Cancel', 'Cancel')}
+        title={__('Duplicate Recurring Rule', 'yatra')}
+        message={__('This will create a copy of this rule. You can edit it after creation.', 'yatra')}
+        confirmText={__('Duplicate', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         isLoading={duplicateMutation.isPending}
       />
 
       <PageHeader
-        title={__('Recurring Rules', 'Recurring Rules')}
-        description={tripData ? `${__('Recurring availability rules for', 'Recurring availability rules for')}: ${tripData.title}` : __('Manage recurring availability rules', 'Manage recurring availability rules')}
+        title={__('Recurring Rules', 'yatra')}
+        description={tripData ? `${__('Recurring availability rules for', 'yatra')}: ${tripData.title}` : __('Manage recurring availability rules', 'yatra')}
         actions={
           <div className="flex gap-2">
             {tripId && (
               <Button onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'create-recurring', trip_id: tripId.toString() })} variant="default">
                 <Plus className="w-4 h-4 mr-2" />
-                {__('Add Rule', 'Add Rule')}
+                {__('Add Rule', 'yatra')}
               </Button>
             )}
             <Button variant="ghost" onClick={() => navigate({ subpage: 'trips', tab: 'availability', trip_id: tripId?.toString() })}>
               <ArrowLeft className="w-4 h-4 mr-2" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           </div>
         }
@@ -385,7 +385,7 @@ const RecurringRulesPage: React.FC = () => {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">{__('Trip ID is required', 'Trip ID is required')}</p>
+              <p className="text-gray-500">{__('Trip ID is required', 'yatra')}</p>
             </div>
           </CardContent>
         </Card>
@@ -400,7 +400,7 @@ const RecurringRulesPage: React.FC = () => {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       type="text"
-                      placeholder={__('Search rules...', 'Search rules...')}
+                      placeholder={__('Search rules...', 'yatra')}
                       value={searchTerm}
                       onChange={(e) => handleSearch(e.target.value)}
                       className="pl-10"
@@ -412,10 +412,10 @@ const RecurringRulesPage: React.FC = () => {
                     value={statusFilter}
                     onChange={(e) => handleStatusFilter(e.target.value)}
                   >
-                    <option value="all">{__('All Status', 'All Status')}</option>
-                    <option value="active">{__('Active', 'Active')}</option>
-                    <option value="inactive">{__('Inactive', 'Inactive')}</option>
-                    <option value="paused">{__('Paused', 'Paused')}</option>
+                    <option value="all">{__('All Status', 'yatra')}</option>
+                    <option value="active">{__('Active', 'yatra')}</option>
+                    <option value="inactive">{__('Inactive', 'yatra')}</option>
+                    <option value="paused">{__('Paused', 'yatra')}</option>
                   </Select>
                 </div>
               </div>
@@ -429,14 +429,14 @@ const RecurringRulesPage: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <span className="text-sm text-gray-700 dark:text-gray-300">
-                      {selectedIds.length} {__('selected', 'selected')}
+                      {selectedIds.length} {__('selected', 'yatra')}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => setSelectedIds([])}
                     >
-                      {__('Clear Selection', 'Clear Selection')}
+                      {__('Clear Selection', 'yatra')}
                     </Button>
                   </div>
                   <div className="flex items-center gap-2">
@@ -445,15 +445,15 @@ const RecurringRulesPage: React.FC = () => {
                       onChange={(e) => setBulkAction(e.target.value)}
                       className="w-48"
                     >
-                      <option value="">{__('Bulk Actions', 'Bulk Actions')}</option>
-                      <option value="delete">{__('Delete', 'Delete')}</option>
+                      <option value="">{__('Bulk Actions', 'yatra')}</option>
+                      <option value="delete">{__('Delete', 'yatra')}</option>
                     </Select>
                     <Button
                       onClick={handleBulkAction}
                       disabled={!bulkAction}
                       variant="default"
                     >
-                      {__('Apply', 'Apply')}
+                      {__('Apply', 'yatra')}
                     </Button>
                   </div>
                 </div>
@@ -470,7 +470,7 @@ const RecurringRulesPage: React.FC = () => {
                 actions={tableActions}
                 isLoading={isLoading}
                 isError={isRulesError}
-                errorText={__('Error loading recurring rules', 'Error loading recurring rules')}
+                errorText={__('Error loading recurring rules', 'yatra')}
                 errorDescription={__(
                   'We couldn’t connect to the recurring rules service. Please refresh or try again shortly.',
                   'We couldn’t connect to the recurring rules service. Please refresh or try again shortly.'
@@ -495,8 +495,8 @@ const RecurringRulesPage: React.FC = () => {
                 }}
                 isAllSelected={selectedIds.length === rulesData.length && rulesData.length > 0}
                 getItemId={(rule) => rule.id}
-                emptyText={__('No recurring rules found', 'No recurring rules found')}
-                emptyDescription={__('Create your first recurring rule to get started', 'Create your first recurring rule to get started')}
+                emptyText={__('No recurring rules found', 'yatra')}
+                emptyDescription={__('Create your first recurring rule to get started', 'yatra')}
               />
             </CardContent>
           </Card>

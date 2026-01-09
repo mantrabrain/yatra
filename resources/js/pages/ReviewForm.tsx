@@ -141,7 +141,7 @@ const ReviewForm: React.FC = () => {
             />
           </button>
         ))}
-        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{rating} {__('stars', 'stars')}</span>
+        <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">{rating} {__('stars', 'yatra')}</span>
       </div>
     );
   };
@@ -150,29 +150,29 @@ const ReviewForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.trip_id) {
-      newErrors.trip_id = __('Trip is required', 'Trip is required');
+      newErrors.trip_id = __('Trip is required', 'yatra');
     }
 
     if (!formData.customer_name.trim()) {
-      newErrors.customer_name = __('Customer name is required', 'Customer name is required');
+      newErrors.customer_name = __('Customer name is required', 'yatra');
     }
 
     if (!formData.customer_email.trim()) {
-      newErrors.customer_email = __('Email is required', 'Email is required');
+      newErrors.customer_email = __('Email is required', 'yatra');
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.customer_email)) {
-      newErrors.customer_email = __('Invalid email address', 'Invalid email address');
+      newErrors.customer_email = __('Invalid email address', 'yatra');
     }
 
     if (!formData.rating || parseInt(formData.rating) < 1 || parseInt(formData.rating) > 5) {
-      newErrors.rating = __('Rating must be between 1 and 5', 'Rating must be between 1 and 5');
+      newErrors.rating = __('Rating must be between 1 and 5', 'yatra');
     }
 
     if (!formData.title.trim()) {
-      newErrors.title = __('Review title is required', 'Review title is required');
+      newErrors.title = __('Review title is required', 'yatra');
     }
 
     if (!formData.comment.trim()) {
-      newErrors.comment = __('Review comment is required', 'Review comment is required');
+      newErrors.comment = __('Review comment is required', 'yatra');
     }
 
     setErrors(newErrors);
@@ -205,7 +205,7 @@ const ReviewForm: React.FC = () => {
       window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=reviews`;
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the review', 'An error occurred while saving the review');
+      const errorMessage = error?.message || __('An error occurred while saving the review', 'yatra');
       setErrors({ submit: errorMessage });
       setIsSubmitting(false);
     },
@@ -231,7 +231,7 @@ const ReviewForm: React.FC = () => {
     return (
       <div className="flex items-center justify-center p-8">
         <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading review...', 'Loading review...')}</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-400">{__('Loading review...', 'yatra')}</span>
       </div>
     );
   }
@@ -242,8 +242,8 @@ const ReviewForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Review', 'Edit Review') : __('Add New Review', 'Add New Review')}
-        description={isEditMode ? __('Update review information', 'Update review information') : __('Create a new customer review', 'Create a new customer review')}
+        title={isEditMode ? __('Edit Review', 'yatra') : __('Add New Review', 'yatra')}
+        description={isEditMode ? __('Update review information', 'yatra') : __('Create a new customer review', 'yatra')}
         actions={
           <Button
             variant="outline"
@@ -251,7 +251,7 @@ const ReviewForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -264,13 +264,13 @@ const ReviewForm: React.FC = () => {
               {/* Review Details */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Review Details', 'Review Details')}</CardTitle>
+                  <CardTitle className="text-base">{__('Review Details', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Trip Selection */}
                   <div>
                     <label htmlFor="trip_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Trip', 'Trip')} <span className="text-red-500">*</span>
+                      {__('Trip', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Select
                       id="trip_id"
@@ -279,7 +279,7 @@ const ReviewForm: React.FC = () => {
                       className={errors.trip_id ? 'border-red-500' : ''}
                       required
                     >
-                      <option value="">{__('Select a trip', 'Select a trip')}</option>
+                      <option value="">{__('Select a trip', 'yatra')}</option>
                       {trips.map((trip: any) => (
                         <option key={trip.id} value={trip.id}>
                           {trip.title}
@@ -294,7 +294,7 @@ const ReviewForm: React.FC = () => {
                   {/* Rating */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Rating', 'Rating')} <span className="text-red-500">*</span>
+                      {__('Rating', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     {renderStarRating(currentRating)}
                     {errors.rating && (
@@ -305,14 +305,14 @@ const ReviewForm: React.FC = () => {
                   {/* Title */}
                   <div>
                     <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Review Title', 'Review Title')} <span className="text-red-500">*</span>
+                      {__('Review Title', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="title"
                       type="text"
                       value={formData.title}
                       onChange={(e) => handleFieldChange('title', e.target.value)}
-                      placeholder={__('Enter review title', 'Enter review title')}
+                      placeholder={__('Enter review title', 'yatra')}
                       className={errors.title ? 'border-red-500' : ''}
                       required
                     />
@@ -324,13 +324,13 @@ const ReviewForm: React.FC = () => {
                   {/* Comment */}
                   <div>
                     <label htmlFor="comment" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Review Comment', 'Review Comment')} <span className="text-red-500">*</span>
+                      {__('Review Comment', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <textarea
                       id="comment"
                       value={formData.comment}
                       onChange={(e) => handleFieldChange('comment', e.target.value)}
-                      placeholder={__('Enter review comment', 'Enter review comment')}
+                      placeholder={__('Enter review comment', 'yatra')}
                       rows={6}
                       className={`flex w-full rounded-md border ${errors.comment ? 'border-red-500' : 'border-gray-300'} bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none`}
                       required
@@ -345,21 +345,21 @@ const ReviewForm: React.FC = () => {
               {/* Customer Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Customer Information', 'Customer Information')}</CardTitle>
+                  <CardTitle className="text-base">{__('Customer Information', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Customer Name */}
                     <div>
                       <label htmlFor="customer_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Customer Name', 'Customer Name')} <span className="text-red-500">*</span>
+                        {__('Customer Name', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="customer_name"
                         type="text"
                         value={formData.customer_name}
                         onChange={(e) => handleFieldChange('customer_name', e.target.value)}
-                        placeholder={__('Enter customer name', 'Enter customer name')}
+                        placeholder={__('Enter customer name', 'yatra')}
                         className={errors.customer_name ? 'border-red-500' : ''}
                         required
                       />
@@ -371,14 +371,14 @@ const ReviewForm: React.FC = () => {
                     {/* Customer Email */}
                     <div>
                       <label htmlFor="customer_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Customer Email', 'Customer Email')} <span className="text-red-500">*</span>
+                        {__('Customer Email', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Input
                         id="customer_email"
                         type="email"
                         value={formData.customer_email}
                         onChange={(e) => handleFieldChange('customer_email', e.target.value)}
-                        placeholder={__('customer@example.com', 'customer@example.com')}
+                        placeholder={__('customer@example.com', 'yatra')}
                         className={errors.customer_email ? 'border-red-500' : ''}
                         required
                       />
@@ -396,22 +396,22 @@ const ReviewForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Review Status', 'Review Status')}
+                      {__('Review Status', 'yatra')}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
                       onChange={(e) => handleFieldChange('status', e.target.value)}
                     >
-                      <option value="pending">{__('Pending', 'Pending')}</option>
-                      <option value="approved">{__('Approved', 'Approved')}</option>
-                      <option value="spam">{__('Spam', 'Spam')}</option>
-                      <option value="trash">{__('Trash', 'Trash')}</option>
+                      <option value="pending">{__('Pending', 'yatra')}</option>
+                      <option value="approved">{__('Approved', 'yatra')}</option>
+                      <option value="spam">{__('Spam', 'yatra')}</option>
+                      <option value="trash">{__('Trash', 'yatra')}</option>
                     </Select>
                   </div>
 
@@ -425,7 +425,7 @@ const ReviewForm: React.FC = () => {
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
                     <label htmlFor="verified" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {__('Verified Purchase', 'Verified Purchase')}
+                      {__('Verified Purchase', 'yatra')}
                     </label>
                   </div>
                 </CardContent>
@@ -449,12 +449,12 @@ const ReviewForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Review', 'Update Review') : __('Create Review', 'Create Review')}
+                            {isEditMode ? __('Update Review', 'yatra') : __('Create Review', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -464,7 +464,7 @@ const ReviewForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>

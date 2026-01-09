@@ -159,7 +159,7 @@ const DiscountForm: React.FC = () => {
         const response = await apiClient.get(`/discounts/${id}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load discount', 'Failed to load discount'), 'error');
+        showToast(error?.message || __('Failed to load discount', 'yatra'), 'error');
         throw error;
       }
     },
@@ -434,22 +434,22 @@ const DiscountForm: React.FC = () => {
     // Internal name/code is always required
     if (!formData.code.trim()) {
       newErrors.code = isEffectiveGroupOnly 
-        ? __('Internal name is required', 'Internal name is required')
-        : __('Coupon code is required', 'Coupon code is required');
+        ? __('Internal name is required', 'yatra')
+        : __('Coupon code is required', 'yatra');
     } else if (!/^[A-Z0-9_-]+$/.test(formData.code)) {
-      newErrors.code = __('Only uppercase letters, numbers, hyphens, and underscores are allowed', 'Only uppercase letters, numbers, hyphens, and underscores are allowed');
+      newErrors.code = __('Only uppercase letters, numbers, hyphens, and underscores are allowed', 'yatra');
     }
 
     // Discount amount validation - skip for group-only mode
     if (!isEffectiveGroupOnly) {
       if (!formData.amount.trim()) {
-        newErrors.amount = __('Discount amount is required', 'Discount amount is required');
+        newErrors.amount = __('Discount amount is required', 'yatra');
       } else {
         const amount = parseFloat(formData.amount);
         if (isNaN(amount) || amount < 0) {
-          newErrors.amount = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+          newErrors.amount = __('Discount amount must be a positive number', 'yatra');
         } else if (formData.type === 'percentage' && amount > 100) {
-          newErrors.amount = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+          newErrors.amount = __('Percentage discount cannot exceed 100%', 'yatra');
         }
       }
 
@@ -457,7 +457,7 @@ const DiscountForm: React.FC = () => {
       if (formData.type === 'percentage' && formData.max_discount_amount && formData.max_discount_amount.trim()) {
         const maxAmount = parseFloat(formData.max_discount_amount);
         if (isNaN(maxAmount) || maxAmount <= 0) {
-          newErrors.max_discount_amount = __('Maximum discount amount must be a positive number', 'Maximum discount amount must be a positive number');
+          newErrors.max_discount_amount = __('Maximum discount amount must be a positive number', 'yatra');
         }
       }
     }
@@ -465,14 +465,14 @@ const DiscountForm: React.FC = () => {
     if (formData.usage_limit && formData.usage_limit !== '0') {
       const limit = parseInt(formData.usage_limit);
       if (isNaN(limit) || limit < 0) {
-        newErrors.usage_limit = __('Usage limit must be a positive number or 0 for unlimited', 'Usage limit must be a positive number or 0 for unlimited');
+        newErrors.usage_limit = __('Usage limit must be a positive number or 0 for unlimited', 'yatra');
       }
     }
 
     if (formData.usage_limit_per_customer && formData.usage_limit_per_customer !== '0') {
       const limit = parseInt(formData.usage_limit_per_customer);
       if (isNaN(limit) || limit < 0) {
-        newErrors.usage_limit_per_customer = __('Per-customer usage limit must be a positive number or 0 for unlimited', 'Per-customer usage limit must be a positive number or 0 for unlimited');
+        newErrors.usage_limit_per_customer = __('Per-customer usage limit must be a positive number or 0 for unlimited', 'yatra');
       }
     }
 
@@ -486,7 +486,7 @@ const DiscountForm: React.FC = () => {
     if (formData.expiry_date) {
       const expiryDate = new Date(formData.expiry_date);
       if (expiryDate < today) {
-        newErrors.expiry_date = __('Expiry date cannot be in the past', 'Expiry date cannot be in the past');
+        newErrors.expiry_date = __('Expiry date cannot be in the past', 'yatra');
       }
     }
 
@@ -495,21 +495,21 @@ const DiscountForm: React.FC = () => {
       const validFrom = new Date(formData.valid_from);
       const expiryDate = new Date(formData.expiry_date);
       if (expiryDate < validFrom) {
-        newErrors.expiry_date = __('Expiry date must be after the valid from date', 'Expiry date must be after the valid from date');
+        newErrors.expiry_date = __('Expiry date must be after the valid from date', 'yatra');
       }
     }
 
     if (formData.min_amount && formData.min_amount.trim()) {
       const minAmount = parseFloat(formData.min_amount);
       if (isNaN(minAmount) || minAmount < 0) {
-        newErrors.min_amount = __('Minimum amount must be a positive number', 'Minimum amount must be a positive number');
+        newErrors.min_amount = __('Minimum amount must be a positive number', 'yatra');
       }
     }
 
     // Group discount validation (multiple ranges) - only for 'total' mode
     if (formData.is_group_discount && formData.group_discount_mode === 'total') {
       if (!formData.group_discount_ranges || formData.group_discount_ranges.length === 0) {
-        newErrors.group_discount_ranges = __('At least one group discount range is required', 'At least one group discount range is required');
+        newErrors.group_discount_ranges = __('At least one group discount range is required', 'yatra');
       } else {
         formData.group_discount_ranges.forEach((range, idx) => {
           const prefix = `group_discount_ranges_${idx}`;
@@ -517,25 +517,25 @@ const DiscountForm: React.FC = () => {
           const max = range.max_group_size ? parseInt(range.max_group_size) : null;
 
           if (Number.isNaN(min) || min < 1) {
-            newErrors[`${prefix}_min`] = __('Minimum group size must be at least 1', 'Minimum group size must be at least 1');
+            newErrors[`${prefix}_min`] = __('Minimum group size must be at least 1', 'yatra');
           }
 
           if (max !== null) {
             if (Number.isNaN(max) || max < 1) {
-              newErrors[`${prefix}_max`] = __('Maximum group size must be a positive number', 'Maximum group size must be a positive number');
+              newErrors[`${prefix}_max`] = __('Maximum group size must be a positive number', 'yatra');
             } else if (!Number.isNaN(min) && max <= min) {
-              newErrors[`${prefix}_max`] = __('Maximum group size must be greater than minimum group size', 'Maximum group size must be greater than minimum group size');
+              newErrors[`${prefix}_max`] = __('Maximum group size must be greater than minimum group size', 'yatra');
             }
           }
 
           const amount = range.discount_amount ? parseFloat(range.discount_amount) : NaN;
           if (!range.discount_type) {
-            newErrors[`${prefix}_type`] = __('Discount type is required', 'Discount type is required');
+            newErrors[`${prefix}_type`] = __('Discount type is required', 'yatra');
           }
           if (Number.isNaN(amount) || amount <= 0) {
-            newErrors[`${prefix}_amount`] = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+            newErrors[`${prefix}_amount`] = __('Discount amount must be a positive number', 'yatra');
           } else if (range.discount_type === 'percentage' && amount > 100) {
-            newErrors[`${prefix}_amount`] = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+            newErrors[`${prefix}_amount`] = __('Percentage discount cannot exceed 100%', 'yatra');
           }
         });
       }
@@ -544,15 +544,15 @@ const DiscountForm: React.FC = () => {
     // Category-based discounts validation
     if (formData.is_group_discount && formData.group_discount_mode === 'category_based') {
       if (!formData.category_discounts || formData.category_discounts.length === 0) {
-        newErrors.category_discounts = __('Add at least one traveler category', 'Add at least one traveler category');
+        newErrors.category_discounts = __('Add at least one traveler category', 'yatra');
       } else {
         formData.category_discounts.forEach((cat, catIdx) => {
           const catPrefix = `category_discounts_${catIdx}`;
           if (!cat.traveler_category_id) {
-            newErrors[`${catPrefix}_id`] = __('Traveler category is required', 'Traveler category is required');
+            newErrors[`${catPrefix}_id`] = __('Traveler category is required', 'yatra');
           }
           if (!cat.ranges || cat.ranges.length === 0) {
-            newErrors[`${catPrefix}_ranges`] = __('Add at least one discount range', 'Add at least one discount range');
+            newErrors[`${catPrefix}_ranges`] = __('Add at least one discount range', 'yatra');
           } else {
             cat.ranges.forEach((range, rIdx) => {
               const rangePrefix = `${catPrefix}_ranges_${rIdx}`;
@@ -560,25 +560,25 @@ const DiscountForm: React.FC = () => {
               const max = range.max_group_size ? parseInt(range.max_group_size) : null;
 
               if (Number.isNaN(min) || min < 1) {
-                newErrors[`${rangePrefix}_min`] = __('Minimum group size must be at least 1', 'Minimum group size must be at least 1');
+                newErrors[`${rangePrefix}_min`] = __('Minimum group size must be at least 1', 'yatra');
               }
 
               if (max !== null) {
                 if (Number.isNaN(max) || max < 1) {
-                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be a positive number', 'Maximum group size must be a positive number');
+                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be a positive number', 'yatra');
                 } else if (!Number.isNaN(min) && max <= min) {
-                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be greater than minimum group size', 'Maximum group size must be greater than minimum group size');
+                  newErrors[`${rangePrefix}_max`] = __('Maximum group size must be greater than minimum group size', 'yatra');
                 }
               }
 
               const amount = range.discount_amount ? parseFloat(range.discount_amount) : NaN;
               if (!range.discount_type) {
-                newErrors[`${rangePrefix}_type`] = __('Discount type is required', 'Discount type is required');
+                newErrors[`${rangePrefix}_type`] = __('Discount type is required', 'yatra');
               }
               if (Number.isNaN(amount) || amount <= 0) {
-                newErrors[`${rangePrefix}_amount`] = __('Discount amount must be a positive number', 'Discount amount must be a positive number');
+                newErrors[`${rangePrefix}_amount`] = __('Discount amount must be a positive number', 'yatra');
               } else if (range.discount_type === 'percentage' && amount > 100) {
-                newErrors[`${rangePrefix}_amount`] = __('Percentage discount cannot exceed 100%', 'Percentage discount cannot exceed 100%');
+                newErrors[`${rangePrefix}_amount`] = __('Percentage discount cannot exceed 100%', 'yatra');
               }
             });
           }
@@ -659,8 +659,8 @@ const DiscountForm: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['discount', discountId || duplicateId] });
       showToast(
         isEditMode 
-          ? __('Discount updated successfully', 'Discount updated successfully')
-          : __('Discount created successfully', 'Discount created successfully'),
+          ? __('Discount updated successfully', 'yatra')
+          : __('Discount created successfully', 'yatra'),
         'success'
       );
       // Only redirect to listing page on create, not on update
@@ -672,7 +672,7 @@ const DiscountForm: React.FC = () => {
       setIsSubmitting(false);
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the discount', 'An error occurred while saving the discount');
+      const errorMessage = error?.message || __('An error occurred while saving the discount', 'yatra');
       showToast(errorMessage, 'error');
       setIsSubmitting(false);
     },
@@ -831,12 +831,12 @@ const DiscountForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Discount Coupon', 'Edit Discount Coupon') : __('Add New Discount Coupon', 'Add New Discount Coupon')}
-        description={isEditMode ? __('Update discount coupon details', 'Update discount coupon details') : __('Create a new discount coupon for your trips', 'Create a new discount coupon for your trips')}
+        title={isEditMode ? __('Edit Discount Coupon', 'yatra') : __('Add New Discount Coupon', 'yatra')}
+        description={isEditMode ? __('Update discount coupon details', 'yatra') : __('Create a new discount coupon for your trips', 'yatra')}
         actions={
           <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'Back')}
+            {__('Back', 'yatra')}
           </Button>
         }
       />
@@ -849,13 +849,13 @@ const DiscountForm: React.FC = () => {
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                  {__('How Discounts Work', 'How Discounts Work')}
+                  {__('How Discounts Work', 'yatra')}
                 </h4>
                 <ul className="text-xs text-blue-800 dark:text-blue-200 space-y-1.5">
-                  <li>• <strong>{__('Regular Discount', 'Regular Discount')}:</strong> {__('Applied first to the booking total (trip price × travelers)', 'Applied first to the booking total (trip price × travelers)')}</li>
-                  <li>• <strong>{__('Group Discount', 'Group Discount')}:</strong> {__('Additional discount applied AFTER regular discount when group size requirement is met', 'Additional discount applied AFTER regular discount when group size requirement is met')}</li>
-                  <li>• <strong>{__('Maximum Cap', 'Maximum Cap')}:</strong> {__('For percentage discounts, you can set a maximum dollar amount to cap the discount', 'For percentage discounts, you can set a maximum dollar amount to cap the discount')}</li>
-                  <li>• <strong>{__('Example', 'Example')}:</strong> {__('$1000 booking, 15% regular discount ($150 off), then 10% group discount on $850 = $85 more off. Final: $765', '$1000 booking, 15% regular discount ($150 off), then 10% group discount on $850 = $85 more off. Final: $765')}</li>
+                  <li>• <strong>{__('Regular Discount', 'yatra')}:</strong> {__('Applied first to the booking total (trip price × travelers)', 'yatra')}</li>
+                  <li>• <strong>{__('Group Discount', 'yatra')}:</strong> {__('Additional discount applied AFTER regular discount when group size requirement is met', 'yatra')}</li>
+                  <li>• <strong>{__('Maximum Cap', 'yatra')}:</strong> {__('For percentage discounts, you can set a maximum dollar amount to cap the discount', 'yatra')}</li>
+                  <li>• <strong>{__('Example', 'yatra')}:</strong> {__('$1000 booking, 15% regular discount ($150 off), then 10% group discount on $850 = $85 more off. Final: $765', 'yatra')}</li>
                 </ul>
               </div>
             </div>
@@ -898,15 +898,15 @@ const DiscountForm: React.FC = () => {
                       }`}>
                         {isGroupOnly 
                           ? (isEditMode 
-                              ? __('Group Discount (Auto-applies, no code needed)', 'Group Discount (Auto-applies, no code needed)')
-                              : __('Creating Group Discount (Auto-applies, no code needed)', 'Creating Group Discount (Auto-applies, no code needed)'))
+                              ? __('Group Discount (Auto-applies, no code needed)', 'yatra')
+                              : __('Creating Group Discount (Auto-applies, no code needed)', 'yatra'))
                           : isPromoOnly 
                             ? (isEditMode 
-                                ? __('Promo Code Discount', 'Promo Code Discount')
-                                : __('Creating Promo Code Discount', 'Creating Promo Code Discount'))
+                                ? __('Promo Code Discount', 'yatra')
+                                : __('Creating Promo Code Discount', 'yatra'))
                             : (isEditMode 
-                                ? __('Promo Code + Group Discount', 'Promo Code + Group Discount')
-                                : __('Creating Promo Code + Group Discount', 'Creating Promo Code + Group Discount'))
+                                ? __('Promo Code + Group Discount', 'yatra')
+                                : __('Creating Promo Code + Group Discount', 'yatra'))
                         }
                       </span>
                     </div>
@@ -918,7 +918,7 @@ const DiscountForm: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">
-                    {isEffectiveGroupOnly ? __('Group Discount Information', 'Group Discount Information') : __('Basic Information', 'Basic Information')}
+                    {isEffectiveGroupOnly ? __('Group Discount Information', 'yatra') : __('Basic Information', 'yatra')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -926,10 +926,10 @@ const DiscountForm: React.FC = () => {
                   {!isEffectiveGroupOnly && (
                   <div>
                     <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Coupon Code', 'Coupon Code')} <span className="text-red-500">*</span>
+                      {__('Coupon Code', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <HelpText 
-                      text={__('Enter a unique coupon code. Only uppercase letters, numbers, hyphens, and underscores are allowed.', 'Enter a unique coupon code. Only uppercase letters, numbers, hyphens, and underscores are allowed.')}
+                      text={__('Enter a unique coupon code. Only uppercase letters, numbers, hyphens, and underscores are allowed.', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -938,7 +938,7 @@ const DiscountForm: React.FC = () => {
                       type="text"
                       value={formData.code}
                       onChange={(e) => handleFieldChange('code', e.target.value.toUpperCase())}
-                      placeholder={__('e.g., SUMMER2024', 'e.g., SUMMER2024')}
+                      placeholder={__('e.g., SUMMER2024', 'yatra')}
                       className={errors.code ? 'border-red-500' : ''}
                       required
                     />
@@ -955,7 +955,7 @@ const DiscountForm: React.FC = () => {
                   {isEffectiveGroupOnly && (
                   <div>
                     <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Internal Name', 'Internal Name')} <span className="text-red-500">*</span>
+                      {__('Internal Name', 'yatra')} <span className="text-red-500">*</span>
                     </label>
                     <HelpText 
                       text={__('Enter a unique internal name for this group discount. This is for your reference only and won\'t be shown to customers.', 'Enter a unique internal name for this group discount. This is for your reference only and won\'t be shown to customers.')}
@@ -967,7 +967,7 @@ const DiscountForm: React.FC = () => {
                       type="text"
                       value={formData.code}
                       onChange={(e) => handleFieldChange('code', e.target.value.toUpperCase().replace(/\s+/g, '_'))}
-                      placeholder={__('e.g., GROUP_DISCOUNT_2024', 'e.g., GROUP_DISCOUNT_2024')}
+                      placeholder={__('e.g., GROUP_DISCOUNT_2024', 'yatra')}
                       className={errors.code ? 'border-red-500' : ''}
                       required
                     />
@@ -983,17 +983,17 @@ const DiscountForm: React.FC = () => {
                   {/* Description */}
                   <div>
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'Description')}
+                      {__('Description', 'yatra')}
                     </label>
                     <HelpText 
-                      text={__('Optional description for this discount coupon. This helps you identify the purpose of the coupon.', 'Optional description for this discount coupon. This helps you identify the purpose of the coupon.')}
+                      text={__('Optional description for this discount coupon. This helps you identify the purpose of the coupon.', 'yatra')}
                       className="mb-2"
                     />
                     <textarea
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('e.g., Summer discount for all trips', 'e.g., Summer discount for all trips')}
+                      placeholder={__('e.g., Summer discount for all trips', 'yatra')}
                       rows={3}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -1005,7 +1005,7 @@ const DiscountForm: React.FC = () => {
                     {/* Discount Type */}
                     <div>
                       <label htmlFor="type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Discount Type', 'Discount Type')} <span className="text-red-500">*</span>
+                        {__('Discount Type', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <Select
                         id="type"
@@ -1015,8 +1015,8 @@ const DiscountForm: React.FC = () => {
                         className={errors.type ? 'border-red-500' : ''}
                         required
                       >
-                        <option value="percentage">{__('Percentage', 'Percentage')}</option>
-                        <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+                        <option value="percentage">{__('Percentage', 'yatra')}</option>
+                        <option value="fixed">{__('Fixed Amount', 'yatra')}</option>
                       </Select>
                       {errors.type && (
                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -1029,7 +1029,7 @@ const DiscountForm: React.FC = () => {
                     {/* Discount Amount */}
                     <div>
                       <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Discount Amount', 'Discount Amount')} <span className="text-red-500">*</span>
+                        {__('Discount Amount', 'yatra')} <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         {formData.type === 'percentage' ? (
@@ -1042,7 +1042,7 @@ const DiscountForm: React.FC = () => {
                             step="0.01"
                             value={formData.amount}
                             onChange={(e) => handleFieldChange('amount', e.target.value)}
-                            placeholder={__('e.g., 15', 'e.g., 15')}
+                            placeholder={__('e.g., 15', 'yatra')}
                             className={errors.amount ? 'border-red-500' : ''}
                             required
                           />
@@ -1057,7 +1057,7 @@ const DiscountForm: React.FC = () => {
                               step="0.01"
                               value={formData.amount}
                               onChange={(e) => handleFieldChange('amount', e.target.value)}
-                              placeholder={__('e.g., 50', 'e.g., 50')}
+                              placeholder={__('e.g., 50', 'yatra')}
                               className={`pl-7 ${errors.amount ? 'border-red-500' : ''}`}
                               required
                             />
@@ -1081,10 +1081,10 @@ const DiscountForm: React.FC = () => {
                   {!isEffectiveGroupOnly && formData.type === 'percentage' && (
                     <div>
                       <label htmlFor="max_discount_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Maximum Discount Amount', 'Maximum Discount Amount')}
+                        {__('Maximum Discount Amount', 'yatra')}
                       </label>
                       <HelpText 
-                        text={__('Optional maximum discount cap. For example, if discount is 20% with max $500, a $5000 booking gets $500 off (not $1000).', 'Optional maximum discount cap. For example, if discount is 20% with max $500, a $5000 booking gets $500 off (not $1000).')}
+                        text={__('Optional maximum discount cap. For example, if discount is 20% with max $500, a $5000 booking gets $500 off (not $1000).', 'yatra')}
                         className="mb-2"
                       />
                       <div className="relative">
@@ -1096,7 +1096,7 @@ const DiscountForm: React.FC = () => {
                           step="0.01"
                           value={formData.max_discount_amount}
                           onChange={(e) => handleFieldChange('max_discount_amount', e.target.value)}
-                          placeholder={__('e.g., 500 (optional)', 'e.g., 500 (optional)')}
+                          placeholder={__('e.g., 500 (optional)', 'yatra')}
                           className={`pl-7 ${errors.max_discount_amount ? 'border-red-500' : ''}`}
                         />
                       </div>
@@ -1114,16 +1114,16 @@ const DiscountForm: React.FC = () => {
               {/* Usage & Restrictions */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Usage & Restrictions', 'Usage & Restrictions')}</CardTitle>
+                  <CardTitle className="text-base">{__('Usage & Restrictions', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Usage Limit (Total) */}
                   <div>
                     <label htmlFor="usage_limit" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Total Usage Limit', 'Total Usage Limit')}
+                      {__('Total Usage Limit', 'yatra')}
                     </label>
                     <HelpText 
-                      text={__('Maximum number of times this coupon can be used across all customers. Enter 0 for unlimited usage.', 'Maximum number of times this coupon can be used across all customers. Enter 0 for unlimited usage.')}
+                      text={__('Maximum number of times this coupon can be used across all customers. Enter 0 for unlimited usage.', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -1132,7 +1132,7 @@ const DiscountForm: React.FC = () => {
                       min="0"
                       value={formData.usage_limit}
                       onChange={(e) => handleFieldChange('usage_limit', e.target.value)}
-                      placeholder={__('0 for unlimited', '0 for unlimited')}
+                      placeholder={__('0 for unlimited', 'yatra')}
                       className={errors.usage_limit ? 'border-red-500' : ''}
                     />
                     {errors.usage_limit && (
@@ -1146,10 +1146,10 @@ const DiscountForm: React.FC = () => {
                   {/* Usage Limit Per Customer */}
                   <div>
                     <label htmlFor="usage_limit_per_customer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Usage Limit Per Customer', 'Usage Limit Per Customer')}
+                      {__('Usage Limit Per Customer', 'yatra')}
                     </label>
                     <HelpText 
-                      text={__('Maximum number of times a single customer can use this coupon. Enter 0 for unlimited usage per customer.', 'Maximum number of times a single customer can use this coupon. Enter 0 for unlimited usage per customer.')}
+                      text={__('Maximum number of times a single customer can use this coupon. Enter 0 for unlimited usage per customer.', 'yatra')}
                       className="mb-2"
                     />
                     <Input
@@ -1158,7 +1158,7 @@ const DiscountForm: React.FC = () => {
                       min="0"
                       value={formData.usage_limit_per_customer}
                       onChange={(e) => handleFieldChange('usage_limit_per_customer', e.target.value)}
-                      placeholder={__('0 for unlimited', '0 for unlimited')}
+                      placeholder={__('0 for unlimited', 'yatra')}
                       className={errors.usage_limit_per_customer ? 'border-red-500' : ''}
                     />
                     {errors.usage_limit_per_customer && (
@@ -1179,11 +1179,11 @@ const DiscountForm: React.FC = () => {
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {__('First-Time Customers Only', 'First-Time Customers Only')}
+                        {__('First-Time Customers Only', 'yatra')}
                       </span>
                     </label>
                     <HelpText 
-                      text={__('If enabled, only customers who have never made a booking before can use this coupon.', 'If enabled, only customers who have never made a booking before can use this coupon.')}
+                      text={__('If enabled, only customers who have never made a booking before can use this coupon.', 'yatra')}
                       className="mb-2 mt-1"
                     />
                   </div>
@@ -1191,10 +1191,10 @@ const DiscountForm: React.FC = () => {
                   {/* Minimum Amount */}
                   <div>
                     <label htmlFor="min_amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Minimum Booking Amount', 'Minimum Booking Amount')}
+                      {__('Minimum Booking Amount', 'yatra')}
                     </label>
                     <HelpText 
-                      text={__('Minimum total booking amount required to use this coupon. This applies to the total booking value (trip price × number of travelers).', 'Minimum total booking amount required to use this coupon. This applies to the total booking value (trip price × number of travelers).')}
+                      text={__('Minimum total booking amount required to use this coupon. This applies to the total booking value (trip price × number of travelers).', 'yatra')}
                       className="mb-2"
                     />
                     <div className="relative">
@@ -1206,7 +1206,7 @@ const DiscountForm: React.FC = () => {
                         step="0.01"
                         value={formData.min_amount}
                         onChange={(e) => handleFieldChange('min_amount', e.target.value)}
-                        placeholder={__('e.g., 100', 'e.g., 100')}
+                        placeholder={__('e.g., 100', 'yatra')}
                         className={`pl-7 ${errors.min_amount ? 'border-red-500' : ''}`}
                       />
                     </div>
@@ -1223,12 +1223,12 @@ const DiscountForm: React.FC = () => {
                     {/* Valid From Date */}
                     <div>
                       <label htmlFor="valid_from" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Valid From', 'Valid From')}
+                        {__('Valid From', 'yatra')}
                       </label>
                       <DatePicker
                         value={formData.valid_from}
                         onChange={(value) => handleFieldChange('valid_from', value)}
-                        placeholder={__('Select start date', 'Select start date')}
+                        placeholder={__('Select start date', 'yatra')}
                         error={!!errors.valid_from}
                         className={errors.valid_from ? 'border-red-500' : ''}
                       />
@@ -1243,12 +1243,12 @@ const DiscountForm: React.FC = () => {
                     {/* Expiry Date */}
                     <div>
                       <label htmlFor="expiry_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Expiry Date', 'Expiry Date')}
+                        {__('Expiry Date', 'yatra')}
                       </label>
                       <DatePicker
                         value={formData.expiry_date}
                         onChange={(value) => handleFieldChange('expiry_date', value)}
-                        placeholder={__('Select expiry date', 'Select expiry date')}
+                        placeholder={__('Select expiry date', 'yatra')}
                         minDate={formData.valid_from ? new Date(formData.valid_from) : new Date()}
                         error={!!errors.expiry_date}
                         className={errors.expiry_date ? 'border-red-500' : ''}
@@ -1268,7 +1268,7 @@ const DiscountForm: React.FC = () => {
               {!isEffectivePromoOnly && (
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Group Discount Settings', 'Group Discount Settings')}</CardTitle>
+                  <CardTitle className="text-base">{__('Group Discount Settings', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Enable Group Discount - Hide checkbox for group-only mode (already enabled) */}
@@ -1282,11 +1282,11 @@ const DiscountForm: React.FC = () => {
                         className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                       />
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {__('Enable Group Discount', 'Enable Group Discount')}
+                        {__('Enable Group Discount', 'yatra')}
                       </span>
                     </label>
                     <HelpText
-                      text={__('Apply discounts for group bookings based on traveler count.', 'Apply discounts for group bookings based on traveler count.')}
+                      text={__('Apply discounts for group bookings based on traveler count.', 'yatra')}
                       className="mb-2 mt-1"
                     />
                   </div>
@@ -1297,10 +1297,10 @@ const DiscountForm: React.FC = () => {
                       {/* Group Discount Mode */}
                       <div>
                         <label htmlFor="group_discount_mode" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                          {__('Discount Mode', 'Discount Mode')} <span className="text-red-500">*</span>
+                          {__('Discount Mode', 'yatra')} <span className="text-red-500">*</span>
                         </label>
                         <HelpText
-                          text={__('Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.', 'Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.')}
+                          text={__('Choose how to apply the group discount: Total discount on entire booking, or category-based rates per traveler type.', 'yatra')}
                           className="mb-2"
                         />
                         <Select
@@ -1310,8 +1310,8 @@ const DiscountForm: React.FC = () => {
                           className={errors.group_discount_mode ? 'border-red-500' : ''}
                           required={formData.is_group_discount}
                         >
-                          <option value="total">{__('Total Discount', 'Total Discount')}</option>
-                          <option value="category_based">{__('Category-Based Discount', 'Category-Based Discount')}</option>
+                          <option value="total">{__('Total Discount', 'yatra')}</option>
+                          <option value="category_based">{__('Category-Based Discount', 'yatra')}</option>
                         </Select>
                         {errors.group_discount_mode && (
                           <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -1327,14 +1327,14 @@ const DiscountForm: React.FC = () => {
                         <>
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Group Size Ranges', 'Group Size Ranges')}</h4>
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Group Size Ranges', 'yatra')}</h4>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {__('Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.', 'Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.')}
+                                {__('Add one or more ranges (e.g., 1-10, 10-12, 12-15, 15+). The first matching range will be applied.', 'yatra')}
                               </p>
                             </div>
                             <Button type="button" variant="outline" onClick={addRange} className="flex items-center gap-2">
                               <Plus className="w-4 h-4" />
-                              {__('Add Range', 'Add Range')}
+                              {__('Add Range', 'yatra')}
                             </Button>
                           </div>
 
@@ -1344,7 +1344,7 @@ const DiscountForm: React.FC = () => {
                                 <CardContent className="p-4 space-y-3">
                                   <div className="flex items-start justify-between gap-3">
                                     <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                                      {__('Range', 'Range')} #{idx + 1}
+                                      {__('Range', 'yatra')} #{idx + 1}
                                     </div>
                                     <Button
                                       type="button"
@@ -1354,21 +1354,21 @@ const DiscountForm: React.FC = () => {
                                       className="flex items-center gap-2"
                                     >
                                       <Trash2 className="w-4 h-4" />
-                                      {__('Remove', 'Remove')}
+                                      {__('Remove', 'yatra')}
                                     </Button>
                                   </div>
 
                                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                        {__('Minimum Group Size', 'Minimum Group Size')} <span className="text-red-500">*</span>
+                                        {__('Minimum Group Size', 'yatra')} <span className="text-red-500">*</span>
                                       </label>
                                       <Input
                                         type="number"
                                         min="1"
                                         value={range.min_group_size}
                                         onChange={(e) => updateRange(range.id, { min_group_size: e.target.value })}
-                                        placeholder={__('e.g., 10', 'e.g., 10')}
+                                        placeholder={__('e.g., 10', 'yatra')}
                                         className={errors[`group_discount_ranges_${idx}_min`] ? 'border-red-500' : ''}
                                       />
                                       {errors[`group_discount_ranges_${idx}_min`] && (
@@ -1381,14 +1381,14 @@ const DiscountForm: React.FC = () => {
 
                                     <div>
                                       <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                        {__('Maximum Group Size', 'Maximum Group Size')}
+                                        {__('Maximum Group Size', 'yatra')}
                                       </label>
                                       <Input
                                         type="number"
                                         min={range.min_group_size ? parseInt(range.min_group_size, 10) + 1 : 2}
                                         value={range.max_group_size}
                                         onChange={(e) => updateRange(range.id, { max_group_size: e.target.value })}
-                                        placeholder={__('Leave empty for unlimited', 'Leave empty for unlimited')}
+                                        placeholder={__('Leave empty for unlimited', 'yatra')}
                                         className={errors[`group_discount_ranges_${idx}_max`] ? 'border-red-500' : ''}
                                       />
                                       {errors[`group_discount_ranges_${idx}_max`] && (
@@ -1404,16 +1404,16 @@ const DiscountForm: React.FC = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                       <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                          {__('Discount Type', 'Discount Type')} <span className="text-red-500">*</span>
+                                          {__('Discount Type', 'yatra')} <span className="text-red-500">*</span>
                                         </label>
                                         <Select
                                           value={range.discount_type || 'percentage'}
                                           onChange={(e) => updateRange(range.id, { discount_type: e.target.value as 'percentage' | 'fixed' })}
                                           className={errors[`group_discount_ranges_${idx}_type`] ? 'border-red-500' : ''}
                                         >
-                                          <option value="percentage">{__('Percentage', 'Percentage')}</option>
-                                          <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
-                                          <option value="percentage_of_total">{__('Percentage of Total', 'Percentage of Total')}</option>
+                                          <option value="percentage">{__('Percentage', 'yatra')}</option>
+                                          <option value="fixed">{__('Fixed Amount', 'yatra')}</option>
+                                          <option value="percentage_of_total">{__('Percentage of Total', 'yatra')}</option>
                                     </Select>
                                         {errors[`group_discount_ranges_${idx}_type`] && (
                                           <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -1425,7 +1425,7 @@ const DiscountForm: React.FC = () => {
 
                                       <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                          {__('Discount Amount', 'Discount Amount')} <span className="text-red-500">*</span>
+                                          {__('Discount Amount', 'yatra')} <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
                                           {range.discount_type === 'fixed' && (
@@ -1438,7 +1438,7 @@ const DiscountForm: React.FC = () => {
                                             step="0.01"
                                             value={range.discount_amount || ''}
                                             onChange={(e) => updateRange(range.id, { discount_amount: e.target.value })}
-                                            placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'e.g., 10') : __('e.g., 50', 'e.g., 50')}
+                                            placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'yatra') : __('e.g., 50', 'yatra')}
                                             className={`${range.discount_type === 'fixed' ? 'pl-7' : ''} ${errors[`group_discount_ranges_${idx}_amount`] ? 'border-red-500' : ''}`}
                                           />
                                           {range.discount_type === 'percentage' && (
@@ -1465,15 +1465,15 @@ const DiscountForm: React.FC = () => {
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Traveler Categories', 'Traveler Categories')}</h4>
+                              <h4 className="text-sm font-semibold text-gray-900 dark:text-white">{__('Traveler Categories', 'yatra')}</h4>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {__('Add traveler categories and define discount ranges for each category.', 'Add traveler categories and define discount ranges for each category.')}
+                                {__('Add traveler categories and define discount ranges for each category.', 'yatra')}
                               </p>
                             </div>
                             <div className="relative">
                               <Button type="button" onClick={addTravelerCategory} className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                                 <Plus className="w-4 h-4" />
-                                {__('Add Category', 'Add Category')}
+                                {__('Add Category', 'yatra')}
                               </Button>
                               
                               {/* Category Selection Dropdown */}
@@ -1481,7 +1481,7 @@ const DiscountForm: React.FC = () => {
                                 <div className="absolute right-0 top-full mt-2 z-50 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 shadow-lg min-w-[320px]">
                                   <div className="p-3 border-b border-gray-200 dark:border-gray-700">
                                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                                      {__('Select a category to add pricing', 'Select a category to add pricing')}
+                                      {__('Select a category to add pricing', 'yatra')}
                                     </p>
                                   </div>
                                   
@@ -1497,7 +1497,7 @@ const DiscountForm: React.FC = () => {
                                             <div className="flex items-center gap-2">
                                               <span className="font-semibold text-gray-900 dark:text-white">{cat.label}</span>
                                               <span className="text-sm text-gray-500 dark:text-gray-400">
-                                                ({cat.age_min || 'null'}-{cat.age_max || 'null'} {__('years', 'years')})
+                                                ({cat.age_min || 'null'}-{cat.age_max || 'null'} {__('years', 'yatra')})
                                               </span>
                                             </div>
                                             <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -1510,7 +1510,7 @@ const DiscountForm: React.FC = () => {
                                     </div>
                                   ) : (
                                     <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                      {__('No traveler categories available. Please create categories first.', 'No traveler categories available. Please create categories first.')}
+                                      {__('No traveler categories available. Please create categories first.', 'yatra')}
                                     </div>
                                   )}
                                 </div>
@@ -1532,12 +1532,12 @@ const DiscountForm: React.FC = () => {
                                   <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
                                 </div>
                                 <div className="text-gray-500 dark:text-gray-400">
-                                  <div className="text-lg font-medium mb-2">{__('No traveler categories added yet', 'No traveler categories added yet')}</div>
-                                  <div className="text-sm mb-4">{__('Select traveler categories to apply group-specific discounts', 'Select traveler categories to apply group-specific discounts')}</div>
+                                  <div className="text-lg font-medium mb-2">{__('No traveler categories added yet', 'yatra')}</div>
+                                  <div className="text-sm mb-4">{__('Select traveler categories to apply group-specific discounts', 'yatra')}</div>
                                 </div>
                                 <Button type="button" onClick={addTravelerCategory} className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
                                   <Plus className="w-4 h-4" />
-                                  {__('Add Your First Category', 'Add Your First Category')}
+                                  {__('Add Your First Category', 'yatra')}
                                 </Button>
                               </div>
                             </div>
@@ -1549,10 +1549,10 @@ const DiscountForm: React.FC = () => {
                                     <div className="flex items-start justify-between gap-3">
                                       <div className="flex-1">
                                         <div className="text-sm font-semibold text-gray-900 dark:text-white">
-                                          {__('Traveler Category', 'Traveler Category')} #{catIdx + 1}
+                                          {__('Traveler Category', 'yatra')} #{catIdx + 1}
                                         </div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                          {__('Configure discount ranges for this traveler category.', 'Configure discount ranges for this traveler category.')}
+                                          {__('Configure discount ranges for this traveler category.', 'yatra')}
                                         </div>
                                       </div>
                                       <Button
@@ -1563,14 +1563,14 @@ const DiscountForm: React.FC = () => {
                                         className="flex items-center gap-2"
                                       >
                                         <Trash2 className="w-4 h-4" />
-                                        {__('Remove', 'Remove')}
+                                        {__('Remove', 'yatra')}
                                       </Button>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                       <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                          {__('Select Traveler Category', 'Select Traveler Category')} <span className="text-red-500">*</span>
+                                          {__('Select Traveler Category', 'yatra')} <span className="text-red-500">*</span>
                                         </label>
                                         <Select
                                           value={category.traveler_category_id}
@@ -1598,14 +1598,14 @@ const DiscountForm: React.FC = () => {
 
                                     <div className="flex items-center justify-between">
                                       <div>
-                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{__('Discount Ranges', 'Discount Ranges')}</div>
+                                        <div className="text-sm font-medium text-gray-900 dark:text-white">{__('Discount Ranges', 'yatra')}</div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                          {__('Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+).', 'Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+.')}
+                                          {__('Add multiple group size ranges for this category (e.g., 1-10, 10-12, 12-15, 15+).', 'yatra')}
                                         </div>
                                       </div>
                                       <Button type="button" variant="outline" onClick={() => addRangeToCategory(catIdx)} className="flex items-center gap-2">
                                         <Plus className="w-4 h-4" />
-                                        {__('Add Range', 'Add Range')}
+                                        {__('Add Range', 'yatra')}
                                       </Button>
                                     </div>
 
@@ -1619,8 +1619,8 @@ const DiscountForm: React.FC = () => {
                                     {category.ranges.length === 0 ? (
                                       <div className="text-center py-6 border-2 border-dashed border-gray-200 dark:border-gray-600 rounded-lg">
                                         <div className="text-gray-500 dark:text-gray-400">
-                                          <div className="text-sm font-medium mb-1">{__('No discount ranges added yet', 'No discount ranges added yet')}</div>
-                                          <div className="text-xs">{__('Click "Add Range" to create discount tiers', 'Click "Add Range" to create discount tiers')}</div>
+                                          <div className="text-sm font-medium mb-1">{__('No discount ranges added yet', 'yatra')}</div>
+                                          <div className="text-xs">{__('Click "Add Range" to create discount tiers', 'yatra')}</div>
                                         </div>
                                       </div>
                                     ) : (
@@ -1629,7 +1629,7 @@ const DiscountForm: React.FC = () => {
                                       <div key={range.id} className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 space-y-3 bg-gray-50 dark:bg-gray-800">
                                         <div className="flex items-start justify-between gap-3">
                                           <div className="text-sm font-medium text-gray-900 dark:text-white">
-                                            {__('Range', 'Range')} #{rIdx + 1}
+                                            {__('Range', 'yatra')} #{rIdx + 1}
                                           </div>
                                           <Button
                                             type="button"
@@ -1640,21 +1640,21 @@ const DiscountForm: React.FC = () => {
                                             className="flex items-center gap-1"
                                           >
                                             <Trash2 className="w-3 h-3" />
-                                            {__('Remove', 'Remove')}
+                                            {__('Remove', 'yatra')}
                                           </Button>
                                         </div>
 
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                           <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                              {__('Minimum Group Size', 'Minimum Group Size')} <span className="text-red-500">*</span>
+                                              {__('Minimum Group Size', 'yatra')} <span className="text-red-500">*</span>
                                             </label>
                                             <Input
                                               type="number"
                                               min="1"
                                               value={range.min_group_size}
                                               onChange={(e) => updateRangeInCategory(catIdx, range.id, { min_group_size: e.target.value })}
-                                              placeholder={__('e.g., 10', 'e.g., 10')}
+                                              placeholder={__('e.g., 10', 'yatra')}
                                               className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] ? 'border-red-500' : ''}
                                             />
                                             {errors[`category_discounts_${catIdx}_ranges_${rIdx}_min`] && (
@@ -1667,14 +1667,14 @@ const DiscountForm: React.FC = () => {
 
                                           <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                              {__('Maximum Group Size', 'Maximum Group Size')}
+                                              {__('Maximum Group Size', 'yatra')}
                                             </label>
                                             <Input
                                               type="number"
                                               min={range.min_group_size ? parseInt(range.min_group_size, 10) + 1 : 2}
                                               value={range.max_group_size}
                                               onChange={(e) => updateRangeInCategory(catIdx, range.id, { max_group_size: e.target.value })}
-                                              placeholder={__('Leave empty for unlimited', 'Leave empty for unlimited')}
+                                              placeholder={__('Leave empty for unlimited', 'yatra')}
                                               className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] ? 'border-red-500' : ''}
                                             />
                                             {errors[`category_discounts_${catIdx}_ranges_${rIdx}_max`] && (
@@ -1689,15 +1689,15 @@ const DiscountForm: React.FC = () => {
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                           <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                              {__('Discount Type', 'Discount Type')} <span className="text-red-500">*</span>
+                                              {__('Discount Type', 'yatra')} <span className="text-red-500">*</span>
                                             </label>
                                             <Select
                                               value={range.discount_type || 'percentage'}
                                               onChange={(e) => updateRangeInCategory(catIdx, range.id, { discount_type: e.target.value as 'percentage' | 'fixed' })}
                                               className={errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] ? 'border-red-500' : ''}
                                             >
-                                              <option value="percentage">{__('Percentage', 'Percentage')}</option>
-                                              <option value="fixed">{__('Fixed Amount', 'Fixed Amount')}</option>
+                                              <option value="percentage">{__('Percentage', 'yatra')}</option>
+                                              <option value="fixed">{__('Fixed Amount', 'yatra')}</option>
                                             </Select>
                                             {errors[`category_discounts_${catIdx}_ranges_${rIdx}_type`] && (
                                               <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -1709,7 +1709,7 @@ const DiscountForm: React.FC = () => {
 
                                           <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                                              {__('Discount Amount', 'Discount Amount')} <span className="text-red-500">*</span>
+                                              {__('Discount Amount', 'yatra')} <span className="text-red-500">*</span>
                                             </label>
                                             <div className="relative">
                                               {range.discount_type === 'fixed' && (
@@ -1722,7 +1722,7 @@ const DiscountForm: React.FC = () => {
                                                 step="0.01"
                                                 value={range.discount_amount || ''}
                                                 onChange={(e) => updateRangeInCategory(catIdx, range.id, { discount_amount: e.target.value })}
-                                                placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'e.g., 10') : __('e.g., 50', 'e.g., 50')}
+                                                placeholder={range.discount_type === 'percentage' ? __('e.g., 10', 'yatra') : __('e.g., 50', 'yatra')}
                                                 className={`${range.discount_type === 'fixed' ? 'pl-7' : ''} ${errors[`category_discounts_${catIdx}_ranges_${rIdx}_amount`] ? 'border-red-500' : ''}`}
                                               />
                                               {range.discount_type === 'percentage' && (
@@ -1760,19 +1760,19 @@ const DiscountForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'Status')}</CardTitle>
+                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Select
                     value={formData.status}
                     onChange={(e) => handleFieldChange('status', e.target.value as 'draft' | 'publish' | 'trash')}
                   >
-                    <option value="draft">{__('Draft', 'Draft')}</option>
-                    <option value="publish">{__('Publish', 'Publish')}</option>
-                    <option value="trash">{__('Trash', 'Trash')}</option>
+                    <option value="draft">{__('Draft', 'yatra')}</option>
+                    <option value="publish">{__('Publish', 'yatra')}</option>
+                    <option value="trash">{__('Trash', 'yatra')}</option>
                   </Select>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {__('Only published coupons can be used by customers.', 'Only published coupons can be used by customers.')}
+                    {__('Only published coupons can be used by customers.', 'yatra')}
                   </p>
                 </CardContent>
               </Card>
@@ -1780,7 +1780,7 @@ const DiscountForm: React.FC = () => {
               {/* Applicable To */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Applicable To', 'Applicable To')}</CardTitle>
+                  <CardTitle className="text-base">{__('Applicable To', 'yatra')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ApplicableTripSelector
@@ -1812,12 +1812,12 @@ const DiscountForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'Saving...')}
+                            {__('Saving...', 'yatra')}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Coupon', 'Update Coupon') : __('Create Coupon', 'Create Coupon')}
+                            {isEditMode ? __('Update Coupon', 'yatra') : __('Create Coupon', 'yatra')}
                           </>
                         )}
                       </Button>
@@ -1827,7 +1827,7 @@ const DiscountForm: React.FC = () => {
                         onClick={handleBack}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'Cancel')}
+                        {__('Cancel', 'yatra')}
                       </Button>
                     </div>
                   </div>
@@ -1842,9 +1842,9 @@ const DiscountForm: React.FC = () => {
       <PremiumUpgradeDialog
         open={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-        moduleName={__('Group Discounts', 'Group Discounts')}
+        moduleName={__('Group Discounts', 'yatra')}
         purchaseUrl="https://wpyatra.com/pricing?module=group-discounts"
-        moduleDescription={__('Unlock powerful group discount features to automatically apply discounts based on group size and traveler categories.', 'Unlock powerful group discount features to automatically apply discounts based on group size and traveler categories.')}
+        moduleDescription={__('Unlock powerful group discount features to automatically apply discounts based on group size and traveler categories.', 'yatra')}
       />
     </div>
   );

@@ -46,7 +46,7 @@ const Modules: React.FC = () => {
     }
 
     if (categoryFilter !== 'all') {
-      list = list.filter((module) => (module.category || __('General', 'General')) === categoryFilter);
+      list = list.filter((module) => (module.category || __('General', 'yatra')) === categoryFilter);
     }
 
     const sorted = [...list];
@@ -115,8 +115,8 @@ const Modules: React.FC = () => {
         aria-pressed={module.enabled}
         aria-label={
           module.enabled
-            ? __('Disable module', 'Disable module')
-            : __('Enable module', 'Enable module')
+            ? __('Disable module', 'yatra')
+            : __('Enable module', 'yatra')
         }
       >
         <span
@@ -197,8 +197,8 @@ const Modules: React.FC = () => {
   return (
     <div className="space-y-4">
       <PageHeader
-        title={__('Modules', 'Modules')}
-        description={__('Manage feature modules and control which capabilities are active.', 'Manage feature modules and control which capabilities are active.')}
+        title={__('Modules', 'yatra')}
+        description={__('Manage feature modules and control which capabilities are active.', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button
@@ -207,7 +207,7 @@ const Modules: React.FC = () => {
             className="flex items-center gap-2"
           >
             <Puzzle className="w-4 h-4" />
-            {__('Refresh Modules', 'Refresh Modules')}
+            {__('Refresh Modules', 'yatra')}
           </Button>
         }
       />
@@ -223,26 +223,26 @@ const Modules: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <ArrowUpDown className="w-4 h-4" />
-                {isAllVisibleSelected ? __('Clear visible selection', 'Clear visible selection') : __('Select visible', 'Select visible')}
+                {isAllVisibleSelected ? __('Clear visible selection', 'yatra') : __('Select visible', 'yatra')}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => bulkUpdate(true)}
                 disabled={!canManageModules || selectedCount === 0 || bulkToggleMutation.isPending}
               >
-                {__('Enable Selected', 'Enable Selected')}
+                {__('Enable Selected', 'yatra')}
               </Button>
               <Button
                 variant="outline"
                 onClick={() => bulkUpdate(false)}
                 disabled={!canManageModules || selectedCount === 0 || bulkToggleMutation.isPending}
               >
-                {__('Disable Selected', 'Disable Selected')}
+                {__('Disable Selected', 'yatra')}
               </Button>
               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 pl-2">
                 <Filter className="w-4 h-4" />
                 <span>
-                  {__('Showing {count} modules', 'Showing {count} modules').replace('{count}', String(filteredModules.length))}
+                  {__('Showing {count} modules', 'yatra').replace('{count}', String(filteredModules.length))}
                 </span>
               </div>
             </div>
@@ -252,7 +252,7 @@ const Modules: React.FC = () => {
                 <Input
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder={__('Search modules...', 'Search modules...')}
+                  placeholder={__('Search modules...', 'yatra')}
                   className="pl-9"
                 />
               </div>
@@ -261,7 +261,7 @@ const Modules: React.FC = () => {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="w-full lg:w-48"
               >
-                <option value="all">{__('All Categories', 'All Categories')}</option>
+                <option value="all">{__('All Categories', 'yatra')}</option>
                 {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
@@ -273,10 +273,10 @@ const Modules: React.FC = () => {
                 onChange={(e) => setSortOption(e.target.value as typeof sortOption)}
                 className="w-full lg:w-48"
               >
-                <option value="name_asc">{__('Name A → Z', 'Name A → Z')}</option>
-                <option value="name_desc">{__('Name Z → A', 'Name Z → A')}</option>
-                <option value="status_enabled">{__('Enabled first', 'Enabled first')}</option>
-                <option value="status_disabled">{__('Disabled first', 'Disabled first')}</option>
+                <option value="name_asc">{__('Name A → Z', 'yatra')}</option>
+                <option value="name_desc">{__('Name Z → A', 'yatra')}</option>
+                <option value="status_enabled">{__('Enabled first', 'yatra')}</option>
+                <option value="status_disabled">{__('Disabled first', 'yatra')}</option>
               </Select>
               {(searchTerm || categoryFilter !== 'all' || sortOption !== 'name_asc') && (
                 <Button
@@ -287,7 +287,7 @@ const Modules: React.FC = () => {
                     setSortOption('name_asc');
                   }}
                 >
-                  {__('Reset', 'Reset')}
+                  {__('Reset', 'yatra')}
                 </Button>
               )}
             </div>
@@ -329,7 +329,7 @@ const Modules: React.FC = () => {
       {error && (
         <Card>
           <CardContent className="p-6 text-red-600 dark:text-red-400">
-            {__('Failed to load modules', 'Failed to load modules')}
+            {__('Failed to load modules', 'yatra')}
           </CardContent>
         </Card>
       )}
@@ -337,7 +337,7 @@ const Modules: React.FC = () => {
       {!isLoading && !error && modules.length === 0 && (
         <Card>
           <CardContent className="p-6 text-gray-500 dark:text-gray-400">
-            {__('No modules available yet.', 'No modules available yet.')}
+            {__('No modules available yet.', 'yatra')}
           </CardContent>
         </Card>
       )}
@@ -380,7 +380,7 @@ const Modules: React.FC = () => {
                             />
                             {module.enabled && (
                               <span className="text-[11px] font-semibold text-green-700 uppercase tracking-wide [writing-mode:vertical-rl] [text-orientation:mixed] transform rotate-180 bg-green-100 dark:bg-green-900/40 px-1 py-1 rounded">
-                                {__('Enabled', 'Enabled')}
+                                {__('Enabled', 'yatra')}
                               </span>
                             )}
                           </div>
@@ -402,7 +402,7 @@ const Modules: React.FC = () => {
                               <CardTitle className="text-lg flex items-center gap-2 flex-wrap">
                               {module.name}
                               {module.is_core && (
-                                <Badge variant="outline">{__('Core', 'Core')}</Badge>
+                                <Badge variant="outline">{__('Core', 'yatra')}</Badge>
                               )}
                               {/* Only show Premium badge if module is premium AND not available (Pro not active) */}
                               {module.is_premium && !module.is_available && (
@@ -411,7 +411,7 @@ const Modules: React.FC = () => {
                                   className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-orange-500 to-orange-400 border-orange-600 text-white shadow-sm dark:bg-orange-600/60 dark:border-orange-500 dark:text-orange-50"
                                 >
                                   <Crown className="w-3 h-3" />
-                                  {__('Premium', 'Premium')}
+                                  {__('Premium', 'yatra')}
                                 </Badge>
                               )}
                               </CardTitle>
@@ -420,7 +420,7 @@ const Modules: React.FC = () => {
                             </CardDescription>
                             <p className="inline-flex items-center px-2 py-0.5 mt-1 text-[11px] font-medium rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                               <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1"></span>
-                              {module.category || __('General', 'General')}
+                              {module.category || __('General', 'yatra')}
                             </p>
                           </div>
                         </div>
@@ -437,12 +437,12 @@ const Modules: React.FC = () => {
                             target="_blank"
                             rel="noreferrer"
                             className="flex items-center gap-1 text-red-600 hover:text-red-500 dark:text-red-400 text-xs font-medium"
-                            title={__('Watch video tutorial', 'Watch video tutorial')}
+                            title={__('Watch video tutorial', 'yatra')}
                           >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                               <polygon points="5 3 19 12 5 21 5 3"></polygon>
                             </svg>
-                            {__('Video', 'Video')}
+                            {__('Video', 'yatra')}
                           </a>
                         )}
                       </div>
@@ -451,13 +451,13 @@ const Modules: React.FC = () => {
                           <a
                             href={`${window.location.origin}/wp-admin/admin.php?page=yatra&subpage=settings`}
                             className="flex items-center gap-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-xs font-medium"
-                            title={__('Settings', 'Settings')}
+                            title={__('Settings', 'yatra')}
                           >
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
                               <circle cx="12" cy="12" r="3"></circle>
                               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                             </svg>
-                            {__('Settings', 'Settings')}
+                            {__('Settings', 'yatra')}
                           </a>
                         )}
                         {module.docs_url && (
@@ -468,7 +468,7 @@ const Modules: React.FC = () => {
                             className="flex items-center gap-1 text-blue-600 hover:text-blue-500 dark:text-blue-400 text-xs font-medium"
                           >
                             <ExternalLink className="w-3 h-3" />
-                            {__('Docs', 'Docs')}
+                            {__('Docs', 'yatra')}
                           </a>
                         )}
                       </div>

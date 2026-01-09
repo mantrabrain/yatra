@@ -90,7 +90,7 @@ const ViewReview: React.FC = () => {
             }`}
           />
         ))}
-        <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">{rating} {__('out of 5', 'out of 5')}</span>
+        <span className="ml-2 text-lg font-semibold text-gray-900 dark:text-white">{rating} {__('out of 5', 'yatra')}</span>
       </div>
     );
   };
@@ -99,19 +99,19 @@ const ViewReview: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'approved': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Approved', 'Approved'),
+        label: __('Approved', 'yatra'),
       },
       'pending': {
         className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'Pending'),
+        label: __('Pending', 'yatra'),
       },
       'spam': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Spam', 'Spam'),
+        label: __('Spam', 'yatra'),
       },
       'trash': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -139,12 +139,12 @@ const ViewReview: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Review Details', 'Review Details')}
-          description={__('View complete review information', 'View complete review information')}
+          title={__('Review Details', 'yatra')}
+          description={__('View complete review information', 'yatra')}
           actions={
             <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           }
         />
@@ -224,8 +224,8 @@ const ViewReview: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Review Not Found', 'Review Not Found')}
-          description={__('The review you are looking for does not exist', 'The review you are looking for does not exist')}
+          title={__('Review Not Found', 'yatra')}
+          description={__('The review you are looking for does not exist', 'yatra')}
           actions={
             <Button
               variant="outline"
@@ -233,13 +233,13 @@ const ViewReview: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Reviews', 'Back to Reviews')}
+              {__('Back to Reviews', 'yatra')}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center text-red-500">
-            {__('Error loading review or review not found', 'Error loading review or review not found')}
+            {__('Error loading review or review not found', 'yatra')}
           </CardContent>
         </Card>
       </div>
@@ -249,8 +249,8 @@ const ViewReview: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Review Details', 'Review Details')}
-        description={__('View complete review information', 'View complete review information')}
+        title={__('Review Details', 'yatra')}
+        description={__('View complete review information', 'yatra')}
         actions={
           <div className="flex gap-2">
             <ConditionalRender capability="yatra_edit_reviews">
@@ -259,7 +259,7 @@ const ViewReview: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <Edit className="w-4 h-4" />
-                {__('Edit Review', 'Edit Review')}
+                {__('Edit Review', 'yatra')}
               </Button>
             </ConditionalRender>
             <Button
@@ -268,7 +268,7 @@ const ViewReview: React.FC = () => {
               className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'Back')}
+              {__('Back', 'yatra')}
             </Button>
           </div>
         }
@@ -282,7 +282,7 @@ const ViewReview: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Review Overview', 'Review Overview')}</CardTitle>
+                  <CardTitle className="text-base">{__('Review Overview', 'yatra')}</CardTitle>
                   {getStatusBadge(review.status)}
                 </div>
               </CardHeader>
@@ -290,7 +290,7 @@ const ViewReview: React.FC = () => {
                 {/* Trip */}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Trip', 'Trip')}
+                    {__('Trip', 'yatra')}
                   </div>
                   {review.trip_id ? (
                     <a 
@@ -309,7 +309,7 @@ const ViewReview: React.FC = () => {
                 {/* Rating */}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-                    {__('Rating', 'Rating')}
+                    {__('Rating', 'yatra')}
                   </div>
                   {renderStars(review.rating)}
                 </div>
@@ -317,7 +317,7 @@ const ViewReview: React.FC = () => {
                 {/* Title */}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Review Title', 'Review Title')}
+                    {__('Review Title', 'yatra')}
                   </div>
                   <div className="text-lg font-semibold text-gray-900 dark:text-white">
                     {review.title}
@@ -327,7 +327,7 @@ const ViewReview: React.FC = () => {
                 {/* Comment */}
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-                    {__('Review Comment', 'Review Comment')}
+                    {__('Review Comment', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                     {review.comment}
@@ -342,12 +342,12 @@ const ViewReview: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Customer Information', 'Customer Information')}</CardTitle>
+                <CardTitle className="text-base">{__('Customer Information', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Customer Name', 'Customer Name')}
+                    {__('Customer Name', 'yatra')}
                   </div>
                   <div className="text-sm font-medium text-gray-900 dark:text-white">
                     {review.customer_name}
@@ -356,17 +356,17 @@ const ViewReview: React.FC = () => {
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <Mail className="w-3 h-3" />
-                    {__('Email Address', 'Email Address')}
+                    {__('Email Address', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {review.customer_email || <span className="text-gray-400">{__('Not provided', 'Not provided')}</span>}
+                    {review.customer_email || <span className="text-gray-400">{__('Not provided', 'yatra')}</span>}
                   </div>
                 </div>
                 {review.customer_location && (
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                       <MapPin className="w-3 h-3" />
-                      {__('Location', 'Location')}
+                      {__('Location', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {review.customer_location}
@@ -376,7 +376,7 @@ const ViewReview: React.FC = () => {
                 {review.verified && (
                   <div>
                     <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
-                      {__('Verified Purchase', 'Verified Purchase')}
+                      {__('Verified Purchase', 'yatra')}
                     </span>
                   </div>
                 )}
@@ -386,13 +386,13 @@ const ViewReview: React.FC = () => {
             {/* Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'Timeline')}</CardTitle>
+                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <Calendar className="w-3 h-3" />
-                    {__('Created', 'Created')}
+                    {__('Created', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {formatDate(review.created_at)}
@@ -401,7 +401,7 @@ const ViewReview: React.FC = () => {
                 {review.updated_at && review.updated_at !== review.created_at && (
                   <div>
                     <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                      {__('Last Updated', 'Last Updated')}
+                      {__('Last Updated', 'yatra')}
                     </div>
                     <div className="text-sm text-gray-900 dark:text-white">
                       {formatDate(review.updated_at)}

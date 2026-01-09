@@ -146,7 +146,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
       <button
         onClick={handleRemove}
         className="flex-shrink-0 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-        aria-label={__('Close', 'Close')}
+        aria-label={__('Close', 'yatra')}
       >
         <X className="w-4 h-4" />
       </button>

@@ -81,11 +81,11 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Pending Payments', 'Pending Payments')}</CardTitle>
+          <CardTitle>{__('Pending Payments', 'yatra')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'Loading...')}
+            {__('Loading...', 'yatra')}
           </div>
         </CardContent>
       </Card>
@@ -96,7 +96,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{__('Pending Payments', 'Pending Payments')}</CardTitle>
+          <CardTitle>{__('Pending Payments', 'yatra')}</CardTitle>
           {totalPending > 0 && (
             <Badge variant="warning" className="text-sm">
               {formatCurrency(totalPending)}
@@ -120,7 +120,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                       </h4>
                       {payment.days_overdue && payment.days_overdue > 0 && (
                         <Badge variant="error" className="text-xs">
-                          {payment.days_overdue} {__('days overdue', 'days overdue')}
+                          {payment.days_overdue} {__('days overdue', 'yatra')}
                         </Badge>
                       )}
                     </div>
@@ -130,7 +130,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                       <Clock className="w-3 h-3" />
-                      <span>{__('Due', 'Due')}: {formatDate(payment.due_date)}</span>
+                      <span>{__('Due', 'yatra')}: {formatDate(payment.due_date)}</span>
                     </div>
                   </div>
                   <div className="text-right">
@@ -154,7 +154,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                         onClick={() => onView(payment)}
                         className="flex-1"
                       >
-                        {__('View', 'View')}
+                        {__('View', 'yatra')}
                       </Button>
                     )}
                     {onCollect && (
@@ -164,7 +164,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                         className="flex-1"
                       >
                         <DollarSign className="w-4 h-4 mr-1" />
-                        {__('Collect', 'Collect')}
+                        {__('Collect', 'yatra')}
                       </Button>
                     )}
                   </div>
@@ -174,7 +174,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No pending payments', 'No pending payments')}
+            {__('No pending payments', 'yatra')}
           </p>
         )}
       </CardContent>

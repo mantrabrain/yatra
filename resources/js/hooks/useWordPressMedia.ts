@@ -123,7 +123,7 @@ export const useWordPressMedia = (options: UseWordPressMediaOptions = {}): UseWo
               retries--;
               setTimeout(checkMedia, delay);
             } else {
-              reject(new Error(__('WordPress media library is not available. Please refresh the page.', 'WordPress media library is not available. Please refresh the page.')));
+              reject(new Error(__('WordPress media library is not available. Please refresh the page.', 'yatra')));
             }
           };
           
@@ -159,7 +159,7 @@ export const useWordPressMedia = (options: UseWordPressMediaOptions = {}): UseWo
           });
 
           if (!frame) {
-            throw new Error(__('Failed to create media frame.', 'Failed to create media frame.'));
+            throw new Error(__('Failed to create media frame.', 'yatra'));
           }
 
           // Handle selection when user clicks the button
@@ -200,7 +200,7 @@ export const useWordPressMedia = (options: UseWordPressMediaOptions = {}): UseWo
         })
         .catch((error) => {
           console.error('Error opening WordPress media library:', error);
-          alert(error.message || __('WordPress media library is not available. Please refresh the page.', 'WordPress media library is not available. Please refresh the page.'));
+          alert(error.message || __('WordPress media library is not available. Please refresh the page.', 'yatra'));
         });
     },
     [title, buttonText, multiple, library]

@@ -100,7 +100,7 @@ const TravelerCategories: React.FC = () => {
         const response = await apiClient.get('/traveler-categories', { params: queryParams });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load traveler categories', 'Failed to load traveler categories'), 'error');
+        showToast(error?.message || __('Failed to load traveler categories', 'yatra'), 'error');
         throw error;
       }
     },
@@ -115,11 +115,11 @@ const TravelerCategories: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
       queryClient.invalidateQueries({ queryKey: ['traveler-categories-stats'] });
-      showToast(__('Traveler category deleted successfully', 'Traveler category deleted successfully'), 'success');
+      showToast(__('Traveler category deleted successfully', 'yatra'), 'success');
       setDeleteConfirm({ isOpen: false, category: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete traveler category', 'Failed to delete traveler category'), 'error');
+      showToast(error?.message || __('Failed to delete traveler category', 'yatra'), 'error');
     },
   });
 
@@ -131,7 +131,7 @@ const TravelerCategories: React.FC = () => {
   const isCategoriesError = !!error || !!apiErrorMessage;
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return __('N/A', 'N/A');
+    if (!dateString) return __('N/A', 'yatra');
     try {
       const date = new Date(dateString);
       return date.toLocaleDateString('en-US', {
@@ -150,15 +150,15 @@ const TravelerCategories: React.FC = () => {
     const statusMap: Record<string, { className: string; label: string }> = {
       'publish': {
         className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Publish', 'Publish'),
+        label: __('Publish', 'yatra'),
       },
       'draft': {
         className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Draft', 'Draft'),
+        label: __('Draft', 'yatra'),
       },
       'trash': {
         className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Trash', 'Trash'),
+        label: __('Trash', 'yatra'),
       },
     };
 
@@ -183,13 +183,13 @@ const TravelerCategories: React.FC = () => {
 
   const formatAgeRange = (ageMin?: number | null, ageMax?: number | null) => {
     if (ageMin !== null && ageMin !== undefined && ageMax !== null && ageMax !== undefined) {
-      return `${ageMin}-${ageMax} ${__('years', 'years')}`;
+      return `${ageMin}-${ageMax} ${__('years old', 'yatra')}`;
     } else if (ageMin !== null && ageMin !== undefined) {
-      return `${ageMin}+ ${__('years', 'years')}`;
+      return `${ageMin}+ ${__('years old', 'yatra')}`;
     } else if (ageMax !== null && ageMax !== undefined) {
-      return `${__('Under', 'Under')} ${ageMax} ${__('years', 'years')}`;
+      return `${__('Under', 'yatra')} ${ageMax} ${__('years old', 'yatra')}`;
     }
-    return __('No age restriction', 'No age restriction');
+    return __('No age restriction', 'yatra');
   };
 
   const formatPricing = (category: TravelerCategory) => {
@@ -200,21 +200,21 @@ const TravelerCategories: React.FC = () => {
       const hasMax = category.max_pax !== null && category.max_pax !== undefined;
 
       if (hasMin && hasMax) {
-        return `${__('Per group', 'Per group')} (${category.min_pax}-${category.max_pax})`;
+        return `${__('Per group', 'yatra')} (${category.min_pax}-${category.max_pax})`;
       }
 
       if (hasMin) {
-        return `${__('Per group', 'Per group')} (${__('From', 'From')} ${category.min_pax})`;
+        return `${__('Per group', 'yatra')} (${__('From', 'yatra')} ${category.min_pax})`;
       }
 
       if (hasMax) {
-        return `${__('Per group', 'Per group')} (${__('Up to', 'Up to')} ${category.max_pax})`;
+        return `${__('Per group', 'yatra')} (${__('Up to', 'yatra')} ${category.max_pax})`;
       }
 
-      return __('Per group', 'Per group');
+      return __('Per group', 'yatra');
     }
 
-    return __('Per person', 'Per person');
+    return __('Per person', 'yatra');
   };
 
   const renderIcon = (icon: IconPickerValue | null | undefined) => {
@@ -375,24 +375,24 @@ const TravelerCategories: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
       queryClient.invalidateQueries({ queryKey: ['traveler-categories-stats'] });
       const msgMap: Record<string, string> = {
-        delete: __('Selected traveler categories deleted successfully', 'Selected traveler categories deleted successfully'),
-        trash: __('Selected traveler categories moved to trash', 'Selected traveler categories moved to trash'),
-        draft: __('Selected traveler categories marked as draft', 'Selected traveler categories marked as draft'),
-        publish: __('Selected traveler categories published', 'Selected traveler categories published'),
+        delete: __('Selected traveler categories deleted successfully', 'yatra'),
+        trash: __('Selected traveler categories moved to trash', 'yatra'),
+        draft: __('Selected traveler categories marked as draft', 'yatra'),
+        publish: __('Selected traveler categories published', 'yatra'),
       };
-      showToast(msgMap[variables.action] || __('Bulk action completed', 'Bulk action completed'), 'success');
+      showToast(msgMap[variables.action] || __('Bulk action completed', 'yatra'), 'success');
       setSelectedIds([]);
       setBulkAction('');
     },
     onError: (error: any, variables) => {
       const msgMapError: Record<string, string> = {
-        delete: __('Failed to delete selected traveler categories', 'Failed to delete selected traveler categories'),
-        trash: __('Failed to move traveler categories to trash', 'Failed to move traveler categories to trash'),
-        draft: __('Failed to mark traveler categories as draft', 'Failed to mark traveler categories as draft'),
-        publish: __('Failed to publish traveler categories', 'Failed to publish traveler categories'),
+        delete: __('Failed to delete selected traveler categories', 'yatra'),
+        trash: __('Failed to move traveler categories to trash', 'yatra'),
+        draft: __('Failed to mark traveler categories as draft', 'yatra'),
+        publish: __('Failed to publish traveler categories', 'yatra'),
       };
       showToast(
-        error?.message || msgMapError[variables.action] || __('Bulk action failed', 'Bulk action failed'),
+        error?.message || msgMapError[variables.action] || __('Bulk action failed', 'yatra'),
         'error'
       );
     },
@@ -400,12 +400,12 @@ const TravelerCategories: React.FC = () => {
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'Select a bulk action first.'), 'warning');
+      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one traveler category.', 'Select at least one traveler category.'), 'warning');
+      showToast(__('Select at least one traveler category.', 'yatra'), 'warning');
       return;
     }
 
@@ -416,7 +416,7 @@ const TravelerCategories: React.FC = () => {
   const columns = [
     {
       key: 'category',
-      label: __('Category', 'Category'),
+      label: __('Category', 'yatra'),
       sortable: true,
       visible: visibleColumns.category,
       render: (category: TravelerCategory) => (
@@ -439,17 +439,17 @@ const TravelerCategories: React.FC = () => {
     },
     {
       key: 'description',
-      label: __('Description', 'Description'),
+      label: __('Description', 'yatra'),
       visible: visibleColumns.description,
       render: (category: TravelerCategory) => (
         <div className="text-gray-600 dark:text-gray-400 text-sm line-clamp-2">
-          {category.description || __('No description', 'No description')}
+          {category.description || __('No description', 'yatra')}
         </div>
       ),
     },
     {
       key: 'age_range',
-      label: __('Age Range', 'Age Range'),
+      label: __('Age Range', 'yatra'),
       visible: visibleColumns.age_range,
       render: (category: TravelerCategory) => (
         <span className="text-gray-600 dark:text-gray-400 text-sm">
@@ -459,7 +459,7 @@ const TravelerCategories: React.FC = () => {
     },
     {
       key: 'pricing',
-      label: __('Pricing', 'Pricing'),
+      label: __('Pricing', 'yatra'),
       visible: visibleColumns.pricing,
       render: (category: TravelerCategory) => (
         <span className="text-gray-600 dark:text-gray-400 text-sm">
@@ -469,34 +469,34 @@ const TravelerCategories: React.FC = () => {
     },
     {
       key: 'status',
-      label: __('Status', 'Status'),
+      label: __('Status', 'yatra'),
       sortable: true,
       visible: visibleColumns.status,
       render: (category: TravelerCategory) => getStatusBadge(category.status),
     },
     {
       key: 'dates',
-      label: __('Date', 'Date'),
+      label: __('Date', 'yatra'),
       sortable: true,
       visible: visibleColumns.dates,
       render: (category: TravelerCategory) => (
         <div className="text-gray-500 dark:text-gray-400 text-sm">
           <div>{formatDate(category.created_at)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated', 'Updated')}: {formatDate(category.updated_at)}
+            {__('Updated', 'yatra')}: {formatDate(category.updated_at)}
           </div>
         </div>
       ),
     },
     {
       key: 'author',
-      label: __('Author', 'Author'),
+      label: __('Author', 'yatra'),
       visible: visibleColumns.author,
       render: (category: TravelerCategory) => (
         <div className="text-gray-600 dark:text-gray-400 text-sm">
           <div>{formatUser(category.created_by, category.created_by_name)}</div>
           <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-            {__('Updated by', 'Updated by')}: {formatUser(category.updated_by, category.updated_by_name)}
+            {__('Updated by', 'yatra')}: {formatUser(category.updated_by, category.updated_by_name)}
           </div>
         </div>
       ),
@@ -506,28 +506,28 @@ const TravelerCategories: React.FC = () => {
   const actions = [
     {
       key: 'edit',
-      label: __('Edit', 'Edit'),
+      label: __('Edit', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: TravelerCategory) => handleEdit(category),
       condition: () => can('yatra_edit_trips'),
     },
     {
       key: 'publish',
-      label: __('Make Published', 'Make Published'),
+      label: __('Make Published', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: TravelerCategory) => bulkMutation.mutate({ action: 'publish', ids: [category.id] }),
       condition: (category: TravelerCategory) => can('yatra_edit_trips') && category.status !== 'publish',
     },
     {
       key: 'draft',
-      label: __('Make Draft', 'Make Draft'),
+      label: __('Make Draft', 'yatra'),
       icon: <Edit className="w-4 h-4" />,
       onClick: (category: TravelerCategory) => bulkMutation.mutate({ action: 'draft', ids: [category.id] }),
       condition: (category: TravelerCategory) => can('yatra_edit_trips') && category.status !== 'draft',
     },
     {
       key: 'trash',
-      label: __('Move to Trash', 'Move to Trash'),
+      label: __('Move to Trash', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (category: TravelerCategory) => bulkMutation.mutate({ action: 'trash', ids: [category.id] }),
       variant: 'destructive' as const,
@@ -535,7 +535,7 @@ const TravelerCategories: React.FC = () => {
     },
     {
       key: 'delete',
-      label: __('Delete Permanently', 'Delete Permanently'),
+      label: __('Delete Permanently', 'yatra'),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (category: TravelerCategory) => handleDelete(category),
       variant: 'destructive' as const,
@@ -550,25 +550,25 @@ const TravelerCategories: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, category: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Traveler Category', 'Delete Traveler Category')}
+        title={__('Delete Traveler Category', 'yatra')}
         message={deleteConfirm.category 
-          ? __('Are you sure you want to delete "{label}"? This action cannot be undone.', 'Are you sure you want to delete "{label}"? This action cannot be undone.').replace('{label}', deleteConfirm.category.label)
-          : __('Are you sure you want to delete this traveler category? This action cannot be undone.', 'Are you sure you want to delete this traveler category? This action cannot be undone.')
+          ? __('Are you sure you want to delete "{label}"? This action cannot be undone.', 'yatra').replace('{label}', deleteConfirm.category.label)
+          : __('Are you sure you want to delete this traveler category? This action cannot be undone.', 'yatra')
         }
-        confirmText={__('Delete', 'Delete')}
-        cancelText={__('Cancel', 'Cancel')}
+        confirmText={__('Delete', 'yatra')}
+        cancelText={__('Cancel', 'yatra')}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
 
       <PageHeader
-        title={__('Traveler Categories', 'Traveler Categories')}
-        description={__('Manage pricing categories for different types of travelers', 'Manage pricing categories for different types of travelers')}
+        title={__('Traveler Categories', 'yatra')}
+        description={__('Manage pricing categories for different types of travelers', 'yatra')}
         actionCapability="yatra_edit_trips"
         actions={
           <Button onClick={handleCreateCategory} className="flex items-center gap-2">
             <Plus className="w-4 h-4" />
-            {__('Add New Category', 'Add New Category')}
+            {__('Add New Category', 'yatra')}
           </Button>
         }
       />
@@ -585,10 +585,10 @@ const TravelerCategories: React.FC = () => {
               setPage(1);
             }}
             statusOptions={[
-              { value: 'all', label: __('All Status', 'All Status') },
-              { value: 'publish', label: __('Publish', 'Publish') },
-              { value: 'draft', label: __('Draft', 'Draft') },
-              { value: 'trash', label: __('Trash', 'Trash') },
+              { value: 'all', label: __('All Status', 'yatra') },
+              { value: 'publish', label: __('Publish', 'yatra') },
+              { value: 'draft', label: __('Draft', 'yatra') },
+              { value: 'trash', label: __('Trash', 'yatra') },
             ]}
             sortBy={sortBy}
             onSortByChange={(value) => {
@@ -602,15 +602,15 @@ const TravelerCategories: React.FC = () => {
               setPage(1);
             }}
             sortOptions={[
-              { value: 'id', label: __('ID', 'ID') },
-              { value: 'label', label: __('Label', 'Label') },
-              { value: 'status', label: __('Status', 'Status') },
-              { value: 'created_at', label: __('Created At', 'Created At') },
-              { value: 'updated_at', label: __('Updated At', 'Updated At') },
+              { value: 'id', label: __('ID', 'yatra') },
+              { value: 'label', label: __('Label', 'yatra') },
+              { value: 'status', label: __('Status', 'yatra') },
+              { value: 'created_at', label: __('Created At', 'yatra') },
+              { value: 'updated_at', label: __('Updated At', 'yatra') },
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={!!hasFilters}
-            placeholder={__('Search categories...', 'Search categories...')}
+            placeholder={__('Search categories...', 'yatra')}
           />
         </CardContent>
       </Card>
@@ -631,21 +631,21 @@ const TravelerCategories: React.FC = () => {
               setBulkAction('');
             }}
             statusOptions={[
-              { key: 'all', label: __('All', 'All'), count: statusCounts.all },
-              { key: 'publish', label: __('Published', 'Published'), count: statusCounts.publish },
-              { key: 'draft', label: __('Draft', 'Draft'), count: statusCounts.draft },
-              { key: 'trash', label: __('Trash', 'Trash'), count: statusCounts.trash },
+              { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
+              { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish },
+              { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft },
+              { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
             ]}
             showColumnsDropdown={showColumnsDropdown}
             setShowColumnsDropdown={setShowColumnsDropdown}
             columnOptions={[
-              { key: 'category', label: __('Category', 'Category'), visible: visibleColumns.category },
-              { key: 'description', label: __('Description', 'Description'), visible: visibleColumns.description },
-              { key: 'age_range', label: __('Age Range', 'Age Range'), visible: visibleColumns.age_range },
-              { key: 'pricing', label: __('Pricing', 'Pricing'), visible: visibleColumns.pricing },
-              { key: 'status', label: __('Status', 'Status'), visible: visibleColumns.status },
-              { key: 'dates', label: __('Date', 'Date'), visible: visibleColumns.dates },
-              { key: 'author', label: __('Author', 'Author'), visible: visibleColumns.author },
+              { key: 'category', label: __('Category', 'yatra'), visible: visibleColumns.category },
+              { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
+              { key: 'age_range', label: __('Age Range', 'yatra'), visible: visibleColumns.age_range },
+              { key: 'pricing', label: __('Pricing', 'yatra'), visible: visibleColumns.pricing },
+              { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
+              { key: 'dates', label: __('Date', 'yatra'), visible: visibleColumns.dates },
+              { key: 'author', label: __('Author', 'yatra'), visible: visibleColumns.author },
             ]}
             onToggleColumn={(key) => toggleColumnVisibility(key as keyof typeof visibleColumns)}
             bulkMutationPending={bulkMutation.isPending}
@@ -662,7 +662,7 @@ const TravelerCategories: React.FC = () => {
               actions={actions}
               isLoading={isLoading}
               isError={isCategoriesError}
-              errorText={__('Error loading traveler categories', 'Error loading traveler categories')}
+              errorText={__('Error loading traveler categories', 'yatra')}
               errorDescription={__(
                 'We couldn’t connect to the traveler categories service. Please refresh or try again shortly.',
                 'We couldn’t connect to the traveler categories service. Please refresh or try again shortly.'
@@ -670,11 +670,11 @@ const TravelerCategories: React.FC = () => {
               errorDetails={errorContext.details || apiErrorMessage}
               errorRequestInfo={errorContext.requestInfo}
               onRetry={() => queryClient.invalidateQueries({ queryKey: ['traveler-categories'] })}
-              emptyText={__('No traveler categories found', 'No traveler categories found')}
+              emptyText={__('No traveler categories found', 'yatra')}
               emptyDescription={
                 hasFilters
-                  ? __('Try adjusting your filters to see more results.', 'Try adjusting your filters to see more results.')
-                  : __('Get started by creating your first traveler category.', 'Get started by creating your first traveler category.')
+                  ? __('Try adjusting your filters to see more results.', 'yatra')
+                  : __('Get started by creating your first traveler category.', 'yatra')
               }
               onCreateClick={can('yatra_edit_trips') ? handleCreateCategory : undefined}
               onSort={handleSort}
@@ -711,7 +711,7 @@ const TravelerCategories: React.FC = () => {
               totalItems={total}
               itemsPerPage={10}
               onPageChange={(newPage) => setPage(newPage)}
-              itemName={__('categories', 'categories')}
+              itemName={__('categories', 'yatra')}
             />
           </div>
         )}
