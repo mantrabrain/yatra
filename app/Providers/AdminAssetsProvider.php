@@ -187,6 +187,7 @@ class AdminAssetsProvider
         // Localize script with API data, permissions, and translations
         $localized_data = apply_filters('yatra_admin_localized_data', [
             'apiUrl' => rest_url('yatra/v1'),
+            'licenseStatus' => 'inactive',
             'restUrl' => rest_url(),
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
