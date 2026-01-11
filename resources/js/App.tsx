@@ -292,35 +292,29 @@ const App: React.FC = () => {
         return <Settings />;
       case 'modules':
         return <Modules />;
-      case 'yatra-google-calendar':
+      case 'google-calendar':
         return <GoogleCalendar />;
-      case 'yatra-additional-services':
+      case 'additional-services':
         // Check if we're creating or editing a service
         if (action === 'create' || action === 'edit') {
           return <AdditionalServicesForm />;
         }
         return <AdditionalServices />;
-      case 'yatra-trip-consent':
+      case 'trip-consent':
         // Check if we're creating or editing a consent form
         if (action === 'create' || action === 'edit') {
           return <TripConsentForm />;
         }
         return <TripConsent />;
-      case 'yatra-email-automation':
-        // Check if we're editing a template
-        if (action === 'edit') {
-          return <EmailTemplateForm />;
-        }
-        return <EmailAutomation />;
-      case 'yatra-abandoned-recovery':
+      case 'abandoned-recovery':
         return <AbandonedRecovery />;
-      case 'yatra-dynamic-pricing':
-        console.log('Dynamic Pricing Route - Action:', action);
+      case 'dynamic-pricing':
+
         if (action === 'create-pricing-rule' || action === 'edit-pricing-rule') {
-          console.log('Rendering DynamicPricingRuleForm');
+
           return <DynamicPricingRuleForm />;
         }
-        console.log('Rendering DynamicPricing main page');
+
         return <DynamicPricing />;
       case 'license':
         return <License />;
