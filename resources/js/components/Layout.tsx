@@ -43,6 +43,7 @@ import { apiClient } from '../lib/api-client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { useModulesQuery, useToggleModule, type ModuleDefinition } from '../hooks/useModules';
+import { isProPluginActive, isModuleActive } from '../lib/plugin-utils';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -260,10 +261,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         { tab: 'availability', label: 'Availability', icon: CalendarDays },
         // Attributes - FREE feature, always show
         { tab: 'attributes', label: 'Attributes', icon: Tag },
-        // Additional Services - always show, but marked as premium
-        { tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true },
-        // Trip Consent - always show, but marked as premium
-        { tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true },
+        // Additional Services - show only if Pro plugin is active and module is enabled
+        ...(isProPluginActive() && isModuleActive('additional_services') ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
+        // Trip Consent - show only if Pro plugin is active and module is enabled
+        ...(isProPluginActive() && isModuleActive('trip_consent') ? [{ tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true }] : []),
       ]
     },
     { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
@@ -287,12 +288,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
     { subpage: 'reviews', label: 'Reviews', icon: Star },
     { subpage: 'reports', label: 'Reports', icon: BarChart3 },
-    // Email Automation - always show, but marked as premium
-    { subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true },
-    // Abandoned Booking Recovery - always show, but marked as premium
-    { subpage: 'yatra-abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true },
-    // Dynamic Pricing - only show if module is enabled
-    ...((window as any).yatraAdmin?.dynamicPricingEnabled ? [{ subpage: 'yatra-dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
+    // Email Automation - show only if Pro plugin is active and module is enabled
+    ...(isProPluginActive() && isModuleActive('email_automation') ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
+    // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
+    ...(isProPluginActive() && isModuleActive('abandoned_booking_recovery') ? [{ subpage: 'abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true }] : []),
+    // Dynamic Pricing - show only if Pro plugin is active and module is enabled
+    ...(isProPluginActive() && isModuleActive('dynamic_pricing') ? [{ subpage: 'dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
     { subpage: 'modules', label: 'Modules', icon: Puzzle },
     { subpage: 'license', label: 'License', icon: Key },
     { subpage: 'settings', label: 'Settings', icon: Settings },
@@ -424,7 +425,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                   )}
                                   <span className="text-sm">{subItem.label}</span>
                                 </div>
-                                {subItem.isPremium && (
+                                {subItem.isPremium && !isProPluginActive() && (
                                   <div className="absolute inset-y-0 right-2 flex items-center justify-center">
                                     <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center">
                                       <Crown className="w-2.5 h-2.5" />
@@ -450,14 +451,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <Icon className="w-5 h-5" />
                         <span>{item.label}</span>
                       </div>
-                      {item.isPremium && (
+                      {item.isPremium && !isProPluginActive() && (
                         <div className="absolute inset-y-0 right-2 flex items-center justify-center">
                           <div className="w-4 h-4 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center">
                             <Crown className="w-2.5 h-2.5" />
                           </div>
                         </div>
                       )}
-                      {item.subpage === 'license' && (window as any).yatraAdmin?.isPro && licenseStatus && (
+                      {item.subpage === 'license' && isProPluginActive() && licenseStatus && (
                         <Badge 
                           variant={
                             licenseStatus === 'active' ? 'success' :
@@ -686,7 +687,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </header>
 
           {/* License Warning Banner */}
-          {(window as any).yatraAdmin?.isPro && licenseStatus && licenseStatus !== 'active' && (
+          {isProPluginActive() && licenseStatus && licenseStatus !== 'active' && (
             <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-b-2 border-red-500">
               <div className="px-6 py-3">
                 <div className="flex items-center gap-4">
