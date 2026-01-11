@@ -97,7 +97,7 @@ class ModuleManager
                 'tags' => ['email', 'automation', 'templates', 'marketing', 'notifications'],
                 'video_url' => self::DEFAULT_VIDEO_URL,
                 'requires_pro' => true,
-                'settings_page' => 'yatra-email-automation',
+                'settings_page' => 'email-automation',
             ],
             [
                 'slug' => 'dynamic_form_field',
@@ -201,7 +201,7 @@ class ModuleManager
                 'tags' => ['pricing', 'revenue', 'automation', 'discounts', 'sales'],
                 'video_url' => self::DEFAULT_VIDEO_URL,
                 'requires_pro' => true,
-                'settings_page' => 'yatra-dynamic-pricing',
+                'settings_page' => 'dynamic-pricing',
             ],
             [
                 'slug' => 'abandoned_booking_recovery',
@@ -216,7 +216,7 @@ class ModuleManager
                 'tags' => ['recovery', 'email', 'automation', 'marketing', 'conversion'],
                 'video_url' => self::DEFAULT_VIDEO_URL,
                 'requires_pro' => true,
-                'settings_page' => 'yatra-abandoned-recovery',
+                'settings_page' => 'abandoned-recovery',
             ],
         ];
         

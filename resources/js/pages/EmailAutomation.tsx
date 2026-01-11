@@ -33,6 +33,8 @@ import {
   GitBranch,
   Copy,
 } from 'lucide-react';
+import { isProPluginActive } from '../lib/plugin-utils';
+
 
 interface EmailTemplate {
   id: number;
@@ -82,8 +84,11 @@ interface EmailLog {
 }
 
 const isModuleAvailable = (): boolean => {
-  const yatraAdmin = (window as any)?.yatraAdmin;
-  return Boolean(yatraAdmin?.isPro && yatraAdmin?.emailAutomationEnabled);
+  if (!isProPluginActive()) {
+    return false;
+  }
+  const raw = (window as any).yatraAdmin?.emailAutomationEnabled;
+  return raw === true || raw === 'true' || raw === 1 || raw === '1';
 };
 
 const categoryIcons: Record<string, React.ElementType> = {

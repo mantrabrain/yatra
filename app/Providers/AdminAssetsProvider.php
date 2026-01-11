@@ -201,50 +201,7 @@ class AdminAssetsProvider
             'isPro' => defined('YATRA_PRO_VERSION'),
             'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
             'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
-            'showGoogleCalendarSettingsUI' => apply_filters(
-                'yatra_show_google_calendar_settings_ui',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('google_calendar') : false
-            ),
-            'dynamicFormFieldEnabled' => apply_filters(
-                'yatra_dynamic_form_field_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('dynamic_form_field') : false
-            ),
-            'showMailchimpSettingsUI' => apply_filters(
-                'yatra_show_mailchimp_settings_ui',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('mailchimp') : false
-            ),
-            'showFacebookPixelSettingsUI' => apply_filters(
-                'yatra_show_facebook_pixel_settings_ui',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('facebook_pixel') : false
-            ),
-            'showGoogleAnalyticsSettingsUI' => apply_filters(
-                'yatra_show_google_analytics_settings_ui',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('google_analytics') : false
-            ),
-            'abandonedBookingRecoveryEnabled' => apply_filters(
-                'yatra_abandoned_booking_recovery_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('abandoned_booking_recovery') : false
-            ),
-            'dynamicPricingEnabled' => apply_filters(
-                'yatra_dynamic_pricing_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('dynamic_pricing') : false
-            ),
-            'tripConsentEnabled' => apply_filters(
-                'yatra_trip_consent_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('trip_consent') : false
-            ),
-            'additionalServicesEnabled' => apply_filters(
-                'yatra_additional_services_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('additional_services') : false
-            ),
-            'emailAutomationEnabled' => apply_filters(
-                'yatra_email_automation_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('email_automation') : false
-            ),
-            'advancedDiscountEnabled' => apply_filters(
-                'yatra_advanced_discount_enabled',
-                class_exists('\\Yatra\\Core\\Modules\\ModuleManager') ? \Yatra\Core\Modules\ModuleManager::isModuleEnabled('advanced_discount') : false
-            ),
+
             'locale' => get_locale(),
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
