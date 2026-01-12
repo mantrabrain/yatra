@@ -33,7 +33,7 @@ add_filter('wp_title', function ($title) {
     return esc_html($trip->title) . ' - ' . get_bloginfo('name');
 }, 10, 1);
 
-get_header();
+yatra_get_header();
 
 // Calculate pricing data using helper functions
 $pricing_data = yatra_single_trip_calculate_base_price($trip);
@@ -149,4 +149,4 @@ window.yatraTripData = {
 <!-- Enquiry Modal -->
 <?php yatra_get_template('partials/single-trip/enquiry-modal', ['trip' => $trip]); ?>
 
-<?php get_footer(); ?>
+<?php yatra_get_footer(); ?>

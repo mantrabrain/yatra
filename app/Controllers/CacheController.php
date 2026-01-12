@@ -14,6 +14,16 @@ use Yatra\Utils\Cache;
 class CacheController extends BaseController
 {
     /**
+     * Register REST API routes
+     * CacheController uses AJAX instead of REST API routes
+     */
+    public function register_routes(): void
+    {
+        // CacheController uses AJAX handlers, not REST routes
+        // Routes are registered via registerAjaxHandlers() method
+    }
+
+    /**
      * Get cache statistics
      */
     public function getStats(): array
@@ -188,23 +198,121 @@ class CacheController extends BaseController
     }
 
     /**
-     * Check if cache backend is available
+     * Register AJAX handlers for cache management
      */
-    private function isCacheBackendAvailable(): bool
+    public static function registerAjaxHandlers(): void
     {
-        try {
-            $testKey = 'yatra_cache_test_' . time();
-            $testValue = 'test_value';
-            
-            Cache::set($testKey, $testValue, 1);
-            $retrieved = Cache::get($testKey);
-            
-            Cache::delete($testKey);
-            
-            return $retrieved === $testValue;
-            
-        } catch (\Exception $e) {
-            return false;
-        }
+        add_action('wp_ajax_yatra_cache_stats', [self::class, 'handleCacheStats']);
+        add_action('wp_ajax_yatra_cache_clear_all', [self::class, 'handleCacheClearAll']);
+        add_action('wp_ajax_yatra_cache_clear_pattern', [self::class, 'handleCacheClearPattern']);
+        add_action('wp_ajax_yatra_cache_toggle', [self::class, 'handleCacheToggle']);
+        add_action('wp_ajax_yatra_cache_warm', [self::class, 'handleCacheWarm']);
     }
+
+    /**
+     * Handle cache stats AJAX request
+     */
+    public static function handleCacheStats(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        $controller = new self();
+        $result = $controller->getStats();
+        wp_send_json($result);
+    }
+
+    /**
+     * Handle cache clear all AJAX request
+     */
+    public static function handleCacheClearAll(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+
+        $controller = new self();
+        $result = $controller->clearAll();
+        wp_send_json($result);
+    }
+
+    /**
+     * Handle cache clear pattern AJAX request
+     */
+    public static function handleCacheClearPattern(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+
+        $pattern = sanitize_text_field($_POST['pattern'] ?? '');
+        $controller = new self();
+        $result = $controller->clearPattern(['pattern' => $pattern]);
+        wp_send_json($result);
+    }
+
+    /**
+     * Handle cache toggle AJAX request
+     */
+    public static function handleCacheToggle(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+
+        $enabled = isset($_POST['enabled']) ? (bool) $_POST['enabled'] : false;
+        $controller = new self();
+        $result = $controller->toggleCache(['enabled' => $enabled]);
+        wp_send_json($result);
+    }
+
+    /**
+     * Handle cache warm AJAX request
+     */
+    public static function handleCacheWarm(): void
+    {
+        // Verify nonce
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_admin_nonce')) {
+            wp_send_json_error('Invalid nonce');
+            return;
+        }
+
+        // Check capabilities
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Insufficient permissions');
+            return;
+        }
+
+        $controller = new self();
+        $result = $controller->warmCache();
+        wp_send_json($result);
+    }
+
 }

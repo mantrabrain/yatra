@@ -48,6 +48,9 @@ class Bootstrap
         try {
             // Register service providers first
             $this->registerServiceProviders();
+
+            // Load helper functions (must be loaded after autoloader)
+            $this->loadHelperFunctions();
             
             // Initialize cache hooks
             if (class_exists('\Yatra\Hooks\CacheHooks')) {
@@ -61,6 +64,21 @@ class Bootstrap
             // Initialize Setup Wizard Service
             if (class_exists('\Yatra\Services\SetupWizardService')) {
                 \Yatra\Services\SetupWizardService::init();
+            }
+
+            // Initialize Dynamic Pricing Service
+            if (class_exists('\Yatra\Services\DynamicPricingService')) {
+                \Yatra\Services\DynamicPricingService::init();
+            }
+
+            // Register Cache Controller AJAX handlers
+            if (class_exists('\Yatra\Controllers\CacheController')) {
+                \Yatra\Controllers\CacheController::registerAjaxHandlers();
+            }
+
+            // Register Setup Service activation hook
+            if (class_exists('\Yatra\Services\SetupService')) {
+                \Yatra\Services\SetupService::registerActivationHook();
             }
             
             // Initialize Action Scheduler
@@ -93,6 +111,19 @@ class Bootstrap
         }
 
         $this->initialized = true;
+    }
+
+    /**
+     * Load helper functions
+     */
+    private function loadHelperFunctions(): void
+    {
+        $helpersPath = YATRA_PLUGIN_PATH . 'includes/helpers.php';
+        if (file_exists($helpersPath)) {
+            require_once $helpersPath;
+        } else {
+            error_log('Yatra: helpers.php file not found at: ' . $helpersPath);
+        }
     }
 
     /**

@@ -1259,3 +1259,82 @@ function yatra_single_trip_get_group_discounts($trip_id) {
 
 // Hook into WordPress enqueue system
 add_action('wp_enqueue_scripts', 'yatra_enqueue_single_trip_scripts');
+
+if ( ! function_exists( 'yatra_get_header' ) ) {
+    
+function yatra_get_header( $header_name = null ) {
+    global $wp_version;
+    if (
+        version_compare( $wp_version, '5.9', '>=' ) &&
+        function_exists( 'wp_is_block_theme' ) &&
+        wp_is_block_theme()
+    ) {
+        ?>
+        <!doctype html>
+            <html <?php language_attributes(); ?>>
+            <head>
+                <meta charset="<?php bloginfo( 'charset' ); ?>">
+                <?php wp_head(); ?>
+            </head>
+
+            <body <?php body_class(); ?>>
+            <?php wp_body_open(); ?>
+                <div class="wp-site-blocks">
+                    <header class="wp-block-template-part site-header">
+                        <?php block_header_area(); ?>
+                    </header>
+        <?php
+    } else {
+        get_header( $header_name );
+    }
+}
+}
+if ( ! function_exists( 'yatra_block_support_styles' ) ) {
+    function yatra_block_support_styles() {
+        // Bail early if function does not exists.
+        if ( ! function_exists( 'wp_style_engine_get_stylesheet_from_context' ) ) {
+            return;
+        }
+
+        $core_styles_keys         = array( 'block-supports' );
+
+        $compiled_core_stylesheet = '';
+
+        foreach ( $core_styles_keys as $style_key ) {
+            $compiled_core_stylesheet .= wp_style_engine_get_stylesheet_from_context( $style_key, array() );
+        }
+
+        if ( empty( $compiled_core_stylesheet ) ) {
+            return;
+        }
+
+        wp_register_style( 'yatra-block-supports', false );
+        wp_enqueue_style( 'yatra-block-supports' );
+        wp_add_inline_style( 'yatra-block-supports', $compiled_core_stylesheet );
+    }
+}
+
+if ( ! function_exists( 'yatra_get_footer' ) ) {
+
+	function yatra_get_footer( $footer_name = null ) {
+		global $wp_version;
+		if (
+			version_compare( $wp_version, '5.9', '>=' ) &&
+			function_exists( 'wp_is_block_theme' ) &&
+			wp_is_block_theme()
+		) {
+			?>
+			<footer class="wp-block-template-part site-footer">
+			<?php block_footer_area(); ?>
+			</footer>
+			</div>
+            <?php yatra_block_support_styles(); ?>
+			<?php wp_footer(); ?>
+			</body>
+			</html>
+			<?php
+		} else {
+			get_footer( $footer_name );
+		}
+	}
+}

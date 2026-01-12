@@ -17,9 +17,9 @@ if (!defined('ABSPATH')) {
 // Load ActivityService from plugin namespace
 if (!class_exists('Yatra\\Services\\ActivityService')) {
     // If the service is not available for some reason, bail gracefully.
-    get_header();
+    yatra_get_header();
     echo '<p>' . esc_html__('Activity service is not available.', 'yatra') . '</p>';
-    get_footer();
+    yatra_get_footer();
     return;
 }
 
@@ -327,12 +327,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 </script>
 
-<?php
-get_header();
-?>
+<?php yatra_get_header(); ?>
 
-<?php
-get_footer();
-?>
+<?php yatra_get_footer(); ?>
