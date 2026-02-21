@@ -98,7 +98,7 @@ export interface TripFormData {
   trip_story: string;
   video_url: string;
   virtual_tour_url: string;
-  testimonials: string[];
+  testimonial_review_ids: number[]; // Array of review IDs to display as testimonials
   
   // Location & Geography
   destinations: number[]; // Array of destination IDs

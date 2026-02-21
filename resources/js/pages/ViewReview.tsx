@@ -24,7 +24,7 @@ interface ReviewData {
   customer_location?: string;
   rating: number;
   title: string;
-  comment: string;
+  content: string;
   status: string;
   verified: boolean;
   created_at: string;
@@ -58,7 +58,7 @@ const ViewReview: React.FC = () => {
         customer_location: data.customer_location || data.author_location || '',
         rating: data.rating,
         title: data.title || '',
-        comment: data.comment || data.content || '',
+        content: data.content || '',
         status: data.status || 'pending',
         verified: data.verified || false,
         created_at: data.created_at || '',
@@ -330,7 +330,7 @@ const ViewReview: React.FC = () => {
                     {__('Review Comment', 'yatra')}
                   </div>
                   <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                    {review.comment}
+                    {review.content}
                   </div>
                 </div>
               </CardContent>

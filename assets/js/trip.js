@@ -3566,7 +3566,11 @@
       // Initialize visual state based on currently checked rating
       const checkedInput = ratingContainer.querySelector('input:checked');
       if (checkedInput) {
-        updateStars(parseInt(checkedInput.value));
+        const rating = parseInt(checkedInput.value);
+        // Use setTimeout to ensure DOM is fully ready
+        setTimeout(() => {
+          updateStars(rating);
+        }, 0);
       }
 
       // Handle rating changes via input change event

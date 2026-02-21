@@ -76,7 +76,7 @@ const SavedTrips: React.FC<SavedTripsProps> = ({ savedTrips, isLoading }) => {
         <div className="yatra-trip-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
           {savedTrips.map((trip: any) => {
             const tripUrl = trip.permalink || `/trip/${trip.trip_slug || trip.trip_id}`;
-            const imageUrl = trip.trip_image || `${window.yatraAdmin?.pluginUrl || ''}/assets/images/trip-placeholder.svg`;
+            const imageUrl = trip.trip_image || `${window.yatraAdmin?.siteUrl || ''}/wp-content/plugins/yatra/assets/images/trip-placeholder.svg`;
             const hasDiscount = trip.discount_percent && trip.discount_percent > 0;
             const displayPrice = trip.price !== undefined && trip.price !== null 
               ? trip.price 

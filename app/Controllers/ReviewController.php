@@ -192,9 +192,27 @@ class ReviewController extends BaseController
 
         $result = $this->reviewService->getReviews($filters);
 
+        // Map database fields to frontend expected fields
+        $mappedData = array_map(function($review) {
+            return (object) [
+                'id' => $review->id,
+                'trip_id' => $review->trip_id,
+                'trip_title' => $review->trip_title ?? '',
+                'trip_slug' => $review->trip_slug ?? '',
+                'customer_name' => $review->author_name ?? '',
+                'customer_email' => $review->author_email ?? '',
+                'rating' => $review->rating,
+                'title' => $review->title ?? '',
+                'content' => $review->content ?? '',
+                'status' => $review->status,
+                'verified' => false, // TODO: Add verified field to database
+                'created_at' => $review->created_at,
+            ];
+        }, $result['data']);
+
         return new WP_REST_Response([
             'success' => true,
-            'data' => $result['data'],
+            'data' => $mappedData,
             'meta' => [
                 'total' => $result['total'],
                 'page' => $result['page'],

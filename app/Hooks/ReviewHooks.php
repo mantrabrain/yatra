@@ -34,7 +34,7 @@ class ReviewHooks
     public static function handleReviewSubmission(): void
     {
         // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_review_nonce')) {
+        if (!wp_verify_nonce($_POST['yatra_review_nonce'] ?? '', 'yatra_submit_review')) {
             wp_send_json_error(['message' => __('Security check failed.', 'yatra')]);
         }
 

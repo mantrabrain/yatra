@@ -29,7 +29,7 @@ interface Review {
   customer_email: string;
   rating: number;
   title: string;
-  comment: string;
+  content: string;
   status: string;
   verified: boolean;
   created_at: string;
@@ -596,7 +596,7 @@ const Reviews: React.FC = () => {
                       {review.title}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                      {review.comment}
+                      {review.content}
                     </div>
                   </div>
                 ),

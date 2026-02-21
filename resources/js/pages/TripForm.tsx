@@ -59,6 +59,7 @@ import { ItinerarySection } from '../components/trip-form/sections/ItinerarySect
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { useToast } from '../components/ui/toast';
 import { MultiSelect } from '../components/ui/multi-select';
+import { TestimonialsSelector } from '../components/trip-form/TestimonialsSelector';
 import { getErrorContext } from '../lib/errors';
 
 type SectionId = 
@@ -216,7 +217,7 @@ interface TripFormData {
   trip_story: string; // Trip Story/Narrative
   video_url: string; // Video Embed URL
   virtual_tour_url: string; // 360° Virtual Tour URL
-  testimonials: string[]; // Testimonials Integration
+  testimonial_review_ids: number[]; // Array of review IDs to display as testimonials
   
   // Location & Geography
   destinations: number[]; // Array of destination IDs
@@ -450,7 +451,7 @@ const TripForm: React.FC = () => {
       trip_story: 'Imagine waking up to the gentle sound of waves lapping against the shore. As the sun rises over the horizon, you step onto your private balcony to witness a breathtaking sunrise. Your day begins with a traditional Balinese breakfast before heading out to explore ancient temples that have stood for centuries. In the afternoon, you find yourself surrounded by emerald-green rice terraces, learning about traditional farming methods from local farmers. As evening approaches, you\'re treated to a mesmerizing cultural dance performance followed by a candlelit dinner on the beach. This is more than a vacation—it\'s a journey into the heart and soul of Bali.',
       video_url: 'https://www.youtube.com/watch?v=example1',
       virtual_tour_url: '',
-      testimonials: ['Amazing experience! The beaches were pristine and the cultural tours were eye-opening.', 'Best trip ever! Perfect balance of relaxation and adventure.', 'The spa treatments were incredible and the guides were so knowledgeable.'],
+      testimonial_review_ids: [], // Will be populated from actual reviews
       destinations: [], // Will be populated based on available destinations
       starting_location: 'Ngurah Rai International Airport (DPS)',
       ending_location: 'Seminyak Beach Resort',
@@ -557,7 +558,7 @@ const TripForm: React.FC = () => {
       trip_story: 'The crisp mountain air fills your lungs as you take your first steps on the trail. With each passing day, the mountains grow larger, the air thinner, and the sense of accomplishment greater. You wake before dawn to witness the sun painting the peaks in shades of gold and pink. You share meals with Sherpa families, learning about their way of life and the challenges they face in this harsh yet beautiful environment. As you approach Base Camp, the anticipation builds. When you finally arrive, standing at 5,364 meters with Everest towering above, you realize this is more than a trek—it\'s a transformation. The journey changes you, teaching resilience, appreciation for nature, and respect for the mountains and the people who call them home.',
       video_url: 'https://www.youtube.com/watch?v=example2',
       virtual_tour_url: '',
-      testimonials: ['Life-changing experience! The guides were incredible and the views were absolutely breathtaking.', 'Challenging but so rewarding. Made it to Base Camp and it was worth every step.', 'The best adventure of my life. The organization was perfect and the support team was amazing.'],
+      testimonial_review_ids: [], // Will be populated from actual reviews
       destinations: [], // Will be populated
       starting_location: 'Kathmandu International Airport',
       ending_location: 'Lukla Airport',
@@ -661,7 +662,7 @@ const TripForm: React.FC = () => {
       trip_story: 'Your European adventure begins as you step off the plane in Paris, greeted by the elegant architecture and romantic atmosphere that has inspired artists for centuries. Each day brings new discoveries—from the artistic treasures of the Louvre to the bohemian charm of Montmartre. In Rome, you walk in the footsteps of emperors and gladiators, feeling the weight of history in every ancient stone. The Vatican\'s art and architecture leave you in awe, while a simple plate of pasta in a local trattoria reminds you that the best experiences are often the simplest. Barcelona welcomes you with its unique blend of Gothic and Modernist architecture, vibrant street life, and Mediterranean warmth. As you watch the sunset from Park Güell, you realize that this journey has not just shown you three cities—it has shown you three different ways of living, three different approaches to art and culture, and three different reasons to fall in love with Europe.',
       video_url: 'https://www.youtube.com/watch?v=example3',
       virtual_tour_url: '',
-      testimonials: ['Amazing tour! We saw so much in 10 days and the guides were fantastic.', 'Perfect blend of history, culture, and fun. Highly recommend!', 'The accommodations were excellent and the itinerary was well-planned.'],
+      testimonial_review_ids: [], // Will be populated from actual reviews
       destinations: [],
       starting_location: 'Charles de Gaulle Airport (CDG)',
       ending_location: 'El Prat Airport (BCN)',
@@ -765,7 +766,7 @@ const TripForm: React.FC = () => {
     trip_story: '',
     video_url: '',
     virtual_tour_url: '',
-    testimonials: [],
+    testimonial_review_ids: [],
     destinations: [], // Array of destination IDs
     starting_location: '',
     ending_location: '',
@@ -1318,7 +1319,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         trip_story: tripData.trip_story || '',
         video_url: tripData.video_url || '',
         virtual_tour_url: tripData.virtual_tour_url || '',
-        testimonials: Array.isArray(tripData.testimonials) ? tripData.testimonials : [],
+        testimonial_review_ids: Array.isArray(tripData.testimonial_review_ids) ? tripData.testimonial_review_ids : [],
         destinations: extractIds(tripData.destinations || []),
         starting_location: tripData.starting_location || '',
         ending_location: tripData.ending_location || '',
@@ -1947,7 +1948,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       gallery_images: dummyData.gallery_images || [],
       itinerary_days: dummyData.itinerary_days || [],
       tags: dummyData.tags || [],
-      testimonials: dummyData.testimonials || [],
+      testimonial_review_ids: dummyData.testimonial_review_ids || [],
       countries: dummyData.countries || [],
       regions: dummyData.regions || [],
       landmarks: dummyData.landmarks || [],
@@ -2175,7 +2176,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         trip_story: data.trip_story.trim(),
         video_url: data.video_url.trim(),
         virtual_tour_url: data.virtual_tour_url.trim(),
-        testimonials: data.testimonials || [],
+        testimonial_review_ids: data.testimonial_review_ids || [],
         destinations: data.destinations || [], // Array of destination IDs
         starting_location: data.starting_location.trim(),
         ending_location: data.ending_location.trim(),
@@ -3892,60 +3893,12 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 </CardContent>
               </Card>
 
-              {/* Testimonials */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>{__('Testimonials', 'yatra')}</CardTitle>
-                  <CardDescription>
-                    {__('Add customer testimonials or reviews to build trust', 'yatra')}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {formData.testimonials.length > 0 ? (
-                    <div className="space-y-2">
-                      {formData.testimonials.map((testimonial, index) => (
-                        <div key={index} className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-                          <span className="flex-1 text-sm text-gray-900 dark:text-white">{testimonial}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              const newTestimonials = [...formData.testimonials];
-                              newTestimonials.splice(index, 1);
-                              handleFieldChange('testimonials', newTestimonials);
-                            }}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                      <FileText className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-                        {__('No testimonials added yet', 'yatra')}
-                      </p>
-                    </div>
-                  )}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      const text = prompt(__('Enter testimonial text:', 'yatra'));
-                      if (text && text.trim()) {
-                        handleFieldChange('testimonials', [...formData.testimonials, text.trim()]);
-                      }
-                    }}
-                    className="w-full"
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    {__('Add Testimonial', 'yatra')}
-                  </Button>
-                </CardContent>
-              </Card>
+              {/* Testimonials - Select from Reviews */}
+              <TestimonialsSelector
+                tripId={tripId}
+                selectedReviewIds={formData.testimonial_review_ids}
+                onChange={(reviewIds) => handleFieldChange('testimonial_review_ids', reviewIds)}
+              />
             </div>
           </div>
         );

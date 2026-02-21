@@ -121,6 +121,7 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `featured_image` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'WordPress attachment ID',
     `video_url` varchar(500) DEFAULT NULL,
     `virtual_tour_url` varchar(500) DEFAULT NULL,
+    `testimonial_review_ids` text COMMENT 'JSON array of review IDs to display as testimonials',
     
     -- SEO (Form Fields)
     `meta_title` varchar(255) DEFAULT NULL,

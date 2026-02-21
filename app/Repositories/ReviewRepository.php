@@ -507,32 +507,32 @@ class ReviewRepository extends BaseRepository
             $prepared['rating'] = max(1, min(5, (int) $data['rating']));
         }
 
-        if (array_key_exists('review_text', $data)) {
-            $prepared['review_text'] = sanitize_textarea_field((string) $data['review_text']);
+        if (array_key_exists('title', $data)) {
+            $prepared['title'] = sanitize_text_field((string) $data['title']);
         }
 
-        if (array_key_exists('reviewer_name', $data)) {
-            $prepared['reviewer_name'] = sanitize_text_field((string) $data['reviewer_name']);
+        if (array_key_exists('content', $data)) {
+            $prepared['content'] = sanitize_textarea_field((string) $data['content']);
         }
 
-        if (array_key_exists('reviewer_email', $data)) {
-            $prepared['reviewer_email'] = sanitize_email((string) $data['reviewer_email']);
+        if (array_key_exists('author_name', $data)) {
+            $prepared['author_name'] = sanitize_text_field((string) $data['author_name']);
+        }
+
+        if (array_key_exists('author_email', $data)) {
+            $prepared['author_email'] = sanitize_email((string) $data['author_email']);
+        }
+
+        if (array_key_exists('author_location', $data)) {
+            $prepared['author_location'] = sanitize_text_field((string) $data['author_location']);
         }
 
         if (array_key_exists('status', $data)) {
             $prepared['status'] = sanitize_text_field((string) $data['status']);
         }
 
-        if (array_key_exists('admin_response', $data)) {
-            $prepared['admin_response'] = sanitize_textarea_field((string) $data['admin_response']);
-        }
-
-        if (array_key_exists('responded_by', $data)) {
-            $prepared['responded_by'] = (int) $data['responded_by'];
-        }
-
-        if (array_key_exists('responded_at', $data) && $data['responded_at']) {
-            $prepared['responded_at'] = sanitize_text_field($data['responded_at']);
+        if (array_key_exists('helpful_count', $data)) {
+            $prepared['helpful_count'] = (int) $data['helpful_count'];
         }
 
         return $prepared;
