@@ -30,24 +30,38 @@ if (!defined('ABSPATH')) {
     // Determine hero images
     // 1. If featured image is set, use it as main image
     // 2. If no featured image, use first gallery image as main
-    // 3. Side images are gallery images 2, 3, 4 (indices 1, 2, 3)
-    $gallery_images = $trip->gallery_images ?? [];
+    // 3. Side images are gallery images (up to 3)
+    
+    // Gallery images are already URLs from SingleTripController
+    $gallery_image_urls = isset($trip->gallery_images) && is_array($trip->gallery_images) ? $trip->gallery_images : [];
+    
     $has_featured = !empty($trip->featured_image_url);
 
     // Main image: featured image OR first gallery image
     $main_image_url = '';
     if ($has_featured) {
         $main_image_url = $trip->featured_image_url;
-        // If featured is set, side images start from index 0
-        $side_images = array_slice($gallery_images, 0, 3);
+        // If featured is set, side images are first 3 gallery images
+        $side_images = array_slice($gallery_image_urls, 0, 3);
     } else {
         // No featured image - use first gallery as main
-        $main_image_url = !empty($gallery_images[0]) ? $gallery_images[0] : '';
+        $main_image_url = !empty($gallery_image_urls[0]) ? $gallery_image_urls[0] : '';
         // Side images start from index 1
-        $side_images = array_slice($gallery_images, 1, 3);
+        $side_images = array_slice($gallery_image_urls, 1, 3);
     }
 
-    $total_images = count($gallery_images) + ($has_featured ? 1 : 0);
+    // Create combined gallery array for modal (featured + gallery images)
+    $all_gallery_images = [];
+    if ($has_featured) {
+        $all_gallery_images[] = $main_image_url;
+    }
+    $all_gallery_images = array_merge($all_gallery_images, $gallery_image_urls);
+    
+    // Set global variable for content-gallery template
+    global $yatra_hero_gallery_images;
+    $yatra_hero_gallery_images = $all_gallery_images;
+    
+    $total_images = count($all_gallery_images);
     ?>
     <div class="yatra-hero-images">
         <div class="yatra-hero-main-image">
@@ -56,21 +70,116 @@ if (!defined('ABSPATH')) {
                     %
                 </div>
             <?php endif; ?>
+            
+            <!-- Media Badges -->
+            <div class="yatra-hero-media-badges">
+                <?php 
+                $image_count = count($all_gallery_images);
+                $video_count = count($trip->videos ?? []);
+                $youtube_count = count($trip->youtube_videos ?? []);
+                $tour_count = count($trip->virtual_tours ?? []);
+                $doc_count = count($trip->documents ?? []);
+                
+                if ($image_count > 0): ?>
+                    <span class="yatra-media-badge yatra-media-badge-image">
+                        <?php echo yatra_svg_icon('camera', 'yatra-media-badge-icon'); ?>
+                        <span class="yatra-media-badge-count"><?php echo esc_html($image_count); ?></span>
+                    </span>
+                <?php endif; ?>
+                
+                <?php if ($video_count > 0): ?>
+                    <span class="yatra-media-badge yatra-media-badge-video">
+                        <?php echo yatra_svg_icon('play', 'yatra-media-badge-icon'); ?>
+                        <span class="yatra-media-badge-count"><?php echo esc_html($video_count); ?></span>
+                    </span>
+                <?php endif; ?>
+                
+                <?php if ($youtube_count > 0): ?>
+                    <span class="yatra-media-badge yatra-media-badge-youtube">
+                        <?php echo yatra_svg_icon('video', 'yatra-media-badge-icon'); ?>
+                        <span class="yatra-media-badge-count"><?php echo esc_html($youtube_count); ?></span>
+                    </span>
+                <?php endif; ?>
+                
+                <?php if ($tour_count > 0): ?>
+                    <span class="yatra-media-badge yatra-media-badge-tour">
+                        <?php echo yatra_svg_icon('globe', 'yatra-media-badge-icon'); ?>
+                        <span class="yatra-media-badge-count"><?php echo esc_html($tour_count); ?></span>
+                    </span>
+                <?php endif; ?>
+                
+                <?php if ($doc_count > 0): ?>
+                    <span class="yatra-media-badge yatra-media-badge-document">
+                        <?php echo yatra_svg_icon('file-text', 'yatra-media-badge-icon'); ?>
+                        <span class="yatra-media-badge-count"><?php echo esc_html($doc_count); ?></span>
+                    </span>
+                <?php endif; ?>
+            </div>
+            
             <?php if (!empty($main_image_url)): ?>
-                <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>"
-                     class="yatra-hero-main-img">
+                <a href="#" class="yatra-hero-main-img-link" data-gallery="hero-gallery" data-image-index="0">
+                    <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>"
+                         class="yatra-hero-main-img">
+                </a>
             <?php else: ?>
                 <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
                      alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
             <?php endif; ?>
-            <a href="#yatra-booking-widget" class="yatra-hero-book-now-btn">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                </svg>
-                <?php echo esc_html__('Book Now', 'yatra'); ?>
-                - <?php echo esc_html(yatra_format_price($base_price)); ?>
-            </a>
+            
+            <!-- Quick Media Switcher -->
+            <div class="yatra-hero-media-switcher">
+                <button type="button" class="yatra-media-switcher-btn yatra-media-switcher-active" data-media="images">
+                    <?php echo yatra_svg_icon('camera', 'yatra-media-switcher-icon'); ?>
+                    <span>Images</span>
+                </button>
+                <?php if ($video_count > 0): ?>
+                    <button type="button" class="yatra-media-switcher-btn" data-media="videos">
+                        <?php echo yatra_svg_icon('play', 'yatra-media-switcher-icon'); ?>
+                        <span>Videos</span>
+                    </button>
+                <?php endif; ?>
+                <?php if ($youtube_count > 0): ?>
+                    <button type="button" class="yatra-media-switcher-btn" data-media="youtube">
+                        <?php echo yatra_svg_icon('video', 'yatra-media-switcher-icon'); ?>
+                    <span>Video</span>
+                    </button>
+                <?php endif; ?>
+                <?php if ($tour_count > 0): ?>
+                    <button type="button" class="yatra-media-switcher-btn" data-media="tours">
+                        <?php echo yatra_svg_icon('globe', 'yatra-media-switcher-icon'); ?>
+                    <span>360°</span>
+                    </button>
+                <?php endif; ?>
+                <?php if ($doc_count > 0): ?>
+                    <button type="button" class="yatra-media-switcher-btn" data-media="documents">
+                        <?php echo yatra_svg_icon('file-text', 'yatra-media-switcher-icon'); ?>
+                        <span>Documents</span>
+                    </button>
+                <?php endif; ?>
+            </div>
+            
+            <!-- Media Data for JavaScript -->
+            <script type="application/json" id="yatra-hero-media-data">
+                <?php echo json_encode([
+                    'images' => $all_gallery_images,
+                    'videos' => $trip->videos ?? [],
+                    'youtube_videos' => $trip->youtube_videos ?? [],
+                    'virtual_tours' => $trip->virtual_tours ?? [],
+                    'documents' => $trip->documents ?? []
+                ]); ?>
+            </script>
+            
+            <!-- Book Now Button on Right Side of Main Image -->
+            <div class="yatra-hero-book-now-container">
+                <a href="#yatra-booking-widget" class="yatra-hero-book-now-btn">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <?php echo esc_html__('Book Now', 'yatra'); ?>
+                    - <?php echo esc_html(yatra_format_price($base_price)); ?>
+                </a>
+            </div>
         </div>
         <div class="yatra-hero-side-images">
             <?php if (!empty($side_images)): ?>
@@ -102,3 +211,4 @@ if (!defined('ABSPATH')) {
         </div>
     </div>
 </div>
+</section>

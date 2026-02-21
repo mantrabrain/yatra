@@ -156,6 +156,57 @@ class SingleTripController
         // Gallery images from separate table (with attachment IDs)
         $trip->gallery_images = $this->getGalleryImages((int) $trip->id);
         
+        // Get videos, YouTube videos, virtual tours, and documents from TripContentTable
+        $trip->videos = $this->getVideos((int) $trip->id);
+        $trip->youtube_videos = $this->getYoutubeVideos((int) $trip->id);
+        $trip->virtual_tours = $this->getVirtualTours((int) $trip->id);
+        $trip->documents = $this->getDocuments((int) $trip->id);
+        
+        // Also check main trip table fields for YouTube videos and virtual tours
+        $youtube_from_table = [];
+        if (!empty($trip->video_url)) {
+            $video_id = $this->extractYoutubeVideoId($trip->video_url);
+            $youtube_from_table[] = [
+                'id' => 'main_' . $trip->id,
+                'title' => $trip->title ?? '',
+                'description' => '',
+                'url' => $trip->video_url,
+                'thumbnail' => $video_id ? "https://img.youtube.com/vi/{$video_id}/maxresdefault.jpg" : '',
+                'video_id' => $video_id,
+                'duration' => '',
+                'embed_url' => $video_id ? "https://www.youtube.com/embed/{$video_id}" : ''
+            ];
+        }
+        
+        $tours_from_table = [];
+        if (!empty($trip->virtual_tour_url)) {
+            $tours_from_table[] = [
+                'id' => 'main_' . $trip->id,
+                'title' => $trip->title ?? '360° Virtual Tour',
+                'description' => '',
+                'url' => $trip->virtual_tour_url,
+                'thumbnail' => '',
+                'tour_type' => '360',
+                'is_embeddable' => false
+            ];
+        }
+        
+        // Merge TripContentTable results with main table results
+        $trip->youtube_videos = array_merge($trip->youtube_videos, $youtube_from_table);
+        $trip->virtual_tours = array_merge($trip->virtual_tours, $tours_from_table);
+        
+        // Debug logging
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('Yatra Media Debug: Trip ID ' . $trip->id . ' - Media counts:');
+            error_log('  - Images: ' . count($trip->gallery_images ?? []));
+            error_log('  - Videos: ' . count($trip->videos ?? []));
+            error_log('  - YouTube Videos: ' . count($trip->youtube_videos ?? []));
+            error_log('  - Virtual Tours: ' . count($trip->virtual_tours ?? []));
+            error_log('  - Documents: ' . count($trip->documents ?? []));
+            error_log('  - Main table video_url: ' . ($trip->video_url ?? 'none'));
+            error_log('  - Main table virtual_tour_url: ' . ($trip->virtual_tour_url ?? 'none'));
+        }
+        
         // Get price types from database table (for traveler-based pricing)
         $trip->price_types = $this->getPriceTypes((int) $trip->id);
         
@@ -585,19 +636,22 @@ class SingleTripController
             )
         ) ?: [];
         
-        // Convert to array of URLs (using attachment ID when available)
+        // Convert to array of URLs
         $gallery = [];
         foreach ($images as $img) {
             $url = '';
             
-            // If we have an attachment ID, get the URL from WordPress
-            if (!empty($img->image_id) && $img->image_id > 0) {
-                $url = wp_get_attachment_url((int) $img->image_id);
+            // Check metadata for attachment_id (stored as JSON)
+            if (!empty($img->metadata)) {
+                $metadata = json_decode($img->metadata, true);
+                if (is_array($metadata) && !empty($metadata['attachment_id'])) {
+                    $url = wp_get_attachment_image_url((int) $metadata['attachment_id'], 'large');
+                }
             }
             
-            // Fallback to stored URL
-            if (empty($url) && !empty($img->image_url)) {
-                $url = $img->image_url;
+            // Fallback to content_url field (direct URL)
+            if (empty($url) && !empty($img->content_url)) {
+                $url = $img->content_url;
             }
             
             if (!empty($url)) {
@@ -606,6 +660,283 @@ class SingleTripController
         }
         
         return $gallery;
+    }
+
+    /**
+     * Get videos for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Videos with URLs and metadata
+     */
+    private function getVideos(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $videos = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'video'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        $video_list = [];
+        foreach ($videos as $video) {
+            $video_data = [
+                'id' => $video->id,
+                'title' => $video->title ?? '',
+                'description' => $video->description ?? '',
+                'url' => $video->content_url ?? '',
+                'thumbnail' => $video->thumbnail_url ?? '',
+                'duration' => '',
+                'file_size' => $video->file_size ?? 0
+            ];
+            
+            // Parse metadata for additional info
+            if (!empty($video->metadata)) {
+                $metadata = json_decode($video->metadata, true);
+                if (is_array($metadata)) {
+                    $video_data['duration'] = $metadata['duration'] ?? '';
+                    $video_data['file_size'] = $metadata['file_size'] ?? $video_data['file_size'];
+                }
+            }
+            
+            if (!empty($video_data['url'])) {
+                $video_list[] = $video_data;
+            }
+        }
+        
+        return $video_list;
+    }
+
+    /**
+     * Get documents for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Documents with URLs and metadata
+     */
+    private function getDocuments(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $documents = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'document'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        $document_list = [];
+        foreach ($documents as $doc) {
+            $doc_data = [
+                'id' => $doc->id,
+                'title' => $doc->title ?? '',
+                'description' => $doc->description ?? '',
+                'url' => $doc->content_url ?? '',
+                'file_path' => $doc->file_path ?? '',
+                'file_size' => $doc->file_size ?? 0,
+                'file_type' => $doc->file_type ?? '',
+                'is_downloadable' => (bool) ($doc->is_downloadable ?? true)
+            ];
+            
+            if (!empty($doc_data['url']) || !empty($doc_data['file_path'])) {
+                $document_list[] = $doc_data;
+            }
+        }
+        
+        return $document_list;
+    }
+
+    /**
+     * Get YouTube videos for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array YouTube videos with URLs and metadata
+     */
+    private function getYoutubeVideos(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        // Debug: Check what content types exist for this trip
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            $all_content = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT content_type, COUNT(*) as count FROM {$tripContentTable} 
+                     WHERE trip_id = %d 
+                     GROUP BY content_type",
+                    $trip_id
+                )
+            );
+            error_log('Yatra Media Debug: Trip ID ' . $trip_id . ' - Content types in database:');
+            foreach ($all_content as $content) {
+                error_log('  - ' . $content->content_type . ': ' . $content->count);
+            }
+        }
+        
+        $youtube_videos = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'youtube'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        $video_list = [];
+        foreach ($youtube_videos as $video) {
+            $video_data = [
+                'id' => $video->id,
+                'title' => $video->title ?? '',
+                'description' => $video->description ?? '',
+                'url' => $video->content_url ?? '',
+                'thumbnail' => $video->thumbnail_url ?? '',
+                'video_id' => '',
+                'duration' => ''
+            ];
+            
+            // Extract YouTube video ID from URL
+            if (!empty($video_data['url'])) {
+                $video_id = $this->extractYoutubeVideoId($video_data['url']);
+                if ($video_id) {
+                    $video_data['video_id'] = $video_id;
+                    $video_data['thumbnail'] = $video_data['thumbnail'] ?: "https://img.youtube.com/vi/{$video_id}/maxresdefault.jpg";
+                    $video_data['embed_url'] = "https://www.youtube.com/embed/{$video_id}";
+                }
+            }
+            
+            // Parse metadata for additional info
+            if (!empty($video->metadata)) {
+                $metadata = json_decode($video->metadata, true);
+                if (is_array($metadata)) {
+                    $video_data['duration'] = $metadata['duration'] ?? $video_data['duration'];
+                }
+            }
+            
+            if (!empty($video_data['url'])) {
+                $video_list[] = $video_data;
+            }
+        }
+        
+        return $video_list;
+    }
+
+    /**
+     * Get virtual tours (360°) for trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Virtual tours with URLs and metadata
+     */
+    private function getVirtualTours(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $virtual_tours = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'virtual_tour'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        ) ?: [];
+        
+        $tour_list = [];
+        foreach ($virtual_tours as $tour) {
+            $tour_data = [
+                'id' => $tour->id,
+                'title' => $tour->title ?? '',
+                'description' => $tour->description ?? '',
+                'url' => $tour->content_url ?? '',
+                'thumbnail' => $tour->thumbnail_url ?? '',
+                'tour_type' => '360',
+                'is_embeddable' => false
+            ];
+            
+            // Parse metadata for additional info
+            if (!empty($tour->metadata)) {
+                $metadata = json_decode($tour->metadata, true);
+                if (is_array($metadata)) {
+                    $tour_data['tour_type'] = $metadata['tour_type'] ?? '360';
+                    $tour_data['is_embeddable'] = $metadata['is_embeddable'] ?? false;
+                }
+            }
+            
+            if (!empty($tour_data['url'])) {
+                $tour_list[] = $tour_data;
+            }
+        }
+        
+        return $tour_list;
+    }
+
+    /**
+     * Extract YouTube video ID from URL
+     *
+     * @param string $url YouTube URL
+     * @return string|null Video ID or null if not found
+     */
+    private function extractYoutubeVideoId(string $url): ?string
+    {
+        $patterns = [
+            '/youtube\.com\/watch\?v=([^&]+)/',
+            '/youtube\.com\/embed\/([^?]+)/',
+            '/youtu\.be\/([^?]+)/',
+            '/youtube\.com\/v\/([^?]+)/'
+        ];
+        
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $url, $matches)) {
+                return $matches[1];
+            }
+        }
+        
+        return null;
     }
 
     /**

@@ -13,6 +13,9 @@ class TripAssetManager extends BaseAssetManager
     {
         parent::__construct('trip');
 
+        // Video player and tour viewer modules are loaded in FrontendAssetsProvider
+        
+        // Add main trip styles and scripts
         $this->addStyle('yatra-trip-single');
         $this->addScript('yatra-trip-single');
 

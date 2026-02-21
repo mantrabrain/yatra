@@ -1053,6 +1053,29 @@ class Trip
     }
 
     /**
+     * Get gallery image URLs from attachment IDs
+     */
+    public function getGalleryImageUrls(): array
+    {
+        $urls = [];
+        
+        if (empty($this->gallery_images) || !is_array($this->gallery_images)) {
+            return $urls;
+        }
+        
+        foreach ($this->gallery_images as $attachment_id) {
+            if (is_numeric($attachment_id)) {
+                $url = wp_get_attachment_image_url((int) $attachment_id, 'large');
+                if ($url) {
+                    $urls[] = $url;
+                }
+            }
+        }
+        
+        return $urls;
+    }
+
+    /**
      * Get trip permalink
      */
     public function getPermalink(): string

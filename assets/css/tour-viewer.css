@@ -1,0 +1,225 @@
+/**
+ * Yatra 360° Tour Viewer Module Styles
+ * Reusable 360° tour viewer styling
+ * 
+ * @package Yatra
+ * @version 1.0.0
+ */
+
+/* Tour Viewer Modal */
+.yatra-tour-viewer-modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 99999 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: yatraTourFadeIn 0.3s ease;
+}
+
+.yatra-tour-viewer-modal[style*="display: flex"] {
+    display: flex !important;
+}
+
+@keyframes yatraTourFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.yatra-tour-viewer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    cursor: pointer;
+}
+
+.yatra-tour-viewer-content {
+    position: relative !important;
+    width: 95% !important;
+    max-width: 1400px !important;
+    height: 90vh !important;
+    z-index: 2 !important;
+}
+
+.yatra-tour-viewer-close {
+    position: absolute !important;
+    top: 16px !important;
+    right: 70px !important;
+    background: rgba(16, 185, 129, 0.3) !important;
+    border: 2px solid rgba(16, 185, 129, 0.6) !important;
+    color: white !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s ease;
+    z-index: 100 !important;
+}
+
+.yatra-tour-viewer-close:hover {
+    background: rgba(16, 185, 129, 0.3);
+    border-color: rgba(16, 185, 129, 0.7);
+    transform: rotate(90deg) scale(1.1);
+}
+
+.yatra-tour-viewer-close svg {
+    width: 24px;
+    height: 24px;
+}
+
+.yatra-tour-viewer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 12px 12px 0 0;
+    backdrop-filter: blur(10px);
+}
+
+.yatra-tour-viewer-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+}
+
+.yatra-tour-viewer-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.yatra-tour-viewer-fullscreen {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.yatra-tour-viewer-fullscreen:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.yatra-tour-viewer-wrapper {
+    width: 100%;
+    height: calc(100% - 68px);
+    background: #000;
+    border-radius: 0 0 12px 12px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.yatra-tour-viewer-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Fullscreen Mode */
+.yatra-tour-viewer-wrapper:fullscreen {
+    border-radius: 0;
+}
+
+.yatra-tour-viewer-wrapper:-webkit-full-screen {
+    border-radius: 0;
+}
+
+.yatra-tour-viewer-wrapper:-moz-full-screen {
+    border-radius: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .yatra-tour-viewer-content {
+        width: 98%;
+        height: 85vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-tour-viewer-content {
+        width: 100%;
+        height: 100vh;
+    }
+    
+    .yatra-tour-viewer-close {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0, 0, 0, 0.7);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .yatra-tour-viewer-close svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .yatra-tour-viewer-header {
+        padding: 12px 16px;
+        border-radius: 0;
+    }
+    
+    .yatra-tour-viewer-title {
+        font-size: 16px;
+    }
+    
+    .yatra-tour-viewer-wrapper {
+        border-radius: 0;
+        height: calc(100% - 56px);
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-tour-viewer-title {
+        font-size: 14px;
+    }
+    
+    .yatra-tour-viewer-fullscreen {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+/* Loading State */
+.yatra-tour-viewer-wrapper.loading::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    border: 4px solid rgba(16, 185, 129, 0.3);
+    border-top-color: #10b981;
+    border-radius: 50%;
+    animation: yatraTourSpin 0.8s linear infinite;
+    z-index: 1;
+}
+
+@keyframes yatraTourSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}

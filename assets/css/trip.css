@@ -378,9 +378,6 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-hero-book-now-btn {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
     background: #10b981;
     color: #fff;
     border: none;
@@ -4979,8 +4976,6 @@ input.yatra-datepicker,
     }
 
     .yatra-hero-book-now-btn {
-        bottom: 12px;
-        left: 12px;
         padding: 12px 20px;
         font-size: 14px;
     }

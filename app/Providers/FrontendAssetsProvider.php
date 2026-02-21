@@ -75,6 +75,8 @@ class FrontendAssetsProvider
             'activity' => 'activity.css',
             'destination' => 'destination.css',
             'yatra-capacity' => 'yatra-capacity.css',
+            'video-player' => 'video-player.css',
+            'tour-viewer' => 'tour-viewer.css',
         ];
 
         foreach ($cssFiles as $handle => $filename) {
@@ -98,6 +100,8 @@ class FrontendAssetsProvider
     private function enqueueCommonJs(): void
     {
         $jsFiles = [
+            'video-player' => 'video-player.js',
+            'tour-viewer' => 'tour-viewer.js',
             'booking' => 'booking.js',
             'listing' => 'listing.js',
             'listing-filters' => 'listing-filters.js',

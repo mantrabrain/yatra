@@ -278,6 +278,543 @@
           }
         });
       });
+
+      // Open from main image link
+      const mainImageLink = document.querySelector('.yatra-hero-main-img-link');
+      if (mainImageLink) {
+        mainImageLink.addEventListener('click', (e) => {
+          // Check if gallery should be prevented (for non-image media types)
+          if (mainImageLink.getAttribute('data-prevent-gallery') === 'true') {
+            // Don't prevent default - let the overlay handle the click
+            return;
+          }
+          e.preventDefault();
+          this.open(0); // Open with featured image as first image
+        });
+      }
+    }
+  }
+
+  /**
+   * Hero Media Switcher Class
+   * Handles media type switching in the hero section
+   */
+  class HeroMediaSwitcher {
+    constructor() {
+      this.currentMediaType = 'images';
+      this.mediaData = null;
+      this.init();
+    }
+
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setup());
+      } else {
+        this.setup();
+      }
+    }
+
+    setup() {
+      // Get media data from JSON script
+      const mediaDataScript = document.getElementById('yatra-hero-media-data');
+      if (!mediaDataScript) return;
+
+      try {
+        this.mediaData = JSON.parse(mediaDataScript.textContent);
+      } catch (e) {
+        console.error('Error parsing media data:', e);
+        return;
+      }
+
+      this.attachEventListeners();
+    }
+
+    attachEventListeners() {
+      // Media switcher buttons
+      const switcherBtns = document.querySelectorAll('.yatra-media-switcher-btn');
+      switcherBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const mediaType = e.currentTarget.dataset.media;
+          this.switchMediaType(mediaType);
+        });
+      });
+
+      // Media badges click
+      const mediaBadges = document.querySelectorAll('.yatra-media-badge');
+      mediaBadges.forEach(badge => {
+        badge.addEventListener('click', (e) => {
+          const badgeType = e.currentTarget.classList.contains('yatra-media-badge-image') ? 'images' :
+                           e.currentTarget.classList.contains('yatra-media-badge-video') ? 'videos' :
+                           e.currentTarget.classList.contains('yatra-media-badge-youtube') ? 'youtube' :
+                           e.currentTarget.classList.contains('yatra-media-badge-tour') ? 'tours' : 'documents';
+          this.switchMediaType(badgeType);
+        });
+      });
+    }
+
+    switchMediaType(mediaType) {
+      if (this.currentMediaType === mediaType) return;
+      
+      this.currentMediaType = mediaType;
+      this.updateSwitcherButtons();
+      this.updateMediaBadgesVisibility();
+      this.updateMainContent();
+      this.updateSideContent();
+      this.updateSideImagesVisibility();
+    }
+
+    updateSwitcherButtons() {
+      const switcherBtns = document.querySelectorAll('.yatra-media-switcher-btn');
+      switcherBtns.forEach(btn => {
+        if (btn.dataset.media === this.currentMediaType) {
+          btn.classList.add('yatra-media-switcher-active');
+        } else {
+          btn.classList.remove('yatra-media-switcher-active');
+        }
+      });
+    }
+
+    updateMediaBadgesVisibility() {
+      const badges = {
+        image: document.querySelector('.yatra-media-badge-image'),
+        video: document.querySelector('.yatra-media-badge-video'),
+        youtube: document.querySelector('.yatra-media-badge-youtube'),
+        tour: document.querySelector('.yatra-media-badge-tour'),
+        document: document.querySelector('.yatra-media-badge-document')
+      };
+
+      // Hide all badges first
+      Object.values(badges).forEach(badge => {
+        if (badge) badge.style.display = 'none';
+      });
+
+      // Show only the active media type badge
+      switch (this.currentMediaType) {
+        case 'images':
+          if (badges.image) badges.image.style.display = 'inline-flex';
+          break;
+        case 'videos':
+          if (badges.video) badges.video.style.display = 'inline-flex';
+          break;
+        case 'youtube':
+          if (badges.youtube) badges.youtube.style.display = 'inline-flex';
+          break;
+        case 'tours':
+          if (badges.tour) badges.tour.style.display = 'inline-flex';
+          break;
+        case 'documents':
+          if (badges.document) badges.document.style.display = 'inline-flex';
+          break;
+      }
+    }
+
+    updateMainContent() {
+      const mainImageLink = document.querySelector('.yatra-hero-main-img-link');
+      const mainImage = document.querySelector('.yatra-hero-main-img');
+      
+      if (!mainImage) return;
+
+      switch (this.currentMediaType) {
+        case 'videos':
+          this.showVideoContent(mainImageLink, mainImage);
+          break;
+        case 'youtube':
+          this.showYoutubeContent(mainImageLink, mainImage);
+          break;
+        case 'tours':
+          this.showTourContent(mainImageLink, mainImage);
+          break;
+        case 'documents':
+          this.showDocumentContent(mainImageLink, mainImage);
+          break;
+        default: // images
+          this.showImageContent(mainImageLink, mainImage);
+      }
+    }
+
+    showImageContent(link, img) {
+      const images = this.mediaData.images || [];
+      
+      // Remove any existing overlays (YouTube, tour, document, etc.)
+      const container = img.parentElement;
+      if (container) {
+        const existingOverlay = container.querySelector('.yatra-media-overlay');
+        if (existingOverlay) {
+          existingOverlay.remove();
+        }
+      }
+      
+      if (images.length > 0) {
+        img.src = images[0];
+        img.alt = 'Trip Image 1';
+        if (link) {
+          link.href = '#';
+          link.dataset.imageIndex = '0';
+        }
+      }
+    }
+
+    showVideoContent(link, img) {
+      const videos = this.mediaData.videos || [];
+      
+      // Remove any existing overlays from other media types
+      const container = img.parentElement;
+      if (container) {
+        const existingOverlay = container.querySelector('.yatra-media-overlay');
+        if (existingOverlay) {
+          existingOverlay.remove();
+        }
+      }
+      
+      if (videos.length > 0) {
+        const video = videos[0];
+        // Show video thumbnail
+        img.src = video.thumbnail || img.src; // Keep current image if no thumbnail
+        img.alt = video.title || 'Trip Video';
+        
+        // Add play button overlay
+        this.addPlayButtonOverlay(img.parentElement);
+        
+        if (link) {
+          link.href = video.url || '#';
+          link.dataset.videoUrl = video.url;
+          link.dataset.videoTitle = video.title || '';
+        }
+      }
+    }
+
+    showYoutubeContent(link, img) {
+      const youtubeVideos = this.mediaData.youtube_videos || [];
+      console.log('showYoutubeContent called, videos:', youtubeVideos);
+      if (youtubeVideos.length > 0) {
+        const video = youtubeVideos[0];
+        console.log('Showing YouTube video:', video);
+        // Show YouTube thumbnail
+        img.src = video.thumbnail || img.src; // Keep current image if no thumbnail
+        img.alt = video.title || 'YouTube Video';
+        
+        // Add YouTube play button overlay
+        this.addYoutubePlayButtonOverlay(img.parentElement, video);
+        
+        if (link) {
+          link.href = video.url || '#';
+          link.dataset.youtubeUrl = video.url;
+          link.dataset.youtubeVideoId = video.video_id || '';
+          link.dataset.youtubeTitle = video.title || '';
+          link.dataset.embedUrl = video.embed_url || '';
+        }
+      } else {
+        console.warn('No YouTube videos available');
+      }
+    }
+
+    showTourContent(link, img) {
+      const virtualTours = this.mediaData.virtual_tours || [];
+      if (virtualTours.length > 0) {
+        const tour = virtualTours[0];
+        // Show tour thumbnail or keep current image
+        if (tour.thumbnail) {
+          img.src = tour.thumbnail;
+        }
+        img.alt = tour.title || '360° Virtual Tour';
+        
+        // Add 360° tour overlay
+        this.addTourOverlay(img.parentElement, tour);
+        
+        if (link) {
+          link.href = tour.url || '#';
+          link.dataset.tourUrl = tour.url;
+          link.dataset.tourTitle = tour.title || '';
+          link.dataset.tourType = tour.tour_type || '360';
+          link.dataset.isEmbeddable = tour.is_embeddable || 'false';
+        }
+      }
+    }
+
+    showDocumentContent(link, img) {
+      const documents = this.mediaData.documents || [];
+      if (documents.length > 0) {
+        const doc = documents[0];
+        // Keep current image for document display
+        img.alt = doc.title || 'Trip Document';
+        
+        // Add document icon overlay
+        this.addDocumentIconOverlay(img.parentElement, doc);
+        
+        if (link) {
+          link.href = doc.url || '#';
+          link.dataset.documentUrl = doc.url;
+          link.dataset.documentTitle = doc.title || '';
+          link.dataset.downloadable = doc.is_downloadable || 'false';
+        }
+      }
+    }
+
+    addPlayButtonOverlay(container) {
+      // Remove existing overlays
+      const existingOverlay = container.querySelector('.yatra-media-overlay');
+      if (existingOverlay) existingOverlay.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'yatra-media-overlay yatra-media-play-overlay';
+      overlay.innerHTML = `
+        <div class="yatra-play-button">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" fill="rgba(0,0,0,0.6)"/>
+            <path d="M10 8l6 4-6 4V8z" fill="white"/>
+          </svg>
+        </div>
+      `;
+      container.appendChild(overlay);
+    }
+
+    addYoutubePlayButtonOverlay(container, video) {
+      // Remove existing overlays
+      const existingOverlay = container.querySelector('.yatra-media-overlay');
+      if (existingOverlay) existingOverlay.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'yatra-media-overlay yatra-media-youtube-overlay';
+      overlay.innerHTML = `
+        <div class="yatra-youtube-play-button">
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="45" fill="rgba(255, 0, 0, 0.9)" stroke="white" stroke-width="3"/>
+            <path d="M40 30 L70 50 L40 70 Z" fill="white"/>
+          </svg>
+        </div>
+      `;
+      
+      // Add click handler to open YouTube video using YatraVideoPlayer module
+      overlay.addEventListener('click', (e) => {
+        // Only handle real user clicks, not programmatic ones
+        if (!e.isTrusted) {
+          console.log('Ignoring non-trusted click event');
+          return;
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        console.log('YouTube overlay clicked', video);
+        console.log('YatraVideoPlayer available:', !!window.YatraVideoPlayer);
+        if (video.url && window.YatraVideoPlayer) {
+          console.log('Playing video:', video);
+          window.YatraVideoPlayer.play(video);
+        } else {
+          console.error('Cannot play video - missing url or YatraVideoPlayer', {
+            hasUrl: !!video.url,
+            hasPlayer: !!window.YatraVideoPlayer
+          });
+        }
+      }, { capture: false });
+      
+      container.appendChild(overlay);
+    }
+
+    addTourOverlay(container, tour) {
+      // Remove existing overlays
+      const existingOverlay = container.querySelector('.yatra-media-overlay');
+      if (existingOverlay) existingOverlay.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'yatra-media-overlay yatra-media-tour-overlay';
+      overlay.innerHTML = `
+        <div class="yatra-tour-info">
+          <div class="yatra-tour-icon">
+            <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
+              <circle cx="50" cy="50" r="45" fill="rgba(16, 185, 129, 0.9)" stroke="white" stroke-width="3"/>
+              <circle cx="50" cy="50" r="35" fill="none" stroke="white" stroke-width="2" opacity="0.4"/>
+              <circle cx="50" cy="50" r="25" fill="none" stroke="white" stroke-width="2" opacity="0.4"/>
+              <path d="M 50 5 Q 75 50 50 95" stroke="white" stroke-width="2" fill="none" opacity="0.4"/>
+              <path d="M 50 5 Q 25 50 50 95" stroke="white" stroke-width="2" fill="none" opacity="0.4"/>
+              <line x1="5" y1="50" x2="95" y2="50" stroke="white" stroke-width="2" opacity="0.4"/>
+              <text x="50" y="58" text-anchor="middle" fill="white" font-size="24" font-weight="bold">360°</text>
+            </svg>
+          </div>
+          <div class="yatra-tour-details">
+            <div class="yatra-tour-title">${tour.title || '360° Virtual Tour'}</div>
+            <div class="yatra-tour-type">${tour.tour_type || '360°'} Experience</div>
+            <div class="yatra-tour-action">Click to explore</div>
+          </div>
+        </div>
+      `;
+      
+      // Add click handler to open virtual tour using YatraTourViewer module
+      overlay.addEventListener('click', (e) => {
+        // Only handle real user clicks, not programmatic ones
+        if (!e.isTrusted) {
+          console.log('Ignoring non-trusted click event');
+          return;
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        console.log('Tour overlay clicked', tour);
+        console.log('YatraTourViewer available:', !!window.YatraTourViewer);
+        if (tour.url && window.YatraTourViewer) {
+          console.log('Viewing tour:', tour);
+          window.YatraTourViewer.view(tour);
+        } else {
+          console.error('Cannot view tour - missing url or YatraTourViewer', {
+            hasUrl: !!tour.url,
+            hasViewer: !!window.YatraTourViewer
+          });
+        }
+      }, { capture: false });
+      
+      container.appendChild(overlay);
+    }
+
+    addDocumentIconOverlay(container, doc) {
+      // Remove existing overlays
+      const existingOverlay = container.querySelector('.yatra-media-overlay');
+      if (existingOverlay) existingOverlay.remove();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'yatra-media-overlay yatra-media-document-overlay';
+      overlay.innerHTML = `
+        <div class="yatra-document-info">
+          <div class="yatra-document-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="rgba(255,255,255,0.9)"/>
+              <path d="M14 2v6h6" fill="rgba(255,255,255,0.7)"/>
+              <path d="M16 13H8" stroke="#374151" stroke-width="2"/>
+              <path d="M16 17H8" stroke="#374151" stroke-width="2"/>
+            </svg>
+          </div>
+          <div class="yatra-document-details">
+            <div class="yatra-document-title">${doc.title || 'Document'}</div>
+            <div class="yatra-document-size">${this.formatFileSize(doc.file_size || 0)}</div>
+          </div>
+        </div>
+      `;
+      container.appendChild(overlay);
+    }
+
+    formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    updateSideContent() {
+      const sideImages = document.querySelectorAll('.yatra-side-image-item');
+      
+      switch (this.currentMediaType) {
+        case 'videos':
+          this.updateSideVideos(sideImages);
+          break;
+        case 'youtube':
+          this.updateSideYoutubeVideos(sideImages);
+          break;
+        case 'tours':
+          this.updateSideTours(sideImages);
+          break;
+        case 'documents':
+          this.updateSideDocuments(sideImages);
+          break;
+        default: // images
+          this.updateSideImages(sideImages);
+      }
+    }
+
+    updateSideImages(sideImages) {
+      const images = this.mediaData.images || [];
+      sideImages.forEach((item, index) => {
+        const img = item.querySelector('img');
+        if (img && images[index + 1]) {
+          img.src = images[index + 1];
+          img.alt = `Trip Image ${index + 2}`;
+        }
+      });
+    }
+
+    updateSideVideos(sideImages) {
+      const videos = this.mediaData.videos || [];
+      sideImages.forEach((item, index) => {
+        const img = item.querySelector('img');
+        if (img && videos[index + 1]) {
+          const video = videos[index + 1];
+          if (video.thumbnail) {
+            img.src = video.thumbnail;
+          }
+          img.alt = video.title || 'Trip Video';
+        }
+      });
+    }
+
+    updateSideYoutubeVideos(sideImages) {
+      const youtubeVideos = this.mediaData.youtube_videos || [];
+      sideImages.forEach((item, index) => {
+        const img = item.querySelector('img');
+        if (img && youtubeVideos[index + 1]) {
+          const video = youtubeVideos[index + 1];
+          if (video.thumbnail) {
+            img.src = video.thumbnail;
+          }
+          img.alt = video.title || 'YouTube Video';
+        }
+      });
+    }
+
+    updateSideTours(sideImages) {
+      const virtualTours = this.mediaData.virtual_tours || [];
+      sideImages.forEach((item, index) => {
+        const img = item.querySelector('img');
+        if (img && virtualTours[index + 1]) {
+          const tour = virtualTours[index + 1];
+          if (tour.thumbnail) {
+            img.src = tour.thumbnail;
+          }
+          img.alt = tour.title || '360° Virtual Tour';
+        }
+      });
+    }
+
+    updateSideDocuments(sideImages) {
+      const documents = this.mediaData.documents || [];
+      sideImages.forEach((item, index) => {
+        const img = item.querySelector('img');
+        if (img && documents[index + 1]) {
+          const doc = documents[index + 1];
+          // Keep existing image for documents
+          img.alt = doc.title || 'Trip Document';
+        }
+      });
+    }
+
+    updateSideImagesVisibility() {
+      const sideImagesContainer = document.querySelector('.yatra-hero-side-images');
+      const heroImagesContainer = document.querySelector('.yatra-hero-images');
+      const mainImageLink = document.querySelector('.yatra-hero-main-img-link');
+      
+      if (!sideImagesContainer) return;
+
+      // Hide side images for non-image media types and make main image full width
+      if (this.currentMediaType === 'images') {
+        sideImagesContainer.classList.remove('yatra-media-non-image');
+        if (heroImagesContainer) {
+          heroImagesContainer.classList.remove('yatra-media-full-width');
+        }
+        // Re-enable gallery click for images
+        if (mainImageLink) {
+          mainImageLink.removeAttribute('data-prevent-gallery');
+        }
+      } else {
+        sideImagesContainer.classList.add('yatra-media-non-image');
+        if (heroImagesContainer) {
+          heroImagesContainer.classList.add('yatra-media-full-width');
+        }
+        // Mark to prevent gallery opening for non-image media
+        if (mainImageLink) {
+          mainImageLink.setAttribute('data-prevent-gallery', 'true');
+        }
+      }
     }
   }
 
@@ -3551,6 +4088,7 @@ class TripPage {
   init() {
     // Create all feature instances
     this.instances.galleryModal = new GalleryModal();
+    this.instances.heroMediaSwitcher = new HeroMediaSwitcher();
     this.instances.bookingSidebar = new BookingSidebar();
     this.instances.enquiryModal = new EnquiryModal();
     this.instances.stickyNav = new StickyNav();
