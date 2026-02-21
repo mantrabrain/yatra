@@ -60,7 +60,7 @@ if (!defined('ABSPATH')) {
                 <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>"
                      class="yatra-hero-main-img">
             <?php else: ?>
-                <img src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=1920&q=80"
+                <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
                      alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
             <?php endif; ?>
             <a href="#yatra-booking-widget" class="yatra-hero-book-now-btn">
@@ -95,7 +95,7 @@ if (!defined('ABSPATH')) {
                 <?php endforeach; ?>
             <?php else: ?>
                 <div class="yatra-side-image-item">
-                    <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80"
+                    <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
                          alt="<?php echo esc_attr__('Gallery Image', 'yatra'); ?>">
                 </div>
             <?php endif; ?>

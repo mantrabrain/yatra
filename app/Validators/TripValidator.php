@@ -391,8 +391,10 @@ class TripValidator
             $sanitized['currency'] = sanitize_text_field($data['currency']);
         }
 
-        if (isset($data['featured_image'])) {
-            $sanitized['featured_image'] = sanitize_text_field($data['featured_image']);
+        // Always include featured_image if it exists in the data, even if null
+        if (array_key_exists('featured_image', $data)) {
+            // Allow null or empty string to remove featured image
+            $sanitized['featured_image'] = empty($data['featured_image']) ? null : sanitize_text_field($data['featured_image']);
         }
 
         // JSON fields

@@ -1040,8 +1040,8 @@ class Trip
             $image_url = $this->featured_image_url;
             $has_image = true;
         } else {
-            // Use the same fallback as the original template
-            $image_url = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop';
+            // Use placeholder SVG when no image exists
+            $image_url = plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE);
             $has_image = false;
         }
         

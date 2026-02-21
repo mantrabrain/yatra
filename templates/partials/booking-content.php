@@ -201,7 +201,7 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                     <!-- Trip Info Card -->
                     <div class="yatra-remaining-trip-card">
                         <div class="yatra-remaining-trip-image">
-                            <img src="<?php echo esc_url($trip->featured_image); ?>" alt="<?php echo esc_attr($trip->title); ?>">
+                            <img src="<?php echo esc_url($trip->featured_image ?? ''); ?>" alt="<?php echo esc_attr($trip->title ?? ''); ?>">
                         </div>
                         <div class="yatra-remaining-trip-info">
                             <h4><?php echo esc_html($trip->title); ?></h4>
@@ -389,16 +389,16 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                         <?php $trip_permalink = function_exists('yatra_get_trip_permalink') ? yatra_get_trip_permalink($trip) : ''; ?>
                         <div class="yatra-summary-image">
                             <?php if (!empty($trip_permalink)) : ?>
-                            <a href="<?php echo esc_url($trip_permalink); ?>">
+                            <a href="<?php echo esc_url($trip_permalink ?? ''); ?>">
                             <?php endif; ?>
-                                <img src="<?php echo esc_url($trip->featured_image); ?>" alt="<?php echo esc_attr($trip->title); ?>">
+                                <img src="<?php echo esc_url($trip->featured_image ?? ''); ?>" alt="<?php echo esc_attr($trip->title ?? ''); ?>">
                             <?php if (!empty($trip_permalink)) : ?>
                             </a>
                             <?php endif; ?>
                         </div>
                         <div class="yatra-summary-details">
                             <?php if (!empty($trip_permalink)) : ?>
-                            <h4><a href="<?php echo esc_url($trip_permalink); ?>"><?php echo esc_html($trip->title); ?></a></h4>
+                            <h4><a href="<?php echo esc_url($trip_permalink ?? ''); ?>"><?php echo esc_html($trip->title ?? ''); ?></a></h4>
                             <?php else : ?>
                             <h4><?php echo esc_html($trip->title); ?></h4>
                             <?php endif; ?>

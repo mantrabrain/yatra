@@ -150,7 +150,7 @@ yatra_get_header();
                             <?php if (!empty($trip->featured_image_url)): ?>
                                 <img src="<?php echo esc_url($trip->featured_image_url); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? 'Trip'); ?>">
                             <?php else: ?>
-                                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? 'Trip'); ?>">
+                                <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($trip->title ?? $trip->name ?? 'Trip'); ?>">
                             <?php endif; ?>
                             
                             <?php if (!empty($trip->discount_percentage) && $trip->discount_percentage > 0): ?>

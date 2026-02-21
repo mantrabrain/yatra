@@ -64,12 +64,27 @@ class BookingPageHandler extends BasePageHandler
                 }
 
                 // Ensure trip has a usable featured_image URL (not attachment ID)
-                if ($trip && !empty($trip->featured_image)) {
-                    if (is_numeric($trip->featured_image)) {
+                if ($trip) {
+                    // If featured_image is not set, try to get it from WordPress
+                    if (empty($trip->featured_image) && !empty($trip->id)) {
+                        $attachment_id = get_post_thumbnail_id($trip->id);
+                        if ($attachment_id) {
+                            $trip->featured_image = $attachment_id;
+                        }
+                    }
+                    
+                    // Convert attachment ID to URL if needed
+                    if (!empty($trip->featured_image) && is_numeric($trip->featured_image)) {
                         $imgUrl = wp_get_attachment_url((int) $trip->featured_image);
                         if ($imgUrl) {
                             $trip->featured_image = $imgUrl;
+                        } else {
+                            // If attachment URL fails, use placeholder
+                            $trip->featured_image = plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE);
                         }
+                    } elseif (empty($trip->featured_image)) {
+                        // No featured image at all, use placeholder
+                        $trip->featured_image = plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE);
                     }
                 }
 

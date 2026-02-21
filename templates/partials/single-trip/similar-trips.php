@@ -32,107 +32,7 @@ if (!defined('ABSPATH')) {
                 // Use dynamic similar trips from controller, with fallback to sample data
                 $similar_trips_data = !empty($trip->similar_trips) ? $trip->similar_trips : [];
 
-                // If no similar trips from DB, show placeholder data for demo
-                if (empty($similar_trips_data)) {
-                    $similar_trips_data = [
-                        (object)[
-                            'title' => 'Annapurna Base Camp Trek',
-                            'slug' => 'annapurna-base-camp-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop',
-                            'duration_days' => 12,
-                            'duration_nights' => 11,
-                            'sale_price' => 1450,
-                            'original_price' => 1650,
-                            'currency' => 'USD',
-                            'discount_percentage' => 12,
-                            'difficulty_level' => 'Moderate',
-                            'location' => 'Nepal',
-                            'rating' => 4.8,
-                            'reviews_count' => 156,
-                            'highlights' => ['Mountain Views', 'Teahouse Stay'],
-                        ],
-                        (object)[
-                            'title' => 'Langtang Valley Trek',
-                            'slug' => 'langtang-valley-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800&h=600&fit=crop',
-                            'duration_days' => 10,
-                            'duration_nights' => 9,
-                            'sale_price' => 1200,
-                            'original_price' => 1200,
-                            'currency' => 'USD',
-                            'discount_percentage' => 0,
-                            'difficulty_level' => 'Moderate',
-                            'location' => 'Nepal',
-                            'rating' => 4.6,
-                            'reviews_count' => 89,
-                            'highlights' => ['Valley Views', 'Local Culture'],
-                        ],
-                        (object)[
-                            'title' => 'Manaslu Circuit Trek',
-                            'slug' => 'manaslu-circuit-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop',
-                            'duration_days' => 16,
-                            'duration_nights' => 15,
-                            'sale_price' => 1850,
-                            'original_price' => 2100,
-                            'currency' => 'USD',
-                            'discount_percentage' => 12,
-                            'difficulty_level' => 'Challenging',
-                            'location' => 'Nepal',
-                            'rating' => 4.9,
-                            'reviews_count' => 67,
-                            'highlights' => ['Remote Trail', 'Less Crowded'],
-                        ],
-                        (object)[
-                            'title' => 'Gokyo Lakes Trek',
-                            'slug' => 'gokyo-lakes-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1526772662000-3f88f10405ff?w=800&h=600&fit=crop',
-                            'duration_days' => 14,
-                            'duration_nights' => 13,
-                            'sale_price' => 1550,
-                            'original_price' => 1550,
-                            'currency' => 'USD',
-                            'discount_percentage' => 0,
-                            'difficulty_level' => 'Moderate',
-                            'location' => 'Nepal',
-                            'rating' => 4.7,
-                            'reviews_count' => 124,
-                            'highlights' => ['Turquoise Lakes', 'Gokyo Ri'],
-                        ],
-                        (object)[
-                            'title' => 'Upper Mustang Trek',
-                            'slug' => 'upper-mustang-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=600&fit=crop',
-                            'duration_days' => 15,
-                            'duration_nights' => 14,
-                            'sale_price' => 2200,
-                            'original_price' => 2500,
-                            'currency' => 'USD',
-                            'discount_percentage' => 12,
-                            'difficulty_level' => 'Moderate',
-                            'location' => 'Nepal',
-                            'rating' => 4.8,
-                            'reviews_count' => 45,
-                            'highlights' => ['Ancient Culture', 'Desert Landscape'],
-                        ],
-                        (object)[
-                            'title' => 'Mardi Himal Trek',
-                            'slug' => 'mardi-himal-trek',
-                            'featured_image_url' => 'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800&h=600&fit=crop',
-                            'duration_days' => 7,
-                            'duration_nights' => 6,
-                            'sale_price' => 850,
-                            'original_price' => 850,
-                            'currency' => 'USD',
-                            'discount_percentage' => 0,
-                            'difficulty_level' => 'Easy',
-                            'location' => 'Nepal',
-                            'rating' => 4.5,
-                            'reviews_count' => 203,
-                            'highlights' => ['Short Trek', 'Mountain Views'],
-                        ],
-                    ];
-                }
+                // Only show real trips from database - no dummy data
 
                 foreach ($similar_trips_data as $similar_trip) {
                     // Handle both object and array format
@@ -154,7 +54,7 @@ if (!defined('ABSPATH')) {
                     <div class="yatra-carousel-item">
                         <div class="yatra-trip-card">
                             <div class="yatra-trip-image">
-                                <img src="<?php echo esc_url($st_image ?: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop'); ?>" alt="<?php echo esc_attr($st_title); ?>" loading="lazy">
+                                <img src="<?php echo esc_url($st_image ?: plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($st_title); ?>" loading="lazy">
                                 <?php if ($st_discount > 0): ?>
                                     <div class="yatra-discount-badge">
                                         <?php echo esc_html($st_discount); ?>% <?php echo esc_html__('OFF', 'yatra'); ?>

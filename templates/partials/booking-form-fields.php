@@ -549,7 +549,7 @@ $has_flexible_options = $flexible_payments_enabled && !empty($payment_method_opt
             <label class="yatra-gateway-option">
                 <input type="radio" name="payment_gateway" value="<?php echo esc_attr($gateway_id); ?>" <?php checked($first); ?>>
                 <span class="yatra-gateway-icon-wrap">
-                    <img src="<?php echo esc_url($icon); ?>" alt="<?php echo esc_attr($gateway['title']); ?>" class="yatra-gateway-icon">
+                    <img src="<?php echo esc_url($icon ?? ''); ?>" alt="<?php echo esc_attr($gateway['title'] ?? ''); ?>" class="yatra-gateway-icon">
                 </span>
                 <span class="yatra-gateway-content">
                     <strong class="yatra-gateway-title"><?php echo esc_html($gateway['title']); ?></strong>

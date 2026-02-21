@@ -1683,12 +1683,17 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
 
-    if (field === 'featured_image') {
-      const numericValue = typeof value === 'number' ? value : Number(value);
-      if (!numericValue) {
+     if (field === 'featured_image') {
+      // Handle explicit null (when removing image)
+      if (value === null || value === '' || value === undefined) {
         setFeaturedImagePreview('');
-      } else if (featuredImageCache.current[numericValue]) {
-        setFeaturedImagePreview(featuredImageCache.current[numericValue]);
+      } else {
+        const numericValue = typeof value === 'number' ? value : Number(value);
+        if (!numericValue) {
+          setFeaturedImagePreview('');
+        } else if (featuredImageCache.current[numericValue]) {
+          setFeaturedImagePreview(featuredImageCache.current[numericValue]);
+        }
       }
     }
   };
@@ -2235,7 +2240,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           .filter(item => item.title),
         itinerary_days: data.itinerary_days || [],
         gallery_images: data.gallery_images || [],
-        featured_image: data.featured_image || null,
+        featured_image: data.featured_image ?? null,
         faqs: data.faqs || [],
         frontend_tabs: data.frontend_tabs.map(tab => ({
           id: tab.id,

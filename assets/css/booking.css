@@ -926,7 +926,7 @@
 .yatra-form-group input[type="date"],
 .yatra-form-group select,
 .yatra-form-group textarea {
-    width: cakc(100% - 32px);
+    width: calc(100% - 32px);
     padding: 12px 16px;
     border: 1px solid #d1d5db;
     border-radius: 8px;
@@ -958,6 +958,7 @@
     background-size: 16px;
     cursor: pointer;
     line-height: 1.5;
+    width:100%;
 }
 
 .yatra-form-group select option {

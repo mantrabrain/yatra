@@ -13,46 +13,12 @@
       "admin/dist/css/index.css"
     ]
   },
-  "_index-CRP0c7Ek.js": {
-    "file": "dist/js/index-CRP0c7Ek.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-zD_YF3eJ.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-LYWPs5bb.js": {
-    "file": "dist/js/index-LYWPs5bb.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-B5Nj4KRn.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
   },
-  "_react-vendor-B5Nj4KRn.js": {
-    "file": "admin/dist/js/react-vendor-B5Nj4KRn.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
   "_react-vendor-Bol_9zUu.js": {
     "file": "admin/dist/js/react-vendor-Bol_9zUu.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
-  "_react-vendor-zD_YF3eJ.js": {
-    "file": "admin/dist/js/react-vendor-zD_YF3eJ.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
