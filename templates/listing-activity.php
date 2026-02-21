@@ -69,7 +69,7 @@ $current_page = min($current_page, $total_pages);
 $offset             = ($current_page - 1) * $per_page;
 $paged_activities = $total_items > 0 ? array_slice($activities, $offset, $per_page) : [];
 
-get_header();
+yatra_get_header();
 ?>
 
 <style>

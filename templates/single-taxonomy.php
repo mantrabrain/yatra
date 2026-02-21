@@ -149,7 +149,7 @@ if (empty($entity_image)) {
     $entity_image = $placeholder_src;
 }
 
-get_header();
+yatra_get_header();
 ?>
 
 <div class="yatra-listing-page yatra-taxonomy-page yatra-<?php echo esc_attr($type); ?>-page">
@@ -354,7 +354,7 @@ get_header();
 </script>
 
 <?php
-get_footer();
+yatra_get_footer();
 ?>
 
 

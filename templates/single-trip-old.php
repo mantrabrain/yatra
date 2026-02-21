@@ -33,7 +33,7 @@ add_filter('wp_title', function ($title) {
     return esc_html($trip->title) . ' - ' . get_bloginfo('name');
 }, 10, 1);
 
-get_header();
+yatra_get_header();
 
 // Calculate base price (for display) - used in hero, quick facts, sticky nav, and sidebar
 // Check if availability dates exist (PRIORITY)
@@ -341,7 +341,7 @@ if (!empty($base_price) && apply_filters('yatra_dynamic_pricing_enabled', false)
 <?php
 yatra_get_template('partials/single-trip/enquiry-modal', ['trip' => $trip]);
 
-get_footer();
+yatra_get_footer();
 ?>
 
 <script>

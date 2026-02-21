@@ -73,12 +73,31 @@ class BookingPageHandler extends BasePageHandler
                     }
                 }
 
-                // Resolve enabled gateways (prefer session, fallback to registry)
-                $enabled_gateways = $session['enabled_gateways'] ?? [];
-                if (empty($enabled_gateways)) {
-                    // Fallback: get available gateways from registry
-                    $gatewayRegistry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
-                    $availableGateways = $gatewayRegistry->getForCheckout();
+                // Resolve enabled gateways - always get full gateway data from registry
+                $gatewayRegistry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
+                $availableGateways = $gatewayRegistry->getForCheckout();
+                $enabled_gateways = [];
+                
+                // Get gateway IDs from session (if any)
+                $session_gateway_ids = $session['enabled_gateways'] ?? [];
+                
+                // If session has gateway IDs (as strings), filter available gateways
+                if (!empty($session_gateway_ids) && is_array($session_gateway_ids)) {
+                    // Check if session has full gateway data or just IDs
+                    $first_item = reset($session_gateway_ids);
+                    if (is_array($first_item) && isset($first_item['id'])) {
+                        // Session has full gateway data
+                        $enabled_gateways = $session_gateway_ids;
+                    } else {
+                        // Session has just IDs, resolve to full gateway data
+                        foreach ($availableGateways as $gateway) {
+                            if (!empty($gateway['id']) && in_array($gateway['id'], $session_gateway_ids)) {
+                                $enabled_gateways[$gateway['id']] = $gateway;
+                            }
+                        }
+                    }
+                } else {
+                    // No session gateways, use all available gateways
                     foreach ($availableGateways as $gateway) {
                         if (!empty($gateway['id'])) {
                             $enabled_gateways[$gateway['id']] = $gateway;

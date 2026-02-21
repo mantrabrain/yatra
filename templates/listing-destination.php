@@ -17,9 +17,9 @@ if (!defined('ABSPATH')) {
 // Load DestinationService from plugin namespace
 if (!class_exists('Yatra\\Services\\DestinationService')) {
     // If the service is not available for some reason, bail gracefully.
-    get_header();
+    yatra_get_header();
     echo '<p>' . esc_html__('Destination service is not available.', 'yatra') . '</p>';
-    get_footer();
+    yatra_get_footer();
     return;
 }
 
@@ -69,7 +69,7 @@ $current_page = min($current_page, $total_pages);
 $offset             = ($current_page - 1) * $per_page;
 $paged_destinations = $total_items > 0 ? array_slice($destinations, $offset, $per_page) : [];
 
-get_header();
+yatra_get_header();
 ?>
 
 <style>
@@ -313,5 +313,5 @@ get_header();
   </div>
 
 <?php
-get_footer();
+yatra_get_footer();
 ?>

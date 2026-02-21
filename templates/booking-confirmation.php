@@ -39,7 +39,7 @@ $status_colors = [
 
 $status_style = $status_colors[$booking->status] ?? $status_colors['pending'];
 
-get_header();
+yatra_get_header();
 ?>
 
 <div class="yatra-wrapper yatra-confirmation-wrapper">
@@ -861,5 +861,5 @@ get_header();
 }
 </style>
 
-<?php get_footer(); ?>
+<?php yatra_get_footer(); ?>
 

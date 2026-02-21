@@ -11,7 +11,7 @@ yatra_start_session();
 
 $booking = $booking ?? ($GLOBALS['yatra_booking'] ?? null);
 
-get_header();
+yatra_get_header();
 ?>
 
 <div class="yatra-booking-page yatra-remaining-page">
@@ -28,4 +28,4 @@ get_header();
 </div>
 
 
-<?php get_footer(); ?>
+<?php yatra_get_footer(); ?>

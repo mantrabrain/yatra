@@ -25,7 +25,7 @@ if (empty($booking) || (!is_object($booking))) {
 }
 
 if (!empty($booking->error)) {
-    get_header();
+    yatra_get_header();
     ?>
     <style>
         .yatra-error-page {
@@ -171,7 +171,7 @@ if (!empty($booking->error)) {
         </div>
     </div>
     <?php
-    get_footer();
+    yatra_get_footer();
     exit;
 }
 
@@ -187,9 +187,9 @@ $enabled_gateways = $booking->enabled_gateways;
 
 
 
-get_header();
+yatra_get_header();
 
 // Include the shared booking content partial
 include YATRA_PLUGIN_PATH . 'templates/partials/booking-content.php';
 
-get_footer();
+yatra_get_footer();

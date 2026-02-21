@@ -145,7 +145,7 @@ if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
     
 }
 
-get_header();
+yatra_get_header();
 ?>
 
 <?php if (!empty($current_filter_type) && !empty($current_filter_slug)) : ?>
@@ -1100,5 +1100,5 @@ document.addEventListener('DOMContentLoaded', function () {
 <?php endif; ?>
 
 <?php
-get_footer();
+yatra_get_footer();
 ?>

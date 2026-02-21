@@ -38,7 +38,7 @@ add_filter('wp_title', function($title) {
     return esc_html($destination->name) . ' - ' . get_bloginfo('name');
 }, 10, 1);
 
-get_header();
+yatra_get_header();
 ?>
 
 <div class="yatra-single-destination" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
@@ -282,5 +282,5 @@ get_header();
 </div>
 
 <?php
-get_footer();
+yatra_get_footer();
 ?>
