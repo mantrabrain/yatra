@@ -135,7 +135,12 @@ if (!defined('ABSPATH')) {
     <?php endif; ?>
 
     <!-- Testimonials Section -->
-    <?php yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]); ?>
+    <?php 
+    $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
+    if (!empty($display_testimonials)): 
+        yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]);
+    endif; 
+    ?>
 
     <div class="yatra-trip-features">
         <div class="yatra-feature-card">
