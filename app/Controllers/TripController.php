@@ -630,6 +630,9 @@ class TripController extends BaseController
             if (isset($data['frontend_tabs'])) {
                 $data['frontend_tabs'] = is_string($data['frontend_tabs']) ? $data['frontend_tabs'] : wp_json_encode($data['frontend_tabs']);
             }
+            if (isset($data['testimonial_review_ids'])) {
+                $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
+            }
             // Remove legacy/removed columns not present in trips table
             foreach (['currency', 'testimonials', 'countries', 'regions', 'landmarks', 'tags'] as $deprecatedKey) {
                 if (isset($data[$deprecatedKey])) {
@@ -707,7 +710,7 @@ class TripController extends BaseController
                 $data['availability_dates'],
                 $data['attributes']
             );
-
+            
             // Update via service to persist main data and relations
             $updated = $this->service->updateWithRelations($id, $data, $relationships);
 
@@ -957,6 +960,7 @@ class TripController extends BaseController
             'custom_fields',
             'pricing_rules',
             'booking_rules',
+            'testimonial_review_ids',
         ];
 
         foreach ($jsonFields as $field) {
@@ -964,6 +968,21 @@ class TripController extends BaseController
                 $decoded = maybe_unserialize($data[$field]);
                 $data[$field] = is_array($decoded) ? $decoded : (json_decode($data[$field], true) ?: []);
             }
+        }
+
+        // Ensure testimonial_review_ids is always a clean array of integers
+        if (isset($data['testimonial_review_ids'])) {
+            if (!is_array($data['testimonial_review_ids'])) {
+                $data['testimonial_review_ids'] = [];
+            } else {
+                // Filter out null values and ensure all values are integers
+                $data['testimonial_review_ids'] = array_values(array_filter(
+                    array_map('intval', $data['testimonial_review_ids']),
+                    function($id) { return $id > 0; }
+                ));
+            }
+        } else {
+            $data['testimonial_review_ids'] = [];
         }
 
         // Convert boolean fields

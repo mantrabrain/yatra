@@ -107,6 +107,8 @@ class ReviewHooks
                 'rating' => $rating,
                 'title' => $title,
                 'content' => $content,
+                'author_name' => $user->display_name ?: $user->user_login,
+                'author_email' => $user->user_email,
                 'status' => \Yatra\Services\SettingsService::autoApproveReviews() ? 'approved' : 'pending',
                 'created_at' => current_time('mysql'),
                 'updated_at' => current_time('mysql'),

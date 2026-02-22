@@ -1684,7 +1684,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
 
-     if (field === 'featured_image') {
+    if (field === 'featured_image') {
       // Handle explicit null (when removing image)
       if (value === null || value === '' || value === undefined) {
         setFeaturedImagePreview('');
@@ -2176,7 +2176,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         trip_story: data.trip_story.trim(),
         video_url: data.video_url.trim(),
         virtual_tour_url: data.virtual_tour_url.trim(),
-        testimonial_review_ids: data.testimonial_review_ids || [],
+        testimonial_review_ids: Array.isArray(data.testimonial_review_ids) 
+          ? data.testimonial_review_ids.filter((id): id is number => id !== null && id !== undefined && id > 0)
+          : [],
         destinations: data.destinations || [], // Array of destination IDs
         starting_location: data.starting_location.trim(),
         ending_location: data.ending_location.trim(),

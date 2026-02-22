@@ -153,6 +153,7 @@ class SingleTripController
         $trip->tags = $this->decodeJson($trip->tags ?? '');
         $trip->included_items = $this->decodeJson($trip->included_items ?? '');
         $trip->excluded_items = $this->decodeJson($trip->excluded_items ?? '');
+        $trip->testimonial_review_ids = $this->decodeJson($trip->testimonial_review_ids ?? '');
         // Gallery images from separate table (with attachment IDs)
         $trip->gallery_images = $this->getGalleryImages((int) $trip->id);
         
@@ -325,6 +326,7 @@ class SingleTripController
         $trip->activities = $this->getActivities($trip_id);
         $trip->trip_categories = $this->getTripCategories($trip_id);
         $trip->reviews = $this->getReviews($trip_id);
+        $trip->testimonials = $this->getTestimonials($trip_id);
         $trip->similar_trips = $this->getSimilarTrips($trip);
 
         // Calculate rating
@@ -1002,6 +1004,56 @@ class SingleTripController
                  ORDER BY created_at DESC 
                  LIMIT 10",
                 $trip_id
+            )
+        ) ?: [];
+    }
+
+    /**
+     * Get testimonials (selected reviews for this trip)
+     *
+     * @param int $trip_id Trip ID
+     * @return array Testimonial reviews
+     */
+    private function getTestimonials(int $trip_id): array
+    {
+        // Get testimonial_review_ids from trip data
+        $testimonial_ids = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SELECT testimonial_review_ids FROM {$this->table_trips} 
+                 WHERE id = %d 
+                 LIMIT 1",
+                $trip_id
+            )
+        );
+
+        if (empty($testimonial_ids)) {
+            return [];
+        }
+
+        // Decode JSON array of IDs
+        $review_ids = json_decode($testimonial_ids, true);
+        if (!is_array($review_ids) || empty($review_ids)) {
+            return [];
+        }
+
+        // Filter out invalid IDs
+        $review_ids = array_filter($review_ids, 'is_numeric');
+        if (empty($review_ids)) {
+            return [];
+        }
+
+        // Get the actual review data
+        $placeholders = implode(',', array_fill(0, count($review_ids), '%d'));
+        
+        return $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT r.*, u.display_name as author_display_name
+                 FROM {$this->table_reviews} r
+                 LEFT JOIN {$this->wpdb->users} u ON r.user_id = u.ID
+                 WHERE r.id IN ($placeholders)
+                 AND r.status = 'approved'
+                 ORDER BY r.created_at DESC",
+                ...$review_ids
             )
         ) ?: [];
     }

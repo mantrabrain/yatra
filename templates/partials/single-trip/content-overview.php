@@ -134,6 +134,9 @@ if (!defined('ABSPATH')) {
         </div>
     <?php endif; ?>
 
+    <!-- Testimonials Section -->
+    <?php yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]); ?>
+
     <div class="yatra-trip-features">
         <div class="yatra-feature-card">
             <?php echo yatra_svg_icon('users', 'yatra-feature-icon'); ?>

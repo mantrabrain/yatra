@@ -47,6 +47,18 @@ class TripRepository extends BaseRepository
     protected array $integerFields = ['id', 'created_by', 'updated_by', 'difficulty_level', 'duration', 'group_size'];
 
     /**
+     * JSON fields specific to trips
+     */
+    protected array $jsonFields = [
+        'included_items',
+        'excluded_items',
+        'frontend_tabs',
+        'testimonial_review_ids',
+        'custom_fields',
+        'price_types',
+    ];
+
+    /**
      * Publish trips whose scheduled_publish_date has passed
      */
     public function publishScheduledTrips(string $now): void

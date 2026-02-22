@@ -36,6 +36,10 @@ if (!defined('ABSPATH')) {
             <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
             <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
         </a>
+        <a href="#testimonials" class="yatra-sticky-nav-item">
+            <?php echo yatra_svg_icon('heart', 'yatra-icon-sm'); ?>
+            <span><?php esc_html_e('Testimonials', 'yatra'); ?></span>
+        </a>
         <a href="#reviews" class="yatra-sticky-nav-item">
             <?php echo yatra_svg_icon('star', 'yatra-icon-sm'); ?>
             <span><?php esc_html_e('Reviews', 'yatra'); ?></span>

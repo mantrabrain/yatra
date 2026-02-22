@@ -79,8 +79,8 @@ class ReviewRepository extends BaseRepository
 
         if (!empty($filters['search'])) {
             $search_like = '%' . $this->wpdb->esc_like(sanitize_text_field($filters['search'])) . '%';
-            $where_clauses[] = '(r.review_text LIKE %s OR r.reviewer_name LIKE %s OR r.reviewer_email LIKE %s)';
-            $where_values = array_merge($where_values, [$search_like, $search_like, $search_like]);
+            $where_clauses[] = '(r.title LIKE %s OR r.content LIKE %s OR r.author_name LIKE %s OR r.author_email LIKE %s)';
+            $where_values = array_merge($where_values, [$search_like, $search_like, $search_like, $search_like]);
         }
 
         $where_sql = implode(' AND ', $where_clauses);
@@ -107,13 +107,17 @@ class ReviewRepository extends BaseRepository
         $query_values = array_merge($where_values, [$per_page, $offset]);
         $reviews = $this->wpdb->get_results($this->wpdb->prepare($query, ...$query_values));
 
-        return [
+         
+        $return_data = [
             'data' => $reviews ?: [],
             'total' => $total,
             'page' => $page,
             'per_page' => $per_page,
             'total_pages' => (int) ceil($total / $per_page),
         ];
+
+
+        return $return_data;
     }
 
     /**

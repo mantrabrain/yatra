@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-21T14:35:46+00:00\n"
+"POT-Creation-Date: 2026-02-22T12:37:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -865,7 +865,7 @@ msgid "Booking Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:837
-#: app/Controllers/TripController.php:1957
+#: app/Controllers/TripController.php:1976
 #: templates/booking-confirmation.php:239
 #: templates/partials/single-trip/content-overview.php:97
 #: templates/partials/single-trip/content-sidebar.php:339
@@ -1198,7 +1198,7 @@ msgid "Booking not found"
 msgstr ""
 
 #: app/Controllers/BookingsController.php:384
-#: app/Controllers/ReviewController.php:316
+#: app/Controllers/ReviewController.php:337
 msgid "Status is required."
 msgstr ""
 
@@ -2030,12 +2030,12 @@ msgid "Enquiry not found."
 msgstr ""
 
 #: app/Controllers/EnquiryController.php:230
-#: app/Controllers/ReviewController.php:258
+#: app/Controllers/ReviewController.php:279
 msgid "No items selected."
 msgstr ""
 
 #: app/Controllers/EnquiryController.php:262
-#: app/Controllers/ReviewController.php:281
+#: app/Controllers/ReviewController.php:302
 msgid "Invalid action."
 msgstr ""
 
@@ -2244,7 +2244,7 @@ msgstr ""
 msgid "Recurring rule deleted successfully"
 msgstr ""
 
-#: app/Controllers/ReviewController.php:219
+#: app/Controllers/ReviewController.php:240
 #: app/Services/ReviewService.php:169
 #: app/Services/ReviewService.php:221
 #: app/Services/ReviewService.php:291
@@ -2454,116 +2454,116 @@ msgstr ""
 msgid "Trip created successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:715
+#: app/Controllers/TripController.php:718
 msgid "Failed to update trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:739
+#: app/Controllers/TripController.php:742
 msgid "Failed to delete trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:743
+#: app/Controllers/TripController.php:746
 msgid "Trip deleted successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:767
+#: app/Controllers/TripController.php:770
 msgid "Failed to permanently delete trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:776
+#: app/Controllers/TripController.php:779
 msgid "Trip permanently deleted"
 msgstr ""
 
-#: app/Controllers/TripController.php:793
+#: app/Controllers/TripController.php:796
 msgid "Search keyword is required"
 msgstr ""
 
-#: app/Controllers/TripController.php:841
-#: app/Controllers/TripController.php:884
-#: app/Controllers/TripController.php:1321
-#: app/Controllers/TripController.php:1326
+#: app/Controllers/TripController.php:844
+#: app/Controllers/TripController.php:887
+#: app/Controllers/TripController.php:1340
+#: app/Controllers/TripController.php:1345
 msgid "Unknown"
 msgstr ""
 
-#: app/Controllers/TripController.php:864
+#: app/Controllers/TripController.php:867
 #: app/Services/TripService.php:969
 msgid "Revision not found"
 msgstr ""
 
-#: app/Controllers/TripController.php:868
+#: app/Controllers/TripController.php:871
 #: app/Services/TripService.php:974
 msgid "Revision does not belong to this trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:901
+#: app/Controllers/TripController.php:904
 msgid "You do not have permission to restore revisions"
 msgstr ""
 
-#: app/Controllers/TripController.php:908
+#: app/Controllers/TripController.php:911
 msgid "Invalid trip ID or revision ID"
 msgstr ""
 
-#: app/Controllers/TripController.php:915
+#: app/Controllers/TripController.php:918
 msgid "Failed to restore revision"
 msgstr ""
 
-#: app/Controllers/TripController.php:922
+#: app/Controllers/TripController.php:925
 msgid "Revision restored successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:1605
-#: app/Controllers/TripController.php:1752
+#: app/Controllers/TripController.php:1624
+#: app/Controllers/TripController.php:1771
 #, php-format
 msgid "%d%% OFF"
 msgstr ""
 
-#: app/Controllers/TripController.php:1610
-#: app/Controllers/TripController.php:1756
+#: app/Controllers/TripController.php:1629
+#: app/Controllers/TripController.php:1775
 #, php-format
 msgid "+%d%%"
 msgstr ""
 
-#: app/Controllers/TripController.php:1621
+#: app/Controllers/TripController.php:1640
 msgid "Today"
 msgstr ""
 
-#: app/Controllers/TripController.php:1623
+#: app/Controllers/TripController.php:1642
 msgid "Tomorrow"
 msgstr ""
 
-#: app/Controllers/TripController.php:1645
+#: app/Controllers/TripController.php:1664
 msgid "Start"
 msgstr ""
 
-#: app/Controllers/TripController.php:1646
+#: app/Controllers/TripController.php:1665
 msgid "End"
 msgstr ""
 
-#: app/Controllers/TripController.php:1652
-#: app/Controllers/TripController.php:1762
+#: app/Controllers/TripController.php:1671
+#: app/Controllers/TripController.php:1781
 #: templates/partials/availability-section.php:147
 #: templates/pdf/itinerary.php:262
 msgid "Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1653
-#: app/Controllers/TripController.php:1765
+#: app/Controllers/TripController.php:1672
+#: app/Controllers/TripController.php:1784
 #: templates/partials/availability-section.php:154
 msgid "Return"
 msgstr ""
 
-#: app/Controllers/TripController.php:1701
-#: app/Controllers/TripController.php:1774
+#: app/Controllers/TripController.php:1720
+#: app/Controllers/TripController.php:1793
 msgid "Group Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1764
-#: app/Controllers/TripController.php:1777
+#: app/Controllers/TripController.php:1783
+#: app/Controllers/TripController.php:1796
 msgid "Starting Point"
 msgstr ""
 
-#: app/Controllers/TripController.php:1767
-#: app/Controllers/TripController.php:1778
+#: app/Controllers/TripController.php:1786
+#: app/Controllers/TripController.php:1797
 msgid "Ending Point"
 msgstr ""
 
@@ -2752,12 +2752,12 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: app/Hooks/ReviewHooks.php:38
-#: app/Hooks/ReviewHooks.php:138
+#: app/Hooks/ReviewHooks.php:140
 msgid "Security check failed."
 msgstr ""
 
 #: app/Hooks/ReviewHooks.php:43
-#: app/Hooks/ReviewHooks.php:128
+#: app/Hooks/ReviewHooks.php:130
 msgid "You must be logged in to submit a review."
 msgstr ""
 
@@ -2789,67 +2789,67 @@ msgstr ""
 msgid "You cannot review this trip."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:116
+#: app/Hooks/ReviewHooks.php:118
 msgid "Your review has been submitted!"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:118
+#: app/Hooks/ReviewHooks.php:120
 msgid "Failed to submit review. Please try again."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:151
+#: app/Hooks/ReviewHooks.php:153
 msgid "Please fill in all required fields."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:155
+#: app/Hooks/ReviewHooks.php:157
 #: app/Services/CustomerService.php:122
 #: app/Services/EnquiryService.php:75
 msgid "Please provide a valid email address."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:159
+#: app/Hooks/ReviewHooks.php:161
 msgid "Please specify at least one traveler."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:189
+#: app/Hooks/ReviewHooks.php:191
 msgid "Your enquiry has been submitted successfully!"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:191
+#: app/Hooks/ReviewHooks.php:193
 msgid "Failed to submit enquiry. Please try again."
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:212
+#: app/Hooks/ReviewHooks.php:214
 #, php-format
 msgid "New Enquiry from %s"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:218
+#: app/Hooks/ReviewHooks.php:220
 #, php-format
 msgid "Name: %s"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:219
+#: app/Hooks/ReviewHooks.php:221
 #, php-format
 msgid "Email: %s"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:222
+#: app/Hooks/ReviewHooks.php:224
 #, php-format
 msgid "Phone: %s"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:226
+#: app/Hooks/ReviewHooks.php:228
 #, php-format
 msgid "Trip: %s"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:229
+#: app/Hooks/ReviewHooks.php:231
 #, php-format
 msgid "Travelers: %d Adults, %d Children"
 msgstr ""
 
-#: app/Hooks/ReviewHooks.php:230
+#: app/Hooks/ReviewHooks.php:232
 msgid "Message:"
 msgstr ""
 
@@ -3693,23 +3693,23 @@ msgstr ""
 msgid "Extreme"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2126
+#: app/Repositories/TripRepository.php:2138
 msgid "Adventure"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2127
+#: app/Repositories/TripRepository.php:2139
 msgid "Cultural"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2128
+#: app/Repositories/TripRepository.php:2140
 msgid "Wildlife"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2129
+#: app/Repositories/TripRepository.php:2141
 msgid "Pilgrimage"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2130
+#: app/Repositories/TripRepository.php:2142
 msgid "Educational"
 msgstr ""
 

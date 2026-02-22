@@ -35,6 +35,13 @@ abstract class BaseRepository
     protected array $integerFields = [];
 
     /**
+     * @var array Fields that contain JSON data
+     * Child repositories can override this to specify JSON fields
+     * These fields will not be sanitized with sanitize_text_field to preserve JSON structure
+     */
+    protected array $jsonFields = [];
+
+    /**
      * Constructor
      */
     public function __construct()
@@ -327,6 +334,9 @@ abstract class BaseRepository
                 if (in_array($key, $this->richTextFields, true)) {
                     // Sanitize Quill HTML content (allows safe HTML tags)
                     $sanitized[$key] = \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($value);
+                } elseif (in_array($key, $this->jsonFields, true)) {
+                    // JSON fields - preserve the JSON string as-is
+                    $sanitized[$key] = $value;
                 } elseif (in_array($key, $this->integerFields, true)) {
                     $sanitized[$key] = absint($value);
                 } else {

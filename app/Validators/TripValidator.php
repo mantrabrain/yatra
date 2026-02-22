@@ -430,6 +430,10 @@ class TripValidator
             $sanitized['frontend_tabs'] = is_array($data['frontend_tabs']) ? maybe_serialize($data['frontend_tabs']) : $data['frontend_tabs'];
         }
 
+        if (isset($data['testimonial_review_ids'])) {
+            $sanitized['testimonial_review_ids'] = is_array($data['testimonial_review_ids']) ? json_encode($data['testimonial_review_ids']) : $data['testimonial_review_ids'];
+        }
+
         if (isset($data['features'])) {
             $sanitized['features'] = is_array($data['features']) ? json_encode($data['features']) : $data['features'];
         }
