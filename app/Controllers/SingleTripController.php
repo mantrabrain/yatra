@@ -162,6 +162,9 @@ class SingleTripController
         // Get highlights from TripContentTable
         $trip->highlights = $this->getHighlights((int) $trip->id);
         
+        // Get landmarks from TripContentTable
+        $trip->landmarks = $this->getLandmarks((int) $trip->id);
+        
         // Get videos, YouTube videos, virtual tours, and documents from TripContentTable
         $trip->videos = $this->getVideos((int) $trip->id);
         $trip->youtube_videos = $this->getYoutubeVideos((int) $trip->id);
@@ -950,6 +953,50 @@ class SingleTripController
         }
         
         return $highlight_texts;
+    }
+
+    /**
+     * Get landmarks for a trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Array of landmark texts
+     */
+    private function getLandmarks(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        // Check if table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $landmarks = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'landmark'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        );
+        
+        // Convert to simple array of landmark texts
+        $landmark_texts = [];
+        foreach ($landmarks as $landmark) {
+            if (!empty($landmark->title)) {
+                $landmark_texts[] = $landmark->title;
+            } elseif (!empty($landmark->description)) {
+                $landmark_texts[] = $landmark->description;
+            }
+        }
+        
+        return $landmark_texts;
     }
 
     /**

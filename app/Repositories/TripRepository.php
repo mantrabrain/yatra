@@ -699,6 +699,9 @@ class TripRepository extends BaseRepository
         // Load highlights
         $trip->highlights = $this->getHighlights($id);
         
+        // Load landmarks
+        $trip->landmarks = $this->getLandmarks($id);
+        
         // Load FAQs
         $trip->faqs = $this->getFaqs($id);
         
@@ -918,6 +921,38 @@ class TripRepository extends BaseRepository
                 'order'       => isset($row->sort_order) ? (int) $row->sort_order : 0,
             ];
         }, $rows);
+    }
+
+    /**
+     * Get landmarks for a trip
+     */
+    public function getLandmarks(int $tripId): array
+    {
+        global $wpdb;
+        
+        // Use TripContentTable for landmarks
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        $rows = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'landmark'
+                 ORDER BY sort_order ASC, id ASC",
+                $tripId
+            )
+        ) ?: [];
+
+        // Convert to simple array of landmark texts (like SingleTripController)
+        $landmark_texts = [];
+        foreach ($rows as $landmark) {
+            if (!empty($landmark->title)) {
+                $landmark_texts[] = $landmark->title;
+            } elseif (!empty($landmark->description)) {
+                $landmark_texts[] = $landmark->description;
+            }
+        }
+        
+        return $landmark_texts;
     }
 
     /**
@@ -1281,6 +1316,59 @@ class TripRepository extends BaseRepository
     }
 
     /**
+     * Save landmarks for a trip
+     */
+    public function saveLandmarks(int $tripId, array $landmarks): void
+    {
+        global $wpdb;
+        
+        $table = TripContentTable::getTableName();
+        
+        // Delete existing landmarks
+        $wpdb->delete(
+            $table,
+            [
+                'trip_id' => $tripId,
+                'content_type' => 'landmark',
+            ],
+            ['%d', '%s']
+        );
+        
+        if (!empty($landmarks)) {
+            foreach ($landmarks as $index => $landmark) {
+                $landmarkText = is_string($landmark) ? $landmark : ($landmark['text'] ?? $landmark['landmark_text'] ?? '');
+                if (empty($landmarkText)) {
+                    continue;
+                }
+                
+                $metadata = [];
+                if (is_array($landmark)) {
+                    if (!empty($landmark['icon'])) {
+                        $metadata['icon'] = $landmark['icon'];
+                    }
+                    if (!empty($landmark['image_id'])) {
+                        $metadata['image_id'] = (int) $landmark['image_id'];
+                    }
+                }
+                
+                $wpdb->insert(
+                    $table,
+                    [
+                        'trip_id' => $tripId,
+                        'content_type' => 'landmark',
+                        'title' => sanitize_text_field($landmarkText),
+                        'description' => is_array($landmark) && !empty($landmark['description']) ? wp_kses_post($landmark['description']) : null,
+                        'metadata' => !empty($metadata) ? wp_json_encode($metadata) : null,
+                        'sort_order' => $index,
+                        'is_featured' => is_array($landmark) && isset($landmark['is_featured']) ? (int) $landmark['is_featured'] : 0,
+                    ],
+                    ['%d', '%s', '%s', '%s', '%s', '%d', '%d']
+                );
+            }
+        }
+    }
+
+    /**
      * Save gallery images for a trip
      */
     public function saveGalleryImages(int $tripId, array $galleryImages): void
@@ -1505,6 +1593,7 @@ class TripRepository extends BaseRepository
         $tripCategories    = $relationships['trip_category'] ?? [];
         $priceTypes        = $relationships['price_types'] ?? [];
         $highlights        = $relationships['highlights'] ?? [];
+        $landmarks         = $relationships['landmarks'] ?? [];
         $galleryImages     = $relationships['gallery_images'] ?? [];
         $faqs              = $relationships['faqs'] ?? [];
         $downloadableItems = $relationships['downloadable_items'] ?? [];
@@ -1518,6 +1607,7 @@ class TripRepository extends BaseRepository
             $data['activities'], 
             $data['trip_category'],
             $data['highlights'],
+            $data['landmarks'],
             $data['gallery_images'],
             $data['faqs'],
             $data['downloadable_items'],
@@ -1548,6 +1638,10 @@ class TripRepository extends BaseRepository
         
         if (!empty($highlights)) {
             $this->saveHighlights($tripId, $highlights);
+        }
+        
+        if (!empty($landmarks)) {
+            $this->saveLandmarks($tripId, $landmarks);
         }
         
         if (!empty($galleryImages)) {
@@ -1590,6 +1684,7 @@ class TripRepository extends BaseRepository
         $tripCategories    = $relationships['trip_category'] ?? null;
         $priceTypes        = $relationships['price_types'] ?? null;
         $highlights        = $relationships['highlights'] ?? null;
+        $landmarks         = $relationships['landmarks'] ?? null;
         $galleryImages     = $relationships['gallery_images'] ?? null;
         $faqs              = $relationships['faqs'] ?? null;
         $downloadableItems = $relationships['downloadable_items'] ?? null;
@@ -1604,6 +1699,7 @@ class TripRepository extends BaseRepository
             $data['trip_category'],
             $data['price_types'],
             $data['highlights'],
+            $data['landmarks'],
             $data['gallery_images'],
             $data['faqs'],
             $data['itinerary_days'],
@@ -1633,6 +1729,10 @@ class TripRepository extends BaseRepository
         
         if ($highlights !== null) {
             $this->saveHighlights($id, $highlights);
+        }
+        
+        if ($landmarks !== null) {
+            $this->saveLandmarks($id, $landmarks);
         }
         
         if ($galleryImages !== null) {

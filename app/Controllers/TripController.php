@@ -558,7 +558,7 @@ class TripController extends BaseController
                 $data['frontend_tabs'] = wp_json_encode($rawData['frontend_tabs']);
             }
             // Remove legacy/removed columns not present in trips table
-            foreach (['currency', 'testimonials', 'countries', 'regions', 'landmarks', 'tags'] as $deprecatedKey) {
+            foreach (['currency', 'testimonials', 'countries', 'regions', 'tags'] as $deprecatedKey) {
                 if (isset($data[$deprecatedKey])) {
                     unset($data[$deprecatedKey]);
                 }
@@ -634,7 +634,7 @@ class TripController extends BaseController
                 $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
             }
             // Remove legacy/removed columns not present in trips table
-            foreach (['currency', 'testimonials', 'countries', 'regions', 'landmarks', 'tags'] as $deprecatedKey) {
+            foreach (['currency', 'testimonials', 'countries', 'regions', 'tags'] as $deprecatedKey) {
                 if (isset($data[$deprecatedKey])) {
                     unset($data[$deprecatedKey]);
                 }
@@ -659,6 +659,9 @@ class TripController extends BaseController
             }
             if (isset($data['highlights'])) {
                 $relationships['highlights'] = $data['highlights'];
+            }
+            if (isset($data['landmarks'])) {
+                $relationships['landmarks'] = $data['landmarks'];
             }
             if (isset($data['gallery_images'])) {
                 $relationships['gallery_images'] = $data['gallery_images'];
@@ -704,6 +707,7 @@ class TripController extends BaseController
                 $data['activity_types'], 
                 $data['trip_category'],
                 $data['highlights'],
+                $data['landmarks'],
                 $data['gallery_images'],
                 $data['faqs'],
                 $data['itinerary_days'],
@@ -1048,22 +1052,10 @@ class TripController extends BaseController
             'deleted_by',
         ];
 
-        // DEBUG: Log duration_nights processing
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] TripController - BEFORE processing - duration_nights: ' . print_r($data['duration_nights'] ?? 'NOT_SET', true));
-            error_log('[YATRA DEBUG] TripController - Raw data keys: ' . print_r(array_keys($data), true));
-        }
-
         foreach ($numericFields as $field) {
             if (isset($data[$field])) {
                 $data[$field] = is_numeric($data[$field]) ? (int) $data[$field] : null;
             }
-        }
-
-        // DEBUG: Log duration_nights processing
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] TripController - AFTER processing - duration_nights: ' . print_r($data['duration_nights'] ?? 'NOT_SET', true));
-            error_log('[YATRA DEBUG] TripController - Final data keys: ' . print_r(array_keys($data), true));
         }
 
         // Convert float fields

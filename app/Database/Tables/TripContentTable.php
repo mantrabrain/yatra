@@ -52,7 +52,7 @@ class TripContentTable extends BaseTable
 CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     `trip_id` bigint(20) unsigned NOT NULL,
-    `content_type` enum('image','video','youtube','virtual_tour','document','highlight','faq','download','testimonial') NOT NULL,
+    `content_type` enum('image','video','youtube','virtual_tour','document','highlight','faq','download','testimonial', 'landmark') NOT NULL,
     `title` varchar(255) DEFAULT NULL,
     `description` text,
     `content_url` varchar(500) DEFAULT NULL,

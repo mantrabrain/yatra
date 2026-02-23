@@ -301,6 +301,10 @@ class TripValidator
             $sanitized['duration_days'] = (int)$data['duration_days'];
         }
 
+        if (isset($data['duration_nights'])) {
+            $sanitized['duration_nights'] = (int)$data['duration_nights'];
+        }
+
         if (isset($data['duration_hours'])) {
             $sanitized['duration_hours'] = (int)$data['duration_hours'];
         }

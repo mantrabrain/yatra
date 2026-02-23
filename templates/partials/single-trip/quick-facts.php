@@ -48,6 +48,46 @@ if (!defined('ABSPATH')) {
         </div>
     <?php endif; ?>
 
+    <!-- Landmarks -->
+    <?php if (!empty($trip->landmarks) && is_array($trip->landmarks)): ?>
+        <div class="yatra-quick-fact">
+            <div class="yatra-quick-fact-icon">
+                <?php echo yatra_svg_icon('map-pin', 'yatra-icon-lg'); ?>
+            </div>
+            <div class="yatra-quick-fact-content">
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Landmarks', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value">
+                    <?php 
+                    $landmark_count = count($trip->landmarks);
+                    echo esc_html(sprintf(_n('%d landmark', '%d landmarks', $landmark_count, 'yatra'), $landmark_count)); 
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <!-- Seasonal Availability -->
+    <?php if (!empty($trip->seasonal_availability)): ?>
+        <div class="yatra-quick-fact">
+            <div class="yatra-quick-fact-icon">
+                <?php echo yatra_svg_icon('calendar', 'yatra-icon-lg'); ?>
+            </div>
+            <div class="yatra-quick-fact-content">
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Season', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value">
+                    <?php 
+                    // Show seasonal availability, but limit length for display
+                    $seasonal_text = $trip->seasonal_availability;
+                    if (strlen($seasonal_text) > 20) {
+                        $seasonal_text = substr($seasonal_text, 0, 20) . '...';
+                    }
+                    echo esc_html($seasonal_text); 
+                    ?>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <!-- Group Size -->
     <div class="yatra-quick-fact">
         <div class="yatra-quick-fact-icon">
@@ -130,12 +170,24 @@ if (!defined('ABSPATH')) {
 /* Simple Quick Facts Styles */
 .yatra-trip-quick-facts {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 16px;
     padding: 20px;
     background: #f8fafc;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
+}
+
+@media (min-width: 768px) {
+    .yatra-trip-quick-facts {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .yatra-trip-quick-facts {
+        grid-template-columns: repeat(6, 1fr);
+    }
 }
 
 .yatra-quick-fact {

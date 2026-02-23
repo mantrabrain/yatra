@@ -48,6 +48,7 @@ import { wpService } from '../lib/api-client';
 import { Button } from '../components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/ui/date-picker';
+import { Modal } from '../components/ui/modal';
 import { Select } from '../components/ui/select';
 import { Alert } from '../components/ui/alert';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
@@ -405,6 +406,8 @@ const TripForm: React.FC = () => {
   const [currentSection, setCurrentSection] = useState<SectionId>(getInitialSection);
   const [visitedSections, setVisitedSections] = useState<Set<SectionId>>(() => new Set([getInitialSection()]));
   const [showCategorySelector, setShowCategorySelector] = useState(false);
+  const [showLandmarkDialog, setShowLandmarkDialog] = useState(false);
+  const [landmarkInput, setLandmarkInput] = useState('');
 
   // Track visited sections for lazy loading and update URL
   useEffect(() => {
@@ -3319,9 +3322,31 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   />
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                       {__('No destinations available. Please create destinations first.', 'yatra')}
                     </p>
+                    <div className="space-y-2">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
+                        {__('To create destinations:', 'yatra')}
+                      </p>
+                      <ol className="text-xs text-gray-400 dark:text-gray-500 text-left list-decimal list-inside space-y-1 max-w-md mx-auto">
+                        <li>{__('Go to Yatra → Destinations in your WordPress admin', 'yatra')}</li>
+                        <li>{__('Click "Add New Destination"', 'yatra')}</li>
+                        <li>{__('Enter destination name and details', 'yatra')}</li>
+                        <li>{__('Set status to "Published"', 'yatra')}</li>
+                      </ol>
+                      <a 
+                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=create" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                      >
+                        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        {__('Create Destinations', 'yatra')}
+                      </a>
+                    </div>
                   </div>
                 )}
                 <HelpText
@@ -3368,7 +3393,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="latitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Latitude', 'yatra')}
+                    {__('Starting Location Latitude', 'yatra')}
                   </label>
                   <Input
                     id="latitude"
@@ -3378,13 +3403,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     placeholder={__('e.g., -8.3405', 'yatra')}
                   />
                   <HelpText
-                    text={__('GPS latitude coordinate for map integration', 'yatra')}
+                    text={__('GPS latitude coordinate of the starting location for trip map', 'yatra')}
                     className="mt-2"
                   />
                 </div>
                 <div>
                   <label htmlFor="longitude" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Longitude', 'yatra')}
+                    {__('Starting Location Longitude', 'yatra')}
                   </label>
                   <Input
                     id="longitude"
@@ -3394,7 +3419,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                     placeholder={__('e.g., 115.0920', 'yatra')}
                   />
                   <HelpText
-                    text={__('GPS longitude coordinate for map integration', 'yatra')}
+                    text={__('GPS longitude coordinate of the starting location for trip map', 'yatra')}
                     className="mt-2"
                   />
                 </div>
@@ -3443,10 +3468,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    const text = prompt(__('Enter landmark name:', 'yatra'));
-                    if (text && text.trim()) {
-                      handleFieldChange('landmarks', [...formData.landmarks, text.trim()]);
-                    }
+                    setShowLandmarkDialog(true);
+                    setLandmarkInput('');
                   }}
                   className="w-full"
                 >
@@ -5753,6 +5776,71 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         variant="info"
         isLoading={false}
       />
+
+      {/* Landmark Input Modal */}
+      <Modal
+        isOpen={showLandmarkDialog}
+        onClose={() => {
+          setShowLandmarkDialog(false);
+          setLandmarkInput('');
+        }}
+        title={__('Add Landmark', 'yatra')}
+        description={__('Enter the name of the landmark or point of interest', 'yatra')}
+        size="sm"
+        hideFooter={false}
+        footer={
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowLandmarkDialog(false);
+                setLandmarkInput('');
+              }}
+            >
+              {__('Cancel', 'yatra')}
+            </Button>
+            <Button
+              onClick={() => {
+                if (landmarkInput.trim()) {
+                  handleFieldChange('landmarks', [...formData.landmarks, landmarkInput.trim()]);
+                  setLandmarkInput('');
+                  setShowLandmarkDialog(false);
+                }
+              }}
+              disabled={!landmarkInput.trim()}
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {__('Add Landmark', 'yatra')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              {__('Landmark Name', 'yatra')}
+            </label>
+            <Input
+              type="text"
+              value={landmarkInput}
+              onChange={(e) => setLandmarkInput(e.target.value)}
+              placeholder={__('e.g., Eiffel Tower, Central Park, Grand Canyon', 'yatra')}
+              className="w-full"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && landmarkInput.trim()) {
+                  handleFieldChange('landmarks', [...formData.landmarks, landmarkInput.trim()]);
+                  setLandmarkInput('');
+                  setShowLandmarkDialog(false);
+                }
+              }}
+            />
+          </div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {__('Examples: Famous monuments, natural landmarks, historical sites, viewpoints, or points of interest that travelers will visit during this trip.', 'yatra')}
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
