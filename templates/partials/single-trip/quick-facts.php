@@ -129,19 +129,19 @@ if (!defined('ABSPATH')) {
     <?php endif; ?>
 
     <!-- Rating -->
-    <div class="yatra-quick-fact">
-        <div class="yatra-quick-fact-icon">
-            <?php echo yatra_svg_icon('star', 'yatra-icon-lg'); ?>
-        </div>
-        <div class="yatra-quick-fact-content">
-            <div class="yatra-quick-fact-label"><?php echo esc_html__('Rating', 'yatra'); ?></div>
-            <div class="yatra-quick-fact-value">
-                <?php 
-                $avg_rating = $trip->avg_rating ?? $trip->average_rating ?? 0;
-                $review_count = $trip->reviews_count ?? $trip->review_count ?? 0;
-                
-                if ($avg_rating > 0): 
-                ?>
+    <?php 
+    $avg_rating = $trip->average_rating ?? 0;
+    $review_count = $trip->review_count ?? 0;
+    
+    if ($avg_rating > 0): 
+    ?>
+        <div class="yatra-quick-fact">
+            <div class="yatra-quick-fact-icon">
+                <?php echo yatra_svg_icon('star', 'yatra-icon-lg'); ?>
+            </div>
+            <div class="yatra-quick-fact-content">
+                <div class="yatra-quick-fact-label"><?php echo esc_html__('Review', 'yatra'); ?></div>
+                <div class="yatra-quick-fact-value">
                     <div class="yatra-rating-display">
                         <span class="yatra-rating-number"><?php echo esc_html(number_format($avg_rating, 1)); ?></span>
                         <div class="yatra-rating-stars">
@@ -158,12 +158,10 @@ if (!defined('ABSPATH')) {
                         </div>
                         <span class="yatra-review-count">(<?php echo esc_html($review_count); ?> <?php echo esc_html(_n('review', 'reviews', $review_count, 'yatra')); ?>)</span>
                     </div>
-                <?php else: ?>
-                    <span class="yatra-no-reviews"><?php echo esc_html__('No reviews yet', 'yatra'); ?></span>
-                <?php endif; ?>
+                </div>
             </div>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
 
 <style>
@@ -176,17 +174,20 @@ if (!defined('ABSPATH')) {
     background: #f8fafc;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
+    width: 100%;
 }
 
 @media (min-width: 768px) {
     .yatra-trip-quick-facts {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
     }
 }
 
 @media (min-width: 1024px) {
     .yatra-trip-quick-facts {
-        grid-template-columns: repeat(6, 1fr);
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 24px;
     }
 }
 
