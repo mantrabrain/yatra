@@ -99,6 +99,11 @@ window.yatraTripData = {
             <!-- Overview Section -->
             <?php yatra_get_template('partials/single-trip/content-overview', ['trip' => $trip, 'has_traveler_pricing' => $has_traveler_pricing, 'has_availability' => $has_availability, 'base_price' => $base_price]); ?>
 
+            <!-- Trip Story Section -->
+            <?php if (!empty($trip->trip_story ?? '')): ?>
+                <?php yatra_get_template('partials/single-trip/content-trip-story', ['trip' => $trip]); ?>
+            <?php endif; ?>
+
             <!-- What Makes This Trip Special Section -->
             <?php if (!empty($trip->what_makes_special ?? '')): ?>
                 <?php yatra_get_template('partials/single-trip/content-whats-make-special', ['trip' => $trip]); ?>

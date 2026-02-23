@@ -132,6 +132,16 @@ try {
             <?php endif; ?>
         </h3>
         
+        <!-- Short Description -->
+        <?php 
+        $short_desc = $trip->getShortDescription();
+        if (!empty($short_desc)): 
+        ?>
+            <p class="yatra-trip-short-description">
+                <?php echo \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($short_desc); ?>
+            </p>
+        <?php endif; ?>
+        
         <!-- Trip Info Row (Duration and Rating on same line) -->
         <div class="yatra-trip-info-row">
             <?php if ($duration['has_duration']): ?>
@@ -217,3 +227,24 @@ try {
         </div>
     </div>
 </div>
+
+<style>
+.yatra-trip-short-description {
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    margin: 8px 0 12px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .yatra-trip-short-description {
+        color: #94a3b8;
+    }
+}
+</style>

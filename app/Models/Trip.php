@@ -671,6 +671,14 @@ class Trip
     }
 
     /**
+     * Get short description
+     */
+    public function getShortDescription(): ?string
+    {
+        return !empty($this->short_description) ? $this->short_description : null;
+    }
+
+    /**
      * Get discount information
      */
     public function getDiscount(): array

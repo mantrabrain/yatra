@@ -36,6 +36,12 @@ if (!defined('ABSPATH')) {
             <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
             <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
         </a>
+        <?php if (!empty($trip->trip_story ?? '')): ?>
+            <a href="#trip-story" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('book-open', 'yatra-icon-sm'); ?>
+                <span><?php esc_html_e('Story', 'yatra'); ?></span>
+            </a>
+        <?php endif; ?>
         <?php 
         $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
         if (!empty($display_testimonials)): 

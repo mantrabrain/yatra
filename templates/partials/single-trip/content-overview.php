@@ -8,8 +8,15 @@ if (!defined('ABSPATH')) {
         <?php echo yatra_svg_icon('book-open', 'yatra-trip-section-title-icon'); ?>
         <?php echo esc_html__('Overview', 'yatra'); ?>
     </h2>
+    
+    <?php if (!empty($trip->short_description)): ?>
+        <div class="yatra-trip-short-description-lead">
+            <?php echo \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($trip->short_description); ?>
+        </div>
+    <?php endif; ?>
+    
     <div class="yatra-trip-description">
-        <?php echo wp_kses_post($trip->description ?? ''); ?>
+        <?php echo \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($trip->description ?? ''); ?>
     </div>
 
     <?php if (!empty($trip->highlights) && is_array($trip->highlights)): ?>
@@ -178,3 +185,35 @@ if (!defined('ABSPATH')) {
         <?php endif; ?>
     </div>
 </section>
+
+<style>
+.yatra-trip-short-description-lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: #475569;
+    font-weight: 500;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    border-left: 4px solid #3b82f6;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .yatra-trip-short-description-lead {
+        color: #cbd5e1;
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        border-left-color: #60a5fa;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .yatra-trip-short-description-lead {
+        font-size: 1rem;
+        padding: 16px;
+        margin-bottom: 20px;
+    }
+}
+</style>
