@@ -1637,9 +1637,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   };
 
 
-  // Smart defaults - Auto-calculate nights from days
+  // Smart defaults - Auto-calculate nights from days (only if nights is empty)
   useEffect(() => {
-    if (formData.duration_days && formData.trip_type === 'multi_day' && !formData.duration_nights) {
+    if (formData.duration_days && formData.trip_type === 'multi_day' && (!formData.duration_nights || formData.duration_nights === '')) {
       const days = parseInt(formData.duration_days);
       if (days > 0 && !isNaN(days)) {
         setFormData(prev => ({ ...prev, duration_nights: String(Math.max(0, days - 1)) }));
@@ -1647,9 +1647,9 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     }
   }, [formData.duration_days, formData.trip_type]);
 
-  // Auto-calculate days from nights
+  // Auto-calculate days from nights (only if days is empty)
   useEffect(() => {
-    if (formData.duration_nights && formData.trip_type === 'multi_day' && !formData.duration_days) {
+    if (formData.duration_nights && formData.trip_type === 'multi_day' && (!formData.duration_days || formData.duration_days === '')) {
       const nights = parseInt(formData.duration_nights);
       if (nights > 0 && !isNaN(nights)) {
         setFormData(prev => ({ ...prev, duration_days: String(nights + 1) }));

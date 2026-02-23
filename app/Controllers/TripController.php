@@ -1048,10 +1048,22 @@ class TripController extends BaseController
             'deleted_by',
         ];
 
+        // DEBUG: Log duration_nights processing
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] TripController - BEFORE processing - duration_nights: ' . print_r($data['duration_nights'] ?? 'NOT_SET', true));
+            error_log('[YATRA DEBUG] TripController - Raw data keys: ' . print_r(array_keys($data), true));
+        }
+
         foreach ($numericFields as $field) {
             if (isset($data[$field])) {
                 $data[$field] = is_numeric($data[$field]) ? (int) $data[$field] : null;
             }
+        }
+
+        // DEBUG: Log duration_nights processing
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] TripController - AFTER processing - duration_nights: ' . print_r($data['duration_nights'] ?? 'NOT_SET', true));
+            error_log('[YATRA DEBUG] TripController - Final data keys: ' . print_r(array_keys($data), true));
         }
 
         // Convert float fields

@@ -154,8 +154,13 @@ class SingleTripController
         $trip->included_items = $this->decodeJson($trip->included_items ?? '');
         $trip->excluded_items = $this->decodeJson($trip->excluded_items ?? '');
         $trip->testimonial_review_ids = $this->decodeJson($trip->testimonial_review_ids ?? '');
+
+    
         // Gallery images from separate table (with attachment IDs)
         $trip->gallery_images = $this->getGalleryImages((int) $trip->id);
+        
+        // Get highlights from TripContentTable
+        $trip->highlights = $this->getHighlights((int) $trip->id);
         
         // Get videos, YouTube videos, virtual tours, and documents from TripContentTable
         $trip->videos = $this->getVideos((int) $trip->id);
@@ -196,17 +201,6 @@ class SingleTripController
         $trip->youtube_videos = array_merge($trip->youtube_videos, $youtube_from_table);
         $trip->virtual_tours = array_merge($trip->virtual_tours, $tours_from_table);
         
-        // Debug logging
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Media Debug: Trip ID ' . $trip->id . ' - Media counts:');
-            error_log('  - Images: ' . count($trip->gallery_images ?? []));
-            error_log('  - Videos: ' . count($trip->videos ?? []));
-            error_log('  - YouTube Videos: ' . count($trip->youtube_videos ?? []));
-            error_log('  - Virtual Tours: ' . count($trip->virtual_tours ?? []));
-            error_log('  - Documents: ' . count($trip->documents ?? []));
-            error_log('  - Main table video_url: ' . ($trip->video_url ?? 'none'));
-            error_log('  - Main table virtual_tour_url: ' . ($trip->virtual_tour_url ?? 'none'));
-        }
         
         // Get price types from database table (for traveler-based pricing)
         $trip->price_types = $this->getPriceTypes((int) $trip->id);
@@ -233,10 +227,7 @@ class SingleTripController
         // Fetch availability dates from database table
         $trip->availability_dates = $this->getAvailabilityDates((int) $trip->id);
         
-        // Debug: Log how many availability dates are loaded
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Debug: Trip ID ' . $trip->id . ' - Loaded ' . count($trip->availability_dates) . ' availability dates');
-        }
+    
         $trip->blackout_dates = $this->decodeJson($trip->blackout_dates ?? '');
         
         // Get trip attributes with their values
@@ -915,6 +906,50 @@ class SingleTripController
         }
         
         return $tour_list;
+    }
+
+    /**
+     * Get highlights for a trip from TripContentTable
+     *
+     * @param int $trip_id Trip ID
+     * @return array Array of highlights
+     */
+    private function getHighlights(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        // Check if table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $highlights = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'highlight'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        );
+        
+        // Convert to simple array of highlight titles
+        $highlight_texts = [];
+        foreach ($highlights as $highlight) {
+            if (!empty($highlight->title)) {
+                $highlight_texts[] = $highlight->title;
+            } elseif (!empty($highlight->description)) {
+                $highlight_texts[] = $highlight->description;
+            }
+        }
+        
+        return $highlight_texts;
     }
 
     /**

@@ -142,18 +142,76 @@ try {
             </p>
         <?php endif; ?>
         
-        <!-- Trip Info Row (Duration and Rating on same line) -->
-        <div class="yatra-trip-info-row">
+        <!-- Trip Stats Row -->
+        <div class="yatra-trip-stats-row">
+            <!-- Duration -->
             <?php if ($duration['has_duration']): ?>
-                <span class="yatra-info-badge duration">
-                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6z" clip-rule="evenodd" />
-                    </svg>
-                    <?php echo esc_html($duration['formatted']); ?>
-                </span>
+                <div class="yatra-trip-stat">
+                    <div class="yatra-stat-icon duration">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="yatra-stat-content">
+                        <span class="yatra-stat-value"><?php echo esc_html($duration['formatted']); ?></span>
+                        <span class="yatra-stat-label"><?php esc_html_e('Duration', 'yatra'); ?></span>
+                    </div>
+                </div>
             <?php endif; ?>
-            
-            <div class="yatra-trip-rating">
+
+            <!-- Difficulty -->
+            <?php if ($difficulty['has_difficulty']): ?>
+                <div class="yatra-trip-stat">
+                    <div class="yatra-stat-icon difficulty">
+                        <?php echo yatra_svg_icon($difficulty['icon'], ''); ?>
+                    </div>
+                    <div class="yatra-stat-content">
+                        <span class="yatra-stat-value"><?php echo esc_html(ucfirst($difficulty['level'])); ?></span>
+                        <span class="yatra-stat-label"><?php esc_html_e('Difficulty', 'yatra'); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Group Size -->
+            <?php if (!empty($trip->min_travelers) || !empty($trip->max_travelers)): ?>
+                <div class="yatra-trip-stat">
+                    <div class="yatra-stat-icon group">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                    <div class="yatra-stat-content">
+                        <span class="yatra-stat-value">
+                            <?php 
+                            $min_travelers = $trip->min_travelers ?? 1;
+                            $max_travelers = $trip->max_travelers ?? 20;
+                            echo esc_html($min_travelers . '-' . $max_travelers); 
+                            ?>
+                        </span>
+                        <span class="yatra-stat-label"><?php esc_html_e('Group Size', 'yatra'); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Bookings Count -->
+            <?php if (!empty($trip->bookings_count) && $trip->bookings_count > 0): ?>
+                <div class="yatra-trip-stat">
+                    <div class="yatra-stat-icon bookings">
+                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="yatra-stat-content">
+                        <span class="yatra-stat-value"><?php echo esc_html(number_format($trip->bookings_count)); ?></span>
+                        <span class="yatra-stat-label"><?php esc_html_e('Bookings', 'yatra'); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Rating Row -->
+        <?php if ($rating['has_rating']): ?>
+            <div class="yatra-trip-rating-row">
                 <div class="yatra-rating-stars">
                     <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
@@ -162,7 +220,7 @@ try {
                 </div>
                 <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> <?php esc_html_e('reviews', 'yatra'); ?>)</span>
             </div>
-        </div>
+        <?php endif; ?>
 
         <!-- Activities Only -->
         <?php if (!empty($activities)) : ?>
@@ -241,10 +299,181 @@ try {
     text-overflow: ellipsis;
 }
 
+/* Trip Stats Row */
+.yatra-trip-stats-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 12px 0;
+    padding: 12px 0;
+    border-top: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-trip-stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.yatra-stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.yatra-stat-icon.duration {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.yatra-stat-icon.difficulty {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.yatra-stat-icon.group {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.yatra-stat-icon.bookings {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.yatra-stat-content {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+
+.yatra-stat-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #1f2937;
+    line-height: 1.2;
+}
+
+.yatra-stat-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    line-height: 1.2;
+    margin-top: 2px;
+}
+
+/* Rating Row */
+.yatra-trip-rating-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.yatra-rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.yatra-rating-value {
+    font-weight: 600;
+    color: #1f2937;
+    font-size: 0.875rem;
+}
+
+.yatra-reviews-count {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .yatra-trip-short-description {
         color: #94a3b8;
+    }
+    
+    .yatra-trip-stats-row {
+        border-top-color: #374151;
+        border-bottom-color: #374151;
+    }
+    
+    .yatra-stat-icon.duration {
+        background: #1e3a8a;
+        color: #93c5fd;
+    }
+    
+    .yatra-stat-icon.difficulty {
+        background: #78350f;
+        color: #fcd34d;
+    }
+    
+    .yatra-stat-icon.group {
+        background: #14532d;
+        color: #86efac;
+    }
+    
+    .yatra-stat-icon.bookings {
+        background: #831843;
+        color: #f9a8d4;
+    }
+    
+    .yatra-stat-value {
+        color: #f9fafb;
+    }
+    
+    .yatra-stat-label {
+        color: #9ca3af;
+    }
+    
+    .yatra-rating-value {
+        color: #f9fafb;
+    }
+    
+    .yatra-reviews-count {
+        color: #9ca3af;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .yatra-trip-stats-row {
+        gap: 12px;
+    }
+    
+    .yatra-trip-stat {
+        min-width: calc(50% - 6px);
+    }
+    
+    .yatra-stat-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .yatra-stat-value {
+        font-size: 0.8rem;
+    }
+    
+    .yatra-stat-label {
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-trip-stats-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .yatra-trip-stat {
+        min-width: 100%;
     }
 }
 </style>

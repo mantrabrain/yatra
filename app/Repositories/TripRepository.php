@@ -44,7 +44,27 @@ class TripRepository extends BaseRepository
     /**
      * Integer fields specific to trips
      */
-    protected array $integerFields = ['id', 'created_by', 'updated_by', 'difficulty_level', 'duration', 'group_size'];
+    protected array $integerFields = [
+        'id', 
+        'created_by', 
+        'updated_by', 
+        'difficulty_level', 
+        'duration_days', 
+        'duration_nights', 
+        'duration_hours',
+        'booking_window_days',
+        'booking_deadline_hours',
+        'min_travelers',
+        'max_travelers',
+        'group_size',
+        'age_min',
+        'age_max',
+        'featured_priority',
+        'version',
+        'views_count',
+        'bookings_count',
+        'reviews_count'
+    ];
 
     /**
      * JSON fields specific to trips
@@ -142,6 +162,41 @@ class TripRepository extends BaseRepository
     protected function getTableName(): string
     {
      return TripsTable::getTableName();
+    }
+
+    /**
+     * Override update method to provide proper field formats
+     */
+    public function update(int $id, array $data): bool
+    {
+        $data = $this->sanitizeData($data);
+        $data['updated_at'] = current_time('mysql');
+
+        // Build format array based on field types
+        $formats = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->integerFields, true)) {
+                $formats[] = '%d';
+            } elseif (in_array($key, ['created_at', 'updated_at'], true)) {
+                $formats[] = '%s';
+            } elseif (in_array($key, ['original_price', 'discounted_price', 'sale_price', 'deposit_amount', 'deposit_percentage'], true)) {
+                $formats[] = '%f';
+            } elseif (in_array($key, ['transportation_included', 'is_featured', 'seasonal_auto_enable'], true)) {
+                $formats[] = '%d'; // boolean as integer
+            } else {
+                $formats[] = '%s'; // default to string
+            }
+        }
+
+        $result = $this->wpdb->update(
+            $this->getTableName(),
+            $data,
+            ['id' => $id],
+            $formats,
+            ['%d']
+        );
+
+        return $result !== false;
     }
 
     /**
