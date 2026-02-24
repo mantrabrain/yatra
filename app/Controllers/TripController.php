@@ -33,6 +33,7 @@ use Yatra\Database\Tables\TripAvailabilityDatesTable;
  */
 class TripController extends BaseController
 {
+
     /**
      * @var TripService
      */
@@ -552,6 +553,11 @@ class TripController extends BaseController
             if (isset($rawData['frontend_tabs'])) {
                 $data['frontend_tabs'] = wp_json_encode($rawData['frontend_tabs']);
             }
+            
+            // Handle featured_priority field
+            if (isset($rawData['featured_priority'])) {
+                $data['featured_priority'] = $rawData['featured_priority'];
+            }
             // Remove legacy/removed columns not present in trips table
             foreach (['currency', 'testimonials', 'countries', 'regions', 'tags'] as $deprecatedKey) {
                 if (isset($data[$deprecatedKey])) {
@@ -628,6 +634,8 @@ class TripController extends BaseController
             if (isset($data['testimonial_review_ids'])) {
                 $data['testimonial_review_ids'] = is_string($data['testimonial_review_ids']) ? $data['testimonial_review_ids'] : wp_json_encode($data['testimonial_review_ids']);
             }
+            
+            // Handle featured_priority field (already in $data for update)
             // Remove legacy/removed columns not present in trips table
             foreach (['currency', 'testimonials', 'countries', 'regions', 'tags'] as $deprecatedKey) {
                 if (isset($data[$deprecatedKey])) {

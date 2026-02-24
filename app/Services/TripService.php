@@ -476,6 +476,7 @@ class TripService extends BaseService
             'downloadable_items', // Managed in separate yatra_trip_downloads table
             'attributes',
             'activities', // Add activities to relationship fields
+            'destinations', // Add destinations to relationship fields
         ];
         
         foreach ($relationshipFields as $field) {
@@ -494,9 +495,16 @@ class TripService extends BaseService
         
         $this->validate($data);
         
+        // Sanitize data using TripValidator
+        $tripValidator = new \Yatra\Validators\TripValidator();
+        $data = $tripValidator->sanitize($data, null);
+        
         // Remove relationship fields from data before processing
         foreach ($relationshipFields as $field) {
-            unset($data[$field]);
+            // Don't remove featured_priority - it's a direct database field, not a relationship
+            if ($field !== 'featured_priority') {
+                unset($data[$field]);
+            }
         }
         
         $data = $this->processBeforeCreate($data);
@@ -523,6 +531,7 @@ class TripService extends BaseService
             'downloadable_items', // Managed in separate yatra_trip_downloads table
             'attributes', // Add attributes to relationship fields
             'activities', // Add activities to relationship fields
+            'destinations', // Add destinations to relationship fields
         ];
         
         foreach ($relationshipFields as $field) {
@@ -535,17 +544,7 @@ class TripService extends BaseService
             }
         }
         
-        // For validation, we need price_types in data temporarily
-        $priceTypesForValidation = $relationships['price_types'] ?? $data['price_types'] ?? [];
-        $data['price_types'] = $priceTypesForValidation;
-        
-        $this->validate($data, $id);
-        
-        // Remove relationship fields from data before processing
-        foreach ($relationshipFields as $field) {
-            unset($data[$field]);
-        }
-        
+                
         $data = $this->processBeforeUpdate($id, $data);
         
         $attributesRelationship = $relationships['attributes'] ?? null;
@@ -886,26 +885,6 @@ class TripService extends BaseService
     public function countByStatus(string $status): int
     {
         return $this->repository->countByStatus($status);
-    }
-
-    /**
-     * Permanent delete (hard delete)
-     */
-    public function permanentDelete(int $id): bool
-    {
-        // DEBUG: Log service method call
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] TripService - Calling permanentDelete for trip ID: ' . $id);
-        }
-        
-        $result = $this->repository->delete($id);
-        
-        // DEBUG: Log repository result
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] TripService - Repository delete result: ' . ($result ? 'SUCCESS' : 'FAILED'));
-        }
-        
-        return $result;
     }
 
     /**

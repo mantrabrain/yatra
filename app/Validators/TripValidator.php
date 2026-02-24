@@ -386,7 +386,7 @@ class TripValidator
         }
 
         if (isset($data['featured_priority'])) {
-            $sanitized['featured_priority'] = in_array($data['featured_priority'], ['none', 'featured', 'popular', 'new', 'limited', 'bestseller']) 
+            $sanitized['featured_priority'] = in_array($data['featured_priority'], ['none', 'featured', 'new', 'limited', 'bestseller']) 
                 ? $data['featured_priority'] 
                 : 'none';
         }

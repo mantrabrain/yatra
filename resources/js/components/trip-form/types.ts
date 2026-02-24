@@ -127,7 +127,7 @@ export interface TripFormData {
   difficulty_level: string;
   trip_category: number[]; // Array of category IDs
   tags: string[];
-  featured_priority: 'none' | 'featured' | 'popular' | 'new' | 'limited';
+  featured_priority: 'none' | 'featured' | 'new' | 'limited';
   
   // Accommodation
   accommodation_type: string;

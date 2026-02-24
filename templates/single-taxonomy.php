@@ -18,9 +18,9 @@ if (!$taxonomy_data) {
     wp_die(__('No taxonomy data found', 'yatra'));
 }
 
-$type = $taxonomy_data['type'];
-$entity = $taxonomy_data['entity'];
-$trips = $taxonomy_data['trips'];
+$type = $taxonomy_data->type;
+$entity = $taxonomy_data; // Use the taxonomy object itself as entity
+$trips = $taxonomy_data->trips ?? []; // This will be populated by the handler
 
 // Helper function to safely get array from $_GET
 function yatra_get_filter_array($key, $sanitize_callback = 'sanitize_text_field') {
@@ -100,15 +100,15 @@ $paged_trips = $total_trips > 0 ? array_slice($trips, $offset, $per_page) : [];
 $entity_image = '';
 
 // Prefer explicit featured_image or image when present
-if (!empty($entity->featured_image)) {
-    $entity_image = wp_get_attachment_url($entity->featured_image);
-} elseif (!empty($entity->image)) {
-    $entity_image = $entity->image;
+if (!empty($taxonomy_data->featured_image)) {
+    $entity_image = wp_get_attachment_url($taxonomy_data->featured_image);
+} elseif (!empty($taxonomy_data->image)) {
+    $entity_image = $taxonomy_data->image;
 }
 
 // If still empty, try resolving from icon configuration (same logic as listing-destination.php)
-if (empty($entity_image) && !empty($entity->icon)) {
-    $icon = maybe_unserialize($entity->icon);
+if (empty($entity_image) && !empty($taxonomy_data->icon)) {
+    $icon = maybe_unserialize($taxonomy_data->icon);
 
     if (is_array($icon)) {
         $type  = $icon['type']  ?? '';
@@ -158,9 +158,9 @@ yatra_get_header();
     <div class="yatra-taxonomy-hero"<?php echo $entity_image ? ' style="background-image: url(' . esc_url($entity_image) . ');"' : ''; ?>>
         <div class="yatra-taxonomy-hero-overlay"></div>
         <div class="yatra-taxonomy-hero-content">
-            <h1 class="yatra-taxonomy-title"><?php echo esc_html($entity->name); ?></h1>
-            <?php if (!empty($entity->description)): ?>
-            <p class="yatra-taxonomy-description"><?php echo wp_kses_post($entity->description); ?></p>
+            <h1 class="yatra-taxonomy-title"><?php echo esc_html($taxonomy_data->name); ?></h1>
+            <?php if (!empty($taxonomy_data->description)): ?>
+            <p class="yatra-taxonomy-description"><?php echo wp_kses_post($taxonomy_data->description); ?></p>
             <?php endif; ?>
             <div class="yatra-taxonomy-stats">
                 <span class="yatra-taxonomy-trip-count">
@@ -181,7 +181,7 @@ yatra_get_header();
                     <!-- Results Header -->
                     <div class="yatra-results-header">
                         <div class="yatra-results-info">
-                            <h2><?php echo sprintf(esc_html($labels['trips_title']), esc_html($entity->name)); ?></h2>
+                            <h2><?php echo sprintf(esc_html($labels['trips_title']), esc_html($taxonomy_data->name)); ?></h2>
                             <p class="yatra-results-count">
                                 <?php echo sprintf(
                                     __('Showing <strong>%d</strong> of %d trips', 'yatra'),
@@ -238,7 +238,7 @@ yatra_get_header();
                     </svg>
                 </div>
                 <h3><?php echo esc_html__('No trips found', 'yatra'); ?></h3>
-                <p><?php echo sprintf(esc_html__('There are no trips available for %s at the moment. Please check back later or explore other options.', 'yatra'), esc_html($entity->name)); ?></p>
+                <p><?php echo sprintf(esc_html__('There are no trips available for %s at the moment. Please check back later or explore other options.', 'yatra'), esc_html($taxonomy_data->name)); ?></p>
                 <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" class="yatra-btn-primary">
                     <?php echo esc_html__('Browse All Trips', 'yatra'); ?>
                 </a>

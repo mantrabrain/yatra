@@ -799,6 +799,14 @@ class AttributeController extends BaseController
     }
 
     /**
+     * Check permissions for update operations
+     */
+    public function update_permissions_check(): bool
+    {
+        return current_user_can('manage_options');
+    }
+
+    /**
      * Get item schema
      */
     public function get_item_schema(): array

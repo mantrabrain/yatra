@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-24T09:01:42+00:00\n"
+"POT-Creation-Date: 2026-02-24T11:59:45+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -867,7 +867,7 @@ msgid "Booking Date"
 msgstr ""
 
 #: assets/dist/js/account-page.js:837
-#: app/Controllers/TripController.php:1980
+#: app/Controllers/TripController.php:1975
 #: templates/booking-confirmation.php:239
 #: templates/partials/single-trip/content-overview.php:95
 #: templates/partials/single-trip/content-sidebar.php:339
@@ -962,6 +962,7 @@ msgstr ""
 #: assets/dist/js/index-CcT81l1I.js:898
 #: assets/dist/js/index-CoA0FryH.js:898
 #: assets/dist/js/index-CqbqWdVq.js:898
+#: assets/dist/js/index-CvnNrZyJ.js:902
 #: assets/dist/js/index-DJ2aWQ7w.js:902
 #: assets/dist/js/index-JhHGhN8T.js:902
 #: assets/dist/js/index-LYWPs5bb.js:902
@@ -977,6 +978,7 @@ msgstr ""
 #: assets/dist/js/index-CcT81l1I.js:522
 #: assets/dist/js/index-CoA0FryH.js:522
 #: assets/dist/js/index-CqbqWdVq.js:522
+#: assets/dist/js/index-CvnNrZyJ.js:522
 #: assets/dist/js/index-DJ2aWQ7w.js:522
 #: assets/dist/js/index-JhHGhN8T.js:522
 #: assets/dist/js/index-LYWPs5bb.js:522
@@ -2451,121 +2453,121 @@ msgstr ""
 msgid "Trip duplicated as draft"
 msgstr ""
 
-#: app/Controllers/TripController.php:600
+#: app/Controllers/TripController.php:595
 msgid "Trip created successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:722
+#: app/Controllers/TripController.php:717
 msgid "Failed to update trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:746
+#: app/Controllers/TripController.php:741
 msgid "Failed to delete trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:750
+#: app/Controllers/TripController.php:745
 msgid "Trip deleted successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:774
+#: app/Controllers/TripController.php:769
 msgid "Failed to permanently delete trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:783
+#: app/Controllers/TripController.php:778
 msgid "Trip permanently deleted"
 msgstr ""
 
-#: app/Controllers/TripController.php:800
+#: app/Controllers/TripController.php:795
 msgid "Search keyword is required"
 msgstr ""
 
-#: app/Controllers/TripController.php:848
-#: app/Controllers/TripController.php:891
+#: app/Controllers/TripController.php:843
+#: app/Controllers/TripController.php:886
+#: app/Controllers/TripController.php:1339
 #: app/Controllers/TripController.php:1344
-#: app/Controllers/TripController.php:1349
 msgid "Unknown"
 msgstr ""
 
-#: app/Controllers/TripController.php:871
-#: app/Services/TripService.php:969
+#: app/Controllers/TripController.php:866
+#: app/Services/TripService.php:975
 msgid "Revision not found"
 msgstr ""
 
-#: app/Controllers/TripController.php:875
-#: app/Services/TripService.php:974
+#: app/Controllers/TripController.php:870
+#: app/Services/TripService.php:980
 msgid "Revision does not belong to this trip"
 msgstr ""
 
-#: app/Controllers/TripController.php:908
+#: app/Controllers/TripController.php:903
 msgid "You do not have permission to restore revisions"
 msgstr ""
 
-#: app/Controllers/TripController.php:915
+#: app/Controllers/TripController.php:910
 msgid "Invalid trip ID or revision ID"
 msgstr ""
 
-#: app/Controllers/TripController.php:922
+#: app/Controllers/TripController.php:917
 msgid "Failed to restore revision"
 msgstr ""
 
-#: app/Controllers/TripController.php:929
+#: app/Controllers/TripController.php:924
 msgid "Revision restored successfully"
 msgstr ""
 
-#: app/Controllers/TripController.php:1628
-#: app/Controllers/TripController.php:1775
+#: app/Controllers/TripController.php:1623
+#: app/Controllers/TripController.php:1770
 #, php-format
 msgid "%d%% OFF"
 msgstr ""
 
-#: app/Controllers/TripController.php:1633
-#: app/Controllers/TripController.php:1779
+#: app/Controllers/TripController.php:1628
+#: app/Controllers/TripController.php:1774
 #, php-format
 msgid "+%d%%"
 msgstr ""
 
-#: app/Controllers/TripController.php:1644
+#: app/Controllers/TripController.php:1639
 msgid "Today"
 msgstr ""
 
-#: app/Controllers/TripController.php:1646
+#: app/Controllers/TripController.php:1641
 msgid "Tomorrow"
 msgstr ""
 
-#: app/Controllers/TripController.php:1668
+#: app/Controllers/TripController.php:1663
 msgid "Start"
 msgstr ""
 
-#: app/Controllers/TripController.php:1669
+#: app/Controllers/TripController.php:1664
 msgid "End"
 msgstr ""
 
-#: app/Controllers/TripController.php:1675
-#: app/Controllers/TripController.php:1785
+#: app/Controllers/TripController.php:1670
+#: app/Controllers/TripController.php:1780
 #: templates/partials/availability-section.php:147
 #: templates/pdf/itinerary.php:262
 msgid "Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1676
-#: app/Controllers/TripController.php:1788
+#: app/Controllers/TripController.php:1671
+#: app/Controllers/TripController.php:1783
 #: templates/partials/availability-section.php:154
 msgid "Return"
 msgstr ""
 
-#: app/Controllers/TripController.php:1724
-#: app/Controllers/TripController.php:1797
+#: app/Controllers/TripController.php:1719
+#: app/Controllers/TripController.php:1792
 msgid "Group Departure"
 msgstr ""
 
-#: app/Controllers/TripController.php:1787
-#: app/Controllers/TripController.php:1800
+#: app/Controllers/TripController.php:1782
+#: app/Controllers/TripController.php:1795
 #: templates/partials/single-trip/content-location.php:45
 msgid "Starting Point"
 msgstr ""
 
-#: app/Controllers/TripController.php:1790
-#: app/Controllers/TripController.php:1801
+#: app/Controllers/TripController.php:1785
+#: app/Controllers/TripController.php:1796
 #: templates/partials/single-trip/content-location.php:57
 msgid "Ending Point"
 msgstr ""
@@ -3699,23 +3701,23 @@ msgstr ""
 msgid "Extreme"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2293
+#: app/Repositories/TripRepository.php:2313
 msgid "Adventure"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2294
+#: app/Repositories/TripRepository.php:2314
 msgid "Cultural"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2295
+#: app/Repositories/TripRepository.php:2315
 msgid "Wildlife"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2296
+#: app/Repositories/TripRepository.php:2316
 msgid "Pilgrimage"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2297
+#: app/Repositories/TripRepository.php:2317
 msgid "Educational"
 msgstr ""
 
@@ -4273,8 +4275,8 @@ msgid "Title is required"
 msgstr ""
 
 #: app/Services/ItineraryService.php:56
-#: app/Services/TripService.php:637
-#: app/Services/TripService.php:963
+#: app/Services/TripService.php:643
+#: app/Services/TripService.php:969
 msgid "Trip not found"
 msgstr ""
 
@@ -4647,7 +4649,7 @@ msgstr ""
 msgid "Reserve Now, Pay Later"
 msgstr ""
 
-#: app/Services/TripService.php:1006
+#: app/Services/TripService.php:1012
 msgid "Invalid revision data"
 msgstr ""
 

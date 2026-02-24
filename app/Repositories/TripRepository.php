@@ -59,7 +59,6 @@ class TripRepository extends BaseRepository
         'group_size',
         'age_min',
         'age_max',
-        'featured_priority',
         'version',
         'views_count',
         'bookings_count',
@@ -729,7 +728,7 @@ class TripRepository extends BaseRepository
         
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT tc.*, c.name as destination_name, c.slug as destination_slug 
+                "SELECT tc.classification_id as id, tc.sort_order, tc.relationship_type, tc.is_featured, c.name, c.slug 
                  FROM {$tripClassificationsTable} tc
                  LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
                  WHERE tc.trip_id = %d AND c.type = %s
@@ -1084,11 +1083,12 @@ class TripRepository extends BaseRepository
     /**
      * Save destinations for a trip
      */
-    public function saveDestinations(int $tripId, array $destinationIds): void
+    public function saveDestinations(int $tripId, array $destinations): void
     {
         global $wpdb;
         
         $table = TripClassificationsTable::getTableName();
+        $classificationsTable = ClassificationsTable::getTableName();
         
         // Delete existing destination relations
         $wpdb->delete(
@@ -1100,14 +1100,53 @@ class TripRepository extends BaseRepository
             ['%d', '%s']
         );
         
-        // Insert new destination relations
+        // Extract destination IDs from destination objects
+        $destinationIds = [];
+        foreach ($destinations as $destination) {
+            if (is_array($destination) && isset($destination['id'])) {
+                $destinationIds[] = (int) $destination['id'];
+            } elseif (is_object($destination) && isset($destination->id)) {
+                $destinationIds[] = (int) $destination->id;
+            } elseif (is_numeric($destination)) {
+                $destinationIds[] = (int) $destination;
+            }
+        }
+        
+        // Validate that destinations exist before saving (same as activities)
+        $validDestinationIds = [];
         if (!empty($destinationIds)) {
-            foreach ($destinationIds as $index => $destinationId) {
+            $placeholders = implode(',', array_fill(0, count($destinationIds), '%d'));
+            $existingDestinations = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT id FROM {$classificationsTable} 
+                     WHERE id IN ({$placeholders}) AND type = %s",
+                    array_merge($destinationIds, [ClassificationTypes::DESTINATION])
+                )
+            );
+            $validDestinationIds = array_map('intval', $existingDestinations);
+        }
+        
+        // Also clean up any existing invalid destination relationships for this trip
+        $deletedRows = $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$table} 
+                 WHERE trip_id = %d AND classification_type = %s 
+                 AND classification_id NOT IN (
+                     SELECT id FROM {$classificationsTable} WHERE type = %s
+                 )",
+                $tripId, ClassificationTypes::DESTINATION, ClassificationTypes::DESTINATION
+            )
+        );
+        
+                
+        // Insert new destination relations
+        if (!empty($validDestinationIds)) {
+            foreach ($validDestinationIds as $index => $destinationId) {
                 $wpdb->insert(
                     $table,
                     [
                         'trip_id' => $tripId,
-                        'classification_id' => (int) $destinationId,
+                        'classification_id' => $destinationId,
                         'classification_type' => ClassificationTypes::DESTINATION,
                         'relationship_type' => $index === 0 ? 'primary' : 'secondary',
                         'sort_order' => $index,
@@ -2074,13 +2113,18 @@ class TripRepository extends BaseRepository
         $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
-        return $wpdb->get_results($wpdb->prepare(
+        $results = $wpdb->get_results($wpdb->prepare(
             "SELECT tc.trip_id, tc.classification_id, c.name, c.slug
              FROM {$tripClassificationsTable} tc
              LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
              WHERE tc.trip_id = %d AND tc.classification_type = %s",
             $tripId, ClassificationTypes::DESTINATION
         ));
+        
+        // Filter out destinations with missing classification data
+        return array_filter($results, function($destination) {
+            return !empty($destination->name) && !empty($destination->slug);
+        });
     }
 
     /**

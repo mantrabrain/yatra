@@ -858,7 +858,6 @@ const Trips: React.FC = () => {
             {(trip.featured_priority && trip.featured_priority !== 'none' && isPro) && (
               <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
                 {trip.featured_priority === 'featured' ? __('Featured', 'yatra') :
-                 trip.featured_priority === 'popular' ? __('Popular', 'yatra') :
                  trip.featured_priority === 'new' ? __('New', 'yatra') :
                  trip.featured_priority === 'limited' ? __('Limited', 'yatra') :
                  trip.featured_priority === 'bestseller' ? __('Bestseller', 'yatra') :

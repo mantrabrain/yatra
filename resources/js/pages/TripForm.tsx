@@ -247,7 +247,7 @@ interface TripFormData {
   difficulty_level: string;
   trip_category: number[]; // Array of category IDs
   tags: string[];
-  featured_priority: 'none' | 'featured' | 'popular' | 'new' | 'limited'; // Featured Priority
+  featured_priority: 'none' | 'featured' | 'new' | 'limited'; // Featured Priority
   
   // Accommodation
   accommodation_type: string;
@@ -584,7 +584,7 @@ const TripForm: React.FC = () => {
       difficulty_level: '',
       trip_category: [],
       tags: ['trekking', 'mountains', 'adventure', 'challenging', 'everest'],
-      featured_priority: 'popular',
+      featured_priority: 'featured',
       accommodation_type: 'Teahouse',
       meal_plan: 'full_board',
       accommodation_details: 'Traditional teahouses along the route with basic amenities. Rooms are shared, and facilities become more basic as altitude increases.',
@@ -688,7 +688,7 @@ const TripForm: React.FC = () => {
       difficulty_level: '',
       trip_category: [],
       tags: ['cultural', 'city-tour', 'history', 'art', 'food'],
-      featured_priority: 'popular',
+      featured_priority: 'featured',
       accommodation_type: 'Hotel',
       meal_plan: 'breakfast',
       accommodation_details: '4-star hotels in city centers with easy access to major attractions',
@@ -1050,13 +1050,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             status: 'publish' // Only get published destinations
           } 
         });
-        return response.data || [];
+                return response.data || [];
       } catch (error: any) {
         showToast(error?.message || __('Failed to load destinations', 'yatra'), 'error');
         return [];
       }
     },
-    enabled: can('yatra_view_trips') && (currentSection === 'location' || visitedSections.has('location')),
+    enabled: can('yatra_view_trips') && (isEditMode || currentSection === 'location' || visitedSections.has('location')),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
@@ -1066,13 +1066,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     queryFn: async () => {
       if (!tripId) return null;
       try {
-        console.log('Fetching trip data for ID:', tripId);
         const response = await apiClient.get(`/trips/${tripId}`);
-        console.log('Trip API response:', response);
         // WordPress REST API returns data directly, but check if it's wrapped
         // Some endpoints return { data: {...} }, others return {...} directly
         const tripData = response?.data || response;
-        console.log('Extracted trip data:', tripData);
         return tripData;
       } catch (error: any) {
         console.error('Error loading trip:', error);
@@ -1305,11 +1302,8 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
 
   useEffect(() => {
     if (!tripData || !isEditMode) {
-      console.log('Not loading data - tripData:', tripData, 'isEditMode:', isEditMode);
-      return;
+            return;
     }
-
-    console.log('Loading trip data into form:', tripData);
 
     setFormData({
         title: tripData.title || '',
@@ -1411,7 +1405,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     } else if (!tripData.featured_image) {
       setFeaturedImagePreview('');
     }
-  }, [tripData, tripAttributesData, isEditMode, tripId]);
+  }, [tripData, tripAttributesData, destinationsData, isEditMode, tripId]);
 
   useEffect(() => {
     let isMounted = true;
@@ -2294,6 +2288,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         meta_description: data.meta_description || '',
         meta_keywords: data.meta_keywords || '',
         attributes: data.attributes || {},
+        featured_priority: data.featured_priority,
       };
 
       if (showDownloadsUI) {
@@ -2483,18 +2478,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
     setSelectedRevisionId(null);
   };
 
-  // Debug logging
-  useEffect(() => {
-    console.log('Edit mode debug:', {
-      isEditMode,
-      tripId,
-      isLoadingTrip,
-      tripData: tripData ? 'Data exists' : 'No data',
-      tripError: tripError ? tripError.message : 'No error',
-      canView: can('yatra_view_trips'),
-    });
-  }, [isEditMode, tripId, isLoadingTrip, tripData, tripError, can]);
-
+  
   // Skeleton loader for edit mode
   if (isEditMode && isLoadingTrip) {
     return (
@@ -3130,10 +3114,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                               value="single_day"
                               checked={formData.trip_type === 'single_day'}
                               onChange={(e) => {
-                                console.log('📝 TRIP TYPE CHANGE HANDLER CALLED:', {
-                                  newValue: e.target.value,
-                                  timestamp: new Date().toISOString()
-                                });
                                 handleFieldChange('trip_type', e.target.value);
                                 if (e.target.value === 'single_day') {
                                   setFormData(prev => ({
@@ -3325,11 +3305,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 </label>
                 {destinationsData && destinationsData.length > 0 ? (
                   <MultiSelect
-                    value={formData.destinations}
+                    value={formData.destinations.map(id => id.toString())}
                     onChange={(values) => handleFieldChange('destinations', values.map(v => Number(v)))}
                     options={destinationsData.map((destination: any) => ({
-                      value: destination.id,
-                      label: destination.name,
+                      value: destination.id.toString(),
+                      label: destination.name || `Destination #${destination.id}`,
                     }))}
                     placeholder={__('Select destinations...', 'yatra')}
                     searchPlaceholder={__('Search destinations...', 'yatra')}
@@ -3756,7 +3736,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 >
                   <option value="none">{__('None', 'yatra')}</option>
                   <option value="featured">{__('Featured', 'yatra')}</option>
-                  <option value="popular">{__('Popular', 'yatra')}</option>
                   <option value="new">{__('New', 'yatra')}</option>
                   <option value="limited">{__('Limited Time', 'yatra')}</option>
                 </Select>

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Yatra\Core\Handlers;
 
+use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Repositories\TripRepository;
+
 /**
  * Taxonomy Page Handler
  *
@@ -30,6 +33,14 @@ class TaxonomyPageHandler extends BasePageHandler
             $this->set404();
             return false;
         }
+
+        // Get trips for this taxonomy
+        $tripRepository = new TripRepository();
+        $filter_key = $this->getFilterKey($taxonomy_type);
+        $trips_data = $tripRepository->findWithFilters([$filter_key => $slug], 1, 50);
+        
+        // Add trips to taxonomy data
+        $taxonomy_data->trips = $trips_data['data'] ?? [];
 
         // Prevent 404 handling
         $this->prevent404();
@@ -69,7 +80,7 @@ class TaxonomyPageHandler extends BasePageHandler
     {
         global $wpdb;
 
-        $table = $wpdb->prefix . 'yatra_classifications';
+        $table = ClassificationsTable::getTableName();
 
         $data = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$table} WHERE type = %s AND slug = %s AND status = 'publish' LIMIT 1",
@@ -78,5 +89,27 @@ class TaxonomyPageHandler extends BasePageHandler
         ));
 
         return $data ?: null;
+    }
+
+    /**
+     * Get filter key for taxonomy type
+     *
+     * @param string $taxonomy_type Taxonomy type
+     * @return string Filter key for TripRepository
+     */
+    private function getFilterKey(string $taxonomy_type): string
+    {
+        switch ($taxonomy_type) {
+            case 'category':
+                return 'trip_category';
+            case 'activity':
+                return 'activity';
+            case 'destination':
+                return 'destination';
+            case 'difficulty':
+                return 'difficulty';
+            default:
+                return $taxonomy_type;
+        }
     }
 }

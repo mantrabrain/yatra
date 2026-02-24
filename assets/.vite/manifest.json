@@ -3,16 +3,6 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-BR2i8ReK.js": {
-    "file": "dist/js/index-BR2i8ReK.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-Bol_9zUu.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
   "_index-CvnNrZyJ.js": {
     "file": "dist/js/index-CvnNrZyJ.js",
     "name": "index",
@@ -29,13 +19,6 @@
   },
   "_react-vendor-B37Vccnj.js": {
     "file": "admin/dist/js/react-vendor-B37Vccnj.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
-  "_react-vendor-Bol_9zUu.js": {
-    "file": "admin/dist/js/react-vendor-Bol_9zUu.js",
     "name": "react-vendor",
     "css": [
       "admin/dist/css/react-vendor.css"
