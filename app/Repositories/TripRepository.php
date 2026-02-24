@@ -750,16 +750,23 @@ class TripRepository extends BaseRepository
         $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
-        return $wpdb->get_results(
+        $results = $wpdb->get_results(
             $wpdb->prepare(
                 "SELECT tc.*, c.name as activity_name, c.slug as activity_slug 
                  FROM {$tripClassificationsTable} tc
                  LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
-                 WHERE tc.trip_id = %d AND c.type = %s
+                 WHERE tc.trip_id = %d AND tc.classification_type = %s
                  ORDER BY tc.sort_order ASC, tc.id ASC",
                 $tripId, ClassificationTypes::ACTIVITY
             )
         ) ?: [];
+        
+        // Filter out relationships where the activity doesn't exist in Classifications table
+        $validResults = array_filter($results, function($result) {
+            return !empty($result->activity_name) && !empty($result->activity_slug);
+        });
+        
+        return array_values($validResults);
     }
 
     /**
@@ -773,25 +780,23 @@ class TripRepository extends BaseRepository
         $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
-        $results = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT tc.*, c.name as category_name, c.slug as category_slug 
-                 FROM {$tripClassificationsTable} tc
-                 LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
-                 WHERE tc.trip_id = %d AND c.type = %s
-                 ORDER BY tc.sort_order ASC, tc.id ASC",
-                $tripId, ClassificationTypes::CATEGORY
-            )
-        ) ?: [];
+        $sql = $wpdb->prepare(
+            "SELECT tc.*, c.name as category_name, c.slug as category_slug 
+             FROM {$tripClassificationsTable} tc
+             LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND tc.classification_type = %s
+             ORDER BY tc.sort_order ASC, tc.id ASC",
+            $tripId, ClassificationTypes::CATEGORY
+        );
         
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra: getTripCategories - Found " . count($results) . " categories for trip {$tripId}");
-            if (!empty($results)) {
-                error_log("Yatra: getTripCategories - Sample category: " . json_encode($results[0]));
-            }
-        }
+        $results = $wpdb->get_results($sql) ?: [];
         
-        return $results;
+        // Filter out relationships where the category doesn't exist in Classifications table
+        $validResults = array_filter($results, function($result) {
+            return !empty($result->category_name) && !empty($result->category_slug);
+        });
+        
+        return array_values($validResults);
     }
 
     /**
@@ -1122,6 +1127,21 @@ class TripRepository extends BaseRepository
         global $wpdb;
         
         $table = TripClassificationsTable::getTableName();
+        $classificationsTable = ClassificationsTable::getTableName();
+        
+        // Validate that activities exist before saving
+        $validActivityIds = [];
+        if (!empty($activityIds)) {
+            $placeholders = implode(',', array_fill(0, count($activityIds), '%d'));
+            $existingActivities = $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT id FROM {$classificationsTable} 
+                     WHERE id IN ({$placeholders}) AND type = %s",
+                    array_merge($activityIds, [ClassificationTypes::ACTIVITY])
+                )
+            );
+            $validActivityIds = array_map('intval', $existingActivities);
+        }
         
         // Delete existing activity relations
         $wpdb->delete(
@@ -1133,9 +1153,9 @@ class TripRepository extends BaseRepository
             ['%d', '%s']
         );
         
-        // Insert new activity relations
-        if (!empty($activityIds)) {
-            foreach ($activityIds as $index => $activityId) {
+        // Insert new activity relations (only for valid activities)
+        if (!empty($validActivityIds)) {
+            foreach ($validActivityIds as $index => $activityId) {
                 $wpdb->insert(
                     $table,
                     [
@@ -2055,11 +2075,11 @@ class TripRepository extends BaseRepository
         $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
         
         return $wpdb->get_results($wpdb->prepare(
-            "SELECT tc.trip_id, c.id, c.name, c.slug
+            "SELECT tc.trip_id, tc.classification_id, c.name, c.slug
              FROM {$tripClassificationsTable} tc
-             INNER JOIN {$classificationsTable} c ON c.id = tc.classification_id
-             WHERE tc.trip_id = %d AND c.type = 'destination'",
-            $tripId
+             LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id
+             WHERE tc.trip_id = %d AND tc.classification_type = %s",
+            $tripId, ClassificationTypes::DESTINATION
         ));
     }
 

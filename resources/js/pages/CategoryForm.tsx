@@ -18,6 +18,7 @@ import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
 import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import { RichTextEditor } from '../components/ui/rich-text-editor';
 
 interface CategoryFormData {
   name: string;
@@ -388,6 +389,19 @@ const CategoryForm: React.FC = () => {
                         ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
                         : __('Auto-generated from name. Click edit icon to customize.', 'yatra')}
                     </p>
+                  </div>
+
+                  {/* Description */}
+                  <div className="mt-4">
+                    <RichTextEditor
+                      label={__('Description', 'yatra')}
+                      value={formData.description || ''}
+                      onChange={(value) => handleFieldChange('description', value)}
+                      placeholder={__('Enter category description...', 'yatra')}
+                      helperText={__('Describe what this category is for and what types of trips it contains.', 'yatra')}
+                      minHeight={120}
+                      maxHeight={360}
+                    />
                   </div>
                 </CardContent>
               </Card>

@@ -11,11 +11,12 @@ import {
   Archive,
   Copy,
   ExternalLink,
-  MapPin,
   Calendar,
   Users,
-  Tag,
-  Mountain,
+  Activity,
+  Route,
+  FolderTree,
+  TrendingUp,
   Plus,
   Search,
   X,
@@ -831,12 +832,12 @@ const Trips: React.FC = () => {
                 const activityLabel = summarizeActivities(trip);
                 const difficultyLabel = formatLabel(trip.difficulty_level);
                 const chips = [
-                  destinationLabel && visibleColumns.destinations && { key: 'dest', label: destinationLabel, icon: MapPin },
+                  destinationLabel && visibleColumns.destinations && { key: 'dest', label: destinationLabel, icon: Route },
                   durationLabel && { key: 'duration', label: durationLabel, icon: Calendar },
                   travelerLabel && { key: 'traveler', label: travelerLabel, icon: Users },
-                  activityLabel && visibleColumns.activities && { key: 'activity', label: activityLabel, icon: Tag },
-                  categoryLabel && visibleColumns.categories && { key: 'category', label: categoryLabel, icon: Tag },
-                  difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: Mountain },
+                  activityLabel && visibleColumns.activities && { key: 'activity', label: activityLabel, icon: Activity },
+                  categoryLabel && visibleColumns.categories && { key: 'category', label: categoryLabel, icon: FolderTree },
+                  difficultyLabel && { key: 'difficulty', label: difficultyLabel, icon: TrendingUp },
                 ].filter(Boolean) as Array<{ key: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>> }>;
                 if (!chips.length) return null;
                 return (

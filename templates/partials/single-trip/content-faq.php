@@ -2,32 +2,262 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-
-// FAQ Section
-// Expected variables: $trip
 ?>
+<?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
 <section class="yatra-trip-section" id="faq">
-    <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon('info', 'yatra-trip-section-title-icon'); ?>
-        <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
-    </h2>
-    <ul class="yatra-trip-faq">
+    <div class="faq-header">
+        <h2 class="yatra-trip-section-title">
+            <?php echo yatra_svg_icon('help-circle', 'yatra-trip-section-title-icon'); ?>
+            <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
+        </h2>
+        <div class="faq-controls">
+            <button class="faq-btn" onclick="expandAll()">
+                <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 9l-7 7-7-7"/>
+                </svg>
+                Expand All
+            </button>
+            <button class="faq-btn" onclick="collapseAll()">
+                <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 9l-7 7-7-7"/>
+                </svg>
+                Collapse All
+            </button>
+        </div>
+    </div>
+    
+    <div class="faq-container">
         <?php foreach ($trip->faqs as $faq): ?>
             <?php
-            $question = is_array($faq) ? ($faq['question'] ?? '') : (is_object($faq) ? ($faq->question ?? '') : '');
-            $answer = is_array($faq) ? ($faq['answer'] ?? '') : (is_object($faq) ? ($faq->answer ?? '') : '');
+            $question = is_object($faq) ? ($faq->title ?? '') : '';
+            $answer = is_object($faq) ? ($faq->description ?? '') : '';
+            
+            if (empty($question) && is_array($faq)) {
+                $question = $faq['question'] ?? '';
+                $answer = $faq['answer'] ?? '';
+            }
             ?>
             <?php if (!empty($question) && !empty($answer)): ?>
-                <li class="yatra-faq-item">
-                    <h3 class="yatra-faq-question">
+                <div class="faq-item">
+                    <button class="faq-question" onclick="toggleFAQ(this)">
                         <?php echo esc_html($question); ?>
-                        <?php echo yatra_svg_icon('chevron-down', 'yatra-faq-toggle'); ?>
-                    </h3>
-                    <div class="yatra-faq-answer">
-                        <p><?php echo wp_kses_post($answer); ?></p>
+                        <svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div class="faq-answer">
+                        <?php echo wp_kses_post($answer); ?>
                     </div>
-                </li>
+                </div>
             <?php endif; ?>
         <?php endforeach; ?>
-    </ul>
+    </div>
 </section>
+
+<script>
+function toggleFAQ(button) {
+    const item = button.parentElement;
+    const answer = item.querySelector('.faq-answer');
+    const arrow = button.querySelector('.faq-arrow');
+    
+    // Close others
+    document.querySelectorAll('.faq-item').forEach(other => {
+        if (other !== item) {
+            other.classList.remove('active');
+            other.querySelector('.faq-answer').style.maxHeight = '0';
+            other.querySelector('.faq-arrow').style.transform = 'rotate(0deg)';
+        }
+    });
+    
+    // Toggle current
+    item.classList.toggle('active');
+    
+    if (item.classList.contains('active')) {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        arrow.style.transform = 'rotate(180deg)';
+    } else {
+        answer.style.maxHeight = '0';
+        arrow.style.transform = 'rotate(0deg)';
+    }
+}
+
+function expandAll() {
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const answer = item.querySelector('.faq-answer');
+        const arrow = item.querySelector('.faq-arrow');
+        
+        item.classList.add('active');
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+        arrow.style.transform = 'rotate(180deg)';
+    });
+}
+
+function collapseAll() {
+    document.querySelectorAll('.faq-item').forEach(item => {
+        const answer = item.querySelector('.faq-answer');
+        const arrow = item.querySelector('.faq-arrow');
+        
+        item.classList.remove('active');
+        answer.style.maxHeight = '0';
+        arrow.style.transform = 'rotate(0deg)';
+    });
+}
+</script>
+
+<style>
+.faq-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.faq-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.faq-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.faq-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #374151;
+}
+
+.faq-btn svg {
+    flex-shrink: 0;
+}
+
+.faq-btn-arrow {
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+}
+
+.faq-container {
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.faq-item {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.faq-question:hover {
+    background: #f9fafb;
+}
+
+.faq-item.active .faq-question {
+    background: #f9fafb;
+    font-weight: 600;
+}
+
+.faq-arrow {
+    color: #9ca3af;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    margin-left: 12px;
+}
+
+.faq-item.active .faq-arrow {
+    color: #6b7280;
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    background: #f9fafb;
+    padding: 0 20px;
+    color: #6b7280;
+    line-height: 1.5;
+    font-size: 14px;
+}
+
+.faq-item.active .faq-answer {
+    padding: 0 20px 16px 20px;
+}
+
+.faq-answer p {
+    margin: 0 0 8px 0;
+}
+
+.faq-answer p:last-child {
+    margin-bottom: 0;
+}
+
+.faq-answer ul,
+.faq-answer ol {
+    margin: 8px 0;
+    padding-left: 16px;
+}
+
+.faq-answer li {
+    margin-bottom: 4px;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .faq-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .faq-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .faq-question {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    
+    .faq-answer {
+        font-size: 13px;
+    }
+    
+    .faq-item.active .faq-answer {
+        padding: 0 16px 14px 16px;
+    }
+}
+</style>
+<?php endif; ?>

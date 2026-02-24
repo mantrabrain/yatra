@@ -13,9 +13,26 @@
       "admin/dist/css/index.css"
     ]
   },
+  "_index-CvnNrZyJ.js": {
+    "file": "dist/js/index-CvnNrZyJ.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-B37Vccnj.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
+  },
+  "_react-vendor-B37Vccnj.js": {
+    "file": "admin/dist/js/react-vendor-B37Vccnj.js",
+    "name": "react-vendor",
+    "css": [
+      "admin/dist/css/react-vendor.css"
+    ]
   },
   "_react-vendor-Bol_9zUu.js": {
     "file": "admin/dist/js/react-vendor-Bol_9zUu.js",
@@ -30,8 +47,8 @@
     "src": "resources/js/account-page.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-Bol_9zUu.js",
-      "_index-BR2i8ReK.js"
+      "_react-vendor-B37Vccnj.js",
+      "_index-CvnNrZyJ.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -40,8 +57,8 @@
     "src": "resources/js/main.tsx",
     "isEntry": true,
     "imports": [
-      "_react-vendor-Bol_9zUu.js",
-      "_index-BR2i8ReK.js"
+      "_react-vendor-B37Vccnj.js",
+      "_index-CvnNrZyJ.js"
     ]
   }
 }

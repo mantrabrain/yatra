@@ -475,11 +475,16 @@ class TripService extends BaseService
             'price_types', // Include price_types in relationship fields
             'downloadable_items', // Managed in separate yatra_trip_downloads table
             'attributes',
+            'activities', // Add activities to relationship fields
         ];
         
         foreach ($relationshipFields as $field) {
-            if (!isset($relationships[$field]) && isset($data[$field])) {
-                $relationships[$field] = $data[$field];
+            if (!isset($relationships[$field])) {
+                // Handle field name mapping for activities
+                $dataField = $field === 'activities' ? 'activity_types' : $field;
+                if (isset($data[$dataField])) {
+                    $relationships[$field] = $data[$dataField];
+                }
             }
         }
         
@@ -517,17 +522,18 @@ class TripService extends BaseService
             'price_types', // Include price_types in relationship fields
             'downloadable_items', // Managed in separate yatra_trip_downloads table
             'attributes', // Add attributes to relationship fields
+            'activities', // Add activities to relationship fields
         ];
         
-        error_log("Yatra TripService: updateWithRelations START - id={$id}");
-        
         foreach ($relationshipFields as $field) {
-            if (!isset($relationships[$field]) && isset($data[$field])) {
-                $relationships[$field] = $data[$field];
+            if (!isset($relationships[$field])) {
+                // Handle field name mapping for activities
+                $dataField = $field === 'activities' ? 'activity_types' : $field;
+                if (isset($data[$dataField])) {
+                    $relationships[$field] = $data[$dataField];
+                }
             }
         }
-        
-        error_log("Yatra TripService: price_types in relationships AFTER: " . json_encode($relationships['price_types'] ?? 'NOT SET'));
         
         // For validation, we need price_types in data temporarily
         $priceTypesForValidation = $relationships['price_types'] ?? $data['price_types'] ?? [];

@@ -353,17 +353,17 @@ class TripController extends BaseController
                     // Destinations
                     $destByTrip = [];
                     foreach ($tripIds as $id) {
-                        $row = $this->service->getWithRelations($id);
+                        $destinations = $this->service->getTripDestinations($id);
                         $destByTrip[$id] = [];
                         
-                        if ($row && isset($row->destinations)) {
-                            foreach ($row->destinations as $destination) {
-                                $destByTrip[$id][] = (object) [
-                                    'destination_id' => (int) $destination->id,
-                                    'destination_name' => $destination->name,
-                                    'destination_slug' => $destination->slug,
-                                ];
-                            }
+                        foreach ($destinations as $destination) {
+                            $destByTrip[$id][] = (object) [
+                                'id' => (int) ($destination->classification_id ?? 0),
+                                'name' => $destination->name ?? '',
+                                'slug' => $destination->slug ?? '',
+                                'debug_classification_id' => $destination->classification_id,
+                                'debug_trip_id' => $destination->trip_id,
+                            ];
                         }
                     }
 
@@ -381,30 +381,25 @@ class TripController extends BaseController
                             $actByTrip[$tId] = [];
                         }
                         $actByTrip[$tId][] = (object) [
-                            'activity_id' => (int) $row->id,
-                            'activity_name' => $row->name,
-                            'activity_slug' => $row->slug,
+                            'id' => (int) $row->id,
+                            'name' => $row->name,
+                            'slug' => $row->slug,
                         ];
                     }
 
                     // Use TripService to get categories
-                    $catRows = [];
+                    $catByTrip = [];
                     foreach ($tripIds as $id) {
                         $categories = $this->service->getTripCategories($id);
-                        $catRows = array_merge($catRows, $categories);
-                    }
-
-                    $catByTrip = [];
-                    foreach ($catRows as $row) {
-                        $tId = (int) $row->trip_id;
-                        if (!isset($catByTrip[$tId])) {
-                            $catByTrip[$tId] = [];
+                        $catByTrip[$id] = [];
+                        
+                        foreach ($categories as $category) {
+                            $catByTrip[$id][] = (object) [
+                                'id' => (int) ($category->classification_id ?? 0),
+                                'name' => $category->category_name ?? '',
+                                'slug' => $category->category_slug ?? '',
+                            ];
                         }
-                        $catByTrip[$tId][] = (object) [
-                            'category_id' => (int) $row->id,
-                            'category_name' => $row->name,
-                            'category_slug' => $row->slug,
-                        ];
                     }
 
                     // Attach grouped relations back to items so prepare_item_for_response can format them
@@ -417,7 +412,7 @@ class TripController extends BaseController
                             $item->destinations = $destByTrip[$id];
                         }
                         if (isset($actByTrip[$id])) {
-                            $item->activities = $actByTrip[$id];
+                            $item->activity_types = $actByTrip[$id];
                         }
                         if (isset($catByTrip[$id])) {
                             $item->trip_category = $catByTrip[$id];
@@ -1089,9 +1084,9 @@ class TripController extends BaseController
         if (isset($item->destinations)) {
             $data['destinations'] = array_map(function ($dest) {
                 return [
-                    'id' => (int) $dest->destination_id,
-                    'name' => $dest->destination_name ?? '',
-                    'slug' => $dest->destination_slug ?? '',
+                    'id' => (int) ($dest->id ?? 0),
+                    'name' => $dest->name ?? '',
+                    'slug' => $dest->slug ?? '',
                     'is_primary' => (bool) $dest->is_primary,
                     'order' => (int) $dest->order,
                 ];
@@ -1101,7 +1096,7 @@ class TripController extends BaseController
         if (isset($item->activities)) {
             $data['activity_types'] = array_map(function ($act) {
                 return [
-                    'id' => (int) $act->activity_id,
+                    'id' => (int) ($act->classification_id ?? 0),
                     'name' => $act->activity_name ?? '',
                     'slug' => $act->activity_slug ?? '',
                     'is_primary' => (bool) $act->is_primary,
@@ -1115,7 +1110,7 @@ class TripController extends BaseController
             if (is_array($item->trip_category)) {
                 $data['trip_category'] = array_map(function ($cat) {
                     return [
-                        'id' => (int) ($cat->category_id ?? $cat->id ?? 0),
+                        'id' => (int) ($cat->classification_id ?? $cat->category_id ?? $cat->id ?? 0),
                         'name' => $cat->category_name ?? $cat->name ?? '',
                         'slug' => $cat->category_slug ?? $cat->slug ?? '',
                         'is_primary' => (bool) ($cat->is_primary ?? false),

@@ -57,7 +57,7 @@ class DestinationRepository extends BaseRepository
     public function getPublished(array $args = []): array
     {
         $args['where']['type'] = ClassificationTypes::DESTINATION;
-        $args['where']['status'] = 'active';
+        $args['where']['status'] = 'publish';
         return $this->all($args);
     }
 
@@ -103,7 +103,7 @@ class DestinationRepository extends BaseRepository
                   ON t.id = tc.trip_id
                 LEFT JOIN `{$reviewsTable}` r
                   ON r.trip_id = t.id AND r.status = 'approved'
-                WHERE d.type = %s AND d.status = 'active'
+                WHERE d.type = %s AND d.status = 'publish'
                 GROUP BY d.id";
 
         $rows = $this->wpdb->get_results($this->wpdb->prepare($sql, ClassificationTypes::DESTINATION, ClassificationTypes::DESTINATION)) ?: [];
@@ -347,9 +347,11 @@ class DestinationRepository extends BaseRepository
             "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripsTable}` t
              INNER JOIN `{$tripDestinationsTable}` td ON td.trip_id = t.id
-             WHERE td.destination_id = %d
+             WHERE td.classification_id = %d
+               AND td.classification_type = %s
                AND t.status != 'trash'",
-            $destinationId
+            $destinationId,
+            ClassificationTypes::DESTINATION
         ));
     }
 
@@ -364,13 +366,17 @@ class DestinationRepository extends BaseRepository
         global $wpdb;
         $tripRepository = new \Yatra\Repositories\TripRepository();
         $tripTable = $tripRepository->getTableName();
+        $tripClassificationsTable = TripClassificationsTable::getTableName();
         
         return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*)
+            "SELECT COUNT(DISTINCT t.id)
              FROM `{$tripTable}` t
-             WHERE t.destination_id = %d
+             INNER JOIN `{$tripClassificationsTable}` tc ON tc.trip_id = t.id
+             WHERE tc.classification_id = %d
+               AND tc.classification_type = %s
                AND t.status != 'trash'",
-            $destinationId
+            $destinationId,
+            ClassificationTypes::DESTINATION
         ));
     }
 }

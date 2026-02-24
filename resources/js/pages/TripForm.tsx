@@ -988,7 +988,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         return [];
       }
     },
-    enabled: can('yatra_view_trips') && (currentSection === 'categorization' || visitedSections.has('categorization')),
+    enabled: can('yatra_view_trips'),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
@@ -1001,11 +1001,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           params: {
             per_page: 100,
             status: 'publish',
-            orderby: 'level_order',
+            orderby: 'sorting',
             order: 'ASC',
           },
         });
-        return response;
+        return response.data || [];
       } catch (error: any) {
         showToast(error?.message || __('Failed to load difficulty levels', 'yatra'), 'error');
         return [];
@@ -2202,7 +2202,22 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         off_season: data.off_season.trim(),
         activity_types: data.activity_types || [], // Array of activity IDs
         difficulty_level: parseInt(data.difficulty_level) || null,
-        trip_category: data.trip_category || [],
+        trip_category: (() => {
+            const rawCategories = data.trip_category || [];
+            
+            // If no trip categories available yet, don't filter - send raw data
+            if (tripCategories.length === 0) {
+              return rawCategories;
+            }
+            
+            // Filter valid categories - save exactly what user selects
+            const validCategories = rawCategories.filter(_catId => {
+              // Always return true - save all selected categories regardless of availability
+              return true;
+            });
+            
+            return validCategories;
+          })(),
         tags: data.tags || [],
         featured_priority: data.featured_priority,
         accommodation_type: data.accommodation_type || '',
@@ -3621,9 +3636,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {isLoadingTripCategories 
-                        ? __('Loading categories...', 'yatra') 
-                        : __('No categories available. Please create categories first.', 'yatra')}
+                      {__('No categories available. ', 'yatra')}
+                      <a 
+                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 underline"
+                      >
+                        {__('Create categories here', 'yatra')}
+                      </a>
                     </p>
                   </div>
                 )}
@@ -3652,7 +3673,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   )}
                   {!isLoadingDifficultyLevels && difficultyLevels.length === 0 && (
                     <option value="" disabled>
-                      {__('No published difficulty levels available', 'yatra')}
+                      {__('No difficulty levels available - Click below to create', 'yatra')}
                     </option>
                   )}
                   {!isLoadingDifficultyLevels &&
@@ -3665,6 +3686,21 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                       </option>
                     ))}
                 </Select>
+                {!isLoadingDifficultyLevels && difficultyLevels.length === 0 && (
+                  <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
+                      {__('No difficulty levels available. ', 'yatra')}
+                      <a 
+                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=difficulty-levels" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-amber-800 hover:text-amber-900 underline font-medium"
+                      >
+                        {__('Create difficulty levels here', 'yatra')}
+                      </a>
+                    </p>
+                  </div>
+                )}
                 <HelpText
                   text={__('Physical difficulty level required for this trip', 'yatra')}
                   className="mt-2"
@@ -3690,7 +3726,15 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                 ) : (
                   <div className="p-4 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {__('No activities available. Please create activities first.', 'yatra')}
+                      {__('No activities available. ', 'yatra')}
+                      <a 
+                        href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities" 
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-700 underline"
+                      >
+                        {__('Create activities here', 'yatra')}
+                      </a>
                     </p>
                   </div>
                 )}

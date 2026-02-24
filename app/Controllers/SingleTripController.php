@@ -165,6 +165,9 @@ class SingleTripController
         // Get landmarks from TripContentTable
         $trip->landmarks = $this->getLandmarks((int) $trip->id);
         
+        // Get FAQs from TripContentTable
+        $trip->faqs = $this->getFaqs((int) $trip->id);
+        
         // Get videos, YouTube videos, virtual tours, and documents from TripContentTable
         $trip->videos = $this->getVideos((int) $trip->id);
         $trip->youtube_videos = $this->getYoutubeVideos((int) $trip->id);
@@ -224,7 +227,7 @@ class SingleTripController
             $trip->itinerary_days = $this->decodeJson($trip->itinerary_days ?? '');
         }
         
-        $trip->faqs = $this->decodeJson($trip->faqs ?? '');
+        // FAQs are now loaded from TripContentTable in getFaqs() method
         $trip->frontend_tabs = $this->decodeJson($trip->frontend_tabs ?? '');
         
         // Fetch availability dates from database table
@@ -997,6 +1000,40 @@ class SingleTripController
         }
         
         return $landmark_texts;
+    }
+
+    /**
+     * Get FAQs for a trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Array of FAQ objects
+     */
+    private function getFaqs(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        // Check if table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $faqs = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'faq'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        );
+        
+        return $faqs ?: [];
     }
 
     /**
