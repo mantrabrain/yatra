@@ -14,6 +14,13 @@ declare global {
       thousandSeparator: string;
       decimalSeparator: string;
       capabilities: Record<string, boolean>;
+      // Module enabled flags
+      emailAutomationEnabled: boolean;
+      tripConsentEnabled: boolean;
+      additionalServicesEnabled: boolean;
+      abandonedBookingRecoveryEnabled: boolean;
+      dynamicPricingEnabled: boolean;
+      advancedCancellationEnabled: boolean;
     };
     yatraBookingData?: {
       currency: string;

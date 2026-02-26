@@ -969,7 +969,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
   });
 
   // LAZY LOAD: only when categorization section is visited
-  const { data: tripCategoriesResponse, isLoading: isLoadingTripCategories } = useQuery({
+  const { data: tripCategoriesResponse } = useQuery({
     queryKey: ['trip-categories', 'published'],
     queryFn: async () => {
       try {
@@ -2213,7 +2213,6 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
             return validCategories;
           })(),
         tags: data.tags || [],
-        featured_priority: data.featured_priority,
         accommodation_type: data.accommodation_type || '',
         meal_plan: data.meal_plan || '',
         accommodation_details: data.accommodation_details.trim(),

@@ -218,6 +218,21 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'abandoned-recovery',
             ],
+            [
+                'slug' => 'advanced_cancellation',
+                'name' => __('Advanced Cancellation', 'yatra'),
+                'description' => __('Premium module for sophisticated cancellation policies with percentage-based fees, tiered rules, and automatic charge processing. Perfect for managing complex cancellation scenarios with flexible refund calculations.', 'yatra'),
+                'category' => __('Bookings', 'yatra'),
+                'docs_url' => 'https://docs.yatra.com/modules/advanced-cancellation',
+                'is_premium' => true,
+                'purchase_url' => 'https://wpyatra.com/pricing?module=advanced-cancellation',
+                'is_core' => false,
+                'enabled' => false,
+                'tags' => ['cancellation', 'refunds', 'booking', 'policies', 'charges'],
+                'video_url' => self::DEFAULT_VIDEO_URL,
+                'requires_pro' => true,
+                'settings_page' => 'yatra-advanced-cancellation',
+            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);
