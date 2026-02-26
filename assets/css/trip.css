@@ -7256,6 +7256,313 @@ a.yatra-card-book-btn:hover {
 }
 
 /* ============================================
+   BOOKING PAGE TRIP INFORMATION
+   ============================================ */
+.yatra-booking-info {
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--yatra-bg-card, #ffffff);
+    border: 1px solid var(--yatra-border-color, #e5e7eb);
+    border-radius: 8px;
+}
+
+.yatra-booking-info h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yatra-text-primary, #1a1a1a);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--yatra-border-color, #e5e7eb);
+}
+
+.yatra-booking-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-booking-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--yatra-border-light, #f3f4f6);
+}
+
+.yatra-booking-info-item:last-child {
+    border-bottom: none;
+}
+
+.yatra-booking-info-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--yatra-text-secondary, #6b7280);
+    flex: 1;
+    min-width: 0;
+    margin-right: 8px;
+}
+
+.yatra-booking-info-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yatra-text-primary, #1a1a1a);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+/* Dark Mode */
+.dark .yatra-booking-info {
+    background: var(--yatra-bg-card-dark, #1f2937);
+    border-color: var(--yatra-border-color-dark, #374151);
+}
+
+.dark .yatra-booking-info h5 {
+    color: var(--yatra-text-primary-dark, #f9fafb);
+    border-bottom-color: var(--yatra-border-color-dark, #374151);
+}
+
+.dark .yatra-booking-info-item {
+    border-bottom-color: var(--yatra-border-light-dark, #374151);
+}
+
+.dark .yatra-booking-info-name {
+    color: var(--yatra-text-secondary-dark, #9ca3af);
+}
+
+.dark .yatra-booking-info-value {
+    color: var(--yatra-text-primary-dark, #f9fafb);
+}
+
+/* Cancellation Policy Content */
+.yatra-cancellation-policy-content p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--yatra-text-secondary, #6b7280);
+    margin: 0 0 8px 0;
+}
+
+.yatra-cancellation-policy-content p:last-child {
+    margin-bottom: 0;
+}
+
+.yatra-policy-more {
+    font-size: 12px;
+    font-style: italic;
+    color: var(--yatra-text-muted, #9ca3af);
+    margin-top: 8px;
+}
+
+/* Dark Mode */
+.dark .yatra-cancellation-policy-content p {
+    color: var(--yatra-text-secondary-dark, #9ca3af);
+}
+
+.dark .yatra-policy-more {
+    color: var(--yatra-text-muted-dark, #6b7280);
+}
+
+/* ============================================
+   IMPORTANT INFORMATION SECTION - SIMPLE & CLEAN
+   ============================================ */
+
+.yatra-important-info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 32px;
+}
+
+.yatra-important-info-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    background: var(--yatra-bg-card, #ffffff);
+    border: 1px solid var(--yatra-border-color, #e5e7eb);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s ease;
+}
+
+.yatra-important-info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-important-info-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--yatra-primary-light, #eff6ff);
+    color: var(--yatra-primary-color, #3b82f6);
+    border-radius: 50%;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.yatra-important-info-content-wrapper {
+    flex: 1;
+}
+
+.yatra-important-info-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--yatra-text-primary, #1a1a1a);
+    margin: 0 0 12px 0;
+}
+
+.yatra-important-info-content {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--yatra-text-secondary, #6b7280);
+    margin: 0;
+}
+
+/* Dark Mode */
+.dark .yatra-important-info-card {
+    background: var(--yatra-bg-card-dark, #1f2937);
+    border-color: var(--yatra-border-color-dark, #374151);
+}
+
+.dark .yatra-important-info-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark .yatra-important-info-title {
+    color: var(--yatra-text-primary-dark, #f9fafb);
+}
+
+.dark .yatra-important-info-content {
+    color: var(--yatra-text-secondary-dark, #9ca3af);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yatra-important-info-grid {
+        gap: 16px;
+    }
+    
+    .yatra-important-info-card {
+        padding: 20px;
+        gap: 16px;
+    }
+    
+    .yatra-important-info-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+    
+    .yatra-important-info-title {
+        font-size: 16px;
+    }
+    
+    .yatra-important-info-content {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-important-info-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+    }
+    
+    .yatra-important-info-icon {
+        margin: 0 auto;
+    }
+}
+
+/* ============================================
+   BOOKING PAGE ATTRIBUTES
+   ============================================ */
+.yatra-booking-attributes {
+    margin: 20px 0;
+    padding: 16px;
+    background: var(--yatra-bg-card, #ffffff);
+    border: 1px solid var(--yatra-border-color, #e5e7eb);
+    border-radius: 8px;
+}
+
+.yatra-booking-attributes h5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--yatra-text-primary, #1a1a1a);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--yatra-border-color, #e5e7eb);
+}
+
+.yatra-booking-attributes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.yatra-booking-attribute-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--yatra-border-light, #f3f4f6);
+}
+
+.yatra-booking-attribute-item:last-child {
+    border-bottom: none;
+}
+
+.yatra-booking-attribute-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--yatra-text-secondary, #6b7280);
+    flex: 1;
+    min-width: 0;
+    margin-right: 8px;
+}
+
+.yatra-booking-attribute-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--yatra-text-primary, #1a1a1a);
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.yatra-booking-color-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    border: 1px solid var(--yatra-border-color, #e5e7eb);
+    vertical-align: middle;
+}
+
+/* Dark Mode */
+.dark .yatra-booking-attributes {
+    background: var(--yatra-bg-card-dark, #1f2937);
+    border-color: var(--yatra-border-color-dark, #374151);
+}
+
+.dark .yatra-booking-attributes h5 {
+    color: var(--yatra-text-primary-dark, #f9fafb);
+    border-bottom-color: var(--yatra-border-color-dark, #374151);
+}
+
+.dark .yatra-booking-attribute-item {
+    border-bottom-color: var(--yatra-border-light-dark, #374151);
+}
+
+.dark .yatra-booking-attribute-name {
+    color: var(--yatra-text-secondary-dark, #9ca3af);
+}
+
+.dark .yatra-booking-attribute-value {
+    color: var(--yatra-text-primary-dark, #f9fafb);
+}
+
+/* ============================================
    TRIP LISTING ATTRIBUTE FILTERS - MATCHES AGE SUITABILITY DESIGN
    ============================================ */
 

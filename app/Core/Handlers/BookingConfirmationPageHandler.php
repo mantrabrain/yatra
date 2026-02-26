@@ -38,6 +38,25 @@ class BookingConfirmationPageHandler extends BasePageHandler
         // Prevent 404 handling
         $this->prevent404();
 
+        // Load trip attributes for booking confirmation display
+        if ($booking && !empty($booking->trip_id)) {
+            try {
+                $singleTripController = new \Yatra\Controllers\SingleTripController();
+                // Use reflection to access private method
+                $reflection = new \ReflectionClass($singleTripController);
+                $method = $reflection->getMethod('getTripAttributes');
+                $method->setAccessible(true);
+                $attributes = $method->invoke($singleTripController, (int) $booking->trip_id);
+                
+                // Create a simple list of attribute names for tag display
+                $booking->trip_attributes_list = array_map(function($attr) {
+                    return $attr['name'];
+                }, $attributes);
+            } catch (\Throwable $e) {
+                $booking->trip_attributes_list = [];
+            }
+        }
+
         // Set up global booking object
         $this->setGlobal('yatra_booking', $booking);
 

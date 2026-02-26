@@ -422,6 +422,62 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                         </div>
                     </div>
 
+                    
+                    <!-- Trip Attributes -->
+                    <?php if (!empty($trip->attributes)): ?>
+                        <div class="yatra-booking-attributes">
+                            <h5><?php esc_html_e('Trip Features', 'yatra'); ?></h5>
+                            <div class="yatra-booking-attributes-list">
+                                <?php foreach ($trip->attributes as $attribute): ?>
+                                    <div class="yatra-booking-attribute-item">
+                                        <div class="yatra-booking-attribute-name">
+                                            <?php echo esc_html($attribute['name']); ?>
+                                        </div>
+                                        <div class="yatra-booking-attribute-value">
+                                            <?php
+                                            // Display value based on field type (simplified for booking sidebar)
+                                            switch ($attribute['field_type']) {
+                                                case 'checkbox':
+                                                    echo $attribute['value'] ? esc_html__('Yes', 'yatra') : esc_html__('No', 'yatra');
+                                                    break;
+                                                case 'select':
+                                                case 'radio':
+                                                    $options = json_decode($attribute['field_options'] ?? '[]', true);
+                                                    $selected_value = is_array($attribute['value']) ? $attribute['value'][0] : $attribute['value'];
+                                                    foreach ($options as $option) {
+                                                        if ($option['value'] === $selected_value) {
+                                                            echo esc_html($option['label']);
+                                                            break;
+                                                        }
+                                                    }
+                                                    break;
+                                                case 'date':
+                                                    echo esc_html(date_i18n(get_option('date_format'), strtotime($attribute['value'])));
+                                                    break;
+                                                case 'color':
+                                                    echo '<span class="yatra-booking-color-swatch" style="background-color: ' . esc_attr($attribute['value']) . ';" title="' . esc_attr($attribute['value']) . '"></span>';
+                                                    break;
+                                                case 'textarea':
+                                                    // Truncate long text for sidebar
+                                                    $text = wp_strip_all_tags($attribute['value']);
+                                                    echo esc_html(substr($text, 0, 25) . (strlen($text) > 25 ? '...' : ''));
+                                                    break;
+                                                case 'number':
+                                                    echo esc_html(number_format($attribute['value'], 0));
+                                                    break;
+                                                default:
+                                                    // Truncate long text for sidebar
+                                                    echo esc_html(substr($attribute['value'], 0, 20) . (strlen($attribute['value']) > 20 ? '...' : ''));
+                                                    break;
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <!-- Coupon Code Section -->
                     <div class="yatra-coupon-section">
                         <div class="yatra-coupon-toggle">
@@ -702,54 +758,49 @@ $group_discount_label = $group_discount['label'] ?? __('Group Discount', 'yatra'
                         <?php endif; ?>
                     </div>
 
-                    <!-- Cancellation & Refund Policy -->
-                    <?php 
-                    $cancellation_policy = $booking->cancellation_policy ?? 'full_refund';
-                    $cancellation_days = $booking->cancellation_days ?? 7;
-                    $refund_policy = $booking->refund_policy ?? '';
-                    
-                    $policy_labels = [
-                        'full_refund' => __('Full refund available', 'yatra'),
-                        'partial_refund' => __('Partial refund available', 'yatra'),
-                        'no_refund' => __('No refund', 'yatra'),
-                        'flexible' => __('Flexible cancellation', 'yatra'),
-                    ];
-                    $policy_label = $policy_labels[$cancellation_policy] ?? __('Standard policy', 'yatra');
-                    ?>
+                    <!-- Cancellation Policy -->
+                    <?php if (!empty($trip->cancellation_policy)): ?>
                     <div class="yatra-summary-info yatra-cancellation-policy">
                         <h4><?php esc_html_e('Cancellation Policy', 'yatra'); ?></h4>
-                        <ul>
-                            <li>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M12 6v6l4 2"></path>
-                                </svg>
-                                <?php 
-                                printf(
-                                    /* translators: %d: number of days */
-                                    esc_html__('Free cancellation up to %d days before departure', 'yatra'), 
-                                    (int) $cancellation_days
-                                ); 
-                                ?>
-                            </li>
-                            <li>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                </svg>
-                                <?php echo esc_html($policy_label); ?>
-                            </li>
-                            <?php if (!empty($refund_policy)) : ?>
-                            <li class="yatra-refund-details">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
-                                    <circle cx="12" cy="12" r="10"></circle>
-                                    <path d="M12 16v-4"></path>
-                                    <path d="M12 8h.01"></path>
-                                </svg>
-                                <?php echo esc_html($refund_policy); ?>
-                            </li>
-                            <?php endif; ?>
-                        </ul>
+                        <div class="yatra-cancellation-policy-content">
+                            <?php 
+                            // Process and display the cancellation policy as a paragraph
+                            $policy_text = wp_strip_all_tags($trip->cancellation_policy);
+                            
+                            // Truncate if too long for booking summary
+                            $max_length = 200;
+                            if (strlen($policy_text) > $max_length) {
+                                $truncated_text = substr($policy_text, 0, $max_length);
+                                // Find last complete sentence within truncation
+                                $last_period = strrpos($truncated_text, '.');
+                                $last_exclamation = strrpos($truncated_text, '!');
+                                $last_question = strrpos($truncated_text, '?');
+                                
+                                $last_sentence_end = max($last_period, $last_exclamation, $last_question);
+                                
+                                if ($last_sentence_end > $max_length * 0.7) {
+                                    // If we have a complete sentence, end there
+                                    $display_text = substr($truncated_text, 0, $last_sentence_end + 1);
+                                } else {
+                                    // Otherwise, truncate at word boundary
+                                    $display_text = substr($truncated_text, 0, strrpos($truncated_text, ' ')) . '...';
+                                }
+                            } else {
+                                $display_text = $policy_text;
+                            }
+                            
+                            echo '<p>' . esc_html($display_text) . '</p>';
+                            
+                            // Show "more" indicator if truncated
+                            if (strlen($policy_text) > $max_length) {
+                                echo '<p class="yatra-policy-more">';
+                                echo esc_html__('Full policy available on trip details page', 'yatra');
+                                echo '</p>';
+                            }
+                            ?>
+                        </div>
                     </div>
+                    <?php endif; ?>
                     
                     <!-- Booking Assurance -->
                     <div class="yatra-summary-info">

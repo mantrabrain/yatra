@@ -684,6 +684,12 @@
     font-weight: 600;
 }
 
+.yatra-attribute-tag {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
 .yatra-confirmation-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));

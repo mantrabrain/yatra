@@ -270,7 +270,7 @@ interface TripFormData {
   payment_terms: string;
   max_travelers: string;
   min_travelers: string;
-  booking_deadline: string;
+  booking_deadline_hours: string;
   cancellation_policy: string;
   age_min: string;
   age_max: string;
@@ -396,7 +396,7 @@ const TripForm: React.FC = () => {
   const getInitialSection = (): SectionId => {
     const urlParams = new URLSearchParams(window.location.search);
     const sectionFromUrl = urlParams.get('section') as SectionId | null;
-    const validSections: SectionId[] = ['basic', 'location', 'duration', 'pricing', 'booking', 'itinerary', 'included', 'media', 'downloads', 'categorization', 'faqs', 'seo', 'advanced'];
+    const validSections: SectionId[] = ['basic', 'location', 'duration', 'pricing', 'booking', 'attributes', 'itinerary', 'included', 'media', 'downloads', 'categorization', 'faqs', 'seo', 'advanced'];
     if (sectionFromUrl && validSections.includes(sectionFromUrl)) {
       return sectionFromUrl;
     }
@@ -498,7 +498,7 @@ const TripForm: React.FC = () => {
       payment_terms: '50% deposit required at booking, remaining 50% due 30 days before departure',
       max_travelers: '12',
       min_travelers: '2',
-      booking_deadline: '',
+      booking_deadline_hours: '24',
       cancellation_policy: 'Free cancellation up to 30 days before departure. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before.',
       age_min: '8',
       age_max: '',
@@ -600,7 +600,7 @@ const TripForm: React.FC = () => {
       payment_terms: '50% deposit required at booking, remaining 50% due 60 days before departure',
       max_travelers: '12',
       min_travelers: '2',
-      booking_deadline: '',
+      booking_deadline_hours: '24',
       cancellation_policy: 'Free cancellation up to 60 days before departure. 50% refund for cancellations 30-60 days before. No refund for cancellations less than 30 days before.',
       age_min: '18',
       age_max: '65',
@@ -704,7 +704,7 @@ const TripForm: React.FC = () => {
       payment_terms: '40% deposit required at booking, remaining 60% due 45 days before departure',
       max_travelers: '20',
       min_travelers: '4',
-      booking_deadline: '',
+      booking_deadline_hours: '24',
       cancellation_policy: 'Free cancellation up to 45 days before departure. 75% refund for cancellations 30-45 days before. 50% refund for cancellations 15-30 days before. No refund for cancellations less than 15 days before.',
       age_min: '',
       age_max: '',
@@ -809,7 +809,7 @@ const TripForm: React.FC = () => {
     payment_terms: '',
     max_travelers: '',
     min_travelers: '',
-    booking_deadline: '',
+    booking_deadline_hours: '24',
     cancellation_policy: '',
     age_min: '',
     age_max: '',
@@ -1360,7 +1360,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         payment_terms: tripData.payment_terms || '',
         max_travelers: tripData.max_travelers?.toString() || '',
         min_travelers: tripData.min_travelers?.toString() || '',
-        booking_deadline: tripData.booking_deadline || '',
+        booking_deadline_hours: tripData.booking_deadline_hours || '',
         cancellation_policy: tripData.cancellation_policy || '',
         age_min: tripData.age_min?.toString() || '',
         age_max: tripData.age_max?.toString() || '',
@@ -1541,10 +1541,10 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
       hasErrors: getSectionErrors('booking').length > 0,
     },
     
-    // Step 6: Attributes & Properties
+    // Step 6: Attributes
     { 
       id: 'attributes', 
-      label: __('Attributes & Properties', 'yatra'), 
+      label: __('Attributes', 'yatra'), 
       icon: Tag, 
       required: false, 
       completed: formData.attributes && Object.keys(formData.attributes).length > 0,
@@ -2234,7 +2234,7 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         payment_terms: data.payment_terms.trim(),
         max_travelers: data.max_travelers ? parseInt(data.max_travelers) : null,
         min_travelers: data.min_travelers ? parseInt(data.min_travelers) : null,
-        booking_deadline: data.booking_deadline || null,
+        booking_deadline_hours: data.booking_deadline_hours || null,
         cancellation_policy: data.cancellation_policy || '',
         age_min: data.age_min ? parseInt(data.age_min) : null,
         age_max: data.age_max ? parseInt(data.age_max) : null,
@@ -4725,16 +4725,21 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
               <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">{__('Booking Deadlines', 'yatra')}</h3>
                 <div>
-                  <label htmlFor="booking_deadline" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
-                    {__('Booking Deadline', 'yatra')}
+                  <label htmlFor="booking_deadline_hours" className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5">
+                    {__('Booking Deadline (Hours)', 'yatra')}
                   </label>
-                  <DatePicker
-                    value={formData.booking_deadline}
-                    onChange={(val) => handleFieldChange('booking_deadline', val)}
-                    placeholder={__('Select date', 'yatra')}
+                  <input
+                    type="number"
+                    id="booking_deadline_hours"
+                    value={formData.booking_deadline_hours}
+                    onChange={(e) => handleFieldChange('booking_deadline_hours', e.target.value)}
+                    placeholder="24"
+                    min="0"
+                    max="720"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   />
                   <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
-                    {__('Last date customers can book this trip', 'yatra')}
+                    {__('Hours before trip start when booking closes (e.g., 24 for 1 day before)', 'yatra')}
                   </p>
                 </div>
               </div>
@@ -4811,13 +4816,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <Tag className="w-5 h-5 text-gray-500" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Attributes & Properties', 'yatra')}</h2>
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Attributes', 'yatra')}</h2>
               <Badge variant="outline" className="text-xs bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-300 border-green-200 dark:border-green-800">
                 {__('Optional', 'yatra')}
               </Badge>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              {__('Add custom attributes and properties to describe your trip', 'yatra')}
+              {__('Add custom attributes to describe your trip', 'yatra')}
               <span className="block text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {__('These attributes can be used for filtering and search on the frontend', 'yatra')}
               </span>

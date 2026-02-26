@@ -88,6 +88,20 @@ class BookingPageHandler extends BasePageHandler
                     }
                 }
 
+                // Load trip attributes for booking page display
+                if ($trip && !empty($trip->id)) {
+                    try {
+                        $singleTripController = new \Yatra\Controllers\SingleTripController();
+                        // Use reflection to access private method
+                        $reflection = new \ReflectionClass($singleTripController);
+                        $method = $reflection->getMethod('getTripAttributes');
+                        $method->setAccessible(true);
+                        $trip->attributes = $method->invoke($singleTripController, (int) $trip->id);
+                    } catch (\Throwable $e) {
+                        $trip->attributes = [];
+                    }
+                }
+
                 // Resolve enabled gateways - always get full gateway data from registry
                 $gatewayRegistry = \Yatra\PaymentGateways\PaymentGatewayRegistry::getInstance();
                 $availableGateways = $gatewayRegistry->getForCheckout();

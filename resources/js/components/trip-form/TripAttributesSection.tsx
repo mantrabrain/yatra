@@ -276,9 +276,35 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* Add Attribute Button/Card */}
-      <Card>
-        <CardContent className="p-4">
+      {/* Show message when no attributes exist at all */}
+      {(!attributesData || attributesData.length === 0) ? (
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="mb-4">
+              <Tag className="w-12 h-12 text-gray-400 mx-auto" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              {__('No Attributes Found', 'yatra')}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {__('Attributes allow you to add custom fields to your trips that are not included in the main plugin features. You can create any type of custom attribute you need.', 'yatra')}
+            </p>
+            <a 
+              href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=attributes&action=create"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {__('Create Your First Attribute', 'yatra')}
+            </a>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Add Attribute Button/Card */}
+          <Card>
+            <CardContent className="p-4">
           <Button
             type="button"
             onClick={() => setShowAttributeDropdown(!showAttributeDropdown)}
@@ -333,9 +359,18 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
 
           {showAttributeDropdown && availableAttributes.length === 0 && (
             <div className="mt-3 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('No more attributes available to add', 'yatra')}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                {__('No attributes available to add', 'yatra')}
               </p>
+              <a 
+                href="/wp-admin/admin.php?page=yatra&subpage=trips&tab=attributes&action=create"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                {__('Create New Attribute', 'yatra')}
+              </a>
             </div>
           )}
         </CardContent>
@@ -409,8 +444,9 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
           })}
         </div>
       )}
-
-</div>
+        </>
+      )}
+    </div>
   );
 };
 
