@@ -150,10 +150,13 @@ class ItineraryRepository extends BaseRepository
         $tableDays = TripItineraryDaysTable::getTableName();
 
         // Determine if this is a day entry or an activity entry
-        // Day entries have no item_type_id and item_id
-        $isDayEntry = empty($data['item_type_id']) && empty($data['item_id']);
+        // Day entries have no item_type_id and item_id (or they are explicitly 0)
+        // Note: empty() treats "0" as empty, so we need explicit checks
+        $itemTypeId = isset($data['item_type_id']) && $data['item_type_id'] !== '' && $data['item_type_id'] !== '0' && $data['item_type_id'] !== 0 ? (int) $data['item_type_id'] : null;
+        $itemId = isset($data['item_id']) && $data['item_id'] !== '' && $data['item_id'] !== '0' && $data['item_id'] !== 0 ? (int) $data['item_id'] : null;
+        $isDayEntry = $itemTypeId === null && $itemId === null;
         
-        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - isDayEntry: " . ($isDayEntry ? 'TRUE' : 'FALSE'));
+        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - item_type_id: " . ($itemTypeId ?? 'NULL') . ", item_id: " . ($itemId ?? 'NULL') . ", isDayEntry: " . ($isDayEntry ? 'TRUE' : 'FALSE'));
 
         if ($isDayEntry) {
             // Creating a DAY entry - store in days table
@@ -279,19 +282,27 @@ class ItineraryRepository extends BaseRepository
 
     /**
      * Update itinerary entry
+     * @param int $entryId Entry ID
+     * @param array $data Update data
+     * @param string|null $mode 'day' or 'activity' to specify which table to update
      */
-    public function updateEntry(int $entryId, array $data): bool
+    public function updateEntry(int $entryId, array $data, ?string $mode = null): bool
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
         $tableDays = TripItineraryDaysTable::getTableName();
 
-        // First check if this is a day entry (stored in days table)
-        $dayEntry = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $entryId)
-        );
-
-        if ($dayEntry) {
+        // Use mode parameter to determine which table to update
+        // If mode is 'day', update days table
+        if ($mode === 'day') {
+            // Update day entry in days table
+            $dayEntry = $wpdb->get_row(
+                $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $entryId)
+            );
+            
+            if (!$dayEntry) {
+                return false;
+            }
             // This is a day entry - update in days table
             $updateData = [];
             $updateFormat = [];
@@ -306,12 +317,16 @@ class ItineraryRepository extends BaseRepository
                 $updateFormat[] = '%s';
             }
 
-            if (isset($data['day'])) {
+            // Only update day_number if it's actually changing to avoid unique constraint violation
+            if (isset($data['day']) && (int) $data['day'] !== (int) $dayEntry->day_number) {
                 $updateData['day_number'] = (int) $data['day'];
                 $updateFormat[] = '%d';
             }
 
             if (!empty($updateData)) {
+                // Suppress error display - errors will be caught by service layer
+                $wpdb->suppress_errors();
+                
                 $result = $wpdb->update(
                     $tableDays,
                     $updateData,
@@ -319,13 +334,18 @@ class ItineraryRepository extends BaseRepository
                     $updateFormat,
                     ['%d']
                 );
+                
+                // Re-enable error display
+                $wpdb->show_errors();
+                
                 return $result !== false;
             }
 
             return true;
         }
 
-        // Get existing activity entry to get day_id
+        // Mode is 'activity' or not specified - update activity entry only
+        // Get existing activity entry
         $existingEntry = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM `{$tableEntries}` WHERE id = %d", $entryId)
         );
@@ -334,78 +354,9 @@ class ItineraryRepository extends BaseRepository
             return false;
         }
 
-        $dayId = (int) $existingEntry->day_id;
-        $tripId = (int) $existingEntry->trip_id;
-
-        // Update day if day_number or day_title changed
-        if (isset($data['day']) || isset($data['day_title']) || isset($data['day_description'])) {
-            $newDayNumber = isset($data['day']) ? (int) $data['day'] : null;
-            $newDayTitle = $data['day_title'] ?? null;
-            $newDayDescription = $data['day_description'] ?? null;
-            
-            if ($newDayNumber !== null) {
-                // Get current day number from existing entry's day
-        $tableDays = TripItineraryDaysTable::getTableName();
-                $currentDay = $wpdb->get_row(
-                    $wpdb->prepare("SELECT day_number FROM `{$tableDays}` WHERE id = %d", $dayId)
-                );
-                $currentDayNumber = $currentDay ? (int) $currentDay->day_number : null;
-                
-                // If day number hasn't changed, just update the title and description if needed
-                if ($currentDayNumber !== null && $newDayNumber === $currentDayNumber) {
-                    $updateData = [];
-                    $updateFormat = [];
-                    
-                    if ($newDayTitle !== null) {
-                        $updateData['title'] = sanitize_text_field($newDayTitle);
-                        $updateFormat[] = '%s';
-                    }
-                    
-                    if ($newDayDescription !== null) {
-                        $updateData['description'] = wp_kses_post($newDayDescription);
-                        $updateFormat[] = '%s';
-                    }
-                    
-                    if (!empty($updateData)) {
-                        $wpdb->update(
-                            $tableDays,
-                            $updateData,
-                            ['id' => $dayId],
-                            $updateFormat,
-                            ['%d']
-                        );
-                    }
-                    // Keep using the same dayId, no need to call getOrCreateDay
-                } else {
-                    // Day number changed - allow using existing days (activities can be moved to existing days)
-                    $dayId = $this->getOrCreateDay($tripId, $newDayNumber, $newDayTitle, $newDayDescription, true);
-                }
-            } elseif ($newDayTitle !== null || $newDayDescription !== null) {
-        $tableDays = TripItineraryDaysTable::getTableName();
-                $updateData = [];
-                $updateFormat = [];
-                
-                if ($newDayTitle !== null) {
-                    $updateData['title'] = sanitize_text_field($newDayTitle);
-                    $updateFormat[] = '%s';
-                }
-                
-                if ($newDayDescription !== null) {
-                    $updateData['description'] = wp_kses_post($newDayDescription);
-                    $updateFormat[] = '%s';
-                }
-                
-                if (!empty($updateData)) {
-                    $wpdb->update(
-                        $tableDays,
-                        $updateData,
-                        ['id' => $dayId],
-                        $updateFormat,
-                        ['%d']
-                    );
-                }
-            }
-        }
+        // When mode='activity', we ONLY update the activity entry itself
+        // We do NOT touch the day table at all
+        // The day_id should remain the same unless explicitly changed
 
         // Format time field
         $timeField = null;
@@ -520,10 +471,8 @@ class ItineraryRepository extends BaseRepository
             $updateFormat[] = '%s';
         }
 
-        if ($dayId !== (int) $existingEntry->day_id) {
-            $updateData['day_id'] = $dayId;
-            $updateFormat[] = '%d';
-        }
+        // Note: We do NOT update day_id when mode='activity'
+        // The activity stays in its current day unless explicitly moved via different logic
 
         if (!empty($updateData)) {
             $wpdb->update(
@@ -624,6 +573,70 @@ class ItineraryRepository extends BaseRepository
     }
 
     /**
+     * Get activity entry with related data (from entries table)
+     * @param int $entryId Entry ID
+     * @return object|null Entry object with relations or null if not found
+     */
+    public function getActivityEntry(int $entryId): ?\stdClass
+    {
+        global $wpdb;
+        $tableEntries = $this->getTableName();
+        $tableDays = TripItineraryDaysTable::getTableName();
+        $tableClassifications = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        
+        $entry = $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT e.*, 
+                        i.name as item_name,
+                        it.name as item_type_name,
+                        it.icon as item_type_icon
+                 FROM `{$tableEntries}` e
+                 LEFT JOIN `{$tableClassifications}` i ON e.item_id = i.id AND i.type = 'item'
+                 LEFT JOIN `{$tableClassifications}` it ON e.item_type_id = it.id AND it.type = 'item_type'
+                 WHERE e.id = %d",
+                $entryId
+            )
+        );
+        
+        if (!$entry) {
+            return null;
+        }
+        
+        // Get day info
+        $day = $wpdb->get_row(
+            $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", (int) $entry->day_id)
+        );
+        
+        if ($day) {
+            $entry->day = (int) $day->day_number;
+            $entry->day_number = (int) $day->day_number;
+            $entry->day_title = $day->title;
+            $entry->day_description = $day->description;
+        }
+        
+        // Decode included/excluded items JSON columns
+        $entry->included_items = $this->decodeAmenityItems($entry->included_items ?? null);
+        $entry->excluded_items = $this->decodeAmenityItems($entry->excluded_items ?? null);
+        
+        // Images are stored in metadata
+        $entry->images = [];
+        
+        // Parse time field to start_time and end_time
+        if (!empty($entry->time)) {
+            $timeParts = preg_split('/\s*-\s*|\s+to\s+/i', $entry->time);
+            if (count($timeParts) >= 2) {
+                $entry->start_time = trim($timeParts[0]);
+                $entry->end_time = trim($timeParts[1]);
+            } elseif (count($timeParts) === 1) {
+                $entry->start_time = trim($timeParts[0]);
+                $entry->end_time = null;
+            }
+        }
+        
+        return $entry;
+    }
+    
+    /**
      * Get entry with related data
      * @param int $entryId Entry ID
      * @return object|null Entry object with relations or null if not found
@@ -669,23 +682,41 @@ class ItineraryRepository extends BaseRepository
                 'day_description' => $dayEntry->description,
             ];
             
-            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - Day entry found:");
-            error_log("[YATRA DEBUG]   id: " . $entry->id);
-            error_log("[YATRA DEBUG]   day_number: " . $entry->day_number);
-            error_log("[YATRA DEBUG]   day_title: '" . ($entry->day_title ?? 'NULL') . "'");
-            error_log("[YATRA DEBUG]   day_description: '" . ($entry->day_description ?? 'NULL') . "'");
-            
+        
             return $entry;
         }
         
         // If not a day entry, look in the entries table (for activities)
-        $entry = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM `{$tableEntries}` WHERE id = %d", $entryId)
+        $tableClassifications = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        
+        $sql = $wpdb->prepare(
+            "SELECT e.*, 
+                    i.name as item_name,
+                    it.name as item_type_name,
+                    it.icon as item_type_icon
+             FROM `{$tableEntries}` e
+             LEFT JOIN `{$tableClassifications}` i ON e.item_id = i.id AND i.type = 'item'
+             LEFT JOIN `{$tableClassifications}` it ON e.item_type_id = it.id AND it.type = 'item_type'
+             WHERE e.id = %d",
+            $entryId
         );
+        
+        error_log("[YATRA DEBUG] getEntryWithRelations SQL: " . $sql);
+        
+        $entry = $wpdb->get_row($sql);
 
         if (!$entry) {
             return null;
         }
+        
+        // Debug: Log the actual values from database
+        error_log("[YATRA DEBUG] getEntryWithRelations - Entry from DB:");
+        error_log("[YATRA DEBUG]   item_type_id type: " . gettype($entry->item_type_id));
+        error_log("[YATRA DEBUG]   item_type_id value: " . var_export($entry->item_type_id, true));
+        error_log("[YATRA DEBUG]   item_id type: " . gettype($entry->item_id));
+        error_log("[YATRA DEBUG]   item_id value: " . var_export($entry->item_id, true));
+        error_log("[YATRA DEBUG]   item_type_name: " . var_export($entry->item_type_name, true));
+        error_log("[YATRA DEBUG]   item_name: " . var_export($entry->item_name, true));
 
         // Get day info for activity entries
         $day = $wpdb->get_row(
@@ -755,17 +786,24 @@ class ItineraryRepository extends BaseRepository
     /**
      * Delete entry and related data
      * Handles both day entries (from days table) and activity entries (from entries table)
+     * @param int $id Entry ID
+     * @param string|null $mode 'day' or 'activity' to specify which table to delete from
      */
-    public function delete(int $id): bool
+    public function delete(int $id, ?string $mode = null): bool
     {
         global $wpdb;
         $tableEntries = $this->getTableName();
         $tableDays = TripItineraryDaysTable::getTableName();
 
-        // First check if this is a day ID (from days table)
-        $dayEntry = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $id)
-        );
+        // If mode is explicitly 'activity', skip day entry check
+        if ($mode === 'activity') {
+            $dayEntry = null;
+        } else {
+            // Check if this is a day ID (from days table)
+            $dayEntry = $wpdb->get_row(
+                $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $id)
+            );
+        }
 
         if ($dayEntry) {
             // This is a day entry - delete the day and all its activities
@@ -1015,7 +1053,7 @@ class ItineraryRepository extends BaseRepository
             error_log("[YATRA DEBUG] Processing day {$dayNumber} with id: {$day->id}");
             
             // Add day entry (summary of the day)
-            $dayEntry = (object) [
+            $dayEntryObj = (object) [
                 'id' => $day->id, // Use actual day ID from days table
                 'trip_id' => $tripId,
                 'day_id' => $day->id,
@@ -1040,40 +1078,46 @@ class ItineraryRepository extends BaseRepository
                 'cost_per_person' => false,
                 'notes' => $day->notes ?? null,
                 'status' => 'publish',
-                'order' => $day->order ?? $day->day_number
+                'order' => $day->order ?? $dayNumber
             ];
             
-            error_log("[YATRA DEBUG] Created day entry: id={$dayEntry->id}, item_type_id={$dayEntry->item_type_id}, item_id={$dayEntry->item_id}");
-            $allEntries[] = $dayEntry;
+            $allEntries[] = $dayEntryObj;
             
-            // Get entries for this specific day
-            $dayEntries = $wpdb->get_results($wpdb->prepare(
-                "SELECT * FROM `{$tableEntries}` 
-                 WHERE day_id = %d
-                 ORDER BY `order` ASC",
+            // Get activities for this day
+            $tableClassifications = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+            $activities = $wpdb->get_results($wpdb->prepare(
+                "SELECT e.*, 
+                        i.name as item_name,
+                        it.name as item_type_name,
+                        it.icon as item_type_icon
+                 FROM `{$tableEntries}` e
+                 LEFT JOIN `{$tableClassifications}` i ON e.item_id = i.id AND i.type = 'item'
+                 LEFT JOIN `{$tableClassifications}` it ON e.item_type_id = it.id AND it.type = 'item_type'
+                 WHERE e.day_id = %d
+                 ORDER BY e.order ASC",
                 $day->id
             )) ?: [];
             
-            // Add individual entries for this day
-            foreach ($dayEntries as $entry) {
-                // Decode included/excluded items JSON
+            // Add activities to entries
+            foreach ($activities as $entry) {
                 $includedItems = $this->decodeAmenityItems($entry->included_items ?? null);
                 $excludedItems = $this->decodeAmenityItems($entry->excluded_items ?? null);
                 
                 $entryObj = (object) [
                     'id' => $entry->id,
-                    'trip_id' => $entry->trip_id,
-                    'day_id' => $entry->day_id,
+                    'trip_id' => $tripId,
+                    'day_id' => $day->id,
                     'day' => $dayNumber,
                     'day_number' => $dayNumber,
                     'day_title' => $day->title,
+                    'day_description' => $day->description,
                     'title' => $entry->title,
                     'description' => $entry->description,
                     'item_type_id' => $entry->item_type_id,
                     'item_id' => $entry->item_id,
-                    'item_type' => $entry->item_type,
-                    'item_name' => null, // Will be populated from item tables if needed
-                    'item_icon' => null, // Will be populated from item tables if needed
+                    'item_type' => $entry->item_type_name,
+                    'item_name' => $entry->item_name,
+                    'item_icon' => $entry->item_type_icon,
                     'time' => $entry->time,
                     'start_time' => $entry->start_time,
                     'end_time' => $entry->end_time,

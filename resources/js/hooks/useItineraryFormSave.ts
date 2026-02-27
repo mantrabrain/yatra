@@ -4,6 +4,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../lib/api-client';
+import { API_ENDPOINTS } from '../lib/api-endpoints';
 import { useToast } from '../components/ui/toast';
 import { __ } from '../lib/i18n';
 import { ItineraryFormData, ActivityForm } from './useItineraryFormValidation';
@@ -132,7 +133,9 @@ export const useItineraryFormSave = ({
           }
           
           // In edit mode, ALWAYS use PUT - never POST
-          const dayResponse = await apiClient.put(`/itinerary/${dayEntryId}`, dayPayload);
+          // Days always use mode=day
+          const endpoint = API_ENDPOINTS.ITINERARY_GET(dayEntryId, 'day');
+          const dayResponse = await apiClient.put(endpoint, dayPayload);
 
           const buildActivityPayload = (activityData: ActivityForm['data']) => ({
             trip_id: tripId,
@@ -180,7 +183,9 @@ export const useItineraryFormSave = ({
             }
 
             try {
-              await apiClient.put(`/itinerary/${activityEntryId}`, payload);
+              // Activities always use mode=activity
+              const endpoint = API_ENDPOINTS.ITINERARY_GET(activityEntryId, 'activity');
+              await apiClient.put(endpoint, payload);
             } catch (error: any) {
               throw new Error(`Failed to update activity ${index + 1}: ${error?.message || 'Unknown error'}`);
             }
@@ -317,7 +322,9 @@ export const useItineraryFormSave = ({
           ...payload,
           status: data.status || 'draft', // Explicitly include status for updates
         };
-        const response = await apiClient.put(`/itinerary/${entryId}`, updatePayload);
+        // Pass mode parameter to specify we're updating an activity entry
+        const endpoint = API_ENDPOINTS.ITINERARY_GET(entryId, 'activity');
+        const response = await apiClient.put(endpoint, updatePayload);
         return response.data || response;
       } else {
         const response = await apiClient.post('/itinerary', payload);
@@ -383,16 +390,19 @@ export const useItineraryFormSave = ({
           });
         }
         
-        // Navigate back to itinerary page with trip_id and day parameters for auto-selection
-        const day = parseInt(formData.day);
-        const tripId = formData.trip_id;
-        setTimeout(() => {
-          const params = new URLSearchParams({
-            trip_id: tripId,
-            day: day.toString(),
-          });
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&${params.toString()}`;
-        }, 1500);
+        // Only redirect for new days, not for editing existing days
+        if (!isEditMode) {
+          const day = parseInt(formData.day);
+          const tripId = formData.trip_id;
+          setTimeout(() => {
+            const params = new URLSearchParams({
+              trip_id: tripId,
+              day: day.toString(),
+            });
+            window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&${params.toString()}`;
+          }, 1500);
+        }
+        // For editing, stay on the same page - no redirect
         return;
       }
       
@@ -428,15 +438,22 @@ export const useItineraryFormSave = ({
       queryClient.refetchQueries({ queryKey: ['trips'] });
       queryClient.refetchQueries({ queryKey: ['trips-simple'] });
       
-      // Redirect after toast is shown
-      setTimeout(() => {
-        const tripIdParam = formData.trip_id ? `&trip_id=${formData.trip_id}` : '';
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary${tripIdParam}`;
-      }, 1000);
+      // Only redirect for new entries, not for editing existing entries
+      if (!isEditMode) {
+        setTimeout(() => {
+          const tripIdParam = formData.trip_id ? `&trip_id=${formData.trip_id}` : '';
+          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary${tripIdParam}`;
+        }, 1000);
+      }
+      // For editing, stay on the same page - no redirect
     },
     onError: (error: any) => {
       const errorMessage = error?.message || __('An error occurred while saving', 'yatra');
       showToast(errorMessage, 'error');
+    },
+    onSettled: () => {
+      // Reset submitting state when mutation completes (success or error)
+      // This ensures the loading state is properly cleared
     },
   });
 

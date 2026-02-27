@@ -5,6 +5,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { apiClient } from '../lib/api-client';
+import { API_ENDPOINTS } from '../lib/api-endpoints';
 import { usePermissions } from './usePermissions';
 import { __ } from '../lib/i18n';
 
@@ -121,13 +122,16 @@ export const useItineraryFormData = ({
 
   // Fetch entry data when editing
   const { data: entryData, isLoading: isLoadingEntryData } = useQuery({
-    queryKey: ['itinerary-entry', entryId],
+    queryKey: ['itinerary-entry', entryId, isEditDayMode ? 'day' : 'activity'],
     queryFn: async () => {
       if (!entryId) return null;
       try {
-        const response = await apiClient.get(`/itinerary/${entryId}`);
+        // Pass mode parameter to API based on isEditDayMode
+        const mode = isEditDayMode ? 'day' : 'activity';
+        const endpoint = API_ENDPOINTS.ITINERARY_GET(entryId, mode);
+        const response = await apiClient.get(endpoint);
         const result = response?.data?.data || response?.data || response;
-        console.log('[YATRA DEBUG] useItineraryFormData - API response:', result);
+        console.log('[YATRA DEBUG] useItineraryFormData - API response (mode: ' + mode + '):', result);
         console.log('[YATRA DEBUG] useItineraryFormData - day_description in API response:', result?.day_description);
         return result;
       } catch (error: any) {

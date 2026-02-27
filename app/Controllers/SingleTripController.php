@@ -1398,10 +1398,10 @@ class SingleTripController
      */
     private function getItineraryDays(int $trip_id): array
     {
-        // Using hardcoded table names for legacy itinerary tables since they use a different schema
+        // Using proper table classes for itinerary system with classification integration
         // Note: Items and Item Types now use ClassificationsTable with unified approach
-        $table_days = $this->wpdb->prefix . 'yatra_new_trip_itinerary_days';
-        $table_entries = $this->wpdb->prefix . 'yatra_trip_itinerary_entries';
+        $table_days = \Yatra\Database\Tables\TripItineraryDaysTable::getTableName();
+        $table_entries = \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName();
         $table_classifications = ClassificationsTable::getTableName();
 
         // Get all days for this trip

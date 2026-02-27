@@ -514,7 +514,7 @@ class ExportImportService
             'difficulty_levels' => 'yatra_difficulty_levels',
             'discounts' => 'yatra_discounts',
             'availability' => 'yatra_trip_availability_dates',
-            'itinerary' => 'yatra_trip_itinerary_entries',
+            'itinerary' => \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName(),
         ];
     }
 

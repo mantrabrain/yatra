@@ -138,6 +138,13 @@ export const API_ENDPOINTS = {
   // Availability
   AVAILABILITY: (tripId: string | number) => `/trips/${tripId}/availability`,
   
+  // Itinerary
+  ITINERARY: '/itinerary',
+  ITINERARY_GET: (id: string | number, mode?: string) => mode ? `/itinerary/${id}?mode=${mode}` : `/itinerary/${id}`,
+  ITINERARY_DELETE: (id: string | number, mode?: string) => mode ? `/itinerary/${id}?mode=${mode}` : `/itinerary/${id}`,
+  ITINERARY_BY_TRIP: (tripId: string | number) => `/itinerary?trip_id=${tripId}`,
+  ITINERARY_DAY_ENTRY_BY_DAY_ID: (dayId: string | number) => `/itinerary/day-entry-by-day-id/${dayId}`,
+  
   // Saved Trips
   SAVED_TRIPS: '/saved-trips',
 } as const;

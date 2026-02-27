@@ -24,6 +24,7 @@ import { getCurrencySymbol } from '../data/currencies';
 import { __ } from '../lib/i18n';
 import { usePermissions } from '../hooks/usePermissions';
 import { apiClient } from '../lib/api-client';
+import { API_ENDPOINTS } from '../lib/api-endpoints';
 import { useToast } from '../components/ui/toast';
 import { Button } from '../components/ui/button';
 import { SearchableSelect } from '../components/ui/searchable-select';
@@ -545,7 +546,10 @@ const Itinerary: React.FC = () => {
   const deleteMutation = useMutation({
     mutationFn: async (entry: ItineraryEntry) => {
       try {
-        const response = await apiClient.delete(`/itinerary/${entry.id}`);
+        // Determine mode based on whether this is a day entry or activity entry
+        const isDayEntry = !entry.item_type_id || entry.item_type_id === 0;
+        const mode = isDayEntry ? 'day' : 'activity';
+        const response = await apiClient.delete(`/itinerary/${entry.id}?mode=${mode}`);
         return { response: response?.data || response, entry };
       } catch (error: any) {
         throw error;
@@ -577,12 +581,12 @@ const Itinerary: React.FC = () => {
   // Mutation to update itinerary entry item
   const updateItemMutation = useMutation({
     mutationFn: async ({ entryId, itemId, itemTypeId }: { entryId: number; itemId: number; itemTypeId: number }) => {
-      // First, get the current entry data
-      const currentEntry = await apiClient.get(`/itinerary/${entryId}`);
+      // Item assignment is always for activities, so use mode=activity
+      const currentEntry = await apiClient.get(`/itinerary/${entryId}?mode=activity`);
       const entryData = currentEntry?.data?.data || currentEntry?.data || currentEntry;
       
       // Update with new item_id and item_type_id
-      return await apiClient.put(`/itinerary/${entryId}`, {
+      return await apiClient.put(`/itinerary/${entryId}?mode=activity`, {
         ...entryData,
         item_id: itemId,
         item_type_id: itemTypeId,
@@ -671,7 +675,11 @@ const Itinerary: React.FC = () => {
   };
 
   const handleEdit = (entry: ItineraryEntry) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${entry.id}`;
+    // Determine if this is a day entry or activity entry
+    // Day entries have item_type_id: 0 or null, activity entries have item_type_id > 0
+    const isDayEntry = !entry.item_type_id || entry.item_type_id === 0;
+    const mode = isDayEntry ? 'day' : 'activity';
+    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary&action=edit&id=${entry.id}&mode=${mode}`;
   };
 
   const handleEditDay = async (tripId: number, day: number) => {
@@ -959,12 +967,23 @@ const Itinerary: React.FC = () => {
     try {
       await Promise.all(
         allIdsForAction.map(async (id) => {
-          // Fetch current entry
-          const current = await apiClient.get(`/itinerary/${id}`);
+          // First fetch with activity mode (most common case)
+          // If it fails, the backend will handle it
+          let current;
+          let mode = 'activity';
+          
+          try {
+            current = await apiClient.get(`/itinerary/${id}?mode=activity`);
+          } catch (error) {
+            // If activity mode fails, try day mode
+            mode = 'day';
+            current = await apiClient.get(`/itinerary/${id}?mode=day`);
+          }
+          
           const entryData = current?.data?.data || current?.data || current;
 
           // Apply status change while preserving other fields
-          await apiClient.put(`/itinerary/${id}`, {
+          await apiClient.put(`/itinerary/${id}?mode=${mode}`, {
             ...entryData,
             status: targetStatus,
           });

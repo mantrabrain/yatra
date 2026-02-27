@@ -121,12 +121,21 @@ class ItineraryController extends BaseController
     {
         try {
             $id = (int) $request->get_param('id');
-            error_log("[YATRA DEBUG] ItineraryController::get_item - Called with id: {$id}");
+            $mode = $request->get_param('mode') ?: 'activity'; // Default to activity mode
             
-            $item = $this->service->find($id);
+            error_log("[YATRA DEBUG] ItineraryController::get_item - Called with id: {$id}, mode: {$mode}");
+            
+            // Use mode to determine which method to call
+            if ($mode === 'day') {
+                // Get day entry (from days table)
+                $item = $this->service->find($id);
+            } else {
+                // Get activity entry (from entries table)
+                $item = $this->service->findActivity($id);
+            }
             
             if (!$item) {
-                error_log("[YATRA DEBUG] ItineraryController::get_item - Item not found for id: {$id}");
+                error_log("[YATRA DEBUG] ItineraryController::get_item - Item not found for id: {$id}, mode: {$mode}");
                 return $this->error_response('Itinerary entry not found', 404);
             }
             
@@ -171,11 +180,12 @@ class ItineraryController extends BaseController
     {
         try {
             $id = (int) $request->get_param('id');
+            $mode = $request->get_param('mode') ?: 'activity'; // Default to activity mode
             $data = $request->get_json_params();
-            error_log("[YATRA DEBUG] ItineraryController::update_item - ID: $id, Received data: " . print_r($data, true));
+            error_log("[YATRA DEBUG] ItineraryController::update_item - ID: $id, mode: $mode, Received data: " . print_r($data, true));
             error_log("[YATRA DEBUG] ItineraryController::update_item - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
 
-            $result = $this->service->update($id, $data);
+            $result = $this->service->update($id, $data, $mode);
 
             if (!$result) {
                 return $this->error_response('Failed to update itinerary entry', 500);
@@ -198,7 +208,8 @@ class ItineraryController extends BaseController
     {
         try {
             $id = (int) $request->get_param('id');
-            $result = $this->service->delete($id);
+            $mode = $request->get_param('mode') ?: 'activity'; // Default to activity mode
+            $result = $this->service->delete($id, $mode);
 
             if (!$result) {
                 return $this->error_response('Failed to delete itinerary entry', 500);
@@ -300,8 +311,11 @@ class ItineraryController extends BaseController
             'cost' => isset($item->cost) ? (float) $item->cost : null,
             'cost_per_person' => isset($item->cost_per_person) ? (bool) $item->cost_per_person : false,
             'notes' => $item->notes ?? null,
-            'item_type_id' => isset($item->item_type_id) ? (int) $item->item_type_id : null,
-            'item_id' => isset($item->item_id) ? (int) $item->item_id : null,
+            'item_type_id' => ($item->item_type_id !== null && $item->item_type_id !== '') ? (int) $item->item_type_id : null,
+            'item_id' => ($item->item_id !== null && $item->item_id !== '') ? (int) $item->item_id : null,
+            'item_type_name' => $item->item_type_name ?? null,
+            'item_name' => $item->item_name ?? null,
+            'item_type_icon' => $item->item_type_icon ?? null,
             'included_items' => $includedItems,
             'excluded_items' => $excludedItems,
             'status' => $item->status ?? 'draft',

@@ -56,6 +56,20 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
   onRefreshData,
 }) => {
   
+  // Debug logging
+  React.useEffect(() => {
+    console.log('[ITINERARY ENTRY FIELDS DEBUG]', {
+      entry_item_type_id: entry.item_type_id,
+      entry_item_type_id_type: typeof entry.item_type_id,
+      entry_item_id: entry.item_id,
+      entry_item_id_type: typeof entry.item_id,
+      itemTypes_count: itemTypes?.length,
+      itemTypes_sample: itemTypes?.[0],
+      items_count: items?.length,
+      items_sample: items?.[0]
+    });
+  }, [entry.item_type_id, entry.item_id, itemTypes, items]);
+  
   // Modal states
   const [isItemTypeModalOpen, setIsItemTypeModalOpen] = useState(false);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
@@ -105,7 +119,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             />
             <div className="flex gap-2">
               <Select
-                value={entry.item_type_id || ''}
+                value={entry.item_type_id && Number(entry.item_type_id) !== 0 ? entry.item_type_id : ''}
                 onChange={(e) => {
                   onFieldChange('item_type_id', e.target.value);
                   // Reset item_id when type changes
@@ -120,7 +134,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               >
                 <option value="">{__('Select a type...', 'yatra')}</option>
                 {itemTypes.map((type: any) => (
-                  <option key={type.id} value={type.id}>
+                  <option key={type.id} value={String(type.id)}>
                     {type.name}
                   </option>
                 ))}
@@ -155,7 +169,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             />
             <div className="flex gap-2">
               <Select
-                value={entry.item_id || ''}
+                value={entry.item_id && Number(entry.item_id) !== 0 ? entry.item_id : ''}
                 onChange={(e) => onFieldChange('item_id', e.target.value)}
                 disabled={!entry.item_type_id || items.filter((item: any) => {
                   const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
@@ -190,7 +204,7 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                   return String(itemTypeIdNum) === itemTypeId;
                 })
                 .map((item: any) => (
-                  <option key={item.id} value={item.id}>
+                  <option key={item.id} value={String(item.id)}>
                     {item.name}
                   </option>
                 ))}
@@ -525,17 +539,6 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                     </button>
                   </Badge>
                 ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsItemModalOpen(true)}
-                  className="flex items-center gap-1"
-                  disabled={!entry.item_type_id}
-                >
-                  <Plus className="w-3 h-3" />
-                  {__('Add Item', 'yatra')}
-                </Button>
               </div>
             </div>
           </div>

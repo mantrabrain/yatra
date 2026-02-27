@@ -90,7 +90,6 @@ const ItineraryForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [newIncludedItem, setNewIncludedItem] = useState('');
   const [newExcludedItem, setNewExcludedItem] = useState('');
   const [activityForms, setActivityForms] = useState<ActivityForm[]>([]);
@@ -279,6 +278,15 @@ const ItineraryForm: React.FC = () => {
     
     if (!isEditDayMode) {
       // For activity editing, load directly into formData
+      console.log('[ITINERARY FORM DEBUG] Loading entry data into form:', {
+        item_type_id_raw: entryData.item_type_id,
+        item_type_id_string: entryData.item_type_id?.toString(),
+        item_id_raw: entryData.item_id,
+        item_id_string: entryData.item_id?.toString(),
+        item_type_name: entryData.item_type_name,
+        item_name: entryData.item_name
+      });
+      
       setFormData({
         trip_id: entryData.trip_id?.toString() || '',
         day: entryData.day?.toString() || '',
@@ -594,7 +602,6 @@ const ItineraryForm: React.FC = () => {
       return;
     }
 
-    setIsSubmitting(true);
     setErrors({});
     saveMutation.mutate(formData);
   };
@@ -743,12 +750,10 @@ const ItineraryForm: React.FC = () => {
       const { isValid, errors: validationErrors } = validateForm(updatedFormData, isAddDayMode, activityForms);
       
       if (isValid) {
-        setIsSubmitting(true);
         setErrors({});
         saveMutation.mutate(updatedFormData);
       } else {
         setErrors(validationErrors);
-        setIsSubmitting(false);
       }
     } else {
       setShowDayConflictDialog(false);
@@ -943,10 +948,10 @@ const ItineraryForm: React.FC = () => {
                     <div className="flex gap-2">
                       <Button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={saveMutation.isPending}
                         className="flex-1 flex items-center justify-center gap-2"
                       >
-                        {isSubmitting ? (
+                        {saveMutation.isPending ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
                             {__('Saving...', 'yatra')}
@@ -962,7 +967,7 @@ const ItineraryForm: React.FC = () => {
                         type="button"
                         variant="outline"
                         onClick={handleCancel}
-                        disabled={isSubmitting}
+                        disabled={saveMutation.isPending}
                       >
                         {__('Cancel', 'yatra')}
                       </Button>
