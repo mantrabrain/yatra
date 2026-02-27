@@ -5,6 +5,33 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+// Utility function to strip HTML and sanitize text for SEO preview
+const sanitizeTextForSEO = (text: string, maxLength: number = 160): string => {
+  if (!text) return '';
+  
+  // Remove HTML tags
+  const plainText = text.replace(/<[^>]*>/g, '');
+  
+  // Decode HTML entities
+  const decodedText = plainText
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, ' ');
+  
+  // Remove extra whitespace and trim
+  const cleanText = decodedText.replace(/\s+/g, ' ').trim();
+  
+  // Truncate if needed
+  if (cleanText.length > maxLength) {
+    return cleanText.substring(0, maxLength) + '...';
+  }
+  
+  return cleanText;
+};
 import { 
   Save, 
   Loader2, 
@@ -1581,6 +1608,14 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
         hasErrors: getSectionErrors('downloads').length > 0,
       },
     ] as Section[]) : []),
+    { 
+      id: 'seo', 
+      label: __('SEO Settings', 'yatra'), 
+      icon: Search, 
+      required: false, 
+      completed: !!(formData.meta_title || formData.meta_description),
+      hasErrors: getSectionErrors('seo').length > 0,
+    },
     { 
       id: 'categorization', 
       label: __('Categorization', 'yatra'), 
@@ -4962,6 +4997,11 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   value={formData.meta_title}
                   onChange={(e) => handleFieldChange('meta_title', e.target.value)}
                   placeholder={formData.title || __('Trip Title', 'yatra')}
+                  maxLength={60}
+                />
+                <HelpText
+                  text={__('Best for search engines: 50-60 characters. Include main keywords.', 'yatra')}
+                  className="mt-1"
                 />
               </div>
               <div>
@@ -4973,7 +5013,13 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   value={formData.meta_description}
                   onChange={(e) => handleFieldChange('meta_description', e.target.value)}
                   rows={3}
+                  maxLength={160}
                   className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
+                  placeholder={__('Compelling description that includes key travel terms...', 'yatra')}
+                />
+                <HelpText
+                  text={__('160 characters max. Include location, duration, and key features.', 'yatra')}
+                  className="mt-1"
                 />
               </div>
               <div>
@@ -4985,10 +5031,48 @@ const isSingleDayTrip = useMemo(() => formData.trip_type === 'single_day', [form
                   type="text"
                   value={formData.meta_keywords}
                   onChange={(e) => handleFieldChange('meta_keywords', e.target.value)}
-                  placeholder={__('e.g., bali, beach, retreat, vacation', 'yatra')}
+                  placeholder={__('adventure, travel, tour, guide, experience', 'yatra')}
+                />
+                <HelpText
+                  text={__('Comma-separated keywords. Include location, activities, and travel terms.', 'yatra')}
+                  className="mt-1"
                 />
               </div>
             </div>
+            
+            {/* SEO Preview */}
+            <Card>
+              <CardHeader>
+                <CardTitle>{__('SEO Preview', 'yatra')}</CardTitle>
+                <CardDescription>
+                  {__('Preview how your trip appears in search results', 'yatra')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">{__('Google Search Result Preview', 'yatra')}</div>
+                  <div className="space-y-2">
+                    <div className="text-blue-800 dark:text-blue-400 text-sm font-medium">
+                      {sanitizeTextForSEO(formData.meta_title || formData.title || 'Trip Title', 60)}
+                    </div>
+                    <div className="text-green-700 dark:text-green-400 text-sm">
+                      {formData.meta_description ? 
+                        sanitizeTextForSEO(formData.meta_description, 150)
+                        : 
+                        (formData.description ? 
+                          sanitizeTextForSEO(formData.description, 150)
+                          : 
+                          'Trip description...'
+                        )
+                      }
+                    </div>
+                    <div className="text-gray-600 dark:text-gray-400 text-xs">
+                      {window.location.hostname}/trip/{formData.slug || 'trip-slug'}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         );
 

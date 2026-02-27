@@ -4,30 +4,61 @@ if (!defined('ABSPATH')) {
 }
 ?>
 <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
-<section class="yatra-trip-section" id="faq">
+<section class="yatra-trip-section" id="faq" itemscope itemtype="https://schema.org/FAQPage">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            <?php
+            $faq_items = [];
+            foreach ($trip->faqs as $index => $faq) {
+                $question = is_object($faq) ? ($faq->title ?? '') : ($faq['question'] ?? '');
+                $answer = is_object($faq) ? ($faq->description ?? '') : ($faq['answer'] ?? '');
+                
+                if (!empty($question) && !empty($answer)) {
+                    $faq_items[] = [
+                        '@type' => 'Question',
+                        'name' => esc_html($question),
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text' => wp_kses_post($answer)
+                        ]
+                    ];
+                }
+            }
+            
+            if (!empty($faq_items)) {
+                echo json_encode($faq_items, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            }
+            ?>
+        ]
+    }
+    </script>
     <div class="faq-header">
         <h2 class="yatra-trip-section-title">
             <?php echo yatra_svg_icon('help-circle', 'yatra-trip-section-title-icon'); ?>
             <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
         </h2>
         <div class="faq-controls">
-            <button class="faq-btn" onclick="expandAll()">
+            <button class="faq-btn" onclick="expandAll()" aria-label="<?php esc_attr_e('Expand all FAQ items', 'yatra'); ?>">
                 <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 9l-7 7-7-7"/>
                 </svg>
-                Expand All
+                <?php esc_html_e('Expand All', 'yatra'); ?>
             </button>
-            <button class="faq-btn" onclick="collapseAll()">
+            <button class="faq-btn" onclick="collapseAll()" aria-label="<?php esc_attr_e('Collapse all FAQ items', 'yatra'); ?>">
                 <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 9l-7 7-7-7"/>
                 </svg>
-                Collapse All
+                <?php esc_html_e('Collapse All', 'yatra'); ?>
             </button>
         </div>
     </div>
     
-    <div class="faq-container">
-        <?php foreach ($trip->faqs as $faq): ?>
+    <div class="faq-container" itemscope itemtype="https://schema.org/FAQ">
+        <meta itemprop="about" content="<?php echo esc_attr($trip->title); ?>">
+        <?php foreach ($trip->faqs as $index => $faq): ?>
             <?php
             $question = is_object($faq) ? ($faq->title ?? '') : '';
             $answer = is_object($faq) ? ($faq->description ?? '') : '';
@@ -38,15 +69,16 @@ if (!defined('ABSPATH')) {
             }
             ?>
             <?php if (!empty($question) && !empty($answer)): ?>
-                <div class="faq-item">
-                    <button class="faq-question" onclick="toggleFAQ(this)">
+                <div class="faq-item" itemscope itemtype="https://schema.org/Question">
+                    <button class="faq-question" onclick="toggleFAQ(this)" itemprop="text" aria-expanded="false">
                         <?php echo esc_html($question); ?>
-                        <svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path d="M19 9l-7 7-7-7"/>
                         </svg>
                     </button>
-                    <div class="faq-answer">
-                        <?php echo wp_kses_post($answer); ?>
+                    <div class="faq-answer" itemscope itemtype="https://schema.org/Answer" itemprop="acceptedAnswer">
+                        <div itemprop="text"><?php echo wp_kses_post($answer); ?></div>
+                        <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     </div>
                 </div>
             <?php endif; ?>

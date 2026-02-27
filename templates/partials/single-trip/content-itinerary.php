@@ -3,11 +3,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<section class="yatra-trip-section" id="itinerary">
+<section class="yatra-trip-section" id="itinerary" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-section-header-with-actions">
         <h2 class="yatra-trip-section-title">
             <?php echo yatra_svg_icon('calendar', 'yatra-trip-section-title-icon'); ?>
-            Detailed Itinerary
+            <?php echo esc_html__('Itinerary', 'yatra'); ?>
         </h2>
         <div class="yatra-itinerary-actions">
             <button type="button" class="yatra-toggle-all-btn" id="yatra-expand-all">
@@ -26,327 +26,8 @@ if (!defined('ABSPATH')) {
     </div>
 
     <?php
-    // Use dynamic itinerary data from trip, fallback to sample data for demo
-    $itinerary_days = !empty($trip->itinerary_days) ? $trip->itinerary_days : [
-        [
-            'day' => 1,
-            'day_title' => 'Arrival in Kathmandu',
-            'entries' => [
-                [
-                    'item_type' => 'Transportation',
-                    'item_name' => 'Airport Transfer',
-                    'icon' => 'car',
-                    'title' => 'Airport Pickup & Hotel Transfer',
-                    'description' => 'Welcome to Nepal! Our representative will meet you at Tribhuvan International Airport with a welcome sign and transfer you to your hotel.',
-                    'location' => 'Tribhuvan International Airport',
-                    'start_time' => 'Flexible',
-                    'end_time' => '',
-                    'duration' => '45 mins',
-                    'included' => ['Airport pickup', 'Private vehicle', 'Bottled water']
-                ],
-                [
-                    'item_type' => 'Rest',
-                    'item_name' => 'Free Time',
-                    'icon' => 'moon',
-                    'title' => 'Hotel Check-in & Rest',
-                    'description' => 'Check into your hotel and take some time to rest after your flight. Freshen up and explore the hotel facilities.',
-                    'location' => 'Hotel Yak & Yeti, Kathmandu',
-                    'start_time' => '2:00 PM',
-                    'end_time' => '6:00 PM',
-                    'duration' => '4 hours',
-                    'included' => ['Hotel accommodation', 'Free WiFi']
-                ],
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Dinner',
-                    'icon' => 'utensils',
-                    'title' => 'Welcome Dinner & Trip Briefing',
-                    'description' => 'Join your fellow trekkers and guide for a traditional Nepali welcome dinner. Your guide will brief you about the trek, answer questions, and distribute any necessary equipment.',
-                    'location' => 'Hotel Restaurant',
-                    'start_time' => '7:00 PM',
-                    'end_time' => '9:00 PM',
-                    'duration' => '2 hours',
-                    'included' => ['Welcome dinner', 'Beverages', 'Equipment check']
-                ],
-                [
-                    'item_type' => 'Accommodation',
-                    'item_name' => 'Hotel',
-                    'icon' => 'hotel',
-                    'title' => 'Overnight Stay',
-                    'description' => 'Comfortable 4-star hotel accommodation with all modern amenities.',
-                    'location' => 'Hotel Yak & Yeti, Kathmandu',
-                    'start_time' => '',
-                    'end_time' => '',
-                    'duration' => 'Overnight',
-                    'included' => ['Twin sharing room', 'Breakfast', 'Free WiFi']
-                ]
-            ]
-        ],
-        [
-            'day' => 2,
-            'day_title' => 'Flight to Lukla & Trek to Phakding',
-            'entries' => [
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Breakfast',
-                    'icon' => 'utensils',
-                    'title' => 'Early Breakfast',
-                    'description' => 'Early breakfast at the hotel before heading to the airport.',
-                    'location' => 'Hotel Restaurant',
-                    'start_time' => '5:00 AM',
-                    'end_time' => '5:45 AM',
-                    'duration' => '45 mins',
-                    'included' => ['Breakfast buffet', 'Tea/Coffee']
-                ],
-                [
-                    'item_type' => 'Transportation',
-                    'item_name' => 'Flight',
-                    'icon' => 'plane',
-                    'title' => 'Scenic Flight to Lukla',
-                    'description' => 'Experience one of the world\'s most spectacular flights! Fly over the Himalayan foothills and land at Tenzing-Hillary Airport, one of the most challenging airports in the world.',
-                    'location' => 'Kathmandu to Lukla',
-                    'start_time' => '6:30 AM',
-                    'end_time' => '7:05 AM',
-                    'duration' => '35 mins',
-                    'included' => ['Domestic flight', 'Airport transfers', 'Luggage allowance 15kg']
-                ],
-                [
-                    'item_type' => 'Activity',
-                    'item_name' => 'Trekking',
-                    'icon' => 'hiking',
-                    'title' => 'Trek to Phakding',
-                    'description' => 'After landing in Lukla (2,860m), meet your porters and begin your trek. The trail descends through the village and follows the Dudh Koshi River to Phakding (2,610m).',
-                    'location' => 'Lukla to Phakding',
-                    'start_time' => '8:00 AM',
-                    'end_time' => '12:00 PM',
-                    'duration' => '3-4 hours',
-                    'included' => ['Experienced guide', 'Porter service', 'Trail snacks']
-                ],
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Lunch',
-                    'icon' => 'utensils',
-                    'title' => 'Lunch at Phakding',
-                    'description' => 'Enjoy a hearty lunch at a local teahouse with views of the river.',
-                    'location' => 'Teahouse, Phakding',
-                    'start_time' => '12:30 PM',
-                    'end_time' => '1:30 PM',
-                    'duration' => '1 hour',
-                    'included' => ['Lunch', 'Tea/Coffee']
-                ],
-                [
-                    'item_type' => 'Rest',
-                    'item_name' => 'Free Time',
-                    'icon' => 'moon',
-                    'title' => 'Rest & Explore Phakding',
-                    'description' => 'Free time to rest, explore the village, or simply relax and enjoy the peaceful surroundings.',
-                    'location' => 'Phakding Village',
-                    'start_time' => '2:00 PM',
-                    'end_time' => '6:00 PM',
-                    'duration' => '4 hours',
-                    'included' => []
-                ],
-                [
-                    'item_type' => 'Accommodation',
-                    'item_name' => 'Teahouse',
-                    'icon' => 'hotel',
-                    'title' => 'Overnight at Teahouse',
-                    'description' => 'Stay at a comfortable teahouse lodge with basic but clean facilities.',
-                    'location' => 'Phakding (2,610m)',
-                    'start_time' => '',
-                    'end_time' => '',
-                    'duration' => 'Overnight',
-                    'included' => ['Twin sharing room', 'Dinner', 'Breakfast']
-                ]
-            ]
-        ],
-        [
-            'day' => 3,
-            'day_title' => 'Trek to Namche Bazaar',
-            'entries' => [
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Breakfast',
-                    'icon' => 'utensils',
-                    'title' => 'Breakfast at Teahouse',
-                    'description' => 'Hot breakfast to fuel you for the challenging day ahead.',
-                    'location' => 'Teahouse, Phakding',
-                    'start_time' => '6:30 AM',
-                    'end_time' => '7:30 AM',
-                    'duration' => '1 hour',
-                    'included' => ['Hot breakfast', 'Tea/Coffee']
-                ],
-                [
-                    'item_type' => 'Activity',
-                    'item_name' => 'Trekking',
-                    'icon' => 'hiking',
-                    'title' => 'Trek to Namche Bazaar',
-                    'description' => 'Today\'s trek is challenging with significant altitude gain. Cross several suspension bridges including the famous Hillary Bridge. Enter Sagarmatha National Park at Monjo. The final ascent to Namche is steep but rewarding.',
-                    'location' => 'Phakding to Namche Bazaar',
-                    'start_time' => '8:00 AM',
-                    'end_time' => '3:00 PM',
-                    'duration' => '5-6 hours',
-                    'included' => ['National Park entry permit', 'Guide service', 'Trail snacks']
-                ],
-                [
-                    'item_type' => 'Activity',
-                    'item_name' => 'Sightseeing',
-                    'icon' => 'camera',
-                    'title' => 'First Views of Everest',
-                    'description' => 'On a clear day, catch your first glimpse of Mount Everest from the trail! Photo opportunity at the famous viewpoint.',
-                    'location' => 'Everest View Point',
-                    'start_time' => '1:00 PM',
-                    'end_time' => '1:30 PM',
-                    'duration' => '30 mins',
-                    'included' => []
-                ],
-                [
-                    'item_type' => 'Accommodation',
-                    'item_name' => 'Teahouse',
-                    'icon' => 'hotel',
-                    'title' => 'Overnight in Namche Bazaar',
-                    'description' => 'Stay at a comfortable teahouse in the bustling Sherpa capital. Namche has ATMs, bakeries, and shops.',
-                    'location' => 'Namche Bazaar (3,440m)',
-                    'start_time' => '',
-                    'end_time' => '',
-                    'duration' => 'Overnight',
-                    'included' => ['Twin sharing room', 'Dinner', 'Breakfast']
-                ]
-            ]
-        ],
-        [
-            'day' => 4,
-            'day_title' => 'Acclimatization Day in Namche',
-            'entries' => [
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Breakfast',
-                    'icon' => 'utensils',
-                    'title' => 'Leisurely Breakfast',
-                    'description' => 'Enjoy a relaxed breakfast at the teahouse.',
-                    'location' => 'Teahouse, Namche Bazaar',
-                    'start_time' => '7:30 AM',
-                    'end_time' => '8:30 AM',
-                    'duration' => '1 hour',
-                    'included' => ['Hot breakfast', 'Tea/Coffee']
-                ],
-                [
-                    'item_type' => 'Activity',
-                    'item_name' => 'Hiking',
-                    'icon' => 'hiking',
-                    'title' => 'Acclimatization Hike to Everest View Hotel',
-                    'description' => 'Climb to the famous Everest View Hotel (3,880m) for stunning panoramic views of Everest, Lhotse, Ama Dablam, and surrounding peaks. This is crucial for acclimatization.',
-                    'location' => 'Namche to Everest View Hotel',
-                    'start_time' => '9:00 AM',
-                    'end_time' => '12:00 PM',
-                    'duration' => '3 hours',
-                    'included' => ['Guide service', 'Tea at viewpoint']
-                ],
-                [
-                    'item_type' => 'Activity',
-                    'item_name' => 'Sightseeing',
-                    'icon' => 'camera',
-                    'title' => 'Visit Sherpa Culture Museum',
-                    'description' => 'Learn about Sherpa culture, history, and the legacy of mountaineering in the Khumbu region.',
-                    'location' => 'Sherpa Culture Museum, Namche',
-                    'start_time' => '2:00 PM',
-                    'end_time' => '3:30 PM',
-                    'duration' => '1.5 hours',
-                    'included' => ['Museum entry fee', 'Guide explanation']
-                ],
-                [
-                    'item_type' => 'Rest',
-                    'item_name' => 'Free Time',
-                    'icon' => 'moon',
-                    'title' => 'Explore Namche Bazaar',
-                    'description' => 'Free time to explore the local markets, bakeries, and shops. Great place to buy souvenirs or rent/buy any missing gear.',
-                    'location' => 'Namche Bazaar Market',
-                    'start_time' => '4:00 PM',
-                    'end_time' => '6:00 PM',
-                    'duration' => '2 hours',
-                    'included' => []
-                ],
-                [
-                    'item_type' => 'Accommodation',
-                    'item_name' => 'Teahouse',
-                    'icon' => 'hotel',
-                    'title' => 'Overnight in Namche Bazaar',
-                    'description' => 'Second night in Namche for proper acclimatization.',
-                    'location' => 'Namche Bazaar (3,440m)',
-                    'start_time' => '',
-                    'end_time' => '',
-                    'duration' => 'Overnight',
-                    'included' => ['Twin sharing room', 'Dinner', 'Breakfast']
-                ]
-            ]
-        ],
-        [
-            'day' => 14,
-            'day_title' => 'Return to Kathmandu & Departure',
-            'entries' => [
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Breakfast',
-                    'icon' => 'utensils',
-                    'title' => 'Early Breakfast',
-                    'description' => 'Quick breakfast before your flight.',
-                    'location' => 'Teahouse, Lukla',
-                    'start_time' => '5:30 AM',
-                    'end_time' => '6:15 AM',
-                    'duration' => '45 mins',
-                    'included' => ['Hot breakfast', 'Tea/Coffee']
-                ],
-                [
-                    'item_type' => 'Transportation',
-                    'item_name' => 'Flight',
-                    'icon' => 'plane',
-                    'title' => 'Flight Back to Kathmandu',
-                    'description' => 'Scenic flight back to Kathmandu. One last chance to enjoy aerial views of the Himalayas.',
-                    'location' => 'Lukla to Kathmandu',
-                    'start_time' => '7:00 AM',
-                    'end_time' => '7:35 AM',
-                    'duration' => '35 mins',
-                    'included' => ['Domestic flight', 'Airport transfers']
-                ],
-                [
-                    'item_type' => 'Rest',
-                    'item_name' => 'Free Time',
-                    'icon' => 'moon',
-                    'title' => 'Rest & Optional Sightseeing',
-                    'description' => 'Free day to rest, shop for souvenirs, or explore Kathmandu\'s heritage sites like Durbar Square, Swayambhunath, or Boudhanath.',
-                    'location' => 'Kathmandu',
-                    'start_time' => '9:00 AM',
-                    'end_time' => '6:00 PM',
-                    'duration' => 'Full day',
-                    'included' => ['Day room at hotel', 'Luggage storage']
-                ],
-                [
-                    'item_type' => 'Meal',
-                    'item_name' => 'Dinner',
-                    'icon' => 'utensils',
-                    'title' => 'Farewell Dinner',
-                    'description' => 'Celebrate the successful completion of your trek with a special farewell dinner featuring Nepali cuisine and cultural performance.',
-                    'location' => 'Traditional Restaurant, Kathmandu',
-                    'start_time' => '7:00 PM',
-                    'end_time' => '9:30 PM',
-                    'duration' => '2.5 hours',
-                    'included' => ['Farewell dinner', 'Cultural show', 'Beverages']
-                ],
-                [
-                    'item_type' => 'Transportation',
-                    'item_name' => 'Airport Transfer',
-                    'icon' => 'car',
-                    'title' => 'Airport Drop-off (If departing)',
-                    'description' => 'Transfer to Tribhuvan International Airport for your departure flight.',
-                    'location' => 'Hotel to Airport',
-                    'start_time' => 'Flexible',
-                    'end_time' => '',
-                    'duration' => '45 mins',
-                    'included' => ['Private vehicle', 'Airport assistance']
-                ]
-            ]
-        ]
-    ];
+    // Use dynamic itinerary data from trip only
+    $itinerary_days = !empty($trip->itinerary_days) ? $trip->itinerary_days : [];
 
     // Icon mapping function
     $get_icon = function($icon_name) {
@@ -373,7 +54,18 @@ if (!defined('ABSPATH')) {
     ?>
 
     <div class="yatra-itinerary-timeline">
-        <?php foreach ($itinerary_days as $day): ?>
+        <?php if (empty($itinerary_days)): ?>
+            <div class="yatra-empty-itinerary">
+                <div class="yatra-empty-state-icon">
+                    <?php echo yatra_svg_icon('calendar', 'yatra-icon-lg'); ?>
+                </div>
+                <h3 class="yatra-empty-state-title"><?php esc_html_e('No Itinerary Available', 'yatra'); ?></h3>
+                <p class="yatra-empty-state-description">
+                    <?php esc_html_e('Detailed itinerary information will be available soon. Please check back later or contact us for more details.', 'yatra'); ?>
+                </p>
+            </div>
+        <?php else: ?>
+            <?php foreach ($itinerary_days as $day): ?>
             <div class="yatra-itinerary-day" data-day="<?php echo esc_attr($day['day']); ?>">
                 <div class="yatra-itinerary-day-header">
                     <div class="yatra-day-badge"><?php esc_html_e('Day', 'yatra'); ?> <?php echo esc_html($day['day']); ?></div>
@@ -473,5 +165,55 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
         <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </section>
+
+<style>
+.yatra-empty-itinerary {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.yatra-empty-state-icon {
+    margin-bottom: 20px;
+    color: #6b7280;
+}
+
+.yatra-empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.yatra-empty-state-description {
+    color: #6b7280;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .yatra-empty-itinerary {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .yatra-empty-state-icon {
+        color: #9ca3af;
+    }
+    
+    .yatra-empty-state-title {
+        color: #f9fafb;
+    }
+    
+    .yatra-empty-state-description {
+        color: #9ca3af;
+    }
+}
+</style>

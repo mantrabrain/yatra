@@ -500,6 +500,7 @@ class SettingsService
         return preg_replace('/[^a-z0-9_-]/i', '', $base) ?: 'book';
     }
 
+    
     /**
      * Check if using custom booking page
      */

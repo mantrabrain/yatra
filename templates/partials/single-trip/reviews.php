@@ -7,13 +7,14 @@ if (!defined('ABSPATH')) {
 // Expected variables: $trip
 ?>
 <!-- Reviews Section - Full Width -->
-<section class="yatra-reviews-section" id="reviews">
+<section class="yatra-reviews-section" id="reviews" itemscope itemtype="https://schema.org/Review">
     <div class="yatra-reviews-section-container">
         <div class="yatra-reviews-header">
             <h2 class="yatra-reviews-section-title">
                 <?php echo yatra_svg_icon('star', 'yatra-reviews-section-icon'); ?>
                 <?php echo esc_html__('Reviews', 'yatra'); ?>
             </h2>
+            <meta itemprop="about" content="<?php echo esc_attr($trip->title); ?>">
         </div>
 
         <?php

@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) {
     exit;
 } ?>
-<section class="yatra-trip-section" id="location">
+<section class="yatra-trip-section" id="location" itemscope itemtype="https://schema.org/Place">
     <h2 class="yatra-trip-section-title">
         <?php echo yatra_svg_icon('map-pin', 'yatra-trip-section-title-icon'); ?>
         <?php echo esc_html__('Location', 'yatra'); ?>
@@ -16,7 +16,8 @@ if (!defined('ABSPATH')) {
             
             <?php if (!empty($map_lat) && !empty($map_lng)): ?>
                     <div class="yatra-trip-map" id="yatra-trip-map" data-lat="<?php echo esc_attr($map_lat); ?>"
-                         data-lng="<?php echo esc_attr($map_lng); ?>">
+                         data-lng="<?php echo esc_attr($map_lng); ?>" itemprop="hasMap" itemscope itemtype="https://schema.org/Map">
+                        <meta itemprop="mapType" content="Google Maps">
                         <iframe
                                 width="100%"
                                 height="400"
@@ -26,6 +27,10 @@ if (!defined('ABSPATH')) {
                                 referrerpolicy="no-referrer-when-downgrade"
                                 src="https://www.google.com/maps?q=<?php echo esc_attr($map_lat); ?>,<?php echo esc_attr($map_lng); ?>&output=embed">
                         </iframe>
+                    </div>
+                    <div itemprop="geo" itemscope itemtype="https://schema.org/GeoCoordinates">
+                        <meta itemprop="latitude" content="<?php echo esc_attr($map_lat); ?>">
+                        <meta itemprop="longitude" content="<?php echo esc_attr($map_lng); ?>">
                     </div>
                 <?php else: ?>
                     <div class="yatra-trip-map yatra-map-placeholder">

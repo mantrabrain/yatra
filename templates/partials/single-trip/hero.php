@@ -3,25 +3,73 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<div class="yatra-trip-hero-new">
+<div class="yatra-trip-hero-new" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-hero-header">
-        <h1 class="yatra-trip-hero-title-new"><?php echo esc_html($trip->title); ?></h1>
-        <div class="yatra-hero-rating">
-            <?php if ($trip->average_rating > 0): ?>
-                <div class="yatra-rating-stars">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span class="yatra-star <?php echo $i <= round($trip->average_rating) ? 'filled' : ''; ?>">★</span>
-                    <?php endfor; ?>
+        <nav class="yatra-hero-breadcrumb" aria-label="Breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+            <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="<?php echo esc_url(home_url('/')); ?>" itemprop="item">
+                    <span itemprop="name"><?php echo esc_html__('Home', 'yatra'); ?></span>
+                </a>
+                <meta itemprop="position" content="1" />
+            </span>
+            <span class="yatra-hero-breadcrumb-separator">›</span>
+            <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <a href="<?php echo esc_url(home_url('/' . \Yatra\Services\SettingsService::getTripBase() . '/')); ?>" itemprop="item">
+                    <span itemprop="name"><?php echo esc_html__('Trips', 'yatra'); ?></span>
+                </a>
+                <meta itemprop="position" content="2" />
+            </span>
+            <span class="yatra-hero-breadcrumb-separator">›</span>
+            <span itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+                <span class="yatra-hero-breadcrumb-current" itemprop="name"><?php echo esc_html($trip->title); ?></span>
+                <meta itemprop="position" content="3" />
+            </span>
+        </nav>
+        <h1 class="yatra-trip-hero-title-new" itemprop="name"><?php echo esc_html($trip->title); ?></h1>
+        <div class="yatra-hero-meta">
+            <div class="yatra-hero-rating" itemprop="aggregateRating" itemscope itemtype="https://schema.org/AggregateRating">
+                <?php if ($trip->average_rating > 0): ?>
+                    <div class="yatra-rating-stars">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="yatra-star <?php echo $i <= round($trip->average_rating) ? 'filled' : ''; ?>" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
+                        <?php endfor; ?>
+                    </div>
+                    <span class="yatra-rating-number" itemprop="ratingValue"><?php echo esc_html(number_format($trip->average_rating, 1)); ?></span>
+                    <span class="yatra-rating-text">
+                        <span itemprop="reviewCount"><?php echo esc_html($trip->review_count); ?></span> 
+                        <?php echo esc_html(_n('Review', 'Reviews', $trip->review_count, 'yatra')); ?>
+                    </span>
+                    <meta itemprop="bestRating" content="5">
+                    <meta itemprop="worstRating" content="1">
+                <?php else: ?>
+                    <div class="yatra-rating-stars yatra-no-rating">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="yatra-star" aria-label="<?php echo esc_attr(sprintf(_n('%d star', '%d stars', $i, 'yatra'), $i)); ?>">★</span>
+                        <?php endfor; ?>
+                    </div>
+                    <span class="yatra-rating-text yatra-no-reviews"><?php echo esc_html__('No reviews yet', 'yatra'); ?></span>
+                    <meta itemprop="reviewCount" content="0">
+                <?php endif; ?>
+            </div>
+            <?php if (!empty($trip->starting_location)): ?>
+                <div class="yatra-hero-location" itemprop="location" itemscope itemtype="https://schema.org/Place">
+                    <?php echo yatra_svg_icon('map-pin', 'yatra-icon-sm'); ?>
+                    <span itemprop="name"><?php echo esc_html($trip->starting_location); ?></span>
                 </div>
-                <span class="yatra-rating-number"><?php echo esc_html(number_format($trip->average_rating, 1)); ?></span>
-                <span class="yatra-rating-text">(<?php echo esc_html($trip->review_count); ?> <?php echo esc_html(_n('Review', 'Reviews', $trip->review_count, 'yatra')); ?>)</span>
-            <?php else: ?>
-                <div class="yatra-rating-stars yatra-no-rating">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span class="yatra-star">★</span>
-                    <?php endfor; ?>
+            <?php endif; ?>
+            <?php if (!empty($trip->duration_days)): ?>
+                <div class="yatra-hero-duration" itemprop="duration">
+                    <?php echo yatra_svg_icon('clock', 'yatra-icon-sm'); ?>
+                    <span>
+                        <?php 
+                        if (!empty($trip->duration_nights) && $trip->duration_nights > 0) {
+                            echo esc_html(sprintf(_n('%d day %d night', '%d days %d nights', $trip->duration_days, 'yatra'), $trip->duration_days, $trip->duration_nights));
+                        } else {
+                            echo esc_html(sprintf(_n('%d day', '%d days', $trip->duration_days, 'yatra'), $trip->duration_days));
+                        }
+                        ?>
+                    </span>
                 </div>
-                <span class="yatra-rating-text yatra-no-reviews"><?php echo esc_html__('No reviews yet', 'yatra'); ?></span>
             <?php endif; ?>
         </div>
     </div>
@@ -64,10 +112,12 @@ if (!defined('ABSPATH')) {
     $total_images = count($all_gallery_images);
     ?>
     <div class="yatra-hero-images">
-        <div class="yatra-hero-main-image">
+        <div class="yatra-hero-main-image" itemprop="image" itemscope itemtype="https://schema.org/ImageObject">
             <?php if ($trip->discount_percentage > 0): ?>
-                <div class="yatra-hero-discount-tag"><?php echo esc_html__('SAVE', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>
-                    %
+                <div class="yatra-hero-discount-tag" itemprop="offers" itemscope itemtype="https://schema.org/Offer">
+                    <?php echo esc_html__('SAVE', 'yatra'); ?> <?php echo esc_html($trip->discount_percentage); ?>%
+                    <meta itemprop="discount" content="<?php echo esc_attr($trip->discount_percentage); ?>">
+                    <meta itemprop="discountCurrency" content="<?php echo esc_attr($trip->currency ?? 'USD'); ?>">
                 </div>
             <?php endif; ?>
             
@@ -118,12 +168,24 @@ if (!defined('ABSPATH')) {
             
             <?php if (!empty($main_image_url)): ?>
                 <a href="#" class="yatra-hero-main-img-link" data-gallery="hero-gallery" data-image-index="0">
-                    <img src="<?php echo esc_url($main_image_url); ?>" alt="<?php echo esc_attr($trip->title); ?>"
+                    <img src="<?php echo esc_url($main_image_url); ?>" 
+                         alt="<?php echo esc_attr(sprintf(__('Main image for %s', 'yatra'), $trip->title)); ?>"
+                         title="<?php echo esc_attr($trip->title); ?>"
+                         itemprop="url" content="<?php echo esc_url($main_image_url); ?>"
                          class="yatra-hero-main-img">
                 </a>
+                <meta itemprop="contentUrl" content="<?php echo esc_url($main_image_url); ?>">
+                <meta itemprop="encodingFormat" content="image/jpeg">
+                <meta itemprop="width" content="1200">
+                <meta itemprop="height" content="630">
             <?php else: ?>
                 <img src="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
-                     alt="<?php echo esc_attr($trip->title); ?>" class="yatra-hero-main-img">
+                     alt="<?php echo esc_attr(sprintf(__('Placeholder image for %s', 'yatra'), $trip->title)); ?>"
+                     title="<?php echo esc_attr($trip->title); ?>"
+                     itemprop="url" content="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>"
+                     class="yatra-hero-main-img">
+                <meta itemprop="contentUrl" content="<?php echo esc_url(plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>">
+                <meta itemprop="encodingFormat" content="image/svg+xml">
             <?php endif; ?>
             
             <!-- Quick Media Switcher -->

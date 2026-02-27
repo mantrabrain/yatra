@@ -33,6 +33,9 @@ add_filter('wp_title', function ($title) {
     return esc_html($trip->title) . ' - ' . get_bloginfo('name');
 }, 10, 1);
 
+// Include SEO helper functions
+require_once plugin_dir_path(dirname(__FILE__)) . 'includes/seo-helper.php';
+
 yatra_get_header();
 
 // Calculate pricing data using helper functions
@@ -70,6 +73,7 @@ window.yatraTripData = {
 </script>
 
 <div class="yatra-single-trip">
+    
     <!-- Hero Section -->
     <?php yatra_get_template('partials/single-trip/hero', ['trip' => $trip, 'base_price' => $base_price]); ?>
 

@@ -3,29 +3,31 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<section class="yatra-trip-section" id="overview">
+<section class="yatra-trip-section" id="overview" itemscope itemtype="https://schema.org/TouristTrip">
     <h2 class="yatra-trip-section-title">
         <?php echo yatra_svg_icon('book-open', 'yatra-trip-section-title-icon'); ?>
         <?php echo esc_html__('Overview', 'yatra'); ?>
     </h2>
     
     <?php if (!empty($trip->short_description)): ?>
-        <div class="yatra-trip-short-description-lead">
+        <div class="yatra-trip-short-description-lead" itemprop="description">
             <?php echo \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($trip->short_description); ?>
         </div>
     <?php endif; ?>
     
-    <div class="yatra-trip-description">
+    <div class="yatra-trip-description" itemprop="about">
         <?php echo \Yatra\Helpers\FormatHelper::sanitizeQuillHtml($trip->description ?? ''); ?>
     </div>
 
     <?php if (is_array($trip->highlights) && count($trip->highlights) > 0): ?>
-        <div class="yatra-trip-highlights">
-            <?php foreach ($trip->highlights as $highlight): ?>
+        <div class="yatra-trip-highlights" itemprop="additionalProperty" itemscope itemtype="https://schema.org/PropertyValue">
+            <meta itemprop="name" content="<?php esc_attr_e('Trip Highlights', 'yatra'); ?>">
+            <?php foreach ($trip->highlights as $index => $highlight): ?>
                 <?php if (!empty(trim($highlight))): ?>
-                    <div class="yatra-highlight-item">
+                    <div class="yatra-highlight-item" itemprop="value" itemscope itemtype="https://schema.org/Text">
                         <?php echo yatra_svg_icon('star', 'yatra-highlight-icon'); ?>
-                        <p class="yatra-highlight-text"><?php echo esc_html($highlight); ?></p>
+                        <p class="yatra-highlight-text" itemprop="text"><?php echo esc_html($highlight); ?></p>
+                        <meta itemprop="position" content="<?php echo $index + 1; ?>">
                     </div>
                 <?php endif; ?>
             <?php endforeach; ?>

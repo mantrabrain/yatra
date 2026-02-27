@@ -400,6 +400,7 @@ if (!function_exists('yatra_svg_icon')) {
         }
 
         $svg = $icons[$icon_name] ?? '';
+
         if ($svg === '' || !is_string($svg)) {
             return '';
         }
@@ -1260,6 +1261,75 @@ function yatra_single_trip_get_group_discounts($trip_id) {
 // Hook into WordPress enqueue system
 add_action('wp_enqueue_scripts', 'yatra_enqueue_single_trip_scripts');
 
+// Yatra page type detection functions
+if (!function_exists('yatra_is_trip_page')) {
+    function yatra_is_trip_page() {
+        global $trip;
+        return isset($trip) && !empty($trip);
+    }
+}
+
+if (!function_exists('yatra_is_destination_page')) {
+    function yatra_is_destination_page() {
+        global $destination;
+        return isset($destination) && !empty($destination);
+    }
+}
+
+if (!function_exists('yatra_is_activity_page')) {
+    function yatra_is_activity_page() {
+        global $activity;
+        return isset($activity) && !empty($activity);
+    }
+}
+
+if (!function_exists('yatra_is_trip_archive_page')) {
+    function yatra_is_trip_archive_page() {
+        $current_url = $_SERVER['REQUEST_URI'] ?? '';
+        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
+        $trip_base = \Yatra\Services\SettingsService::getTripBase();
+        return strpos($current_path, '/' . $trip_base . '/') !== false && !yatra_is_trip_page();
+    }
+}
+
+if (!function_exists('yatra_is_destination_archive_page')) {
+    function yatra_is_destination_archive_page() {
+        $current_url = $_SERVER['REQUEST_URI'] ?? '';
+        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
+        $destination_base = \Yatra\Services\SettingsService::getString('destination_base', 'destination');
+        return strpos($current_path, '/' . $destination_base . '/') !== false && !yatra_is_destination_page();
+    }
+}
+
+if (!function_exists('yatra_is_activity_archive_page')) {
+    function yatra_is_activity_archive_page() {
+        $current_url = $_SERVER['REQUEST_URI'] ?? '';
+        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
+        $activity_base = \Yatra\Services\SettingsService::getString('activity_base', 'activity');
+        return strpos($current_path, '/' . $activity_base . '/') !== false && !yatra_is_activity_page();
+    }
+}
+
+if (!function_exists('yatra_is_listing_page')) {
+    function yatra_is_listing_page() {
+        $current_url = $_SERVER['REQUEST_URI'] ?? '';
+        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
+        return strpos($current_path, '/listing-') !== false;
+    }
+}
+
+if (!function_exists('yatra_is_yatra_page')) {
+    function yatra_is_yatra_page() {
+        return yatra_is_trip_page() || 
+               yatra_is_destination_page() || 
+               yatra_is_activity_page() || 
+               yatra_is_trip_archive_page() || 
+               yatra_is_destination_archive_page() || 
+               yatra_is_activity_archive_page() || 
+               yatra_is_listing_page();
+    }
+}
+
 if ( ! function_exists( 'yatra_get_header' ) ) {
     
 function yatra_get_header( $header_name = null ) {
@@ -1289,6 +1359,7 @@ function yatra_get_header( $header_name = null ) {
     }
 }
 }
+
 if ( ! function_exists( 'yatra_block_support_styles' ) ) {
     function yatra_block_support_styles() {
         // Bail early if function does not exists.

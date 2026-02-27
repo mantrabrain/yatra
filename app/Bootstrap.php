@@ -124,6 +124,13 @@ class Bootstrap
         } else {
             error_log('Yatra: helpers.php file not found at: ' . $helpersPath);
         }
+        
+        $seoHelperPath = YATRA_PLUGIN_PATH . 'includes/seo-helper.php';
+        if (file_exists($seoHelperPath)) {
+            require_once $seoHelperPath;
+        } else {
+            error_log('Yatra: seo-helper.php file not found at: ' . $seoHelperPath);
+        }
     }
 
     /**
