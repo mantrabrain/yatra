@@ -165,9 +165,13 @@ class ItemController extends BaseController
         try {
             $id = $this->service->create($this->getBody($request));
 
+            // Get the created item to return full data
+            $item = $this->service->getById($id);
+
             return $this->success_response([
                 'id' => $id,
                 'message' => __('Item created successfully', 'yatra'),
+                'data' => $item,
             ], 201);
         } catch (\InvalidArgumentException $e) {
             return $this->validation_error($e->getMessage());
@@ -216,12 +220,9 @@ class ItemController extends BaseController
     {
         $prepared = (array) $item;
 
-        // Parse metadata and extract type_id
-        if (!empty($prepared['metadata'])) {
-            $metadata = json_decode($prepared['metadata'], true);
-            if (is_array($metadata) && isset($metadata['type_id'])) {
-                $prepared['type_id'] = (int) $metadata['type_id'];
-            }
+        // For unified ClassificationsTable, items have parent_id = item type ID
+        if (!empty($prepared['parent_id'])) {
+            $prepared['type_id'] = (int) $prepared['parent_id'];
         }
 
         // Get item type info
@@ -239,7 +240,13 @@ class ItemController extends BaseController
                         $prepared['type_icon'] = $type->icon;
                     }
                 }
+            } else {
+                // If type not found, set unknown
+                $prepared['type_name'] = __('Unknown', 'yatra');
             }
+        } else {
+            // If no type_id, set unknown
+            $prepared['type_name'] = __('Unknown', 'yatra');
         }
 
         if (!empty($prepared['created_by'])) {

@@ -45,8 +45,8 @@ interface ItemType {
 const ItemTypes: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [sortBy, setSortBy] = useState('id');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
   const [bulkAction, setBulkAction] = useState('');

@@ -29,6 +29,7 @@ interface ActivityAccordionProps {
   onRemoveIncludedItem: (activityId: string, index: number) => void;
   onRemoveExcludedItem: (activityId: string, index: number) => void;
   calculateDuration: (startTime?: string, endTime?: string, timeType?: string) => string;
+  onRefreshData?: () => void;
 }
 
 export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
@@ -49,6 +50,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
   onRemoveIncludedItem,
   onRemoveExcludedItem,
   calculateDuration,
+  onRefreshData,
 }) => {
   return (
     <>
@@ -122,6 +124,7 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                     calculateDuration={calculateDuration}
                     size="default"
                     showCardWrapper={false}
+                    onRefreshData={onRefreshData}
                   />
                 </CardContent>
               )}

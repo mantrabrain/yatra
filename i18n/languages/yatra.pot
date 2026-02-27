@@ -4,990 +4,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Yatra - Travel Booking & Management 3.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/yatra\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: Yatra Dev <mantrabrain@gmail.com>\n"
+"Language-Team: Yatra Development Team <mantrabrain@gmail.com>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-26T13:11:19+00:00\n"
+"POT-Creation-Date: 2026-02-27T04:30:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: yatra\n"
-
-#: assets/admin/dist/js/app.js:30972
-msgid "Failed to load reviews. Please try again."
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31002
-msgid "Select reviews to display as testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31004
-msgid "Save the trip first to select testimonials from reviews"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31009
-#: templates/partials/single-trip/sticky-nav.php:51
-msgid "Testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31010
-msgid "Select approved reviews to display as testimonials on the trip page"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31014
-msgid "Loading reviews..."
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31025
-msgid "Retry"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31030
-msgid "No approved reviews yet"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31031
-msgid "Reviews will appear here once customers submit and they are approved"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31034
-msgid "Select reviews to feature as testimonials"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31043
-#: templates/listing-trip.php:377
-msgid "Clear all"
-msgstr ""
-
-#: assets/admin/dist/js/app.js:31081
-msgid "Selected as testimonial"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1003
-#: templates/booking-confirmation.php:337
-#: templates/partials/remaining-checkout-content.php:70
-#: templates/pdf/voucher.php:186
-msgid "Amount Paid"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1007
-#: templates/booking-confirmation.php:344
-msgid "Amount Due"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1013
-msgid "Timeline"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1016
-msgid "Created"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1020
-msgid "Last Updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1117
-msgid "Manage and view all your travel bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1123
-msgid "Search bookings..."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1136
-msgid "All Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1155
-#: assets/dist/js/account-page.js:1137
-msgid "Upcoming"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1169
-#: assets/dist/js/account-page.js:1139
-msgid "Completed"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1184
-msgid "No bookings found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1185
-msgid "Try adjusting your filters or check back later."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1208
-#: assets/dist/js/account-page.js:298
-msgid "Multiple destinations"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1219
-#: templates/booking-confirmation.php:246
-#: templates/partials/booking-content.php:290
-#: templates/partials/remaining-checkout-content.php:84
-#: templates/partials/remaining-checkout-content.php:143
-#: templates/pdf/invoice.php:128
-#: templates/pdf/itinerary.php:176
-#: assets/dist/js/account-page.js:830
-msgid "Travel Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1223
-#: templates/booking-confirmation.php:270
-#: templates/partials/availability-section.php:267
-#: templates/partials/booking-content.php:308
-#: templates/partials/booking-content.php:378
-#: templates/partials/remaining-checkout-content.php:88
-#: templates/partials/remaining-checkout-content.php:147
-#: assets/dist/js/account-page.js:309
-#: assets/dist/js/account-page.js:842
-msgid "Travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1227
-#: app/Providers/FrontendAssetsProvider.php:382
-#: templates/booking-confirmation.php:319
-#: templates/partials/remaining-checkout-content.php:154
-#: templates/pdf/voucher.php:182
-#: assets/dist/js/account-page.js:848
-#: assets/dist/js/account-page.js:999
-msgid "Total Amount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1231
-msgid "Paid / Due"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1235
-msgid "Due:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1242
-#: templates/booking-confirmation.php:254
-msgid "Booked On"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1264
-msgid "Download Voucher"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1274
-msgid "Payment"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1289
-#: templates/partials/booking-content.php:75
-#: templates/partials/remaining-checkout-content.php:49
-#: templates/partials/remaining-checkout-content.php:120
-msgid "Pay Remaining Balance"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1363
-msgid "Payments & Invoices"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1365
-msgid "Track deposits, balances, and installment schedules with secure payment links."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1370
-msgid "Total Payments"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1377
-#: templates/partials/remaining-checkout-content.php:158
-msgid "Paid"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1385
-#: app/Controllers/BookingSessionController.php:2108
-#: app/Controllers/BookingSessionController.php:2134
-#: assets/dist/js/account-page.js:1138
-#: assets/dist/js/account-page.js:1162
-msgid "Pending"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1392
-msgid "Outstanding"
-msgstr ""
-
-#: assets/dist/js/account-page.js:14
-#: assets/dist/js/account-page.js:10
-msgid "Invalid date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1400
-msgid "No payments found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1401
-msgid "Payment history will appear here once you make a booking."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1425
-#: templates/partials/availability-section.php:83
-msgid "Booking"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1444
-#: templates/pdf/invoice.php:129
-msgid "Amount"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1451
-#: templates/partials/booking-form-fields.php:513
-#: assets/dist/js/account-page.js:994
-msgid "Payment Method"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1458
-msgid "Payment Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1472
-#: templates/booking-confirmation.php:453
-msgid "Download Invoice"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1486
-msgid "View Receipt"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1492
-msgid "Pending approval"
-msgstr ""
-
-#: assets/dist/js/account-page.js:150
-msgid "Welcome back,"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1502
-msgid "View Booking Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1540
-msgid "Travel Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1541
-msgid "Download itineraries, vouchers, invoices, and other documents for each trip."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1548
-msgid "Search documents..."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1561
-msgid "All Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1562
-msgid "Itineraries"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1563
-msgid "Vouchers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1564
-msgid "Invoices"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1573
-#: templates/partials/single-trip/sticky-nav.php:21
-msgid "Itinerary"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1577
-msgid "Voucher"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1581
-msgid "Invoice"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1585
-#: assets/dist/js/account-page.js:956
-#: assets/dist/js/account-page.js:1565
-msgid "Downloads"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1591
-msgid "No documents found"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1592
-msgid "No documents are available yet. Please check back later."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1603
-msgid "Updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1608
-msgid "Access"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1624
-#: assets/dist/js/account-page.js:966
-msgid "Not Available"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1624
-#: templates/partials/remaining-checkout-content.php:62
-msgid "Not available"
-msgstr ""
-
-#: assets/dist/js/account-page.js:163
-msgid "You have"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1632
-#: assets/dist/js/account-page.js:976
-msgid "Download"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1635
-msgid "Preview"
-msgstr ""
-
-#: assets/dist/js/account-page.js:167
-msgid "upcoming adventure"
-msgstr ""
-
-#: assets/dist/js/account-page.js:167
-msgid "upcoming adventures"
-msgstr ""
-
-#: assets/dist/js/account-page.js:169
-msgid "coming up"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1697
-msgid "Update your contact details, address, and communication preferences."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1702
-msgid "Edit Profile"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1709
-#: templates/partials/single-trip/enquiry-modal.php:31
-msgid "Full Name"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1720
-#: templates/partials/single-trip/enquiry-modal.php:32
-msgid "Enter your full name"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1726
-#: templates/partials/booking-auth.php:144
-#: templates/partials/single-trip/enquiry-modal.php:36
-msgid "Email Address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1737
-msgid "Enter your email address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1742
-#: templates/partials/booking-auth.php:157
-#: templates/partials/single-trip/enquiry-modal.php:41
-msgid "Phone Number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1750
-msgid "Enter your phone number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1755
-msgid "City"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1763
-msgid "Enter your city"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1768
-msgid "Address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1776
-msgid "Enter your address"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1781
-msgid "Country"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1789
-msgid "Enter your country"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1791
-#: assets/dist/js/account-page.js:1722
-#: assets/dist/js/account-page.js:1739
-#: assets/dist/js/account-page.js:1752
-#: assets/dist/js/account-page.js:1765
-#: assets/dist/js/account-page.js:1778
-msgid "Not set"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1803
-msgid "Save Changes"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1829
-msgid "Update your password to keep your account secure."
-msgstr ""
-
-#: assets/dist/js/account-page.js:1840
-#: assets/dist/js/account-page.js:1827
-msgid "Change Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1848
-msgid "Current Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1859
-msgid "Enter your current password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1865
-msgid "New Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1876
-msgid "Enter new password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:188
-msgid "View Calendar"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1882
-msgid "Confirm New Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1893
-msgid "Confirm your new password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1896
-msgid "Passwords do not match"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1918
-msgid "Update Password"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1938
-#: templates/partials/booking-content.php:158
-#: templates/partials/single-trip/enquiry-modal.php:127
-#: assets/dist/js/account-page.js:1816
-#: assets/js/stripe.js:145
-msgid "Cancel"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1949
-msgid "Communication Preferences"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1954
-msgid "Booking reminders"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1958
-msgid "Payment notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1962
-msgid "Promotional offers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1966
-msgid "Trip updates"
-msgstr ""
-
-#: assets/dist/js/account-page.js:1981
-#: templates/listing-activity.php:248
-#: templates/partials/single-trip/content-sidebar.php:187
-#: templates/single-activity.php:132
-#: templates/single-destination.php:132
-msgid "From"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2014
-msgid "Support & Help Center"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2016
-msgid "Our team is available 24/7 for urgent requests. Submit a ticket or contact us directly."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2021
-msgid "Total Tickets"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2028
-msgid "Open"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2035
-msgid "Resolved"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2045
-msgid "Create a new support ticket"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2046
-msgid "Please describe your issue and we will get back to you as soon as possible."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2052
-msgid "Subject"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2062
-msgid "Enter ticket subject"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2070
-#: templates/partials/single-trip/enquiry-modal.php:118
-msgid "Message"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2079
-msgid "How can we help?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2094
-msgid "Submit Ticket"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2103
-msgid "Your Support Tickets"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2107
-msgid "No support tickets yet"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2108
-msgid "Create a ticket above to get started."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2123
-msgid "Last updated"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2134
-msgid "View"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2146
-msgid "Need Immediate Assistance?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2147
-msgid "Call our 24/7 concierge desk for urgent travel support."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2170
-msgid "Failed to remove trip from wishlist."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2176
-msgid "Your wishlist of favorite trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2187
-#: assets/dist/js/account-page.js:1984
-msgid "No saved trips yet"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2188
-msgid "Start exploring and save your favorite trips to your wishlist!"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2196
-msgid "Browse Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2222
-#: templates/partials/single-trip/content-sidebar.php:181
-#: templates/partials/single-trip/similar-trips.php:60
-msgid "OFF"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2228
-msgid "Remove from favorites"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2241
-#: app/Repositories/SavedTripRepository.php:320
-msgid "Flexible"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2265
-#: templates/single-activity.php:203
-#: templates/single-destination.php:203
-#: templates/trip-listing-card.php:221
-msgid "reviews"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2274
-msgid "Starting from"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2279
-msgid "Per person"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2281
-#: app/Providers/FrontendAssetsProvider.php:384
-#: templates/partials/single-trip/similar-trips.php:113
-#: templates/single-activity.php:224
-#: templates/single-destination.php:242
-#: templates/trip-listing-card.php:283
-#: assets/dist/js/account-page.js:1254
-msgid "View Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2292
-msgid "Dashboard"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2293
-#: app/Core/Modules/ModuleManager.php:106
-#: app/Core/Modules/ModuleManager.php:225
-#: templates/trip-listing-card.php:206
-#: assets/dist/js/account-page.js:1116
-msgid "Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2294
-#: app/Core/Modules/ModuleManager.php:180
-msgid "Payments"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2295
-msgid "Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2296
-#: assets/dist/js/account-page.js:1973
-#: assets/dist/js/account-page.js:2175
-msgid "Saved Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2297
-#: assets/dist/js/account-page.js:1695
-msgid "Profile"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2298
-#: assets/dist/js/account-page.js:1300
-msgid "Support"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2486
-#: assets/dist/js/account-page.js:1148
-msgid "Total Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2492
-#: assets/dist/js/account-page.js:267
-msgid "Upcoming Trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2497
-msgid "Outstanding Balance"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2502
-#: assets/dist/js/account-page.js:1176
-msgid "Total Spent"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2577
-msgid "Hello,"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2579
-msgid "Guest"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2581
-msgid "Manage bookings, payments, and documents – everything for your adventures in one place."
-msgstr ""
-
-#: assets/dist/js/account-page.js:2587
-#: app/Providers/FrontendAssetsProvider.php:375
-msgid "Logout"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2608
-msgid "Need help right away?"
-msgstr ""
-
-#: assets/dist/js/account-page.js:2609
-msgid "Concierge Desk"
-msgstr ""
-
-#: assets/dist/js/account-page.js:268
-msgid "Your next adventures"
-msgstr ""
-
-#: assets/dist/js/account-page.js:279
-msgid "View all"
-msgstr ""
-
-#: assets/dist/js/account-page.js:319
-msgid "No upcoming trips"
-msgstr ""
-
-#: assets/dist/js/account-page.js:320
-msgid "Start planning your next adventure!"
-msgstr ""
-
-#: assets/dist/js/account-page.js:327
-msgid "Quick Actions"
-msgstr ""
-
-#: assets/dist/js/account-page.js:340
-msgid "View Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:356
-msgid "Make Payment"
-msgstr ""
-
-#: assets/dist/js/account-page.js:372
-#: assets/dist/js/account-page.js:206
-msgid "My Documents"
-msgstr ""
-
-#: assets/dist/js/account-page.js:388
-msgid "Get Support"
-msgstr ""
-
-#: assets/dist/js/account-page.js:400
-msgid "Notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:401
-msgid "Updates & reminders"
-msgstr ""
-
-#: assets/dist/js/account-page.js:419
-msgid "No new notifications"
-msgstr ""
-
-#: assets/dist/js/account-page.js:428
-msgid "Recent Activity"
-msgstr ""
-
-#: assets/dist/js/account-page.js:429
-msgid "Your latest updates"
-msgstr ""
-
-#: assets/dist/js/account-page.js:437
-msgid "Booking confirmed:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:449
-msgid "Payment pending:"
-msgstr ""
-
-#: assets/dist/js/account-page.js:46
-#: app/Providers/FrontendAssetsProvider.php:354
-#: app/Providers/FrontendAssetsProvider.php:393
-#: includes/helpers.php:261
-#: templates/partials/single-trip/content-sidebar.php:195
-#: templates/trip-listing-card.php:278
-msgid "Contact for pricing"
-msgstr ""
-
-#: assets/dist/js/account-page.js:5
-msgid "N/A"
-msgstr ""
-
-#: assets/dist/js/account-page.js:750
-msgid "Booking not found or error loading booking"
-msgstr ""
-
-#: assets/dist/js/account-page.js:773
-#: app/Providers/FrontendAssetsProvider.php:380
-#: app/Services/BookingService.php:864
-#: templates/pdf/voucher.php:110
-#: assets/dist/js/account-page.js:724
-#: assets/dist/js/account-page.js:735
-msgid "Booking Details"
-msgstr ""
-
-#: assets/dist/js/account-page.js:774
-msgid "Complete booking information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:785
-#: assets/dist/js/account-page.js:745
-msgid "Back to Bookings"
-msgstr ""
-
-#: assets/dist/js/account-page.js:794
-msgid "Booking Overview"
-msgstr ""
-
-#: assets/dist/js/account-page.js:802
-msgid "Booking Number"
-msgstr ""
-
-#: assets/dist/js/account-page.js:806
-#: templates/partials/remaining-checkout-content.php:80
-#: templates/partials/remaining-checkout-content.php:139
-#: templates/single-activity.php:110
-#: templates/single-destination.php:110
-msgid "Trip"
-msgid_plural "Trips"
-msgstr[0] ""
-msgstr[1] ""
-
-#: assets/dist/js/account-page.js:815
-msgid "View Trip"
-msgstr ""
-
-#: assets/dist/js/account-page.js:823
-#: templates/pdf/itinerary.php:221
-msgid "Booking Date"
-msgstr ""
-
-#: assets/dist/js/account-page.js:837
-#: app/Controllers/TripController.php:1983
-#: templates/booking-confirmation.php:250
-#: templates/partials/single-trip/content-overview.php:95
-#: templates/partials/single-trip/content-sidebar.php:339
-#: templates/partials/single-trip/content-sidebar.php:527
-#: templates/partials/single-trip/enquiry-modal.php:61
-#: templates/pdf/itinerary.php:159
-msgid "Number of Travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:855
-msgid "Customer Information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:873
-msgid "Travelers Information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:878
-#: templates/partials/booking-content.php:223
-#: templates/partials/booking-content.php:380
-msgid "traveler"
-msgid_plural "travelers"
-msgstr[0] ""
-msgstr[1] ""
-
-#: assets/dist/js/account-page.js:878
-#: templates/partials/availability-section.php:75
-#: templates/partials/availability-section.php:414
-msgid "travelers"
-msgstr ""
-
-#: assets/dist/js/account-page.js:900
-#: app/Controllers/BookingSessionController.php:2409
-#: templates/booking-confirmation.php:281
-#: templates/partials/availability-section.php:296
-#: templates/partials/availability-section.php:298
-#: templates/partials/availability-section.php:304
-#: templates/partials/booking-content.php:314
-#: templates/partials/booking-content.php:621
-#: templates/partials/booking-form-fields.php:320
-#: templates/partials/booking-form-fields.php:356
-#: templates/partials/single-trip/content-overview.php:60
-#: templates/partials/single-trip/content-overview.php:72
-#: templates/partials/single-trip/content-overview.php:76
-#: templates/partials/single-trip/content-sidebar.php:235
-#: templates/partials/single-trip/content-sidebar.php:287
-#: templates/partials/single-trip/content-sidebar.php:423
-#: templates/partials/single-trip/content-sidebar.php:475
-#: assets/dist/js/account-page.js:152
-#: assets/dist/js/account-page.js:309
-#: assets/dist/js/account-page.js:842
-msgid "Traveler"
-msgstr ""
-
-#: assets/dist/js/account-page.js:900
-#: templates/partials/booking-form-fields.php:439
-msgid "Lead Traveler"
-msgstr ""
-
-#: assets/dist/js/account-page.js:906
-msgid "Primary Contact"
-msgstr ""
-
-#: assets/dist/js/account-page.js:936
-#: templates/pdf/itinerary.php:308
-msgid "Emergency Contact"
-msgstr ""
-
-#: assets/dist/js/account-page.js:949
-#: templates/partials/booking-form-fields.php:572
-msgid "Special Requests"
-msgstr ""
-
-#: assets/dist/js/account-page.js:985
-#: templates/partials/booking-content.php:834
-msgid "Payment Information"
-msgstr ""
-
-#: assets/dist/js/account-page.js:988
-#: app/Providers/FrontendAssetsProvider.php:383
-msgid "Payment Status"
-msgstr ""
-
-#: assets/dist/js/index-B3F_wdPj.js:103
-#: assets/dist/js/index-BId2ZWKw.js:902
-#: assets/dist/js/index-BR2i8ReK.js:902
-#: assets/dist/js/index-BXqWjmYY.js:898
-#: assets/dist/js/index-BmVLLpoQ.js:898
-#: assets/dist/js/index-CJHBeKuZ.js:898
-#: assets/dist/js/index-CRP0c7Ek.js:902
-#: assets/dist/js/index-CUZ-9I-e.js:902
-#: assets/dist/js/index-CbF2rAks.js:100
-#: assets/dist/js/index-CcT81l1I.js:898
-#: assets/dist/js/index-CoA0FryH.js:898
-#: assets/dist/js/index-CqbqWdVq.js:898
-#: assets/dist/js/index-CvnNrZyJ.js:902
-#: assets/dist/js/index-DJ2aWQ7w.js:902
-#: assets/dist/js/index-JhHGhN8T.js:902
-#: assets/dist/js/index-LYWPs5bb.js:902
-msgid "Close"
-msgstr ""
-
-#: assets/dist/js/index-BId2ZWKw.js:522
-#: assets/dist/js/index-BR2i8ReK.js:522
-#: assets/dist/js/index-BXqWjmYY.js:522
-#: assets/dist/js/index-BmVLLpoQ.js:522
-#: assets/dist/js/index-CJHBeKuZ.js:522
-#: assets/dist/js/index-CRP0c7Ek.js:522
-#: assets/dist/js/index-CUZ-9I-e.js:522
-#: assets/dist/js/index-CcT81l1I.js:522
-#: assets/dist/js/index-CoA0FryH.js:522
-#: assets/dist/js/index-CqbqWdVq.js:522
-#: assets/dist/js/index-CvnNrZyJ.js:522
-#: assets/dist/js/index-DJ2aWQ7w.js:522
-#: assets/dist/js/index-JhHGhN8T.js:522
-#: assets/dist/js/index-LYWPs5bb.js:522
-msgctxt "text direction"
-msgid "ltr"
-msgstr ""
 
 #. Plugin Name of the plugin
 #: yatra.php
@@ -1698,6 +724,11 @@ msgstr ""
 msgid "Confirmed"
 msgstr ""
 
+#: app/Controllers/BookingSessionController.php:2108
+#: app/Controllers/BookingSessionController.php:2134
+msgid "Pending"
+msgstr ""
+
 #: app/Controllers/BookingSessionController.php:2110
 #, php-format
 msgid "[%s] %s New Booking - %s"
@@ -1843,6 +874,25 @@ msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2209
 msgid "Coupon applied successfully!"
+msgstr ""
+
+#: app/Controllers/BookingSessionController.php:2409
+#: templates/booking-confirmation.php:281
+#: templates/partials/availability-section.php:296
+#: templates/partials/availability-section.php:298
+#: templates/partials/availability-section.php:304
+#: templates/partials/booking-content.php:314
+#: templates/partials/booking-content.php:621
+#: templates/partials/booking-form-fields.php:320
+#: templates/partials/booking-form-fields.php:356
+#: templates/partials/single-trip/content-overview.php:60
+#: templates/partials/single-trip/content-overview.php:72
+#: templates/partials/single-trip/content-overview.php:76
+#: templates/partials/single-trip/content-sidebar.php:235
+#: templates/partials/single-trip/content-sidebar.php:287
+#: templates/partials/single-trip/content-sidebar.php:423
+#: templates/partials/single-trip/content-sidebar.php:475
+msgid "Traveler"
 msgstr ""
 
 #: app/Controllers/BookingSessionController.php:2458
@@ -2051,47 +1101,56 @@ msgstr ""
 msgid "Item not found"
 msgstr ""
 
-#: app/Controllers/ItemController.php:170
+#: app/Controllers/ItemController.php:173
 msgid "Item created successfully"
 msgstr ""
 
-#: app/Controllers/ItemController.php:185
+#: app/Controllers/ItemController.php:189
 msgid "Failed to update item"
 msgstr ""
 
-#: app/Controllers/ItemController.php:189
+#: app/Controllers/ItemController.php:193
 msgid "Item updated successfully"
 msgstr ""
 
-#: app/Controllers/ItemController.php:204
+#: app/Controllers/ItemController.php:208
 msgid "Failed to delete item"
 msgstr ""
 
-#: app/Controllers/ItemController.php:208
+#: app/Controllers/ItemController.php:212
 msgid "Item deleted successfully"
+msgstr ""
+
+#: app/Controllers/ItemController.php:245
+#: app/Controllers/ItemController.php:249
+#: app/Controllers/TripController.php:851
+#: app/Controllers/TripController.php:894
+#: app/Controllers/TripController.php:1347
+#: app/Controllers/TripController.php:1352
+msgid "Unknown"
 msgstr ""
 
 #: app/Controllers/ItemTypeController.php:121
 msgid "Item type not found"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:138
+#: app/Controllers/ItemTypeController.php:142
 msgid "Item type created successfully"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:153
+#: app/Controllers/ItemTypeController.php:158
 msgid "Failed to update item type"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:157
+#: app/Controllers/ItemTypeController.php:162
 msgid "Item type updated successfully"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:172
+#: app/Controllers/ItemTypeController.php:177
 msgid "Failed to delete item type"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:176
+#: app/Controllers/ItemTypeController.php:181
 msgid "Item type deleted successfully"
 msgstr ""
 
@@ -2481,13 +1540,6 @@ msgstr ""
 msgid "Search keyword is required"
 msgstr ""
 
-#: app/Controllers/TripController.php:851
-#: app/Controllers/TripController.php:894
-#: app/Controllers/TripController.php:1347
-#: app/Controllers/TripController.php:1352
-msgid "Unknown"
-msgstr ""
-
 #: app/Controllers/TripController.php:874
 #: app/Services/TripService.php:954
 msgid "Revision not found"
@@ -2572,6 +1624,16 @@ msgstr ""
 msgid "Ending Point"
 msgstr ""
 
+#: app/Controllers/TripController.php:1983
+#: templates/booking-confirmation.php:250
+#: templates/partials/single-trip/content-overview.php:95
+#: templates/partials/single-trip/content-sidebar.php:339
+#: templates/partials/single-trip/content-sidebar.php:527
+#: templates/partials/single-trip/enquiry-modal.php:61
+#: templates/pdf/itinerary.php:159
+msgid "Number of Travelers"
+msgstr ""
+
 #: app/Controllers/TripDownloadController.php:98
 msgid "Invalid download request."
 msgstr ""
@@ -2651,11 +1713,11 @@ msgid "Operations"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:89
-msgid "Email Automation"
+msgid "Email Automation/Customization"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:90
-msgid "Customize all email templates and create automated email sequences. Track email delivery and send booking confirmations. Keep travelers informed with professional marketing emails."
+msgid "Automated email campaigns for booking confirmations, payment reminders, and customer engagement. Increase conversions with timely, personalized communication throughout the booking journey."
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:91
@@ -2673,6 +1735,11 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:105
 msgid "Customize booking form fields with drag-and-drop builder. Add custom fields for traveler information and emergency contacts. Create the perfect booking experience for your customers."
+msgstr ""
+
+#: app/Core/Modules/ModuleManager.php:106
+#: templates/trip-listing-card.php:206
+msgid "Bookings"
 msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:119
@@ -2715,6 +1782,10 @@ msgstr ""
 msgid "Enable deposit and partial payment options for bookings. Allow customers to pay a percentage upfront and the rest later. Perfect for high-value trips and improving conversion rates."
 msgstr ""
 
+#: app/Core/Modules/ModuleManager.php:180
+msgid "Payments"
+msgstr ""
+
 #: app/Core/Modules/ModuleManager.php:193
 #: templates/setup-wizard/complete-old.php:61
 #: templates/setup-wizard/complete.php:84
@@ -2731,18 +1802,6 @@ msgstr ""
 
 #: app/Core/Modules/ModuleManager.php:209
 msgid "Recover lost sales by automatically tracking abandoned bookings and sending targeted email sequences. Win back customers who left before completing their purchase."
-msgstr ""
-
-#: app/Core/Modules/ModuleManager.php:223
-msgid "Advanced Cancellation"
-msgstr ""
-
-#: app/Core/Modules/ModuleManager.php:224
-msgid "Premium module for sophisticated cancellation policies with percentage-based fees, tiered rules, and automatic charge processing. Perfect for managing complex cancellation scenarios with flexible refund calculations."
-msgstr ""
-
-#: app/Core/Modules/ModuleManager.php:287
-msgid "Custom"
 msgstr ""
 
 #: app/Helpers/FormatHelper.php:208
@@ -3347,7 +2406,6 @@ msgid "Select which payment channels to enable"
 msgstr ""
 
 #: app/PaymentGateways/Gateways/Paystack/PaystackGateway.php:66
-#: assets/js/stripe.js:579
 msgid "Card"
 msgstr ""
 
@@ -3534,12 +2592,24 @@ msgstr ""
 msgid "Yatra"
 msgstr ""
 
+#: app/Providers/FrontendAssetsProvider.php:354
+#: app/Providers/FrontendAssetsProvider.php:393
+#: includes/helpers.php:261
+#: templates/partials/single-trip/content-sidebar.php:195
+#: templates/trip-listing-card.php:278
+msgid "Contact for pricing"
+msgstr ""
+
 #: app/Providers/FrontendAssetsProvider.php:373
 msgid "My Bookings"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:374
 msgid "Account Settings"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:375
+msgid "Logout"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:376
@@ -3552,9 +2622,34 @@ msgstr ""
 msgid "Register"
 msgstr ""
 
+#: app/Providers/FrontendAssetsProvider.php:380
+#: app/Services/BookingService.php:864
+#: templates/pdf/voucher.php:110
+msgid "Booking Details"
+msgstr ""
+
 #: app/Providers/FrontendAssetsProvider.php:381
 #: templates/pdf/itinerary.php:186
 msgid "Booking Status"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:382
+#: templates/booking-confirmation.php:319
+#: templates/partials/remaining-checkout-content.php:154
+#: templates/pdf/voucher.php:182
+msgid "Total Amount"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:383
+msgid "Payment Status"
+msgstr ""
+
+#: app/Providers/FrontendAssetsProvider.php:384
+#: templates/partials/single-trip/similar-trips.php:113
+#: templates/single-activity.php:224
+#: templates/single-destination.php:242
+#: templates/trip-listing-card.php:283
+msgid "View Details"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:387
@@ -3656,6 +2751,10 @@ msgstr ""
 #: app/Repositories/SavedTripRepository.php:316
 #, php-format
 msgid "%d Nights"
+msgstr ""
+
+#: app/Repositories/SavedTripRepository.php:320
+msgid "Flexible"
 msgstr ""
 
 #: app/Repositories/SavedTripRepository.php:329
@@ -5081,6 +4180,28 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+#: templates/booking-confirmation.php:246
+#: templates/partials/booking-content.php:290
+#: templates/partials/remaining-checkout-content.php:84
+#: templates/partials/remaining-checkout-content.php:143
+#: templates/pdf/invoice.php:128
+#: templates/pdf/itinerary.php:176
+msgid "Travel Date"
+msgstr ""
+
+#: templates/booking-confirmation.php:254
+msgid "Booked On"
+msgstr ""
+
+#: templates/booking-confirmation.php:270
+#: templates/partials/availability-section.php:267
+#: templates/partials/booking-content.php:308
+#: templates/partials/booking-content.php:378
+#: templates/partials/remaining-checkout-content.php:88
+#: templates/partials/remaining-checkout-content.php:147
+msgid "Travelers"
+msgstr ""
+
 #: templates/booking-confirmation.php:310
 #: templates/partials/booking-content.php:185
 msgid "Payment Summary"
@@ -5091,6 +4212,16 @@ msgstr ""
 #: templates/partials/booking-content.php:744
 #: templates/partials/pricing-summary.php:140
 msgid "Net Amount"
+msgstr ""
+
+#: templates/booking-confirmation.php:337
+#: templates/partials/remaining-checkout-content.php:70
+#: templates/pdf/voucher.php:186
+msgid "Amount Paid"
+msgstr ""
+
+#: templates/booking-confirmation.php:344
+msgid "Amount Due"
 msgstr ""
 
 #: templates/booking-confirmation.php:351
@@ -5143,6 +4274,10 @@ msgstr ""
 
 #: templates/booking-confirmation.php:436
 msgid "Return to Home"
+msgstr ""
+
+#: templates/booking-confirmation.php:453
+msgid "Download Invoice"
 msgstr ""
 
 #: templates/booking-confirmation.php:463
@@ -5283,6 +4418,13 @@ msgstr ""
 
 #: templates/listing-activity.php:225
 msgid "No description available"
+msgstr ""
+
+#: templates/listing-activity.php:248
+#: templates/partials/single-trip/content-sidebar.php:187
+#: templates/single-activity.php:132
+#: templates/single-destination.php:132
+msgid "From"
 msgstr ""
 
 #: templates/listing-activity.php:254
@@ -5478,6 +4620,10 @@ msgstr ""
 msgid "Filters"
 msgstr ""
 
+#: templates/listing-trip.php:377
+msgid "Clear all"
+msgstr ""
+
 #: templates/listing-trip.php:395
 msgid "Price Range"
 msgstr ""
@@ -5637,6 +4783,15 @@ msgstr ""
 
 #: templates/partials/availability-section.php:74
 msgid "Capacity"
+msgstr ""
+
+#: templates/partials/availability-section.php:75
+#: templates/partials/availability-section.php:414
+msgid "travelers"
+msgstr ""
+
+#: templates/partials/availability-section.php:83
+msgid "Booking"
 msgstr ""
 
 #: templates/partials/availability-section.php:84
@@ -5864,8 +5019,18 @@ msgstr ""
 msgid "Doe"
 msgstr ""
 
+#: templates/partials/booking-auth.php:144
+#: templates/partials/single-trip/enquiry-modal.php:36
+msgid "Email Address"
+msgstr ""
+
 #: templates/partials/booking-auth.php:151
 msgid "your@email.com"
+msgstr ""
+
+#: templates/partials/booking-auth.php:157
+#: templates/partials/single-trip/enquiry-modal.php:41
+msgid "Phone Number"
 msgstr ""
 
 #: templates/partials/booking-auth.php:163
@@ -5928,6 +5093,12 @@ msgstr ""
 msgid "Please login or create an account to continue with your booking"
 msgstr ""
 
+#: templates/partials/booking-content.php:75
+#: templates/partials/remaining-checkout-content.php:49
+#: templates/partials/remaining-checkout-content.php:120
+msgid "Pay Remaining Balance"
+msgstr ""
+
 #: templates/partials/booking-content.php:77
 msgid "Complete Your Booking"
 msgstr ""
@@ -5963,12 +5134,24 @@ msgstr ""
 msgid "Complete Booking"
 msgstr ""
 
+#: templates/partials/booking-content.php:158
+#: templates/partials/single-trip/enquiry-modal.php:127
+msgid "Cancel"
+msgstr ""
+
 #: templates/partials/booking-content.php:196
 #: templates/partials/remaining-checkout-content.php:61
 #: templates/pdf/itinerary.php:115
 #: templates/pdf/itinerary.php:217
 msgid "Booking Reference"
 msgstr ""
+
+#: templates/partials/booking-content.php:223
+#: templates/partials/booking-content.php:380
+msgid "traveler"
+msgid_plural "travelers"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/booking-content.php:232
 msgid "Original Booking Total"
@@ -6142,6 +5325,10 @@ msgstr ""
 msgid "Secure payment processing"
 msgstr ""
 
+#: templates/partials/booking-content.php:834
+msgid "Payment Information"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:228
 #: templates/partials/booking-form-fields.php:460
 msgid "Passport Details"
@@ -6163,6 +5350,10 @@ msgstr ""
 msgid "%s %d"
 msgstr ""
 
+#: templates/partials/booking-form-fields.php:439
+msgid "Lead Traveler"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:442
 msgid "Traveler 1 (Lead Traveler)"
 msgstr ""
@@ -6176,6 +5367,10 @@ msgstr ""
 msgid "Additional traveler"
 msgstr ""
 
+#: templates/partials/booking-form-fields.php:513
+msgid "Payment Method"
+msgstr ""
+
 #: templates/partials/booking-form-fields.php:519
 msgid "Pay in Full"
 msgstr ""
@@ -6186,6 +5381,10 @@ msgstr ""
 
 #: templates/partials/booking-form-fields.php:540
 msgid "Select Payment Gateway"
+msgstr ""
+
+#: templates/partials/booking-form-fields.php:572
+msgid "Special Requests"
 msgstr ""
 
 #: templates/partials/booking-form-fields.php:573
@@ -6288,9 +5487,22 @@ msgstr ""
 msgid "(unknown)"
 msgstr ""
 
+#: templates/partials/remaining-checkout-content.php:62
+msgid "Not available"
+msgstr ""
+
 #: templates/partials/remaining-checkout-content.php:74
 msgid "Total Cost"
 msgstr ""
+
+#: templates/partials/remaining-checkout-content.php:80
+#: templates/partials/remaining-checkout-content.php:139
+#: templates/single-activity.php:110
+#: templates/single-destination.php:110
+msgid "Trip"
+msgid_plural "Trips"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/remaining-checkout-content.php:93
 msgid "Partial Payment"
@@ -6298,6 +5510,10 @@ msgstr ""
 
 #: templates/partials/remaining-checkout-content.php:124
 msgid "Back to My Bookings"
+msgstr ""
+
+#: templates/partials/remaining-checkout-content.php:158
+msgid "Paid"
 msgstr ""
 
 #: templates/partials/remaining-checkout-content.php:168
@@ -6406,6 +5622,11 @@ msgstr ""
 msgid "Group discount available"
 msgstr ""
 
+#: templates/partials/single-trip/content-sidebar.php:181
+#: templates/partials/single-trip/similar-trips.php:60
+msgid "OFF"
+msgstr ""
+
 #: templates/partials/single-trip/content-sidebar.php:207
 #, php-format
 msgid "%d departure available"
@@ -6505,6 +5726,14 @@ msgstr ""
 msgid "Fill out the form below and we'll get back to you as soon as possible"
 msgstr ""
 
+#: templates/partials/single-trip/enquiry-modal.php:31
+msgid "Full Name"
+msgstr ""
+
+#: templates/partials/single-trip/enquiry-modal.php:32
+msgid "Enter your full name"
+msgstr ""
+
 #: templates/partials/single-trip/enquiry-modal.php:48
 msgid "Preferred Travel Date"
 msgstr ""
@@ -6543,6 +5772,10 @@ msgstr ""
 
 #: templates/partials/single-trip/enquiry-modal.php:111
 msgid "Ages 3 and younger are not permitted."
+msgstr ""
+
+#: templates/partials/single-trip/enquiry-modal.php:118
+msgid "Message"
 msgstr ""
 
 #: templates/partials/single-trip/enquiry-modal.php:119
@@ -6806,6 +6039,10 @@ msgstr ""
 msgid "Similar Adventures"
 msgstr ""
 
+#: templates/partials/single-trip/sticky-nav.php:21
+msgid "Itinerary"
+msgstr ""
+
 #: templates/partials/single-trip/sticky-nav.php:25
 #: templates/pdf/itinerary.php:317
 msgid "What's Included"
@@ -6821,6 +6058,10 @@ msgstr ""
 
 #: templates/partials/single-trip/sticky-nav.php:42
 msgid "Story"
+msgstr ""
+
+#: templates/partials/single-trip/sticky-nav.php:51
+msgid "Testimonials"
 msgstr ""
 
 #: templates/partials/single-trip/sticky-nav.php:60
@@ -6958,6 +6199,10 @@ msgstr ""
 msgid "Booking Ref"
 msgstr ""
 
+#: templates/pdf/invoice.php:129
+msgid "Amount"
+msgstr ""
+
 #: templates/pdf/invoice.php:136
 msgid "Payment via"
 msgstr ""
@@ -7023,6 +6268,10 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
+#: templates/pdf/itinerary.php:221
+msgid "Booking Date"
+msgstr ""
+
 #: templates/pdf/itinerary.php:237
 msgid "Trip Highlights"
 msgstr ""
@@ -7081,6 +6330,10 @@ msgstr ""
 
 #: templates/pdf/itinerary.php:304
 msgid "Weather Conditions"
+msgstr ""
+
+#: templates/pdf/itinerary.php:308
+msgid "Emergency Contact"
 msgstr ""
 
 #: templates/pdf/itinerary.php:337
@@ -7681,6 +6934,12 @@ msgstr ""
 msgid "Days"
 msgstr ""
 
+#: templates/single-activity.php:203
+#: templates/single-destination.php:203
+#: templates/trip-listing-card.php:221
+msgid "reviews"
+msgstr ""
+
 #: templates/single-activity.php:218
 #: templates/single-destination.php:236
 msgid "Price on request"
@@ -7777,81 +7036,4 @@ msgstr ""
 
 #: app/PaymentGateways/Gateways/Square/square.js:96
 msgid "Card Details"
-msgstr ""
-
-#: assets/js/stripe.js:139
-msgid "Complete Your Payment"
-msgstr ""
-
-#: assets/js/stripe.js:142
-#: assets/js/stripe.js:172
-msgid "Pay"
-msgstr ""
-
-#: assets/js/stripe.js:159
-msgid "Processing..."
-msgstr ""
-
-#: assets/js/stripe.js:226
-msgid "One-tap checkout"
-msgstr ""
-
-#: assets/js/stripe.js:237
-msgid "Checking your device for wallet support…"
-msgstr ""
-
-#: assets/js/stripe.js:375
-msgid "Please pay using the Apple Pay or Google Pay button above."
-msgstr ""
-
-#: assets/js/stripe.js:460
-msgid "Apple Pay and Google Pay are not available on this browser/device."
-msgstr ""
-
-#: assets/js/stripe.js:464
-msgid "Use card payment instead or switch to a supported device."
-msgstr ""
-
-#: assets/js/stripe.js:471
-msgid "Great! Apple Pay or Google Pay is available on this device."
-msgstr ""
-
-#: assets/js/stripe.js:502
-msgid "Unable to load Apple Pay / Google Pay. Please try again later or use card payment."
-msgstr ""
-
-#: assets/js/stripe.js:505
-msgid "Wallet payment failed to load."
-msgstr ""
-
-#: assets/js/stripe.js:562
-msgid "Choose a payment option"
-msgstr ""
-
-#: assets/js/stripe.js:566
-msgid "Payment methods"
-msgstr ""
-
-#: assets/js/stripe.js:570
-msgid "Pick the option that works best for you."
-msgstr ""
-
-#: assets/js/stripe.js:580
-msgid "Use any major debit or credit card via Stripe Elements."
-msgstr ""
-
-#: assets/js/stripe.js:588
-msgid "Google Pay"
-msgstr ""
-
-#: assets/js/stripe.js:589
-msgid "Pay instantly with the cards saved to your Google account."
-msgstr ""
-
-#: assets/js/stripe.js:597
-msgid "Apple Pay"
-msgstr ""
-
-#: assets/js/stripe.js:598
-msgid "Use Apple Wallet on iPhone, iPad, or Mac to pay securely."
 msgstr ""

@@ -3,7 +3,7 @@
  * Reusable form fields for itinerary entries - used by both ItineraryForm and ItinerarySection
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, Clock, X, Plus, Info } from 'lucide-react';
 import { __ } from '../../../lib/i18n';
 import { ItineraryEntry } from '../types';
@@ -13,6 +13,7 @@ import { Button } from '../../ui/button';
 import { Badge } from '../../ui/badge';
 import { HelpText } from '../../ui/help-text';
 import { Card, CardContent } from '../../ui/card';
+import { Modal } from '../../ui/modal';
 import { getCurrencySymbol } from '../../../data/currencies';
 
 interface ItineraryEntryFieldsProps {
@@ -32,6 +33,7 @@ interface ItineraryEntryFieldsProps {
   calculateDuration?: (startTime: string, endTime: string, timeType: string) => string;
   size?: 'default' | 'compact';
   showCardWrapper?: boolean;
+  onRefreshData?: () => void; // Callback to refresh item types and items after creation
 }
 
 export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
@@ -50,8 +52,14 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
   onRemoveExcludedItem,
   calculateDuration,
   size = 'default',
-  showCardWrapper = false,
+  showCardWrapper = true,
+  onRefreshData,
 }) => {
+  
+  // Modal states
+  const [isItemTypeModalOpen, setIsItemTypeModalOpen] = useState(false);
+  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
+
   const isCompact = size === 'compact';
   const textSize = isCompact ? 'text-xs' : 'text-sm';
   const labelSize = isCompact ? 'text-xs' : 'text-sm';
@@ -95,27 +103,40 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               text={__('Select the type of item (Activity, Meal, Accommodation, etc.).', 'yatra')}
               className="mb-2"
             />
-            <Select
-              value={entry.item_type_id || ''}
-              onChange={(e) => {
-                onFieldChange('item_type_id', e.target.value);
-                // Reset item_id when type changes
-                onFieldChange('item_id', '');
-              }}
-              className={`${errors.item_type_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800`}
-              style={{
-                color: 'rgb(17, 24, 39)',
-                backgroundColor: 'rgb(255, 255, 255)',
-              }}
-              required
-            >
-              <option value="">{__('Select a type...', 'yatra')}</option>
-              {itemTypes.map((type: any) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
-                </option>
-              ))}
-            </Select>
+            <div className="flex gap-2">
+              <Select
+                value={entry.item_type_id || ''}
+                onChange={(e) => {
+                  onFieldChange('item_type_id', e.target.value);
+                  // Reset item_id when type changes
+                  onFieldChange('item_id', '');
+                }}
+                className={`${errors.item_type_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 flex-1`}
+                style={{
+                  color: 'rgb(17, 24, 39)',
+                  backgroundColor: 'rgb(255, 255, 255)',
+                }}
+                required
+              >
+                <option value="">{__('Select a type...', 'yatra')}</option>
+                {itemTypes.map((type: any) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
+              </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsItemTypeModalOpen(true)}
+                className="flex items-center gap-1 whitespace-nowrap"
+                title={__('Add new item type', 'yatra')}
+              >
+                <Plus className="w-4 h-4" />
+                {isCompact ? '' : __('Add Type', 'yatra')}
+              </Button>
+            </div>
             {errors.item_type_id && (
               <p className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}>
                 <Info className="w-4 h-4" />
@@ -132,21 +153,22 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
               text={__('Select the specific item (Hiking, Lunch, Bus, etc.).', 'yatra')}
               className="mb-2"
             />
-            <Select
-              value={entry.item_id || ''}
-              onChange={(e) => onFieldChange('item_id', e.target.value)}
-              disabled={!entry.item_type_id || items.filter((item: any) => {
-                const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
-                const itemTypeIdNum = item.type_id || item.item_type_id;
-                return String(itemTypeIdNum) === itemTypeId;
-              }).length === 0}
-              className={`${errors.item_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800`}
-              style={{
-                color: 'rgb(17, 24, 39)',
-                backgroundColor: 'rgb(255, 255, 255)',
-              }}
-              required
-            >
+            <div className="flex gap-2">
+              <Select
+                value={entry.item_id || ''}
+                onChange={(e) => onFieldChange('item_id', e.target.value)}
+                disabled={!entry.item_type_id || items.filter((item: any) => {
+                  const itemTypeId = entry.item_type_id ? String(entry.item_type_id) : '';
+                  const itemTypeIdNum = item.type_id || item.item_type_id;
+                  return String(itemTypeIdNum) === itemTypeId;
+                }).length === 0}
+                className={`${errors.item_id ? 'border-red-500' : ''} ${textSize} text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 flex-1`}
+                style={{
+                  color: 'rgb(17, 24, 39)',
+                  backgroundColor: 'rgb(255, 255, 255)',
+                }}
+                required
+              >
               <option value="">
                 {!entry.item_type_id 
                   ? __('Select type first...', 'yatra')
@@ -173,6 +195,19 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                   </option>
                 ))}
             </Select>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsItemModalOpen(true)}
+                disabled={!entry.item_type_id}
+                className="flex items-center gap-1 whitespace-nowrap"
+                title={__('Add new item', 'yatra')}
+              >
+                <Plus className="w-4 h-4" />
+                {isCompact ? '' : __('Add Item', 'yatra')}
+              </Button>
+            </div>
             {errors.item_id && (
               <p className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}>
                 <Info className="w-4 h-4" />
@@ -490,6 +525,17 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                     </button>
                   </Badge>
                 ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsItemModalOpen(true)}
+                  className="flex items-center gap-1"
+                  disabled={!entry.item_type_id}
+                >
+                  <Plus className="w-3 h-3" />
+                  {__('Add Item', 'yatra')}
+                </Button>
               </div>
             </div>
           </div>
@@ -552,9 +598,319 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Item Type Creation Modal */}
+      <Modal
+        isOpen={isItemTypeModalOpen}
+        onClose={() => setIsItemTypeModalOpen(false)}
+        title={__('Add New Item Type', 'yatra')}
+        description={__('Create a new category for organizing itinerary items', 'yatra')}
+        size="xl"
+      >
+        <ItemTypeFormContent 
+          onSuccess={(newItemType) => {
+            setIsItemTypeModalOpen(false);
+            
+            // Select the newly created item type
+            const itemTypeId = newItemType?.data?.id || newItemType?.id;
+            if (itemTypeId) {
+              onFieldChange('item_type_id', itemTypeId.toString());
+            }
+            
+            // Reset item selection
+            onFieldChange('item_id', '');
+            // Refresh data to update dropdowns
+            onRefreshData?.();
+          }}
+          onCancel={() => setIsItemTypeModalOpen(false)}
+        />
+      </Modal>
+
+      {/* Item Creation Modal */}
+      <Modal
+        isOpen={isItemModalOpen}
+        onClose={() => setIsItemModalOpen(false)}
+        title={__('Add New Item', 'yatra')}
+        description={__('Create a new item for the selected item type', 'yatra')}
+        size="xl"
+      >
+        <ItemFormContent 
+          selectedTypeId={entry.item_type_id}
+          onSuccess={(newItem) => {
+            setIsItemModalOpen(false);
+            
+            // Select the newly created item
+            const itemId = newItem?.data?.id || newItem?.id;
+            if (itemId) {
+              onFieldChange('item_id', itemId.toString());
+            }
+            
+            // Refresh data to update dropdowns
+            onRefreshData?.();
+          }}
+          onCancel={() => setIsItemModalOpen(false)}
+        />
+      </Modal>
     </>
   );
 
   return renderField(content);
 };
 
+// Minimal Item Type Form - Uses exact same API as main ItemTypeForm
+interface ItemTypeFormContentProps {
+  onSuccess: (itemType: any) => void;
+  onCancel: () => void;
+}
+
+const ItemTypeFormContent: React.FC<ItemTypeFormContentProps> = ({ onSuccess, onCancel }) => {
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    icon: null,
+    color: 'blue',
+    status: 'publish',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-generate slug from name (same as main form)
+  const handleNameChange = (value: string) => {
+    const slug = value.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    setFormData(prev => ({
+      ...prev,
+      name: value,
+      slug: slug,
+    }));
+    if (errors.name) {
+      setErrors(prev => ({ ...prev, name: '' }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Use exact same API endpoint and structure as main ItemTypeForm
+      const response = await fetch('/wp-json/yatra/v1/item-types', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': (window as any).wpApiSettings?.nonce || ''
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        const newItemType = await response.json();
+        onSuccess(newItemType);
+      } else {
+        const errorData = await response.json();
+        setErrors(errorData.errors || { general: 'Failed to create item type' });
+      }
+    } catch (error) {
+      setErrors({ general: 'An error occurred while creating the item type' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          {__('Type Name', 'yatra')} <span className="text-red-500">*</span>
+        </label>
+        <Input
+          type="text"
+          value={formData.name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          placeholder={__('e.g., Activity, Meal, Accommodation', 'yatra')}
+          className={errors.name ? 'border-red-500' : ''}
+          required
+        />
+        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {__('Slug will be auto-generated. You can edit icon, color, and other options later in Item Types page', 'yatra')}
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          {__('Description', 'yatra')}
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder={__('Brief description of this item type...', 'yatra')}
+          rows={3}
+          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:text-white resize-none"
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4 border-t dark:border-gray-700">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
+          {__('Cancel', 'yatra')}
+        </Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? __('Creating...', 'yatra') : __('Create Item Type', 'yatra')}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+// Minimal Item Form - Uses exact same API as main ItemForm
+interface ItemFormContentProps {
+  selectedTypeId?: string;
+  onSuccess: (item: any) => void;
+  onCancel: () => void;
+}
+
+const ItemFormContent: React.FC<ItemFormContentProps> = ({ selectedTypeId, onSuccess, onCancel }) => {
+  // Check if item type is selected
+  if (!selectedTypeId) {
+    return (
+      <div className="p-6 text-center">
+        <div className="mb-4">
+          <Info className="w-12 h-12 text-yellow-500 mx-auto" />
+        </div>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          {__('Item Type Required', 'yatra')}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          {__('Please select an Item Type first before creating an Item.', 'yatra')}
+        </p>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+        >
+          {__('Close', 'yatra')}
+        </Button>
+      </div>
+    );
+  }
+
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    description: '',
+    type_id: '',
+    status: 'publish',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Update formData when selectedTypeId changes
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      type_id: selectedTypeId || '',
+    }));
+  }, [selectedTypeId]);
+
+  // Auto-generate slug from name (same as main form)
+  const handleNameChange = (value: string) => {
+    const slug = value.toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+    setFormData(prev => ({
+      ...prev,
+      name: value,
+      slug: slug,
+    }));
+    if (errors.name) {
+      setErrors(prev => ({ ...prev, name: '' }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Use exact same API endpoint and structure as main ItemForm
+      const response = await fetch('/wp-json/yatra/v1/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-WP-Nonce': (window as any).wpApiSettings?.nonce || ''
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      if (response.ok) {
+        const newItem = await response.json();
+        onSuccess(newItem);
+      } else {
+        const errorData = await response.json();
+        setErrors(errorData.errors || { general: 'Failed to create item' });
+      }
+    } catch (error) {
+      setErrors({ general: 'An error occurred while creating the item' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          {__('Item Name', 'yatra')} <span className="text-red-500">*</span>
+        </label>
+        <Input
+          type="text"
+          value={formData.name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          placeholder={__('e.g., Hiking, Lunch, Hotel', 'yatra')}
+          className={errors.name ? 'border-red-500' : ''}
+          required
+        />
+        {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {__('Slug will be auto-generated. You can edit additional details later in Items page', 'yatra')}
+        </p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+          {__('Description', 'yatra')}
+        </label>
+        <textarea
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder={__('Brief description of this item...', 'yatra')}
+          rows={3}
+          className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:text-white resize-none"
+        />
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4 border-t dark:border-gray-700">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={isSubmitting}
+        >
+          {__('Cancel', 'yatra')}
+        </Button>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? __('Creating...', 'yatra') : __('Create Item', 'yatra')}
+        </Button>
+      </div>
+    </form>
+  );
+};

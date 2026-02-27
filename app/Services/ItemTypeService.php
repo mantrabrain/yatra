@@ -72,6 +72,9 @@ class ItemTypeService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        // Set type to item_type for ClassificationsTable
+        $data['type'] = \Yatra\Constants\ClassificationTypes::ITEM_TYPE;
+
         // Sanitize name
         if (isset($data['name'])) {
             $data['name'] = sanitize_text_field($data['name']);
@@ -79,9 +82,16 @@ class ItemTypeService extends BaseService
 
         // Always auto-generate slug from name (backend ensures uniqueness)
         if (!empty($data['name'])) {
+            // Use ClassificationsTable directly to avoid protected method issue
+            $tableName = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+            // Remove WordPress prefix since SlugHelper adds it automatically
+            global $wpdb;
+            $tableNameWithoutPrefix = str_replace($wpdb->prefix, '', $tableName);
+
+            
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_item_types',
+                $tableNameWithoutPrefix,
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -137,6 +147,8 @@ class ItemTypeService extends BaseService
                 $data['icon'] = sanitize_text_field($data['icon']);
             }
         }
+
+   
 
         return $data;
     }

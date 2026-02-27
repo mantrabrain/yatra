@@ -86,8 +86,8 @@ class ModuleManager
             ],
             [
                 'slug' => 'email_automation',
-                'name' => __('Email Automation', 'yatra'),
-                'description' => __('Customize all email templates and create automated email sequences. Track email delivery and send booking confirmations. Keep travelers informed with professional marketing emails.', 'yatra'),
+                'name' => __('Email Automation/Customization', 'yatra'),
+                'description' => __('Automated email campaigns for booking confirmations, payment reminders, and customer engagement. Increase conversions with timely, personalized communication throughout the booking journey.', 'yatra'),
                 'category' => __('Marketing', 'yatra'),
                 'docs_url' => 'https://docs.yatra.com/modules/email-automation',
                 'is_premium' => true,
@@ -218,21 +218,6 @@ class ModuleManager
                 'requires_pro' => true,
                 'settings_page' => 'abandoned-recovery',
             ],
-            [
-                'slug' => 'advanced_cancellation',
-                'name' => __('Advanced Cancellation', 'yatra'),
-                'description' => __('Premium module for sophisticated cancellation policies with percentage-based fees, tiered rules, and automatic charge processing. Perfect for managing complex cancellation scenarios with flexible refund calculations.', 'yatra'),
-                'category' => __('Bookings', 'yatra'),
-                'docs_url' => 'https://docs.yatra.com/modules/advanced-cancellation',
-                'is_premium' => true,
-                'purchase_url' => 'https://wpyatra.com/pricing?module=advanced-cancellation',
-                'is_core' => false,
-                'enabled' => false,
-                'tags' => ['cancellation', 'refunds', 'booking', 'policies', 'charges'],
-                'video_url' => self::DEFAULT_VIDEO_URL,
-                'requires_pro' => true,
-                'settings_page' => 'yatra-advanced-cancellation',
-            ],
         ];
         
         return apply_filters('yatra_default_modules', $modules);
@@ -243,16 +228,20 @@ class ModuleManager
      */
     public static function getModules(): array
     {
-        $stored = get_option(self::OPTION_KEY, []);
-        $stored = is_array($stored) ? $stored : [];
+        // Get enable/disable status ONLY from database
+        $stored_status = get_option(self::OPTION_KEY, []);
+        $stored_status = is_array($stored_status) ? $stored_status : [];
 
-        $modules = [];
-        foreach (self::getDefaultModules() as $module) {
+        // Get module definitions ONLY from hardcoded array
+        $modules = self::getDefaultModules();
+        
+        $result = [];
+        foreach ($modules as $module) {
             $slug = $module['slug'];
-            $state = $stored[$slug] ?? [];
-
-            $enabled = isset($state['enabled'])
-                ? (bool) $state['enabled']
+            
+            // Get enable/disable status from database only
+            $enabled = isset($stored_status[$slug]['enabled'])
+                ? (bool) $stored_status[$slug]['enabled']
                 : (bool) ($module['enabled'] ?? false);
 
             // Check if module is available (can be enabled)
@@ -268,34 +257,14 @@ class ModuleManager
                 }
             }
 
-            $modules[] = array_merge($module, [
+            $result[] = array_merge($module, [
                 'enabled' => $enabled,
-                'updated_at' => $state['updated_at'] ?? null,
-                'video_url' => $state['video_url'] ?? ($module['video_url'] ?? self::DEFAULT_VIDEO_URL),
+                'updated_at' => $stored_status[$slug]['updated_at'] ?? null,
                 'is_available' => $is_available,
             ]);
         }
 
-        // Include any custom modules saved in options but not part of defaults
-        foreach ($stored as $slug => $state) {
-            $exists = array_filter($modules, static fn ($module) => $module['slug'] === $slug);
-            if (!$exists) {
-                $modules[] = [
-                    'slug' => $slug,
-                    'name' => $state['name'] ?? ucfirst(str_replace('_', ' ', $slug)),
-                    'description' => $state['description'] ?? '',
-                    'category' => $state['category'] ?? __('Custom', 'yatra'),
-                    'version' => $state['version'] ?? '1.0.0',
-                    'is_core' => (bool) ($state['is_core'] ?? false),
-                    'enabled' => (bool) ($state['enabled'] ?? false),
-                    'tags' => $state['tags'] ?? [],
-                    'updated_at' => $state['updated_at'] ?? null,
-                    'video_url' => $state['video_url'] ?? self::DEFAULT_VIDEO_URL,
-                ];
-            }
-        }
-
-        return $modules;
+        return $result;
     }
 
     /**

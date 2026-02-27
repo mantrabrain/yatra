@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Save, Loader2 } from 'lucide-react';
 import { __ } from '../lib/i18n';
 import { Button } from '../components/ui/button';
@@ -23,6 +24,7 @@ import { DayConflictDialog } from '../components/itinerary/DayConflictDialog';
 import { ItineraryFormSkeleton } from '../components/itinerary/ItineraryFormSkeleton';
 
 const ItineraryForm: React.FC = () => {
+  const queryClient = useQueryClient();
   
   // URL Parameters
   const action = useMemo(() => {
@@ -124,9 +126,29 @@ const ItineraryForm: React.FC = () => {
     isAddDayMode,
     tripIdParam,
     dayParam,
-    formDataItemTypeId: formData.item_type_id,
-    formDataTripId: formData.trip_id || undefined,
+    formDataItemTypeId: formData.item_type_id || '',
+    formDataTripId: formData.trip_id,
   });
+
+  // Function to refresh dropdown data after creating new item types/items
+  const refreshData = () => {
+    // Invalidate item types query
+    queryClient.invalidateQueries({ queryKey: ['item-types-published'] });
+    
+    // Invalidate items queries
+    queryClient.invalidateQueries({ queryKey: ['items-all-published'] });
+    queryClient.invalidateQueries({ queryKey: ['items-by-type'] });
+  };
+
+  // Auto-select item from URL param
+  useEffect(() => {
+    if (itemParam && itemsData && itemsData.length > 0) {
+      const item = itemsData.find((i: any) => i.name.toLowerCase() === itemParam.toLowerCase());
+      if (item) {
+        setFormData(prev => ({ ...prev, item_id: item.id.toString() }));
+      }
+    }
+  }, [itemParam, itemsData]);
 
   // Validation hook
   const { validateForm } = useItineraryFormValidation();
@@ -810,6 +832,7 @@ const ItineraryForm: React.FC = () => {
                     onRemoveIncludedItem={handleActivityRemoveIncludedItem}
                     onRemoveExcludedItem={handleActivityRemoveExcludedItem}
                     calculateDuration={calculateDuration}
+                    onRefreshData={refreshData}
                   />
                 </>
               )}
@@ -875,6 +898,7 @@ const ItineraryForm: React.FC = () => {
                     calculateDuration={calculateDuration}
                     size="default"
                     showCardWrapper={true}
+                    onRefreshData={refreshData}
                   />
                 </>
               )}

@@ -51,7 +51,6 @@ import { Label } from '../components/ui/label';
 import { PageHeader } from '../components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '../components/ui/card';
 import { ConditionalRender } from '../components/ui/conditional-render';
-import { Modal } from '../components/ui/modal';
 import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
 import { getCurrencyOptions } from '../data/currencies';
 import { SearchableSelect } from '../components/ui/searchable-select';
@@ -518,12 +517,7 @@ interface SettingsData {
   allow_waitlist: boolean;
   waitlist_auto_confirm: boolean;
   
-  // Advanced Cancellation Settings
-  advanced_cancellation_customer_cancellations: boolean;
-  advanced_cancellation_auto_refunds: boolean;
-  advanced_cancellation_email_notifications: boolean;
-  advanced_cancellation_enable_logging: boolean;
-  
+    
   // Payment Settings
   currency: string;
   payment_test_mode: boolean;
@@ -1569,11 +1563,7 @@ const Settings: React.FC = () => {
   const [gatewayOrder, setGatewayOrder] = useState<string[]>([]);
   const [draggedGateway, setDraggedGateway] = useState<string | null>(null);
 
-  // Advanced Cancellation modal state
-  const [showCancellationRulesModal, setShowCancellationRulesModal] = useState(false);
-  const [showCreateRuleModal, setShowCreateRuleModal] = useState(false);
-  const [editingRule, setEditingRule] = useState<any>(null);
-
+  
   // Initialize viewingSection from activeSection on mount
   useEffect(() => {
     setViewingSection(activeSection);
@@ -1595,28 +1585,7 @@ const Settings: React.FC = () => {
     // Avoid overwriting in-progress edits due to background refetches
   });
 
-  // Fetch cancellation rules
-  const { data: cancellationRules = [], isLoading: isLoadingRules } = useQuery({
-    queryKey: ['cancellation-rules'],
-    queryFn: async () => {
-      if (!(window as any).yatraAdmin?.advancedCancellationEnabled) {
-        return [];
-      }
-      const response = await fetch('/wp-json/yatra/v1/cancellation/rules', {
-        headers: {
-          'X-WP-Nonce': (window as any).wpApiSettings?.nonce || ''
-        }
-      });
-      if (!response.ok) throw new Error('Failed to fetch cancellation rules');
-      return response.json();
-    },
-    enabled: !!(window as any).yatraAdmin?.advancedCancellationEnabled,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    staleTime: Infinity,
-    retry: 1,
-    retryDelay: 1000,
-  });
+  // Cancellation settings are now saved with main settings
 
   // Fetch payment gateway definitions from server
   const { data: gatewayDefinitions } = useQuery<Record<string, GatewayDefinition>>({
@@ -1662,12 +1631,7 @@ const Settings: React.FC = () => {
         allow_waitlist: true,
         waitlist_auto_confirm: false,
         
-        // Advanced Cancellation Settings
-        advanced_cancellation_customer_cancellations: true,
-        advanced_cancellation_auto_refunds: false,
-        advanced_cancellation_email_notifications: true,
-        advanced_cancellation_enable_logging: true,
-        
+                
         currency: 'USD',
         payment_test_mode: true,
         payment_gateways: ['stripe', 'paypal'],
@@ -1919,7 +1883,7 @@ const Settings: React.FC = () => {
     if (gatewayDefinitions && Object.keys(gatewayDefinitions).length > 0 && gatewayOrder.length === 0) {
       // Use saved order if available, otherwise use default order from definitions
       const savedOrder = settings?.gateway_order as string[] | undefined;
-      if (savedOrder && Array.isArray(savedOrder) && savedOrder.length > 0) {
+      if (savedOrder) {
         // Merge saved order with any new gateways
         const allGateways = Object.keys(gatewayDefinitions);
         const validSavedOrder = savedOrder.filter(id => allGateways.includes(id));
@@ -2167,7 +2131,13 @@ const Settings: React.FC = () => {
   const handleSave = () => {
     if (formData) {
       setIsSaving(true);
-      saveMutation.mutate(formData, {
+      
+      // Include cancellation settings in formData if needed
+      let updatedFormData: any = { ...formData };
+      
+            
+      // Single API call to save all settings
+      saveMutation.mutate(updatedFormData, {
         onSuccess: () => {
           // Update activeSection to the current viewingSection when save is successful
           setActiveSection(viewingSection);
@@ -3185,166 +3155,6 @@ onChange={handleFieldChange}
                 />
               </FormField>
             </div>
-
-            {/* Advanced Cancellation Module Settings */}
-            {(window as any).yatraAdmin?.advancedCancellationEnabled ? (
-              <>
-                <SectionDivider title={__('Advanced Cancellation Rules', 'yatra')} />
-                
-                <div className="space-y-4">
-                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0">
-                        <SettingsIcon className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                          {__('Advanced Cancellation Module Active', 'yatra')}
-                        </h4>
-                        <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                          {__('Create sophisticated cancellation policies with percentage-based fees, tiered rules, and automatic charge processing.', 'yatra')}
-                        </p>
-                        <div className="mt-3">
-                          <button
-                            onClick={() => setShowCancellationRulesModal(true)}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
-                          >
-                            {__('Manage Cancellation Rules', 'yatra')}
-                            <ChevronRight className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                      <input
-                        type="checkbox"
-                        id="advanced_cancellation_customer_cancellations"
-                        checked={formData.advanced_cancellation_customer_cancellations || false}
-                        name='advanced_cancellation_customer_cancellations'
-                        onChange={handleFieldChange}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="advanced_cancellation_customer_cancellations" className="font-medium cursor-pointer">
-                          {__('Customer Cancellations', 'yatra')}
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Allow customers to cancel their own bookings', 'yatra')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                      <input
-                        type="checkbox"
-                        id="advanced_cancellation_auto_refunds"
-                        checked={formData.advanced_cancellation_auto_refunds || false}
-                        name='advanced_cancellation_auto_refunds'
-                        onChange={handleFieldChange}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="advanced_cancellation_auto_refunds" className="font-medium cursor-pointer">
-                          {__('Auto-Process Refunds', 'yatra')}
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Automatically process refunds when cancellations occur', 'yatra')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                      <input
-                        type="checkbox"
-                        id="advanced_cancellation_email_notifications"
-                        checked={formData.advanced_cancellation_email_notifications !== false}
-                        name='advanced_cancellation_email_notifications'
-                        onChange={handleFieldChange}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="advanced_cancellation_email_notifications" className="font-medium cursor-pointer">
-                          {__('Email Notifications', 'yatra')}
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Send email notifications for cancellations and refunds', 'yatra')}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                      <input
-                        type="checkbox"
-                        id="advanced_cancellation_enable_logging"
-                        checked={formData.advanced_cancellation_enable_logging !== false}
-                        name='advanced_cancellation_enable_logging'
-                        onChange={handleFieldChange}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="advanced_cancellation_enable_logging" className="font-medium cursor-pointer">
-                          {__('Enable Logging', 'yatra')}
-                        </Label>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                          {__('Log all cancellation activities for debugging and auditing', 'yatra')}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="mt-4">
-                    <button
-                      onClick={() => setShowCancellationRulesModal(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      <SettingsIcon className="w-4 h-4" />
-                      {__('Manage Cancellation Rules', 'yatra')}
-                    </button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <SectionDivider title={__('Advanced Cancellation Rules', 'yatra')} />
-                
-                <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0">
-                      <Lock className="w-6 h-6 text-purple-500" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
-                        {__('Advanced Cancellation Module Required', 'yatra')}
-                      </h4>
-                      <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
-                        {__('Upgrade to Yatra Pro and enable the Advanced Cancellation module to create sophisticated cancellation policies with percentage-based fees, tiered rules, and automatic charge processing.', 'yatra')}
-                      </p>
-                      <div className="flex items-center gap-3 mt-4">
-                        <a
-                          href="/wp-admin/admin.php?page=yatra&subpage=modules"
-                          className="inline-flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400"
-                        >
-                          {__('Enable Module', 'yatra')}
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                        <a
-                          href="https://wpyatra.com/pricing?module=advanced-cancellation"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400"
-                        >
-                          {__('Learn More', 'yatra')}
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </>
-            )}
 
             <SectionDivider title={__('Booking Expiry & Reminders', 'yatra')} />
 
@@ -5510,245 +5320,7 @@ onChange={handleFieldChange}
         </div>
       </ConditionalRender>
 
-      {/* Cancellation Rules Modal */}
-      <ConditionalRender capability="manage_yatra">
-        <Modal
-        isOpen={showCancellationRulesModal}
-        onClose={() => setShowCancellationRulesModal(false)}
-        title={__('Cancellation Rules Management', 'yatra')}
-        description={__('Manage your cancellation policies and rules', 'yatra')}
-        size="xl"
-        footer={
-          <div className="flex justify-end gap-3">
-            <Button 
-              variant="outline" 
-              onClick={() => setShowCancellationRulesModal(false)}
-            >
-              {__('Close', 'yatra')}
-            </Button>
-            <Button>
-              {__('Save Changes', 'yatra')}
-            </Button>
-          </div>
-        }
-      >
-        <div className="space-y-6">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {__('Cancellation Rules', 'yatra')}
-                </h3>
-                <button
-                  onClick={() => setShowCreateRuleModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  {__('Add New Rule', 'yatra')}
-                </button>
-              </div>
-
-              {/* Rules List */}
-              <div className="space-y-4">
-                {isLoadingRules ? (
-                  <div className="space-y-3">
-                    {[1, 2, 3].map((i) => (
-                      <div key={i} className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 animate-pulse">
-                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-2"></div>
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
-                      </div>
-                    ))}
-                  </div>
-                ) : !Array.isArray(cancellationRules) || cancellationRules.length === 0 ? (
-                  <div className="text-center py-12 text-gray-500 dark:text-gray-400">
-                    <SettingsIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-                      {__('No Cancellation Rules Yet', 'yatra')}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400">
-                      {__('Create your first cancellation rule to get started', 'yatra')}
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {Array.isArray(cancellationRules) && cancellationRules.map((rule: any) => (
-                      <div key={rule.id} className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h4 className="font-semibold text-gray-900 dark:text-white">
-                                {rule.rule_name}
-                              </h4>
-                              {rule.is_global ? (
-                                <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 rounded-full">
-                                  {__('Global', 'yatra')}
-                                </span>
-                              ) : (
-                                <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-900/20 text-gray-800 dark:text-gray-400 rounded-full">
-                                  {__('Trip Specific', 'yatra')}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-sm text-gray-600 dark:text-gray-400">
-                              <p>{rule.status === 'active' ? __('Active', 'yatra') : __('Inactive', 'yatra')}</p>
-                              <p>{__('Created')}: {new Date(rule.created_at).toLocaleDateString()}</p>
-                              <p>{__('Tiers')}: {rule.tiers?.length || 0}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => {
-                                setEditingRule(rule);
-                                setShowCreateRuleModal(true);
-                              }}
-                              className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              className="text-red-600 hover:text-red-700 dark:text-red-400"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                      <SettingsIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Rules', 'yatra')}</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">{Array.isArray(cancellationRules) ? cancellationRules.length : 0}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Active Rules', 'yatra')}</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">{Array.isArray(cancellationRules) ? cancellationRules.filter((r: any) => r.status === 'active').length : 0}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                      <Globe className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{__('Global Rules', 'yatra')}</p>
-                      <p className="text-xl font-bold text-gray-900 dark:text-white">{Array.isArray(cancellationRules) ? cancellationRules.filter((r: any) => r.is_global).length : 0}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Help Section */}
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-                  <div>
-                    <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100">
-                      {__('About Cancellation Rules', 'yatra')}
-                    </h4>
-                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                      {__('Create sophisticated cancellation policies with percentage-based fees, tiered rules based on days before departure, and automatic charge processing. Rules can be applied globally or to specific trips.', 'yatra')}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-      </Modal>
-
-      {/* Create/Edit Rule Modal */}
-      <Modal
-            isOpen={showCreateRuleModal}
-            onClose={() => {
-              setShowCreateRuleModal(false);
-              setEditingRule(null);
-            }}
-            title={editingRule ? __('Edit Cancellation Rule', 'yatra') : __('Create Cancellation Rule', 'yatra')}
-            description={editingRule ? __('Update your cancellation rule settings', 'yatra') : __('Create a new cancellation policy for your bookings', 'yatra')}
-            size="lg"
-            footer={
-              <div className="flex justify-end gap-3">
-                <Button 
-                  variant="outline"
-                  onClick={() => {
-                    setShowCreateRuleModal(false);
-                    setEditingRule(null);
-                  }}
-                >
-                  {__('Cancel', 'yatra')}
-                </Button>
-                <Button>
-                  {editingRule ? __('Update Rule', 'yatra') : __('Create Rule', 'yatra')}
-                </Button>
-              </div>
-            }
-          >
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Rule Name', 'yatra')}
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                    placeholder={__('Enter rule name...', 'yatra')}
-                    defaultValue={editingRule?.rule_name || ''}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    {__('Rule Type', 'yatra')}
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                    <option value="global">{__('Global Rule', 'yatra')}</option>
-                    <option value="trip">{__('Trip Specific', 'yatra')}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {__('Description', 'yatra')}
-                </label>
-                <textarea
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white"
-                  placeholder={__('Describe your cancellation policy...', 'yatra')}
-                  defaultValue={editingRule?.description || ''}
-                ></textarea>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {__('Status', 'yatra')}
-                </label>
-                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-white">
-                  <option value="active">{__('Active', 'yatra')}</option>
-                  <option value="inactive">{__('Inactive', 'yatra')}</option>
-                </select>
-              </div>
-            </div>
-          </Modal>
-        </ConditionalRender>
+      
     </div>
   );
 };

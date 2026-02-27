@@ -72,6 +72,11 @@ class ItemService extends BaseService
      */
     protected function processBeforeCreate(array $data): array
     {
+        // DEBUG: Log incoming data
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('[YATRA DEBUG] ItemService::processBeforeCreate - Input data: ' . print_r($data, true));
+        }
+        
         // Set type to item for ClassificationsTable
         $data['type'] = 'item';
         
@@ -82,9 +87,15 @@ class ItemService extends BaseService
 
         // Always auto-generate slug from name (backend ensures uniqueness)
         if (!empty($data['name'])) {
+            // Use ClassificationsTable directly to avoid protected method issue
+            $tableName = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+            // Remove WordPress prefix since SlugHelper adds it automatically
+            global $wpdb;
+            $tableNameWithoutPrefix = str_replace($wpdb->prefix, '', $tableName);
+            
             $data['slug'] = SlugHelper::generateUniqueFromDatabase(
                 $data['name'],
-                'yatra_new_classifications',
+                $tableNameWithoutPrefix,
                 'slug'
             );
         } elseif (isset($data['slug'])) {
@@ -194,6 +205,9 @@ class ItemService extends BaseService
             $search = sanitize_text_field($args['search']);
             return $this->repository->search($search, $args);
         }
+
+        // Always filter by type = 'item' for items
+        $args['where']['type'] = 'item';
 
         // Sanitize and handle type filter
         if (!empty($args['type_id']) && $args['type_id'] !== 'all') {

@@ -133,9 +133,14 @@ class ItemTypeController extends BaseController
         try {
             $id = $this->service->create($this->getBody($request));
 
+            // Get the created item type to return full data
+            $repository = $this->service->getRepositoryInstance();
+            $itemType = $repository->find($id);
+
             return $this->success_response([
                 'id' => $id,
                 'message' => __('Item type created successfully', 'yatra'),
+                'data' => $itemType,
             ], 201);
         } catch (\InvalidArgumentException $e) {
             return $this->validation_error($e->getMessage());

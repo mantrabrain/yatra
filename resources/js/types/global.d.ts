@@ -20,8 +20,7 @@ declare global {
       additionalServicesEnabled: boolean;
       abandonedBookingRecoveryEnabled: boolean;
       dynamicPricingEnabled: boolean;
-      advancedCancellationEnabled: boolean;
-    };
+          };
     yatraBookingData?: {
       currency: string;
     };
