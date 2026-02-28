@@ -267,10 +267,10 @@ class SettingsService
     }
 
     /**
-     * Get a single setting value
+     * Get setting value with fallback to default
      *
-     * @param string $key     Setting key (supports dot notation: 'review.enable_reviews')
-     * @param mixed  $default Default value if not set
+     * @param string $key Setting key
+     * @param mixed $default Default value if setting not found
      * @return mixed Setting value or default
      */
     public static function get(string $key, $default = null)

@@ -283,7 +283,7 @@ class CacheService
     /**
      * Remember pattern - get from cache or execute callback and cache result
      */
-    public static function remember(string $key, callable $callback, int $duration = null): mixed
+    public static function remember(string $key, callable $callback, ?int $duration = null): mixed
     {
         // Try to get from cache first
         $cached = Cache::get($key);

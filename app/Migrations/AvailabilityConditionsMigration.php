@@ -267,7 +267,7 @@ class AvailabilityConditionsMigration extends BaseMigration
     /**
      * Insert recurring rule into new system
      */
-    private function insertRecurringRule(int $tripId, array $ruleData, int $oldConditionId = null): bool
+    private function insertRecurringRule(int $tripId, array $ruleData, ?int $oldConditionId = null): bool
     {
         global $wpdb;
         $table = TripAvailabilityRulesTable::getTableName();

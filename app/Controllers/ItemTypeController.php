@@ -191,7 +191,7 @@ class ItemTypeController extends BaseController
         }
     }
 
-    private function prepareItem($item, $repository = null): array
+    private function prepareItem($item, ?BaseRepository $repository = null): array
     {
         $prepared = (array) $item;
 
