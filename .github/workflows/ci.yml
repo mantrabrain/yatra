@@ -313,11 +313,99 @@ jobs:
           
           echo "✅ WordPress compatibility checks passed"
 
+  # TypeScript/React Code Quality
+  typescript-quality:
+    name: TypeScript/React Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: TypeScript Type Check
+        run: |
+          echo "Running TypeScript type checking..."
+          npm run type-check || {
+            echo "❌ TypeScript type checking failed"
+            exit 1
+          }
+          
+      - name: ESLint Check
+        run: |
+          echo "Running ESLint..."
+          npx eslint resources/js/ --ext .ts,.tsx --format=compact || {
+            echo "❌ ESLint check failed"
+            exit 1
+          }
+          
+      - name: Prettier Check
+        run: |
+          echo "Running Prettier format check..."
+          npx prettier --check "resources/js/**/*.{ts,tsx,js,jsx}" || {
+            echo "❌ Prettier format check failed"
+            echo "Run 'npm run format' to fix formatting issues"
+            exit 1
+          }
+          
+      - name: Check for console.log statements
+        run: |
+          echo "Checking for console.log statements in production code..."
+          if grep -r "console\.log" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v "//.*console\.log"; then
+            echo "❌ Found console.log statements in production code"
+            echo "Please remove console.log statements before committing"
+            exit 1
+          fi
+          echo "✅ No console.log statements found"
+          
+      - name: Check for hardcoded secrets in JS/TS
+        run: |
+          echo "Checking for hardcoded secrets in JavaScript/TypeScript..."
+          secret_patterns=(
+            "password\s*=\s*['\"][^'\"]+['\"]"
+            "api_key\s*=\s*['\"][^'\"]+['\"]"
+            "secret\s*=\s*['\"][^'\"]+['\"]"
+            "token\s*=\s*['\"][^'\"]+['\"]"
+          )
+          
+          for pattern in "${secret_patterns[@]}"; do
+            if grep -r "$pattern" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx"; then
+              echo "❌ Potential hardcoded secret found in JavaScript/TypeScript"
+              exit 1
+            fi
+          done
+          echo "✅ No hardcoded secrets found in JavaScript/TypeScript"
+          
+      - name: Check React best practices
+        run: |
+          echo "Checking React best practices..."
+          
+          # Check for missing React keys in lists
+          if grep -r "map(" resources/js/ --include="*.tsx" --include="*.jsx" | grep -v "key="; then
+            echo "⚠️  Possible missing React key in map function"
+          fi
+          
+          # Check for any() usage in React components
+          if grep -r "any" resources/js/ --include="*.tsx" --include="*.jsx" | grep -v "//.*any"; then
+            echo "⚠️  Found 'any' type usage in React components"
+          fi
+          
+          echo "✅ React best practices check completed"
+
   # Build Summary
   build-summary:
     name: Build Summary
     runs-on: ubuntu-latest
-    needs: [quality-check, security-scan, structure-check, wordpress-compatibility]
+    needs: [quality-check, security-scan, structure-check, wordpress-compatibility, typescript-quality]
     if: always()
     
     steps:
@@ -352,6 +440,13 @@ jobs:
             echo "✅ **WordPress Compatibility**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **WordPress Compatibility**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # TypeScript/React Quality Status
+          if [ "${{ needs.typescript-quality.result }}" == "success" ]; then
+            echo "✅ **TypeScript/React Quality**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **TypeScript/React Quality**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY

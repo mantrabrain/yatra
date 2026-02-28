@@ -9,6 +9,10 @@
     "dev": "npm run makepot && vite build --watch",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext ts,tsx --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"resources/js/**/*.{ts,tsx,js,jsx}\"",
+    "format:check": "prettier --check \"resources/js/**/*.{ts,tsx,js,jsx}\"",
     "makepot": "babel assets/dist assets/admin/dist --out-file /dev/null && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --include=\"app,includes,templates\" --domain=yatra --location --headers='{\"Language-Team\":\"Yatra Development Team <mantrabrain@gmail.com>\",\"Last-Translator\":\"Yatra Dev <mantrabrain@gmail.com>\",\"Language\":\"en_US\",\"Plural-Forms\":\"nplurals=2; plural=(n != 1);\"}' && WP_MEMORY_LIMIT=1G php -d memory_limit=1G $(which wp) --allow-root i18n make-pot . i18n/languages/yatra.pot --merge=i18n/languages/yatra-js.pot && rm -f i18n/languages/yatra-js.pot",
     "i18n": "npm run makepot"
   },
@@ -39,6 +43,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "postcss": "^8.4.32",
+    "prettier": "^3.1.0",
     "tailwindcss": "^3.3.6",
     "terser": "^5.44.1",
     "typescript": "^5.2.2",
