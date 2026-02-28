@@ -57,21 +57,86 @@ jobs:
           vendor/bin/phpcs \
             --standard=phpcs.xml \
             --report=full \
-            --report-file=phpcs-report.txt
+            --report=summary \
+            --report-file=phpcs-report.txt \
+            --report-json=phpcs-report.json \
+            --report-gitblame=phpcs-gitblame.txt \
+            --verbose
+          
+          echo "=== PHPCS Summary ==="
+          cat phpcs-report.txt | head -50
+          
+          echo ""
+          echo "=== PHPCS Error Details ==="
+          if [ -f phpcs-report.json ]; then
+            # Extract file errors from JSON report
+            php -r '
+              $json = json_decode(file_get_contents("phpcs-report.json"), true);
+              if (isset($json["files"])) {
+                foreach ($json["files"] as $file => $data) {
+                  if (isset($data["messages"]) && !empty($data["messages"])) {
+                    echo "📁 File: " . $file . "\n";
+                    foreach ($data["messages"] as $msg) {
+                      echo "  ❌ Line " . $msg["line"] . ": " . $msg["message"] . " (" . $msg["source"] . ")\n";
+                    }
+                    echo "\n";
+                  }
+                }
+              }
+            '
+          fi
             
-      - name: Upload PHPCS Report
+      - name: Upload PHPCS Reports
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: phpcs-report-php${{ matrix.php }}
-          path: phpcs-report.txt
+          name: phpcs-reports-php${{ matrix.php }}
+          path: |
+            phpcs-report.txt
+            phpcs-report.json
+            phpcs-gitblame.txt
           
                 
       - name: Run PHPStan Static Analysis
         run: |
           echo "Running PHPStan static analysis..."
-          vendor/bin/phpstan analyse --no-progress --error-format=table --memory-limit=1G
+          vendor/bin/phpstan analyse \
+            --no-progress \
+            --error-format=table \
+            --error-format=json=phpstan-report.json \
+            --memory-limit=1G
           
+          echo ""
+          echo "=== PHPStan Error Details ==="
+          if [ -f phpstan-report.json ]; then
+            php -r '
+              $json = json_decode(file_get_contents("phpstan-report.json"), true);
+              if (isset($json["files"])) {
+                foreach ($json["files"] as $file => $data) {
+                  if (isset($data["messages"]) && !empty($data["messages"])) {
+                    echo "📁 File: " . $file . "\n";
+                    foreach ($data["messages"] as $msg) {
+                      echo "  ❌ Line " . $msg["line"] . ": " . $msg["message"] . "\n";
+                    }
+                    echo "\n";
+                  }
+                }
+              }
+              if (isset($json["totals"]) && $json["totals"]["errors"] > 0) {
+                echo "🚨 Total PHPStan Errors: " . $json["totals"]["errors"] . "\n";
+              }
+            '
+          fi
+          
+      - name: Upload PHPStan Reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpstan-reports-php${{ matrix.php }}
+          path: |
+            phpstan-report.json
+            phpstan-report.txt
+                
       - name: Composer Audit (Security Check)
         run: composer audit
         
