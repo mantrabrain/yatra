@@ -69,7 +69,8 @@ jobs:
           # Create temporary file to store errors
           ERROR_FILE=$(mktemp)
           SYNTAX_ERRORS=0
-          echo 0 > /tmp/syntax_error_count
+          rm -f /tmp/syntax_error_count
+          touch /tmp/syntax_error_count
           
           # Temporarily disable strict error handling
           set +e
