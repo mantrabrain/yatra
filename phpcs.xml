@@ -17,8 +17,6 @@
     <!-- Directories to check -->
     <file>app</file>
     <file>includes</file>
-    <file>admin</file>
-    <file>frontend</file>
     <file>templates</file>
     <file>yatra.php</file>
     

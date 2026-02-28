@@ -76,6 +76,7 @@ jobs:
         run: |
           echo "Running WordPress coding standards check..."
           vendor/bin/phpcs \
+            -d memory_limit=512M \
             --standard=phpcs.xml \
             --report=full \
             --report-file=phpcs-report.txt \
