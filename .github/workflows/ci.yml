@@ -114,7 +114,7 @@ jobs:
           set -e
           
           # Debug: Show what specific file is still causing issues
-          echo "DEBUG: Total syntax errors found: $(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)" >&2
+          echo "DEBUG: Total syntax errors found: $(awk '{sum+=$1} END {print sum}' /tmp/syntax_error_count 2>/dev/null || echo 0)" >&2
           echo "DEBUG: Syntax error count file contents:" >&2
           cat /tmp/syntax_error_count 2>/dev/null || echo "DEBUG: No syntax error count file" >&2
           echo "DEBUG: Error file contents before final check:" >&2
@@ -124,8 +124,8 @@ jobs:
           echo "DEBUG: Checking for BOM issues..." >&2
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -exec sh -c 'if [ "$(head -c 3 "$0" | od -tx1 -N1 | cut -d' ' -f1)" = 'efbbbf' ]; then echo "BOM found in $0"; fi' {} \; 2>/dev/null || echo "DEBUG: BOM check completed" >&2
           
-          # Count errors
-          SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)
+          # Count errors - use sum of numbers instead of line count
+          SYNTAX_ERRORS=$(awk '{sum+=$1} END {print sum}' /tmp/syntax_error_count 2>/dev/null || echo 0)
           rm -f /tmp/syntax_error_count
           
           echo "DEBUG: Final error count: $SYNTAX_ERRORS" >&2
