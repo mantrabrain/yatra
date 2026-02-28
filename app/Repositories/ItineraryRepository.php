@@ -34,13 +34,6 @@ class ItineraryRepository extends BaseRepository
      */
     public function getOrCreateDay(int $tripId, int $dayNumber, ?string $dayTitle = null, ?string $dayDescription = null, bool $allowExisting = true): int
     {
-        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Called with:");
-        error_log("[YATRA DEBUG]   trip_id: $tripId");
-        error_log("[YATRA DEBUG]   day_number: $dayNumber");
-        error_log("[YATRA DEBUG]   day_title: " . ($dayTitle ?? 'NULL'));
-        error_log("[YATRA DEBUG]   day_description: " . ($dayDescription ?? 'NULL'));
-        error_log("[YATRA DEBUG]   allowExisting: " . ($allowExisting ? 'TRUE' : 'FALSE'));
-        
         // Use QueryCache for caching day existence checks
         $cacheKey = Cache::KEY_DAY_EXISTS . "_{$tripId}_day_{$dayNumber}";
         
@@ -117,7 +110,6 @@ class ItineraryRepository extends BaseRepository
             }
             
             if (!empty($updateData)) {
-                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Updating existing day with data: " . print_r($updateData, true));
                 $result = $wpdb->update(
                     $tableDays,
                     $updateData,
@@ -125,9 +117,7 @@ class ItineraryRepository extends BaseRepository
                     $updateFormat,
                     ['%d']
                 );
-                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Update result: $result");
-                error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - WPDB last_error: " . $wpdb->last_error);
-            }
+                }
             return (int) $existingDay->id;
         }
 
@@ -139,15 +129,11 @@ class ItineraryRepository extends BaseRepository
             'description' => $dayDescription ? wp_kses_post($dayDescription) : null,
             'order' => $dayNumber - 1,
         ];
-        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Creating new day with data: " . print_r($insertData, true));
         $wpdb->insert(
             $tableDays,
             $insertData,
             ['%d', '%d', '%s', '%s', '%d']
         );
-        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - Insert result: " . $wpdb->insert_id);
-        error_log("[YATRA DEBUG] ItineraryRepository::getOrCreateDay - WPDB last_error: " . $wpdb->last_error);
-
         return (int) $wpdb->insert_id;
     }
 
@@ -157,8 +143,6 @@ class ItineraryRepository extends BaseRepository
      */
     public function createEntry(array $data): int
     {
-        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - Input data: " . print_r($data, true));
-        
         global $wpdb;
         $tableEntries = $this->getTableName(); // yatra_new_trip_itinerary_day_entry
         $tableDays = TripItineraryDaysTable::getTableName();
@@ -170,12 +154,8 @@ class ItineraryRepository extends BaseRepository
         $itemId = isset($data['item_id']) && $data['item_id'] !== '' && $data['item_id'] !== '0' && $data['item_id'] !== 0 ? (int) $data['item_id'] : null;
         $isDayEntry = $itemTypeId === null && $itemId === null;
         
-        error_log("[YATRA DEBUG] ItineraryRepository::createEntry - item_type_id: " . ($itemTypeId ?? 'NULL') . ", item_id: " . ($itemId ?? 'NULL') . ", isDayEntry: " . ($isDayEntry ? 'TRUE' : 'FALSE'));
-
         if ($isDayEntry) {
             // Creating a DAY entry - store in days table
-            error_log("[YATRA DEBUG] Creating DAY entry in days table");
-            
             // Check if day already exists for this trip and day number
             $existingDay = $wpdb->get_row(
                 $wpdb->prepare(
@@ -187,8 +167,6 @@ class ItineraryRepository extends BaseRepository
             
             if ($existingDay) {
                 // Day already exists, update it
-                error_log("[YATRA DEBUG] Day already exists with ID: {$existingDay->id}, updating...");
-                
                 $wpdb->update(
                     $tableDays,
                     [
@@ -203,8 +181,6 @@ class ItineraryRepository extends BaseRepository
                 return (int) $existingDay->id;
             } else {
                 // Create new day
-                error_log("[YATRA DEBUG] Creating new day entry");
-                
                 $wpdb->insert(
                     $tableDays,
                     [
@@ -218,8 +194,6 @@ class ItineraryRepository extends BaseRepository
                 );
                 
                 $dayId = (int) $wpdb->insert_id;
-                error_log("[YATRA DEBUG] Created day with ID: {$dayId}");
-                
                 // Fire hook for cache invalidation
                 do_action('yatra_itinerary_day_created', $dayId, $data);
                 
@@ -227,8 +201,6 @@ class ItineraryRepository extends BaseRepository
             }
         } else {
             // Creating an ACTIVITY entry - store in entries table
-            error_log("[YATRA DEBUG] Creating ACTIVITY entry in entries table");
-            
             // First, ensure the day exists
             $dayId = $this->getOrCreateDay(
                 (int) $data['trip_id'],
@@ -237,8 +209,6 @@ class ItineraryRepository extends BaseRepository
                 $data['day_description'] ?? null,
                 true // Allow existing days
             );
-            
-            error_log("[YATRA DEBUG] Using day_id: {$dayId}");
             
             // Format time field
             $timeField = null;
@@ -291,8 +261,6 @@ class ItineraryRepository extends BaseRepository
             );
             
             $entryId = (int) $wpdb->insert_id;
-            error_log("[YATRA DEBUG] Created activity entry with ID: {$entryId}");
-            
             // Fire hook for cache invalidation
             do_action('yatra_itinerary_activity_created', $entryId, $data);
             
@@ -743,8 +711,6 @@ class ItineraryRepository extends BaseRepository
             $entryId
         );
         
-        error_log("[YATRA DEBUG] getEntryWithRelations SQL: " . $sql);
-        
         $entry = $wpdb->get_row($sql);
 
         if (!$entry) {
@@ -752,35 +718,19 @@ class ItineraryRepository extends BaseRepository
         }
         
         // Debug: Log the actual values from database
-        error_log("[YATRA DEBUG] getEntryWithRelations - Entry from DB:");
-        error_log("[YATRA DEBUG]   item_type_id type: " . gettype($entry->item_type_id));
-        error_log("[YATRA DEBUG]   item_type_id value: " . var_export($entry->item_type_id, true));
-        error_log("[YATRA DEBUG]   item_id type: " . gettype($entry->item_id));
-        error_log("[YATRA DEBUG]   item_id value: " . var_export($entry->item_id, true));
-        error_log("[YATRA DEBUG]   item_type_name: " . var_export($entry->item_type_name, true));
-        error_log("[YATRA DEBUG]   item_name: " . var_export($entry->item_name, true));
-
         // Get day info for activity entries
         $day = $wpdb->get_row(
             $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", (int) $entry->day_id)
         );
         
         if ($day) {
-            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - Day data found:");
-            error_log("[YATRA DEBUG]   day_id: " . $day->id);
-            error_log("[YATRA DEBUG]   day_number: " . $day->day_number);
-            error_log("[YATRA DEBUG]   day_title: '" . ($day->title ?? 'NULL') . "'");
-            error_log("[YATRA DEBUG]   day_description: '" . ($day->description ?? 'NULL') . "'");
-            
             $entry->day = (int) $day->day_number; // Add 'day' field for form compatibility
             $entry->day_number = (int) $day->day_number;
             $entry->day_title = $day->title;
             $entry->day_description = $day->description;
             
-            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - Set entry->day_description: '" . ($entry->day_description ?? 'NULL') . "'");
-        } else {
-            error_log("[YATRA DEBUG] ItineraryRepository::getEntryWithRelations - No day data found for day_id: " . (int) $entry->day_id);
-        }
+            } else {
+            }
 
         // Decode included/excluded items JSON columns (stored directly on the entry)
         $entry->included_items = $this->decodeAmenityItems($entry->included_items ?? null);
@@ -850,8 +800,6 @@ class ItineraryRepository extends BaseRepository
 
         if ($dayEntry) {
             // This is a day entry - delete the day and all its activities
-            error_log("[YATRA DEBUG] Deleting day entry with ID: {$id}");
-            
             // Delete all activity entries for this day (CASCADE will handle this via foreign key)
             // But we'll do it explicitly for clarity
             $wpdb->delete($tableEntries, ['day_id' => $id], ['%d']);
@@ -872,8 +820,6 @@ class ItineraryRepository extends BaseRepository
 
         if ($activityEntry) {
             // This is an activity entry - just delete it
-            error_log("[YATRA DEBUG] Deleting activity entry with ID: {$id}");
-            
             $result = $wpdb->delete($tableEntries, ['id' => $id], ['%d']);
             
             // Fire hook for cache invalidation
@@ -883,7 +829,6 @@ class ItineraryRepository extends BaseRepository
         }
 
         // Entry not found in either table
-        error_log("[YATRA DEBUG] Entry not found with ID: {$id}");
         return false;
     }
 
@@ -1092,17 +1037,11 @@ class ItineraryRepository extends BaseRepository
                 $tripId
             )) ?: [];
             
-            error_log('[ITINERARY REPOSITORY DEBUG] Days query: ' . $wpdb->last_query);
-            error_log('[ITINERARY REPOSITORY DEBUG] Days found: ' . count($days));
-            error_log('[ITINERARY REPOSITORY DEBUG] Days data: ' . json_encode($days));
-        
-        $allEntries = [];
+            $allEntries = [];
         
         // Process each day
         foreach ($days as $day) {
             $dayNumber = (int) $day->day_number;
-            
-            error_log("[YATRA DEBUG] Processing day {$dayNumber} with id: {$day->id}");
             
             // Add day entry (summary of the day)
             $dayEntryObj = (object) [

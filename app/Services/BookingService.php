@@ -401,11 +401,9 @@ class BookingService
                     $data['start_date'],
                     $data['end_date']
                 );
-                error_log("Yatra: Handled date change for booking {$id}");
-            } catch (\Exception $e) {
+                } catch (\Exception $e) {
                 // Log error but don't fail the update
-                error_log('Yatra: Failed to handle booking date change: ' . $e->getMessage());
-            }
+                }
         }
 
         // Update travelers if provided
@@ -477,16 +475,14 @@ class BookingService
                     !in_array($oldStatus, ['cancelled', 'refunded'], true)) {
                     // Unlink booking from departure (this will handle cancellation if no bookings remain)
                     $this->departureService->unlinkBookingFromDeparture($id, $departure->id);
-                    error_log("Yatra: Unlinked booking {$id} from departure {$departure->id} (cancelled/refunded)");
-                }
+                    }
                 // If booking status changes from cancelled/refunded back to active
                 elseif (in_array($oldStatus, ['cancelled', 'refunded'], true) && 
                         !in_array($status, ['cancelled', 'refunded'], true)) {
                     // Ensure booking is linked and increment booked count
                     $this->departureService->linkBookingToDeparture($id, $departure->id);
                     $this->departureService->incrementBookedCount($departure->id, $travelersCount);
-                    error_log("Yatra: Reactivated booking {$id} on departure {$departure->id}");
-                }
+                    }
             } elseif (!empty($booking->start_date) || !empty($booking->travel_date)) {
                 // Booking doesn't have a departure yet, but has a date - create and link
                 $startDate = $booking->start_date ?? $booking->travel_date;
@@ -505,12 +501,10 @@ class BookingService
                 
                 $this->departureService->linkBookingToDeparture($id, $departure->id);
                 $this->departureService->incrementBookedCount($departure->id, $travelersCount);
-                error_log("Yatra: Created and linked departure {$departure->id} for reactivated booking {$id}");
-            }
+                }
         } catch (\Exception $e) {
             // Log error but don't fail the status update
-            error_log('Yatra: Failed to update departure for booking status change: ' . $e->getMessage());
-        }
+            }
 
         // Send status change notification
         $this->sendStatusChangeNotification($id, $oldStatus, $status);

@@ -1885,9 +1885,7 @@ class TripRepository extends BaseRepository
         
         // DEBUG: Log method entry
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA PRICE RANGE DEBUG - Method called with min_price=' . $min_price . ', max_price=' . $max_price);
-            error_log('YATRA PRICE RANGE DEBUG - Args: ' . print_r($args, true));
-        }
+            }
         
         // Base query to get all active trips
         $args['where']['deleted_at'] = null;
@@ -1897,8 +1895,7 @@ class TripRepository extends BaseRepository
         
         // DEBUG: Log query args
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA PRICE RANGE DEBUG - Query args: ' . print_r($args, true));
-        }
+            }
         
         // Get all active trips first
         $all_trips = $this->all($args);
@@ -1917,9 +1914,7 @@ class TripRepository extends BaseRepository
         
         // DEBUG: Log price filtering process
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('YATRA PRICE RANGE DEBUG - Starting price filtering for ' . count($all_trips) . ' trips');
-            error_log('YATRA PRICE RANGE DEBUG - Filter range: $' . $min_price . ' - $' . $max_price);
-        }
+            }
         
         foreach ($all_trips as $trip) {
             $trip_id = $trip->id;
@@ -1947,8 +1942,7 @@ class TripRepository extends BaseRepository
             
             // DEBUG: Log individual trip filtering
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('YATRA PRICE RANGE DEBUG - Trip ID ' . $trip_id . ': trip_min_price=$' . $trip_min_price . ', passes_filter=' . ($passes_filter ? 'YES' : 'NO'));
-            }
+                }
             
             if ($passes_filter) {
                 $trip->min_price = $trip_min_price;

@@ -19,9 +19,7 @@ global $destination;
 
 // Debug: Check what data we have
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('=== SINGLE DESTINATION DEBUG ===');
-    error_log('Destination object: ' . print_r($destination, true));
-}
+    }
 
 // Bail if no destination data - return proper 404
 if (!$destination) {

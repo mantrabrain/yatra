@@ -30,8 +30,7 @@ class RouteServiceProvider extends ServiceProvider
 
         // Debug: Log service provider registration
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra RouteServiceProvider: Registering with routes file - ' . $this->routesFile);
-        }
+            }
 
         // Register routes on rest_api_init hook with higher priority to ensure it runs early
         add_action('rest_api_init', [$this, 'registerRoutes'], 5);
@@ -50,15 +49,13 @@ class RouteServiceProvider extends ServiceProvider
 
         if (!file_exists($this->routesFile)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra: Routes file not found - ' . $this->routesFile);
-            }
+                }
             return;
         }
 
         // Debug: Log routes file loading
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra: Loading API routes from - ' . $this->routesFile);
-        }
+            }
 
         // Load routes registry
         require_once $this->routesFile;
@@ -72,8 +69,7 @@ class RouteServiceProvider extends ServiceProvider
         
         // Debug: Log route registration completion
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra: API routes registration completed');
-        }
+            }
     }
 
     /**
@@ -83,8 +79,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         $server = rest_get_server();
         $routes = $server->get_routes('yatra/v1');
-        
-        error_log('Yatra API: Total routes registered - ' . count($routes));
         
         // Group routes by resource
         $grouped = [];
@@ -98,7 +92,6 @@ class RouteServiceProvider extends ServiceProvider
         }
         
         foreach ($grouped as $resource => $count) {
-            error_log("  - {$resource}: {$count} endpoints");
-        }
+            }
     }
 }

@@ -91,11 +91,7 @@ $controllers = [
 
 // Debug: Check if BookingsController is in the array
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('Yatra: Routes file loaded at ' . date('Y-m-d H:i:s'));
-    error_log('Yatra: Controllers array contains ' . count($controllers) . ' controllers');
-    error_log('Yatra: BookingsController in array: ' . (in_array(\Yatra\Controllers\BookingsController::class, $controllers) ? 'YES' : 'NO'));
-    error_log('Yatra: Looking for BookingsController in: ' . print_r($controllers, true));
-}
+    }
 
 /**
  * Register all controller routes
@@ -106,8 +102,7 @@ if (defined('WP_DEBUG') && WP_DEBUG) {
 foreach ($controllers as $controllerClass) {
     if (!class_exists($controllerClass)) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra API: Controller not found - {$controllerClass}");
-        }
+            }
         continue;
     }
 
@@ -116,25 +111,21 @@ foreach ($controllers as $controllerClass) {
         
         // Debug: Log controller instantiation
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra API: Instantiated controller - {$controllerClass}");
-        }
+            }
         
         if (method_exists($controller, 'register_routes')) {
             $controller->register_routes();
             
             // Debug: Log successful route registration
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra API: Successfully registered routes for - {$controllerClass}");
-            }
+                }
         } else {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra API: Controller missing register_routes() - {$controllerClass}");
-            }
+                }
         }
     } catch (\Throwable $e) {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log("Yatra API: Failed to register routes for {$controllerClass} - " . $e->getMessage());
-        }
+            }
     }
 }
 
@@ -144,7 +135,5 @@ foreach ($controllers as $controllerClass) {
 if (defined('WP_DEBUG') && WP_DEBUG && defined('YATRA_DEBUG_API') && YATRA_DEBUG_API) {
     add_action('rest_api_init', function() {
         $routes = rest_get_server()->get_routes('yatra/v1');
-        error_log('Yatra API: Registered endpoints - ' . count($routes));
-        error_log('Yatra API: Endpoints: ' . implode(', ', array_keys($routes)));
-    }, 999);
+        }, 999);
 }

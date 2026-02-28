@@ -104,9 +104,6 @@ class SavedTripController extends BaseController
         $data = $request->get_json_params();
         
         // Debug: log received data
-        error_log("Yatra SavedTripController: Received data: " . json_encode($data));
-        error_log("Yatra SavedTripController: User ID: $userId");
-        
         // Try multiple possible parameter names
         $tripId = 0;
         if (isset($data['trip_id'])) {
@@ -119,8 +116,6 @@ class SavedTripController extends BaseController
             $tripId = (int) $request->get_param('trip_id');
         }
 
-        error_log("Yatra SavedTripController: Extracted trip ID: $tripId");
-
         if (!$tripId || $tripId <= 0) {
             return new WP_REST_Response([
                 'success' => false,
@@ -132,7 +127,6 @@ class SavedTripController extends BaseController
         // Note: User ID and Trip ID can be the same number (e.g., both 1), so we don't block that
         // Instead, we verify the trip exists in the database
         
-        error_log("Yatra SavedTripController: Calling saveTrip with userId=$userId, tripId=$tripId");
         $result = $this->savedTripService->saveTrip($userId, $tripId);
 
         if (!$result['success']) {

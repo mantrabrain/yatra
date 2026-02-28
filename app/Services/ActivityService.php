@@ -347,8 +347,6 @@ class ActivityService extends BaseService
         $counts = $this->repository->getStatusCounts();
                
         // Debug: Log the repository counts
-        error_log('ActivityService getStatusCounts - Repository counts: ' . print_r($counts, true));
-
         $publish = $counts['publish'] ?? 0;
         $draft = $counts['draft'] ?? 0;
         $trash = $counts['trash'] ?? 0;

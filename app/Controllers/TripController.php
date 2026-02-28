@@ -258,23 +258,12 @@ class TripController extends BaseController
                 'order' => strtoupper($request->get_param('order') ?: 'DESC'),
             ];
 
-            // DEBUG: Log request parameters
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[YATRA DEBUG] TripController get_items - Request params:');
-                error_log('[YATRA DEBUG] - per_page: ' . $args['limit']);
-                error_log('[YATRA DEBUG] - page: ' . ((int) ($request->get_param('page') ?: 1)));
-                error_log('[YATRA DEBUG] - offset: ' . $args['offset']);
-                error_log('[YATRA DEBUG] - status filter: ' . ($request->get_param('status') ?: 'none'));
-                error_log('[YATRA DEBUG] - search: ' . ($request->get_param('search') ?: 'none'));
-            }
-
+        
             // Add status filter
             $status = $request->get_param('status');
             if ($status && $status !== 'all') {
                 $args['where']['status'] = $status;
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('[YATRA DEBUG] TripController - Applied status filter: ' . $status);
-                }
+              
             }
 
             // Add search
@@ -282,27 +271,20 @@ class TripController extends BaseController
             if ($search) {
                 $items = $this->service->search($search, $args);
                 $total = count($items);
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('[YATRA DEBUG] TripController - Search results: ' . count($items));
-                }
+          
             } else {
                 // DEBUG: Use TripService to get trip counts
-                if (defined('WP_DEBUG') && WP_DEBUG) {
+            
                     $direct_count = $this->service->count();
                     $publish_count = $this->service->countByStatus('publish');
                     $trash_count = $this->service->countByStatus('trash');
-                    error_log('[YATRA DEBUG] TripController - Direct SQL count: ' . $direct_count);
-                    error_log('[YATRA DEBUG] TripController - Status distribution: publish=' . $publish_count . ', trash=' . $trash_count);
-                }
+            
                 
                 // For admin listing, include all trips regardless of status or soft delete
                 $args['include_deleted'] = true;
                 $items = $this->service->getAll($args);
                 $total = $this->service->count($args);
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('[YATRA DEBUG] TripController - getAll results (with include_deleted): ' . count($items));
-                    error_log('[YATRA DEBUG] TripController - Total count (with include_deleted): ' . $total);
-                }
+          
             }
 
             // Ensure traveler-based pricing trips have a usable base price in list view
@@ -451,10 +433,8 @@ class TripController extends BaseController
                 $itemRepo = new ItemRepository();
                 $allItems = $itemRepo->all(['where' => ['status' => 'publish']]);
                 
-                error_log('[YATRA DEBUG] TripController - Raw items from repository:');
                 foreach ($allItems as $item) {
-                    error_log('[YATRA DEBUG]   Item: id=' . $item->id . ', name=' . $item->name . ', parent_id=' . ($item->parent_id ?? 'NULL') . ', type=' . ($item->type ?? 'NULL'));
-                }
+                    }
                 
                 $meta['available_items'] = array_map(function ($item) {
                     // Items use parent_id to link to their item type (not type_id)
@@ -463,14 +443,9 @@ class TripController extends BaseController
                         'name' => esc_html($item->name),
                         'type_id' => (int) ($item->parent_id ?? 0), // parent_id is the item type ID
                     ];
-                    error_log('[YATRA DEBUG]   Mapped item: ' . json_encode($mappedItem));
                     return $mappedItem;
                 }, $allItems);
                 
-                error_log('[YATRA DEBUG] TripController - Returning meta data:');
-                error_log('[YATRA DEBUG] - Item types count: ' . count($meta['available_item_types']));
-                error_log('[YATRA DEBUG] - Items count: ' . count($meta['available_items']));
-                error_log('[YATRA DEBUG] - Available items: ' . json_encode($meta['available_items']));
             }
 
             $response = [
@@ -480,14 +455,7 @@ class TripController extends BaseController
                 'per_page' => $args['limit'], // Use the actual limit from args
             ];
 
-            // DEBUG: Log final response
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[YATRA DEBUG] TripController - Final response:');
-                error_log('[YATRA DEBUG] - data count: ' . count($response['data']));
-                error_log('[YATRA DEBUG] - total: ' . $response['total']);
-                error_log('[YATRA DEBUG] - page: ' . $response['page']);
-                error_log('[YATRA DEBUG] - per_page: ' . $response['per_page']);
-            }
+      
 
             if (!empty($meta)) {
                 $response['meta'] = $meta;
@@ -657,8 +625,7 @@ class TripController extends BaseController
             if (isset($data['price_types'])) {
                 $relationships['price_types'] = $data['price_types'];
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log("Yatra TripController update_item: Added price_types to relationships: " . json_encode($data['price_types']));
-                }
+                    }
             }
             if (isset($data['highlights'])) {
                 $relationships['highlights'] = $data['highlights'];
@@ -767,26 +734,22 @@ class TripController extends BaseController
             
             // DEBUG: Log permanent delete attempt
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[YATRA DEBUG] TripController - Attempting permanent delete for trip ID: ' . $id);
-            }
+                }
             
             $result = $this->service->permanentDelete($id);
 
             if (!$result) {
-                error_log('[YATRA DEBUG] TripController - Permanent delete failed for trip ID: ' . $id);
                 return $this->error_response(__('Failed to permanently delete trip', 'yatra'), 500);
             }
 
             // DEBUG: Log successful delete
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[YATRA DEBUG] TripController - Successfully permanently deleted trip ID: ' . $id);
-            }
+                }
 
             return $this->success_response([
                 'message' => __('Trip permanently deleted', 'yatra'),
             ]);
         } catch (\Exception $e) {
-            error_log('[YATRA DEBUG] TripController - Exception during permanent delete: ' . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }
@@ -1131,13 +1094,11 @@ class TripController extends BaseController
             }
             
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: prepare_item_for_response - trip_category formatted: " . json_encode($data['trip_category']));
-            }
+                }
         } else {
             $data['trip_category'] = [];
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: prepare_item_for_response - trip_category not set in item");
-            }
+                }
         }
 
         if (isset($item->price_types)) {
@@ -1150,7 +1111,6 @@ class TripController extends BaseController
                 $rawPriceTypes = [];
             }
 
-            error_log("Yatra prepare_item_for_response: price_types found, count=" . count($rawPriceTypes));
             $data['price_types'] = array_map(function ($pt) {
                 // Normalize array to object for consistent access
                 if (is_array($pt)) {
@@ -1171,9 +1131,7 @@ class TripController extends BaseController
                     'valid_to' => $pt->valid_to ?? null,
                 ];
             }, $rawPriceTypes);
-            error_log("Yatra prepare_item_for_response: price_types formatted=" . json_encode($data['price_types']));
-        } else {
-            error_log("Yatra prepare_item_for_response: price_types NOT SET on item");
+            } else {
             $data['price_types'] = [];
         }
 
@@ -1404,8 +1362,7 @@ class TripController extends BaseController
                 }
             } catch (\Exception $e) {
                 // Log error but continue with specific dates only
-                error_log('Yatra: Failed to generate recurring dates - ' . $e->getMessage());
-            }
+                }
             
             // Merge and deduplicate (specific dates take priority)
             $availability_dates = array_merge($specific_dates, $recurring_dates);
@@ -2082,7 +2039,6 @@ class TripController extends BaseController
      */
     public function test_endpoint(): WP_REST_Response
     {
-        error_log("Yatra TripController: test_endpoint called successfully!");
         return $this->success_response(['message' => 'Test endpoint working', 'timestamp' => date('Y-m-d H:i:s')]);
     }
 
@@ -2092,23 +2048,15 @@ class TripController extends BaseController
     public function update_trip_attributes(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         // Add immediate log to verify method is called
-        error_log("Yatra TripController: update_trip_attributes - ENTRY POINT - " . date('Y-m-d H:i:s'));
-        
         try {
-            error_log("Yatra TripController: update_trip_attributes - METHOD CALLED");
-            
             $trip_id = (int) $request->get_param('id');
             $attributes = $request->get_param('attributes') ?? [];
             
-            error_log("Yatra TripController: update_trip_attributes - RAW INPUT: trip_id={$trip_id}, attributes=" . json_encode($attributes));
-            
             if (!$trip_id) {
-                error_log("Yatra TripController: update_trip_attributes - ERROR: Trip ID is required");
                 return $this->error_response('Trip ID is required', 400);
             }
 
             if (!is_array($attributes)) {
-                error_log("Yatra TripController: update_trip_attributes - ERROR: Attributes must be an array");
                 return $this->error_response('Attributes must be an array', 400);
             }
 
@@ -2121,13 +2069,8 @@ class TripController extends BaseController
                 ];
             }
 
-            error_log("Yatra TripController: update_trip_attributes - FORMATTED: " . json_encode($formattedAttributes));
-
             // Use TripService to update trip attributes
-            error_log("Yatra TripController: update_trip_attributes - CALLING SERVICE");
             $result = $this->service->updateTripAttributes($trip_id, $formattedAttributes);
-            error_log("Yatra TripController: update_trip_attributes - SERVICE RESULT: " . var_export($result, true));
-            
             return $this->success_response(['message' => 'Trip attributes updated successfully']);
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);

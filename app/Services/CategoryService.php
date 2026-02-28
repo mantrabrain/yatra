@@ -298,8 +298,7 @@ class CategoryService extends BaseService
         } catch (\Exception $e) {
             // DEBUG: Log the error
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[YATRA DEBUG] CategoryService - Update failed for ID: ' . $id . ' Error: ' . $e->getMessage());
-            }
+                }
             throw $e;
         }
     }

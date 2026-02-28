@@ -127,8 +127,7 @@ class Logger
 
         // Also log to WordPress debug log for critical errors
         if (in_array($level, [self::EMERGENCY, self::ALERT, self::CRITICAL, self::ERROR])) {
-            error_log("Yatra [{$level}]: {$message}");
-        }
+            }
     }
 
     /**

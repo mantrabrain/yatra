@@ -135,10 +135,8 @@ class BookingPageHandler extends BasePageHandler
                 }
 
                 // Debug log to verify gateways are being resolved
-                error_log('BookingPageHandler: enabled_gateways count = ' . count($enabled_gateways));
                 if (!empty($enabled_gateways)) {
-                    error_log('BookingPageHandler: gateway IDs = ' . implode(', ', array_keys($enabled_gateways)));
-                }
+                    }
                 // Build booking view model expected by templates
                 $booking = (object) [
                     'trip' => $trip,

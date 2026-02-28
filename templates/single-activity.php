@@ -19,9 +19,7 @@ global $activity;
 
 // Debug: Check what data we have
 if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('=== SINGLE ACTIVITY DEBUG ===');
-    error_log('Activity object: ' . print_r($activity, true));
-}
+    }
 
 // Bail if no activity data - return proper 404
 if (!$activity) {

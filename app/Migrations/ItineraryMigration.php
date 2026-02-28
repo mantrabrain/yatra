@@ -15,7 +15,6 @@ class ItineraryMigration extends BaseMigration
 {
     public function __construct(MigrationProgress $service)
     {
-        error_log("[YATRA DEBUG] ItineraryMigration::__construct() - CALLED");
         parent::__construct($service);
     }
 
@@ -25,8 +24,6 @@ class ItineraryMigration extends BaseMigration
     public function run(): array
     {
         // CRITICAL DEBUG: Log immediately to see if this method is called
-        error_log("[YATRA DEBUG] ItineraryMigration::run() - STARTED");
-        
         $migrated = 0;
         $skipped = 0;
         $failed = 0;
@@ -151,8 +148,6 @@ class ItineraryMigration extends BaseMigration
              WHERE post_type = 'tour'"
         );
 
-        error_log("[YATRA DEBUG] getOldToursWithItinerary: Found " . count($tours) . " tours");
-
         Logger::info("Itinerary Migration: Found tours", [
             'total_tours' => count($tours)
         ]);
@@ -160,22 +155,14 @@ class ItineraryMigration extends BaseMigration
         // Debug: Check first tour before filtering
         if (!empty($tours)) {
             $firstTour = reset($tours);
-            error_log("[YATRA DEBUG] First tour sample - ID: {$firstTour->ID}, Title: {$firstTour->post_title}, Status: {$firstTour->post_status}");
-            
             $firstMeta = $this->getPostMeta($firstTour->ID);
-            error_log("[YATRA DEBUG] First tour meta count: " . count($firstMeta));
-            error_log("[YATRA DEBUG] First tour meta keys: " . implode(', ', array_keys($firstMeta)));
-        }
+            }
 
         // Filter tours that have itinerary-related meta data
         $toursWithItinerary = array_filter($tours, function($tour) {
             $meta = $this->getPostMeta($tour->ID);
             
             // Aggressive debug: Log all meta keys for this tour
-            error_log("[YATRA DEBUG] Processing tour ID {$tour->ID}: {$tour->post_title} (status: {$tour->post_status})");
-            error_log("[YATRA DEBUG] Tour meta keys: " . implode(', ', array_keys($meta)));
-            error_log("[YATRA DEBUG] Tour content preview: " . substr($tour->post_content, 0, 200));
-            
             Logger::info("Itinerary Migration: Tour meta keys", [
                 'tour_id' => $tour->ID,
                 'tour_title' => $tour->post_title,
@@ -256,12 +243,7 @@ class ItineraryMigration extends BaseMigration
 
         foreach ($itineraryKeys as $key) {
             if (!empty($meta[$key])) {
-                error_log("[YATRA DEBUG] Found itinerary data in key: $key");
-                error_log("[YATRA DEBUG] Raw itinerary data: " . print_r($meta[$key], true));
-                
                 $itineraryData = $this->parseItineraryData($meta[$key]);
-                error_log("[YATRA DEBUG] Parsed itinerary data: " . print_r($itineraryData, true));
-                
                 if (!empty($itineraryData)) {
                     break;
                 }
@@ -440,8 +422,6 @@ class ItineraryMigration extends BaseMigration
                 $cleanedData = $this->cleanDayData($dayData['title'], $dayData['description']);
                 
                 // Create day
-                error_log("[YATRA DEBUG] Creating itinerary day - Trip: $tripId, Day: {$dayData['day_number']}, Original Title: '{$dayData['title']}', Cleaned Title: '{$cleanedData['title']}'");
-                
                 $dayResult = $this->wpdb->insert(
                     $tableDays,
                     [
@@ -456,8 +436,6 @@ class ItineraryMigration extends BaseMigration
                     ['%d', '%d', '%s', '%s', '%d', '%s', '%s']
                 );
                 
-                error_log("[YATRA DEBUG] Day insert result: " . ($dayResult ? 'SUCCESS' : 'FAILED'));
-
                 if (!$dayResult) {
                     Logger::error("Failed to create itinerary day", [
                         'trip_id' => $tripId,

@@ -153,18 +153,11 @@ class DepartureRepository extends BaseRepository
         }
         
         // Debug output
-        error_log('FindAll Query: ' . $query);
-        error_log('FindAll Params: ' . print_r($params, true));
-        error_log('FindAll Filters: ' . print_r($filters, true));
-        
         $prepared_query = $this->wpdb->prepare($query, ...$params);
-        error_log('FindAll Prepared Query: ' . $prepared_query);
-        
         $results = $this->wpdb->get_results($prepared_query, ARRAY_A);
         
         if ($this->wpdb->last_error) {
-            error_log('FindAll SQL Error: ' . $this->wpdb->last_error);
-        }
+            }
         
         return array_map(function ($row) {
             return Departure::fromArray($row);

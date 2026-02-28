@@ -126,8 +126,7 @@ class ScheduledPaymentService
         
         // Log that we're syncing (gateway webhooks should be primary)
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('[Yatra] Syncing scheduled payment %d status from %s', $payment->id, $payment->gateway));
-        }
+            }
     }
     
     /**

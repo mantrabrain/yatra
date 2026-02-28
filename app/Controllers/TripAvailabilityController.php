@@ -230,8 +230,7 @@ class TripAvailabilityController extends BaseController
                             $departureArray['total_revenue'] = $totalRevenue;
                         } catch (\Exception $e) {
                             // If any error occurs, leave the original value
-                            error_log('Error calculating departure revenue: ' . $e->getMessage());
-                        }
+                            }
                     }
                     
                     // Get all travelers for this departure
@@ -285,8 +284,6 @@ class TripAvailabilityController extends BaseController
                     }
                     
                     // Debug: Log time and revenue values
-                    error_log('Departure ID: ' . $d->id . ' - Time: ' . ($departureArray['time'] ?? 'NULL') . ' - Revenue: ' . ($departureArray['total_revenue'] ?? 'NULL'));
-                    
                     return $departureArray;
                 }, $departures),
                 'meta' => [
@@ -407,8 +404,7 @@ class TripAvailabilityController extends BaseController
             } catch (\Exception $e) {
                 // Leave original value on error
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('Error calculating single departure revenue: ' . $e->getMessage());
-                }
+                    }
             }
         }
 
@@ -616,8 +612,7 @@ class TripAvailabilityController extends BaseController
                         }
                         $departureArray['total_revenue'] = $totalRevenue;
                     } catch (\Exception $e) {
-                        error_log('Error calculating departure revenue: ' . $e->getMessage());
-                    }
+                        }
                 }
                 
                 // Get all travelers for this departure

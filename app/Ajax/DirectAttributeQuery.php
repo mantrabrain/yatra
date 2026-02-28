@@ -44,12 +44,6 @@ class DirectAttributeQuery
             }
 
             // Log the cached values
-            error_log('CACHED QUERY - Attribute ID: ' . $attributeId);
-            error_log('CACHED QUERY - required: ' . var_export($attribute->required, true));
-            error_log('CACHED QUERY - show_on_frontend: ' . var_export($attribute->show_on_frontend, true));
-            error_log('CACHED QUERY - show_in_filters: ' . var_export($attribute->show_in_filters, true));
-            error_log('CACHED QUERY - searchable: ' . var_export($attribute->searchable, true));
-
             wp_send_json_success([
                 'id' => $attribute->id,
                 'name' => $attribute->name,
@@ -72,7 +66,6 @@ class DirectAttributeQuery
             ]);
 
         } catch (\Exception $e) {
-            error_log('Attribute query error: ' . $e->getMessage());
             wp_send_json_error('Database query failed: ' . $e->getMessage());
         }
     }

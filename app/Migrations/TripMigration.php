@@ -32,16 +32,9 @@ class TripMigration extends BaseMigration
             "SELECT COUNT(*) FROM " . TripsTable::getTableName()
         );
         
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Starting Trip Migration");
-        error_log("[Yatra Migration] Found {$total} tours in wp_posts (old system)");
-        error_log("[Yatra Migration] Found {$existingTripsCount} trips in yatra_trips (new system)");
-        error_log("[Yatra Migration] ========================================");
-        
         // List all tour IDs and titles for debugging
         foreach ($oldTrips as $idx => $trip) {
-            error_log("[Yatra Migration] Tour " . ($idx + 1) . ": ID={$trip->ID}, Title={$trip->post_title}, Slug={$trip->post_name}, Status={$trip->post_status}");
-        }
+            }
 
         foreach ($oldTrips as $oldTrip) {
             try {
@@ -57,8 +50,7 @@ class TripMigration extends BaseMigration
                 if ($this->isForceMigration()) {
                     // Force migration: Always insert new (create duplicates)
                     $slug = $this->generateUniqueSlug($baseSlug, 'yatra_trips');
-                    error_log("[Yatra Migration] Force mode: Will insert new trip with unique slug: {$slug}");
-                } else {
+                    } else {
                     // Regular migration: Check if already exists
                     $existingTripId = $this->wpdb->get_var($this->wpdb->prepare(
                         "SELECT id FROM " . TripsTable::getTableName() . " WHERE slug = %s",
@@ -138,8 +130,6 @@ class TripMigration extends BaseMigration
 
                 if ($existingTripId && !$this->isForceMigration()) {
                     // Regular migration: Update existing trip
-                    error_log("[Yatra Migration] Regular mode: Updating existing trip ID {$existingTripId} from old tour ID {$oldTrip->ID}");
-                    
                     $updateData = $tripData;
                     unset($updateData['created_at']); // Don't update created_at
                     
@@ -153,8 +143,7 @@ class TripMigration extends BaseMigration
                         $newTripId = $existingTripId;
                         $this->deleteTripRelationships($newTripId);
                         $migrated++;
-                        error_log("[Yatra Migration] Successfully updated trip ID {$existingTripId}");
-                    } else {
+                        } else {
                         $failed++;
                         Logger::error("Failed to update trip ID {$oldTrip->ID}: {$this->wpdb->last_error}", [
                             'source' => 'migration',
@@ -163,15 +152,12 @@ class TripMigration extends BaseMigration
                             'trip_title' => $oldTrip->post_title,
                             'db_error' => $this->wpdb->last_error
                         ]);
-                        error_log("[Yatra Migration] FAILED to update trip: {$this->wpdb->last_error}");
                         $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
                 } else {
                     // Force migration OR new trip: Insert new
                     $mode = $this->isForceMigration() ? 'Force mode' : 'Regular mode (new trip)';
-                    error_log("[Yatra Migration] {$mode}: Inserting new trip from old tour ID {$oldTrip->ID}: {$tripData['title']} (slug: {$tripData['slug']})");
-                    
                     $inserted = $this->wpdb->insert(
                         TripsTable::getTableName(),
                         $tripData
@@ -180,8 +166,7 @@ class TripMigration extends BaseMigration
                     if ($inserted) {
                         $newTripId = $this->wpdb->insert_id;
                         $migrated++;
-                        error_log("[Yatra Migration] Successfully inserted new trip ID {$newTripId}");
-                    } else {
+                        } else {
                         $failed++;
                         Logger::error("Failed to insert trip ID {$oldTrip->ID} into database", [
                             'source' => 'migration',
@@ -190,7 +175,6 @@ class TripMigration extends BaseMigration
                             'trip_title' => $oldTrip->post_title,
                             'db_error' => $this->wpdb->last_error
                         ]);
-                        error_log("[Yatra Migration] FAILED to insert trip: {$this->wpdb->last_error}");
                         $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
@@ -218,17 +202,10 @@ class TripMigration extends BaseMigration
                     'error' => $e->getMessage()
                 ]);
 
-                error_log("[Yatra Migration] FAILED: Exception migrating trip ID {$oldTrip->ID} ({$oldTrip->post_title}): " . $e->getMessage());
-
                 $this->updateProgress('trips', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
 
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Trip Migration Complete");
-        error_log("[Yatra Migration] Migrated: {$migrated}, Skipped: {$skipped}, Failed: {$failed}");
-        error_log("[Yatra Migration] ========================================");
-        
         return compact('migrated', 'skipped', 'failed');
     }
 
@@ -240,14 +217,11 @@ class TripMigration extends BaseMigration
         global $wpdb;
         $table = TripContentTable::getTableName();
         
-        error_log("[Yatra Migration] Starting gallery migration for tour ID {$oldTourId}, trip ID {$newTripId}");
-        
         // Clear existing gallery for this trip (unless force migration)
         if (!$this->isForceMigration()) {
             $deleted = $wpdb->delete($table, ['trip_id' => $newTripId], ['%d']);
             if ($deleted) {
-                error_log("[Yatra Migration] Cleared {$deleted} existing gallery images for trip {$newTripId}");
-            }
+                }
         }
         
         // Direct database query to find ALL gallery-related meta
@@ -260,13 +234,10 @@ class TripMigration extends BaseMigration
         ));
         
         if (!empty($allGalleryMeta)) {
-            error_log("[Yatra Migration] Found " . count($allGalleryMeta) . " gallery-related meta keys in database:");
             foreach ($allGalleryMeta as $metaRow) {
-                error_log("[Yatra Migration]   - {$metaRow->meta_key}: " . substr($metaRow->meta_value, 0, 100));
-            }
+                }
         } else {
-            error_log("[Yatra Migration] No gallery-related meta found in database for tour {$oldTourId}");
-        }
+            }
         
         $galleryImages = [];
         
@@ -293,22 +264,17 @@ class TripMigration extends BaseMigration
         foreach ($galleryKeys as $key) {
             if (isset($meta[$key]) && !empty($meta[$key])) {
                 $galleryData = $meta[$key];
-                error_log("[Yatra Migration] Found gallery meta key '{$key}' with type: " . gettype($galleryData));
-                error_log("[Yatra Migration] Raw value: " . $galleryData);
-                
                 // Handle comma-separated attachment IDs (e.g., "0,27,26,25,24,23,22,19,18")
                 if (is_string($galleryData) && strpos($galleryData, ',') !== false) {
                     $attachmentIds = array_filter(array_map('intval', explode(',', $galleryData)));
                     if (!empty($attachmentIds)) {
                         $galleryImages = $attachmentIds;
-                        error_log("[Yatra Migration] Parsed comma-separated IDs from '{$key}': " . count($attachmentIds) . " images");
                         break;
                     }
                 }
                 // Handle single attachment ID
                 elseif (is_numeric($galleryData) && intval($galleryData) > 0) {
                     $galleryImages = [intval($galleryData)];
-                    error_log("[Yatra Migration] Single attachment ID from '{$key}'");
                     break;
                 }
                 // Handle serialized data
@@ -316,29 +282,22 @@ class TripMigration extends BaseMigration
                     $unserialized = maybe_unserialize($galleryData);
                     if (is_array($unserialized) && !empty($unserialized)) {
                         $galleryImages = $unserialized;
-                        error_log("[Yatra Migration] Unserialized array from '{$key}' with " . count($unserialized) . " images");
                         break;
                     }
                 }
                 // Handle array data
                 elseif (is_array($galleryData) && !empty($galleryData)) {
                     $galleryImages = $galleryData;
-                    error_log("[Yatra Migration] Array data from '{$key}' with " . count($galleryData) . " images");
                     break;
                 }
             }
         }
         
         // Log what keys were checked
-        error_log("[Yatra Migration] Checked meta keys: " . implode(', ', $galleryKeys));
-        error_log("[Yatra Migration] Available meta keys in array: " . implode(', ', array_keys($meta)));
-        
         // If no gallery meta found, try to get attached images to the tour post
         if (empty($galleryImages)) {
-            error_log("[Yatra Migration] No gallery meta found, checking for attached images to post {$oldTourId}");
             $attachedImages = get_attached_media('image', $oldTourId);
             if (!empty($attachedImages)) {
-                error_log("[Yatra Migration] Found " . count($attachedImages) . " attached images");
                 foreach ($attachedImages as $attachment) {
                     $galleryImages[] = [
                         'id' => $attachment->ID,
@@ -349,17 +308,14 @@ class TripMigration extends BaseMigration
                     ];
                 }
             } else {
-                error_log("[Yatra Migration] No attached images found for tour {$oldTourId}");
-            }
+                }
         }
         
         // Migrate gallery images to new format
         if (empty($galleryImages)) {
-            error_log("[Yatra Migration] No gallery images to migrate for tour {$oldTourId}");
             return;
         }
         
-        error_log("[Yatra Migration] Migrating " . count($galleryImages) . " gallery images");
         $order = 0;
         $migrated = 0;
         $failed = 0;
@@ -378,13 +334,11 @@ class TripMigration extends BaseMigration
                     
                     // Skip invalid IDs (like 0)
                     if ($imageId <= 0) {
-                        error_log("[Yatra Migration] Skipping invalid attachment ID: {$imageId}");
                         continue;
                     }
                     
                     $imageUrl = wp_get_attachment_url($imageId);
                     if (!$imageUrl) {
-                        error_log("[Yatra Migration] Attachment ID {$imageId} has no URL, skipping");
                         continue;
                     }
                     
@@ -395,9 +349,7 @@ class TripMigration extends BaseMigration
                         $caption = $attachment->post_excerpt ?: '';
                     }
                     
-                    error_log("[Yatra Migration] Processing attachment ID {$imageId}: {$imageUrl}");
-                    
-                } elseif (is_string($image)) {
+                    } elseif (is_string($image)) {
                     // URL string
                     $imageUrl = $image;
                     $thumbnailUrl = $imageUrl;
@@ -431,18 +383,14 @@ class TripMigration extends BaseMigration
                     if ($result) {
                         $migrated++;
                         $order++;
-                        error_log("[Yatra Migration] Inserted gallery image {$order}: {$imageUrl}");
-                    } else {
+                        } else {
                         $failed++;
-                        error_log("[Yatra Migration] Failed to insert gallery image: {$imageUrl} - Error: " . $wpdb->last_error);
-                    }
+                        }
                 } else {
-                    error_log("[Yatra Migration] Skipping gallery item at index {$index} - no valid image URL");
-                }
+                    }
         }
         
-        error_log("[Yatra Migration] Gallery migration complete for tour {$oldTourId}: {$migrated} migrated, {$failed} failed");
-    }
+        }
 
     /**
      * Migrate trip highlights from old tour system
@@ -516,8 +464,7 @@ class TripMigration extends BaseMigration
                 }
             }
             
-            error_log("[Yatra Migration] Migrated " . $order . " highlights for tour ID {$oldTourId} to trip ID {$newTripId}");
-        }
+            }
     }
 
     /**
@@ -528,14 +475,11 @@ class TripMigration extends BaseMigration
         global $wpdb;
         $table = TripContentTable::getTableName();
         
-        error_log("[Yatra Migration] Starting FAQ migration for tour ID {$oldTourId}, trip ID {$newTripId}");
-        
         // Clear existing FAQs for this trip (unless force migration)
         if (!$this->isForceMigration()) {
             $deleted = $wpdb->delete($table, ['trip_id' => $newTripId, 'content_type' => 'faq'], ['%d', '%s']);
             if ($deleted) {
-                error_log("[Yatra Migration] Cleared {$deleted} existing FAQs for trip {$newTripId}");
-            }
+                }
         }
         
         $faqs = [];
@@ -556,12 +500,9 @@ class TripMigration extends BaseMigration
         foreach ($faqKeys as $key) {
             if (isset($meta[$key]) && !empty($meta[$key])) {
                 $faqData = $meta[$key];
-                error_log("[Yatra Migration] Found FAQ meta key '{$key}' with type: " . gettype($faqData));
-                
                 if (is_string($faqData)) {
                     $faqData = maybe_unserialize($faqData);
-                    error_log("[Yatra Migration] After unserialize, type: " . gettype($faqData));
-                }
+                    }
                 
                 if (is_array($faqData) && !empty($faqData)) {
                     // Check if this is the faq_repeator format with faq_heading and faq_description
@@ -570,8 +511,6 @@ class TripMigration extends BaseMigration
                         $descriptions = $faqData['faq_description'];
                         
                         if (is_array($headings) && is_array($descriptions)) {
-                            error_log("[Yatra Migration] Found faq_repeator format with " . count($headings) . " FAQs");
-                            
                             // Convert to standard format
                             $faqs = [];
                             $count = min(count($headings), count($descriptions));
@@ -588,7 +527,6 @@ class TripMigration extends BaseMigration
                     } else {
                         // Standard array format
                         $faqs = $faqData;
-                        error_log("[Yatra Migration] Using standard FAQ format from '{$key}' with " . count($faqs) . " FAQs");
                         break;
                     }
                 }
@@ -597,11 +535,9 @@ class TripMigration extends BaseMigration
         
         // Migrate FAQs
         if (empty($faqs)) {
-            error_log("[Yatra Migration] No FAQs to migrate for tour {$oldTourId}");
             return;
         }
         
-        error_log("[Yatra Migration] Migrating " . count($faqs) . " FAQs");
         $order = 0;
         $migrated = 0;
         $failed = 0;
@@ -631,18 +567,14 @@ class TripMigration extends BaseMigration
                 if ($result) {
                     $migrated++;
                     $order++;
-                    error_log("[Yatra Migration] Inserted FAQ {$order}: " . substr($question, 0, 50));
-                } else {
+                    } else {
                     $failed++;
-                    error_log("[Yatra Migration] Failed to insert FAQ: " . $wpdb->last_error);
-                }
+                    }
             } else {
-                error_log("[Yatra Migration] Skipping FAQ with empty question or answer");
-            }
+                }
         }
         
-        error_log("[Yatra Migration] FAQ migration complete for tour {$oldTourId}: {$migrated} migrated, {$failed} failed");
-    }
+        }
 
     /**
      * Migrate availability date ranges from old tour system
@@ -676,9 +608,6 @@ class TripMigration extends BaseMigration
         $availabilityData = null;
         $foundKey = null;
         
-        error_log("[Yatra Migration] Checking availability for tour ID {$oldTourId}, trip ID {$newTripId}");
-        error_log("[Yatra Migration] Available meta keys: " . implode(', ', array_keys($meta)));
-        
         // Also try direct database query to ensure we're not missing data
         $directMetaQuery = $wpdb->get_results($wpdb->prepare(
             "SELECT meta_key, meta_value FROM {$wpdb->prefix}postmeta WHERE post_id = %d AND meta_key LIKE %s",
@@ -687,42 +616,32 @@ class TripMigration extends BaseMigration
         ));
         
         if (!empty($directMetaQuery)) {
-            error_log("[Yatra Migration] Direct DB query found " . count($directMetaQuery) . " availability meta entries");
             foreach ($directMetaQuery as $metaRow) {
-                error_log("[Yatra Migration] DB Meta: {$metaRow->meta_key} = " . substr($metaRow->meta_value, 0, 150));
-            }
+                }
         }
         
         foreach ($availabilityKeys as $key) {
             if (isset($meta[$key])) {
                 $availabilityData = $meta[$key];
-                error_log("[Yatra Migration] Found meta key '{$key}' with value type: " . gettype($availabilityData));
-                error_log("[Yatra Migration] Raw value: " . substr(print_r($availabilityData, true), 0, 300));
-                
                 if (is_string($availabilityData)) {
                     $availabilityData = maybe_unserialize($availabilityData);
-                    error_log("[Yatra Migration] After unserialize, type: " . gettype($availabilityData));
                     if (is_array($availabilityData) || is_object($availabilityData)) {
-                        error_log("[Yatra Migration] Unserialized value: " . substr(print_r($availabilityData, true), 0, 300));
-                    }
+                        }
                 }
                 
                 // Check if it's an empty array string like '[]'
                 if (is_string($availabilityData) && trim($availabilityData) === '[]') {
-                    error_log("[Yatra Migration] Meta key '{$key}' contains empty array string");
                     continue;
                 }
                 
                 if (!empty($availabilityData)) {
                     $foundKey = $key;
-                    error_log("[Yatra Migration] Using availability dates from meta key: {$key}");
                     break;
                 }
             }
         }
         
         if (empty($availabilityData)) {
-            error_log("[Yatra Migration] No availability dates found for tour ID {$oldTourId} - checked keys: " . implode(', ', $availabilityKeys));
             return;
         }
         
@@ -734,8 +653,7 @@ class TripMigration extends BaseMigration
             $jsonDecoded = json_decode($availabilityData, true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($jsonDecoded)) {
                 $availabilityData = $jsonDecoded;
-                error_log("[Yatra Migration] Decoded JSON availability data for tour ID {$oldTourId}");
-            }
+                }
         }
         
         if (is_array($availabilityData)) {
@@ -751,15 +669,13 @@ class TripMigration extends BaseMigration
                     
                     if ($start && $end) {
                         $dateRanges[] = ['start' => $start, 'end' => $end];
-                        error_log("[Yatra Migration] Parsed date range: {$start} to {$end}");
-                    }
+                        }
                 } elseif (is_string($dateRange)) {
                     // Format: "2025-12-25 - 2026-01-18"
                     $parts = preg_split('/\s*[-–—]\s*/', $dateRange, 2);
                     if (count($parts) === 2) {
                         $dateRanges[] = ['start' => trim($parts[0]), 'end' => trim($parts[1])];
-                        error_log("[Yatra Migration] Parsed string date range: {$parts[0]} to {$parts[1]}");
-                    }
+                        }
                 }
             }
         } elseif (is_string($availabilityData)) {
@@ -773,13 +689,11 @@ class TripMigration extends BaseMigration
                 $parts = preg_split('/\s*[-–—]\s*/', $line, 2);
                 if (count($parts) === 2) {
                     $dateRanges[] = ['start' => trim($parts[0]), 'end' => trim($parts[1])];
-                    error_log("[Yatra Migration] Parsed plain string date range: {$parts[0]} to {$parts[1]}");
-                }
+                    }
             }
         }
         
         if (empty($dateRanges)) {
-            error_log("[Yatra Migration] Could not parse availability dates for tour ID {$oldTourId}");
             return;
         }
         
@@ -791,7 +705,6 @@ class TripMigration extends BaseMigration
             
             // Validate dates
             if (!strtotime($startDate) || !strtotime($endDate)) {
-                error_log("[Yatra Migration] Invalid date range: {$startDate} - {$endDate}");
                 continue;
             }
             
@@ -838,14 +751,11 @@ class TripMigration extends BaseMigration
             
             if ($inserted) {
                 $created++;
-                error_log("[Yatra Migration] Created availability date: {$startDate} to {$endDate} for trip ID {$newTripId}");
-            } else {
-                error_log("[Yatra Migration] Failed to create availability date: {$wpdb->last_error}");
-            }
+                } else {
+                }
         }
         
         if ($created > 0) {
-            error_log("[Yatra Migration] Migrated {$created} availability date ranges for tour ID {$oldTourId} to trip ID {$newTripId}");
-        }
+            }
     }
 }

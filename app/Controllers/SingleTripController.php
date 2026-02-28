@@ -802,10 +802,8 @@ class SingleTripController
                     $trip_id
                 )
             );
-            error_log('Yatra Media Debug: Trip ID ' . $trip_id . ' - Content types in database:');
             foreach ($all_content as $content) {
-                error_log('  - ' . $content->content_type . ': ' . $content->count);
-            }
+                }
         }
         
         $youtube_videos = $this->wpdb->get_results(

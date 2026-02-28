@@ -1099,9 +1099,7 @@ class Trip
             
             // Debug logging for development
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Trip {$this->id} permalink generated: {$permalink}");
-                error_log("Trip slug: " . ($this->slug ?? 'empty'));
-            }
+                }
             
             return $permalink;
         }

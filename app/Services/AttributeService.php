@@ -403,8 +403,6 @@ class AttributeService extends BaseService
 
             // Process icon field
             if (isset($data['icon'])) {
-                error_log('DEBUG: AttributeService create - Icon data before processing: ' . var_export($data['icon'], true));
-                
                 if (is_array($data['icon'])) {
                     // Sanitize icon array
                     $icon = [
@@ -416,15 +414,12 @@ class AttributeService extends BaseService
                             : '',
                     ];
                     $data['icon'] = maybe_serialize($icon);
-                    error_log('DEBUG: AttributeService create - Icon data after processing: ' . var_export($data['icon'], true));
-                } elseif (is_string($data['icon'])) {
+                    } elseif (is_string($data['icon'])) {
                     // If it's already a string, sanitize it
                     $data['icon'] = sanitize_text_field($data['icon']);
-                    error_log('DEBUG: AttributeService create - Icon as string: ' . var_export($data['icon'], true));
-                }
+                    }
             } else {
-                error_log('DEBUG: AttributeService create - Icon data not set');
-            }
+                }
 
             $attributeId = $this->attributeRepository->create($data);
             
@@ -490,8 +485,6 @@ class AttributeService extends BaseService
 
             // Process icon field
             if (isset($data['icon'])) {
-                error_log('DEBUG: AttributeService update - Icon data before processing: ' . var_export($data['icon'], true));
-                
                 if (is_array($data['icon'])) {
                     // Sanitize icon array
                     $icon = [
@@ -503,15 +496,12 @@ class AttributeService extends BaseService
                             : '',
                     ];
                     $data['icon'] = maybe_serialize($icon);
-                    error_log('DEBUG: AttributeService update - Icon data after processing: ' . var_export($data['icon'], true));
-                } elseif (is_string($data['icon'])) {
+                    } elseif (is_string($data['icon'])) {
                     // If it's already a string, sanitize it
                     $data['icon'] = sanitize_text_field($data['icon']);
-                    error_log('DEBUG: AttributeService update - Icon as string: ' . var_export($data['icon'], true));
-                }
+                    }
             } else {
-                error_log('DEBUG: AttributeService update - Icon data not set');
-            }
+                }
 
             $result = $this->attributeRepository->update($id, $data);
             
@@ -769,28 +759,21 @@ class AttributeService extends BaseService
     {
         try {
             if (!$tripId || empty($attributes)) {
-                error_log("Yatra AttributeService: bulkUpdateTripAttributes - INVALID INPUT: trip_id={$tripId}, attributes=" . json_encode($attributes));
                 return false;
             }
-
-            error_log("Yatra AttributeService: bulkUpdateTripAttributes - START: trip_id={$tripId}, attribute_count=" . count($attributes));
 
             // Use repository layer for transaction handling
             $success = $this->tripAttributeRepository->saveTripAttributes($tripId, $attributes);
             
             if ($success) {
-                error_log("Yatra AttributeService: bulkUpdateTripAttributes - COMMIT SUCCESS");
-                
                 // Fire bulk update hook
                 do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
                 
                 // Clear cache
                 $this->clearTripAttributeCache($tripId);
             } else {
-                error_log("Yatra AttributeService: bulkUpdateTripAttributes - FAILED");
-            }
+                }
             
-            error_log("Yatra AttributeService: bulkUpdateTripAttributes - FINAL RESULT: " . var_export($success, true));
             return $success;
             
         } catch (\Exception $e) {

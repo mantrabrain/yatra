@@ -279,8 +279,6 @@ class MigrationProgress
             // Update progress to 'failed'
             $this->updateProgress($dataType, 'failed', 0, 0, 0, 0, null, current_time('mysql'));
             
-            error_log("[Yatra Migration] FAILED: Migration failed for {$dataType}: {$e->getMessage()}");
-            
             return [
                 'success' => false,
                 'data_type' => $dataType,
@@ -381,8 +379,6 @@ class MigrationProgress
             // Schedule migrations for each data type
             $scheduledActions = [];
             foreach ($this->dataTypesOrder as $dataType) {
-                error_log("[Yatra Migration] Scheduling action for: {$dataType}");
-                
                 $args = [
                     'data_type' => $dataType,
                 ];
@@ -398,12 +394,8 @@ class MigrationProgress
                     'yatra_migration'
                 );
                 
-                error_log("[Yatra Migration] Action scheduled for {$dataType}, ID: {$actionId}");
-                
                 $scheduledActions[$dataType] = $actionId;
             }
-            
-            error_log("[Yatra Migration] All actions scheduled: " . json_encode($scheduledActions));
             
             $response = [
                 'success' => true,
@@ -756,8 +748,7 @@ class MigrationProgress
             } catch (\Exception $e) {
                 $failed++;
                 $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                error_log("Coupon migration failed for ID {$oldCoupon->ID}: " . $e->getMessage());
-            }
+                }
         }
         
         return [
@@ -849,8 +840,7 @@ class MigrationProgress
             } catch (\Exception $e) {
                 $failed++;
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
-                error_log("Tour date migration failed for ID {$oldDate->id}: " . $e->getMessage());
-            }
+                }
         }
         
         return [
@@ -1034,7 +1024,6 @@ class MigrationProgress
                 }
             }
         } catch (\Throwable $e) {
-            error_log('[Yatra Migration] Failed to manually kick Action Scheduler: ' . $e->getMessage());
-        }
+            }
     }
 }

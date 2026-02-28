@@ -117,8 +117,7 @@ class BookingCronService
 
         // Log the operation
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('Yatra: Sent %d booking reminders for travel date %s', count($bookings), $target_date));
-        }
+            }
     }
 
     /**
@@ -220,8 +219,7 @@ class BookingCronService
 
         // Log the operation
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('Yatra: Expired %d pending bookings', count($expired_bookings)));
-        }
+            }
     }
 
     /**

@@ -51,8 +51,7 @@ class AttributeController extends BaseController
     public function register_routes(): void
     {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra AttributeController: Registering routes');
-        }
+            }
         
         // Standard CRUD routes
         $this->registerCrudRoutes();
@@ -320,8 +319,6 @@ class AttributeController extends BaseController
             $data = $this->prepare_item_for_database($request);
             
             // Debug logging for icon data
-            error_log('DEBUG: Create attribute - Icon data in prepared data: ' . var_export(isset($data['icon']) ? $data['icon'] : 'NOT SET', true));
-            
             // Handle slug conflicts by generating unique slug if needed
             $originalSlug = $data['slug'];
             $slug = $originalSlug;
@@ -784,8 +781,7 @@ class AttributeController extends BaseController
         $hasPermission = current_user_can('manage_options');
         
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra AttributeController: Permission check - ' . ($hasPermission ? 'GRANTED' : 'DENIED'));
-        }
+            }
         
         return $hasPermission;
     }

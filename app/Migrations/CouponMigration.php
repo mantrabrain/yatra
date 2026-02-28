@@ -71,8 +71,7 @@ class CouponMigration extends BaseMigration
             } catch (\Exception $e) {
                 $failed++;
                 $this->updateProgress('coupons', 'running', $migrated, $skipped, $failed, $total, null, null);
-                error_log("Coupon migration failed for ID {$oldCoupon->ID}: " . $e->getMessage());
-            }
+                }
         }
 
         return [

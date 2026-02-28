@@ -75,7 +75,6 @@ class TemplateRenderer
     private static function logError(string $message): void
     {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra TemplateRenderer: ' . $message);
-        }
+            }
     }
 }

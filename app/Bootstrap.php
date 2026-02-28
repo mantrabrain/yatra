@@ -44,7 +44,6 @@ class Bootstrap
             return;
         }
 
-        error_log('Yatra: Bootstrap::init() called');
         try {
             // Register service providers first
             $this->registerServiceProviders();
@@ -97,8 +96,7 @@ class Bootstrap
         } catch (\Exception $e) {
             // Log the error
             if (function_exists('error_log')) {
-                error_log('Yatra plugin initialization error: ' . $e->getMessage());
-            }
+                }
             
             // Show admin notice if in admin area
             if (is_admin()) {
@@ -123,15 +121,13 @@ class Bootstrap
         if (file_exists($helpersPath)) {
             require_once $helpersPath;
         } else {
-            error_log('Yatra: helpers.php file not found at: ' . $helpersPath);
-        }
+            }
         
         $seoHelperPath = YATRA_PLUGIN_PATH . 'includes/seo-helper.php';
         if (file_exists($seoHelperPath)) {
             require_once $seoHelperPath;
         } else {
-            error_log('Yatra: seo-helper.php file not found at: ' . $seoHelperPath);
-        }
+            }
     }
 
     /**
@@ -142,16 +138,13 @@ class Bootstrap
      */
     private function registerServiceProviders(): void
     {
-        error_log('Yatra: registerServiceProviders() called');
         $providers = [];
         
         // Core providers
         if (class_exists('Yatra\Providers\AppServiceProvider')) {
-            error_log('Yatra: AppServiceProvider found, adding to providers');
             $providers[] = 'Yatra\Providers\AppServiceProvider';
         } else {
-            error_log('Yatra: AppServiceProvider NOT found');
-        }
+            }
         
         if (class_exists('Yatra\Providers\RouteServiceProvider')) {
             $providers[] = 'Yatra\Providers\RouteServiceProvider';
@@ -174,7 +167,6 @@ class Bootstrap
                     $providerInstance->register();
                 }
             } catch (\Exception $e) {
-                error_log("Failed to register provider {$provider}: " . $e->getMessage());
                 continue;
             }
         }
@@ -187,7 +179,6 @@ class Bootstrap
                     $providerInstance->boot();
                 }
             } catch (\Exception $e) {
-                error_log("Failed to boot provider {$provider}: " . $e->getMessage());
                 continue;
             }
         }
@@ -242,15 +233,11 @@ class Bootstrap
         
         // Register Action Scheduler hook for background migration processing
         add_action('yatra_migrate_data_type', function($dataType, $force = false) {
-            error_log("[Yatra Migration] Action Scheduler hook called for: {$dataType} (force=" . ($force ? 'true' : 'false') . ')');
-            
             if (class_exists('\Yatra\Migrations\MigrationProgress')) {
                 $migrationService = new \Yatra\Migrations\MigrationProgress();
                 $result = $migrationService->processMigration($dataType, (bool) $force);
-                error_log("[Yatra Migration] Migration result for {$dataType}: " . json_encode($result));
-            } else {
-                error_log("[Yatra Migration] ERROR: MigrationProgress class not found!");
-            }
+                } else {
+                }
         }, 10, 2);
     }
 

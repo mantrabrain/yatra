@@ -53,15 +53,13 @@ class TemplateLoader
         }
 
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[Yatra] Confirmation template check for reference: ' . $confirmationId);
-        }
+            }
 
         $bookingRepo = new BookingRepository();
         $booking = $bookingRepo->findByReferenceWithTrip($confirmationId) ?: $bookingRepo->findByReference($confirmationId);
         if (!$booking) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[Yatra] Confirmation booking not found for reference: ' . $confirmationId);
-            }
+                }
             return $template;
         }
 
@@ -76,14 +74,12 @@ class TemplateLoader
         $template_path = YATRA_PLUGIN_PATH . 'templates/booking-confirmation.php';
         if (file_exists($template_path)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[Yatra] Loading booking confirmation template for reference: ' . $confirmationId);
-            }
+                }
             return $template_path;
         }
 
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[Yatra] Booking confirmation template not found at: ' . $template_path);
-        }
+            }
         return $template;
     }
 

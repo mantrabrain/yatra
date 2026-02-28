@@ -40,16 +40,8 @@ class TourDateMigration extends BaseMigration
             'count' => $total
         ]);
 
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Starting Tour Dates Migration");
-        error_log("[Yatra Migration] Found {$total} tour dates in old system");
-        error_log("[Yatra Migration] Force migration: " . ($this->isForceMigration() ? 'YES' : 'NO'));
-        error_log("[Yatra Migration] ========================================");
-
         foreach ($oldTourDates as $oldDate) {
             try {
-                error_log("[Yatra Migration] Processing tour date ID {$oldDate->id} for tour {$oldDate->tour_id}");
-                
                 // Check if already migrated (only for regular migration)
                 $existsInAvailability = null;
                 
@@ -66,14 +58,12 @@ class TourDateMigration extends BaseMigration
                     ));
 
                     if ($existsInAvailability) {
-                        error_log("[Yatra Migration] Tour date {$oldDate->id} already migrated, skipping...");
                         $skipped++;
                         $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
                 } else {
-                    error_log("[Yatra Migration] Force mode: Will insert new tour date records");
-                }
+                    }
 
                 $newTripId = $this->getMigratedTripId($oldDate->tour_id);
 
@@ -94,8 +84,6 @@ class TourDateMigration extends BaseMigration
                 $discountedPrice = null;
                 $pricingType = 'regular';
                 $priceTypes = null;
-                
-                error_log("[Yatra Migration] Raw pricing data for tour date {$oldDate->id}: " . print_r($pricing, true));
                 
                 if (is_array($pricing)) {
                     // Check various formats for traveler-based pricing
@@ -128,8 +116,7 @@ class TourDateMigration extends BaseMigration
                             $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
                             $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
                             $hasTravelerPricing = true;
-                            error_log("[Yatra Migration] Traveler-based pricing (format 1) with " . count($priceTypesArray) . " categories");
-                        }
+                            }
                     }
                     
                     // Format 2: Direct traveler_categories array
@@ -157,8 +144,7 @@ class TourDateMigration extends BaseMigration
                             $originalPrice = $priceTypesArray[0]['original_price'] ?? null;
                             $discountedPrice = $priceTypesArray[0]['discounted_price'] ?? null;
                             $hasTravelerPricing = true;
-                            error_log("[Yatra Migration] Traveler-based pricing (format 2) with " . count($priceTypesArray) . " categories");
-                        }
+                            }
                     }
                     
                     // Format 3: Regular pricing (single price for all)
@@ -172,14 +158,11 @@ class TourDateMigration extends BaseMigration
                             $discountedPrice = null;
                         }
                         
-                        error_log("[Yatra Migration] Regular pricing - original: {$originalPrice}, discounted: {$discountedPrice}");
-                    }
+                        }
                 }
                 
-                error_log("[Yatra Migration] Parsed pricing - Type: {$pricingType}, Original: {$originalPrice}, Discounted: {$discountedPrice}");
                 if ($priceTypes) {
-                    error_log("[Yatra Migration] Price types JSON: {$priceTypes}");
-                }
+                    }
 
                 // Migrate to yatra_trip_availability_dates
                 if (!$existsInAvailability || $this->isForceMigration()) {
@@ -212,8 +195,6 @@ class TourDateMigration extends BaseMigration
                         'updated_at' => $oldDate->updated_at ?? current_time('mysql'),
                     ];
                     
-                    error_log("[Yatra Migration] Inserting availability with pricing_type={$pricingType}, price_types=" . ($priceTypes ? 'YES' : 'NO'));
-
                     $wpdb->insert(
                         $wpdb->prefix . 'yatra_trip_availability_dates',
                         $availabilityData
@@ -223,7 +204,6 @@ class TourDateMigration extends BaseMigration
                     
                     if (!$insertedId) {
                         $failed++;
-                        error_log("[Yatra Migration] Failed to insert availability for tour date {$oldDate->id}: " . $wpdb->last_error);
                         Logger::error("Failed to insert availability date", [
                             'source' => 'migration',
                             'tour_date_id' => $oldDate->id,
@@ -232,11 +212,9 @@ class TourDateMigration extends BaseMigration
                         $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
                         continue;
                     }
-                    error_log("[Yatra Migration] Inserted availability ID {$insertedId} for tour date {$oldDate->id} (departure: {$oldDate->start_date}, return: {$oldDate->end_date}, pricing: {$pricingType})");
-                }
+                    }
 
                 $migrated++;
-                error_log("[Yatra Migration] Successfully migrated tour date {$oldDate->id} to trip {$newTripId}");
                 Logger::info("Migrated tour date to availability", [
                     'source' => 'migration',
                     'old_tour_date_id' => $oldDate->id,
@@ -248,7 +226,6 @@ class TourDateMigration extends BaseMigration
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
             } catch (\Exception $e) {
                 $failed++;
-                error_log("[Yatra Migration] Exception migrating tour date {$oldDate->id}: " . $e->getMessage());
                 Logger::error("Tour date migration exception", [
                     'source' => 'migration',
                     'tour_date_id' => $oldDate->id,
@@ -257,11 +234,6 @@ class TourDateMigration extends BaseMigration
                 $this->updateProgress('tour_dates', 'running', $migrated, $skipped, $failed, $total, null, null);
             }
         }
-
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Tour Dates Migration Complete");
-        error_log("[Yatra Migration] Migrated: {$migrated}, Skipped: {$skipped}, Failed: {$failed}");
-        error_log("[Yatra Migration] ========================================");
 
         return [
             'migrated' => $migrated,

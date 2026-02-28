@@ -124,8 +124,6 @@ class MollieGateway extends AbstractPaymentGateway
                 $paymentRequest['webhookUrl'] = site_url('/wp-json/yatra/v1/payment/mollie/webhook');
             }
             
-            error_log('[Yatra Mollie] Creating payment: ' . print_r($paymentRequest, true));
-
             // Add Mollie-specific payment method if specified (not the generic payment_method field)
             // Mollie methods: creditcard, ideal, bancontact, sofort, etc.
             if (!empty($paymentData['mollie_method'])) {
@@ -134,12 +132,8 @@ class MollieGateway extends AbstractPaymentGateway
 
             $response = $this->makeApiRequest('POST', '/payments', $paymentRequest, $apiKey);
             
-            error_log('[Yatra Mollie] API Response: ' . print_r($response, true));
-
             if (isset($response['id'])) {
                 $checkoutUrl = $response['_links']['checkout']['href'] ?? '';
-                error_log('[Yatra Mollie] Checkout URL: ' . $checkoutUrl);
-                
                 return [
                     'success' => true,
                     'transaction_id' => $response['id'],
@@ -152,7 +146,6 @@ class MollieGateway extends AbstractPaymentGateway
             throw new \Exception($errorMessage);
 
         } catch (\Exception $e) {
-            error_log('[Yatra Mollie] Payment Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -187,7 +180,6 @@ class MollieGateway extends AbstractPaymentGateway
             ];
 
         } catch (\Exception $e) {
-            error_log('Mollie Webhook Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -331,26 +323,18 @@ class MollieGateway extends AbstractPaymentGateway
      */
     public function handlePaymentReturn($booking, $bookingRepository): void
     {
-        error_log('[Yatra Mollie] handlePaymentReturn called for booking: ' . ($booking->id ?? 'unknown'));
-        
         // Get payment ID from booking's session ID
         $paymentId = $booking->payment_session_id ?? '';
         
         if (empty($paymentId)) {
-            error_log('[Yatra Mollie] No payment_session_id found');
             return;
         }
         
-        error_log('[Yatra Mollie] Verifying payment: ' . $paymentId);
         $result = $this->verifyPayment($paymentId);
-        error_log('[Yatra Mollie] Verify result: ' . print_r($result, true));
-        
         if ($result['success'] && $result['status'] === 'completed') {
-            error_log('[Yatra Mollie] Payment completed, recording...');
             $this->completePayment($booking, $bookingRepository, $paymentId, $result);
         } else {
-            error_log('[Yatra Mollie] Payment not completed. Status: ' . ($result['status'] ?? 'unknown'));
-        }
+            }
     }
     
     /**

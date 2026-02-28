@@ -30,12 +30,9 @@ class DepartureCronService
      */
     public function dailyStatusUpdate(): void
     {
-        error_log('Yatra: Running daily departure status update');
-        
         $updated = $this->repository->recalculateAllStatuses();
         
-        error_log("Yatra: Updated {$updated} departure statuses");
-    }
+        }
 
     /**
      * Register WordPress cron hook

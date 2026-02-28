@@ -65,7 +65,6 @@ class SquareGateway extends AbstractPaymentGateway
     {
         // Check if API credentials are configured
         if (empty($this->config['application_id']) || empty($this->config['access_token']) || empty($this->config['location_id'])) {
-            error_log('[Yatra Square] API credentials not configured');
             return [
                 'success' => false,
                 'error' => __('Square API credentials are not configured. Please configure them in settings.', 'yatra'),
@@ -82,8 +81,6 @@ class SquareGateway extends AbstractPaymentGateway
         // If we have a source_id (card token from frontend), complete the payment directly
         $sourceId = $paymentData['square_source_id'] ?? '';
         if (!empty($sourceId)) {
-            error_log('[Yatra Square] Processing payment with source_id for booking: ' . $bookingId);
-            
             $result = $this->createPayment([
                 'source_id' => $sourceId,
                 'booking_id' => $bookingId,
@@ -104,8 +101,6 @@ class SquareGateway extends AbstractPaymentGateway
         }
         
         // No source_id - return config for frontend to tokenize card
-        error_log('[Yatra Square] Returning requires_action for booking: ' . $bookingId);
-        
         return [
             'success' => true,
             'requires_action' => 'square_payment',

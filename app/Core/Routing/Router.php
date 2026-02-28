@@ -218,7 +218,6 @@ class Router
     private function logError(string $message): void
     {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('Yatra Router: ' . $message);
-        }
+            }
     }
 }

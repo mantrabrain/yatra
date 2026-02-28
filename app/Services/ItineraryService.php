@@ -128,9 +128,6 @@ class ItineraryService
      */
     public function create(array $data): int
     {
-        error_log("[YATRA DEBUG] ItineraryService::create - Input data: " . print_r($data, true));
-        error_log("[YATRA DEBUG] ItineraryService::create - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
-        
         $this->validate($data);
         
         global $wpdb;
@@ -141,8 +138,6 @@ class ItineraryService
         
         // Check for database errors
         if ($wpdb->last_error) {
-            error_log("[YATRA ERROR] Database error during create: " . $wpdb->last_error);
-            
             // Check for duplicate entry error
             if (strpos($wpdb->last_error, 'Duplicate entry') !== false) {
                 throw new \Exception('A day with this number already exists for this trip. Please choose a different day number.');
@@ -151,7 +146,6 @@ class ItineraryService
             throw new \Exception('Failed to create itinerary entry. Please try again.');
         }
         
-        error_log("[YATRA DEBUG] ItineraryService::create - Repository result: $result");
         return $result;
     }
 
@@ -163,9 +157,6 @@ class ItineraryService
      */
     public function update(int $id, array $data, ?string $mode = null): bool
     {
-        error_log("[YATRA DEBUG] ItineraryService::update - ID: $id, mode: " . ($mode ?? 'NULL') . ", Input data: " . print_r($data, true));
-        error_log("[YATRA DEBUG] ItineraryService::update - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
-        
         $this->validate($data, $id);
         
         global $wpdb;
@@ -176,8 +167,6 @@ class ItineraryService
         
         // Check for database errors
         if ($wpdb->last_error) {
-            error_log("[YATRA ERROR] Database error during update: " . $wpdb->last_error);
-            
             // Check for duplicate entry error
             if (strpos($wpdb->last_error, 'Duplicate entry') !== false) {
                 throw new \Exception('A day with this number already exists for this trip. Please choose a different day number.');
@@ -186,7 +175,6 @@ class ItineraryService
             throw new \Exception('Failed to update itinerary entry. Please try again.');
         }
         
-        error_log("[YATRA DEBUG] ItineraryService::update - Repository result: " . ($result ? 'TRUE' : 'FALSE'));
         return $result;
     }
 
@@ -195,9 +183,7 @@ class ItineraryService
      */
     public function find(int $id): ?\stdClass
     {
-        error_log("[YATRA DEBUG] ItineraryService::find - Called with ID: $id");
         $result = $this->repository->getEntryWithRelations($id);
-        error_log("[YATRA DEBUG] ItineraryService::find - Result day_description: " . ($result->day_description ?? 'NULL_OR_EMPTY是社会'));
         return $result;
     }
     

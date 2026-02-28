@@ -90,7 +90,6 @@ class RazorpayGateway extends AbstractPaymentGateway
     {
         // Check if API keys are configured
         if (empty($this->config['key_id']) || empty($this->config['key_secret'])) {
-            error_log('[Yatra Razorpay] API keys not configured');
             return [
                 'success' => false,
                 'error' => __('Razorpay API keys are not configured. Please configure them in settings.', 'yatra'),
@@ -115,19 +114,14 @@ class RazorpayGateway extends AbstractPaymentGateway
             ],
         ];
         
-        error_log('[Yatra Razorpay] Creating order: ' . wp_json_encode($orderData));
-
         $response = $this->makeRequest("{$this->apiBase}/orders", [
             'method' => 'POST',
             'headers' => $this->getHeaders(),
             'body' => wp_json_encode($orderData),
         ]);
         
-        error_log('[Yatra Razorpay] Order response: ' . wp_json_encode($response));
-
         if (!$response['success'] || empty($response['body']['id'])) {
             $errorMsg = $response['body']['error']['description'] ?? ($response['error'] ?? __('Failed to create order', 'yatra'));
-            error_log('[Yatra Razorpay] Order creation failed: ' . $errorMsg);
             return [
                 'success' => false,
                 'error' => $errorMsg,

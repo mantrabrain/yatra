@@ -37,16 +37,14 @@ class BookingRepository extends BaseRepository
             if ($exists === $candidate) {
                 $this->resolvedBookingsTable = $candidate;
                 if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('[Yatra] BookingRepository using table: ' . $candidate);
-                }
+                    }
                 return $candidate;
             }
         }
         // Fallback to default
         $this->resolvedBookingsTable = BookingsTable::getTableName();
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[Yatra] BookingRepository fallback table: ' . $this->resolvedBookingsTable);
-        }
+            }
         return $this->resolvedBookingsTable;
     }
 
@@ -203,8 +201,7 @@ class BookingRepository extends BaseRepository
 
         $row = $this->wpdb->get_row($query);
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[Yatra] findByReference table=' . $table . ' ref=' . $reference . ' found=' . (!empty($row) ? 'yes' : 'no'));
-        }
+            }
         return $row ?: null;
     }
 

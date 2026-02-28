@@ -105,7 +105,6 @@ class ExportImportRepository
         $result = $wpdb->insert($tableName, $record);
         
         if ($result === false) {
-            error_log("Failed to insert record into {$tableName}: " . $wpdb->last_error);
             return false;
         }
         

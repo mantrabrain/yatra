@@ -115,34 +115,22 @@ abstract class BaseRepository
 
         // DEBUG: Log query execution for TripRepository
         if (defined('WP_DEBUG') && WP_DEBUG && strpos($table, 'yatra_trips') !== false) {
-            error_log('YATRA TRIP QUERY DEBUG - Table: ' . $table);
-            error_log('YATRA TRIP QUERY DEBUG - Final SQL: ' . $query);
-            
             // Add direct SQL count to verify database state
             $direct_count = (int) $this->wpdb->get_var("SELECT COUNT(*) FROM `{$table}`");
-            error_log('YATRA TRIP QUERY DEBUG - Direct count without WHERE: ' . $direct_count);
-            
             // Check status distribution
             $status_counts = $this->wpdb->get_results("SELECT status, COUNT(*) as count FROM `{$table}` GROUP BY status");
-            error_log('YATRA TRIP QUERY DEBUG - Status distribution: ' . print_r($status_counts, true));
-            
             // Check deleted_at column
             $deleted_count = (int) $this->wpdb->get_var("SELECT COUNT(*) FROM `{$table}` WHERE deleted_at IS NOT NULL AND deleted_at != '0000-00-00 00:00:00'");
-            error_log('YATRA TRIP QUERY DEBUG - Deleted items count: ' . $deleted_count);
-        }
+            }
 
         $results = $this->wpdb->get_results($query) ?: [];
         
         // DEBUG: Log results for TripRepository
         if (defined('WP_DEBUG') && WP_DEBUG && strpos($table, 'yatra_trips') !== false) {
-            error_log('YATRA TRIP QUERY DEBUG - Results count: ' . count($results));
-            error_log('YATRA TRIP QUERY DEBUG - Args: ' . print_r($args, true));
             if (!empty($results)) {
-                error_log('YATRA TRIP QUERY DEBUG - First result sample: ' . print_r($results[0], true));
-            }
+                }
             if ($this->wpdb->last_error) {
-                error_log('YATRA TRIP QUERY DEBUG - SQL Error: ' . $this->wpdb->last_error);
-            }
+                }
         }
 
         return $results;
@@ -176,10 +164,7 @@ abstract class BaseRepository
 
         // DEBUG: Log the update attempt
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] BaseRepository - Attempting update on table: ' . $this->table);
-            error_log('[YATRA DEBUG] BaseRepository - ID: ' . $id);
-            error_log('[YATRA DEBUG] BaseRepository - Data: ' . print_r($data, true));
-        }
+            }
 
         $result = $this->wpdb->update(
             $this->table,
@@ -193,11 +178,7 @@ abstract class BaseRepository
         
         // DEBUG: Log the result
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] BaseRepository - WPDB update result: ' . $result);
-            error_log('[YATRA DEBUG] BaseRepository - Update success: ' . ($success ? 'YES' : 'NO'));
-            error_log('[YATRA DEBUG] BaseRepository - WPDB last error: ' . $this->wpdb->last_error);
-            error_log('[YATRA DEBUG] BaseRepository - WPDB last query: ' . $this->wpdb->last_query);
-        }
+            }
 
         return $success;
     }
@@ -209,8 +190,7 @@ abstract class BaseRepository
     {
         // DEBUG: Log repository delete attempt
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] BaseRepository - Attempting hard delete from table ' . $this->table . ' for ID: ' . $id);
-        }
+            }
         
         $result = $this->wpdb->delete(
             $this->table,
@@ -222,10 +202,8 @@ abstract class BaseRepository
         
         // DEBUG: Log repository delete result
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] BaseRepository - Hard delete result: ' . ($success ? 'SUCCESS' : 'FAILED'));
             if (!$success) {
-                error_log('[YATRA DEBUG] BaseRepository - WPDB error: ' . $this->wpdb->last_error);
-            }
+                }
         }
 
         return $success;
@@ -261,10 +239,7 @@ abstract class BaseRepository
 
         // DEBUG: Check for soft delete
         if (defined('WP_DEBUG') && WP_DEBUG && strpos($this->table, 'yatra_trips') !== false) {
-            error_log('[YATRA DEBUG] BaseRepository buildWhereClause - Table: ' . $this->table);
-            error_log('[YATRA DEBUG] BaseRepository buildWhereClause - Has soft delete: ' . ($this->hasSoftDelete() ? 'YES' : 'NO'));
-            error_log('[YATRA DEBUG] BaseRepository buildWhereClause - Conditions before soft delete: ' . print_r($conditions, true));
-        }
+            }
 
         // Add soft delete condition if table has deleted_at column and not including deleted
         if ($this->hasSoftDelete() && (!isset($args['include_deleted']) || !$args['include_deleted'])) {
@@ -371,9 +346,7 @@ abstract class BaseRepository
 
         // DEBUG: Log count method details for yatra_trips
         if (defined('WP_DEBUG') && WP_DEBUG && strpos($this->table, 'yatra_trips') !== false) {
-            error_log('[YATRA DEBUG] BaseRepository count - Query: ' . $query);
-            error_log('[YATRA DEBUG] BaseRepository count - Args: ' . print_r($args, true));
-        }
+            }
 
         return (int) $this->wpdb->get_var($query);
     }

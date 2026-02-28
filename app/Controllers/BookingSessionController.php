@@ -1080,8 +1080,7 @@ class BookingSessionController extends BaseController
             ]);
         } catch (\Exception $e) {
             // Log error but continue - customer creation is not critical
-            error_log('Yatra: Failed to create customer: ' . $e->getMessage());
-        }
+            }
 
         // Create booking using BookingService
         $booking_service = new \Yatra\Services\BookingService();
@@ -1229,11 +1228,9 @@ class BookingSessionController extends BaseController
                 // Increment booked count for this departure
                 $this->departureService->incrementBookedCount($departure->id, $travelers_count);
 
-                error_log("Yatra: Created/updated departure ID {$departure->id} for booking {$booking_id} on date {$start_date} (end: {$end_date})");
-            } catch (\Exception $e) {
+                } catch (\Exception $e) {
                 // Log error but don't fail the booking
-                error_log('Yatra: Failed to create/update departure for booking: ' . $e->getMessage());
-            }
+                }
         }
 
         // Clear booking session
@@ -1549,9 +1546,7 @@ class BookingSessionController extends BaseController
     {
         // Debug logging
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[Yatra] processPaymentGateway called with gateway: ' . $gateway);
-            error_log('[Yatra] Payment params: ' . print_r($params, true));
-        }
+            }
         
         // All gateways use the unified gateway system
         return $this->processPaymentWithGateway($gateway, $params);
@@ -1590,8 +1585,7 @@ class BookingSessionController extends BaseController
             
             // Debug logging
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('[Yatra Payment] Gateway: ' . $gatewayId . ' Result: ' . print_r($result, true));
-            }
+                }
             
             if ($result['success']) {
                 // Save transaction ID for tracking
@@ -1635,13 +1629,7 @@ class BookingSessionController extends BaseController
             
             // Log the payment failure for debugging
             if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Payment processing failed: ' . print_r([
-                    'gateway' => $gatewayId,
-                    'params' => $params,
-                    'error' => $result['message'] ?? 'Unknown error',
-                    'trace' => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5)
-                ], true));
-            }
+                }
             
             return [
                 'success' => false, 
@@ -1650,9 +1638,6 @@ class BookingSessionController extends BaseController
             
         } catch (\Exception $e) {
             // Log the exception for debugging
-            error_log('Payment processing exception: ' . $e->getMessage());
-            error_log('Stack trace: ' . $e->getTraceAsString());
-            
             return [
                 'success' => false, 
                 'message' => 'An unexpected error occurred. Please try again or contact support.'
@@ -1704,11 +1689,8 @@ class BookingSessionController extends BaseController
                 'gateway' => $gatewayId,
             ]);
             
-            error_log("[Yatra] Payment recorded for booking {$bookingId}: {$amount} {$currency} via {$gatewayId}");
-            
-        } catch (\Exception $e) {
-            error_log("[Yatra] Failed to record payment: " . $e->getMessage());
-        }
+            } catch (\Exception $e) {
+            }
     }
     
     /**
@@ -2349,8 +2331,6 @@ class BookingSessionController extends BaseController
         if (apply_filters('yatra_dynamic_pricing_enabled', false)) {
             $spots_remaining = $availability ? (int) ($availability->spots_remaining ?? null) : null;
 
-            error_log('[Yatra Booking Summary] Applying dynamic pricing - Travel Date: ' . ($travel_date ?: 'null') . ', Spots: ' . ($spots_remaining ?? 'null'));
-
             foreach ($price_types as $pt) {
                 if (!isset($pt->effective_price)) {
                     continue;
@@ -2362,8 +2342,7 @@ class BookingSessionController extends BaseController
                     'availability_id' => $availability_id,
                     'price_type_id' => $pt->id ?? ($pt->price_type_id ?? null),
                 ]);
-                error_log('[Yatra Booking Summary] Price Type ' . ($pt->category_label ?? 'Unknown') . ': ' . $price_before . ' => ' . $pt->effective_price);
-            }
+                }
         }
 
         $is_traveler_based = $resolved_pricing_type === 'traveler_based' && !empty($price_types);

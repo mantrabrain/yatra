@@ -145,12 +145,8 @@ class SavedTripRepository extends BaseRepository
         $savedData = get_user_meta($userId, self::META_KEY, true);
         
         // Debug: log what we retrieved
-        error_log("Yatra SavedTripRepository::getUserSavedTrips - userId=$userId, savedData type: " . gettype($savedData));
-        error_log("Yatra SavedTripRepository::getUserSavedTrips - savedData content: " . json_encode($savedData));
-        
         // Handle empty or invalid data
         if (empty($savedData)) {
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - savedData is empty");
             return [];
         }
         
@@ -162,11 +158,9 @@ class SavedTripRepository extends BaseRepository
                 if ($unserialized !== false && is_array($unserialized)) {
                     $savedData = $unserialized;
                 } else {
-                    error_log("Yatra SavedTripRepository::getUserSavedTrips - savedData is string but not serialized: " . $savedData);
                     return [];
                 }
             } else {
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - savedData is not array or string: " . gettype($savedData));
                 return [];
             }
         }
@@ -174,32 +168,23 @@ class SavedTripRepository extends BaseRepository
         // Handle both old format (array of trip objects) and new format (array of IDs)
         $savedTripIds = [];
         foreach ($savedData as $key => $item) {
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - Processing item at key $key: " . gettype($item) . " = " . json_encode($item));
-            
             if (is_array($item) && isset($item['trip_id'])) {
                 // Old format: array with trip_id key
                 $savedTripIds[] = (int) $item['trip_id'];
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Extracted trip_id from array: " . (int) $item['trip_id']);
-            } elseif (is_int($item)) {
+                } elseif (is_int($item)) {
                 // Direct integer
                 $savedTripIds[] = $item;
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Direct integer: $item");
-            } elseif (is_numeric($item)) {
+                } elseif (is_numeric($item)) {
                 // Numeric string
                 $savedTripIds[] = (int) $item;
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Numeric string converted: " . (int) $item);
-            } else {
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Skipping item (not array with trip_id, not int, not numeric): " . gettype($item));
-            }
+                } else {
+                }
         }
         
         // Remove duplicates and re-index
         $savedTripIds = array_values(array_unique($savedTripIds));
         
-        error_log("Yatra SavedTripRepository::getUserSavedTrips - extracted trip IDs: " . json_encode($savedTripIds));
-        
         if (empty($savedTripIds)) {
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - no valid trip IDs found");
             return [];
         }
          
@@ -209,29 +194,21 @@ class SavedTripRepository extends BaseRepository
         $tripRepository = new TripRepository();
         $validTrips = [];
         
-        error_log("Yatra SavedTripRepository::getUserSavedTrips - Processing " . count($savedTripIds) . " saved trip IDs");
-        
         foreach ($savedTripIds as $tripId) {
             if ($tripId <= 0) {
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Skipping invalid trip ID: $tripId");
                 continue;
             }
             
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - Fetching trip ID: $tripId");
             $tripObj = $tripRepository->findWithRelations($tripId);
             
             // Include trip if it exists
             if (!$tripObj) {
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId not found in database");
                 continue; // Trip not found, skip it
             }
             
             $tripStatus = $tripObj->status ?? '';
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId status: $tripStatus");
-            
             // Only include published trips (accept both 'publish' and 'published')
             if ($tripStatus !== 'publish') {
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId is not published, skipping");
                 continue; // Trip not published, skip it
             }
             
@@ -248,8 +225,6 @@ class SavedTripRepository extends BaseRepository
             $hasDiscount = false;
             $discountPercent = 0;
             
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId pricing: originalPrice=$originalPrice, salePrice=$salePrice, hasAvailability=" . ($hasAvailability ? 'yes' : 'no') . ", hasTravelerPricing=" . ($hasTravelerPricing ? 'yes' : 'no'));
-            
             // Calculate base price (matching single-trip.php logic)
             if ($hasAvailability) {
                 // Get the lowest price from availability dates
@@ -262,8 +237,7 @@ class SavedTripRepository extends BaseRepository
                     }
                 }
                 $displayPrice = ($minPrice < PHP_FLOAT_MAX) ? $minPrice : ($salePrice > 0 ? $salePrice : $originalPrice);
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId availability pricing: minPrice=$minPrice, displayPrice=$displayPrice");
-            } elseif ($hasTravelerPricing) {
+                } elseif ($hasTravelerPricing) {
                 // Get default or first traveler category price
                 $defaultPriceType = null;
                 foreach ($tripObj->price_types as $pt) {
@@ -281,8 +255,7 @@ class SavedTripRepository extends BaseRepository
                 } else {
                     $displayPrice = $salePrice > 0 ? $salePrice : $originalPrice;
                 }
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId traveler pricing: displayPrice=$displayPrice");
-            } else {
+                } else {
                 // Regular pricing - use sale_price if available and less than original, otherwise original_price
                 if ($salePrice > 0 && $salePrice < $originalPrice && $originalPrice > 0) {
                     $displayPrice = $salePrice;
@@ -291,10 +264,7 @@ class SavedTripRepository extends BaseRepository
                 } else {
                     $displayPrice = $originalPrice > 0 ? $originalPrice : 0;
                 }
-                error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId regular pricing: displayPrice=$displayPrice, hasDiscount=" . ($hasDiscount ? 'yes' : 'no'));
-            }
-            
-            error_log("Yatra SavedTripRepository::getUserSavedTrips - Trip ID $tripId final displayPrice=$displayPrice");
+                }
             
             // Get destinations for location
             $destinations = $tripRepository->getDestinations($tripId);
@@ -428,8 +398,6 @@ class SavedTripRepository extends BaseRepository
         if ($limit > 0 && count($validTrips) > $limit) {
             $validTrips = array_slice($validTrips, 0, $limit);
         }
-        
-        error_log("Yatra SavedTripRepository::getUserSavedTrips - Returning " . count($validTrips) . " valid trips");
         
         return $validTrips;
     }

@@ -149,7 +149,6 @@ class PaystackGateway extends AbstractPaymentGateway
             throw new \Exception($response['message'] ?? 'Failed to initialize payment');
 
         } catch (\Exception $e) {
-            error_log('Paystack Payment Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),
@@ -195,7 +194,6 @@ class PaystackGateway extends AbstractPaymentGateway
             ];
 
         } catch (\Exception $e) {
-            error_log('Paystack Webhook Error: ' . $e->getMessage());
             return [
                 'success' => false,
                 'error' => $e->getMessage(),

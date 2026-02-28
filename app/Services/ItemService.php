@@ -74,8 +74,7 @@ class ItemService extends BaseService
     {
         // DEBUG: Log incoming data
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log('[YATRA DEBUG] ItemService::processBeforeCreate - Input data: ' . print_r($data, true));
-        }
+            }
         
         // Set type to item for ClassificationsTable
         $data['type'] = 'item';

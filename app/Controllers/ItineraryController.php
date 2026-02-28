@@ -94,20 +94,12 @@ class ItineraryController extends BaseController
             $items = $this->service->getByTripId($trip_id);
             
             // Debug logging
-            error_log('[ITINERARY CONTROLLER DEBUG] Raw items from service: ' . json_encode($items));
-            error_log('[ITINERARY CONTROLLER DEBUG] Items count: ' . count($items));
-            
             $prepared_items = array_map(function ($item) use ($request) {
                 $prepared = $this->prepare_item_for_response($item, $request);
-                error_log('[ITINERARY CONTROLLER DEBUG] Prepared item: ' . json_encode($prepared));
                 return $prepared;
             }, $items);
 
-            error_log('[ITINERARY CONTROLLER DEBUG] Final prepared items: ' . json_encode($prepared_items));
-            
             $response = $this->success_response($prepared_items);
-            error_log('[ITINER Beautify DEBUG] Final response data: ' . json_encode($response->get_data()));
-            
             return $response;
         } catch (\Exception $e) {
             return $this->error_response($e->getMessage(), 500);
@@ -123,8 +115,6 @@ class ItineraryController extends BaseController
             $id = (int) $request->get_param('id');
             $mode = $request->get_param('mode') ?: 'activity'; // Default to activity mode
             
-            error_log("[YATRA DEBUG] ItineraryController::get_item - Called with id: {$id}, mode: {$mode}");
-            
             // Use mode to determine which method to call
             if ($mode === 'day') {
                 // Get day entry (from days table)
@@ -135,18 +125,12 @@ class ItineraryController extends BaseController
             }
             
             if (!$item) {
-                error_log("[YATRA DEBUG] ItineraryController::get_item - Item not found for id: {$id}, mode: {$mode}");
                 return $this->error_response('Itinerary entry not found', 404);
             }
             
-            error_log("[YATRA DEBUG] ItineraryController::get_item - Raw item from service: " . json_encode($item));
-            
             $prepared = $this->prepare_item_for_response($item, $request);
-            error_log("[YATRA DEBUG] ItineraryController::get_item - Prepared item: " . json_encode($prepared));
-            
             return $this->success_response($prepared);
         } catch (\Exception $e) {
-            error_log("[YATRA DEBUG] ItineraryController::get_item - Error: " . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }
@@ -158,8 +142,6 @@ class ItineraryController extends BaseController
     {
         try {
             $data = $request->get_json_params();
-            error_log("[YATRA DEBUG] ItineraryController::create_item - Received data: " . print_r($data, true));
-            error_log("[YATRA DEBUG] ItineraryController::create_item - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
             $id = $this->service->create($data);
 
             return $this->success_response([
@@ -182,9 +164,6 @@ class ItineraryController extends BaseController
             $id = (int) $request->get_param('id');
             $mode = $request->get_param('mode') ?: 'activity'; // Default to activity mode
             $data = $request->get_json_params();
-            error_log("[YATRA DEBUG] ItineraryController::update_item - ID: $id, mode: $mode, Received data: " . print_r($data, true));
-            error_log("[YATRA DEBUG] ItineraryController::update_item - day_description: " . ($data['day_description'] ?? 'NOT_SET'));
-
             $result = $this->service->update($id, $data, $mode);
 
             if (!$result) {
@@ -259,18 +238,13 @@ class ItineraryController extends BaseController
     {
         try {
             $dayId = (int) $request->get_param('day_id');
-            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Called with day_id: {$dayId}");
-            
             $repository = new ItineraryRepository();
             $dayEntryId = $repository->getDayEntryIdByDayId($dayId);
             
-            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Retrieved day_entry_id: " . ($dayEntryId ?? 'NULL'));
-
             return $this->success_response([
                 'day_entry_id' => $dayEntryId,
             ]);
         } catch (\Exception $e) {
-            error_log("[YATRA DEBUG] ItineraryController::get_day_entry_id_by_day_id - Error: " . $e->getMessage());
             return $this->error_response($e->getMessage(), 500);
         }
     }

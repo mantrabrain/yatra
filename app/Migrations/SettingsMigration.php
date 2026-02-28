@@ -20,10 +20,6 @@ class SettingsMigration extends BaseMigration
         $skipped = 0;
         $failed = 0;
 
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Starting Settings Migration");
-        error_log("[Yatra Migration] ========================================");
-
         try {
             // Map old settings to new settings
             $settingsMap = $this->getSettingsMap();
@@ -45,7 +41,6 @@ class SettingsMigration extends BaseMigration
                     }
                     
                     if ($oldValue === null) {
-                        error_log("[Yatra Migration] Setting '{$oldKey}' not found in old system, skipping");
                         $skipped++;
                         continue;
                     }
@@ -57,7 +52,6 @@ class SettingsMigration extends BaseMigration
                     $existingValue = get_option($newKey, null);
                     
                     if ($existingValue !== null && !$this->isForceMigration()) {
-                        error_log("[Yatra Migration] Setting '{$newKey}' already exists, skipping");
                         $skipped++;
                         continue;
                     }
@@ -65,12 +59,10 @@ class SettingsMigration extends BaseMigration
                     // Update or add new setting
                     update_option($newKey, $newValue);
                     
-                    error_log("[Yatra Migration] Migrated setting: {$oldKey} => {$newKey} (value: " . print_r($newValue, true) . ")");
                     $migrated++;
                     
                 } catch (\Exception $e) {
                     $failed++;
-                    error_log("[Yatra Migration] Failed to migrate setting '{$oldKey}': " . $e->getMessage());
                     Logger::error("Setting migration exception", [
                         'source' => 'migration',
                         'old_key' => $oldKey,
@@ -85,17 +77,11 @@ class SettingsMigration extends BaseMigration
             $this->migrateComplexSettings();
             
         } catch (\Exception $e) {
-            error_log("[Yatra Migration] Settings migration exception: " . $e->getMessage());
             Logger::error("Settings migration failed", [
                 'source' => 'migration',
                 'error' => $e->getMessage()
             ]);
         }
-
-        error_log("[Yatra Migration] ========================================");
-        error_log("[Yatra Migration] Settings Migration Complete");
-        error_log("[Yatra Migration] Migrated: {$migrated}, Skipped: {$skipped}, Failed: {$failed}");
-        error_log("[Yatra Migration] ========================================");
 
         return [
             'migrated' => $migrated,
@@ -415,8 +401,6 @@ class SettingsMigration extends BaseMigration
      */
     private function migrateComplexSettings(): void
     {
-        error_log("[Yatra Migration] Migrating complex settings...");
-        
         // Migrate payment gateway settings
         $oldGatewaySettings = get_option('yatra_payment_gateways', []);
         if (!empty($oldGatewaySettings) && is_array($oldGatewaySettings)) {
@@ -430,8 +414,7 @@ class SettingsMigration extends BaseMigration
             
             if (!empty($newGatewayConfigs)) {
                 update_option('yatra_gateway_configs', $newGatewayConfigs);
-                error_log("[Yatra Migration] Migrated payment gateway configs: " . count($newGatewayConfigs) . " gateways");
-            }
+                }
         }
         
         // Migrate email template settings
@@ -451,8 +434,7 @@ class SettingsMigration extends BaseMigration
             if ($oldTemplate !== null) {
                 $newKey = "yatra_email_{$template}";
                 update_option($newKey, $oldTemplate);
-                error_log("[Yatra Migration] Migrated email template: {$template}");
-            }
+                }
         }
         
         // Migrate date/time format settings
@@ -461,13 +443,11 @@ class SettingsMigration extends BaseMigration
         
         if ($dateFormat) {
             update_option('yatra_date_format', $dateFormat);
-            error_log("[Yatra Migration] Migrated date format: {$dateFormat}");
-        }
+            }
         
         if ($timeFormat) {
             update_option('yatra_time_format', $timeFormat);
-            error_log("[Yatra Migration] Migrated time format: {$timeFormat}");
-        }
+            }
         
         // Migrate page settings
         $pages = [
@@ -481,10 +461,8 @@ class SettingsMigration extends BaseMigration
             $pageId = get_option($oldKey, 0);
             if ($pageId) {
                 update_option("yatra_{$newKey}", intval($pageId));
-                error_log("[Yatra Migration] Migrated page setting: {$newKey} = {$pageId}");
-            }
+                }
         }
         
-        error_log("[Yatra Migration] Complex settings migration complete");
-    }
+        }
 }

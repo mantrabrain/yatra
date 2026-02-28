@@ -59,7 +59,6 @@ class BookingsController extends BaseController
      */
     public function register_routes(): void
     {
-        error_log('Yatra: BookingsController::register_routes() called');
         // =====================
         // BOOKINGS ROUTES
         // =====================

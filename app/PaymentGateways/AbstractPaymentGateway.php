@@ -186,8 +186,7 @@ abstract class AbstractPaymentGateway implements PaymentGatewayInterface
     protected function log(string $message, array $context = []): void
     {
         if (defined('WP_DEBUG') && WP_DEBUG) {
-            error_log(sprintf('[Yatra %s] %s: %s', $this->id, $message, json_encode($context)));
-        }
+            }
     }
 
     // Default implementations that can be overridden
