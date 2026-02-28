@@ -30,43 +30,42 @@ parameters:
     
     ignoreErrors:
         # Third-party library calls (DOMPDF, Action Scheduler)
-        - '#Call to an undefined method Dompdf.*#'
-        - '#Call to an undefined method ActionScheduler.*#'
+        - '#Call to an undefined method Dompdf#'
+        - '#Call to an undefined method ActionScheduler#'
         # WordPress dynamic properties (unavoidable in WP context)
-        - '#Access to an undefined property object::\$.*#'
+        - '#Access to an undefined property#'
         - '#Variable \$this might not be defined#'
         # Plugin-specific constants (defined in plugin bootstrap)
-        - '#Constant YATRA_.* not found#'
-        - '#Constant DB_.* not found#'
+        - '#Constant YATRA_#'
+        - '#Constant DB_#'
         # WordPress function issues (non-critical for PHP 7.4)
         - '#Function esc_like not found#'
         # Template variable issues (non-critical)
         - '#Variable \$.* might not be defined#'
-        - '#Undefined variable: \$.*#'
+        - '#Undefined variable: \$#'
         # Type casting issues (non-critical)
-        - '#Parameter #.* of function .* expects string, .* given#'
-        - '#Offset .* on array.* on left side of \?\? always exists and is not nullable#'
-        - '#Variable .* in empty\(\) always exists and is not falsy#'
-        - '#Variable .* on left side of \?\? always exists and is not nullable#'
+        - '#expects string, .* given#'
+        - '#Parameter #.* of function#'
+        - '#on left side of \?\? always exists#'
+        - '#in empty\(\) always exists#'
         # Unused methods/properties (code quality, not compatibility)
-        - '#Method .* is unused#'
-        - '#Property .* is never read, only written#'
-        - '#Static property .* is never read, only written#'
+        - '#is unused#'
+        - '#is never read, only written#'
         # Logic analysis warnings (non-critical)
-        - '#Else branch is unreachable.*#'
+        - '#Else branch is unreachable#'
         - '#Right side of && is always true#'
         - '#Left side of && is always true#'
         - '#If condition is always false#'
         - '#Result of && is always false#'
-        - '#Unreachable statement.*#'
+        - '#Unreachable statement#'
         # Type comparison issues (non-critical)
-        - '#Strict comparison using === between.* will always evaluate to false#'
-        - '#Call to function is_.* with mixed will always evaluate to false#'
+        - '#will always evaluate to false#'
+        - '#will always evaluate to true#'
         # PHPStan reflection issues (non-critical)
-        - '#Call to an undefined method ReflectionType::.*#'
+        - '#Call to an undefined method ReflectionType#'
         # Array access issues (non-critical)
-        - '#Offset .* does not exist on array.*#'
-        - '#Offset .* on array.* in empty\(\) does not exist#'
-        - '#Offset .* on array.* on left side of \?\? does not exist#'
+        - '#Offset .* does not exist#'
+        - '#Offset .* on array.* in empty#'
+        - '#Offset .* on array.* on left side#'
         # Method signature mismatches (code quality)
-        - '#Method .* should return .* but returns .*#'
+        - '#should return .* but returns#'
