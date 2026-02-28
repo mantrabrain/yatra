@@ -707,30 +707,59 @@ jobs:
           
           # --- PHP COMPATIBILITY ---
           HAS_PHP_COMPAT_ERRORS=false
+          echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHP_COMPAT_ERRORS=true
+          
+          # Debug: Check what directories exist
+          echo "DEBUG: Available PHP compatibility directories:" >> $GITHUB_STEP_SUMMARY
+          ls -la error-reports/ | grep "php.*compatibility" >> $GITHUB_STEP_SUMMARY || echo "No compatibility directories found" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           for version in 7.4 8.0 8.1 8.2 8.3 8.4; do
             HAS_VERSION_ERRORS=false
+            echo "DEBUG: Checking PHP ${version}..." >> $GITHUB_STEP_SUMMARY
+            
             if [ -d "error-reports/php${version}-compatibility" ]; then
+              echo "DEBUG: Directory exists for PHP ${version}" >> $GITHUB_STEP_SUMMARY
+              
               # Check if any files have content
-              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
-                HAS_VERSION_ERRORS=true
-              fi
-              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
-                # Check if file contains actual errors (not just success messages)
-                if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                echo "DEBUG: compat.txt exists, size: $(wc -c < error-reports/php${version}-compatibility/php${version}-compat.txt)" >> $GITHUB_STEP_SUMMARY
+                if [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                  echo "DEBUG: compat.txt has content" >> $GITHUB_STEP_SUMMARY
                   HAS_VERSION_ERRORS=true
                 fi
+              else
+                echo "DEBUG: compat.txt does not exist" >> $GITHUB_STEP_SUMMARY
               fi
+              
+              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                echo "DEBUG: lint.txt exists, size: $(wc -c < error-reports/php${version}-compatibility/php${version}-lint.txt)" >> $GITHUB_STEP_SUMMARY
+                if [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                  echo "DEBUG: lint.txt has content" >> $GITHUB_STEP_SUMMARY
+                  # Check if file contains actual errors (not just success messages)
+                  if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                    echo "DEBUG: lint.txt contains errors" >> $GITHUB_STEP_SUMMARY
+                    HAS_VERSION_ERRORS=true
+                  else
+                    echo "DEBUG: lint.txt does not contain error patterns" >> $GITHUB_STEP_SUMMARY
+                  fi
+                else
+                  echo "DEBUG: lint.txt is empty" >> $GITHUB_STEP_SUMMARY
+                fi
+              else
+                echo "DEBUG: lint.txt does not exist" >> $GITHUB_STEP_SUMMARY
+              fi
+              
               if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
                 HAS_VERSION_ERRORS=true
               fi
+            else
+              echo "DEBUG: Directory does not exist for PHP ${version}" >> $GITHUB_STEP_SUMMARY
+            fi
                             
-              if [ "$HAS_VERSION_ERRORS" = "true" ]; then
-                if [ "$HAS_PHP_COMPAT_ERRORS" = "false" ]; then
-                  echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
-                  echo '```' >> $GITHUB_STEP_SUMMARY
-                  HAS_PHP_COMPAT_ERRORS=true
-                fi
-                echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
+            echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
                 
                 # Show compatibility errors
                 if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
@@ -752,7 +781,11 @@ jobs:
                   cat "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
                 fi
                 
-                                
+                # Show status if no errors found
+                if [ "$HAS_VERSION_ERRORS" = "false" ]; then
+                  echo "✅ All checks passed" >> $GITHUB_STEP_SUMMARY
+                fi
+                
                 echo "" >> $GITHUB_STEP_SUMMARY
               fi
             fi
