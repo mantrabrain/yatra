@@ -555,6 +555,9 @@ class ScheduledPaymentService
             }
             
             return $created_ids;
+        }
+        
+        return $created_ids;
     }
     
     /**

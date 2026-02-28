@@ -29,27 +29,58 @@ if ($json === null) {
 
 $output = "";
 $totalErrors = 0;
+$fileCount = 0;
 
-if (isset($json["files"])) {
+if (isset($json["files"]) && is_array($json["files"])) {
     foreach ($json["files"] as $file => $data) {
-        if (isset($data["messages"]) && !empty($data["messages"])) {
-            $output .= "FILE: " . $file . "\n";
+        $fileErrors = $data["errors"] ?? 0;
+        
+        if ($fileErrors > 0 && isset($data["messages"]) && !empty($data["messages"])) {
+            $fileCount++;
+            $totalErrors += $fileErrors;
+            
+            // Shorten file path for readability
+            $shortFile = str_replace('/Users/umesh/Local Sites/yatra/app/public/wp-content/plugins/yatra/', '', $file);
+            
+            $output .= "FILE: " . $shortFile . " (" . $fileErrors . " errors)\n";
             
             foreach ($data["messages"] as $msg) {
-                $totalErrors++;
-                $output .= "  Line " . $msg["line"] . ": " . $msg["message"] . "\n";
+                $message = $msg["message"] ?? "Unknown error";
+                $line = $msg["line"] ?? "?";
+                $output .= "  Line " . $line . ": " . $message . "\n";
             }
             $output .= "\n";
         }
     }
 }
 
-$totals = $json["totals"]["errors"] ?? $totalErrors;
-
-if ($totals === 0) {
+if ($totalErrors === 0) {
     $output = "✅ No PHPStan errors found. Code passes static analysis at level 5.\n";
 } else {
-    $output .= "TOTAL ERRORS: " . $totals . "\n";
+    $output = "PHPSTAN ANALYSIS RESULTS\n";
+    $output .= "========================\n\n";
+    $output .= "Total Files with Errors: " . $fileCount . "\n";
+    $output .= "Total Errors: " . $totalErrors . "\n\n";
+    $output .= "ERRORS BY FILE:\n";
+    $output .= "===============\n\n";
+    
+    // Re-iterate to output errors
+    foreach ($json["files"] as $file => $data) {
+        $fileErrors = $data["errors"] ?? 0;
+        
+        if ($fileErrors > 0 && isset($data["messages"]) && !empty($data["messages"])) {
+            $shortFile = str_replace('/Users/umesh/Local Sites/yatra/app/public/wp-content/plugins/yatra/', '', $file);
+            
+            $output .= "FILE: " . $shortFile . " (" . $fileErrors . " errors)\n";
+            
+            foreach ($data["messages"] as $msg) {
+                $message = $msg["message"] ?? "Unknown error";
+                $line = $msg["line"] ?? "?";
+                $output .= "  Line " . $line . ": " . $message . "\n";
+            }
+            $output .= "\n";
+        }
+    }
 }
 
 file_put_contents("phpstan-errors-readable.txt", $output);

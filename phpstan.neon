@@ -6,8 +6,6 @@ parameters:
     paths:
         - app/
         - includes/
-        - admin/
-        - frontend/
         - templates/
         - yatra.php
     

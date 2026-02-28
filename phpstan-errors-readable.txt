@@ -1,0 +1,938 @@
+PHPSTAN ANALYSIS RESULTS
+========================
+
+Total Files with Errors: 137
+Total Errors: 655
+
+ERRORS BY FILE:
+===============
+
+FILE: app/Ajax/DirectAttributeQuery.php (1 errors)
+  Line 19: Instantiated class Yatra\App\Repositories\AttributeRepository not found.
+
+FILE: app/Bootstrap.php (5 errors)
+  Line 120: Constant YATRA_PLUGIN_PATH not found.
+  Line 126: Constant YATRA_PLUGIN_PATH not found.
+  Line 165: Class Yatra\Providers\AppServiceProvider does not have a constructor and must be instantiated without any parameters.
+  Line 165: Class Yatra\Providers\FrontendAssetsProvider does not have a constructor and must be instantiated without any parameters.
+  Line 192: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Controllers/ActivityController.php (1 errors)
+  Line 180: Variable $id on left side of ?? always exists and is not nullable.
+
+FILE: app/Controllers/AttributeController.php (13 errors)
+  Line 260: Access to an undefined property object::$field_type.
+  Line 261: Access to an undefined property object::$required.
+  Line 262: Access to an undefined property object::$show_on_frontend.
+  Line 263: Access to an undefined property object::$show_in_filters.
+  Line 264: Access to an undefined property object::$filter_type.
+  Line 265: Access to an undefined property object::$searchable.
+  Line 266: Access to an undefined property object::$display_order.
+  Line 267: Access to an undefined property object::$default_value.
+  Line 268: Access to an undefined property object::$placeholder.
+  Line 269: Access to an undefined property object::$field_options.
+  Line 270: Access to an undefined property object::$validation_rules.
+  Line 309: Method Yatra\Controllers\AttributeController::get_items() should return WP_REST_Response but returns WP_Error.
+  Line 623: Method Yatra\Controllers\AttributeController::get_trip_attributes() should return WP_REST_Response but returns WP_Error.
+
+FILE: app/Controllers/AvailabilityController.php (5 errors)
+  Line 245: Else branch is unreachable because ternary operator condition is always true.
+  Line 270: Call to an undefined method Yatra\Services\AvailabilityService::find().
+  Line 410: Else branch is unreachable because ternary operator condition is always true.
+  Line 413: Else branch is unreachable because ternary operator condition is always true.
+  Line 416: Else branch is unreachable because ternary operator condition is always true.
+
+FILE: app/Controllers/AvailabilityRecurringRulesController.php (5 errors)
+  Line 106: Constant colonies not found.
+  Line 172: Call to an undefined method Yatra\Services\AvailabilityRecurringRulesService::getAll().
+  Line 198: Call to an undefined method Yatra\Services\AvailabilityRecurringRulesService::getById().
+  Line 241: Call to an undefined method Yatra\Services\AvailabilityRecurringRulesService::getById().
+  Line 279: Call to an undefined method Yatra\Services\AvailabilityRecurringRulesService::getById().
+
+FILE: app/Controllers/AvailabilitySpecificDatesController.php (4 errors)
+  Line 162: Call to an undefined method Yatra\Services\AvailabilitySpecificDatesService::getAll().
+  Line 188: Call to an undefined method Yatra\Services\AvailabilitySpecificDatesService::getById().
+  Line 231: Call to an undefined method Yatra\Services\AvailabilitySpecificDatesService::getById().
+  Line 269: Call to an undefined method Yatra\Services\AvailabilitySpecificDatesService::getById().
+
+FILE: app/Controllers/BaseController.php (2 errors)
+  Line 326: Parameter #2 $value of method WP_HTTP_Response::header() expects string, int given.
+  Line 327: Parameter #2 $value of method WP_HTTP_Response::header() expects string, int given.
+
+FILE: app/Controllers/BookingSessionController.php (18 errors)
+  Line 746: Variable $travel_date in empty() always exists and is not falsy.
+  Line 796: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 796: Else branch is unreachable because ternary operator condition is always true.
+  Line 864: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 1041: Variable $contact_phone in empty() always exists and is not falsy.
+  Line 1101: Undefined variable: $availability_id
+  Line 1101: Variable $availability_id in empty() is never defined.
+  Line 1186: Variable $travel_date in empty() always exists and is not falsy.
+  Line 1359: Variable $departure might not be defined.
+  Line 1362: Variable $departure might not be defined.
+  Line 1363: Call to function is_object() with array will always evaluate to false.
+  Line 1699: Method Yatra\Controllers\BookingSessionController::processPayPalPayment() is unused.
+  Line 1782: Method Yatra\Controllers\BookingSessionController::processRazorpayPayment() is unused.
+  Line 1847: Method Yatra\Controllers\BookingSessionController::processEsewaPayment() is unused.
+  Line 1876: Method Yatra\Controllers\BookingSessionController::processKhaltiPayment() is unused.
+  Line 1930: Method Yatra\Controllers\BookingSessionController::processAuthorizeNetPayment() is unused.
+  Line 2251: Parameter #1 $availabilityId of method Yatra\Services\AvailabilityService::getById() expects int, string given.
+  Line 2681: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Controllers/BookingsController.php (7 errors)
+  Line 289: Variable $id on left side of ?? always exists and is not nullable.
+  Line 403: Variable $stats on left side of ?? always exists and is not nullable.
+  Line 633: Call to an undefined method Yatra\Services\PaymentService::getScheduledPayments().
+  Line 654: Call to an undefined method Yatra\Services\PaymentService::getScheduledPayment().
+  Line 677: Call to an undefined method Yatra\Services\PaymentService::updateScheduledPayment().
+  Line 693: Call to an undefined method Yatra\Services\PaymentService::cancelScheduledPayment().
+  Line 709: Call to an undefined method Yatra\Services\PaymentService::getBookingScheduledPayments().
+
+FILE: app/Controllers/CacheController.php (2 errors)
+  Line 316: Method Yatra\Controllers\CacheController::getTransientCreatedTime() is unused.
+  Line 331: Method Yatra\Controllers\CacheController::getTransientExpirationTime() is unused.
+
+FILE: app/Controllers/CategoryController.php (3 errors)
+  Line 24: Non-abstract class Yatra\Controllers\CategoryController contains abstract method register_routes() from class Yatra\Controllers\BaseController.
+  Line 53: Variable $args might not be defined.
+  Line 54: Variable $args might not be defined.
+
+FILE: app/Controllers/CustomerController.php (3 errors)
+  Line 335: Else branch is unreachable because ternary operator condition is always true.
+  Line 421: Else branch is unreachable because ternary operator condition is always true.
+  Line 520: Variable $stats on left side of ?? always exists and is not nullable.
+
+FILE: app/Controllers/DiscountController.php (1 errors)
+  Line 117: Call to an undefined static method Yatra\Models\Discount::where().
+
+FILE: app/Controllers/PaymentGatewayController.php (3 errors)
+  Line 273: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 273: Else branch is unreachable because ternary operator condition is always true.
+  Line 624: Call to an undefined static method Yatra\Services\SettingsService::getAll().
+
+FILE: app/Controllers/ReportsController.php (3 errors)
+  Line 423: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 423: Else branch is unreachable because ternary operator condition is always true.
+  Line 666: Unreachable statement - code above always terminates.
+
+FILE: app/Controllers/ReviewController.php (1 errors)
+  Line 165: Call to an undefined static method Yatra\Services\SettingsService::getSettings().
+
+FILE: app/Controllers/SettingsController.php (2 errors)
+  Line 674: Offset 'order' on array{id: string, type: mixed, label: string, placeholder: string, required: bool, enabled: bool, order: int, width: mixed, ...} on left side of ?? always exists and is not nullable.
+  Line 674: Offset 'order' on array{id: string, type: mixed, label: string, placeholder: string, required: bool, enabled: bool, order: int, width: mixed, ...} on left side of ?? always exists and is not nullable.
+
+FILE: app/Controllers/SetupWizardController.php (9 errors)
+  Line 147: Constant YATRA_PLUGIN_URL not found.
+  Line 155: Constant YATRA_PLUGIN_URL not found.
+  Line 223: Constant YATRA_PLUGIN_URI not found.
+  Line 286: Constant YATRA_ABSPATH not found.
+  Line 294: Constant YATRA_ABSPATH not found.
+  Line 323: Constant YATRA_ABSPATH not found.
+  Line 354: Constant YATRA_ABSPATH not found.
+  Line 432: Constant YATRA_ABSPATH not found.
+  Line 459: Constant YATRA_ABSPATH not found.
+
+FILE: app/Controllers/SingleTripController.php (11 errors)
+  Line 38: Property Yatra\Controllers\SingleTripController::$table_destinations is never read, only written.
+  Line 43: Property Yatra\Controllers\SingleTripController::$table_activities is never read, only written.
+  Line 182: Access to an undefined property object::$id.
+  Line 196: Access to an undefined property object::$id.
+  Line 335: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 335: Right side of && is always true.
+  Line 385: Access to an undefined property object::$original_price.
+  Line 385: Access to an undefined property object::$sale_price.
+  Line 423: Access to an undefined property object::$original_price.
+  Line 423: Access to an undefined property object::$sale_price.
+  Line 499: Right side of && is always true.
+
+FILE: app/Controllers/ToolsController.php (8 errors)
+  Line 304: Constant YATRA_PLUGIN_PATH not found.
+  Line 305: Constant YATRA_PLUGIN_URL not found.
+  Line 309: Constant DB_CHARSET not found.
+  Line 310: Constant DB_COLLATE not found.
+  Line 343: Method WP_REST_Request<array<string, mixed>>::get_param() invoked with 2 parameters, 1 required.
+  Line 344: Method WP_REST_Request<array<string, mixed>>::get_param() invoked with 2 parameters, 1 required.
+  Line 1132: Offset 'interval' on array{interval: int, display: string} on left side of ?? always exists and is not nullable.
+  Line 1133: Offset 'display' on array{interval: int, display: string} on left side of ?? always exists and is not nullable.
+
+FILE: app/Controllers/TripAvailabilityController.php (3 errors)
+  Line 214: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::getBookingsForDeparture().
+  Line 389: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::getBookingsForDeparture().
+  Line 599: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::getBookingsForDeparture().
+
+FILE: app/Controllers/TripController.php (11 errors)
+  Line 739: Call to an undefined method Yatra\Services\TripService::permanentDelete().
+  Line 895: Method Yatra\Controllers\BaseController::success_response() invoked with 3 parameters, 1-2 required.
+  Line 895: Parameter #2 $status of method Yatra\Controllers\BaseController::success_response() expects int, string given.
+  Line 1569: Access to an undefined property object::$id.
+  Line 1574: Access to an undefined property object::$id.
+  Line 1668: Access to an undefined property object::$id.
+  Line 1683: Access to an undefined property object::$title.
+  Line 1794: Constant YATRA_PLUGIN_PATH not found.
+  Line 1851: Method Yatra\Controllers\TripController::mergeAvailabilityDates() is unused.
+  Line 1936: Constant YATRA_ABSPATH not found.
+  Line 2094: Call to an undefined method Yatra\Services\TripService::deleteTripAttribute().
+
+FILE: app/Controllers/TripDownloadController.php (2 errors)
+  Line 162: Access to an undefined property Yatra\Controllers\TripDownloadController::$tripService.
+  Line 325: Offset 'basedir' on array{path: string, url: string, subdir: string, basedir: string, baseurl: string, error: string|false} in isset() always exists and is not nullable.
+
+FILE: app/Core/Assets/ListingAssetManager.php (1 errors)
+  Line 12: Property Yatra\Core\Assets\ListingAssetManager::$listing_type is never read, only written.
+
+FILE: app/Core/Container.php (2 errors)
+  Line 90: Call to an undefined method ReflectionType::isBuiltin().
+  Line 97: Call to an undefined method ReflectionType::getName().
+
+FILE: app/Core/Handlers/AccountPageHandler.php (1 errors)
+  Line 42: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/Handlers/BookingConfirmationPageHandler.php (4 errors)
+  Line 42: Left side of && is always true.
+  Line 52: Access to an undefined property object::$trip_attributes_list.
+  Line 56: Access to an undefined property object::$trip_attributes_list.
+  Line 70: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/Handlers/BookingPageHandler.php (1 errors)
+  Line 168: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/Handlers/CheckoutPageHandler.php (2 errors)
+  Line 28: Call to an undefined method Yatra\Repositories\BookingRepository::findByCheckoutToken().
+  Line 47: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/Handlers/TaxonomyPageHandler.php (1 errors)
+  Line 59: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/Modules/ModuleManager.php (1 errors)
+  Line 372: Offset 'enabled' on array{slug: non-falsy-string, enabled: bool} on left side of ?? always exists and is not nullable.
+
+FILE: app/Core/Template/TemplateRenderer.php (1 errors)
+  Line 55: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Core/TemplateLoader.php (2 errors)
+  Line 74: Constant YATRA_PLUGIN_PATH not found.
+  Line 103: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Helpers/CurrencyHelper.php (1 errors)
+  Line 322: Offset 'AUD'|'CAD'|'CHF'|'CNY'|'EUR'|'GBP'|'INR'|'JPY'|'NPR'|'USD' on array{USD: array{name: 'US Dollar', symbol: '$', decimal_digits: 2}, EUR: array{name: 'Euro', symbol: '€', decimal_digits: 2}, GBP: array{name: 'British Pound', symbol: '£', decimal_digits: 2}, JPY: array{name: 'Japanese Yen', symbol: '¥', decimal_digits: 0}, CNY: array{name: 'Chinese Yuan', symbol: '¥', decimal_digits: 2}, CHF: array{name: 'Swiss Franc', symbol: 'CHF', decimal_digits: 2}, CAD: array{name: 'Canadian Dollar', symbol: 'C$', decimal_digits: 2}, AUD: array{name: 'Australian Dollar', symbol: 'A$', decimal_digits: 2}, ...} in isset() always exists and is not nullable.
+
+FILE: app/Hooks/CacheHooks.php (1 errors)
+  Line 306: Call to private static method getAvailableBackends() of class Yatra\Utils\Cache.
+
+FILE: app/Hooks/RestApiHooks.php (1 errors)
+  Line 52: Expression on left side of ?? is not nullable.
+
+FILE: app/Migrations/AvailabilityConditionsMigration.php (2 errors)
+  Line 212: Method Yatra\Migration\AvailabilityConditionsMigration::convertToRecurringRule() never returns null so it can be removed from the return type.
+  Line 270: Deprecated in PHP 8.4: Parameter #3 $oldConditionId (int) is implicitly nullable via default value null.
+
+FILE: app/Migrations/ItineraryMigration.php (5 errors)
+  Line 288: Offset 'itinerary_heading' on array on left side of ?? always exists and is not nullable.
+  Line 314: Offset 'title' on array on left side of ?? always exists and is not nullable.
+  Line 339: Offset 'title' on array on left side of ?? always exists and is not nullable.
+  Line 368: Offset 3 on array{string, ''|'0'|(non-falsy-string&numeric-string), ''|numeric-string, string} on left side of ?? always exists and is not nullable.
+  Line 558: Method Yatra\Migration\ItineraryMigration::getMigratedTripId() should return int|null but returns string|null.
+
+FILE: app/Migrations/MigrationDetector.php (1 errors)
+  Line 372: Method Yatra\Migration\MigrationDetector::tableExists() is unused.
+
+FILE: app/Migrations/MigrationProgress.php (4 errors)
+  Line 36: Property Yatra\Migration\MigrationProgress::$logger is never read, only written.
+  Line 166: Instantiated class Yatra\Migrations\MigrationDetector not found.
+  Line 167: Call to method detectOldData() on an unknown class Yatra\Migrations\MigrationDetector.
+  Line 605: Call to static method getTableName() on an unknown class Yatra\Migration\TripsTable.
+
+FILE: app/Migrations/ReviewMigration.php (1 errors)
+  Line 18: Call to an undefined method Yatra\Migration\MigrationProgress::migrateReviews().
+
+FILE: app/Migrations/ServicesMigration.php (2 errors)
+  Line 27: Call to static method getTableName() on an unknown class YatraPro\Database\Tables\AdditionalServicesTable.
+  Line 28: Call to static method getTableName() on an unknown class YatraPro\Database\Tables\TripAdditionalServicesTable.
+
+FILE: app/Migrations/TourDateMigration.php (2 errors)
+  Line 168: Negated boolean expression is always true.
+  Line 168: Result of || is always true.
+
+FILE: app/Migrations/TravelerCategoriesMigration.php (1 errors)
+  Line 236: Call to an undefined method Yatra\Migration\TravelerCategoriesMigration::createPriceType().
+
+FILE: app/Migrations/TripMigration.php (8 errors)
+  Line 32: Call to static method getTableName() on an unknown class Yatra\Migration\TripsTable.
+  Line 56: Call to static method getTableName() on an unknown class Yatra\Migration\TripsTable.
+  Line 137: Call to static method getTableName() on an unknown class Yatra\Migration\TripsTable.
+  Line 144: Parameter #1 $tripId of method Yatra\Migration\BaseMigration::deleteTripRelationships() expects int, string given.
+  Line 162: Call to static method getTableName() on an unknown class Yatra\Migration\TripsTable.
+  Line 218: Call to static method getTableName() on an unknown class Yatra\Migration\TripContentTable.
+  Line 401: Call to static method getTableName() on an unknown class Yatra\Migration\TripContentTable.
+  Line 476: Call to static method getTableName() on an unknown class Yatra\Migration\TripContentTable.
+
+FILE: app/Models/Trip.php (4 errors)
+  Line 701: Right side of && is always true.
+  Line 803: Method Yatra\Models\Trip::getCategories() should return array but returns string.
+  Line 848: Right side of && is always true.
+  Line 1070: Negated boolean expression is always false.
+
+FILE: app/PaymentGateways/Gateways/PayPal/PayPalGateway.php (1 errors)
+  Line 102: Method Yatra\PaymentGateways\Gateways\PayPal\PayPalGateway::getHeaders() is unused.
+
+FILE: app/PaymentGateways/Gateways/Razorpay/RazorpayGateway.php (1 errors)
+  Line 151: Offset 'key_id' on array on left side of ?? always exists and is not nullable.
+
+FILE: app/PaymentGateways/Gateways/Square/SquareGateway.php (3 errors)
+  Line 107: Offset 'application_id' on array on left side of ?? always exists and is not nullable.
+  Line 108: Offset 'location_id' on array on left side of ?? always exists and is not nullable.
+  Line 141: Constant YATRA_PLUGIN_URL not found.
+
+FILE: app/Providers/AdminAssetsProvider.php (9 errors)
+  Line 106: Constant YATRA_PLUGIN_PATH not found.
+  Line 114: Constant YATRA_PLUGIN_URL not found.
+  Line 126: Constant YATRA_PLUGIN_URL not found.
+  Line 140: Constant YATRA_PLUGIN_PATH not found.
+  Line 148: Constant YATRA_PLUGIN_URL not found.
+  Line 239: Constant YATRA_PLUGIN_PATH not found.
+  Line 243: Constant YATRA_PLUGIN_URL not found.
+  Line 250: Constant YATRA_PLUGIN_PATH not found.
+  Line 254: Constant YATRA_PLUGIN_URL not found.
+
+FILE: app/Providers/AdminServiceProvider.php (1 errors)
+  Line 95: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Providers/FrontendAssetsProvider.php (16 errors)
+  Line 83: Constant YATRA_PLUGIN_PATH not found.
+  Line 87: Constant YATRA_PLUGIN_URL not found.
+  Line 114: Constant YATRA_PLUGIN_PATH not found.
+  Line 118: Constant YATRA_PLUGIN_URL not found.
+  Line 235: Constant YATRA_PLUGIN_PATH not found.
+  Line 239: Constant YATRA_PLUGIN_URL not found.
+  Line 254: Constant YATRA_PLUGIN_PATH not found.
+  Line 258: Constant YATRA_PLUGIN_URL not found.
+  Line 312: Constant YATRA_PLUGIN_PATH not found.
+  Line 316: Constant YATRA_PLUGIN_URL not found.
+  Line 341: Constant YATRA_PLUGIN_PATH not found.
+  Line 345: Constant YATRA_PLUGIN_URL not found.
+  Line 423: Parameter #2 $tag of function has_shortcode expects string, array given.
+  Line 470: Constant YATRA_PLUGIN_PATH not found.
+  Line 477: Constant YATRA_PLUGIN_URL not found.
+  Line 490: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Repositories/AttributeRepository.php (6 errors)
+  Line 63: Variable $where in empty() always exists and is not falsy.
+  Line 104: Variable $where in empty() always exists and is not falsy.
+  Line 343: Call to an undefined method Yatra\Repositories\AttributeRepository::getTripAttributesTableName().
+  Line 505: Access to constant KEY_AVAILABLE_ATTRIBUTES on an unknown class Yatra\Repositories\Cache.
+  Line 505: Call to static method remember() on an unknown class Yatra\Repositories\Cache.
+  Line 531: Access to constant DURATION_ATTRIBUTES on an unknown class Yatra\Repositories\Cache.
+
+FILE: app/Repositories/BookingDepartureRepository.php (3 errors)
+  Line 154: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::tableExists().
+  Line 155: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::createTable().
+  Line 182: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::tableExists().
+
+FILE: app/Repositories/BookingRepository.php (1 errors)
+  Line 403: Variable $updateData in empty() always exists and is not falsy.
+
+FILE: app/Repositories/CategoryRepository.php (6 errors)
+  Line 34: Method Yatra\Repositories\BaseRepository::__construct() invoked with 1 parameter, 0 required.
+  Line 107: Undefined variable: $wpdb
+  Line 115: Variable $params might not be defined.
+  Line 272: Offset 'publish' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+  Line 273: Offset 'draft' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+  Line 274: Offset 'trash' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+
+FILE: app/Repositories/CustomerRepository.php (1 errors)
+  Line 742: Undefined variable: $bookingRepository
+
+FILE: app/Repositories/DepartureRepository.php (1 errors)
+  Line 456: Variable $updateData in empty() always exists and is not falsy.
+
+FILE: app/Repositories/DestinationRepository.php (3 errors)
+  Line 303: Offset 'publish' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+  Line 304: Offset 'draft' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+  Line 305: Offset 'trash' on array{publish: int, draft: int, trash: int, total: int} on left side of ?? always exists and is not nullable.
+
+FILE: app/Repositories/DifficultyLevelRepository.php (1 errors)
+  Line 31: Method Yatra\Repositories\BaseRepository::__construct() invoked with 1 parameter, 0 required.
+
+FILE: app/Repositories/DiscountRepository.php (1 errors)
+  Line 47: Function esc_like not found.
+
+FILE: app/Repositories/ItineraryRepository.php (22 errors)
+  Line 113: Undefined variable: $wpdb
+  Line 114: Undefined variable: $tableDays
+  Line 132: Undefined variable: $wpdb
+  Line 133: Undefined variable: $tableDays
+  Line 137: Undefined variable: $wpdb
+  Line 489: Method Yatra\Repositories\ItineraryRepository::getItemIdsFromActivityType() is unused.
+  Line 534: Undefined variable: $result
+  Line 535: Undefined variable: $result
+  Line 542: Method Yatra\Repositories\ItineraryRepository::getActivityTypeFromItems() is unused.
+  Line 581: PHPDoc tag @return with type object|null is not subtype of native type stdClass|null.
+  Line 633: Access to an undefined property object::$start_time.
+  Line 634: Access to an undefined property object::$end_time.
+  Line 636: Access to an undefined property object::$start_time.
+  Line 637: Access to an undefined property object::$end_time.
+  Line 650: PHPDoc tag @return with type object|null is not subtype of native type stdClass|null.
+  Line 746: Access to an undefined property object::$start_time.
+  Line 747: Access to an undefined property object::$end_time.
+  Line 749: Access to an undefined property object::$start_time.
+  Line 750: Access to an undefined property object::$end_time.
+  Line 900: Undefined variable: $tableImages
+  Line 916: Undefined variable: $tableImages
+  Line 976: Unreachable statement - code above always terminates.
+
+FILE: app/Repositories/RecurringAvailabilityRepository.php (1 errors)
+  Line 321: Access to an undefined property object::$days_of_week_array.
+
+FILE: app/Repositories/RecurringRuleRepository.php (1 errors)
+  Line 188: Variable $updateData in empty() always exists and is not falsy.
+
+FILE: app/Repositories/SavedTripRepository.php (3 errors)
+  Line 69: Call to function is_int() with mixed will always evaluate to false.
+  Line 216: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 329: Right side of && is always true.
+
+FILE: app/Repositories/ScheduledPaymentRepository.php (1 errors)
+  Line 258: Constant DB_NAME not found.
+
+FILE: app/Repositories/TripAttributeRepository.php (4 errors)
+  Line 40: Access to constant KEY_TRIP_ATTRIBUTES on an unknown class Yatra\Repositories\Cache.
+  Line 42: Call to static method remember() on an unknown class Yatra\Repositories\Cache.
+  Line 78: Call to function is_array() with mixed will always evaluate to false.
+  Line 147: Access to constant DURATION_ATTRIBUTES on an unknown class Yatra\Repositories\Cache.
+
+FILE: app/Repositories/TripDownloadRepository.php (6 errors)
+  Line 188: Offset 'type' on array{ext: string|false, type: string|false} on left side of ?? always exists and is not nullable.
+  Line 195: Offset 0 on array{string, int, int, bool} in isset() always exists and is not nullable.
+  Line 200: Offset 'type' on array{ext: string|false, type: string|false} on left side of ?? always exists and is not nullable.
+  Line 308: Offset 'type' on array{ext: string|false, type: string|false} on left side of ?? always exists and is not nullable.
+  Line 315: Offset 0 on array{string, int, int, bool} in isset() always exists and is not nullable.
+  Line 318: Offset 'type' on array{ext: string|false, type: string|false} on left side of ?? always exists and is not nullable.
+
+FILE: app/Repositories/TripRepository.php (6 errors)
+  Line 38: Static property Yatra\Repositories\TripRepository::$tableExistsCache is never read, only written.
+  Line 823: Else branch is unreachable because ternary operator condition is always true.
+  Line 1039: Constant DB_NAME not found.
+  Line 1319: Variable $data in empty() always exists and is not falsy.
+  Line 1940: Strict comparison using === between float and 0 will always evaluate to false.
+  Line 1941: Strict comparison using === between float and 0 will always evaluate to false.
+
+FILE: app/Repositories/YatraAvailabilityRepository.php (2 errors)
+  Line 16: Non-abstract class Yatra\Repositories\YatraAvailabilityRepository contains abstract method getTableName() from class Yatra\Repositories\BaseRepository.
+  Line 29: Call to static method getTableName() on an unknown class Yatra\Database\Tables\YatraAvailabilityTable.
+
+FILE: app/Scripts/DepartureDeduplicationScript.php (6 errors)
+  Line 80: Call to an undefined method Yatra\Core\Database::getPrefix().
+  Line 86: Call to an undefined method Yatra\Core\Database::getResults().
+  Line 113: Call to an undefined method Yatra\Core\Database::getPrefix().
+  Line 117: Call to an undefined method Yatra\Core\Database::execute().
+  Line 132: Call to an undefined method Yatra\Core\Database::getPrefix().
+  Line 136: Call to an undefined method Yatra\Core\Database::getRow().
+
+FILE: app/Services/ActivityService.php (1 errors)
+  Line 152: Call to static method getTableName() on an unknown class Yatra\Services\ClassificationsTable.
+
+FILE: app/Services/AttributeService.php (10 errors)
+  Line 201: Call to protected method getTableName() of class Yatra\Repositories\AttributeRepository.
+  Line 206: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 207: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 215: Call to protected method getTableName() of class Yatra\Repositories\AttributeRepository.
+  Line 220: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 221: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 247: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 248: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 260: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+  Line 261: Access to protected property Yatra\Repositories\AttributeRepository::$wpdb.
+
+FILE: app/Services/AvailabilityRecurringRulesService.php (19 errors)
+  Line 43: Call to static method validateRequired() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 48: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 52: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 103: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getById().
+  Line 109: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 113: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 171: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getById().
+  Line 200: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getActiveRulesForTrip().
+  Line 211: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getRulesForTrip().
+  Line 223: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getRulesForDate().
+  Line 240: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::updateStatus().
+  Line 251: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::deleteRulesForTrip().
+  Line 263: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 267: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::addException().
+  Line 279: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 283: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::removeException().
+  Line 294: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getRulesWithExceptions().
+  Line 307: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::getById().
+  Line 329: Call to an undefined method Yatra\Repositories\RecurringAvailabilityRepository::ruleAppliesToDate().
+
+FILE: app/Services/AvailabilityService.php (6 errors)
+  Line 78: Call to an undefined method Yatra\Services\AvailabilityService::normalizeTimeFormat().
+  Line 85: Call to an undefined method Yatra\Services\AvailabilityService::normalizeTimeFormat().
+  Line 117: Offset 'seats_total' on array in isset() always exists and is not nullable.
+  Line 138: Offset 'seats_available' on array on left side of ?? always exists and is not nullable.
+  Line 203: Call to an undefined method Yatra\Services\AvailabilityService::normalizeTimeFormat().
+  Line 259: Call to an undefined method Yatra\Services\AvailabilityService::normalizeTimeFormat().
+
+FILE: app/Services/AvailabilitySpecificDatesService.php (9 errors)
+  Line 43: Call to static method validateRequired() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 48: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 82: Call to an undefined method Yatra\Repositories\AvailabilityRepository::getById().
+  Line 88: Call to static method validateDate() on an unknown class Yatra\Helpers\ValidationHelper.
+  Line 122: Call to an undefined method Yatra\Repositories\AvailabilityRepository::getById().
+  Line 176: Call to an undefined method Yatra\Repositories\AvailabilityRepository::isDateAvailable().
+  Line 188: Call to an undefined method Yatra\Repositories\AvailabilityRepository::getAvailableSlots().
+  Line 255: Call to an undefined method Yatra\Repositories\AvailabilityRepository::getDatesWithPriceOverrides().
+  Line 268: Call to an undefined method Yatra\Repositories\AvailabilityRepository::deleteDatesInRange().
+
+FILE: app/Services/BaseService.php (1 errors)
+  Line 375: Caught class Yatra\Services\ArgumentCountError not found.
+
+FILE: app/Services/BookingService.php (4 errors)
+  Line 769: Call to an undefined method Yatra\Repositories\TravellerRepository::createTraveller().
+  Line 786: Call to an undefined static method Yatra\Services\SettingsService::getSettings().
+  Line 795: Access to an undefined property object::$reference.
+  Line 828: Access to an undefined property object::$reference.
+
+FILE: app/Services/CacheService.php (2 errors)
+  Line 250: Call to private static method getAvailableBackends() of class Yatra\Utils\Cache.
+  Line 272: Deprecated in PHP 8.4: Parameter #3 $duration (int) is implicitly nullable via default value null.
+
+FILE: app/Services/CustomerService.php (2 errors)
+  Line 240: Call to an undefined method Yatra\Repositories\CustomerRepository::deleteCustomer().
+  Line 685: Call to an undefined method Yatra\Repositories\CustomerRepository::deleteCustomer().
+
+FILE: app/Services/DepartureService.php (4 errors)
+  Line 221: Else branch is unreachable because ternary operator condition is always true.
+  Line 428: Strict comparison using === between int and null will always evaluate to false.
+  Line 571: Call to an undefined method Yatra\Repositories\BookingDepartureRepository::getDepartureForBooking().
+  Line 665: Method Yatra\Services\DepartureService::dateMatchesRecurringRule() is unused.
+
+FILE: app/Services/DifficultyLevelService.php (2 errors)
+  Line 268: Call to an undefined method Yatra\Repositories\DifficultyLevelRepository::search().
+  Line 303: Call to an undefined method Yatra\Repositories\DifficultyLevelRepository::search().
+
+FILE: app/Services/DiscountService.php (3 errors)
+  Line 635: Call to an undefined static method Yatra\Models\Discount::where().
+  Line 660: Undefined variable: $totalTravelers
+  Line 817: Call to an undefined method Yatra\Services\DiscountService::getGroupDiscountsForTrip().
+
+FILE: app/Services/EnquiryService.php (3 errors)
+  Line 438: Access to an undefined property object::$name.
+  Line 464: Access to an undefined property object::$name.
+  Line 466: Access to an undefined property object::$message.
+
+FILE: app/Services/ExportImportService.php (4 errors)
+  Line 357: Variable $importData in empty() always exists and is not falsy.
+  Line 540: Undefined variable: $wpdb
+  Line 695: Static method Yatra\Services\ExportImportService::exportTableData() is unused.
+  Line 739: Empty array passed to foreach.
+
+FILE: app/Services/FilterService.php (2 errors)
+  Line 88: Method Yatra\Services\DifficultyLevelService::getPublished() invoked with 1 parameter, 0 required.
+  Line 181: Parameter #1 $text of function esc_attr expects string, int given.
+
+FILE: app/Services/ItineraryService.php (2 errors)
+  Line 140: If condition is always false.
+  Line 169: If condition is always false.
+
+FILE: app/Services/PdfService.php (1 errors)
+  Line 90: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Services/RecurringAvailabilityService.php (10 errors)
+  Line 186: Parameter #1 $args of method Yatra\Repositories\RecurringAvailabilityRepository::getStatusCounts() expects array, int given.
+  Line 486: Access to an undefined property object::$original_price.
+  Line 487: Access to an undefined property object::$seats_total.
+  Line 491: Access to an undefined property object::$id.
+  Line 492: Access to an undefined property object::$id.
+  Line 493: Access to an undefined property object::$trip_id.
+  Line 502: Access to an undefined property object::$from_location.
+  Line 503: Access to an undefined property object::$to_location.
+  Line 504: Access to an undefined property object::$cutoff_hours.
+  Line 507: Access to an undefined property object::$name.
+
+FILE: app/Services/ReviewService.php (2 errors)
+  Line 134: Call to an undefined static method Yatra\Services\SettingsService::getSettings().
+  Line 323: Call to an undefined static method Yatra\Services\SettingsService::getSettings().
+
+FILE: app/Services/ScheduledPaymentService.php (13 errors)
+  Line 175: Access to an undefined property object::$scheduled_date.
+  Line 179: Access to an undefined property object::$contact_first_name.
+  Line 180: Access to an undefined property object::$reference.
+  Line 181: Access to an undefined property object::$amount.
+  Line 182: Access to an undefined property object::$currency.
+  Line 213: Call to an undefined method Yatra\Repositories\PaymentRepository::getTokenById().
+  Line 218: Call to an undefined method Yatra\Repositories\PaymentRepository::getTokenByCustomerAndGateway().
+  Line 377: Call to an undefined static method Yatra\Services\ScheduledPaymentService::notifyPaymentCompleted().
+  Line 457: Call to an undefined method Yatra\Repositories\PaymentRepository::getTokenById().
+  Line 520: Call to an undefined method Yatra\PaymentGateways\PaymentGatewayInterface::createScheduledInvoice().
+  Line 566: Static method Yatra\Services\ScheduledPaymentService::createFinalPayment() is unused.
+  Line 583: Call to an undefined method Yatra\PaymentGateways\PaymentGatewayInterface::createScheduledInvoice().
+  Line 661: Static method Yatra\Services\ScheduledPaymentService::notifyPaymentSuccess() is unused.
+
+FILE: app/Services/TravelerCategoryService.php (4 errors)
+  Line 316: Strict comparison using === between mixed and null will always evaluate to false.
+  Line 324: Strict comparison using === between mixed and null will always evaluate to false.
+  Line 341: Strict comparison using === between mixed and null will always evaluate to false.
+  Line 349: Strict comparison using === between mixed and null will always evaluate to false.
+
+FILE: app/Services/TripListingService.php (10 errors)
+  Line 213: Call to an undefined method Yatra\Repositories\TripRepository::filterByAttributes().
+  Line 295: Call to an undefined method Yatra\Repositories\TripRepository::getPriceRange().
+  Line 296: Call to an undefined method Yatra\Repositories\TripRepository::getDurationRange().
+  Line 386: Call to an undefined method Yatra\Repositories\TripRepository::getAccommodationTypes().
+  Line 387: Call to an undefined method Yatra\Repositories\TripRepository::getIncludedServices().
+  Line 388: Call to an undefined method Yatra\Repositories\TripRepository::getDurationOptions().
+  Line 389: Call to an undefined method Yatra\Repositories\TripRepository::getGroupSizeOptions().
+  Line 390: Call to an undefined method Yatra\Repositories\TripRepository::getPhysicalGrades().
+  Line 488: Call to an undefined method Yatra\Repositories\DestinationRepository::getPublishedDestinations().
+  Line 509: Call to an undefined method Yatra\Repositories\ActivityRepository::getPublishedActivities().
+
+FILE: app/Services/TripService.php (11 errors)
+  Line 50: Property Yatra\Services\TripService::$attributeRepository is never read, only written.
+  Line 55: Property Yatra\Services\TripService::$availabilityRepository is never read, only written.
+  Line 128: Call to protected method loadTripRelationships() of class Yatra\Repositories\TripRepository.
+  Line 499: Method Yatra\Validators\TripValidator::sanitize() invoked with 2 parameters, 1 required.
+  Line 636: Offset 'title' on non-empty-array on left side of ?? always exists and is not nullable.
+  Line 1033: Call to an undefined static method Yatra\Services\CacheService::clearTripCache().
+  Line 1071: Call to an undefined static method Yatra\Services\CacheService::clearTripCache().
+  Line 1131: Call to an undefined static method Yatra\Services\CacheService::clearTripCache().
+  Line 1233: Call to an undefined method Yatra\Repositories\TripRepository::countDeparturesByDate().
+  Line 1252: Instantiated class Yatra\Repositories\TripPriceTypeRepository not found.
+  Line 1253: Call to method getPriceRangeByTripId() on an unknown class Yatra\Repositories\TripPriceTypeRepository.
+
+FILE: app/Shortcodes/BaseShortcode.php (1 errors)
+  Line 107: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: app/Utils/QueryCache.php (2 errors)
+  Line 46: Undefined variable: $cacheKey
+  Line 169: Call to private static method getAvailableBackends() of class Yatra\Utils\Cache.
+
+FILE: includes/helpers.php (8 errors)
+  Line 201: Parameter #3 $number of function _n expects int, float given.
+  Line 204: Parameter #3 $number of function _n expects int, float given.
+  Line 412: Offset 1 on array{string, string} on left side of ?? always exists and is not nullable.
+  Line 1055: Constant YATRA_PLUGIN_PATH not found.
+  Line 1089: Constant YATRA_PLUGIN_URL not found.
+  Line 1121: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 1197: Access to an undefined property object::$original_price.
+  Line 1197: Access to an undefined property object::$sale_price.
+
+FILE: templates/admin.php (3 errors)
+  Line 12: Constant YATRA_PLUGIN_PATH not found.
+  Line 13: Constant YATRA_PLUGIN_PATH not found.
+  Line 105: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: templates/booking-confirmation.php (6 errors)
+  Line 113: Access to an undefined property object::$trip_review_count.
+  Line 120: Result of && is always false.
+  Line 120: Strict comparison using === between int<1, 5> and float will always evaluate to false.
+  Line 146: Access to an undefined property object::$duration_nights.
+  Line 278: Parameter #1 $text of function esc_html expects string, (float|int) given.
+  Line 876: File ends with a trailing whitespace. This may cause problems when running the code in the web browser. Remove the closing ?> mark or remove the whitespace.
+
+FILE: templates/booking.php (1 errors)
+  Line 193: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: templates/listing-activity.php (2 errors)
+  Line 65: Else branch is unreachable because ternary operator condition is always true.
+  Line 240: Parameter #1 $text of function esc_html expects string, int given.
+
+FILE: templates/listing-destination.php (3 errors)
+  Line 65: Else branch is unreachable because ternary operator condition is always true.
+  Line 249: Parameter #1 $text of function esc_html expects string, int given.
+  Line 297: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+
+FILE: templates/listing-trip-category.php (3 errors)
+  Line 65: Else branch is unreachable because ternary operator condition is always true.
+  Line 254: Parameter #1 $text of function esc_html expects string, int given.
+  Line 306: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+
+FILE: templates/listing-trip.php (12 errors)
+  Line 231: Offset 'duration' does not exist on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...}.
+  Line 231: Offset 'duration' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} in empty() does not exist.
+  Line 267: Offset 'budget' does not exist on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...}.
+  Line 267: Offset 'budget' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} in empty() does not exist.
+  Line 321: Offset 'sort' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} on left side of ?? always exists and is not nullable.
+  Line 383: Call to an undefined method Yatra\Services\TripListingService::getPriceStats().
+  Line 477: Method Yatra\Services\DifficultyLevelService::getPublished() invoked with 1 parameter, 0 required.
+  Line 754: Offset 'services' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} on left side of ?? does not exist.
+  Line 787: Offset 'offers' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} on left side of ?? does not exist.
+  Line 820: Offset 'booking' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} on left side of ?? does not exist.
+  Line 853: Offset 'age' on array{destination: mixed, activity: mixed, price_min: mixed, price_max: mixed, trip_type: mixed, sort: mixed, difficulty: mixed, rating: mixed, ...} on left side of ?? does not exist.
+  Line 1045: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+
+FILE: templates/partials/availability-section.php (17 errors)
+  Line 16: Variable $trip_data on left side of ?? always exists and is not nullable.
+  Line 17: Variable $availability_cards on left side of ?? always exists and is not nullable.
+  Line 18: Variable $month_filters on left side of ?? always exists and is not nullable.
+  Line 103: Parameter #1 $text of function esc_attr expects string, int<1, 10> given.
+  Line 103: Parameter #1 $text of function esc_attr expects string, int<1, max> given.
+  Line 123: Parameter #1 $text of function esc_attr expects string, float given.
+  Line 124: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 320: Variable $dp_enabled might not be defined.
+  Line 385: Constant YATRA_PLUGIN_PATH not found.
+  Line 405: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 407: Parameter #1 $text of function esc_attr expects string, float given.
+  Line 427: Parameter #1 $text of function esc_attr expects string, float given.
+  Line 427: Variable $display_sale_price on left side of ?? always exists and is not nullable.
+  Line 428: Variable $display_sale_price on left side of ?? always exists and is not nullable.
+  Line 464: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 471: Parameter #1 $text of function esc_attr expects string, float given.
+  Line 486: Parameter #1 $text of function esc_attr expects string, float given.
+
+FILE: templates/partials/booking-content.php (51 errors)
+  Line 32: Variable $trip might not be defined.
+  Line 67: Constant YATRA_PLUGIN_PATH not found.
+  Line 121: Parameter #1 $text of function esc_attr expects string, (float|int) given.
+  Line 121: Variable $total_travelers might not be defined.
+  Line 121: Variable $trip might not be defined.
+  Line 144: Constant YATRA_PLUGIN_PATH not found.
+  Line 155: Variable $total_travelers might not be defined.
+  Line 155: Variable $trip might not be defined.
+  Line 157: Variable $trip might not be defined.
+  Line 163: Variable $trip might not be defined.
+  Line 173: Variable $total_travelers might not be defined.
+  Line 173: Variable $trip might not be defined.
+  Line 184: Parameter #1 $text of function esc_attr expects string, (float|int) given.
+  Line 184: Parameter #1 $text of function esc_attr expects string, (float|int) given.
+  Line 207: Variable $trip might not be defined.
+  Line 216: Variable $travel_date might not be defined.
+  Line 223: Variable $total_travelers might not be defined.
+  Line 223: Variable $total_travelers might not be defined.
+  Line 276: Parameter #1 $text of function esc_attr expects string, (float|int) given.
+  Line 276: Parameter #1 $text of function esc_attr expects string, (float|int) given.
+  Line 293: Variable $travel_date might not be defined.
+  Line 296: Variable $travel_date might not be defined.
+  Line 299: Variable $travel_date might not be defined.
+  Line 353: Variable $trip might not be defined.
+  Line 372: Constant YATRA_PLUGIN_PATH not found.
+  Line 380: Variable $total_travelers might not be defined.
+  Line 380: Variable $total_travelers might not be defined.
+  Line 382: Variable $total_travelers might not be defined.
+  Line 389: Variable $trip might not be defined.
+  Line 392: Variable $trip_permalink on left side of ?? always exists and is not nullable.
+  Line 401: Variable $trip_permalink on left side of ?? always exists and is not nullable.
+  Line 403: Variable $trip might not be defined.
+  Line 532: Variable $total_travelers might not be defined.
+  Line 532: Variable $travel_date might not be defined.
+  Line 532: Variable $traveler_counts on left side of ?? always exists and is not nullable.
+  Line 577: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 578: Parameter #1 $text of function esc_attr expects string, float given.
+  Line 584: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 603: Ternary operator condition is always false.
+  Line 628: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 671: Variable $deposit_required might not be defined.
+  Line 673: Variable $deposit_percentage might not be defined.
+  Line 674: Variable $deposit_percentage might not be defined.
+  Line 692: Variable $trip might not be defined.
+  Line 692: Variable $trip might not be defined.
+  Line 696: Variable $total_travelers might not be defined.
+  Line 736: Variable $deposit_required might not be defined.
+  Line 738: Variable $deposit_percentage might not be defined.
+  Line 739: Variable $deposit_percentage might not be defined.
+  Line 748: Ternary operator condition is always false.
+  Line 751: Ternary operator condition is always false.
+
+FILE: templates/partials/booking-form-fields.php (12 errors)
+  Line 82: Variable $prop in empty() always exists and is not falsy.
+  Line 257: Variable $trip_id might not be defined.
+  Line 262: Variable $is_remaining_payment might not be defined.
+  Line 270: Variable $remaining_amount might not be defined.
+  Line 395: Variable $total_travelers might not be defined.
+  Line 398: Variable $total_travelers might not be defined.
+  Line 445: Parameter #1 $text of function esc_attr expects string, int<1, max> given.
+  Line 503: Variable $deposit_required might not be defined.
+  Line 504: Variable $deposit_percentage might not be defined.
+  Line 505: Variable $partial_payment might not be defined.
+  Line 506: Variable $partial_payment_percentage might not be defined.
+  Line 552: Variable $icon on left side of ?? always exists and is not nullable.
+
+FILE: templates/partials/pricing-summary.php (1 errors)
+  Line 48: Variable $price_per_person on left side of ?? always exists and is not nullable.
+
+FILE: templates/partials/remaining-checkout-content.php (3 errors)
+  Line 32: Access to an undefined property object::$travel_date.
+  Line 33: Access to an undefined property object::$travelers.
+  Line 112: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: templates/partials/single-trip/content-faq.php (1 errors)
+  Line 60: Access to an undefined property object::$title.
+
+FILE: templates/partials/single-trip/content-gallery.php (4 errors)
+  Line 19: Variable $trip might not be defined.
+  Line 20: Variable $trip might not be defined.
+  Line 23: Variable $trip might not be defined.
+  Line 24: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/content-location.php (4 errors)
+  Line 13: Access to an undefined property object::$latitude.
+  Line 13: Variable $trip might not be defined.
+  Line 14: Access to an undefined property object::$longitude.
+  Line 14: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/content-overview.php (9 errors)
+  Line 22: Variable $trip might not be defined.
+  Line 22: Variable $trip might not be defined.
+  Line 25: Variable $trip might not be defined.
+  Line 59: Variable $trip might not be defined.
+  Line 116: Variable $trip might not be defined.
+  Line 117: Variable $trip might not be defined.
+  Line 119: Variable $base_price might not be defined.
+  Line 129: Variable $trip might not be defined.
+  Line 129: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/content-sidebar.php (38 errors)
+  Line 20: Call to an undefined method Yatra\Services\DiscountService::getGroupDiscountsForTrip().
+  Line 20: Variable $trip might not be defined.
+  Line 41: Variable $has_availability might not be defined.
+  Line 42: Variable $trip might not be defined.
+  Line 69: Variable $has_traveler_pricing might not be defined.
+  Line 84: Variable $trip might not be defined.
+  Line 93: Variable $has_traveler_pricing might not be defined.
+  Line 115: Variable $trip might not be defined.
+  Line 116: Variable $trip might not be defined.
+  Line 117: Variable $trip might not be defined.
+  Line 118: Variable $trip might not be defined.
+  Line 136: Variable $has_traveler_pricing might not be defined.
+  Line 160: Variable $pricing_type might not be defined.
+  Line 186: Variable $has_traveler_pricing might not be defined.
+  Line 207: Variable $trip might not be defined.
+  Line 207: Variable $trip might not be defined.
+  Line 230: Variable $has_traveler_pricing might not be defined.
+  Line 239: Variable $trip might not be defined.
+  Line 283: Variable $trip might not be defined.
+  Line 334: Constant YATRA_PLUGIN_PATH not found.
+  Line 355: Variable $trip might not be defined.
+  Line 356: Variable $trip might not be defined.
+  Line 358: Variable $base_price might not be defined.
+  Line 365: Variable $trip might not be defined.
+  Line 365: Variable $trip might not be defined.
+  Line 408: Variable $trip might not be defined.
+  Line 409: Variable $trip might not be defined.
+  Line 418: Variable $has_traveler_pricing might not be defined.
+  Line 427: Variable $trip might not be defined.
+  Line 471: Variable $trip might not be defined.
+  Line 522: Constant YATRA_PLUGIN_PATH not found.
+  Line 543: Variable $trip might not be defined.
+  Line 544: Variable $trip might not be defined.
+  Line 546: Variable $base_price might not be defined.
+  Line 553: Variable $trip might not be defined.
+  Line 553: Variable $trip might not be defined.
+  Line 562: Variable $base_price might not be defined.
+  Line 566: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/enquiry-modal.php (2 errors)
+  Line 24: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 24: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/group-discounts.php (1 errors)
+  Line 22: Variable $group_discounts_data might not be defined.
+
+FILE: templates/partials/single-trip/hero.php (20 errors)
+  Line 24: Variable $trip might not be defined.
+  Line 28: Variable $trip might not be defined.
+  Line 31: Variable $trip might not be defined.
+  Line 34: Variable $trip might not be defined.
+  Line 37: Variable $trip might not be defined.
+  Line 39: Variable $trip might not be defined.
+  Line 40: Variable $trip might not be defined.
+  Line 116: Variable $trip might not be defined.
+  Line 118: Variable $trip might not be defined.
+  Line 119: Variable $trip might not be defined.
+  Line 136: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 143: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 150: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 157: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 164: Parameter #1 $text of function esc_html expects string, int<1, max> given.
+  Line 172: Variable $trip might not be defined.
+  Line 173: Variable $trip might not be defined.
+  Line 183: Variable $trip might not be defined.
+  Line 184: Variable $trip might not be defined.
+  Line 242: Variable $base_price might not be defined.
+
+FILE: templates/partials/single-trip/quick-facts.php (3 errors)
+  Line 19: Variable $trip might not be defined.
+  Line 22: Variable $trip might not be defined.
+  Line 22: Variable $trip might not be defined.
+
+FILE: templates/partials/single-trip/reviews.php (12 errors)
+  Line 17: Variable $trip might not be defined.
+  Line 26: Variable $trip might not be defined.
+  Line 26: Variable $trip might not be defined.
+  Line 87: Parameter #1 $text of function esc_attr expects string, float|int<0, max> given.
+  Line 89: Parameter #1 $text of function esc_html expects string, int<0, max> given.
+  Line 189: Variable $trip might not be defined.
+  Line 199: Variable $trip might not be defined.
+  Line 237: Right side of && is always true.
+  Line 240: Variable $trip might not be defined.
+  Line 241: Right side of && is always true.
+  Line 249: Parameter #1 $text of function esc_attr expects string, int given.
+  Line 280: Right side of && is always true.
+
+FILE: templates/partials/single-trip/sticky-nav.php (3 errors)
+  Line 59: Variable $has_availability might not be defined.
+  Line 59: Variable $has_traveler_pricing might not be defined.
+  Line 64: Variable $base_price might not be defined.
+
+FILE: templates/partials/single-trip/trip-attributes.php (1 errors)
+  Line 16: Variable $trip might not be defined.
+
+FILE: templates/pdf/itinerary.php (3 errors)
+  Line 240: Call to function is_array() with non-falsy-string will always evaluate to false.
+  Line 320: Call to function is_array() with non-falsy-string will always evaluate to false.
+  Line 340: Call to function is_array() with non-falsy-string will always evaluate to false.
+
+FILE: templates/pdf/voucher.php (1 errors)
+  Line 107: Variable $traveler_count might not be defined.
+
+FILE: templates/remaining-checkout.php (1 errors)
+  Line 20: Constant YATRA_PLUGIN_PATH not found.
+
+FILE: templates/setup-wizard/currency.php (1 errors)
+  Line 99: Variable $this might not be defined.
+
+FILE: templates/setup-wizard/general.php (1 errors)
+  Line 63: Variable $this might not be defined.
+
+FILE: templates/setup-wizard/pages.php (1 errors)
+  Line 79: Variable $this might not be defined.
+
+FILE: templates/setup-wizard/theme-old.php (2 errors)
+  Line 35: Constant YATRA_PLUGIN_URI not found.
+  Line 113: Variable $this might not be defined.
+
+FILE: templates/setup-wizard/theme.php (2 errors)
+  Line 38: Constant YATRA_PLUGIN_URI not found.
+  Line 81: Variable $this might not be defined.
+
+FILE: templates/setup-wizard/welcome.php (1 errors)
+  Line 66: Variable $this might not be defined.
+
+FILE: templates/single-activity.php (3 errors)
+  Line 29: Parameter #1 $slug of function get_template_part expects string, int given.
+  Line 86: Access to an undefined property object::$name.
+  Line 169: Access to an undefined property object::$name.
+
+FILE: templates/single-destination.php (3 errors)
+  Line 29: Parameter #1 $slug of function get_template_part expects string, int given.
+  Line 86: Access to an undefined property object::$name.
+  Line 169: Access to an undefined property object::$name.
+
+FILE: templates/single-taxonomy.php (1 errors)
+  Line 359: File ends with a trailing whitespace. This may cause problems when running the code in the web browser. Remove the closing ?> mark or remove the whitespace.
+
+FILE: templates/single-trip-old.php (5 errors)
+  Line 26: Parameter #1 $slug of function get_template_part expects string, int given.
+  Line 40: Comparison operation ">" between int<1, max> and 0 is always true.
+  Line 120: Access to an undefined property object::$original_price.
+  Line 120: Access to an undefined property object::$sale_price.
+  Line 532: Function yatra_get_currency_symbol invoked with 0 parameters, 1 required.
+
+FILE: templates/single-trip.php (1 errors)
+  Line 26: Parameter #1 $slug of function get_template_part expects string, int given.
+
+FILE: templates/trip-listing-card.php (3 errors)
+  Line 18: Result of || is always false.
+  Line 18: Variable $trip in isset() always exists and is not nullable.
+  Line 92: Parameter #1 $text of function esc_attr expects string, int given.
+
