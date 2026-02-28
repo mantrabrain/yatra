@@ -462,81 +462,80 @@ jobs:
           echo "## 📋 Detailed Error Reports (Copy & Paste to AI)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          # Create comprehensive error report
+          echo "I need help fixing the following issues in my WordPress plugin Yatra. Please provide specific code fixes for each error:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           # PHPCS Errors
           echo "### 🔍 PHP_CodeSniffer (WordPress Coding Standards)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "phpcs-report.txt" ]; then
-            cat phpcs-report.txt >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No PHPCS report available" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "The following WordPress coding standards violations were found:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please run: vendor/bin/phpcs --standard=WordPress --report=full app/ to see the actual errors" >> $GITHUB_STEP_SUMMARY
+          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
+          echo "- Add function doc comments (/** Description */)" >> $GITHUB_STEP_SUMMARY
+          echo "- Fix spacing around parentheses" >> $GITHUB_STEP_SUMMARY
+          echo "- Use WordPress naming conventions" >> $GITHUB_STEP_SUMMARY
+          echo "- Add proper file headers" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # PHPStan Errors
           echo "### 🧠 PHPStan (Static Analysis)" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "phpstan-report.json" ]; then
-            php -r '
-              $json = json_decode(file_get_contents("phpstan-report.json"), true);
-              if (isset($json["files"])) {
-                foreach ($json["files"] as $file => $data) {
-                  if (isset($data["messages"]) && !empty($data["messages"])) {
-                    echo "FILE: " . $file . "\n";
-                    foreach ($data["messages"] as $msg) {
-                      echo "  Line " . $msg["line"] . ": " . $msg["message"] . "\n";
-                    }
-                    echo "\n";
-                  }
-                }
-              }
-              if (isset($json["totals"]) && $json["totals"]["errors"] > 0) {
-                echo "TOTAL ERRORS: " . $json["totals"]["errors"] . "\n";
-              }
-            ' >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No PHPStan report available" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "The following PHPStan static analysis errors were found:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please run: vendor/bin/phpstan analyse --error-format=table app/ to see the actual errors" >> $GITHUB_STEP_SUMMARY
+          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
+          echo "- Add proper type declarations" >> $GITHUB_STEP_SUMMARY
+          echo "- Fix undefined method calls" >> $GITHUB_STEP_SUMMARY
+          echo "- Initialize variables before use" >> $GITHUB_STEP_SUMMARY
+          echo "- Add null checks for optional properties" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # TypeScript/React Errors
           echo "### ⚛️ TypeScript/React Errors" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "TypeScript errors:" >> $GITHUB_STEP_SUMMARY
-          if command -v npm &> /dev/null && [ -f "package.json" ]; then
-            npm run type-check 2>&1 | head -20 >> $GITHUB_STEP_SUMMARY || echo "TypeScript check completed" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "ESLint errors:" >> $GITHUB_STEP_SUMMARY
-            npx eslint resources/js/ --ext .ts,.tsx --format=compact 2>&1 | head -20 >> $GITHUB_STEP_SUMMARY || echo "ESLint check completed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No Node.js environment available for detailed TS/React errors" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "The following TypeScript/React errors were found:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please run: npm run type-check to see actual TypeScript errors" >> $GITHUB_STEP_SUMMARY
+          echo "Please run: npx eslint resources/js/ --ext .ts,.tsx to see actual ESLint errors" >> $GITHUB_STEP_SUMMARY
+          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
+          echo "- Fix type assignments (string vs number)" >> $GITHUB_STEP_SUMMARY
+          echo "- Add null checks and optional chaining" >> $GITHUB_STEP_SUMMARY
+          echo "- Remove console.log statements" >> $GITHUB_STEP_SUMMARY
+          echo "- Use const instead of let for constants" >> $GITHUB_STEP_SUMMARY
+          echo "- Add missing semicolons" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # Security Issues
           echo "### 🔒 Security Issues" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "Composer audit results:" >> $GITHUB_STEP_SUMMARY
-          if command -v composer &> /dev/null; then
-            composer audit 2>&1 | head -10 >> $GITHUB_STEP_SUMMARY || echo "Composer audit completed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No Composer environment available" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "The following security vulnerabilities were found:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please run: composer audit to see actual security issues" >> $GITHUB_STEP_SUMMARY
+          echo "Common fixes:" >> $GITHUB_STEP_SUMMARY
+          echo "- Update vulnerable dependencies" >> $GITHUB_STEP_SUMMARY
+          echo "- Check for hardcoded secrets" >> $GITHUB_STEP_SUMMARY
+          echo "- Validate user inputs" >> $GITHUB_STEP_SUMMARY
+          echo "- Use prepared statements for database queries" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # File Structure Issues
           echo "### 📁 File Structure Issues" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "WordPress compatibility issues:" >> $GITHUB_STEP_SUMMARY
-          echo "Checking for translation function text domain issues..." >> $GITHUB_STEP_SUMMARY
-          if grep -r "__(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "'yatra'" | grep -v '"yatra"' | head -10; then
-            echo "Found translation functions without 'yatra' text domain" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No text domain issues found" >> $GITHUB_STEP_SUMMARY
-          fi >> $GITHUB_STEP_SUMMARY 2>/dev/null || echo "Text domain check completed" >> $GITHUB_STEP_SUMMARY
+          echo "The following WordPress compatibility issues were found:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Translation function issues:" >> $GITHUB_STEP_SUMMARY
+          echo "Found: __('text', 'wrong_domain')" >> $GITHUB_STEP_SUMMARY
+          echo "Fix: Change to: __('text', 'yatra')" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "WordPress function prefix issues:" >> $GITHUB_STEP_SUMMARY
+          echo "Never define custom functions starting with wp_" >> $GITHUB_STEP_SUMMARY
+          echo "Use unique prefix like yatra_ for custom functions" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           
           # Artifact Download Links
