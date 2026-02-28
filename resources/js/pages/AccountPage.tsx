@@ -119,8 +119,7 @@ const AccountPage: React.FC = () => {
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [urlKey]);
+      }, [urlKey]);
 
   // Update URL and localStorage when section changes
   const handleSectionChange = (newSection: Section) => {

@@ -2503,8 +2503,7 @@ const Settings: React.FC = () => {
       setFormData(defaultSettings);
       isInitializedRef.current = true;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings, isLoading]);
+      }, [settings, isLoading]);
 
   // Initialize gateway order when gateway definitions are loaded
   React.useEffect(() => {
