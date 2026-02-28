@@ -132,15 +132,29 @@ class CacheService
         // Handle both entity types and service class names
         $normalizedType = self::normalizeEntityType($entityType);
         
-        $prefix = match ($normalizedType) {
-            'trip' => Cache::PREFIX_TRIP_DATA,
-            'booking' => Cache::PREFIX_BOOKING_DATA,
-            'customer' => Cache::PREFIX_CUSTOMER_DATA,
-            'activity' => Cache::PREFIX_ACTIVITY_DATA,
-            'destination' => Cache::PREFIX_DESTINATION_DATA,
-            'difficulty' => Cache::PREFIX_QUERY_RESULT, // For difficulty levels, use query cache
-            default => null,
-        };
+        switch ($normalizedType) {
+            case 'trip':
+                $prefix = Cache::PREFIX_TRIP_DATA;
+                break;
+            case 'booking':
+                $prefix = Cache::PREFIX_BOOKING_DATA;
+                break;
+            case 'customer':
+                $prefix = Cache::PREFIX_CUSTOMER_DATA;
+                break;
+            case 'activity':
+                $prefix = Cache::PREFIX_ACTIVITY_DATA;
+                break;
+            case 'destination':
+                $prefix = Cache::PREFIX_DESTINATION_DATA;
+                break;
+            case 'difficulty':
+                $prefix = Cache::PREFIX_QUERY_RESULT; // For difficulty levels, use query cache
+                break;
+            default:
+                $prefix = null;
+                break;
+        }
 
         if ($prefix) {
             if ($normalizedType === 'difficulty') {

@@ -4,7 +4,8 @@
 # Usage: ./parse-phpstan-report.sh
 
 if [ ! -f "phpstan-report.json" ]; then
-    echo "✅ No PHPStan errors found. Code passes static analysis at level 5." > phpstan-errors-readable.txt
+    # No report file - create empty file so CI knows it ran successfully
+    touch phpstan-errors-readable.txt
     exit 0
 fi
 
@@ -55,7 +56,8 @@ if (isset($json["files"]) && is_array($json["files"])) {
 }
 
 if ($totalErrors === 0) {
-    $output = "✅ No PHPStan errors found. Code passes static analysis at level 5.\n";
+    // No errors - create empty file so CI knows it ran successfully
+    $output = "";
 } else {
     $output = "PHPSTAN ANALYSIS RESULTS\n";
     $output .= "========================\n\n";

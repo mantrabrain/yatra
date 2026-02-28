@@ -4,7 +4,8 @@
 # Usage: ./parse-phpcs-report.sh
 
 if [ ! -f "phpcs-report.json" ]; then
-    echo "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards." > phpcs-errors-readable.txt
+    # No report file - create empty file so CI knows it ran successfully
+    touch phpcs-errors-readable.txt
     exit 0
 fi
 
@@ -33,7 +34,8 @@ if (isset($json["files"])) {
 }
 
 if ($totalErrors === 0 && $totalWarnings === 0) {
-    $output = "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards.\n";
+    // No errors - create empty file so CI knows it ran successfully
+    $output = "";
 } else {
     $output .= "TOTAL: " . $totalErrors . " errors, " . $totalWarnings . " warnings\n";
 }
