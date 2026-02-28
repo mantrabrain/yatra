@@ -437,7 +437,7 @@ jobs:
           
           # PHP 7.4 deprecations
           if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
-            DEPRECATED=$(grep -rn "create_function\|each\|money_format\|ezmlm_hash" app includes templates --include="*.php" 2>/dev/null || true)
+            DEPRECATED=$(grep -rn "create_function\(\|each(\|money_format(\|ezmlm_hash(" app includes templates --include="*.php" 2>/dev/null || true)
             if [ -n "$DEPRECATED" ]; then
               echo "⚠️ PHP 7.4+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
               echo "$DEPRECATED" | tee -a php${{ matrix.php }}-compat.txt
@@ -446,7 +446,7 @@ jobs:
           
           # PHP 8.0+ deprecations
           if [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
-            DEPRECATED_80=$(grep -rn "get_magic_quotes_gpc\|get_magic_quotes_runtime" app includes templates --include="*.php" 2>/dev/null || true)
+            DEPRECATED_80=$(grep -rn "get_magic_quotes_gpc(\|get_magic_quotes_runtime(" app includes templates --include="*.php" 2>/dev/null || true)
             if [ -n "$DEPRECATED_80" ]; then
               echo "⚠️ PHP 8.0+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
               echo "$DEPRECATED_80" | tee -a php${{ matrix.php }}-compat.txt
@@ -455,7 +455,7 @@ jobs:
           
           # PHP 8.1+ deprecations
           if [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
-            DEPRECATED_81=$(grep -rn "utf8_encode\|utf8_decode" app includes templates --include="*.php" 2>/dev/null || true)
+            DEPRECATED_81=$(grep -rn "utf8_encode(\|utf8_decode(" app includes templates --include="*.php" 2>/dev/null || true)
             if [ -n "$DEPRECATED_81" ]; then
               echo "⚠️ PHP 8.1+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
               echo "$DEPRECATED_81" | tee -a php${{ matrix.php }}-compat.txt
@@ -475,9 +475,11 @@ jobs:
               --report-json=phpcs-report.json \
               -q > phpcs-output.txt 2>&1 || true
             
-            # Parse PHPCS report using bash script
-            if [ -f "phpcs-report.json" ]; then
-              bash .github/scripts/parse-phpcs-report.sh || true
+            # Show raw PHPCS output for detailed analysis
+            if [ -f "phpcs-output.txt" ]; then
+              echo "=== RAW PHPCS REPORT FOR PHP ${{ matrix.php }} ===" | tee -a php${{ matrix.php }}-compat.txt
+              cat phpcs-output.txt | tee -a php${{ matrix.php }}-compat.txt
+              echo "=== END PHPCS REPORT ===" | tee -a php${{ matrix.php }}-compat.txt
               echo "PHPCS analysis completed for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
             else
               echo "PHPCS not available for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
@@ -494,9 +496,8 @@ jobs:
           path: |
             php${{ matrix.php }}-compat.txt
             php${{ matrix.php }}-lint.txt
-            phpcs-errors-readable.txt
-            phpcs-report.json
             phpcs-output.txt
+            phpcs-report.json
           if-no-files-found: ignore
           
       - name: Upload Fallback Report (if job failed)
