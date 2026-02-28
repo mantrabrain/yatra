@@ -1,3 +1,6 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
 parameters:
     level: 5
     paths:
@@ -13,46 +16,16 @@ parameters:
         - node_modules/
         - */tests/*
         - */test/*
-        - app/Providers/RouteServiceProvider.php  # May have WordPress-specific code
+        - app/Providers/RouteServiceProvider.php
+    
+    # WordPress-specific configuration
+    bootstrapFiles:
+        - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
     
     ignoreErrors:
-        # WordPress global functions and variables
-        - '#Call to an undefined function (wpdb|wp_|get_|add_|do_|apply_filters|esc_|__|is_|has_|the_|wp_is_|wp_get_|wp_set_|wp_enqueue_|wp_register_|wp_dequeue_|wp_deregister_).*#'
-        - '#Access to an undefined property \$wpdb#'
-        - '#Undefined variable: \$wp_#'
-        
-        # WordPress hooks and filters
-        - '#Call to an undefined method add_action\(\)#'
-        - '#Call to an undefined method add_filter\(\)#'
-        - '#Call to an undefined method do_action\(\)#'
-        - '#Call to an undefined method apply_filters\(\)#'
-        
-        # WordPress global variables
-        - '#Undefined variable: \$post#'
-        - '#Undefined variable: \$wp_query#'
-        - '#Undefined variable: \$current_user#'
-        - '#Undefined variable: \$wp_rewrite#'
-        
         # Third-party library calls (DOMPDF, Action Scheduler)
         - '#Call to an undefined method Dompdf.*#'
         - '#Call to an undefined method ActionScheduler.*#'
-        
-        # Dynamic property access (common in WordPress)
-        - '#Access to an undefined property.*#'
-        
-        # Array access on mixed types (common in WordPress data handling)
-        - '#Cannot access property on mixed type#'
-        - '#Cannot access offset on mixed type#'
-    
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
-    checkMissingVarAnnotation: false
-    
-    # Memory limit for large codebases
-    memoryLimit: 1G
-    
-    # Parallel processing
-    parallel:
-        jobSize: 20
-        maximumNumberOfProcesses: 32
-        minimumNumberOfJobsPerProcess: 2
+        # Ignore missing array/generic typehints (common in WordPress)
+        - identifier: missingType.iterableValue
+        - identifier: missingType.generics

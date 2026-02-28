@@ -43,6 +43,9 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --optimize-autoloader
         
+      - name: Configure PHPCS
+        run: vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs
+        
       - name: Validate Composer
         run: composer validate --strict
         
