@@ -253,8 +253,15 @@ jobs:
         run: |
           echo "Checking file permissions..."
           
-          # Ensure no executable permissions on PHP files (except for scripts)
-          find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -executable -exec echo "❌ Executable permission found: {}" \; && exit 1
+          # Check for executable permissions on PHP files
+          executable_files=$(find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -executable 2>/dev/null || true)
+          
+          if [ -n "$executable_files" ]; then
+            echo "❌ Executable permissions found on PHP files:"
+            echo "$executable_files"
+            echo "PHP files should not have executable permissions for security."
+            exit 1
+          fi
           
           echo "✅ File permissions are correct"
 
