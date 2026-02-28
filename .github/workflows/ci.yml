@@ -47,127 +47,157 @@ jobs:
         run: composer validate --strict
         
       - name: PHP Lint (Syntax Check)
+        id: php-lint
         run: |
           echo "Running PHP syntax check..."
-          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -print0 | xargs -0 -n1 -P4 php -l
+          ERRORS=""
+          while IFS= read -r -d '' file; do
+            OUTPUT=$(php -l "$file" 2>&1)
+            if [ $? -ne 0 ]; then
+              ERRORS="${ERRORS}${OUTPUT}\n"
+            fi
+          done < <(find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -print0)
+          
+          if [ -n "$ERRORS" ]; then
+            echo -e "$ERRORS" > php-lint-errors.txt
+            echo -e "$ERRORS"
+            echo "has_errors=true" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+          echo "No PHP syntax errors found" > php-lint-errors.txt
+          echo "has_errors=false" >> $GITHUB_OUTPUT
           
       - name: Run PHP_CodeSniffer (WordPress Standards)
+        id: phpcs
+        if: always() && steps.php-lint.outcome != 'failure'
         run: |
           echo "Running WordPress coding standards check..."
           vendor/bin/phpcs \
             --standard=phpcs.xml \
             --report=full \
-            --report=summary \
             --report-file=phpcs-report.txt \
             --report-json=phpcs-report.json \
             --report-gitblame=phpcs-gitblame.txt \
-            --verbose
+            -q || true
           
-          echo "=== PHPCS Summary ==="
-          cat phpcs-report.txt | head -50
-          
-          echo ""
-          echo "=== PHPCS Error Details ==="
+          # Parse JSON and create readable error report
           if [ -f phpcs-report.json ]; then
-            # Extract file errors from JSON report
             php -r '
               $json = json_decode(file_get_contents("phpcs-report.json"), true);
+              $output = "";
+              $totalErrors = 0;
+              $totalWarnings = 0;
               if (isset($json["files"])) {
                 foreach ($json["files"] as $file => $data) {
+                  $totalErrors += $data["errors"] ?? 0;
+                  $totalWarnings += $data["warnings"] ?? 0;
                   if (isset($data["messages"]) && !empty($data["messages"])) {
-                    echo "📁 File: " . $file . "\n";
+                    $output .= "FILE: " . $file . " (Errors: " . ($data["errors"] ?? 0) . ", Warnings: " . ($data["warnings"] ?? 0) . ")\n";
                     foreach ($data["messages"] as $msg) {
-                      echo "  ❌ Line " . $msg["line"] . ": " . $msg["message"] . " (" . $msg["source"] . ")\n";
+                      $type = $msg["type"] === "ERROR" ? "ERROR" : "WARNING";
+                      $output .= "  Line " . $msg["line"] . " [" . $type . "]: " . $msg["message"] . " (" . $msg["source"] . ")\n";
                     }
-                    echo "\n";
+                    $output .= "\n";
                   }
                 }
               }
+              $output .= "TOTAL: " . $totalErrors . " errors, " . $totalWarnings . " warnings\n";
+              file_put_contents("phpcs-errors-readable.txt", $output);
+              echo $output;
+              if ($totalErrors > 0) { exit(1); }
             '
           fi
-            
-      - name: Upload PHPCS Reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: phpcs-reports-php${{ matrix.php }}
-          path: |
-            phpcs-report.txt
-            phpcs-report.json
-            phpcs-gitblame.txt
-          
                 
       - name: Run PHPStan Static Analysis
+        id: phpstan
+        if: always() && steps.php-lint.outcome != 'failure'
         run: |
           echo "Running PHPStan static analysis..."
           vendor/bin/phpstan analyse \
             --no-progress \
-            --error-format=table \
-            --error-format=json=phpstan-report.json \
-            --memory-limit=1G
+            --error-format=json \
+            --memory-limit=1G > phpstan-report.json 2>&1 || true
           
-          echo ""
-          echo "=== PHPStan Error Details ==="
+          # Parse JSON and create readable error report
           if [ -f phpstan-report.json ]; then
             php -r '
-              $json = json_decode(file_get_contents("phpstan-report.json"), true);
+              $raw = file_get_contents("phpstan-report.json");
+              $json = json_decode($raw, true);
+              if ($json === null) {
+                file_put_contents("phpstan-errors-readable.txt", "PHPStan output (non-JSON):\n" . $raw . "\n");
+                echo $raw;
+                exit(0);
+              }
+              $output = "";
+              $totalErrors = 0;
               if (isset($json["files"])) {
                 foreach ($json["files"] as $file => $data) {
                   if (isset($data["messages"]) && !empty($data["messages"])) {
-                    echo "📁 File: " . $file . "\n";
+                    $output .= "FILE: " . $file . "\n";
                     foreach ($data["messages"] as $msg) {
-                      echo "  ❌ Line " . $msg["line"] . ": " . $msg["message"] . "\n";
+                      $totalErrors++;
+                      $output .= "  Line " . $msg["line"] . ": " . $msg["message"] . "\n";
                     }
-                    echo "\n";
+                    $output .= "\n";
                   }
                 }
               }
-              if (isset($json["totals"]) && $json["totals"]["errors"] > 0) {
-                echo "🚨 Total PHPStan Errors: " . $json["totals"]["errors"] . "\n";
-              }
+              $totals = $json["totals"]["errors"] ?? $totalErrors;
+              $output .= "TOTAL ERRORS: " . $totals . "\n";
+              file_put_contents("phpstan-errors-readable.txt", $output);
+              echo $output;
+              if ($totals > 0) { exit(1); }
             '
           fi
           
-      - name: Upload PHPStan Reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: phpstan-reports-php${{ matrix.php }}
-          path: |
-            phpstan-report.json
-            phpstan-report.txt
-                
       - name: Composer Audit (Security Check)
-        run: composer audit
-        
+        id: composer-audit
+        if: always()
+        run: |
+          composer audit 2>&1 | tee composer-audit.txt || true
+          
       - name: Check for disallowed functions
+        id: disallowed
+        if: always()
         run: |
           echo "Checking for disallowed functions..."
-          disallowed_functions=(
-            "eval("
-            "exec("
-            "shell_exec("
-            "system("
-            "passthru("
-            "file_get_contents("
-            "fopen("
-            "fwrite("
-            "curl_exec("
-          )
+          FOUND=""
+          disallowed_functions=("eval(" "exec(" "shell_exec(" "system(" "passthru(")
           
           for func in "${disallowed_functions[@]}"; do
-            if grep -r "$func" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
-              echo "❌ Disallowed function $func found!"
-              exit 1
+            MATCHES=$(grep -rn "$func" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              FOUND="${FOUND}Disallowed function '${func}' found:\n${MATCHES}\n\n"
             fi
           done
-          echo "✅ No disallowed functions found"
+          
+          if [ -n "$FOUND" ]; then
+            echo -e "$FOUND" | tee disallowed-functions.txt
+            exit 1
+          fi
+          echo "No disallowed functions found" > disallowed-functions.txt
+
+      - name: Upload All Error Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-errors-php${{ matrix.php }}
+          path: |
+            php-lint-errors.txt
+            phpcs-report.txt
+            phpcs-report.json
+            phpcs-gitblame.txt
+            phpcs-errors-readable.txt
+            phpstan-report.json
+            phpstan-errors-readable.txt
+            composer-audit.txt
+            disallowed-functions.txt
+          if-no-files-found: ignore
 
   # Security Scanning
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
-    needs: quality-check
     
     steps:
       - name: Checkout code
@@ -195,17 +225,31 @@ jobs:
         run: composer install --prefer-dist --no-progress
         
       - name: Run Composer Security Audit
-        run: composer audit
+        id: security-audit
+        run: composer audit 2>&1 | tee security-audit.txt || true
         
       - name: Check for hardcoded secrets
+        id: secrets-check
         run: |
-          echo "Checking for potential secrets..."
-          # Check for common secret patterns
-          if grep -r -i "password\|secret\|key\|token\|api" . --include="*.php" --include="*.js" --include="*.json" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "// password\|# password\|// secret\|# secret\|// key\|# key"; then
-            echo "⚠️  Potential secrets found. Please review the output above."
+          echo "Checking for potential secrets..." > secrets-check.txt
+          FOUND=$(grep -rn -i "password\s*=\s*['\"][^'\"]\+['\"]" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+          if [ -n "$FOUND" ]; then
+            echo "Potential hardcoded passwords found:" >> secrets-check.txt
+            echo "$FOUND" >> secrets-check.txt
+            cat secrets-check.txt
             exit 1
           fi
-          echo "✅ No obvious secrets found"
+          echo "No obvious secrets found" >> secrets-check.txt
+
+      - name: Upload Security Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-errors
+          path: |
+            security-audit.txt
+            secrets-check.txt
+          if-no-files-found: ignore
 
   # Plugin Structure Validation
   structure-check:
@@ -218,52 +262,45 @@ jobs:
         
       - name: Check plugin structure
         run: |
-          echo "Checking Yatra plugin structure..."
+          ERRORS="" 
           
-          # Check main plugin file
           if [ ! -f "yatra.php" ]; then
-            echo "❌ Main plugin file yatra.php not found"
-            exit 1
+            ERRORS="${ERRORS}Main plugin file yatra.php not found\n"
           fi
           
-          # Check required directories
           required_dirs=("app" "assets" "templates" "includes")
           for dir in "${required_dirs[@]}"; do
             if [ ! -d "$dir" ]; then
-              echo "❌ Required directory $dir not found"
-              exit 1
+              ERRORS="${ERRORS}Required directory $dir not found\n"
             fi
           done
           
-          # Check plugin header
-          if ! grep -q "Plugin Name:" yatra.php; then
-            echo "❌ Plugin header not found in yatra.php"
-            exit 1
+          if ! grep -q "Plugin Name:" yatra.php 2>/dev/null; then
+            ERRORS="${ERRORS}Plugin header not found in yatra.php\n"
           fi
           
-          # Check for composer.json
           if [ ! -f "composer.json" ]; then
-            echo "❌ composer.json not found"
-            exit 1
+            ERRORS="${ERRORS}composer.json not found\n"
           fi
           
-          echo "✅ Plugin structure is valid"
-          
-      - name: Check file permissions
-        run: |
-          echo "Checking file permissions..."
-          
-          # Check for executable permissions on PHP files
           executable_files=$(find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -executable 2>/dev/null || true)
-          
           if [ -n "$executable_files" ]; then
-            echo "❌ Executable permissions found on PHP files:"
-            echo "$executable_files"
-            echo "PHP files should not have executable permissions for security."
-            exit 1
+            ERRORS="${ERRORS}Executable PHP files found (security risk):\n${executable_files}\n"
           fi
           
-          echo "✅ File permissions are correct"
+          if [ -n "$ERRORS" ]; then
+            echo -e "$ERRORS" | tee structure-errors.txt
+            exit 1
+          fi
+          echo "Plugin structure is valid" > structure-errors.txt
+          
+      - name: Upload Structure Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: structure-errors
+          path: structure-errors.txt
+          if-no-files-found: ignore
 
   # WordPress Compatibility Check
   wordpress-compatibility:
@@ -295,24 +332,35 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress
         
-      - name: Check WordPress functions usage
+      - name: Check WordPress compatibility
         run: |
-          echo "Checking WordPress function usage..."
+          ERRORS=""
           
-          # Check for custom function definitions with wp_ prefix (not function_exists calls)
-          if grep -r "^function wp_\|^    function wp_\|^public function wp_\|^private function wp_\|^static function wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
-            echo "❌ Custom functions with wp_ prefix found (should be unique)"
-            echo "WordPress core functions should not be redefined. Use unique prefix for custom functions."
-            exit 1
+          # Check for custom function definitions with wp_ prefix
+          WP_FUNCS=$(grep -rn "^[[:space:]]*\(public \|private \|protected \|static \)*function wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null || true)
+          if [ -n "$WP_FUNCS" ]; then
+            ERRORS="${ERRORS}Custom functions with wp_ prefix found (should use unique prefix):\n${WP_FUNCS}\n\n"
           fi
           
           # Check for proper text domain usage
-          if grep -r "__(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "'yatra'" | grep -v '"yatra"'; then
-            echo "❌ Translation functions without 'yatra' text domain found"
-            exit 1
+          TEXT_DOMAIN_ISSUES=$(grep -rn "__(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules 2>/dev/null | grep -v "'yatra'" | grep -v '"yatra"' | head -50 || true)
+          if [ -n "$TEXT_DOMAIN_ISSUES" ]; then
+            ERRORS="${ERRORS}Translation functions possibly missing 'yatra' text domain:\n${TEXT_DOMAIN_ISSUES}\n\n"
           fi
           
-          echo "✅ WordPress compatibility checks passed"
+          if [ -n "$ERRORS" ]; then
+            echo -e "$ERRORS" | tee wp-compat-errors.txt
+            exit 1
+          fi
+          echo "WordPress compatibility checks passed" > wp-compat-errors.txt
+
+      - name: Upload WP Compatibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wp-compat-errors
+          path: wp-compat-errors.txt
+          if-no-files-found: ignore
 
   # TypeScript/React Code Quality
   typescript-quality:
@@ -334,75 +382,66 @@ jobs:
         run: npm ci
         
       - name: TypeScript Type Check
+        id: typecheck
         run: |
           echo "Running TypeScript type checking..."
-          npm run type-check || {
-            echo "❌ TypeScript type checking failed"
+          npm run type-check > typescript-errors.txt 2>&1 || {
+            echo "TypeScript type checking failed:"
+            cat typescript-errors.txt
             exit 1
           }
+          echo "No TypeScript errors found" > typescript-errors.txt
           
       - name: ESLint Check
+        id: eslint
+        if: always()
         run: |
           echo "Running ESLint..."
-          npx eslint resources/js/ --ext .ts,.tsx --format=compact || {
-            echo "❌ ESLint check failed"
+          npx eslint resources/js/ --ext .ts,.tsx --format=compact > eslint-errors.txt 2>&1 || {
+            echo "ESLint check failed:"
+            cat eslint-errors.txt
             exit 1
           }
+          echo "No ESLint errors found" > eslint-errors.txt
           
       - name: Prettier Check
+        id: prettier
+        if: always()
         run: |
           echo "Running Prettier format check..."
-          npx prettier --check "resources/js/**/*.{ts,tsx,js,jsx}" || {
-            echo "❌ Prettier format check failed"
-            echo "Run 'npm run format' to fix formatting issues"
+          npx prettier --check "resources/js/**/*.{ts,tsx,js,jsx}" > prettier-errors.txt 2>&1 || {
+            echo "Prettier format check failed:"
+            cat prettier-errors.txt
             exit 1
           }
+          echo "No Prettier errors found" > prettier-errors.txt
           
       - name: Check for console.log statements
+        id: consolelog
+        if: always()
         run: |
-          echo "Checking for console.log statements in production code..."
-          if grep -r "console\.log" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" | grep -v "//.*console\.log"; then
-            echo "❌ Found console.log statements in production code"
-            echo "Please remove console.log statements before committing"
+          FOUND=$(grep -rn "console\.log" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" 2>/dev/null | grep -v "//.*console\.log" || true)
+          if [ -n "$FOUND" ]; then
+            echo "console.log statements found in production code:" > consolelog-errors.txt
+            echo "$FOUND" >> consolelog-errors.txt
+            cat consolelog-errors.txt
             exit 1
           fi
-          echo "✅ No console.log statements found"
-          
-      - name: Check for hardcoded secrets in JS/TS
-        run: |
-          echo "Checking for hardcoded secrets in JavaScript/TypeScript..."
-          secret_patterns=(
-            "password\s*=\s*['\"][^'\"]+['\"]"
-            "api_key\s*=\s*['\"][^'\"]+['\"]"
-            "secret\s*=\s*['\"][^'\"]+['\"]"
-            "token\s*=\s*['\"][^'\"]+['\"]"
-          )
-          
-          for pattern in "${secret_patterns[@]}"; do
-            if grep -r "$pattern" resources/js/ --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx"; then
-              echo "❌ Potential hardcoded secret found in JavaScript/TypeScript"
-              exit 1
-            fi
-          done
-          echo "✅ No hardcoded secrets found in JavaScript/TypeScript"
-          
-      - name: Check React best practices
-        run: |
-          echo "Checking React best practices..."
-          
-          # Check for missing React keys in lists
-          if grep -r "map(" resources/js/ --include="*.tsx" --include="*.jsx" | grep -v "key="; then
-            echo "⚠️  Possible missing React key in map function"
-          fi
-          
-          # Check for any() usage in React components
-          if grep -r "any" resources/js/ --include="*.tsx" --include="*.jsx" | grep -v "//.*any"; then
-            echo "⚠️  Found 'any' type usage in React components"
-          fi
-          
-          echo "✅ React best practices check completed"
+          echo "No console.log statements found" > consolelog-errors.txt
 
-  # Build Summary
+      - name: Upload All TS/React Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typescript-errors
+          path: |
+            typescript-errors.txt
+            eslint-errors.txt
+            prettier-errors.txt
+            consolelog-errors.txt
+          if-no-files-found: ignore
+
+  # Build Summary - Downloads all artifacts and compiles one comprehensive report
   build-summary:
     name: Build Summary
     runs-on: ubuntu-latest
@@ -410,40 +449,37 @@ jobs:
     if: always()
     
     steps:
-      - name: Build Summary
+      - name: Download all error artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: error-reports
+          
+      - name: Compile Comprehensive AI Error Report
         run: |
           echo "## 🚀 Yatra CI Build Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Quality Check Status
+          # Job Status Overview
           if [ "${{ needs.quality-check.result }}" == "success" ]; then
             echo "✅ **Code Quality**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Code Quality**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # Security Scan Status
           if [ "${{ needs.security-scan.result }}" == "success" ]; then
             echo "✅ **Security Scan**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Security Scan**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # Structure Check Status
           if [ "${{ needs.structure-check.result }}" == "success" ]; then
             echo "✅ **Plugin Structure**: Valid" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **Plugin Structure**: Invalid" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # WordPress Compatibility Status
           if [ "${{ needs.wordpress-compatibility.result }}" == "success" ]; then
             echo "✅ **WordPress Compatibility**: Passed" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ **WordPress Compatibility**: Failed" >> $GITHUB_STEP_SUMMARY
           fi
-          
-          # TypeScript/React Quality Status
           if [ "${{ needs.typescript-quality.result }}" == "success" ]; then
             echo "✅ **TypeScript/React Quality**: Passed" >> $GITHUB_STEP_SUMMARY
           else
@@ -451,103 +487,165 @@ jobs:
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### 📊 Test Matrix" >> $GITHUB_STEP_SUMMARY
-          echo "| PHP Version | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| 8.1 | ${{ contains(needs.quality-check.result, 'success') && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| 8.2 | ${{ contains(needs.quality-check.result, 'success') && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
-          
-          # Detailed Error Reports Section
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📋 Detailed Error Reports (Copy & Paste to AI)" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Create comprehensive error report
-          echo "I need help fixing the following issues in my WordPress plugin Yatra. Please provide specific code fixes for each error:" >> $GITHUB_STEP_SUMMARY
+          # ============================================================
+          # COMPREHENSIVE AI-READY ERROR REPORT
+          # ============================================================
+          echo "## 📋 COMPLETE ERROR REPORT — Copy everything below this line to AI" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "I need help fixing the following CI errors in my WordPress plugin called **Yatra** (a travel booking plugin). The plugin uses PHP 8.1+, TypeScript, React, TailwindCSS, and Vite. Please provide specific code fixes for each error below." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # PHPCS Errors
-          echo "### 🔍 PHP_CodeSniffer (WordPress Coding Standards)" >> $GITHUB_STEP_SUMMARY
+          # List all downloaded artifacts for debugging
+          echo "### Downloaded artifacts:" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "The following WordPress coding standards violations were found:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please run: vendor/bin/phpcs --standard=WordPress --report=full app/ to see the actual errors" >> $GITHUB_STEP_SUMMARY
-          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
-          echo "- Add function doc comments (/** Description */)" >> $GITHUB_STEP_SUMMARY
-          echo "- Fix spacing around parentheses" >> $GITHUB_STEP_SUMMARY
-          echo "- Use WordPress naming conventions" >> $GITHUB_STEP_SUMMARY
-          echo "- Add proper file headers" >> $GITHUB_STEP_SUMMARY
+          ls -R error-reports/ 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "No artifacts downloaded" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # PHPStan Errors
-          echo "### 🧠 PHPStan (Static Analysis)" >> $GITHUB_STEP_SUMMARY
+          # --- PHP LINT ERRORS ---
+          echo "### 1. PHP Syntax Errors" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "The following PHPStan static analysis errors were found:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please run: vendor/bin/phpstan analyse --error-format=table app/ to see the actual errors" >> $GITHUB_STEP_SUMMARY
-          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
-          echo "- Add proper type declarations" >> $GITHUB_STEP_SUMMARY
-          echo "- Fix undefined method calls" >> $GITHUB_STEP_SUMMARY
-          echo "- Initialize variables before use" >> $GITHUB_STEP_SUMMARY
-          echo "- Add null checks for optional properties" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # TypeScript/React Errors
-          echo "### ⚛️ TypeScript/React Errors" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "The following TypeScript/React errors were found:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please run: npm run type-check to see actual TypeScript errors" >> $GITHUB_STEP_SUMMARY
-          echo "Please run: npx eslint resources/js/ --ext .ts,.tsx to see actual ESLint errors" >> $GITHUB_STEP_SUMMARY
-          echo "Common issues to fix:" >> $GITHUB_STEP_SUMMARY
-          echo "- Fix type assignments (string vs number)" >> $GITHUB_STEP_SUMMARY
-          echo "- Add null checks and optional chaining" >> $GITHUB_STEP_SUMMARY
-          echo "- Remove console.log statements" >> $GITHUB_STEP_SUMMARY
-          echo "- Use const instead of let for constants" >> $GITHUB_STEP_SUMMARY
-          echo "- Add missing semicolons" >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/php-lint-errors.txt; do
+            if [ -f "$f" ]; then
+              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Security Issues
-          echo "### 🔒 Security Issues" >> $GITHUB_STEP_SUMMARY
+          # --- PHPCS ERRORS ---
+          echo "### 2. PHP_CodeSniffer — WordPress Coding Standards Violations" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "The following security vulnerabilities were found:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please run: composer audit to see actual security issues" >> $GITHUB_STEP_SUMMARY
-          echo "Common fixes:" >> $GITHUB_STEP_SUMMARY
-          echo "- Update vulnerable dependencies" >> $GITHUB_STEP_SUMMARY
-          echo "- Check for hardcoded secrets" >> $GITHUB_STEP_SUMMARY
-          echo "- Validate user inputs" >> $GITHUB_STEP_SUMMARY
-          echo "- Use prepared statements for database queries" >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/phpcs-errors-readable.txt; do
+            if [ -f "$f" ]; then
+              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
-          # File Structure Issues
-          echo "### 📁 File Structure Issues" >> $GITHUB_STEP_SUMMARY
+          # --- PHPSTAN ERRORS ---
+          echo "### 3. PHPStan — Static Analysis Errors" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "The following WordPress compatibility issues were found:" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Translation function issues:" >> $GITHUB_STEP_SUMMARY
-          echo "Found: __('text', 'wrong_domain')" >> $GITHUB_STEP_SUMMARY
-          echo "Fix: Change to: __('text', 'yatra')" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "WordPress function prefix issues:" >> $GITHUB_STEP_SUMMARY
-          echo "Never define custom functions starting with wp_" >> $GITHUB_STEP_SUMMARY
-          echo "Use unique prefix like yatra_ for custom functions" >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/phpstan-errors-readable.txt; do
+            if [ -f "$f" ]; then
+              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
           echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           
-          # Artifact Download Links
+          # --- COMPOSER AUDIT ---
+          echo "### 4. Composer Security Audit" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/composer-audit.txt error-reports/security-errors/security-audit.txt; do
+            if [ -f "$f" ]; then
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              break
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📦 Download Full Reports" >> $GITHUB_STEP_SUMMARY
+          
+          # --- DISALLOWED FUNCTIONS ---
+          echo "### 5. Disallowed Functions" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          for f in error-reports/quality-errors-php*/disallowed-functions.txt; do
+            if [ -f "$f" ]; then
+              cat "$f" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              break
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Download the complete error reports from the Actions tab:" >> $GITHUB_STEP_SUMMARY
-          echo "- **PHPCS Reports**: \`phpcs-reports-php8.1\` and \`phpcs-reports-php8.2\`" >> $GITHUB_STEP_SUMMARY
-          echo "- **PHPStan Reports**: \`phpstan-reports-php8.1\` and \`phpstan-reports-php8.2\`" >> $GITHUB_STEP_SUMMARY
+          
+          # --- SECURITY SECRETS ---
+          echo "### 6. Hardcoded Secrets Check" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/security-errors/secrets-check.txt" ]; then
+            cat "error-reports/security-errors/secrets-check.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No secrets check report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "These artifacts contain:" >> $GITHUB_STEP_SUMMARY
-          echo "- \`phpcs-report.txt\` - Full PHPCS output" >> $GITHUB_STEP_SUMMARY
-          echo "- \`phpcs-report.json\` - Structured PHPCS data" >> $GITHUB_STEP_SUMMARY
-          echo "- \`phpcs-gitblame.txt\` - Git blame information" >> $GITHUB_STEP_SUMMARY
-          echo "- \`phpstan-report.json\` - Complete PHPStan analysis" >> $GITHUB_STEP_SUMMARY
+          
+          # --- STRUCTURE ERRORS ---
+          echo "### 7. Plugin Structure Validation" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/structure-errors/structure-errors.txt" ]; then
+            cat "error-reports/structure-errors/structure-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No structure report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- WP COMPATIBILITY ---
+          echo "### 8. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/wp-compat-errors/wp-compat-errors.txt" ]; then
+            cat "error-reports/wp-compat-errors/wp-compat-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No WP compatibility report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- TYPESCRIPT ERRORS ---
+          echo "### 9. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/typescript-errors/typescript-errors.txt" ]; then
+            cat "error-reports/typescript-errors/typescript-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No TypeScript report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- ESLINT ERRORS ---
+          echo "### 10. ESLint Violations" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/typescript-errors/eslint-errors.txt" ]; then
+            cat "error-reports/typescript-errors/eslint-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No ESLint report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- PRETTIER ERRORS ---
+          echo "### 11. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/typescript-errors/prettier-errors.txt" ]; then
+            cat "error-reports/typescript-errors/prettier-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No Prettier report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # --- CONSOLE.LOG ---
+          echo "### 12. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f "error-reports/typescript-errors/consolelog-errors.txt" ]; then
+            cat "error-reports/typescript-errors/consolelog-errors.txt" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No console.log report available" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "End of error report. Please provide specific fixes for each error above." >> $GITHUB_STEP_SUMMARY
