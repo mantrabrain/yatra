@@ -1884,7 +1884,7 @@ class TripController extends BaseController
     /**
      * Get date-specific pricing and availability info
      */
-    public function get_date_pricing(\WP_REST_Request $request): \WP_REST_Response|\WP_Error
+    public function get_date_pricing(\WP_REST_Request $request)
     {
         try {
             $trip_id = (int) $request->get_param('id');

@@ -57,24 +57,31 @@ jobs:
           # Create temporary file to store errors
           ERROR_FILE=$(mktemp)
           SYNTAX_ERRORS=0
+          echo 0 > /tmp/syntax_error_count
           
           # Find PHP files and check syntax
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | while read -r file; do
             if [ -f "$file" ] && [ -r "$file" ]; then
-              OUTPUT=$(php -l "$file" 2>&1)
+              OUTPUT=$(php -l "$file" 2>&1) || {
+                # Handle PHP crash (exit code 255) or other failures
+                echo "❌ PHP crashed while checking $file - likely PHP version incompatibility" | tee -a "$ERROR_FILE"
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a "$ERROR_FILE"
+                echo 1 >> /tmp/syntax_error_count
+                continue
+              }
               PHP_EXIT_CODE=$?
+              
               if [ $PHP_EXIT_CODE -ne 0 ]; then
-                ERRORS="${ERRORS}❌ $file:\n${OUTPUT}\n"
-                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+                echo "❌ $file:" | tee -a "$ERROR_FILE"
+                echo "$OUTPUT" | tee -a "$ERROR_FILE"
+                echo 1 >> /tmp/syntax_error_count
               fi
             fi
           done
           
           # Count errors
-          if [ -f "/tmp/syntax_error_count" ]; then
-            SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count)
-            rm -f /tmp/syntax_error_count
-          fi
+          SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)
+          rm -f /tmp/syntax_error_count
           
           if [ $SYNTAX_ERRORS -gt 0 ]; then
             cat "$ERROR_FILE" > php-lint-errors.txt
