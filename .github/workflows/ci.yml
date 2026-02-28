@@ -99,6 +99,8 @@ jobs:
                 echo "❌ $file:" | tee -a "$ERROR_FILE"
                 echo "$OUTPUT" | tee -a "$ERROR_FILE"
                 echo "DEBUG: Syntax error in $file: $OUTPUT" >&2
+                echo "DEBUG: File with syntax error: $file" >&2
+                echo "DEBUG: Error details: $OUTPUT" >&2
                 echo 1 >> /tmp/syntax_error_count
               fi
             fi
@@ -123,7 +125,9 @@ jobs:
           if [ $SYNTAX_ERRORS -gt 0 ]; then
             echo "DEBUG: Writing errors to files..." >&2
             cat "$ERROR_FILE" > php-lint-errors.txt
-            cat "$ERROR_FILE"
+            echo "=== SYNTAX ERRORS FOUND ===" >&2
+            cat "$ERROR_FILE" >&2
+            echo "=== END SYNTAX ERRORS ===" >&2
             echo "has_errors=true" >> $GITHUB_OUTPUT
             rm -f "$ERROR_FILE"
             echo "DEBUG: Exiting with code 1 due to $SYNTAX_ERRORS syntax errors" >&2
