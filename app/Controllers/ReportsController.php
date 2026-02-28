@@ -212,7 +212,7 @@ class ReportsController extends BaseController
         // ------------------------------------------------------------------
         $trips = [];
         foreach ($bookings as $b) {
-            $title = $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'Untitled Trip'));
+            $title = $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'yatra'));
             $amount = isset($b['total_amount']) ? (float) $b['total_amount'] : 0.0;
             if (!isset($trips[$title])) {
                 $trips[$title] = ['count' => 0, 'revenue' => 0.0];
@@ -252,10 +252,10 @@ class ReportsController extends BaseController
         }
 
         $statusOrder = [
-            'paid'    => ['label' => __('Paid', 'Paid'),    'color' => '#10b981'],
-            'pending' => ['label' => __('Pending', 'Pending'), 'color' => '#f59e0b'],
-            'refunded'=> ['label' => __('Refunded', 'Refunded'), 'color' => '#ef4444'],
-            'partial' => ['label' => __('Partial', 'Partial'), 'color' => '#8b5cf6'],
+            'paid'    => ['label' => __('Paid', 'yatra'),    'color' => '#10b981'],
+            'pending' => ['label' => __('Pending', 'yatra'), 'color' => '#f59e0b'],
+            'refunded'=> ['label' => __('Refunded', 'yatra'), 'color' => '#ef4444'],
+            'partial' => ['label' => __('Partial', 'yatra'), 'color' => '#8b5cf6'],
         ];
 
         $paymentStatus = [];
@@ -285,7 +285,7 @@ class ReportsController extends BaseController
             if ($depTs !== false && $depTs >= $todayTs) {
                 $upcomingDepartures++;
                 $upcomingTrips[] = [
-                    'trip'     => $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'Unknown Trip')),
+                    'trip'     => $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'yatra')),
                     'date'     => $dateStr,
                     'booked'   => (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0),
                     'capacity' => (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0),
@@ -317,7 +317,7 @@ class ReportsController extends BaseController
         foreach ($bookings as $b) {
             $email = strtolower(trim((string) ($b['contact_email'] ?? $b['customer_email'] ?? '')));
             if ($email === '') {
-                $email = __('Unknown', 'Unknown');
+                $email = __('Unknown', 'yatra');
             }
             $name = trim((string) (($b['contact_first_name'] ?? $b['customer_first_name'] ?? '') . ' ' . ($b['contact_last_name'] ?? $b['customer_last_name'] ?? '')));
             if ($name === '') {
@@ -369,9 +369,9 @@ class ReportsController extends BaseController
         $topCustomers = array_slice($customerList, 0, 5);
 
         $customerSegments = [
-            ['label' => __('First-time', 'First-time'),       'value' => $firstTime,    'color' => '#3b82f6'],
-            ['label' => __('Returning (2-3)', 'Returning (2-3)'), 'value' => $returning23, 'color' => '#10b981'],
-            ['label' => __('Loyal (4+)', 'Loyal (4+)'),       'value' => $loyal4,       'color' => '#f59e0b'],
+            ['label' => __('First-time', 'yatra'),       'value' => $firstTime,    'color' => '#3b82f6'],
+            ['label' => __('Returning (2-3)', 'yatra'), 'value' => $returning23, 'color' => '#10b981'],
+            ['label' => __('Loyal (4+)', 'yatra'),       'value' => $loyal4,       'color' => '#f59e0b'],
         ];
 
         $customerAnalytics = [
@@ -392,7 +392,7 @@ class ReportsController extends BaseController
         // Revenue broken down by trip
         $revenueByTrip = [];
         foreach ($bookings as $b) {
-            $tripTitle = $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'Untitled Trip'));
+            $tripTitle = $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'yatra'));
             $amount = isset($b['total_amount']) ? (float) $b['total_amount'] : 0.0;
             $status = strtolower((string) ($b['payment_status'] ?? $b['status'] ?? 'pending'));
 
@@ -442,7 +442,7 @@ class ReportsController extends BaseController
             $bookingsTable[] = [
                 'id'                 => $b['id'] ?? null,
                 'bookingNumber'      => $b['booking_number'] ?? ($b['id'] ?? null),
-                'trip'               => $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'Untitled Trip')),
+                'trip'               => $b['trip_title'] ?? ($b['trip']['title'] ?? __('(Untitled Trip)', 'yatra')),
                 'departureDate'      => $b['travel_date'] ?? null,
                 'travelerCount'      => $travelerCount,
                 'price'              => isset($b['total_amount']) ? (float) $b['total_amount'] : 0.0,
@@ -521,10 +521,10 @@ class ReportsController extends BaseController
 
         $travelerSegments = [
             'segments' => [
-                ['label' => __('Adult', 'Adult'),   'key' => 'adult',   'value' => $travelerBuckets['adult']],
-                ['label' => __('Child', 'Child'),   'key' => 'child',   'value' => $travelerBuckets['child']],
-                ['label' => __('Senior', 'Senior'), 'key' => 'senior',  'value' => $travelerBuckets['senior']],
-                ['label' => __('Student', 'Student'), 'key' => 'student', 'value' => $travelerBuckets['student']],
+                ['label' => __('Adult', 'yatra'),   'key' => 'adult',   'value' => $travelerBuckets['adult']],
+                ['label' => __('Child', 'yatra'),   'key' => 'child',   'value' => $travelerBuckets['child']],
+                ['label' => __('Senior', 'yatra'), 'key' => 'senior',  'value' => $travelerBuckets['senior']],
+                ['label' => __('Student', 'yatra'), 'key' => 'student', 'value' => $travelerBuckets['student']],
             ],
             'totalTravelers'         => $totalTravelersAll,
             'avgTravelersPerBooking' => $avgTravelersPerBooking,
@@ -540,7 +540,7 @@ class ReportsController extends BaseController
 
         foreach ($departures as $d) {
             $dateStr = $d['start_date'] ?? ($d['date'] ?? null);
-            $tripTitle = $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'Unknown Trip'));
+            $tripTitle = $d['trip']['title'] ?? ($d['trip_title'] ?? __('Unknown Trip', 'yatra'));
             $capacity = (int) ($d['max_capacity'] ?? $d['total_spots'] ?? 0);
             $booked   = (int) ($d['booked_count'] ?? $d['travelers_count'] ?? 0);
             $left     = $capacity > 0 ? max(0, $capacity - $booked) : 0;

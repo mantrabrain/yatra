@@ -304,9 +304,9 @@ jobs:
               OUTPUT=$(php -l "$file" 2>&1)
               PHP_EXIT_CODE=$?
               
-              echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
-              
+              # Only capture actual errors, not "No syntax errors detected"
               if [ $PHP_EXIT_CODE -ne 0 ]; then
+                echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
                 echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
                 echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
                 SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
@@ -694,7 +694,10 @@ jobs:
                 HAS_VERSION_ERRORS=true
               fi
               if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
-                HAS_VERSION_ERRORS=true
+                # Check if file contains actual errors (not just success messages)
+                if grep -q "Parse error\|syntax error\|Fatal error" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                  HAS_VERSION_ERRORS=true
+                fi
               fi
               if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
                 HAS_VERSION_ERRORS=true
@@ -715,8 +718,11 @@ jobs:
                 
                 # Show lint errors
                 if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
-                  echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
-                  cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+                  # Only show if file contains actual errors
+                  if grep -q "Parse error\|syntax error\|Fatal error" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                    echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
+                    cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+                  fi
                 fi
                 
                 # Show PHPCS errors
