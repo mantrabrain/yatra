@@ -95,8 +95,7 @@ jobs:
           vendor/bin/phpstan analyse \
             --no-progress \
             --error-format=json \
-            --memory-limit=2G \
-            --no-parallel > phpstan-report.json 2>&1 || true
+            --memory-limit=2G > phpstan-report.json 2>&1 || true
           
           # Parse PHPStan report using bash script
           bash .github/scripts/parse-phpstan-report.sh
@@ -291,12 +290,20 @@ jobs:
         run: |
           echo "Checking PHP syntax for PHP ${{ matrix.php }}..."
           find app includes templates -name "*.php" -print0 | xargs -0 -n1 php -l > php${{ matrix.php }}-lint.txt 2>&1 || true
-          if grep -q "Parse error\|Fatal error\|syntax error" php${{ matrix.php }}-lint.txt; then
-            echo "❌ PHP ${{ matrix.php }} syntax errors found"
-            cat php${{ matrix.php }}-lint.txt
-            exit 1
+          
+          # Check for actual syntax errors
+          if grep -q "Parse error\|Fatal error\|syntax error\|No syntax errors detected" php${{ matrix.php }}-lint.txt; then
+            if grep -q "Parse error\|Fatal error\|syntax error" php${{ matrix.php }}-lint.txt; then
+              echo "❌ PHP ${{ matrix.php }} syntax errors found" | tee -a php${{ matrix.php }}-compat.txt
+              cat php${{ matrix.php }}-lint.txt >> php${{ matrix.php }}-compat.txt
+              exit 1
+            else
+              echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
+            fi
+          else
+            # No output means all files passed syntax check
+            echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
           fi
-          echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
           
       - name: Check Deprecated Functions (PHP ${{ matrix.php }})
         run: |
@@ -331,6 +338,26 @@ jobs:
           
           echo "Deprecated function check completed" | tee -a php${{ matrix.php }}-compat.txt
           
+      - name: PHPStan Static Analysis (PHP ${{ matrix.php }})
+        run: |
+          echo "Running PHPStan static analysis for PHP ${{ matrix.php }}..."
+          if [ -f "vendor/bin/phpstan" ]; then
+            vendor/bin/phpstan analyse \
+              --no-progress \
+              --error-format=json \
+              --memory-limit=2G > phpstan-report.json 2>&1 || true
+            
+            # Parse PHPStan report using bash script
+            if [ -f "phpstan-report.json" ]; then
+              bash .github/scripts/parse-phpstan-report.sh || true
+              echo "PHPStan analysis completed for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            else
+              echo "PHPStan not available for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          else
+            echo "PHPStan binary not found for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+          fi
+          
       - name: Upload PHP ${{ matrix.php }} Compatibility Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -339,6 +366,8 @@ jobs:
           path: |
             php${{ matrix.php }}-compat.txt
             php${{ matrix.php }}-lint.txt
+            phpstan-errors-readable.txt
+            phpstan-report.json
           if-no-files-found: ignore
 
   # WordPress Compatibility Check
@@ -545,43 +574,61 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- PHP LINT ERRORS ---
-          echo "### 1. PHP Syntax Errors" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHP_LINT_ERRORS=false
           for f in error-reports/quality-errors-php*/php-lint-errors.txt; do
-            if [ -f "$f" ]; then
+            if [ -f "$f" ] && [ -s "$f" ]; then
+              if [ "$HAS_PHP_LINT_ERRORS" = "false" ]; then
+                echo "### 1. PHP Syntax Errors" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                HAS_PHP_LINT_ERRORS=true
+              fi
               echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
               cat "$f" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
             fi
           done
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$HAS_PHP_LINT_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
           
           # --- PHPCS ERRORS ---
-          echo "### 2. PHP_CodeSniffer — WordPress Coding Standards Violations" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHPCS_ERRORS=false
           for f in error-reports/quality-errors-php*/phpcs-errors-readable.txt; do
-            if [ -f "$f" ]; then
+            if [ -f "$f" ] && [ -s "$f" ]; then
+              if [ "$HAS_PHPCS_ERRORS" = "false" ]; then
+                echo "### 2. PHP_CodeSniffer — WordPress Coding Standards Violations" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                HAS_PHPCS_ERRORS=true
+              fi
               echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
               cat "$f" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
             fi
           done
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$HAS_PHPCS_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
           
           # --- PHPSTAN ERRORS ---
-          echo "### 3. PHPStan — Static Analysis Errors" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHPSTAN_ERRORS=false
           for f in error-reports/quality-errors-php*/phpstan-errors-readable.txt; do
-            if [ -f "$f" ]; then
+            if [ -f "$f" ] && [ -s "$f" ]; then
+              if [ "$HAS_PHPSTAN_ERRORS" = "false" ]; then
+                echo "### 3. PHPStan — Static Analysis Errors" >> $GITHUB_STEP_SUMMARY
+                echo '```' >> $GITHUB_STEP_SUMMARY
+                HAS_PHPSTAN_ERRORS=true
+              fi
               echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
               cat "$f" >> $GITHUB_STEP_SUMMARY
               echo "" >> $GITHUB_STEP_SUMMARY
             fi
           done
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$HAS_PHPSTAN_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
           
           # --- COMPOSER AUDIT ---
           echo "### 4. Composer Security Audit" >> $GITHUB_STEP_SUMMARY
@@ -632,78 +679,99 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- PHP COMPATIBILITY ---
-          echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
+          HAS_PHP_COMPAT_ERRORS=false
           for version in 7.4 8.0 8.1 8.2 8.3 8.4; do
+            HAS_VERSION_ERRORS=false
             if [ -d "error-reports/php${version}-compatibility" ]; then
-              echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
-              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
-                cat "error-reports/php${version}-compatibility/php${version}-compat.txt" >> $GITHUB_STEP_SUMMARY
+              # Check if any files have content
+              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                HAS_VERSION_ERRORS=true
               fi
-              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
-                echo "Lint errors:" >> $GITHUB_STEP_SUMMARY
-                cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                HAS_VERSION_ERRORS=true
               fi
-              echo "" >> $GITHUB_STEP_SUMMARY
+              if [ -f "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ]; then
+                HAS_VERSION_ERRORS=true
+              fi
+              
+              if [ "$HAS_VERSION_ERRORS" = "true" ]; then
+                if [ "$HAS_PHP_COMPAT_ERRORS" = "false" ]; then
+                  echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
+                  echo '```' >> $GITHUB_STEP_SUMMARY
+                  HAS_PHP_COMPAT_ERRORS=true
+                fi
+                echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
+                
+                # Show compatibility errors
+                if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                  cat "error-reports/php${version}-compatibility/php${version}-compat.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                # Show lint errors
+                if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                  echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
+                  cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                # Show PHPStan errors
+                if [ -f "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ]; then
+                  echo "Static analysis errors:" >> $GITHUB_STEP_SUMMARY
+                  cat "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                echo "" >> $GITHUB_STEP_SUMMARY
+              fi
             fi
           done
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "$HAS_PHP_COMPAT_ERRORS" = "true" ]; then
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
           
           # --- WP COMPATIBILITY ---
-          echo "### 9. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "error-reports/wp-compat-errors/wp-compat-errors.txt" ]; then
+          if [ -f "error-reports/wp-compat-errors/wp-compat-errors.txt" ] && [ -s "error-reports/wp-compat-errors/wp-compat-errors.txt" ]; then
+            echo "### 9. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             cat "error-reports/wp-compat-errors/wp-compat-errors.txt" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No WP compatibility report available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- TYPESCRIPT ERRORS ---
-          echo "### 10. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "error-reports/typescript-errors/typescript-errors.txt" ]; then
+          if [ -f "error-reports/typescript-errors/typescript-errors.txt" ] && [ -s "error-reports/typescript-errors/typescript-errors.txt" ]; then
+            echo "### 10. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             cat "error-reports/typescript-errors/typescript-errors.txt" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No TypeScript report available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- ESLINT ERRORS ---
-          echo "### 11. ESLint Violations" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "error-reports/typescript-errors/eslint-errors.txt" ]; then
+          if [ -f "error-reports/typescript-errors/eslint-errors.txt" ] && [ -s "error-reports/typescript-errors/eslint-errors.txt" ]; then
+            echo "### 11. ESLint Violations" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             cat "error-reports/typescript-errors/eslint-errors.txt" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No ESLint report available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- PRETTIER ERRORS ---
-          echo "### 12. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "error-reports/typescript-errors/prettier-errors.txt" ]; then
+          if [ -f "error-reports/typescript-errors/prettier-errors.txt" ] && [ -s "error-reports/typescript-errors/prettier-errors.txt" ]; then
+            echo "### 12. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             cat "error-reports/typescript-errors/prettier-errors.txt" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No Prettier report available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- CONSOLE.LOG ---
-          echo "### 13. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ -f "error-reports/typescript-errors/consolelog-errors.txt" ]; then
+          if [ -f "error-reports/typescript-errors/consolelog-errors.txt" ] && [ -s "error-reports/typescript-errors/consolelog-errors.txt" ]; then
+            echo "### 13. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
             cat "error-reports/typescript-errors/consolelog-errors.txt" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No console.log report available" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
           
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "End of error report. Please provide specific fixes for each error above." >> $GITHUB_STEP_SUMMARY
