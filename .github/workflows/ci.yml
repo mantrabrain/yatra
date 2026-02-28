@@ -286,9 +286,12 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --ignore-platform-reqs
         
+      - name: Configure PHPCS
+        run: vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs || true
+        
       - name: PHP Syntax Check (Lint)
         run: |
-          echo "Checking PHP syntax for PHP ${{ matrix.php }}..."
+          echo "Checking PHP syntax for PHP ${{ matrix.php }}..." >&2
           find app includes templates -name "*.php" -print0 | xargs -0 -n1 php -l > php${{ matrix.php }}-lint.txt 2>&1 || true
           
           # Check for actual syntax errors
@@ -298,15 +301,16 @@ jobs:
               cat php${{ matrix.php }}-lint.txt >> php${{ matrix.php }}-compat.txt
               exit 1
             else
-              echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
+              echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee -a php${{ matrix.php }}-compat.txt
             fi
           else
             # No output means all files passed syntax check
-            echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
+            echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee -a php${{ matrix.php }}-compat.txt
           fi
           
       - name: Check Deprecated Functions (PHP ${{ matrix.php }})
         run: |
+          echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." >&2
           echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." | tee -a php${{ matrix.php }}-compat.txt
           
           # PHP 7.4 deprecations
@@ -338,6 +342,28 @@ jobs:
           
           echo "Deprecated function check completed" | tee -a php${{ matrix.php }}-compat.txt
           
+      - name: PHPCS Coding Standards (PHP ${{ matrix.php }})
+        run: |
+          echo "Running PHPCS coding standards for PHP ${{ matrix.php }}..." >&2
+          if [ -f "vendor/bin/phpcs" ]; then
+            vendor/bin/phpcs \
+              -d memory_limit=512M \
+              --standard=phpcs.xml \
+              --report=full \
+              --report-json=phpcs-report.json \
+              -q > phpcs-output.txt 2>&1 || true
+            
+            # Parse PHPCS report using bash script
+            if [ -f "phpcs-report.json" ]; then
+              bash .github/scripts/parse-phpcs-report.sh || true
+              echo "PHPCS analysis completed for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            else
+              echo "PHPCS not available for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          else
+            echo "PHPCS binary not found for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
+          fi
+          
       - name: PHPStan Static Analysis (PHP ${{ matrix.php }})
         run: |
           echo "Running PHPStan static analysis for PHP ${{ matrix.php }}..."
@@ -366,6 +392,9 @@ jobs:
           path: |
             php${{ matrix.php }}-compat.txt
             php${{ matrix.php }}-lint.txt
+            phpcs-errors-readable.txt
+            phpcs-report.json
+            phpcs-output.txt
             phpstan-errors-readable.txt
             phpstan-report.json
           if-no-files-found: ignore
@@ -690,6 +719,9 @@ jobs:
               if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
                 HAS_VERSION_ERRORS=true
               fi
+              if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
+                HAS_VERSION_ERRORS=true
+              fi
               if [ -f "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ]; then
                 HAS_VERSION_ERRORS=true
               fi
@@ -711,6 +743,12 @@ jobs:
                 if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
                   echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
                   cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+                fi
+                
+                # Show PHPCS errors
+                if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
+                  echo "Coding standards errors:" >> $GITHUB_STEP_SUMMARY
+                  cat "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
                 fi
                 
                 # Show PHPStan errors
