@@ -82,7 +82,7 @@ class ItineraryController extends BaseController
     /**
      * Get items by trip ID
      */
-    public function get_items_by_trip(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items_by_trip(WP_REST_Request $request)
     {
         try {
             $trip_id = (int) $request->get_param('trip_id');
@@ -109,7 +109,7 @@ class ItineraryController extends BaseController
     /**
      * Get item
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -138,7 +138,7 @@ class ItineraryController extends BaseController
     /**
      * Create item
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -158,7 +158,7 @@ class ItineraryController extends BaseController
     /**
      * Update item
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -183,7 +183,7 @@ class ItineraryController extends BaseController
     /**
      * Delete item
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -205,7 +205,7 @@ class ItineraryController extends BaseController
     /**
      * Bulk delete items
      */
-    public function bulk_delete_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function bulk_delete_items(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -234,7 +234,7 @@ class ItineraryController extends BaseController
     /**
      * Get day entry ID by day_id
      */
-    public function get_day_entry_id_by_day_id(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_day_entry_id_by_day_id(WP_REST_Request $request)
     {
         try {
             $dayId = (int) $request->get_param('day_id');

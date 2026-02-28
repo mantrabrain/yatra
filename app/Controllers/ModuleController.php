@@ -72,7 +72,7 @@ class ModuleController extends BaseController
         ]);
     }
 
-    public function toggle_module(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function toggle_module(WP_REST_Request $request)
     {
         $slug = sanitize_key($request->get_param('slug'));
         $enabled = filter_var($request->get_param('enabled'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -95,7 +95,7 @@ class ModuleController extends BaseController
         ]);
     }
 
-    public function bulk_toggle(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function bulk_toggle(WP_REST_Request $request)
     {
         $items = $request->get_param('items');
         if (!is_array($items) || empty($items)) {

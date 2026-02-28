@@ -264,7 +264,7 @@ class BookingsController extends BaseController
     /**
      * GET /bookings/{id} - Get single booking
      */
-    public function getBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getBooking(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -294,7 +294,7 @@ class BookingsController extends BaseController
     /**
      * POST /bookings - Create booking
      */
-    public function createBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function createBooking(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -324,7 +324,7 @@ class BookingsController extends BaseController
     /**
      * PUT /bookings/{id} - Update booking
      */
-    public function updateBooking(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function updateBooking(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -717,7 +717,7 @@ class BookingsController extends BaseController
     /**
      * GET /bookings/{id}/voucher - Download travel voucher for a booking
      */
-    public function downloadVoucher(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function downloadVoucher(WP_REST_Request $request)
     {
         $bookingId = (int) $request->get_param('id');
         $isPreview = $request->get_param('preview') === '1';
@@ -778,7 +778,7 @@ class BookingsController extends BaseController
     /**
      * GET /bookings/{id}/itinerary - Download travel itinerary for a booking
      */
-    public function downloadItinerary(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function downloadItinerary(WP_REST_Request $request)
     {
         $bookingId = (int) $request->get_param('id');
         $isPreview = $request->get_param('preview') === '1';

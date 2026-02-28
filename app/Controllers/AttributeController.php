@@ -313,7 +313,7 @@ class AttributeController extends BaseController
     /**
      * Create attribute
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $data = $this->prepare_item_for_database($request);
@@ -368,7 +368,7 @@ class AttributeController extends BaseController
     /**
      * Get single attribute
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -440,7 +440,7 @@ class AttributeController extends BaseController
     /**
      * Update attribute
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -483,7 +483,7 @@ class AttributeController extends BaseController
     /**
      * Delete attribute
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -504,7 +504,7 @@ class AttributeController extends BaseController
     /**
      * Get attribute values
      */
-    public function get_attribute_values(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_attribute_values(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -521,7 +521,7 @@ class AttributeController extends BaseController
     /**
      * Update display orders
      */
-    public function update_orders(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_orders(WP_REST_Request $request)
     {
         try {
             $orders = $request->get_param('orders');
@@ -542,7 +542,7 @@ class AttributeController extends BaseController
     /**
      * Update display orders
      */
-    public function update_display_orders(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_display_orders(WP_REST_Request $request)
     {
         try {
             $orders = $request->get_param('orders');
@@ -563,7 +563,7 @@ class AttributeController extends BaseController
     /**
      * Check if slug exists and suggest unique slug if needed
      */
-    public function check_slug(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function check_slug(WP_REST_Request $request)
     {
         try {
             $slug = sanitize_title($request->get_param('slug'));
@@ -627,7 +627,7 @@ class AttributeController extends BaseController
     /**
      * Set trip attribute
      */
-    public function set_trip_attribute(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function set_trip_attribute(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');
@@ -650,7 +650,7 @@ class AttributeController extends BaseController
     /**
      * Remove trip attribute
      */
-    public function remove_trip_attribute(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function remove_trip_attribute(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');
@@ -909,7 +909,7 @@ class AttributeController extends BaseController
      * Get attribute statistics
      * GET /attributes/stats
      */
-    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getStats(WP_REST_Request $request)
     {
         try {
             $stats = $this->attributeService->getStatusCounts();

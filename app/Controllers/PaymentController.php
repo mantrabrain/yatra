@@ -111,7 +111,7 @@ class PaymentController extends BaseController
     /**
      * GET /payments/{id} - Get single payment
      */
-    public function getPayment(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getPayment(WP_REST_Request $request)
     {
         $id = (int) $request->get_param('id');
         $payment = $this->paymentService->getPayment($id);
@@ -126,7 +126,7 @@ class PaymentController extends BaseController
     /**
      * POST /payments - Create payment
      */
-    public function createPayment(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function createPayment(WP_REST_Request $request)
     {
         $data = $request->get_json_params();
         
@@ -141,7 +141,7 @@ class PaymentController extends BaseController
     /**
      * PUT /payments/{id} - Update payment
      */
-    public function updatePayment(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function updatePayment(WP_REST_Request $request)
     {
         $id = (int) $request->get_param('id');
         $data = $request->get_json_params();
@@ -162,7 +162,7 @@ class PaymentController extends BaseController
     /**
      * DELETE /payments/{id} - Delete payment
      */
-    public function deletePayment(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function deletePayment(WP_REST_Request $request)
     {
         $id = (int) $request->get_param('id');
 

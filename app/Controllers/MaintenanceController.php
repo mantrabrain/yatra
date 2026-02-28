@@ -48,7 +48,7 @@ class MaintenanceController extends BaseController
     /**
      * Regenerate database tables
      */
-    public function regenerate_tables(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function regenerate_tables(WP_REST_Request $request)
     {
         try {
             Database::createTables();

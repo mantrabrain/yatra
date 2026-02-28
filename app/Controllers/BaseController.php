@@ -206,7 +206,7 @@ abstract class BaseController
     /**
      * Get items (GET /items)
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         return new WP_Error('not_implemented', __('Method not implemented', 'yatra'), ['status' => 501]);
     }
@@ -214,7 +214,7 @@ abstract class BaseController
     /**
      * Get single item (GET /items/{id})
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         return new WP_Error('not_implemented', __('Method not implemented', 'yatra'), ['status' => 501]);
     }
@@ -222,7 +222,7 @@ abstract class BaseController
     /**
      * Create item (POST /items)
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         return new WP_Error('not_implemented', __('Method not implemented', 'yatra'), ['status' => 501]);
     }
@@ -230,7 +230,7 @@ abstract class BaseController
     /**
      * Update item (PUT /items/{id})
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         return new WP_Error('not_implemented', __('Method not implemented', 'yatra'), ['status' => 501]);
     }
@@ -238,7 +238,7 @@ abstract class BaseController
     /**
      * Delete item (DELETE /items/{id})
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         return new WP_Error('not_implemented', __('Method not implemented', 'yatra'), ['status' => 501]);
     }

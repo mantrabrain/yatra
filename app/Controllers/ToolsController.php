@@ -200,7 +200,7 @@ class ToolsController extends BaseController
     /**
      * Export Yatra data
      */
-    public function exportData(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function exportData(WP_REST_Request $request)
     {
         try {
             // Get selected data types from request
@@ -225,7 +225,7 @@ class ToolsController extends BaseController
     /**
      * Import Yatra data
      */
-    public function importData(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function importData(WP_REST_Request $request)
     {
         try {
             $import_data = $request->get_param('import_data');
@@ -283,7 +283,7 @@ class ToolsController extends BaseController
     /**
      * Get system status
      */
-    public function getSystemStatus(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getSystemStatus(WP_REST_Request $request)
     {
         try {
             $status = [
@@ -336,7 +336,7 @@ class ToolsController extends BaseController
     /**
      * Get logs by type
      */
-    public function getLogs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getLogs(WP_REST_Request $request)
     {
         try {
             $type = $request->get_param('type');
@@ -367,7 +367,7 @@ class ToolsController extends BaseController
     /**
      * Clear logs by type
      */
-    public function clearLogs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function clearLogs(WP_REST_Request $request)
     {
         try {
             $type = $request->get_param('type');
@@ -759,7 +759,7 @@ class ToolsController extends BaseController
     /**
      * Create export job (background processing)
      */
-    public function createExportJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function createExportJob(WP_REST_Request $request)
     {
         try {
             $dataTypes = $request->get_param('data_types') ?: [];
@@ -785,7 +785,7 @@ class ToolsController extends BaseController
     /**
      * Get export job status
      */
-    public function getExportJobStatus(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getExportJobStatus(WP_REST_Request $request)
     {
         try {
             $jobId = $request->get_param('job_id');
@@ -806,7 +806,7 @@ class ToolsController extends BaseController
     /**
      * Download export file
      */
-    public function downloadExportFile(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function downloadExportFile(WP_REST_Request $request)
     {
         try {
             $jobId = $request->get_param('job_id');
@@ -846,7 +846,7 @@ class ToolsController extends BaseController
     /**
      * Delete export job and its file
      */
-    public function deleteExportJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function deleteExportJob(WP_REST_Request $request)
     {
         try {
             $jobId = $request->get_param('job_id');
@@ -878,7 +878,7 @@ class ToolsController extends BaseController
     /**
      * Create import job (background processing)
      */
-    public function createImportJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function createImportJob(WP_REST_Request $request)
     {
         try {
             // Get data_types and ensure it's an array
@@ -960,7 +960,7 @@ class ToolsController extends BaseController
     /**
      * Get import job status
      */
-    public function getImportJobStatus(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getImportJobStatus(WP_REST_Request $request)
     {
         try {
             $jobId = $request->get_param('job_id');
@@ -981,7 +981,7 @@ class ToolsController extends BaseController
     /**
      * Delete import job and its file
      */
-    public function deleteImportJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function deleteImportJob(WP_REST_Request $request)
     {
         try {
             $jobId = $request->get_param('job_id');
@@ -1030,7 +1030,7 @@ class ToolsController extends BaseController
     /**
      * Get active jobs for current user
      */
-    public function getActiveJobs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getActiveJobs(WP_REST_Request $request)
     {
         try {
             $userId = get_current_user_id();
@@ -1046,7 +1046,7 @@ class ToolsController extends BaseController
     /**
      * Get all jobs for current user (for Jobs tab)
      */
-    public function get_all_jobs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_all_jobs(WP_REST_Request $request)
     {
         try {
             $userId = get_current_user_id();
@@ -1070,7 +1070,7 @@ class ToolsController extends BaseController
     /**
      * Clear all Yatra caches
      */
-    public function clearAllCache(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function clearAllCache(WP_REST_Request $request)
     {
         try {
             // Clear Yatra transients using CacheService
@@ -1108,7 +1108,7 @@ class ToolsController extends BaseController
     /**
      * Get all Yatra-related cron jobs
      */
-    public function getCronJobs(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getCronJobs(WP_REST_Request $request)
     {
         try {
             $crons = _get_cron_array();
@@ -1170,7 +1170,7 @@ class ToolsController extends BaseController
     /**
      * Manually run a cron job
      */
-    public function runCronJob(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function runCronJob(WP_REST_Request $request)
     {
         try {
             $hook = $request->get_param('hook');

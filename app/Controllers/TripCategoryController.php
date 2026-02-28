@@ -87,7 +87,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             $params = $this->getPaginationParams($request);
@@ -174,7 +174,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $item = $this->service->getById($this->getId($request));
@@ -196,7 +196,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function get_subcategories(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_subcategories(WP_REST_Request $request)
     {
         try {
             $subcategories = $this->service->getSubcategories($this->getId($request));
@@ -209,7 +209,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $id = $this->service->create($this->getBody($request));
@@ -225,7 +225,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $result = $this->service->update($this->getId($request), $this->getBody($request));
@@ -243,7 +243,7 @@ class TripCategoryController extends BaseController
         }
     }
 
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $result = $this->service->delete($this->getId($request));

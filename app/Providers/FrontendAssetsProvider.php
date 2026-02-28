@@ -464,7 +464,7 @@ class FrontendAssetsProvider
      * @param string $type 'css' or 'js'
      * @return string|false Asset URL or false if file doesn't exist
      */
-    public function getAssetUrl(string $path, string $type = 'css'): string|false
+    public function getAssetUrl(string $path, string $type = 'css')
     {
         $basePath = $type === 'css' ? 'assets/css/' : 'assets/js/';
         $fullPath = YATRA_PLUGIN_PATH . $basePath . $path;

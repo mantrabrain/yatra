@@ -114,7 +114,7 @@ class AvailabilityController extends BaseController
     /**
      * Get all availability dates for a trip
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');
@@ -232,7 +232,7 @@ class AvailabilityController extends BaseController
         }
     }
 
-    public function duplicate_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function duplicate_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -263,7 +263,7 @@ class AvailabilityController extends BaseController
     /**
      * Get single availability date
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -306,7 +306,7 @@ class AvailabilityController extends BaseController
     /**
      * Create availability date
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -339,7 +339,7 @@ class AvailabilityController extends BaseController
     /**
      * Update availability date
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -373,7 +373,7 @@ class AvailabilityController extends BaseController
     /**
      * Delete availability date
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');

@@ -223,7 +223,7 @@ class CustomerController extends BaseController
     /**
      * PUT /customers/me - Update current customer profile
      */
-    public function updateMe(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function updateMe(WP_REST_Request $request)
     {
         try {
             $userId = get_current_user_id();

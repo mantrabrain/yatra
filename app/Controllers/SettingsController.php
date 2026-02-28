@@ -250,7 +250,7 @@ class SettingsController extends BaseController
     /**
      * Get all settings
      */
-    public function get_settings(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_settings(WP_REST_Request $request)
     {
         try {
             $settings = [];
@@ -291,7 +291,7 @@ class SettingsController extends BaseController
     /**
      * Update settings
      */
-    public function update_settings(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_settings(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -682,7 +682,7 @@ class SettingsController extends BaseController
     /**
      * Flush rewrite rules
      */
-    public function flush_rewrite_rules(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function flush_rewrite_rules(WP_REST_Request $request)
     {
         try {
             // Flush rewrite rules
@@ -700,7 +700,7 @@ class SettingsController extends BaseController
      * Get list of WordPress pages for booking page selection
      * Note: We don't check for shortcode here - it's checked on-demand when user selects a page
      */
-    public function get_pages(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_pages(WP_REST_Request $request)
     {
         try {
             $pages = get_pages([
@@ -728,7 +728,7 @@ class SettingsController extends BaseController
     /**
      * Check if a page has the booking shortcode
      */
-    public function check_booking_shortcode(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function check_booking_shortcode(WP_REST_Request $request)
     {
         try {
             $page_id = (int) $request->get_param('page_id');
@@ -760,7 +760,7 @@ class SettingsController extends BaseController
     /**
      * Insert booking shortcode into a page
      */
-    public function insert_booking_shortcode(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function insert_booking_shortcode(WP_REST_Request $request)
     {
         try {
             $page_id = (int) $request->get_param('page_id');

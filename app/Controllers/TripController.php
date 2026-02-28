@@ -206,7 +206,7 @@ class TripController extends BaseController
     /**
      * Get statistics for admin trip views (status counts)
      */
-    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getStats(WP_REST_Request $request)
     {
         try {
             $stats = $this->service->getStatusCounts();
@@ -221,7 +221,7 @@ class TripController extends BaseController
      *
      * Endpoint: POST /trips/{id}/duplicate
      */
-    public function duplicate_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function duplicate_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -246,7 +246,7 @@ class TripController extends BaseController
     /**
      * Get items
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             // For admin listing, show more items by default to see all trips
@@ -470,7 +470,7 @@ class TripController extends BaseController
     /**
      * Get single item
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -495,7 +495,7 @@ class TripController extends BaseController
     /**
      * Create item
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $rawData = $request->get_json_params();
@@ -576,7 +576,7 @@ class TripController extends BaseController
     /**
      * Update item
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -706,7 +706,7 @@ class TripController extends BaseController
     /**
      * Delete item (soft delete)
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -727,7 +727,7 @@ class TripController extends BaseController
     /**
      * Permanent delete item (hard delete)
      */
-    public function permanent_delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function permanent_delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -757,7 +757,7 @@ class TripController extends BaseController
     /**
      * Search items
      */
-    public function search_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function search_items(WP_REST_Request $request)
     {
         try {
             $keyword = $request->get_param('keyword') ?: $request->get_param('search');
@@ -789,7 +789,7 @@ class TripController extends BaseController
     /**
      * Get revisions for a trip
      */
-    public function get_revisions(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_revisions(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -824,7 +824,7 @@ class TripController extends BaseController
     /**
      * Get single revision
      */
-    public function get_revision(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_revision(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -866,7 +866,7 @@ class TripController extends BaseController
     /**
      * Restore a revision (WordPress-style)
      */
-    public function restore_revision(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function restore_revision(WP_REST_Request $request)
     {
         try {
             // Check permissions
@@ -1327,7 +1327,7 @@ class TripController extends BaseController
      * Get availability template HTML
      * Returns the HTML for the availability section
      */
-    public function get_availability_template(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_availability_template(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -1959,7 +1959,7 @@ class TripController extends BaseController
      * Get public trips for frontend display
      * Only returns published trips, excludes soft-deleted trips
      */
-    public function get_public_trips(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_public_trips(WP_REST_Request $request)
     {
         try {
             $args = [
@@ -1997,7 +1997,7 @@ class TripController extends BaseController
     /**
      * Get trip attributes
      */
-    public function get_trip_attributes(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_trip_attributes(WP_REST_Request $request)
     {
         try {
             $trip_id = (int) $request->get_param('id');
@@ -2045,7 +2045,7 @@ class TripController extends BaseController
     /**
      * Update trip attributes
      */
-    public function update_trip_attributes(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_trip_attributes(WP_REST_Request $request)
     {
         // Add immediate log to verify method is called
         try {
@@ -2080,7 +2080,7 @@ class TripController extends BaseController
     /**
      * Delete trip attribute
      */
-    public function delete_trip_attribute(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_trip_attribute(WP_REST_Request $request)
     {
         try {
             $trip_id = (int) $request->get_param('id');

@@ -174,7 +174,7 @@ class PaymentGatewayController extends BaseController
         ], 200);
     }
 
-    public function create_remaining_balance_intent(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_remaining_balance_intent(WP_REST_Request $request)
     {
         $bookingId = (int) $request->get_param('booking_id');
         $method = sanitize_text_field($request->get_param('method') ?: 'stripe');
@@ -229,7 +229,7 @@ class PaymentGatewayController extends BaseController
         return new WP_REST_Response([ 'success' => true, 'data' => $result ], 200);
     }
 
-    public function start_remaining_payment_session(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function start_remaining_payment_session(WP_REST_Request $request)
     {
         if (!function_exists('yatra_start_session')) {
             return new WP_Error('session_unavailable', __('Booking session helpers not loaded.', 'yatra'), ['status' => 500]);
@@ -324,7 +324,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Save gateway configuration
      */
-    public function save_gateway_config(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function save_gateway_config(WP_REST_Request $request)
     {
         $gatewayId = $request->get_param('gateway_id');
         $config = $request->get_json_params();
@@ -345,7 +345,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Create payment intent
      */
-    public function create_payment_intent(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_payment_intent(WP_REST_Request $request)
     {
         $gatewayId = sanitize_text_field($request->get_param('gateway'));
         $paymentData = [
@@ -413,7 +413,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Confirm payment
      */
-    public function confirm_payment(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function confirm_payment(WP_REST_Request $request)
     {
         $gatewayId = sanitize_text_field($request->get_param('gateway'));
         $transactionId = sanitize_text_field($request->get_param('transaction_id'));
@@ -449,7 +449,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Handle webhook
      */
-    public function handle_webhook(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function handle_webhook(WP_REST_Request $request)
     {
         $gatewayId = $request->get_param('gateway');
         $gateway = $this->registry->get($gatewayId);
@@ -507,7 +507,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Get payment status
      */
-    public function get_payment_status(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_payment_status(WP_REST_Request $request)
     {
         $bookingId = (int) $request->get_param('booking_id');
 
@@ -707,7 +707,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Download invoice PDF for a payment
      */
-    public function download_invoice(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function download_invoice(WP_REST_Request $request)
     {
         $paymentId = (int) $request->get_param('payment_id');
         $isPreview = $request->get_param('preview') === '1';
@@ -815,7 +815,7 @@ class PaymentGatewayController extends BaseController
     /**
      * Download travel voucher PDF for a booking
      */
-    public function download_voucher(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function download_voucher(WP_REST_Request $request)
     {
         $paymentId = (int) $request->get_param('payment_id');
         $isPreview = $request->get_param('preview') === '1';
@@ -932,7 +932,7 @@ class PaymentGatewayController extends BaseController
     /**
      * GET /payments/{payment_id}/itinerary - Download travel itinerary for a payment
      */
-    public function download_itinerary(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function download_itinerary(WP_REST_Request $request)
     {
         $paymentId = (int) $request->get_param('payment_id');
         $isPreview = $request->get_param('preview') === '1';

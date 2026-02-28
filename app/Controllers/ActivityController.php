@@ -101,7 +101,7 @@ class ActivityController extends BaseController
     /**
      * Get items
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             $params = $this->getPaginationParams($request);
@@ -154,7 +154,7 @@ class ActivityController extends BaseController
     /**
      * Get single item
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = $this->getId($request);
@@ -191,7 +191,7 @@ class ActivityController extends BaseController
     /**
      * Create item
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $data = $this->getBody($request);
@@ -221,7 +221,7 @@ class ActivityController extends BaseController
     /**
      * Update item
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = $this->getId($request);
@@ -248,7 +248,7 @@ class ActivityController extends BaseController
     /**
      * Delete item
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $result = $this->service->delete($this->getId($request));
@@ -268,7 +268,7 @@ class ActivityController extends BaseController
     /**
      * Bulk actions endpoint
      */
-    public function bulkAction(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function bulkAction(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -314,7 +314,7 @@ class ActivityController extends BaseController
     /**
      * Get statistics for admin views
      */
-    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getStats(WP_REST_Request $request)
     {
         try {
             $stats = $this->service->getStatusCounts();

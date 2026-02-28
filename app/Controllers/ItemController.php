@@ -59,7 +59,7 @@ class ItemController extends BaseController
      * GET /items/stats
      * Return stable status counts for admin list views.
      */
-    public function getStats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getStats(WP_REST_Request $request)
     {
         try {
             $stats = $this->service->getStatusCounts();
@@ -96,7 +96,7 @@ class ItemController extends BaseController
         }
     }
 
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             $params = $this->getPaginationParams($request);
@@ -151,7 +151,7 @@ class ItemController extends BaseController
         }
     }
 
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $item = $this->service->getById($this->getId($request));
@@ -166,7 +166,7 @@ class ItemController extends BaseController
         }
     }
 
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $id = $this->service->create($this->getBody($request));
@@ -186,7 +186,7 @@ class ItemController extends BaseController
         }
     }
 
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $result = $this->service->update($this->getId($request), $this->getBody($request));
@@ -205,7 +205,7 @@ class ItemController extends BaseController
         }
     }
 
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $result = $this->service->delete($this->getId($request));

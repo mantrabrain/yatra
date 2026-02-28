@@ -39,7 +39,7 @@ class CategoryController extends BaseController
     /**
      * List categories
      */
-    public function list_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function list_items(WP_REST_Request $request)
     {
         try {
             $params = $this->getPaginationParams($request);
@@ -77,7 +77,7 @@ class CategoryController extends BaseController
     /**
      * Get single category
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $item = $this->service->getById($this->getId($request));
@@ -102,7 +102,7 @@ class CategoryController extends BaseController
     /**
      * Create category
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $id = $this->service->create($this->getBody($request));
@@ -119,7 +119,7 @@ class CategoryController extends BaseController
     /**
      * Update category
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = $this->getId($request);
@@ -143,7 +143,7 @@ class CategoryController extends BaseController
     /**
      * Delete category
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = $this->getId($request);
@@ -164,7 +164,7 @@ class CategoryController extends BaseController
     /**
      * Get status counts
      */
-    public function get_stats(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_stats(WP_REST_Request $request)
     {
         try {
             $counts = $this->service->getStatusCounts();

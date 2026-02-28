@@ -143,7 +143,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Get status counts for recurring rules
      */
-    public function get_counts(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_counts(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');
@@ -159,7 +159,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Get all rules for a trip
      */
-    public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_items(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');
@@ -196,7 +196,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Get single rule
      */
-    public function get_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function get_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -219,7 +219,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Create new rule
      */
-    public function create_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function create_item(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -244,7 +244,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Update rule
      */
-    public function update_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function update_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -278,7 +278,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Delete rule
      */
-    public function delete_item(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function delete_item(WP_REST_Request $request)
     {
         try {
             $id = (int) $request->get_param('id');
@@ -305,7 +305,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Preview generated dates from rule data
      */
-    public function preview_dates(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function preview_dates(WP_REST_Request $request)
     {
         try {
             $data = $request->get_json_params();
@@ -330,7 +330,7 @@ class RecurringAvailabilityController extends BaseController
     /**
      * Generate dates for a trip from all active rules
      */
-    public function generate_dates(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function generate_dates(WP_REST_Request $request)
     {
         try {
             $tripId = (int) $request->get_param('trip_id');

@@ -122,7 +122,7 @@ class CacheController extends BaseController
     /**
      * Get cache statistics
      */
-    public function getStats(): WP_REST_Response|WP_Error
+    public function getStats()
     {
         try {
             $metrics = get_option('yatra_cache_metrics', []);
@@ -163,7 +163,7 @@ class CacheController extends BaseController
     /**
      * Get all cache data for viewing
      */
-    public function getAllCacheData(): WP_REST_Response|WP_Error
+    public function getAllCacheData()
     {
         try {
             $cacheData = [];
@@ -259,7 +259,7 @@ class CacheController extends BaseController
     /**
      * Clear specific cache item
      */
-    public function clearCacheItem(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function clearCacheItem(WP_REST_Request $request)
     {
         try {
             $key = $request->get_param('key');
@@ -344,7 +344,7 @@ class CacheController extends BaseController
     /**
      * Clear all cache
      */
-    public function clearAll(): WP_REST_Response|WP_Error
+    public function clearAll()
     {
         try {
             $startTime = microtime(true);
@@ -373,7 +373,7 @@ class CacheController extends BaseController
     /**
      * Clear cache by pattern
      */
-    public function clearByPattern(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function clearByPattern(WP_REST_Request $request)
     {
         try {
             $pattern = $request->get_param('pattern');
@@ -415,7 +415,7 @@ class CacheController extends BaseController
     /**
      * Toggle cache enabled status
      */
-    public function toggleCache(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function toggleCache(WP_REST_Request $request)
     {
         try {
             $enabled = $request->get_param('enabled');
@@ -442,7 +442,7 @@ class CacheController extends BaseController
     /**
      * Warm cache
      */
-    public function warmCache(): WP_REST_Response|WP_Error
+    public function warmCache()
     {
         try {
             $startTime = microtime(true);
@@ -516,7 +516,7 @@ class CacheController extends BaseController
     /**
      * Get cache status
      */
-    public function getCacheStatus(): WP_REST_Response|WP_Error
+    public function getCacheStatus()
     {
         try {
             $status = \Yatra\Utils\Cache::getStatus();
@@ -538,7 +538,7 @@ class CacheController extends BaseController
     /**
      * Enable cache
      */
-    public function enableCache(): WP_REST_Response|WP_Error
+    public function enableCache()
     {
         try {
             $success = \Yatra\Utils\Cache::enableForTesting();
@@ -563,7 +563,7 @@ class CacheController extends BaseController
     /**
      * Disable cache
      */
-    public function disableCache(): WP_REST_Response|WP_Error
+    public function disableCache()
     {
         try {
             $success = \Yatra\Utils\Cache::disableForTesting();
