@@ -305,7 +305,7 @@ jobs:
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
           
           # Initialize error counter
-          SYNTAX_ERRORS=0
+          echo 0 > /tmp/syntax_error_count_${{ matrix.php }}
           
           # Get list of PHP files and check each one
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" > php_files_list.txt 2>/dev/null || {
@@ -318,11 +318,7 @@ jobs:
           while IFS= read -r file; do
             if [ -f "$file" ] && [ -r "$file" ]; then
               echo "Checking: $file" >&2
-              OUTPUT=$(php -l "$file" 2>&1) || {
-                echo "❌ Failed to check $file" | tee -a php${{ matrix.php }}-compat.txt
-                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
-                continue
-              }
+              OUTPUT=$(php -l "$file" 2>&1)
               PHP_EXIT_CODE=$?
               
               # Only capture actual errors, not "No syntax errors detected"
@@ -337,6 +333,10 @@ jobs:
           
           # Clean up
           rm -f php_files_list.txt
+          
+          # Count errors from file
+          SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count_${{ matrix.php }} 2>/dev/null || echo 0)
+          rm -f /tmp/syntax_error_count_${{ matrix.php }}
           
           echo "Syntax check completed. Errors found: $SYNTAX_ERRORS" >&2
           
