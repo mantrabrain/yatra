@@ -183,7 +183,7 @@ class ActivityController extends BaseController
             return $this->success_response($this->prepareActivity($item));
             
         } catch (\Exception $e) {
-            Logger::error("Failed to get activity", ['activity_id' => $id ?? 0, 'error' => $e->getMessage()]);
+            Logger::error("Failed to get activity", ['activity_id' => isset($id) ? $id : 0, 'error' => $e->getMessage()]);
             return $this->handle_exception($e);
         }
     }

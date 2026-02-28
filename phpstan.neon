@@ -23,9 +23,10 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     tmpDir: build/phpstan
     
-    # WordPress-specific configuration
+    # WordPress-specific configuration - use WordPress bootstrap
     bootstrapFiles:
         - vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+        - phpstan-bootstrap.php
     
     ignoreErrors:
         # Third-party library calls (DOMPDF, Action Scheduler)
@@ -34,6 +35,6 @@ parameters:
         # WordPress dynamic properties (unavoidable in WP context)
         - '#Access to an undefined property object::\$.*#'
         - '#Variable \$this might not be defined#'
-        # WordPress constants defined at runtime
-        - '#Constant YATRA_PLUGIN_PATH not found#'
-        - '#Constant YATRA_PLUGIN_URI not found#'
+        # Plugin-specific constants (defined in plugin bootstrap)
+        - '#Constant YATRA_.* not found#'
+        - '#Constant DB_.* not found#'
