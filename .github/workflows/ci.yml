@@ -274,6 +274,17 @@ jobs:
           php-version: ${{ matrix.php }}
           extensions: dom, mbstring, xml, ctype, iconv, pdo, pdo_mysql, gd, zip, curl, json
           
+      - name: Debug PHP Setup
+        run: |
+          echo "DEBUG: PHP setup completed for ${{ matrix.php }}"
+          echo "DEBUG: PHP version:"
+          php -v
+          echo "DEBUG: Current directory:"
+          pwd
+          echo "DEBUG: Available files:"
+          ls -la
+          echo "DEBUG: Starting compatibility check..."
+          
       - name: Get Composer cache directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
@@ -419,6 +430,31 @@ jobs:
             phpcs-errors-readable.txt
             phpcs-report.json
             phpcs-output.txt
+          if-no-files-found: ignore
+          
+      - name: Upload Fallback Report (if job failed)
+        if: failure()
+        run: |
+          echo "Creating fallback report for PHP ${{ matrix.php }}..." >&2
+          echo "❌ PHP ${{ matrix.php }} job failed during execution" > php${{ matrix.php }}-fallback.txt
+          echo "This indicates a critical issue with PHP ${{ matrix.php }} compatibility." >> php${{ matrix.php }}-fallback.txt
+          echo "Possible causes:" >> php${{ matrix.php }}-fallback.txt
+          echo "- PHP setup failure" >> php${{ matrix.php }}-fallback.txt
+          echo "- Composer installation failure" >> php${{ matrix.php }}-fallback.txt
+          echo "- Critical syntax errors preventing job completion" >> php${{ matrix.php }}-fallback.txt
+          echo "- CI environment issues" >> php${{ matrix.php }}-fallback.txt
+          echo "" >> php${{ matrix.php }}-fallback.txt
+          echo "Debug information:" >> php${{ matrix.php }}-fallback.txt
+          echo "PHP version: $(php -v 2>&1 || echo 'PHP not available')" >> php${{ matrix.php }}-fallback.txt
+          echo "Current directory: $(pwd)" >> php${{ matrix.php }}-fallback.txt
+          echo "Available files: $(ls -la 2>/dev/null || echo 'Cannot list files')" >> php${{ matrix.php }}-fallback.txt
+          
+      - name: Upload Fallback Artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php${{ matrix.php }}-compatibility
+          path: php${{ matrix.php }}-fallback.txt
           if-no-files-found: ignore
 
   # WordPress Compatibility Check
