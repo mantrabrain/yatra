@@ -89,7 +89,7 @@ jobs:
                 echo "❌ PHP crashed while checking $file - likely PHP version incompatibility" | tee -a "$ERROR_FILE"
                 echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a "$ERROR_FILE"
                 echo "DEBUG: PHP crashed on $file" >&2
-                echo 1 >> /tmp/syntax_error_count
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
                 continue
               fi
               
@@ -370,7 +370,7 @@ jobs:
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
           
           # Initialize error counter
-          echo 0 > /tmp/syntax_error_count_${{ matrix.php }}
+          SYNTAX_ERRORS=0
           
           # Get list of PHP files and check each one
           find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" > php_files_list.txt 2>/dev/null || {
@@ -389,7 +389,7 @@ jobs:
                 echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a php${{ matrix.php }}-compat.txt
                 echo "❌ PHP crashed while checking $file - likely PHP ${{ matrix.php }} incompatibility" >> php${{ matrix.php }}-lint.txt
                 echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" >> php${{ matrix.php }}-lint.txt
-                echo 1 >> /tmp/syntax_error_count_${{ matrix.php }}
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
                 continue
               }
               PHP_EXIT_CODE=$?
@@ -399,7 +399,7 @@ jobs:
                 echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
                 echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
                 echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
-                echo 1 >> /tmp/syntax_error_count_${{ matrix.php }}
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
               fi
             fi
           done < php_files_list.txt
@@ -407,9 +407,7 @@ jobs:
           # Clean up
           rm -f php_files_list.txt
           
-          # Count errors from file
-          SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count_${{ matrix.php }} 2>/dev/null || echo 0)
-          rm -f /tmp/syntax_error_count_${{ matrix.php }}
+          # SYNTAX_ERRORS already contains the correct count
           
           echo "Syntax check completed. Errors found: $SYNTAX_ERRORS" >&2
           
