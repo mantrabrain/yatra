@@ -24,7 +24,7 @@
     </rule>
     
     <!-- Additional rules for modern PHP -->
-    <rule ref="Generic.PHP.DeprecatedFunctions"/>
+    <!-- Deprecated functions are checked separately in CI workflow to avoid false positives -->
     <rule ref="Generic.PHP.Syntax"/>
     
     <!-- Directories to check -->
