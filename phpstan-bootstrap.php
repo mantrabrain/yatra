@@ -185,3 +185,27 @@ if (!function_exists('yatra_get_currency_symbol')) {
         return '$';
     }
 }
+
+if (!function_exists('esc_like')) {
+    function esc_like($text) {
+        return addslashes($text);
+    }
+}
+
+if (!function_exists('is_multisite')) {
+    function is_multisite() {
+        return false;
+    }
+}
+
+if (!function_exists('get_template_part')) {
+    function get_template_part($slug, $name = null) {
+        return '';
+    }
+}
+
+if (!function_exists('has_shortcode')) {
+    function has_shortcode($content, $tag) {
+        return false;
+    }
+}
