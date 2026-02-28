@@ -2387,7 +2387,6 @@ const Itinerary: React.FC = () => {
                                       options={(() => {
                                         const itemTypeId = entry.item_type_id;
 
-                                        
                                         if (!itemTypeId) return [];
 
                                         const itemTypeIdNum =
