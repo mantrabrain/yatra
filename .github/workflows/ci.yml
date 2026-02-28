@@ -2,9 +2,9 @@ name: Yatra CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop, 3.0.0 ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop, 3.0.0 ]
 
 jobs:
   # Code Quality and Standards Compliance
