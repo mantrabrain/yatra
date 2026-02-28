@@ -4,13 +4,26 @@
     
     <!-- WordPress Coding Standards -->
     <rule ref="WordPress">
+        <!-- Exclude file naming rules (modern PSR-4 autoloading) -->
         <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
         <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+        
+        <!-- Exclude variable naming rules (allow camelCase for modern PHP) -->
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase"/>
+        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
+        
+        <!-- Allow short array syntax [] alongside array() -->
+        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
+        
+        <!-- Exclude Yoda conditions (modern PHP doesn't require them) -->
+        <exclude name="WordPress.PHP.YodaConditions"/>
+        
+        <!-- Allow multiple assignments per line (common in modern PHP) -->
+        <exclude name="Squiz.PHP.DisallowMultipleAssignments"/>
     </rule>
     
     <!-- Additional rules for modern PHP -->
-    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
     <rule ref="Generic.PHP.DeprecatedFunctions"/>
     <rule ref="Generic.PHP.Syntax"/>
     

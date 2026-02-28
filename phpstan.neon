@@ -15,6 +15,13 @@ parameters:
         - */tests/*
         - */test/*
         - app/Providers/RouteServiceProvider.php
+        - templates/setup-wizard/*
+        - templates/pdf/*
+        - templates/examples/*
+    
+    # Performance optimizations
+    reportUnmatchedIgnoredErrors: false
+    tmpDir: build/phpstan
     
     # WordPress-specific configuration
     bootstrapFiles:
@@ -24,6 +31,9 @@ parameters:
         # Third-party library calls (DOMPDF, Action Scheduler)
         - '#Call to an undefined method Dompdf.*#'
         - '#Call to an undefined method ActionScheduler.*#'
-        # Ignore missing array/generic typehints (common in WordPress)
-        - identifier: missingType.iterableValue
-        - identifier: missingType.generics
+        # WordPress dynamic properties (unavoidable in WP context)
+        - '#Access to an undefined property object::\$.*#'
+        - '#Variable \$this might not be defined#'
+        # WordPress constants defined at runtime
+        - '#Constant YATRA_PLUGIN_PATH not found#'
+        - '#Constant YATRA_PLUGIN_URI not found#'

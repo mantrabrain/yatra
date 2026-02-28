@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [8.1, 8.2]
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
         
     steps:
       - name: Checkout code
@@ -95,7 +95,8 @@ jobs:
           vendor/bin/phpstan analyse \
             --no-progress \
             --error-format=json \
-            --memory-limit=1G > phpstan-report.json 2>&1 || true
+            --memory-limit=2G \
+            --no-parallel > phpstan-report.json 2>&1 || true
           
           # Parse PHPStan report using bash script
           bash .github/scripts/parse-phpstan-report.sh
@@ -252,6 +253,94 @@ jobs:
           path: structure-errors.txt
           if-no-files-found: ignore
 
+  # PHP Compatibility Matrix Testing
+  php-compatibility:
+    name: PHP ${{ matrix.php }} Compatibility
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl, json
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-php${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-php${{ matrix.php }}-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --ignore-platform-reqs
+        
+      - name: PHP Syntax Check (Lint)
+        run: |
+          echo "Checking PHP syntax for PHP ${{ matrix.php }}..."
+          find app includes templates -name "*.php" -print0 | xargs -0 -n1 php -l > php${{ matrix.php }}-lint.txt 2>&1 || true
+          if grep -q "Parse error\|Fatal error\|syntax error" php${{ matrix.php }}-lint.txt; then
+            echo "❌ PHP ${{ matrix.php }} syntax errors found"
+            cat php${{ matrix.php }}-lint.txt
+            exit 1
+          fi
+          echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee php${{ matrix.php }}-compat.txt
+          
+      - name: Check Deprecated Functions (PHP ${{ matrix.php }})
+        run: |
+          echo "Checking for deprecated functions in PHP ${{ matrix.php }}..." | tee -a php${{ matrix.php }}-compat.txt
+          
+          # PHP 7.4 deprecations
+          if [ "${{ matrix.php }}" = "7.4" ] || [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED=$(grep -rn "create_function\|each\|money_format\|ezmlm_hash" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED" ]; then
+              echo "⚠️ PHP 7.4+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          # PHP 8.0+ deprecations
+          if [ "${{ matrix.php }}" = "8.0" ] || [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED_80=$(grep -rn "get_magic_quotes_gpc\|get_magic_quotes_runtime" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED_80" ]; then
+              echo "⚠️ PHP 8.0+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED_80" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          # PHP 8.1+ deprecations
+          if [ "${{ matrix.php }}" = "8.1" ] || [ "${{ matrix.php }}" = "8.2" ] || [ "${{ matrix.php }}" = "8.3" ] || [ "${{ matrix.php }}" = "8.4" ]; then
+            DEPRECATED_81=$(grep -rn "utf8_encode\|utf8_decode" app includes templates --include="*.php" 2>/dev/null || true)
+            if [ -n "$DEPRECATED_81" ]; then
+              echo "⚠️ PHP 8.1+ deprecated functions found:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$DEPRECATED_81" | tee -a php${{ matrix.php }}-compat.txt
+            fi
+          fi
+          
+          echo "Deprecated function check completed" | tee -a php${{ matrix.php }}-compat.txt
+          
+      - name: Upload PHP ${{ matrix.php }} Compatibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: php${{ matrix.php }}-compatibility
+          path: |
+            php${{ matrix.php }}-compat.txt
+            php${{ matrix.php }}-lint.txt
+          if-no-files-found: ignore
+
   # WordPress Compatibility Check
   wordpress-compatibility:
     name: WordPress Compatibility
@@ -395,7 +484,7 @@ jobs:
   build-summary:
     name: Build Summary
     runs-on: ubuntu-latest
-    needs: [quality-check, security-scan, structure-check, wordpress-compatibility, typescript-quality]
+    needs: [quality-check, security-scan, structure-check, php-compatibility, wordpress-compatibility, typescript-quality]
     if: always()
     
     steps:
@@ -542,8 +631,27 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
+          # --- PHP COMPATIBILITY ---
+          echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          for version in 7.4 8.0 8.1 8.2 8.3 8.4; do
+            if [ -d "error-reports/php${version}-compatibility" ]; then
+              echo "=== PHP ${version} ===" >> $GITHUB_STEP_SUMMARY
+              if [ -f "error-reports/php${version}-compatibility/php${version}-compat.txt" ]; then
+                cat "error-reports/php${version}-compatibility/php${version}-compat.txt" >> $GITHUB_STEP_SUMMARY
+              fi
+              if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
+                echo "Lint errors:" >> $GITHUB_STEP_SUMMARY
+                cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
+              fi
+              echo "" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
           # --- WP COMPATIBILITY ---
-          echo "### 8. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
+          echo "### 9. WordPress Compatibility Issues" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ -f "error-reports/wp-compat-errors/wp-compat-errors.txt" ]; then
             cat "error-reports/wp-compat-errors/wp-compat-errors.txt" >> $GITHUB_STEP_SUMMARY
@@ -554,7 +662,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- TYPESCRIPT ERRORS ---
-          echo "### 9. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
+          echo "### 10. TypeScript Compilation Errors" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ -f "error-reports/typescript-errors/typescript-errors.txt" ]; then
             cat "error-reports/typescript-errors/typescript-errors.txt" >> $GITHUB_STEP_SUMMARY
@@ -565,7 +673,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- ESLINT ERRORS ---
-          echo "### 10. ESLint Violations" >> $GITHUB_STEP_SUMMARY
+          echo "### 11. ESLint Violations" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ -f "error-reports/typescript-errors/eslint-errors.txt" ]; then
             cat "error-reports/typescript-errors/eslint-errors.txt" >> $GITHUB_STEP_SUMMARY
@@ -576,7 +684,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- PRETTIER ERRORS ---
-          echo "### 11. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
+          echo "### 12. Prettier Formatting Issues" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ -f "error-reports/typescript-errors/prettier-errors.txt" ]; then
             cat "error-reports/typescript-errors/prettier-errors.txt" >> $GITHUB_STEP_SUMMARY
@@ -587,7 +695,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           
           # --- CONSOLE.LOG ---
-          echo "### 12. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
+          echo "### 13. Console.log Statements in Production Code" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           if [ -f "error-reports/typescript-errors/consolelog-errors.txt" ]; then
             cat "error-reports/typescript-errors/consolelog-errors.txt" >> $GITHUB_STEP_SUMMARY
