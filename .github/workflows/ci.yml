@@ -24,7 +24,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl, json
+          extensions: dom, mbstring, xml, ctype, iconv, pdo, pdo_mysql, gd, zip, curl, json
           coverage: none
           
       - name: Get Composer cache directory
@@ -269,7 +269,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl, json
+          extensions: dom, mbstring, xml, ctype, iconv, pdo, pdo_mysql, gd, zip, curl, json
           
       - name: Get Composer cache directory
         id: composer-cache
@@ -293,14 +293,28 @@ jobs:
         run: |
           echo "Checking PHP syntax for PHP ${{ matrix.php }}..." >&2
           
+          # Debug: Check PHP version
+          echo "PHP version:" >&2
+          php -v >&2
+          
+          # Debug: Check if PHP files exist
+          echo "PHP files found:" >&2
+          find app includes templates -name "*.php" | wc -l >&2
+          
           # Initialize error counter
           SYNTAX_ERRORS=0
           
           # Get list of PHP files and check each one
-          find app includes templates -name "*.php" > php_files_list.txt
+          find app includes templates -name "*.php" > php_files_list.txt || {
+            echo "❌ No PHP files found to check" | tee -a php${{ matrix.php }}-compat.txt
+            exit 1
+          }
+          
+          echo "Starting syntax check..." >&2
           
           while read -r file; do
             if [ -f "$file" ]; then
+              echo "Checking: $file" >&2
               OUTPUT=$(php -l "$file" 2>&1)
               PHP_EXIT_CODE=$?
               
@@ -316,6 +330,8 @@ jobs:
           
           # Clean up
           rm -f php_files_list.txt
+          
+          echo "Syntax check completed. Errors found: $SYNTAX_ERRORS" >&2
           
           if [ $SYNTAX_ERRORS -gt 0 ]; then
             echo "❌ PHP ${{ matrix.php }}: Found $SYNTAX_ERRORS files with syntax errors" | tee -a php${{ matrix.php }}-compat.txt
