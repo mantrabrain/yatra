@@ -53,22 +53,39 @@ jobs:
         id: php-lint
         run: |
           echo "Running PHP syntax check..."
-          ERRORS=""
-          while IFS= read -r -d '' file; do
-            OUTPUT=$(php -l "$file" 2>&1)
-            if [ $? -ne 0 ]; then
-              ERRORS="${ERRORS}${OUTPUT}\n"
-            fi
-          done < <(find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -print0)
           
-          if [ -n "$ERRORS" ]; then
-            echo -e "$ERRORS" > php-lint-errors.txt
-            echo -e "$ERRORS"
+          # Create temporary file to store errors
+          ERROR_FILE=$(mktemp)
+          SYNTAX_ERRORS=0
+          
+          # Find PHP files and check syntax
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | while read -r file; do
+            if [ -f "$file" ] && [ -r "$file" ]; then
+              OUTPUT=$(php -l "$file" 2>&1)
+              PHP_EXIT_CODE=$?
+              if [ $PHP_EXIT_CODE -ne 0 ]; then
+                ERRORS="${ERRORS}❌ $file:\n${OUTPUT}\n"
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+              fi
+            fi
+          done
+          
+          # Count errors
+          if [ -f "/tmp/syntax_error_count" ]; then
+            SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count)
+            rm -f /tmp/syntax_error_count
+          fi
+          
+          if [ $SYNTAX_ERRORS -gt 0 ]; then
+            cat "$ERROR_FILE" > php-lint-errors.txt
+            cat "$ERROR_FILE"
             echo "has_errors=true" >> $GITHUB_OUTPUT
+            rm -f "$ERROR_FILE"
             exit 1
           fi
           echo "No PHP syntax errors found" > php-lint-errors.txt
           echo "has_errors=false" >> $GITHUB_OUTPUT
+          rm -f "$ERROR_FILE"
           
       - name: Run PHP_CodeSniffer (WordPress Standards)
         id: phpcs
@@ -313,7 +330,7 @@ jobs:
                 echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
                 echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
                 echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
-                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+                echo 1 >> /tmp/syntax_error_count_${{ matrix.php }}
               fi
             fi
           done < php_files_list.txt
@@ -699,7 +716,7 @@ jobs:
               fi
               if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
                 # Check if file contains actual errors (not just success messages)
-                if grep -q "Parse error\|syntax error\|Fatal error" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
                   HAS_VERSION_ERRORS=true
                 fi
               fi
@@ -723,7 +740,7 @@ jobs:
                 # Show lint errors
                 if [ -f "error-reports/php${version}-compatibility/php${version}-lint.txt" ] && [ -s "error-reports/php${version}-compatibility/php${version}-lint.txt" ]; then
                   # Only show if file contains actual errors
-                  if grep -q "Parse error\|syntax error\|Fatal error" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
+                  if grep -q "Parse error\|syntax error\|Fatal error\|❌\|Failed to check" "error-reports/php${version}-compatibility/php${version}-lint.txt"; then
                     echo "Syntax errors:" >> $GITHUB_STEP_SUMMARY
                     cat "error-reports/php${version}-compatibility/php${version}-lint.txt" >> $GITHUB_STEP_SUMMARY
                   fi

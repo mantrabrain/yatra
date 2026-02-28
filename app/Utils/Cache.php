@@ -397,11 +397,14 @@ class Cache
      */
     private static function isBackendAvailable(string $backend): bool
     {
-        return match ($backend) {
-            'transient' => function_exists('get_transient'),
-            'memory' => true,
-            default => false,
-        };
+        switch ($backend) {
+            case 'transient':
+                return function_exists('get_transient');
+            case 'memory':
+                return true;
+            default:
+                return false;
+        }
     }
 
     /**
@@ -409,11 +412,14 @@ class Cache
      */
     private static function getFromBackend(string $backend, string $key): mixed
     {
-        return match ($backend) {
-            'transient' => self::getFromTransient($key),
-            'memory' => self::$memoryCache[$key] ?? null,
-            default => null,
-        };
+        switch ($backend) {
+            case 'transient':
+                return self::getFromTransient($key);
+            case 'memory':
+                return self::$memoryCache[$key] ?? null;
+            default:
+                return null;
+        }
     }
 
     /**
@@ -421,11 +427,14 @@ class Cache
      */
     private static function setToBackend(string $backend, string $key, mixed $value, int $duration): bool
     {
-        return match ($backend) {
-            'transient' => self::setToTransient($key, $value, $duration),
-            'memory' => true, // Already handled above
-            default => false,
-        };
+        switch ($backend) {
+            case 'transient':
+                return self::setToTransient($key, $value, $duration);
+            case 'memory':
+                return true; // Already handled above
+            default:
+                return false;
+        }
     }
 
     /**
@@ -433,11 +442,14 @@ class Cache
      */
     private static function deleteFromBackend(string $backend, string $key): bool
     {
-        return match ($backend) {
-            'transient' => self::deleteFromTransient($key),
-            'memory' => true, // Already handled above
-            default => false,
-        };
+        switch ($backend) {
+            case 'transient':
+                return self::deleteFromTransient($key);
+            case 'memory':
+                return true; // Already handled above
+            default:
+                return false;
+        }
     }
 
     /**
@@ -445,11 +457,14 @@ class Cache
      */
     private static function clearPrefixFromBackend(string $backend, string $prefix): bool
     {
-        return match ($backend) {
-            'transient' => self::clearPrefixFromTransient($prefix),
-            'memory' => true, // Already handled above
-            default => false,
-        };
+        switch ($backend) {
+            case 'transient':
+                return self::clearPrefixFromTransient($prefix);
+            case 'memory':
+                return true; // Already handled above
+            default:
+                return false;
+        }
     }
 
     
