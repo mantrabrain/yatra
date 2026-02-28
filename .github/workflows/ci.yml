@@ -54,6 +54,18 @@ jobs:
         run: |
           echo "Running PHP syntax check..."
           
+          # Debug: Check PHP environment
+          echo "=== DEBUG: PHP Environment ===" >&2
+          echo "PHP Version:" >&2
+          php -v >&2
+          echo "PHP Configuration:" >&2
+          php -i | grep -E "(error_reporting|display_errors|log_errors)" >&2
+          echo "Current Directory:" >&2
+          pwd >&2
+          echo "Available PHP Files:" >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
+          echo "=== END DEBUG ===" >&2
+          
           # Create temporary file to store errors
           ERROR_FILE=$(mktemp)
           SYNTAX_ERRORS=0
@@ -68,10 +80,16 @@ jobs:
               OUTPUT=$(php -l "$file" 2>&1)
               PHP_EXIT_CODE=$?
               
+              # Debug: Show first few files being checked
+              if [ "$SYNTAX_ERRORS" -lt 3 ]; then
+                echo "DEBUG: Checking $file (exit code: $PHP_EXIT_CODE)" >&2
+              fi
+              
               # Handle PHP crash (exit code 255) or other failures
               if [ $PHP_EXIT_CODE -eq 255 ]; then
                 echo "❌ PHP crashed while checking $file - likely PHP version incompatibility" | tee -a "$ERROR_FILE"
                 echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a "$ERROR_FILE"
+                echo "DEBUG: PHP crashed on $file" >&2
                 echo 1 >> /tmp/syntax_error_count
                 continue
               fi
@@ -80,6 +98,7 @@ jobs:
               if [ $PHP_EXIT_CODE -ne 0 ]; then
                 echo "❌ $file:" | tee -a "$ERROR_FILE"
                 echo "$OUTPUT" | tee -a "$ERROR_FILE"
+                echo "DEBUG: Syntax error in $file: $OUTPUT" >&2
                 echo 1 >> /tmp/syntax_error_count
               fi
             fi
@@ -88,20 +107,28 @@ jobs:
           # Re-enable strict error handling
           set -e
           
+          # Debug: Show error count before final check
+          echo "DEBUG: Total syntax errors found: $(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)" >&2
+          
           # Count errors
           SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)
           rm -f /tmp/syntax_error_count
           
+          echo "DEBUG: Final error count: $SYNTAX_ERRORS" >&2
+          
           if [ $SYNTAX_ERRORS -gt 0 ]; then
+            echo "DEBUG: Writing errors to files..." >&2
             cat "$ERROR_FILE" > php-lint-errors.txt
             cat "$ERROR_FILE"
             echo "has_errors=true" >> $GITHUB_OUTPUT
             rm -f "$ERROR_FILE"
+            echo "DEBUG: Exiting with code 1 due to $SYNTAX_ERRORS syntax errors" >&2
             exit 1
           fi
           echo "No PHP syntax errors found" > php-lint-errors.txt
           echo "has_errors=false" >> $GITHUB_OUTPUT
           rm -f "$ERROR_FILE"
+          echo "DEBUG: All checks passed, exiting with code 0" >&2
           
       - name: Run PHP_CodeSniffer (WordPress Standards)
         id: phpcs
