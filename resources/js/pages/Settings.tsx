@@ -2503,7 +2503,7 @@ const Settings: React.FC = () => {
       setFormData(defaultSettings);
       isInitializedRef.current = true;
     }
-      }, [settings, isLoading]);
+  }, [settings, isLoading]);
 
   // Initialize gateway order when gateway definitions are loaded
   React.useEffect(() => {

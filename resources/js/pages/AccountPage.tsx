@@ -119,7 +119,7 @@ const AccountPage: React.FC = () => {
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
-      }, [urlKey]);
+  }, [urlKey]);
 
   // Update URL and localStorage when section changes
   const handleSectionChange = (newSection: Section) => {
