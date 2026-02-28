@@ -291,17 +291,21 @@ jobs:
           SYNTAX_ERRORS=0
           
           # Get list of PHP files and check each one
-          find app includes templates -name "*.php" > php_files_list.txt || {
+          find app includes templates -name "*.php" > php_files_list.txt 2>/dev/null || {
             echo "❌ No PHP files found to check" | tee -a php${{ matrix.php }}-compat.txt
             exit 1
           }
           
           echo "Starting syntax check..." >&2
           
-          while read -r file; do
-            if [ -f "$file" ]; then
+          while IFS= read -r file; do
+            if [ -f "$file" ] && [ -r "$file" ]; then
               echo "Checking: $file" >&2
-              OUTPUT=$(php -l "$file" 2>&1)
+              OUTPUT=$(php -l "$file" 2>&1) || {
+                echo "❌ Failed to check $file" | tee -a php${{ matrix.php }}-compat.txt
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+                continue
+              }
               PHP_EXIT_CODE=$?
               
               # Only capture actual errors, not "No syntax errors detected"
