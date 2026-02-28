@@ -8,6 +8,7 @@ use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Utils\QueryCache;
+use Yatra\Utils\Cache;
 
 /**
  * Trip Attribute Repository
@@ -36,8 +37,8 @@ class TripAttributeRepository extends BaseRepository
      */
     public function saveTripAttributes(int $tripId, array $attributes): bool
     {
-        // Use QueryCache for caching trip attributes
-        $cacheKey = Cache::KEY_TRIP_ATTRIBUTES . '_' . $tripId . '_' . md5(serialize($attributes));
+        // Use Cache for caching trip attributes
+        $cacheKey = Cache::PREFIX_ATTRIBUTES . $tripId . '_' . md5(serialize($attributes));
         
         return Cache::remember($cacheKey, function() use ($tripId, $attributes) {
             global $wpdb;
@@ -144,7 +145,7 @@ class TripAttributeRepository extends BaseRepository
                 return false;
             }
             
-        }, Cache::DURATION_ATTRIBUTES); // Cache for 1 hour
+        }, 3600); // Cache for 1 hour
     }
 
     /**

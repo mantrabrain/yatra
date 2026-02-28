@@ -3,8 +3,8 @@
  * Shows a skeleton UI while the form data is loading
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader } from '../ui/card';
+import React from "react";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 export const ItineraryFormSkeleton: React.FC = () => {
   return (
@@ -106,4 +106,3 @@ export const ItineraryFormSkeleton: React.FC = () => {
     </div>
   );
 };
-

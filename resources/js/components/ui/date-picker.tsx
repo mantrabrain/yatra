@@ -27,7 +27,7 @@ export const DatePicker: React.FC<DatePickerProps> = ({
   error = false,
 }) => {
   const [open, setOpen] = React.useState(false);
-  
+
   // Parse date safely - check if value is valid and parse correctly
   let selectedDate: Date | undefined = undefined;
   if (value && value.trim()) {
@@ -84,4 +84,3 @@ export const DatePicker: React.FC<DatePickerProps> = ({
     </Popover>
   );
 };
-

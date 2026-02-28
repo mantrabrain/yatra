@@ -3,102 +3,121 @@
  * Add/Edit Itinerary Entry form with location, duration, cost, notes, etc.
  */
 
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2 } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { Button } from '../components/ui/button';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
-import { ItineraryEntryFields } from '../components/trip-form/shared/ItineraryEntryFields';
-import { useItineraryFormData } from '../hooks/useItineraryFormData';
-import { useItineraryFormValidation, ItineraryFormData, ActivityForm } from '../hooks/useItineraryFormValidation';
-import { useItineraryFormSave } from '../hooks/useItineraryFormSave';
-import { DayFormFields } from '../components/itinerary/DayFormFields';
-import { ActivityAccordion } from '../components/itinerary/ActivityAccordion';
-import { DayConflictDialog } from '../components/itinerary/DayConflictDialog';
-import { ItineraryFormSkeleton } from '../components/itinerary/ItineraryFormSkeleton';
+import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { __ } from "../lib/i18n";
+import { Button } from "../components/ui/button";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { HelpText } from "../components/ui/help-text";
+import { Alert } from "../components/ui/alert";
+import { ItineraryEntryFields } from "../components/trip-form/shared/ItineraryEntryFields";
+import { useItineraryFormData } from "../hooks/useItineraryFormData";
+import {
+  useItineraryFormValidation,
+  ItineraryFormData,
+  ActivityForm,
+} from "../hooks/useItineraryFormValidation";
+import { useItineraryFormSave } from "../hooks/useItineraryFormSave";
+import { DayFormFields } from "../components/itinerary/DayFormFields";
+import { ActivityAccordion } from "../components/itinerary/ActivityAccordion";
+import { DayConflictDialog } from "../components/itinerary/DayConflictDialog";
+import { ItineraryFormSkeleton } from "../components/itinerary/ItineraryFormSkeleton";
 
 const ItineraryForm: React.FC = () => {
   const queryClient = useQueryClient();
-  
+
   // URL Parameters
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') || 'create';
+    return params.get("action") || "create";
   }, []);
 
   const entryId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
   const tripIdParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('trip_id');
+    return params.get("trip_id");
   }, []);
 
   const dayParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('day');
+    return params.get("day");
   }, []);
 
   const typeIdParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('type_id');
+    return params.get("type_id");
   }, []);
 
   const itemParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('item');
+    return params.get("item");
   }, []);
 
   const modeParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('mode') || 'activity';
+    return params.get("mode") || "activity";
   }, []);
 
-  const isEditMode = action === 'edit' && entryId !== null;
-  const isAddDayMode = modeParam === 'day';
-  const isEditDayMode = isEditMode && modeParam === 'day';
+  const isEditMode = action === "edit" && entryId !== null;
+  const isAddDayMode = modeParam === "day";
+  const isEditDayMode = isEditMode && modeParam === "day";
 
   // Form State
   const [formData, setFormData] = useState<ItineraryFormData>({
-    trip_id: '',
-    day: '',
-    day_title: '',
-    day_description: '',
-    item_type_id: '',
-    item_id: '',
-    title: '',
-    description: '',
-    location: '',
-    duration: '',
-    start_time: '08:00',
-    end_time: '17:00',
-    time_type: 'exact',
-    cost: '',
+    trip_id: "",
+    day: "",
+    day_title: "",
+    day_description: "",
+    item_type_id: "",
+    item_id: "",
+    title: "",
+    description: "",
+    location: "",
+    duration: "",
+    start_time: "08:00",
+    end_time: "17:00",
+    time_type: "exact",
+    cost: "",
     cost_per_person: true,
-    notes: '',
+    notes: "",
     included_items: [],
     excluded_items: [],
-    status: 'publish',
+    status: "publish",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [newIncludedItem, setNewIncludedItem] = useState('');
-  const [newExcludedItem, setNewExcludedItem] = useState('');
+  const [newIncludedItem, setNewIncludedItem] = useState("");
+  const [newExcludedItem, setNewExcludedItem] = useState("");
   const [activityForms, setActivityForms] = useState<ActivityForm[]>([]);
-  const [activityIncludedItems, setActivityIncludedItems] = useState<Record<string, string>>({});
-  const [activityExcludedItems, setActivityExcludedItems] = useState<Record<string, string>>({});
+  const [activityIncludedItems, setActivityIncludedItems] = useState<
+    Record<string, string>
+  >({});
+  const [activityExcludedItems, setActivityExcludedItems] = useState<
+    Record<string, string>
+  >({});
   const [showDayConflictDialog, setShowDayConflictDialog] = useState(false);
-  const [conflictDayNumber, setConflictDayNumber] = useState<number | null>(null);
-  const [suggestedDayNumber, setSuggestedDayNumber] = useState<number | null>(null);
-  const [originalDayNumber, setOriginalDayNumber] = useState<number | null>(null); // Track original day number when editing
+  const [conflictDayNumber, setConflictDayNumber] = useState<number | null>(
+    null,
+  );
+  const [suggestedDayNumber, setSuggestedDayNumber] = useState<number | null>(
+    null,
+  );
+  const [originalDayNumber, setOriginalDayNumber] = useState<number | null>(
+    null,
+  ); // Track original day number when editing
 
   // Refs for preventing infinite loops
   const dayManuallyEditedRef = useRef(false);
@@ -125,26 +144,28 @@ const ItineraryForm: React.FC = () => {
     isAddDayMode,
     tripIdParam,
     dayParam,
-    formDataItemTypeId: formData.item_type_id || '',
+    formDataItemTypeId: formData.item_type_id || "",
     formDataTripId: formData.trip_id,
   });
 
   // Function to refresh dropdown data after creating new item types/items
   const refreshData = () => {
     // Invalidate item types query
-    queryClient.invalidateQueries({ queryKey: ['item-types-published'] });
-    
+    queryClient.invalidateQueries({ queryKey: ["item-types-published"] });
+
     // Invalidate items queries
-    queryClient.invalidateQueries({ queryKey: ['items-all-published'] });
-    queryClient.invalidateQueries({ queryKey: ['items-by-type'] });
+    queryClient.invalidateQueries({ queryKey: ["items-all-published"] });
+    queryClient.invalidateQueries({ queryKey: ["items-by-type"] });
   };
 
   // Auto-select item from URL param
   useEffect(() => {
     if (itemParam && itemsData && itemsData.length > 0) {
-      const item = itemsData.find((i: any) => i.name.toLowerCase() === itemParam.toLowerCase());
+      const item = itemsData.find(
+        (i: any) => i.name.toLowerCase() === itemParam.toLowerCase(),
+      );
       if (item) {
-        setFormData(prev => ({ ...prev, item_id: item.id.toString() }));
+        setFormData((prev) => ({ ...prev, item_id: item.id.toString() }));
       }
     }
   }, [itemParam, itemsData]);
@@ -153,13 +174,17 @@ const ItineraryForm: React.FC = () => {
   const { validateForm } = useItineraryFormValidation();
 
   // Calculate duration helper
-  const calculateDuration = (startTime?: string, endTime?: string, timeType?: string) => {
+  const calculateDuration = (
+    startTime?: string,
+    endTime?: string,
+    timeType?: string,
+  ) => {
     const st = startTime || formData.start_time;
     const et = endTime || formData.end_time;
     const tt = timeType || formData.time_type;
-    if (st && et && tt === 'exact') {
-      const [startHour, startMin] = st.split(':').map(Number);
-      const [endHour, endMin] = et.split(':').map(Number);
+    if (st && et && tt === "exact") {
+      const [startHour, startMin] = st.split(":").map(Number);
+      const [endHour, endMin] = et.split(":").map(Number);
       const startMinutes = startHour * 60 + startMin;
       const endMinutes = endHour * 60 + endMin;
       let diffMinutes = endMinutes - startMinutes;
@@ -167,14 +192,14 @@ const ItineraryForm: React.FC = () => {
       const hours = Math.floor(diffMinutes / 60);
       const minutes = diffMinutes % 60;
       if (hours > 0 && minutes > 0) {
-        return `${hours} hour${hours > 1 ? 's' : ''} ${minutes} minute${minutes > 1 ? 's' : ''}`;
+        return `${hours} hour${hours > 1 ? "s" : ""} ${minutes} minute${minutes > 1 ? "s" : ""}`;
       } else if (hours > 0) {
-        return `${hours} hour${hours > 1 ? 's' : ''}`;
+        return `${hours} hour${hours > 1 ? "s" : ""}`;
       } else {
-        return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+        return `${minutes} minute${minutes > 1 ? "s" : ""}`;
       }
     }
-    return '';
+    return "";
   };
 
   // Save hook
@@ -202,62 +227,52 @@ const ItineraryForm: React.FC = () => {
   // Initialize from URL params
   useEffect(() => {
     if (tripIdParam) {
-      setFormData(prev => ({ ...prev, trip_id: tripIdParam }));
+      setFormData((prev) => ({ ...prev, trip_id: tripIdParam }));
       lastTripIdRef.current = tripIdParam;
     }
     if (dayParam) {
-      setFormData(prev => ({ ...prev, day: dayParam }));
+      setFormData((prev) => ({ ...prev, day: dayParam }));
       dayManuallyEditedRef.current = true;
     }
     if (typeIdParam) {
-      setFormData(prev => ({ ...prev, item_type_id: typeIdParam }));
+      setFormData((prev) => ({ ...prev, item_type_id: typeIdParam }));
     }
   }, [tripIdParam, dayParam, typeIdParam]); // Remove isAddDayMode dependency
 
   // Auto-select item from URL param
   useEffect(() => {
     if (itemParam && itemsData && itemsData.length > 0) {
-      const item = itemsData.find((i: any) => i.name.toLowerCase() === itemParam.toLowerCase());
+      const item = itemsData.find(
+        (i: any) => i.name.toLowerCase() === itemParam.toLowerCase(),
+      );
       if (item) {
-        setFormData(prev => ({ ...prev, item_id: item.id.toString() }));
+        setFormData((prev) => ({ ...prev, item_id: item.id.toString() }));
       }
     }
   }, [itemParam, itemsData]);
 
   // Load entry data when editing
   useEffect(() => {
-    console.log('[YATRA DEBUG] Load entry effect triggered - isEditMode:', isEditMode, 'entryData:', entryData, 'isLoadingInitialDataRef:', isLoadingInitialDataRef.current);
-    
     if (!entryData || !isEditMode || isLoadingInitialDataRef.current) return;
-    
+
     // Debug logging to see what data we received
-    console.log('[YATRA DEBUG] ItineraryForm - entryData received:', entryData);
-    console.log('[YATRA DEBUG] ItineraryForm - entryData fields:', {
-      id: entryData.id,
-      trip_id: entryData.trip_id,
-      day: entryData.day,
-      day_title: entryData.day_title,
-      day_description: entryData.day_description,
-      item_type_id: entryData.item_type_id,
-      item_id: entryData.item_id
-    });
-    
+
     if (!entryData || !entryData.id) {
-      console.log('[YATRA DEBUG] No entryData or no ID, returning');
       return;
     }
-    
-    // In edit day mode, if entryData is an activity (has item_type_id and item_id), 
+
+    // In edit day mode, if entryData is an activity (has item_type_id and item_id),
     // we should wait for the day entry to be loaded (effectiveEntryData will be the day entry)
     if (isEditDayMode) {
       // Check if this is an activity entry (has non-zero item_type_id and item_id)
       // Day entries have item_type_id: 0 and item_id: 0
-      const isActivityEntry = entryData.item_type_id !== null && 
-                             entryData.item_type_id !== undefined && 
-                             entryData.item_type_id !== 0 &&
-                             entryData.item_id !== null && 
-                             entryData.item_id !== undefined &&
-                             entryData.item_id !== 0;
+      const isActivityEntry =
+        entryData.item_type_id !== null &&
+        entryData.item_type_id !== undefined &&
+        entryData.item_type_id !== 0 &&
+        entryData.item_id !== null &&
+        entryData.item_id !== undefined &&
+        entryData.item_id !== 0;
       // If it's an activity, wait - the hook will fetch the day entry and update entryData
       if (isActivityEntry) {
         // Check if this is the same activity we've already processed
@@ -266,55 +281,49 @@ const ItineraryForm: React.FC = () => {
         return;
       }
     }
-    
+
     // Prevent re-loading the same entry
     if (initializedEntryIdRef.current === entryData.id) return;
-    
+
     // Mark as loading initial data
     isLoadingInitialDataRef.current = true;
-    
+
     // Mark as initialized immediately (before any state updates)
     initializedEntryIdRef.current = entryData.id;
-    
+
     if (!isEditDayMode) {
       // For activity editing, load directly into formData
-      console.log('[ITINERARY FORM DEBUG] Loading entry data into form:', {
-        item_type_id_raw: entryData.item_type_id,
-        item_type_id_string: entryData.item_type_id?.toString(),
-        item_id_raw: entryData.item_id,
-        item_id_string: entryData.item_id?.toString(),
-        item_type_name: entryData.item_type_name,
-        item_name: entryData.item_name
-      });
-      
+
       setFormData({
-        trip_id: entryData.trip_id?.toString() || '',
-        day: entryData.day?.toString() || '',
-        day_title: entryData.day_title || '',
-        day_description: entryData.day_description || '',
-        item_type_id: entryData.item_type_id?.toString() || '',
-        item_id: entryData.item_id?.toString() || '',
-        title: entryData.title || '',
-        description: entryData.description || '',
-        location: entryData.location || '',
-        duration: entryData.duration || '',
-        start_time: entryData.start_time || '08:00',
-        end_time: entryData.end_time || '17:00',
-        time_type: entryData.time_type || 'exact',
-        cost: entryData.cost || '',
+        trip_id: entryData.trip_id?.toString() || "",
+        day: entryData.day?.toString() || "",
+        day_title: entryData.day_title || "",
+        day_description: entryData.day_description || "",
+        item_type_id: entryData.item_type_id?.toString() || "",
+        item_id: entryData.item_id?.toString() || "",
+        title: entryData.title || "",
+        description: entryData.description || "",
+        location: entryData.location || "",
+        duration: entryData.duration || "",
+        start_time: entryData.start_time || "08:00",
+        end_time: entryData.end_time || "17:00",
+        time_type: entryData.time_type || "exact",
+        cost: entryData.cost || "",
         cost_per_person: entryData.cost_per_person !== false,
-        notes: entryData.notes || '',
+        notes: entryData.notes || "",
         included_items: entryData.included_items || [],
         excluded_items: entryData.excluded_items || [],
-        status: entryData.status || 'publish',
+        status: entryData.status || "publish",
       });
     } else if (isEditDayMode) {
       // For day editing, entryData should now be the day entry (thanks to effectiveEntryData in useItineraryFormData)
       // Load all day info into formData
-      const dayNumber = entryData.day ? parseInt(entryData.day.toString()) : null;
+      const dayNumber = entryData.day
+        ? parseInt(entryData.day.toString())
+        : null;
       setOriginalDayNumber(dayNumber);
-      
-      setFormData(prev => ({
+
+      setFormData((prev) => ({
         ...prev,
         trip_id: entryData.trip_id?.toString() || tripIdParam || prev.trip_id,
         day: entryData.day?.toString() || dayParam || prev.day,
@@ -323,66 +332,75 @@ const ItineraryForm: React.FC = () => {
         status: entryData.status || prev.status,
       }));
     }
-    
+
     // Clear loading flag after form data is set
     setTimeout(() => {
       isLoadingInitialDataRef.current = false;
     }, 100);
-  }, [entryId, isEditMode, isEditDayMode, entryData, tripIdParam, dayParam, dayTripData]); // Include entryData to trigger when data arrives
+  }, [
+    entryId,
+    isEditMode,
+    isEditDayMode,
+    entryData,
+    tripIdParam,
+    dayParam,
+    dayTripData,
+  ]); // Include entryData to trigger when data arrives
 
   // Load activities for day editing
   useEffect(() => {
     if (!isEditDayMode) return;
     if (!entryTripId || !entryDay) return;
     if (!dayTripData) return;
-    
+
     const dayKey = `${entryTripId}-${entryDay}`;
     if (loadedDayActivitiesRef.current === dayKey) return;
-    
+
     loadedDayActivitiesRef.current = dayKey;
-    
-    const dayNumber = typeof entryDay === 'string' ? parseInt(entryDay) : entryDay;
+
+    const dayNumber =
+      typeof entryDay === "string" ? parseInt(entryDay) : entryDay;
     if (isNaN(dayNumber as number)) return;
-    
+
     const itineraryDays = dayTripData.itinerary_days || [];
-    const dayData = itineraryDays.find((d: any) => 
-      (d.day_number || d.day) === dayNumber
+    const dayData = itineraryDays.find(
+      (d: any) => (d.day_number || d.day) === dayNumber,
     );
-    
+
     if (!dayData || !dayData.entries) return;
-    
+
     const activities = dayData.entries
       .filter((e: any) => e.item_type_id && e.item_id)
       .map((entry: any, index: number) => ({
         id: `activity-${entry.id || index}`,
         entryId: entry.id ? parseInt(entry.id.toString()) : null, // Store actual entry ID for updates
         data: {
-          item_type_id: entry.item_type_id?.toString() || '',
-          item_id: entry.item_id?.toString() || '',
-          title: entry.title || '',
-          description: entry.description || '',
-          location: entry.location || '',
-          duration: entry.duration || '',
-          start_time: entry.start_time || '08:00',
-          end_time: entry.end_time || '17:00',
-          time_type: entry.time_type || 'exact',
-          cost: entry.cost || '',
+          item_type_id: entry.item_type_id?.toString() || "",
+          item_id: entry.item_id?.toString() || "",
+          title: entry.title || "",
+          description: entry.description || "",
+          location: entry.location || "",
+          duration: entry.duration || "",
+          start_time: entry.start_time || "08:00",
+          end_time: entry.end_time || "17:00",
+          time_type: entry.time_type || "exact",
+          cost: entry.cost || "",
           cost_per_person: entry.cost_per_person !== false,
-          notes: entry.notes || '',
+          notes: entry.notes || "",
           included_items: entry.included_items || [],
           excluded_items: entry.excluded_items || [],
-          status: entry.status || 'publish',
+          status: entry.status || "publish",
         },
         isExpanded: index === 0,
       }));
-    
+
     setActivityForms(activities);
-    
+
     const includedItems: Record<string, string> = {};
     const excludedItems: Record<string, string> = {};
     activities.forEach((activity: { id: string }) => {
-      includedItems[activity.id] = '';
-      excludedItems[activity.id] = '';
+      includedItems[activity.id] = "";
+      excludedItems[activity.id] = "";
     });
     setActivityIncludedItems(includedItems);
     setActivityExcludedItems(excludedItems);
@@ -390,12 +408,12 @@ const ItineraryForm: React.FC = () => {
 
   // Track if we're loading initial data to prevent item_id reset during load
   const isLoadingInitialDataRef = useRef(false);
-  
+
   // Reset item_id when type changes (but not during initial data load)
   useEffect(() => {
     // Don't reset during initial data load
     if (isLoadingInitialDataRef.current) return;
-    
+
     // Only reset if item_type_id changes and item_id is set
     // This allows users to change item type and forces them to select a new item
     if (formData.item_type_id && formData.item_id) {
@@ -409,8 +427,8 @@ const ItineraryForm: React.FC = () => {
     if (!effectiveTripData || !dayParam) return null;
     const itineraryDays = effectiveTripData.itinerary_days || [];
     const dayNumber = parseInt(dayParam);
-    const day = itineraryDays.find((d: any) => 
-      (d.day_number || d.day) === dayNumber
+    const day = itineraryDays.find(
+      (d: any) => (d.day_number || d.day) === dayNumber,
     );
     return day?.title || day?.day_title || null;
   }, [effectiveTripData, dayParam]);
@@ -418,29 +436,31 @@ const ItineraryForm: React.FC = () => {
   // Get trip type (single_day or multi_day)
   const selectedTripType = useMemo(() => {
     if (!formData.trip_id) return null;
-    const trip = tripsData?.find((t: any) => t.id.toString() === formData.trip_id);
+    const trip = tripsData?.find(
+      (t: any) => t.id.toString() === formData.trip_id,
+    );
     return trip?.trip_type || null;
   }, [formData.trip_id, tripsData]);
 
-  const isSingleDayTrip = selectedTripType === 'single_day';
+  const isSingleDayTrip = selectedTripType === "single_day";
 
   const submitButtonLabel = useMemo(() => {
     if (isEditMode) {
       if (isAddDayMode) {
         return isSingleDayTrip
-          ? __('Update Entry', 'yatra')
-          : __('Update Day', 'yatra');
+          ? __("Update Entry", "yatra")
+          : __("Update Day", "yatra");
       }
-      return __('Update Itinerary Activity', 'yatra');
+      return __("Update Itinerary Activity", "yatra");
     }
 
     if (isAddDayMode) {
       return isSingleDayTrip
-        ? __('Create Entry', 'yatra')
-        : __('Create Day', 'yatra');
+        ? __("Create Entry", "yatra")
+        : __("Create Day", "yatra");
     }
 
-    return __('Create Itinerary Activity', 'yatra');
+    return __("Create Itinerary Activity", "yatra");
   }, [isEditMode, isAddDayMode, isSingleDayTrip]);
 
   // Get existing day numbers for the trip
@@ -449,7 +469,9 @@ const ItineraryForm: React.FC = () => {
     const itineraryDays = effectiveTripData.itinerary_days || [];
     const days = itineraryDays
       .map((d: any) => d.day_number || d.day)
-      .filter((day: any) => day !== null && day !== undefined && !isNaN(Number(day)))
+      .filter(
+        (day: any) => day !== null && day !== undefined && !isNaN(Number(day)),
+      )
       .map((day: any) => Number(day))
       .sort((a: number, b: number) => a - b);
     return days;
@@ -462,71 +484,88 @@ const ItineraryForm: React.FC = () => {
   }, [existingDayNumbers]);
 
   // Auto-fill day number when trip is selected or changes in day mode
-  const currentTripId = formData.trip_id || '';
+  const currentTripId = formData.trip_id || "";
   const tripIdChanged = lastTripIdRef.current !== currentTripId;
-  
+
   useEffect(() => {
     // Only auto-fill when creating a new day/entry, not when editing
     if (!isAddDayMode || isEditMode) return;
-    
+
     if (currentTripId) {
       if (tripIdChanged) {
         lastTripIdRef.current = currentTripId;
         dayManuallyEditedRef.current = false;
       }
-      
+
       // For single-day trips, auto-fill entry number if empty
       if (isSingleDayTrip) {
-        if (!formData.day || formData.day === '') {
+        if (!formData.day || formData.day === "") {
           // Auto-fill with next available entry number for single-day trips
           const currentDay = parseInt(formData.day) || 0;
-          const shouldUpdate = !formData.day || 
-                              formData.day === '' ||
-                              existingDayNumbers.includes(currentDay);
-          
+          const shouldUpdate =
+            !formData.day ||
+            formData.day === "" ||
+            existingDayNumbers.includes(currentDay);
+
           if (shouldUpdate && nextAvailableDayNumber) {
-            setFormData(prev => ({ ...prev, day: nextAvailableDayNumber.toString() }));
-          } else if (!formData.day || formData.day === '') {
+            setFormData((prev) => ({
+              ...prev,
+              day: nextAvailableDayNumber.toString(),
+            }));
+          } else if (!formData.day || formData.day === "") {
             // Default to 1 if no existing entries
-            setFormData(prev => ({ ...prev, day: '1' }));
+            setFormData((prev) => ({ ...prev, day: "1" }));
           }
         }
         // Allow manual editing for single-day trips, so don't return early
       }
-      
+
       // For multi-day trips, auto-fill day number when trip data is loaded
       if (effectiveTripData !== undefined && effectiveTripData !== null) {
         if (!dayManuallyEditedRef.current) {
           const currentDay = parseInt(formData.day) || 0;
-          const shouldUpdate = !formData.day || 
-                              formData.day === '' ||
-                              existingDayNumbers.includes(currentDay);
-          
+          const shouldUpdate =
+            !formData.day ||
+            formData.day === "" ||
+            existingDayNumbers.includes(currentDay);
+
           if (shouldUpdate && nextAvailableDayNumber) {
-            setFormData(prev => ({ ...prev, day: nextAvailableDayNumber.toString() }));
+            setFormData((prev) => ({
+              ...prev,
+              day: nextAvailableDayNumber.toString(),
+            }));
           }
         }
       }
     } else {
-      setFormData(prev => ({ ...prev, day: '' }));
+      setFormData((prev) => ({ ...prev, day: "" }));
       dayManuallyEditedRef.current = false;
       lastTripIdRef.current = null;
     }
-  }, [isAddDayMode, isEditMode, currentTripId, effectiveTripData, nextAvailableDayNumber, existingDayNumbers.length, formData.day, isSingleDayTrip]);
+  }, [
+    isAddDayMode,
+    isEditMode,
+    currentTripId,
+    effectiveTripData,
+    nextAvailableDayNumber,
+    existingDayNumbers.length,
+    formData.day,
+    isSingleDayTrip,
+  ]);
 
   // Handlers
   const handleFieldChange = (field: keyof ItineraryFormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-    
-    if (field === 'day' && isAddDayMode) {
+
+    if (field === "day" && isAddDayMode) {
       dayManuallyEditedRef.current = true;
     }
-    
-    if (field === 'trip_id' && isAddDayMode) {
-      setFormData(prev => ({ ...prev, day: '' }));
+
+    if (field === "trip_id" && isAddDayMode) {
+      setFormData((prev) => ({ ...prev, day: "" }));
       dayManuallyEditedRef.current = false;
       lastTripIdRef.current = value;
     }
@@ -534,16 +573,16 @@ const ItineraryForm: React.FC = () => {
 
   const handleAddIncludedItem = () => {
     if (newIncludedItem.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         included_items: [...prev.included_items, newIncludedItem.trim()],
       }));
-      setNewIncludedItem('');
+      setNewIncludedItem("");
     }
   };
 
   const handleRemoveIncludedItem = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       included_items: prev.included_items.filter((_, i) => i !== index),
     }));
@@ -551,16 +590,16 @@ const ItineraryForm: React.FC = () => {
 
   const handleAddExcludedItem = () => {
     if (newExcludedItem.trim()) {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         excluded_items: [...prev.excluded_items, newExcludedItem.trim()],
       }));
-      setNewExcludedItem('');
+      setNewExcludedItem("");
     }
   };
 
   const handleRemoveExcludedItem = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       excluded_items: prev.excluded_items.filter((_, i) => i !== index),
     }));
@@ -568,11 +607,11 @@ const ItineraryForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Check for day conflict in day mode before validation
     if (isAddDayMode && formData.trip_id && formData.day) {
       const dayNumber = parseInt(formData.day);
-      
+
       if (!isNaN(dayNumber)) {
         // In edit mode, only check conflict if day number has changed
         if (isEditMode && originalDayNumber !== null) {
@@ -595,8 +634,12 @@ const ItineraryForm: React.FC = () => {
         }
       }
     }
-    
-    const { isValid, errors: validationErrors } = validateForm(formData, isAddDayMode, activityForms);
+
+    const { isValid, errors: validationErrors } = validateForm(
+      formData,
+      isAddDayMode,
+      activityForms,
+    );
     if (!isValid) {
       setErrors(validationErrors);
       return;
@@ -607,26 +650,26 @@ const ItineraryForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=itinerary`;
   };
 
   // Activity form handlers
   const handleToggleExpand = (activityId: string) => {
-    setActivityForms(prev => prev.map(af => 
-      af.id === activityId 
-        ? { ...af, isExpanded: !af.isExpanded }
-        : af
-    ));
+    setActivityForms((prev) =>
+      prev.map((af) =>
+        af.id === activityId ? { ...af, isExpanded: !af.isExpanded } : af,
+      ),
+    );
   };
 
   const handleRemoveActivity = (activityId: string) => {
-    setActivityForms(prev => prev.filter(af => af.id !== activityId));
-    setActivityIncludedItems(prev => {
+    setActivityForms((prev) => prev.filter((af) => af.id !== activityId));
+    setActivityIncludedItems((prev) => {
       const updated = { ...prev };
       delete updated[activityId];
       return updated;
     });
-    setActivityExcludedItems(prev => {
+    setActivityExcludedItems((prev) => {
       const updated = { ...prev };
       delete updated[activityId];
       return updated;
@@ -635,120 +678,160 @@ const ItineraryForm: React.FC = () => {
 
   const handleAddActivity = () => {
     const newActivityId = `activity_${Date.now()}`;
-    setActivityForms(prev => [...prev, {
-      id: newActivityId,
-      data: {
-        item_type_id: '',
-        item_id: '',
-        title: '',
-        description: '',
-        location: '',
-        duration: '',
-        start_time: '08:00',
-        end_time: '17:00',
-        time_type: 'exact',
-        cost: '',
-        cost_per_person: true,
-        notes: '',
-        included_items: [],
-        excluded_items: [],
+    setActivityForms((prev) => [
+      ...prev,
+      {
+        id: newActivityId,
+        data: {
+          item_type_id: "",
+          item_id: "",
+          title: "",
+          description: "",
+          location: "",
+          duration: "",
+          start_time: "08:00",
+          end_time: "17:00",
+          time_type: "exact",
+          cost: "",
+          cost_per_person: true,
+          notes: "",
+          included_items: [],
+          excluded_items: [],
+        },
+        isExpanded: true,
       },
-      isExpanded: true,
-    }]);
+    ]);
   };
 
-  const handleActivityFieldChange = (activityId: string, field: string, value: any) => {
-    setActivityForms(prev => prev.map(af => 
-      af.id === activityId
-        ? { ...af, data: { ...af.data, [field]: value } }
-        : af
-    ));
+  const handleActivityFieldChange = (
+    activityId: string,
+    field: string,
+    value: any,
+  ) => {
+    setActivityForms((prev) =>
+      prev.map((af) =>
+        af.id === activityId
+          ? { ...af, data: { ...af.data, [field]: value } }
+          : af,
+      ),
+    );
   };
 
-  const handleActivityIncludedItemChange = (activityId: string, value: string) => {
-    setActivityIncludedItems(prev => ({ ...prev, [activityId]: value }));
+  const handleActivityIncludedItemChange = (
+    activityId: string,
+    value: string,
+  ) => {
+    setActivityIncludedItems((prev) => ({ ...prev, [activityId]: value }));
   };
 
-  const handleActivityExcludedItemChange = (activityId: string, value: string) => {
-    setActivityExcludedItems(prev => ({ ...prev, [activityId]: value }));
+  const handleActivityExcludedItemChange = (
+    activityId: string,
+    value: string,
+  ) => {
+    setActivityExcludedItems((prev) => ({ ...prev, [activityId]: value }));
   };
 
   const handleActivityAddIncludedItem = (activityId: string) => {
     const item = activityIncludedItems[activityId]?.trim();
     if (item) {
-      setActivityForms(prev => prev.map(af => 
-        af.id === activityId
-          ? { 
-              ...af, 
-              data: { 
-                ...af.data, 
-                included_items: [...(af.data.included_items || []), item]
-              } 
-            }
-          : af
-      ));
-      setActivityIncludedItems(prev => ({ ...prev, [activityId]: '' }));
+      setActivityForms((prev) =>
+        prev.map((af) =>
+          af.id === activityId
+            ? {
+                ...af,
+                data: {
+                  ...af.data,
+                  included_items: [...(af.data.included_items || []), item],
+                },
+              }
+            : af,
+        ),
+      );
+      setActivityIncludedItems((prev) => ({ ...prev, [activityId]: "" }));
     }
   };
 
   const handleActivityAddExcludedItem = (activityId: string) => {
     const item = activityExcludedItems[activityId]?.trim();
     if (item) {
-      setActivityForms(prev => prev.map(af => 
-        af.id === activityId
-          ? { 
-              ...af, 
-              data: { 
-                ...af.data, 
-                excluded_items: [...(af.data.excluded_items || []), item]
-              } 
-            }
-          : af
-      ));
-      setActivityExcludedItems(prev => ({ ...prev, [activityId]: '' }));
+      setActivityForms((prev) =>
+        prev.map((af) =>
+          af.id === activityId
+            ? {
+                ...af,
+                data: {
+                  ...af.data,
+                  excluded_items: [...(af.data.excluded_items || []), item],
+                },
+              }
+            : af,
+        ),
+      );
+      setActivityExcludedItems((prev) => ({ ...prev, [activityId]: "" }));
     }
   };
 
-  const handleActivityRemoveIncludedItem = (activityId: string, index: number) => {
-    setActivityForms(prev => prev.map(af => 
-      af.id === activityId
-        ? { 
-            ...af, 
-            data: { 
-              ...af.data, 
-              included_items: (af.data.included_items || []).filter((_: any, i: number) => i !== index)
-            } 
-          }
-        : af
-    ));
+  const handleActivityRemoveIncludedItem = (
+    activityId: string,
+    index: number,
+  ) => {
+    setActivityForms((prev) =>
+      prev.map((af) =>
+        af.id === activityId
+          ? {
+              ...af,
+              data: {
+                ...af.data,
+                included_items: (af.data.included_items || []).filter(
+                  (_: any, i: number) => i !== index,
+                ),
+              },
+            }
+          : af,
+      ),
+    );
   };
 
-  const handleActivityRemoveExcludedItem = (activityId: string, index: number) => {
-    setActivityForms(prev => prev.map(af => 
-      af.id === activityId
-        ? { 
-            ...af, 
-            data: { 
-              ...af.data, 
-              excluded_items: (af.data.excluded_items || []).filter((_: any, i: number) => i !== index)
-            } 
-          }
-        : af
-    ));
+  const handleActivityRemoveExcludedItem = (
+    activityId: string,
+    index: number,
+  ) => {
+    setActivityForms((prev) =>
+      prev.map((af) =>
+        af.id === activityId
+          ? {
+              ...af,
+              data: {
+                ...af.data,
+                excluded_items: (af.data.excluded_items || []).filter(
+                  (_: any, i: number) => i !== index,
+                ),
+              },
+            }
+          : af,
+      ),
+    );
   };
 
   const handleDayConflictConfirm = () => {
     if (suggestedDayNumber !== null) {
-      const updatedFormData = { ...formData, day: suggestedDayNumber.toString() };
-      
+      const updatedFormData = {
+        ...formData,
+        day: suggestedDayNumber.toString(),
+      };
+
       setShowDayConflictDialog(false);
       setConflictDayNumber(null);
       setSuggestedDayNumber(null);
-      
+
       setFormData(updatedFormData);
-      
-      const { isValid, errors: validationErrors } = validateForm(updatedFormData, isAddDayMode, activityForms);
-      
+
+      const { isValid, errors: validationErrors } = validateForm(
+        updatedFormData,
+        isAddDayMode,
+        activityForms,
+      );
+
       if (isValid) {
         setErrors({});
         saveMutation.mutate(updatedFormData);
@@ -770,20 +853,31 @@ const ItineraryForm: React.FC = () => {
     <div className="space-y-3">
       <PageHeader
         title={
-          isEditMode 
-            ? __('Edit Itinerary Entry', 'yatra') 
+          isEditMode
+            ? __("Edit Itinerary Entry", "yatra")
             : isAddDayMode
-            ? (isSingleDayTrip ? __('Add New Entry', 'yatra') : __('Add New Day', 'yatra'))
-            : __('Add New Activity', 'yatra')
+              ? isSingleDayTrip
+                ? __("Add New Entry", "yatra")
+                : __("Add New Day", "yatra")
+              : __("Add New Activity", "yatra")
         }
         description={
-          isEditMode 
-            ? __('Update itinerary entry information', 'yatra') 
+          isEditMode
+            ? __("Update itinerary entry information", "yatra")
             : isAddDayMode
-            ? (isSingleDayTrip 
-                ? __('Create a new entry for your single-day trip itinerary.', 'yatra')
-                : __('Create a new day entry for your trip itinerary. This will be the first activity of the new day.', 'yatra'))
-            : __('Add a new activity, meal, or accommodation to this day of the trip itinerary.', 'yatra')
+              ? isSingleDayTrip
+                ? __(
+                    "Create a new entry for your single-day trip itinerary.",
+                    "yatra",
+                  )
+                : __(
+                    "Create a new day entry for your trip itinerary. This will be the first activity of the new day.",
+                    "yatra",
+                  )
+              : __(
+                  "Add a new activity, meal, or accommodation to this day of the trip itinerary.",
+                  "yatra",
+                )
         }
         actions={
           <Button
@@ -792,7 +886,7 @@ const ItineraryForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'yatra')}
+            {__("Back", "yatra")}
           </Button>
         }
       />
@@ -808,8 +902,8 @@ const ItineraryForm: React.FC = () => {
                     formData={{
                       trip_id: formData.trip_id,
                       day: formData.day,
-                      day_title: formData.day_title || '',
-                      day_description: formData.day_description || '',
+                      day_title: formData.day_title || "",
+                      day_description: formData.day_description || "",
                     }}
                     errors={errors}
                     tripsData={tripsData}
@@ -851,19 +945,29 @@ const ItineraryForm: React.FC = () => {
                       <CardContent className="p-3">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">{__('Trip:', 'yatra')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">
+                              {__("Trip:", "yatra")}
+                            </span>
                             <span className="ml-2 font-medium">
-                              {tripsData?.find((t: any) => t.id.toString() === tripIdParam)?.title || tripIdParam}
+                              {tripsData?.find(
+                                (t: any) => t.id.toString() === tripIdParam,
+                              )?.title || tripIdParam}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-500 dark:text-gray-400">{__('Day:', 'yatra')}</span>
+                            <span className="text-gray-500 dark:text-gray-400">
+                              {__("Day:", "yatra")}
+                            </span>
                             <span className="ml-2 font-medium">{dayParam}</span>
                           </div>
                           {dayTitle && (
                             <div>
-                              <span className="text-gray-500 dark:text-gray-400">{__('Day Title:', 'yatra')}</span>
-                              <span className="ml-2 font-medium">{dayTitle}</span>
+                              <span className="text-gray-500 dark:text-gray-400">
+                                {__("Day Title:", "yatra")}
+                              </span>
+                              <span className="ml-2 font-medium">
+                                {dayTitle}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -881,7 +985,11 @@ const ItineraryForm: React.FC = () => {
                       duration: formData.duration,
                       start_time: formData.start_time,
                       end_time: formData.end_time,
-                      time_type: formData.time_type as 'exact' | 'approximate' | 'all_day' | 'flexible',
+                      time_type: formData.time_type as
+                        | "exact"
+                        | "approximate"
+                        | "all_day"
+                        | "flexible",
                       cost: formData.cost,
                       cost_per_person: formData.cost_per_person,
                       notes: formData.notes,
@@ -893,7 +1001,9 @@ const ItineraryForm: React.FC = () => {
                     items={itemsData}
                     newIncludedItem={newIncludedItem}
                     newExcludedItem={newExcludedItem}
-                    onFieldChange={(field, value) => handleFieldChange(field as keyof ItineraryFormData, value)}
+                    onFieldChange={(field, value) =>
+                      handleFieldChange(field as keyof ItineraryFormData, value)
+                    }
                     onIncludedItemChange={setNewIncludedItem}
                     onExcludedItemChange={setNewExcludedItem}
                     onAddIncludedItem={handleAddIncludedItem}
@@ -912,26 +1022,36 @@ const ItineraryForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Status", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Entry Status', 'yatra')}
+                    <label
+                      htmlFor="status"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Entry Status", "yatra")}
                     </label>
-                    <HelpText 
-                      text={__('Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.', 'yatra')}
+                    <HelpText
+                      text={__(
+                        "Published entries are visible in trip schedules. Draft entries are saved but not visible. Trashed entries are deleted.",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <Select
                       id="status"
                       value={formData.status}
-                      onChange={(e) => handleFieldChange('status', e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange("status", e.target.value)
+                      }
                       className="w-full"
                     >
-                      <option value="publish">{__('Publish', 'yatra')}</option>
-                      <option value="draft">{__('Draft', 'yatra')}</option>
-                      <option value="trash">{__('Trash', 'yatra')}</option>
+                      <option value="publish">{__("Publish", "yatra")}</option>
+                      <option value="draft">{__("Draft", "yatra")}</option>
+                      <option value="trash">{__("Trash", "yatra")}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -941,7 +1061,7 @@ const ItineraryForm: React.FC = () => {
                 <CardContent className="p-3">
                   <div className="space-y-2">
                     {errors.submit && (
-                      <Alert variant="error" title={__('Error', 'yatra')}>
+                      <Alert variant="error" title={__("Error", "yatra")}>
                         {errors.submit}
                       </Alert>
                     )}
@@ -954,7 +1074,7 @@ const ItineraryForm: React.FC = () => {
                         {saveMutation.isPending ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'yatra')}
+                            {__("Saving...", "yatra")}
                           </>
                         ) : (
                           <>
@@ -969,7 +1089,7 @@ const ItineraryForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={saveMutation.isPending}
                       >
-                        {__('Cancel', 'yatra')}
+                        {__("Cancel", "yatra")}
                       </Button>
                     </div>
                   </div>

@@ -3,23 +3,37 @@
  * Manage payments for bookings
  */
 
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, Eye, CreditCard } from 'lucide-react';
-import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
-import { __ } from '../lib/i18n';
-import { getErrorContext } from '../lib/errors';
-import { apiService } from '../lib/api-client';
-import { usePermissions } from '../hooks/usePermissions';
-import { useToast } from '../components/ui/toast';
-import { Button } from '../components/ui/button';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { getCurrencySymbol, getCurrency } from '../data/currencies';
-import { formatDate as formatDateUtil } from '../lib/dateFormat';
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Plus,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Edit,
+  Trash2,
+  Eye,
+  CreditCard,
+} from "lucide-react";
+import {
+  Pagination,
+  SearchFilterToolbar,
+  BulkActionToolbar,
+  Table as SharedTable,
+} from "../components/shared";
+import { __ } from "../lib/i18n";
+import { getErrorContext } from "../lib/errors";
+import { apiService } from "../lib/api-client";
+import { usePermissions } from "../hooks/usePermissions";
+import { useToast } from "../components/ui/toast";
+import { Button } from "../components/ui/button";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import { Card, CardContent } from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import { formatDate as formatDateUtil } from "../lib/dateFormat";
 
 interface Payment {
   id: number;
@@ -32,7 +46,13 @@ interface Payment {
   amount: number;
   currency?: string;
   payment_method: string;
-  payment_status: 'pending' | 'completed' | 'failed' | 'refunded' | 'partial' | 'cancelled';
+  payment_status:
+    | "pending"
+    | "completed"
+    | "failed"
+    | "refunded"
+    | "partial"
+    | "cancelled";
   transaction_id?: string;
   payment_date: string;
   notes?: string;
@@ -40,22 +60,25 @@ interface Payment {
 }
 
 const Payments: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [methodFilter, setMethodFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('payment_date');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [methodFilter, setMethodFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("payment_date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [bulkAction, setBulkAction] = useState('');
+  const [bulkAction, setBulkAction] = useState("");
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [isBulkPending, setIsBulkPending] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; payment: Payment | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    payment: Payment | null;
+  }>({
     isOpen: false,
     payment: null,
   });
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return {
         payment: true,
         customer: true,
@@ -66,7 +89,7 @@ const Payments: React.FC = () => {
         date: true,
       };
     }
-    const saved = window.localStorage.getItem('yatra-payments-visible-columns');
+    const saved = window.localStorage.getItem("yatra-payments-visible-columns");
     return saved
       ? JSON.parse(saved)
       : {
@@ -82,7 +105,10 @@ const Payments: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const { showToast } = useToast();
-  const defaultCurrency = (window as any)?.yatraAdmin?.currency || (window as any)?.yatraBookingData?.currency || 'USD';
+  const defaultCurrency =
+    (window as any)?.yatraAdmin?.currency ||
+    (window as any)?.yatraBookingData?.currency ||
+    "USD";
 
   // Fetch payments from API
 
@@ -98,11 +124,11 @@ const Payments: React.FC = () => {
       params.search = searchTerm;
     }
 
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       params.payment_status = statusFilter;
     }
 
-    if (methodFilter !== 'all') {
+    if (methodFilter !== "all") {
       params.payment_method = methodFilter;
     }
 
@@ -111,20 +137,20 @@ const Payments: React.FC = () => {
 
   // Fetch payments from API
   const { data, isLoading, error } = useQuery({
-    queryKey: ['payments', queryParams],
+    queryKey: ["payments", queryParams],
     queryFn: async () => {
       const params = new URLSearchParams();
-      params.append('page', String(queryParams.page));
-      params.append('per_page', String(queryParams.per_page));
-      
+      params.append("page", String(queryParams.page));
+      params.append("per_page", String(queryParams.per_page));
+
       if (queryParams.search) {
-        params.append('search', queryParams.search);
+        params.append("search", queryParams.search);
       }
       if (queryParams.payment_status) {
-        params.append('status', queryParams.payment_status);
+        params.append("status", queryParams.payment_status);
       }
       if (queryParams.payment_method) {
-        params.append('gateway', queryParams.payment_method);
+        params.append("gateway", queryParams.payment_method);
       }
 
       const paramsObj: Record<string, any> = {
@@ -133,11 +159,12 @@ const Payments: React.FC = () => {
       };
       if (queryParams.search) paramsObj.search = queryParams.search;
       if (queryParams.status) paramsObj.status = queryParams.status;
-      if (queryParams.payment_method) paramsObj.gateway = queryParams.payment_method;
+      if (queryParams.payment_method)
+        paramsObj.gateway = queryParams.payment_method;
 
       return await apiService.getPayments(paramsObj);
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   // Delete mutation
@@ -146,13 +173,16 @@ const Payments: React.FC = () => {
       await apiService.deletePayment(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
-      showToast(__('Payment deleted successfully', 'yatra'), 'success');
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      showToast(__("Payment deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, payment: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete payment', 'yatra'), 'error');
+      showToast(
+        error?.message || __("Failed to delete payment", "yatra"),
+        "error",
+      );
     },
   });
 
@@ -165,11 +195,14 @@ const Payments: React.FC = () => {
     return formatDateUtil(dateString);
   };
 
-  const formatPrice = (price: number, currencyCode: string = defaultCurrency) => {
+  const formatPrice = (
+    price: number,
+    currencyCode: string = defaultCurrency,
+  ) => {
     const symbol = getCurrencySymbol(currencyCode);
     const currencyData = getCurrency(currencyCode);
     const decimals = currencyData?.decimalDigits ?? 2;
-    
+
     return `${symbol}${new Intl.NumberFormat(undefined, {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
@@ -178,46 +211,55 @@ const Payments: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'completed': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Completed', 'yatra'),
+      completed: {
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+        label: __("Completed", "yatra"),
       },
-      'pending': {
-        className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Pending', 'yatra'),
+      pending: {
+        className:
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+        label: __("Pending", "yatra"),
       },
-      'partial': {
-        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('Partial', 'yatra'),
+      partial: {
+        className:
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+        label: __("Partial", "yatra"),
       },
-      'failed': {
-        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Failed', 'yatra'),
+      failed: {
+        className:
+          "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        label: __("Failed", "yatra"),
       },
-      'refunded': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Refunded', 'yatra'),
+      refunded: {
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
+        label: __("Refunded", "yatra"),
       },
-      'cancelled': {
-        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Cancelled', 'yatra'),
+      cancelled: {
+        className:
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Cancelled", "yatra"),
       },
     };
 
     const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      className:
+        "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
       label: status,
     };
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}>
+      <span
+        className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${statusInfo.className}`}
+      >
         {statusInfo.label}
       </span>
     );
   };
 
   const handleEdit = (payment: Payment) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=payments&action=edit&id=${payment.id}`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=edit&id=${payment.id}`;
   };
 
   const handleDelete = (payment: Payment) => {
@@ -231,28 +273,28 @@ const Payments: React.FC = () => {
   };
 
   const handleView = (payment: Payment) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=payments&action=view&id=${payment.id}`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=view&id=${payment.id}`;
   };
 
   const handleCreatePayment = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=payments&action=create`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=payments&action=create`;
   };
 
   const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setMethodFilter('all');
-    setSortBy('payment_date');
-    setSortOrder('desc');
+    setSearchTerm("");
+    setStatusFilter("all");
+    setMethodFilter("all");
+    setSortBy("payment_date");
+    setSortOrder("desc");
     setPage(1);
   };
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(field);
-      setSortOrder('desc');
+      setSortOrder("desc");
     }
   };
 
@@ -260,12 +302,19 @@ const Payments: React.FC = () => {
     if (sortBy !== field) {
       return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-gray-400" />;
     }
-    return sortOrder === 'asc' 
-      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    ) : (
+      <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    );
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || methodFilter !== 'all' || sortBy !== 'payment_date' || sortOrder !== 'desc';
+  const hasFilters =
+    searchTerm ||
+    statusFilter !== "all" ||
+    methodFilter !== "all" ||
+    sortBy !== "payment_date" ||
+    sortOrder !== "desc";
 
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
@@ -273,13 +322,18 @@ const Payments: React.FC = () => {
       [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
     };
     setVisibleColumns(newVisibleColumns);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('yatra-payments-visible-columns', JSON.stringify(newVisibleColumns));
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "yatra-payments-visible-columns",
+        JSON.stringify(newVisibleColumns),
+      );
     }
   };
 
   const handleSelectItem = (id: string | number, checked: boolean) => {
-    setSelectedIds((prev) => (checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id)));
+    setSelectedIds((prev) =>
+      checked ? [...prev, id] : prev.filter((selectedId) => selectedId !== id),
+    );
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -290,16 +344,17 @@ const Payments: React.FC = () => {
     }
   };
 
-  const isAllSelected = payments.length > 0 && selectedIds.length === payments.length;
+  const isAllSelected =
+    payments.length > 0 && selectedIds.length === payments.length;
 
   const updateStatusForIds = async (
     ids: (string | number)[],
-    newStatus: Payment['payment_status']
+    newStatus: Payment["payment_status"],
   ) => {
     await Promise.all(
       ids.map(async (id) => {
         await apiService.updatePaymentStatus(id, newStatus);
-      })
+      }),
     );
   };
 
@@ -311,23 +366,27 @@ const Payments: React.FC = () => {
     try {
       setIsBulkPending(true);
 
-      if (bulkAction === 'delete') {
-        await apiService.bulkPaymentsAction('delete', selectedIds);
-        showToast(__('Selected payments deleted successfully', 'yatra'), 'success');
+      if (bulkAction === "delete") {
+        await apiService.bulkPaymentsAction("delete", selectedIds);
+        showToast(
+          __("Selected payments deleted successfully", "yatra"),
+          "success",
+        );
       } else {
-        const newStatus = bulkAction as Payment['payment_status'];
+        const newStatus = bulkAction as Payment["payment_status"];
         await updateStatusForIds(selectedIds, newStatus);
-        showToast(__('Bulk status updated successfully', 'yatra'), 'success');
+        showToast(__("Bulk status updated successfully", "yatra"), "success");
       }
 
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       setSelectedIds([]);
-      setBulkAction('');
+      setBulkAction("");
     } catch (error: any) {
       showToast(
-        error?.message || __('Failed to perform bulk action on payments', 'yatra'),
-        'error'
+        error?.message ||
+          __("Failed to perform bulk action on payments", "yatra"),
+        "error",
       );
     } finally {
       setIsBulkPending(false);
@@ -335,38 +394,38 @@ const Payments: React.FC = () => {
   };
 
   const allBulkActionOptions = [
-    { value: 'completed', label: __('Mark as Completed', 'yatra') },
-    { value: 'failed', label: __('Mark as Failed', 'yatra') },
-    { value: 'refunded', label: __('Mark as Refunded', 'yatra') },
-    { value: 'cancelled', label: __('Mark as Cancelled', 'yatra') },
-    { value: 'delete', label: __('Delete permanently', 'yatra') },
+    { value: "completed", label: __("Mark as Completed", "yatra") },
+    { value: "failed", label: __("Mark as Failed", "yatra") },
+    { value: "refunded", label: __("Mark as Refunded", "yatra") },
+    { value: "cancelled", label: __("Mark as Cancelled", "yatra") },
+    { value: "delete", label: __("Delete permanently", "yatra") },
   ];
 
   const getBulkActionOptionsForStatus = (view: string) => {
     switch (view) {
-      case 'completed':
+      case "completed":
         return allBulkActionOptions.filter((opt) =>
-          ['failed', 'refunded', 'cancelled', 'delete'].includes(opt.value)
+          ["failed", "refunded", "cancelled", "delete"].includes(opt.value),
         );
-      case 'pending':
+      case "pending":
         return allBulkActionOptions.filter((opt) =>
-          ['completed', 'failed', 'cancelled', 'delete'].includes(opt.value)
+          ["completed", "failed", "cancelled", "delete"].includes(opt.value),
         );
-      case 'partial':
+      case "partial":
         return allBulkActionOptions.filter((opt) =>
-          ['completed', 'cancelled', 'delete'].includes(opt.value)
+          ["completed", "cancelled", "delete"].includes(opt.value),
         );
-      case 'failed':
+      case "failed":
         return allBulkActionOptions.filter((opt) =>
-          ['completed', 'cancelled', 'delete'].includes(opt.value)
+          ["completed", "cancelled", "delete"].includes(opt.value),
         );
-      case 'refunded':
+      case "refunded":
         return allBulkActionOptions.filter((opt) =>
-          ['completed', 'cancelled', 'delete'].includes(opt.value)
+          ["completed", "cancelled", "delete"].includes(opt.value),
         );
-      case 'cancelled':
+      case "cancelled":
         return allBulkActionOptions.filter((opt) =>
-          ['completed', 'delete'].includes(opt.value)
+          ["completed", "delete"].includes(opt.value),
         );
       default:
         return allBulkActionOptions;
@@ -376,40 +435,64 @@ const Payments: React.FC = () => {
   const bulkActionOptions = getBulkActionOptionsForStatus(statusFilter);
 
   const statusOptions = [
-    { value: 'all', label: __('All Status', 'yatra') },
-    { value: 'completed', label: __('Completed', 'yatra') },
-    { value: 'partial', label: __('Partial', 'yatra') },
-    { value: 'failed', label: __('Failed', 'yatra') },
-    { value: 'refunded', label: __('Refunded', 'yatra') },
-    { value: 'cancelled', label: __('Cancelled', 'yatra') },
+    { value: "all", label: __("All Status", "yatra") },
+    { value: "completed", label: __("Completed", "yatra") },
+    { value: "partial", label: __("Partial", "yatra") },
+    { value: "failed", label: __("Failed", "yatra") },
+    { value: "refunded", label: __("Refunded", "yatra") },
+    { value: "cancelled", label: __("Cancelled", "yatra") },
   ];
 
   const sortOptions = [
-    { value: 'payment_date', label: __('Payment Date', 'yatra') },
-    { value: 'payment_number', label: __('Payment Number', 'yatra') },
-    { value: 'customer_name', label: __('Customer', 'yatra') },
-    { value: 'amount', label: __('Amount', 'yatra') },
-    { value: 'payment_method', label: __('Payment Method', 'yatra') },
-    { value: 'payment_status', label: __('Status', 'yatra') },
+    { value: "payment_date", label: __("Payment Date", "yatra") },
+    { value: "payment_number", label: __("Payment Number", "yatra") },
+    { value: "customer_name", label: __("Customer", "yatra") },
+    { value: "amount", label: __("Amount", "yatra") },
+    { value: "payment_method", label: __("Payment Method", "yatra") },
+    { value: "payment_status", label: __("Status", "yatra") },
   ];
 
   const columnOptions = [
-    { key: 'payment', label: __('Payment', 'yatra'), visible: visibleColumns.payment },
-    { key: 'customer', label: __('Customer', 'yatra'), visible: visibleColumns.customer },
-    { key: 'booking', label: __('Booking', 'yatra'), visible: visibleColumns.booking },
-    { key: 'amount', label: __('Amount', 'yatra'), visible: visibleColumns.amount },
-    { key: 'method', label: __('Method', 'yatra'), visible: visibleColumns.method },
-    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
-    { key: 'date', label: __('Date', 'yatra'), visible: visibleColumns.date },
+    {
+      key: "payment",
+      label: __("Payment", "yatra"),
+      visible: visibleColumns.payment,
+    },
+    {
+      key: "customer",
+      label: __("Customer", "yatra"),
+      visible: visibleColumns.customer,
+    },
+    {
+      key: "booking",
+      label: __("Booking", "yatra"),
+      visible: visibleColumns.booking,
+    },
+    {
+      key: "amount",
+      label: __("Amount", "yatra"),
+      visible: visibleColumns.amount,
+    },
+    {
+      key: "method",
+      label: __("Method", "yatra"),
+      visible: visibleColumns.method,
+    },
+    {
+      key: "status",
+      label: __("Status", "yatra"),
+      visible: visibleColumns.status,
+    },
+    { key: "date", label: __("Date", "yatra"), visible: visibleColumns.date },
   ];
 
   const columns = [
     {
-      key: 'payment',
-      label: __('Payment', 'yatra'),
+      key: "payment",
+      label: __("Payment", "yatra"),
       sortable: true,
       visible: visibleColumns.payment,
-      width: 'w-[220px]',
+      width: "w-[220px]",
       render: (payment: Payment) => (
         <div>
           <button
@@ -424,15 +507,15 @@ const Payments: React.FC = () => {
           </button>
           {payment.transaction_id && (
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-              {__('TXN', 'yatra')}: {payment.transaction_id}
+              {__("TXN", "yatra")}: {payment.transaction_id}
             </div>
           )}
         </div>
       ),
     },
     {
-      key: 'customer',
-      label: __('Customer', 'yatra'),
+      key: "customer",
+      label: __("Customer", "yatra"),
       sortable: true,
       visible: visibleColumns.customer,
       render: (payment: Payment) => (
@@ -447,8 +530,8 @@ const Payments: React.FC = () => {
       ),
     },
     {
-      key: 'booking',
-      label: __('Booking', 'yatra'),
+      key: "booking",
+      label: __("Booking", "yatra"),
       sortable: false,
       visible: visibleColumns.booking,
       render: (payment: Payment) => (
@@ -463,8 +546,8 @@ const Payments: React.FC = () => {
       ),
     },
     {
-      key: 'amount',
-      label: __('Amount', 'yatra'),
+      key: "amount",
+      label: __("Amount", "yatra"),
       sortable: true,
       visible: visibleColumns.amount,
       render: (payment: Payment) => (
@@ -474,8 +557,8 @@ const Payments: React.FC = () => {
       ),
     },
     {
-      key: 'method',
-      label: __('Method', 'yatra'),
+      key: "method",
+      label: __("Method", "yatra"),
       sortable: true,
       visible: visibleColumns.method,
       render: (payment: Payment) => (
@@ -485,15 +568,15 @@ const Payments: React.FC = () => {
       ),
     },
     {
-      key: 'status',
-      label: __('Status', 'yatra'),
+      key: "status",
+      label: __("Status", "yatra"),
       sortable: true,
       visible: visibleColumns.status,
       render: (payment: Payment) => getStatusBadge(payment.payment_status),
     },
     {
-      key: 'date',
-      label: __('Date', 'yatra'),
+      key: "date",
+      label: __("Date", "yatra"),
       sortable: true,
       visible: visibleColumns.date,
       render: (payment: Payment) => (
@@ -506,99 +589,115 @@ const Payments: React.FC = () => {
 
   const actions = [
     {
-      key: 'view',
-      label: __('View', 'yatra'),
+      key: "view",
+      label: __("View", "yatra"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (payment: Payment) => handleView(payment),
     },
     {
-      key: 'edit',
-      label: __('Edit', 'yatra'),
+      key: "edit",
+      label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (payment: Payment) => handleEdit(payment),
     },
     {
-      key: 'mark_completed',
-      label: __('Mark as Completed', 'yatra'),
+      key: "mark_completed",
+      label: __("Mark as Completed", "yatra"),
       icon: <ArrowUp className="w-4 h-4" />,
       onClick: async (payment: Payment) => {
         setIsBulkPending(true);
         try {
-          await updateStatusForIds([payment.id], 'completed');
-          queryClient.invalidateQueries({ queryKey: ['payments'] });
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Payment status updated', 'yatra'), 'success');
+          await updateStatusForIds([payment.id], "completed");
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update payment status', 'yatra'), 'error');
+          showToast(
+            error?.message || __("Failed to update payment status", "yatra"),
+            "error",
+          );
         } finally {
           setIsBulkPending(false);
         }
       },
-      condition: (payment: Payment) => can('yatra_edit_bookings') && payment.payment_status !== 'completed',
+      condition: (payment: Payment) =>
+        can("yatra_edit_bookings") && payment.payment_status !== "completed",
     },
     {
-      key: 'mark_failed',
-      label: __('Mark as Failed', 'yatra'),
+      key: "mark_failed",
+      label: __("Mark as Failed", "yatra"),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (payment: Payment) => {
         setIsBulkPending(true);
         try {
-          await updateStatusForIds([payment.id], 'failed');
-          queryClient.invalidateQueries({ queryKey: ['payments'] });
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Payment status updated', 'yatra'), 'success');
+          await updateStatusForIds([payment.id], "failed");
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update payment status', 'yatra'), 'error');
+          showToast(
+            error?.message || __("Failed to update payment status", "yatra"),
+            "error",
+          );
         } finally {
           setIsBulkPending(false);
         }
       },
-      condition: (payment: Payment) => can('yatra_edit_bookings') && payment.payment_status !== 'failed',
+      condition: (payment: Payment) =>
+        can("yatra_edit_bookings") && payment.payment_status !== "failed",
     },
     {
-      key: 'mark_refunded',
-      label: __('Mark as Refunded', 'yatra'),
+      key: "mark_refunded",
+      label: __("Mark as Refunded", "yatra"),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (payment: Payment) => {
         setIsBulkPending(true);
         try {
-          await updateStatusForIds([payment.id], 'refunded');
-          queryClient.invalidateQueries({ queryKey: ['payments'] });
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Payment status updated', 'yatra'), 'success');
+          await updateStatusForIds([payment.id], "refunded");
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update payment status', 'yatra'), 'error');
+          showToast(
+            error?.message || __("Failed to update payment status", "yatra"),
+            "error",
+          );
         } finally {
           setIsBulkPending(false);
         }
       },
-      condition: (payment: Payment) => can('yatra_edit_bookings') && payment.payment_status !== 'refunded',
+      condition: (payment: Payment) =>
+        can("yatra_edit_bookings") && payment.payment_status !== "refunded",
     },
     {
-      key: 'mark_cancelled',
-      label: __('Mark as Cancelled', 'yatra'),
+      key: "mark_cancelled",
+      label: __("Mark as Cancelled", "yatra"),
       icon: <ArrowDown className="w-4 h-4" />,
       onClick: async (payment: Payment) => {
         setIsBulkPending(true);
         try {
-          await updateStatusForIds([payment.id], 'cancelled');
-          queryClient.invalidateQueries({ queryKey: ['payments'] });
-          queryClient.invalidateQueries({ queryKey: ['bookings'] });
-          showToast(__('Payment status updated', 'yatra'), 'success');
+          await updateStatusForIds([payment.id], "cancelled");
+          queryClient.invalidateQueries({ queryKey: ["payments"] });
+          queryClient.invalidateQueries({ queryKey: ["bookings"] });
+          showToast(__("Payment status updated", "yatra"), "success");
         } catch (error: any) {
-          showToast(error?.message || __('Failed to update payment status', 'yatra'), 'error');
+          showToast(
+            error?.message || __("Failed to update payment status", "yatra"),
+            "error",
+          );
         } finally {
           setIsBulkPending(false);
         }
       },
-      condition: (payment: Payment) => can('yatra_edit_bookings') && payment.payment_status !== 'cancelled',
+      condition: (payment: Payment) =>
+        can("yatra_edit_bookings") && payment.payment_status !== "cancelled",
     },
     {
-      key: 'delete',
-      label: __('Delete', 'yatra'),
+      key: "delete",
+      label: __("Delete", "yatra"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (payment: Payment) => handleDelete(payment),
-      variant: 'destructive' as const,
+      variant: "destructive" as const,
     },
   ];
 
@@ -608,24 +707,35 @@ const Payments: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, payment: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Payment', 'yatra')}
-        message={deleteConfirm.payment
-          ? __('Are you sure you want to delete payment "{number}"? This action cannot be undone.', 'yatra').replace('{number}', deleteConfirm.payment.payment_number)
-          : __('Are you sure you want to delete this payment? This action cannot be undone.', 'yatra')}
-        confirmText={__('Delete', 'yatra')}
-        cancelText={__('Cancel', 'yatra')}
+        title={__("Delete Payment", "yatra")}
+        message={
+          deleteConfirm.payment
+            ? __(
+                'Are you sure you want to delete payment "{number}"? This action cannot be undone.',
+                "yatra",
+              ).replace("{number}", deleteConfirm.payment.payment_number)
+            : __(
+                "Are you sure you want to delete this payment? This action cannot be undone.",
+                "yatra",
+              )
+        }
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
 
       <PageHeader
-        title={__('Payments', 'yatra')}
-        description={__('Manage payment records for bookings', 'yatra')}
+        title={__("Payments", "yatra")}
+        description={__("Manage payment records for bookings", "yatra")}
         actionCapability="yatra_edit_bookings"
         actions={
-          <Button onClick={handleCreatePayment} className="flex items-center gap-2">
+          <Button
+            onClick={handleCreatePayment}
+            className="flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
-            {__('Add New Payment', 'yatra')}
+            {__("Add New Payment", "yatra")}
           </Button>
         }
       />
@@ -656,7 +766,7 @@ const Payments: React.FC = () => {
                 sortOptions={sortOptions}
                 onResetFilters={handleResetFilters}
                 hasFilters={!!hasFilters}
-                placeholder={__('Search payments...', 'yatra')}
+                placeholder={__("Search payments...", "yatra")}
               />
             </div>
 
@@ -669,11 +779,15 @@ const Payments: React.FC = () => {
                 }}
                 className="w-full lg:w-48 max-w-xs"
               >
-                <option value="all">{__('All Methods', 'yatra')}</option>
-                <option value="Credit Card">{__('Credit Card', 'yatra')}</option>
-                <option value="PayPal">{__('PayPal', 'yatra')}</option>
-                <option value="Bank Transfer">{__('Bank Transfer', 'yatra')}</option>
-                <option value="Cash">{__('Cash', 'yatra')}</option>
+                <option value="all">{__("All Methods", "yatra")}</option>
+                <option value="Credit Card">
+                  {__("Credit Card", "yatra")}
+                </option>
+                <option value="PayPal">{__("PayPal", "yatra")}</option>
+                <option value="Bank Transfer">
+                  {__("Bank Transfer", "yatra")}
+                </option>
+                <option value="Cash">{__("Cash", "yatra")}</option>
               </Select>
             </div>
           </div>
@@ -695,13 +809,13 @@ const Payments: React.FC = () => {
                 setPage(1);
               }}
               statusOptions={[
-                { key: 'all', label: __('All', 'yatra'), count: 0 },
-                { key: 'completed', label: __('Completed', 'yatra'), count: 0 },
-                { key: 'pending', label: __('Pending', 'yatra'), count: 0 },
-                { key: 'partial', label: __('Partial', 'yatra'), count: 0 },
-                { key: 'failed', label: __('Failed', 'yatra'), count: 0 },
-                { key: 'refunded', label: __('Refunded', 'yatra'), count: 0 },
-                { key: 'cancelled', label: __('Cancelled', 'yatra'), count: 0 },
+                { key: "all", label: __("All", "yatra"), count: 0 },
+                { key: "completed", label: __("Completed", "yatra"), count: 0 },
+                { key: "pending", label: __("Pending", "yatra"), count: 0 },
+                { key: "partial", label: __("Partial", "yatra"), count: 0 },
+                { key: "failed", label: __("Failed", "yatra"), count: 0 },
+                { key: "refunded", label: __("Refunded", "yatra"), count: 0 },
+                { key: "cancelled", label: __("Cancelled", "yatra"), count: 0 },
               ]}
               showColumnsDropdown={showColumnsDropdown}
               setShowColumnsDropdown={setShowColumnsDropdown}
@@ -721,22 +835,30 @@ const Payments: React.FC = () => {
                 actions={actions}
                 isLoading={isLoading}
                 isError={!!error}
-                errorText={__('Error loading payments', 'yatra')}
+                errorText={__("Error loading payments", "yatra")}
                 errorDescription={__(
-                  'We couldn’t connect to the payments service. Please refresh or try again in a moment.',
-                  'We couldn’t connect to the payments service. Please refresh or try again in a moment.'
+                  "We couldn’t connect to the payments service. Please refresh or try again in a moment.",
+                  "We couldn’t connect to the payments service. Please refresh or try again in a moment.",
                 )}
-                onRetry={() => queryClient.invalidateQueries({ queryKey: ['payments'] })}
+                onRetry={() =>
+                  queryClient.invalidateQueries({ queryKey: ["payments"] })
+                }
                 errorDetails={errorContext.details}
                 errorRequestInfo={errorContext.requestInfo}
-                emptyText={__('No payments found', 'yatra')}
+                emptyText={__("No payments found", "yatra")}
                 emptyDescription={
                   hasFilters
-                    ? __('Try adjusting your filters to see more results.', 'yatra')
-                    : __('Get started by recording your first payment.', 'yatra')
+                    ? __(
+                        "Try adjusting your filters to see more results.",
+                        "yatra",
+                      )
+                    : __(
+                        "Get started by recording your first payment.",
+                        "yatra",
+                      )
                 }
                 onCreateClick={
-                  can('yatra_edit_bookings') ? handleCreatePayment : undefined
+                  can("yatra_edit_bookings") ? handleCreatePayment : undefined
                 }
                 onSort={handleSort}
                 getSortIcon={getSortIcon}
@@ -759,7 +881,7 @@ const Payments: React.FC = () => {
                 totalItems={total}
                 itemsPerPage={10}
                 onPageChange={(newPage) => setPage(newPage)}
-                itemName={__('payments', 'yatra')}
+                itemName={__("payments", "yatra")}
               />
             </div>
           )}
@@ -770,4 +892,3 @@ const Payments: React.FC = () => {
 };
 
 export default Payments;
-

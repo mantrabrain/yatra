@@ -107,7 +107,7 @@ class YatraStripe {
             return;
         }
         
-        console.log('[Yatra Stripe] Handling stripe_payment response:', event.detail);
+        
         this.handleStripePaymentAction(event.detail);
     }
     

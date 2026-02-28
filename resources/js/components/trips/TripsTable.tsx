@@ -4,13 +4,20 @@
  * Supports extensibility for Pro features
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { ConditionalRender } from '../ui/conditional-render';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Edit, Trash2, Eye } from 'lucide-react';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { ConditionalRender } from "../ui/conditional-render";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Edit, Trash2, Eye } from "lucide-react";
 
 interface Trip {
   id: number;
@@ -44,7 +51,6 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   onView,
   showProFeatures = false,
 }) => {
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -54,21 +60,30 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { variant: 'default' | 'success' | 'warning' | 'error' | 'info'; label: string }> = {
-      'active': { variant: 'success', label: __('Active', 'yatra') },
-      'draft': { variant: 'default', label: __('Draft', 'yatra') },
-      'inactive': { variant: 'error', label: __('Inactive', 'yatra') },
-      'pending': { variant: 'warning', label: __('Pending', 'yatra') },
+    const statusMap: Record<
+      string,
+      {
+        variant: "default" | "success" | "warning" | "error" | "info";
+        label: string;
+      }
+    > = {
+      active: { variant: "success", label: __("Active", "yatra") },
+      draft: { variant: "default", label: __("Draft", "yatra") },
+      inactive: { variant: "error", label: __("Inactive", "yatra") },
+      pending: { variant: "warning", label: __("Pending", "yatra") },
     };
 
-    const statusInfo = statusMap[status] || { variant: 'default' as const, label: status };
+    const statusInfo = statusMap[status] || {
+      variant: "default" as const,
+      label: status,
+    };
     return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
   if (loading) {
     return (
       <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-        {__('Loading trips...', 'yatra')}
+        {__("Loading trips...", "yatra")}
       </div>
     );
   }
@@ -76,7 +91,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
   if (trips.length === 0) {
     return (
       <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-        {__('No trips found', 'yatra')}
+        {__("No trips found", "yatra")}
       </div>
     );
   }
@@ -86,15 +101,17 @@ export const TripsTable: React.FC<TripsTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>{__('Title', 'yatra')}</TableHead>
-            <TableHead>{__('Slug', 'yatra')}</TableHead>
-            <TableHead>{__('Price', 'yatra')}</TableHead>
-            <TableHead>{__('Status', 'yatra')}</TableHead>
+            <TableHead>{__("Title", "yatra")}</TableHead>
+            <TableHead>{__("Slug", "yatra")}</TableHead>
+            <TableHead>{__("Price", "yatra")}</TableHead>
+            <TableHead>{__("Status", "yatra")}</TableHead>
             {showProFeatures && (
-              <TableHead>{__('Bookings', 'yatra')}</TableHead>
+              <TableHead>{__("Bookings", "yatra")}</TableHead>
             )}
-            <TableHead>{__('Created', 'yatra')}</TableHead>
-            <TableHead className="text-right">{__('Actions', 'yatra')}</TableHead>
+            <TableHead>{__("Created", "yatra")}</TableHead>
+            <TableHead className="text-right">
+              {__("Actions", "yatra")}
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +122,7 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                   {trip.title}
                   {trip.featured && showProFeatures && (
                     <Badge variant="info" className="text-xs">
-                      {__('Featured', 'yatra')}
+                      {__("Featured", "yatra")}
                     </Badge>
                   )}
                 </div>
@@ -129,37 +146,44 @@ export const TripsTable: React.FC<TripsTableProps> = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => onView(trip)}
-                        aria-label={__('View trip', 'yatra')}
+                        aria-label={__("View trip", "yatra")}
                       >
                         <Eye className="w-4 h-4" />
                       </Button>
                     )}
                   </ConditionalRender>
-                  
+
                   <ConditionalRender capability="yatra_edit_trips">
                     {onEdit && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => onEdit(trip)}
-                        aria-label={__('Edit trip', 'yatra')}
+                        aria-label={__("Edit trip", "yatra")}
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
                     )}
                   </ConditionalRender>
-                  
+
                   <ConditionalRender capability="yatra_delete_trips">
                     {onDelete && (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => {
-                          if (confirm(__('Are you sure you want to delete this trip?', 'yatra'))) {
+                          if (
+                            confirm(
+                              __(
+                                "Are you sure you want to delete this trip?",
+                                "yatra",
+                              ),
+                            )
+                          ) {
                             onDelete(trip);
                           }
                         }}
-                        aria-label={__('Delete trip', 'yatra')}
+                        aria-label={__("Delete trip", "yatra")}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </Button>
@@ -176,4 +200,3 @@ export const TripsTable: React.FC<TripsTableProps> = ({
 };
 
 export default TripsTable;
-

@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Star, User, MapPin, Calendar, Loader2 } from 'lucide-react';
-import { apiService } from '../../lib/api-client';
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Star, User, MapPin, Calendar, Loader2 } from "lucide-react";
+import { apiService } from "../../lib/api-client";
 
 const __ = (text: string) => {
   return (window as any)?.yatraAdmin?.translations?.[text] || text;
@@ -18,7 +24,7 @@ interface Review {
   author_name: string;
   author_location: string | null;
   created_at: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
 }
 
 interface TestimonialsSelectorProps {
@@ -53,14 +59,14 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
     try {
       const data = await apiService.getReviews({
         trip_id: tripId,
-        status: 'approved',
-        per_page: 100
+        status: "approved",
+        per_page: 100,
       });
-      
+
       setReviews(data.data || []);
     } catch (err) {
-      console.error('Error fetching reviews:', err);
-      setError(__('Failed to load reviews. Please try again.'));
+      console.error("Error fetching reviews:", err);
+      setError(__("Failed to load reviews. Please try again."));
     } finally {
       setLoading(false);
     }
@@ -68,17 +74,17 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
 
   const toggleReview = (reviewId: number) => {
     const newSelection = selectedReviewIds.includes(reviewId)
-      ? selectedReviewIds.filter(id => id !== reviewId)
+      ? selectedReviewIds.filter((id) => id !== reviewId)
       : [...selectedReviewIds, reviewId];
     onChange(newSelection);
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString(undefined, { 
-      year: 'numeric', 
-      month: 'short', 
-      day: 'numeric' 
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -90,8 +96,8 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
             key={star}
             className={`w-4 h-4 ${
               star <= rating
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'text-gray-300 dark:text-gray-600'
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-gray-300 dark:text-gray-600"
             }`}
           />
         ))}
@@ -103,15 +109,15 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Testimonials')}</CardTitle>
+          <CardTitle>{__("Testimonials")}</CardTitle>
           <CardDescription>
-            {__('Select reviews to display as testimonials')}
+            {__("Select reviews to display as testimonials")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {__('Save the trip first to select testimonials from reviews')}
+              {__("Save the trip first to select testimonials from reviews")}
             </p>
           </div>
         </CardContent>
@@ -122,9 +128,11 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Testimonials')}</CardTitle>
+        <CardTitle>{__("Testimonials")}</CardTitle>
         <CardDescription>
-          {__('Select approved reviews to display as testimonials on the trip page')}
+          {__(
+            "Select approved reviews to display as testimonials on the trip page",
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -132,7 +140,7 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
             <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">
-              {__('Loading reviews...')}
+              {__("Loading reviews...")}
             </span>
           </div>
         ) : error ? (
@@ -145,17 +153,19 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
               onClick={fetchReviews}
               className="mt-2"
             >
-              {__('Retry')}
+              {__("Retry")}
             </Button>
           </div>
         ) : reviews.length === 0 ? (
           <div className="p-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-center">
             <User className="w-8 h-8 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-              {__('No approved reviews yet')}
+              {__("No approved reviews yet")}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-500">
-              {__('Reviews will appear here once customers submit and they are approved')}
+              {__(
+                "Reviews will appear here once customers submit and they are approved",
+              )}
             </p>
           </div>
         ) : (
@@ -164,7 +174,7 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
               <p className="text-sm text-gray-600 dark:text-gray-400">
                 {selectedReviewIds.length > 0
                   ? __(`${selectedReviewIds.length} review(s) selected`)
-                  : __('Select reviews to feature as testimonials')}
+                  : __("Select reviews to feature as testimonials")}
               </p>
               {selectedReviewIds.length > 0 && (
                 <Button
@@ -174,7 +184,7 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
                   onClick={() => onChange([])}
                   className="text-xs"
                 >
-                  {__('Clear all')}
+                  {__("Clear all")}
                 </Button>
               )}
             </div>
@@ -185,8 +195,8 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
                   key={review.id}
                   className={`p-4 border rounded-lg cursor-pointer transition-all ${
                     selectedReviewIds.includes(review.id)
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                   }`}
                   onClick={() => toggleReview(review.id)}
                 >
@@ -231,7 +241,7 @@ export const TestimonialsSelector: React.FC<TestimonialsSelectorProps> = ({
 
                       {selectedReviewIds.includes(review.id) && (
                         <Badge variant="info" className="mt-2">
-                          {__('Selected as testimonial')}
+                          {__("Selected as testimonial")}
                         </Badge>
                       )}
                     </div>

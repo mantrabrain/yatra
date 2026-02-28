@@ -6,12 +6,7 @@ class TripListingWishlist {
         this.isLoggedIn = window.yatraAdmin?.is_logged_in || false;
         
         // Debug logging
-        console.log('Wishlist Debug:', {
-            yatraAdmin: window.yatraAdmin,
-            isLoggedIn: this.isLoggedIn,
-            nonce: this.nonce,
-            apiUrl: this.apiUrl
-        });
+        
         
         this.init();
     }

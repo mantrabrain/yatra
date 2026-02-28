@@ -3,11 +3,11 @@
  * Displays trips with upcoming departure dates
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Calendar, MapPin, Users } from 'lucide-react';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Calendar, MapPin, Users } from "lucide-react";
 
 interface Departure {
   id: number;
@@ -36,10 +36,10 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
 }) => {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
@@ -55,11 +55,11 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Upcoming Departures', 'yatra')}</CardTitle>
+          <CardTitle>{__("Upcoming Departures", "yatra")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'yatra')}
+            {__("Loading...", "yatra")}
           </div>
         </CardContent>
       </Card>
@@ -69,7 +69,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Upcoming Departures', 'yatra')}</CardTitle>
+        <CardTitle>{__("Upcoming Departures", "yatra")}</CardTitle>
       </CardHeader>
       <CardContent>
         {departures && departures.length > 0 ? (
@@ -79,11 +79,13 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
               const total = Number(departure.total_spots) || 0;
               let occupancy = 0;
               if (total > 0) {
-                occupancy = ((total - Number(departure.available_spots || 0)) / total) * 100;
+                occupancy =
+                  ((total - Number(departure.available_spots || 0)) / total) *
+                  100;
               }
               // Clamp to [0, 100] to avoid negative or >100 values
               occupancy = Math.max(0, Math.min(100, occupancy));
-              
+
               return (
                 <div
                   key={departure.id}
@@ -94,9 +96,9 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                       return;
                     }
                     const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || '';
-                    const tripId = departure.trip_id || '';
-                    const query = `?page=yatra&subpage=departures&action=view&id=${departure.id}${tripId ? `&trip_id=${tripId}` : ''}`;
+                    const baseUrl = admin?.siteUrl || "";
+                    const tripId = departure.trip_id || "";
+                    const query = `?page=yatra&subpage=departures&action=view&id=${departure.id}${tripId ? `&trip_id=${tripId}` : ""}`;
                     window.location.href = `${baseUrl}/wp-admin/admin.php${query}`;
                   }}
                 >
@@ -113,17 +115,16 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                       )}
                     </div>
                     {daysUntil >= 0 && daysUntil <= 7 && (
-                      <Badge variant={daysUntil <= 3 ? 'error' : 'warning'}>
-                        {daysUntil === 0 
-                          ? __('Today', 'yatra')
+                      <Badge variant={daysUntil <= 3 ? "error" : "warning"}>
+                        {daysUntil === 0
+                          ? __("Today", "yatra")
                           : daysUntil === 1
-                          ? __('Tomorrow', 'yatra')
-                          : `${daysUntil} ${__('days', 'yatra')}`
-                        }
+                            ? __("Tomorrow", "yatra")
+                            : `${daysUntil} ${__("days", "yatra")}`}
                       </Badge>
                     )}
                   </div>
-                  
+
                   <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
@@ -132,11 +133,12 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                     <div className="flex items-center gap-1">
                       <Users className="w-4 h-4" />
                       <span>
-                        {departure.available_spots} / {departure.total_spots} {__('available', 'yatra')}
+                        {departure.available_spots} / {departure.total_spots}{" "}
+                        {__("available", "yatra")}
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="mt-2">
                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                       <div
@@ -145,7 +147,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
                       />
                     </div>
                     <span className="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
-                      {occupancy.toFixed(0)}% {__('occupied', 'yatra')}
+                      {occupancy.toFixed(0)}% {__("occupied", "yatra")}
                     </span>
                   </div>
                 </div>
@@ -154,7 +156,7 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No upcoming departures', 'yatra')}
+            {__("No upcoming departures", "yatra")}
           </p>
         )}
       </CardContent>
@@ -163,4 +165,3 @@ export const UpcomingDepartures: React.FC<UpcomingDeparturesProps> = ({
 };
 
 export default UpcomingDepartures;
-

@@ -3,23 +3,28 @@
  * Add/Edit Traveler Category form with clean, minimal SaaS-style design
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Edit2, X, AlertCircle } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
-import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api-client';
-import { generateSlug } from '../lib/slug';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
-import { Skeleton } from '../components/ui/skeleton';
-import { HelpText } from '../components/ui/help-text';
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2, Edit2, X, AlertCircle } from "lucide-react";
+import { __ } from "../lib/i18n";
+import { usePermissions } from "../hooks/usePermissions";
+import { useToast } from "../components/ui/toast";
+import { apiClient } from "../lib/api-client";
+import { generateSlug } from "../lib/slug";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
+import { Skeleton } from "../components/ui/skeleton";
+import { HelpText } from "../components/ui/help-text";
 
 interface TravelerCategoryFormData {
   label: string;
@@ -28,11 +33,11 @@ interface TravelerCategoryFormData {
   age_min: string;
   age_max: string;
   icon: {
-    type: 'icon' | 'image';
+    type: "icon" | "image";
     value: string;
   } | null;
-  status: 'draft' | 'publish' | 'trash';
-  pricing_mode: 'per_person' | 'per_group';
+  status: "draft" | "publish" | "trash";
+  pricing_mode: "per_person" | "per_group";
   min_pax: string;
   max_pax: string;
 }
@@ -42,16 +47,16 @@ const TravelerCategoryForm: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   const [formData, setFormData] = useState<TravelerCategoryFormData>({
-    label: '',
-    slug: '',
-    description: '',
-    age_min: '',
-    age_max: '',
+    label: "",
+    slug: "",
+    description: "",
+    age_min: "",
+    age_max: "",
     icon: null,
-    status: 'publish',
-    pricing_mode: 'per_person',
-    min_pax: '',
-    max_pax: '',
+    status: "publish",
+    pricing_mode: "per_person",
+    min_pax: "",
+    max_pax: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -60,46 +65,59 @@ const TravelerCategoryForm: React.FC = () => {
   // Get action and id from URL
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') || 'create';
+    return params.get("action") || "create";
   }, []);
 
   const categoryId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
-  const isEditMode = action === 'edit' && categoryId !== null;
+  const isEditMode = action === "edit" && categoryId !== null;
 
   // Fetch category data if editing
   const { data: categoryData, isLoading: isLoadingCategory } = useQuery({
-    queryKey: ['traveler-category', categoryId],
+    queryKey: ["traveler-category", categoryId],
     queryFn: async () => {
       if (!categoryId) return null;
       try {
-        const response = await apiClient.get(`/traveler-categories/${categoryId}`);
+        const response = await apiClient.get(
+          `/traveler-categories/${categoryId}`,
+        );
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load traveler category', 'yatra'), 'error');
+        showToast(
+          error?.message || __("Failed to load traveler category", "yatra"),
+          "error",
+        );
         throw error;
       }
     },
-    enabled: isEditMode && can('yatra_view_trips'),
+    enabled: isEditMode && can("yatra_view_trips"),
   });
 
   // Load category data into form when editing
   useEffect(() => {
     if (categoryData && isEditMode) {
       setFormData({
-        label: categoryData.label || '',
-        slug: categoryData.slug || '',
-        description: categoryData.description || '',
-        age_min: categoryData.age_min?.toString() || '',
-        age_max: categoryData.age_max?.toString() || '',
+        label: categoryData.label || "",
+        slug: categoryData.slug || "",
+        description: categoryData.description || "",
+        age_min: categoryData.age_min?.toString() || "",
+        age_max: categoryData.age_max?.toString() || "",
         icon: (categoryData.icon as IconPickerValue) || null,
-        status: categoryData.status || 'draft',
-        pricing_mode: (categoryData.pricing_mode as 'per_person' | 'per_group') || 'per_person',
-        min_pax: categoryData.min_pax !== undefined && categoryData.min_pax !== null ? categoryData.min_pax.toString() : '',
-        max_pax: categoryData.max_pax !== undefined && categoryData.max_pax !== null ? categoryData.max_pax.toString() : '',
+        status: categoryData.status || "draft",
+        pricing_mode:
+          (categoryData.pricing_mode as "per_person" | "per_group") ||
+          "per_person",
+        min_pax:
+          categoryData.min_pax !== undefined && categoryData.min_pax !== null
+            ? categoryData.min_pax.toString()
+            : "",
+        max_pax:
+          categoryData.max_pax !== undefined && categoryData.max_pax !== null
+            ? categoryData.max_pax.toString()
+            : "",
       });
     }
   }, [categoryData, isEditMode]);
@@ -108,28 +126,28 @@ const TravelerCategoryForm: React.FC = () => {
     // Auto-generate slug from label only on create (and when slug is not manually edited)
     if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         label: value,
         slug: newSlug,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         label: value,
       }));
     }
     if (errors.label) {
-      setErrors(prev => ({ ...prev, label: '' }));
+      setErrors((prev) => ({ ...prev, label: "" }));
     }
   };
 
   const handleSlugChange = (value: string) => {
     // Only allow manual slug editing if edit mode is enabled
     if (isSlugEditable) {
-      setFormData(prev => ({ ...prev, slug: value }));
+      setFormData((prev) => ({ ...prev, slug: value }));
       if (errors.slug) {
-        setErrors(prev => ({ ...prev, slug: '' }));
+        setErrors((prev) => ({ ...prev, slug: "" }));
       }
     }
   };
@@ -138,15 +156,18 @@ const TravelerCategoryForm: React.FC = () => {
     if (isSlugEditable) {
       // If disabling edit, regenerate slug from label
       const newSlug = generateSlug(formData.label);
-      setFormData(prev => ({ ...prev, slug: newSlug }));
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
     setIsSlugEditable(!isSlugEditable);
   };
 
-  const handleFieldChange = (field: keyof TravelerCategoryFormData, value: string | IconPickerValue | null) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (
+    field: keyof TravelerCategoryFormData,
+    value: string | IconPickerValue | null,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -154,37 +175,53 @@ const TravelerCategoryForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.label.trim()) {
-      newErrors.label = __('Label is required', 'yatra');
+      newErrors.label = __("Label is required", "yatra");
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'yatra');
+      newErrors.slug = __("Slug is required", "yatra");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+      newErrors.slug = __(
+        "Slug can only contain lowercase letters, numbers, and hyphens",
+        "yatra",
+      );
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = __('Description is required', 'yatra');
+      newErrors.description = __("Description is required", "yatra");
     }
 
     // Validate age range
     if (formData.age_min && isNaN(parseInt(formData.age_min))) {
-      newErrors.age_min = __('Minimum age must be a valid number', 'yatra');
+      newErrors.age_min = __("Minimum age must be a valid number", "yatra");
     }
     if (formData.age_max && isNaN(parseInt(formData.age_max))) {
-      newErrors.age_max = __('Maximum age must be a valid number', 'yatra');
+      newErrors.age_max = __("Maximum age must be a valid number", "yatra");
     }
-    if (formData.age_min && formData.age_max && parseInt(formData.age_min) >= parseInt(formData.age_max)) {
-      newErrors.age_max = __('Maximum age must be greater than minimum age', 'yatra');
+    if (
+      formData.age_min &&
+      formData.age_max &&
+      parseInt(formData.age_min) >= parseInt(formData.age_max)
+    ) {
+      newErrors.age_max = __(
+        "Maximum age must be greater than minimum age",
+        "yatra",
+      );
     }
 
     // Validate group size when pricing_mode is per_group
-    if (formData.pricing_mode === 'per_group') {
+    if (formData.pricing_mode === "per_group") {
       if (formData.min_pax && isNaN(parseInt(formData.min_pax))) {
-        newErrors.min_pax = __('Minimum group size must be a valid number', 'yatra');
+        newErrors.min_pax = __(
+          "Minimum group size must be a valid number",
+          "yatra",
+        );
       }
       if (formData.max_pax && isNaN(parseInt(formData.max_pax))) {
-        newErrors.max_pax = __('Maximum group size must be a valid number', 'yatra');
+        newErrors.max_pax = __(
+          "Maximum group size must be a valid number",
+          "yatra",
+        );
       }
       if (
         formData.min_pax &&
@@ -193,7 +230,10 @@ const TravelerCategoryForm: React.FC = () => {
         !isNaN(parseInt(formData.max_pax)) &&
         parseInt(formData.min_pax) > parseInt(formData.max_pax)
       ) {
-        newErrors.max_pax = __('Maximum group size should be greater than or equal to minimum group size', 'yatra');
+        newErrors.max_pax = __(
+          "Maximum group size should be greater than or equal to minimum group size",
+          "yatra",
+        );
       }
     }
 
@@ -213,30 +253,30 @@ const TravelerCategoryForm: React.FC = () => {
       };
 
       // Handle age_min
-      if (data.age_min && data.age_min.trim() !== '') {
+      if (data.age_min && data.age_min.trim() !== "") {
         payload.age_min = parseInt(data.age_min);
       } else {
         payload.age_min = null;
       }
 
       // Handle age_max
-      if (data.age_max && data.age_max.trim() !== '') {
+      if (data.age_max && data.age_max.trim() !== "") {
         payload.age_max = parseInt(data.age_max);
       } else {
         payload.age_max = null;
       }
 
       // Pricing mode and group size
-      payload.pricing_mode = data.pricing_mode || 'per_person';
+      payload.pricing_mode = data.pricing_mode || "per_person";
 
-      if (data.pricing_mode === 'per_group') {
-        if (data.min_pax && data.min_pax.trim() !== '') {
+      if (data.pricing_mode === "per_group") {
+        if (data.min_pax && data.min_pax.trim() !== "") {
           payload.min_pax = parseInt(data.min_pax);
         } else {
           payload.min_pax = null;
         }
 
-        if (data.max_pax && data.max_pax.trim() !== '') {
+        if (data.max_pax && data.max_pax.trim() !== "") {
           payload.max_pax = parseInt(data.max_pax);
         } else {
           payload.max_pax = null;
@@ -252,25 +292,30 @@ const TravelerCategoryForm: React.FC = () => {
       }
 
       if (isEditMode && categoryId) {
-        return await apiClient.put(`/traveler-categories/${categoryId}`, payload);
+        return await apiClient.put(
+          `/traveler-categories/${categoryId}`,
+          payload,
+        );
       } else {
-        return await apiClient.post('/traveler-categories', payload);
+        return await apiClient.post("/traveler-categories", payload);
       }
     },
     onSuccess: (response: any) => {
-      queryClient.invalidateQueries({ queryKey: ['traveler-categories'] });
-      queryClient.invalidateQueries({ queryKey: ['traveler-category', categoryId] });
+      queryClient.invalidateQueries({ queryKey: ["traveler-categories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["traveler-category", categoryId],
+      });
       showToast(
-        isEditMode 
-          ? __('Traveler category updated successfully', 'yatra')
-          : __('Traveler category created successfully', 'yatra'),
-        'success'
+        isEditMode
+          ? __("Traveler category updated successfully", "yatra")
+          : __("Traveler category created successfully", "yatra"),
+        "success",
       );
       if (!isEditMode) {
         const newId = response?.id || response?.data?.id;
         if (newId) {
           setTimeout(() => {
-            window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${newId}`;
+            window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=traveler-categories&action=edit&id=${newId}`;
           }, 800);
         }
       } else {
@@ -278,17 +323,19 @@ const TravelerCategoryForm: React.FC = () => {
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the traveler category', 'yatra');
-      showToast(errorMessage, 'error');
+      const errorMessage =
+        error?.message ||
+        __("An error occurred while saving the traveler category", "yatra");
+      showToast(errorMessage, "error");
       setIsSubmitting(false);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'yatra'), 'warning');
+      showToast(__("Please fix the form errors", "yatra"), "warning");
       return;
     }
 
@@ -298,18 +345,16 @@ const TravelerCategoryForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=traveler-categories`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=traveler-categories`;
   };
 
   if (isEditMode && isLoadingCategory) {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Edit Category', 'yatra')}
-          description={__('Update traveler category information', 'yatra')}
-          actions={
-            <Skeleton className="w-24 h-9 rounded-md" />
-          }
+          title={__("Edit Category", "yatra")}
+          description={__("Update traveler category information", "yatra")}
+          actions={<Skeleton className="w-24 h-9 rounded-md" />}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
@@ -353,8 +398,16 @@ const TravelerCategoryForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Category', 'yatra') : __('Add Category', 'yatra')}
-        description={isEditMode ? __('Update traveler category information', 'yatra') : __('Create a new traveler category for pricing', 'yatra')}
+        title={
+          isEditMode
+            ? __("Edit Category", "yatra")
+            : __("Add Category", "yatra")
+        }
+        description={
+          isEditMode
+            ? __("Update traveler category information", "yatra")
+            : __("Create a new traveler category for pricing", "yatra")
+        }
         actions={
           <Button
             variant="outline"
@@ -362,7 +415,7 @@ const TravelerCategoryForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'yatra')}
+            {__("Back", "yatra")}
           </Button>
         }
       />
@@ -375,16 +428,25 @@ const TravelerCategoryForm: React.FC = () => {
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Category Information', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Category Information", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Label */}
                   <div>
-                    <label htmlFor="label" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Category Label', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="label"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Category Label", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <HelpText
-                      text={__('The name of this traveler category (e.g., Adult, Child, Senior, Student)', 'yatra')}
+                      text={__(
+                        "The name of this traveler category (e.g., Adult, Child, Senior, Student)",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <Input
@@ -392,8 +454,8 @@ const TravelerCategoryForm: React.FC = () => {
                       type="text"
                       value={formData.label}
                       onChange={(e) => handleLabelChange(e.target.value)}
-                      placeholder={__('e.g., Adult', 'yatra')}
-                      className={errors.label ? 'border-red-500' : ''}
+                      placeholder={__("e.g., Adult", "yatra")}
+                      className={errors.label ? "border-red-500" : ""}
                       required
                     />
                     {errors.label && (
@@ -406,8 +468,12 @@ const TravelerCategoryForm: React.FC = () => {
 
                   {/* Slug */}
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="slug"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Slug", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -415,8 +481,8 @@ const TravelerCategoryForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('category-slug', 'yatra')}
-                        className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                        placeholder={__("category-slug", "yatra")}
+                        className={`pr-10 ${errors.slug ? "border-red-500" : ""} ${!isSlugEditable ? "bg-gray-50 dark:bg-gray-800 cursor-not-allowed" : ""}`}
                         disabled={!isSlugEditable}
                         required
                       />
@@ -424,7 +490,11 @@ const TravelerCategoryForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
+                        aria-label={
+                          isSlugEditable
+                            ? __("Cancel editing slug", "yatra")
+                            : __("Edit slug", "yatra")
+                        }
                       >
                         {isSlugEditable ? (
                           <X className="w-4 h-4" />
@@ -437,28 +507,46 @@ const TravelerCategoryForm: React.FC = () => {
                       <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {isSlugEditable 
-                        ? __('You are manually editing the slug. Click X to cancel and regenerate from label.', 'yatra')
-                        : __('This slug is auto-generated from the label. Click the edit icon to customize.', 'yatra')}
+                      {isSlugEditable
+                        ? __(
+                            "You are manually editing the slug. Click X to cancel and regenerate from label.",
+                            "yatra",
+                          )
+                        : __(
+                            "This slug is auto-generated from the label. Click the edit icon to customize.",
+                            "yatra",
+                          )}
                     </p>
                   </div>
 
                   {/* Description */}
                   <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="description"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Description", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <HelpText
-                      text={__('A brief description of this category and who it applies to', 'yatra')}
+                      text={__(
+                        "A brief description of this category and who it applies to",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('e.g., Standard adult pricing for travelers aged 18 and above', 'yatra')}
+                      onChange={(e) =>
+                        handleFieldChange("description", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., Standard adult pricing for travelers aged 18 and above",
+                        "yatra",
+                      )}
                       rows={3}
-                      className={`flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none ${errors.description ? 'border-red-500' : ''}`}
+                      className={`flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none ${errors.description ? "border-red-500" : ""}`}
                       required
                     />
                     {errors.description && (
@@ -472,25 +560,33 @@ const TravelerCategoryForm: React.FC = () => {
                   {/* Age Range */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Age Range', 'yatra')}
+                      {__("Age Range", "yatra")}
                     </label>
                     <HelpText
-                      text={__('Specify the age range for this category (e.g., 0-4 for Infant, 5-17 for Child, 18+ for Adult). Leave empty if no age restriction.', 'yatra')}
+                      text={__(
+                        "Specify the age range for this category (e.g., 0-4 for Infant, 5-17 for Child, 18+ for Adult). Leave empty if no age restriction.",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label htmlFor="age_min" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                          {__('Minimum Age', 'yatra')}
+                        <label
+                          htmlFor="age_min"
+                          className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Minimum Age", "yatra")}
                         </label>
                         <Input
                           id="age_min"
                           type="number"
                           min="0"
                           value={formData.age_min}
-                          onChange={(e) => handleFieldChange('age_min', e.target.value)}
-                          placeholder={__('e.g., 0, 5, 18', 'yatra')}
-                          className={errors.age_min ? 'border-red-500' : ''}
+                          onChange={(e) =>
+                            handleFieldChange("age_min", e.target.value)
+                          }
+                          placeholder={__("e.g., 0, 5, 18", "yatra")}
+                          className={errors.age_min ? "border-red-500" : ""}
                         />
                         {errors.age_min && (
                           <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -500,17 +596,25 @@ const TravelerCategoryForm: React.FC = () => {
                         )}
                       </div>
                       <div>
-                        <label htmlFor="age_max" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                          {__('Maximum Age', 'yatra')}
+                        <label
+                          htmlFor="age_max"
+                          className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5"
+                        >
+                          {__("Maximum Age", "yatra")}
                         </label>
                         <Input
                           id="age_max"
                           type="number"
                           min="0"
                           value={formData.age_max}
-                          onChange={(e) => handleFieldChange('age_max', e.target.value)}
-                          placeholder={__('e.g., 4, 17, leave empty for 18+', 'yatra')}
-                          className={errors.age_max ? 'border-red-500' : ''}
+                          onChange={(e) =>
+                            handleFieldChange("age_max", e.target.value)
+                          }
+                          placeholder={__(
+                            "e.g., 4, 17, leave empty for 18+",
+                            "yatra",
+                          )}
+                          className={errors.age_max ? "border-red-500" : ""}
                         />
                         {errors.age_max && (
                           <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -520,51 +624,77 @@ const TravelerCategoryForm: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    {formData.age_min && formData.age_max && parseInt(formData.age_min) >= parseInt(formData.age_max) && (
-                      <p className="mt-1.5 text-sm text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {__('Minimum age should be less than maximum age', 'yatra')}
-                      </p>
-                    )}
+                    {formData.age_min &&
+                      formData.age_max &&
+                      parseInt(formData.age_min) >=
+                        parseInt(formData.age_max) && (
+                        <p className="mt-1.5 text-sm text-yellow-600 dark:text-yellow-400 flex items-center gap-1">
+                          <AlertCircle className="w-4 h-4" />
+                          {__(
+                            "Minimum age should be less than maximum age",
+                            "yatra",
+                          )}
+                        </p>
+                      )}
                   </div>
 
                   {/* Pricing Mode & Group Size */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Pricing Mode', 'yatra')}
+                      {__("Pricing Mode", "yatra")}
                     </label>
                     <HelpText
-                      text={__('Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking.', 'yatra')}
+                      text={__(
+                        "Choose how this traveler category is priced. Per person charges per traveler, while per group uses a flat price for a group booking.",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <Select
                       id="pricing_mode"
                       value={formData.pricing_mode}
-                      onChange={(e) => handleFieldChange('pricing_mode', e.target.value as 'per_person' | 'per_group')}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "pricing_mode",
+                          e.target.value as "per_person" | "per_group",
+                        )
+                      }
                     >
-                      <option value="per_person">{__('Per person', 'yatra')}</option>
-                      <option value="per_group">{__('Per group', 'yatra')}</option>
+                      <option value="per_person">
+                        {__("Per person", "yatra")}
+                      </option>
+                      <option value="per_group">
+                        {__("Per group", "yatra")}
+                      </option>
                     </Select>
 
-                    {formData.pricing_mode === 'per_group' && (
+                    {formData.pricing_mode === "per_group" && (
                       <div className="mt-3 space-y-2">
                         <HelpText
-                          text={__('Optional group size limits for this category. These are used to validate bookings when this category is priced per group.', 'yatra')}
+                          text={__(
+                            "Optional group size limits for this category. These are used to validate bookings when this category is priced per group.",
+                            "yatra",
+                          )}
                           className="mb-1"
                         />
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           <div>
-                            <label htmlFor="min_pax" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                              {__('Minimum Group Size', 'yatra')}
+                            <label
+                              htmlFor="min_pax"
+                              className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5"
+                            >
+                              {__("Minimum Group Size", "yatra")}
                             </label>
                             <Input
                               id="min_pax"
                               type="number"
                               min="1"
                               value={formData.min_pax}
-                              onChange={(e) => handleFieldChange('min_pax', e.target.value)}
-                              placeholder={__('e.g., 10', 'yatra')}
-                              className={errors.min_pax ? 'border-red-500' : ''}
+                              onChange={(e) =>
+                                handleFieldChange("min_pax", e.target.value)
+                              }
+                              placeholder={__("e.g., 10", "yatra")}
+                              className={errors.min_pax ? "border-red-500" : ""}
                             />
                             {errors.min_pax && (
                               <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -574,17 +704,22 @@ const TravelerCategoryForm: React.FC = () => {
                             )}
                           </div>
                           <div>
-                            <label htmlFor="max_pax" className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5">
-                              {__('Maximum Group Size', 'yatra')}
+                            <label
+                              htmlFor="max_pax"
+                              className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1.5"
+                            >
+                              {__("Maximum Group Size", "yatra")}
                             </label>
                             <Input
                               id="max_pax"
                               type="number"
                               min="1"
                               value={formData.max_pax}
-                              onChange={(e) => handleFieldChange('max_pax', e.target.value)}
-                              placeholder={__('e.g., 6 (optional)', 'yatra')}
-                              className={errors.max_pax ? 'border-red-500' : ''}
+                              onChange={(e) =>
+                                handleFieldChange("max_pax", e.target.value)
+                              }
+                              placeholder={__("e.g., 6 (optional)", "yatra")}
+                              className={errors.max_pax ? "border-red-500" : ""}
                             />
                             {errors.max_pax && (
                               <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -597,7 +732,6 @@ const TravelerCategoryForm: React.FC = () => {
                       </div>
                     )}
                   </div>
-
                 </CardContent>
               </Card>
             </div>
@@ -607,14 +741,19 @@ const TravelerCategoryForm: React.FC = () => {
               {/* Icon/Image Picker */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Category Icon or Image', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Category Icon or Image", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <IconPicker
                     value={formData.icon}
-                    onChange={(value) => handleFieldChange('icon', value)}
+                    onChange={(value) => handleFieldChange("icon", value)}
                     label={undefined}
-                    helpText={__('Select an icon from the library or upload a custom image for this category.', 'yatra')}
+                    helpText={__(
+                      "Select an icon from the library or upload a custom image for this category.",
+                      "yatra",
+                    )}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -625,25 +764,38 @@ const TravelerCategoryForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Status", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'yatra')}
+                    <label
+                      htmlFor="status"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Status", "yatra")}
                     </label>
                     <HelpText
-                      text={__('Draft categories will not be available when creating trips', 'yatra')}
+                      text={__(
+                        "Draft categories will not be available when creating trips",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <Select
                       id="status"
                       value={formData.status}
-                      onChange={(e) => handleFieldChange('status', e.target.value as 'draft' | 'publish' | 'trash')}
+                      onChange={(e) =>
+                        handleFieldChange(
+                          "status",
+                          e.target.value as "draft" | "publish" | "trash",
+                        )
+                      }
                     >
-                      <option value="draft">{__('Draft', 'yatra')}</option>
-                      <option value="publish">{__('Publish', 'yatra')}</option>
-                      <option value="trash">{__('Trash', 'yatra')}</option>
+                      <option value="draft">{__("Draft", "yatra")}</option>
+                      <option value="publish">{__("Publish", "yatra")}</option>
+                      <option value="trash">{__("Trash", "yatra")}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -662,12 +814,14 @@ const TravelerCategoryForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'yatra')}...
+                            {__("Saving...", "yatra")}...
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Category', 'yatra') : __('Create Category', 'yatra')}
+                            {isEditMode
+                              ? __("Update Category", "yatra")
+                              : __("Create Category", "yatra")}
                           </>
                         )}
                       </Button>
@@ -677,7 +831,7 @@ const TravelerCategoryForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'yatra')}
+                        {__("Cancel", "yatra")}
                       </Button>
                     </div>
                   </div>

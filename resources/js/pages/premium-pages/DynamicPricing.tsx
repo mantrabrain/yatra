@@ -1,22 +1,22 @@
 /**
  * Dynamic Pricing Premium Page
- * 
+ *
  * Premium upgrade page for Dynamic Pricing module.
  * Shows when Yatra Pro is not active or module is not enabled.
- * 
+ *
  * @package Yatra
  * @since 3.0.0
  */
 
-import React from 'react';
-import { Card, CardContent } from '../../components/ui/card';
-import { Button } from '../../components/ui/button';
-import { __ } from '../../lib/i18n';
-import { 
-  Target, 
-  DollarSign, 
-  Calendar, 
-  Users, 
+import React from "react";
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { __ } from "../../lib/i18n";
+import {
+  Target,
+  DollarSign,
+  Calendar,
+  Users,
   Sparkles,
   CheckCircle,
   ArrowRight,
@@ -24,82 +24,92 @@ import {
   TrendingUp,
   BarChart,
   Clock,
-  Activity
-} from 'lucide-react';
+  Activity,
+} from "lucide-react";
 
 // Premium Upgrade Component
 const DynamicPricingPremium: React.FC = () => {
   const features = [
     {
       icon: Target,
-      title: __('Smart Pricing Rules'),
-      description: __('Create intelligent pricing rules based on demand, season, and booking patterns.')
+      title: __("Smart Pricing Rules"),
+      description: __(
+        "Create intelligent pricing rules based on demand, season, and booking patterns.",
+      ),
     },
     {
       icon: Calendar,
-      title: __('Time-based Pricing'),
-      description: __('Set different prices for early bookings, last-minute deals, and peak seasons.')
+      title: __("Time-based Pricing"),
+      description: __(
+        "Set different prices for early bookings, last-minute deals, and peak seasons.",
+      ),
     },
     {
       icon: Users,
-      title: __('Group Pricing'),
-      description: __('Offer tiered pricing based on group size and booking volume.')
+      title: __("Group Pricing"),
+      description: __(
+        "Offer tiered pricing based on group size and booking volume.",
+      ),
     },
     {
       icon: BarChart,
-      title: __('Revenue Analytics'),
-      description: __('Track pricing performance and optimize your revenue strategy.')
-    }
+      title: __("Revenue Analytics"),
+      description: __(
+        "Track pricing performance and optimize your revenue strategy.",
+      ),
+    },
   ];
 
   const stats = [
     {
       icon: TrendingUp,
-      value: '42%',
-      label: __('Revenue Increase')
+      value: "42%",
+      label: __("Revenue Increase"),
     },
     {
       icon: Users,
-      value: '3.2x',
-      label: __('Booking Conversion')
+      value: "3.2x",
+      label: __("Booking Conversion"),
     },
     {
       icon: Target,
-      value: 'Unlimited',
-      label: __('Pricing Rules')
+      value: "Unlimited",
+      label: __("Pricing Rules"),
     },
     {
       icon: DollarSign,
-      value: 'Auto',
-      label: __('Price Optimization')
-    }
+      value: "Auto",
+      label: __("Price Optimization"),
+    },
   ];
 
   const popularRules = [
     {
       icon: Clock,
-      title: __('Early Bird Discounts'),
-      description: __('Reward early bookings with attractive discounts.'),
-      discount: __('Save up to 20%')
+      title: __("Early Bird Discounts"),
+      description: __("Reward early bookings with attractive discounts."),
+      discount: __("Save up to 20%"),
     },
     {
       icon: Zap,
-      title: __('Last-minute Deals'),
-      description: __('Fill remaining spots with dynamic last-minute pricing.'),
-      discount: __('Save up to 30%')
+      title: __("Last-minute Deals"),
+      description: __("Fill remaining spots with dynamic last-minute pricing."),
+      discount: __("Save up to 30%"),
     },
     {
       icon: Calendar,
-      title: __('Seasonal Pricing'),
-      description: __('Adjust prices automatically based on peak and off-peak seasons.'),
-      discount: __('Varies by season')
+      title: __("Seasonal Pricing"),
+      description: __(
+        "Adjust prices automatically based on peak and off-peak seasons.",
+      ),
+      discount: __("Varies by season"),
     },
     {
       icon: Users,
-      title: __('Group Discounts'),
-      description: __('Offer better rates for larger group bookings.'),
-      discount: __('Save 10-25%')
-    }
+      title: __("Group Discounts"),
+      description: __("Offer better rates for larger group bookings."),
+      discount: __("Save 10-25%"),
+    },
   ];
 
   return (
@@ -111,18 +121,25 @@ const DynamicPricingPremium: React.FC = () => {
             <Sparkles className="w-6 h-6 text-amber-600 dark:text-amber-400" />
             <div>
               <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">
-                {__('Premium Feature')}
+                {__("Premium Feature")}
               </h3>
               <p className="text-amber-700 dark:text-amber-300 text-sm">
-                {__('Dynamic Pricing is a premium module. Upgrade to Yatra Pro to unlock intelligent pricing automation.')}
+                {__(
+                  "Dynamic Pricing is a premium module. Upgrade to Yatra Pro to unlock intelligent pricing automation.",
+                )}
               </p>
             </div>
           </div>
-          <Button 
+          <Button
             className="bg-amber-600 text-white hover:bg-amber-700 px-6 py-2 text-sm font-medium"
-            onClick={() => window.open('https://wpyatra.com/pricing?module=dynamic-pricing', '_blank')}
+            onClick={() =>
+              window.open(
+                "https://wpyatra.com/pricing?module=dynamic-pricing",
+                "_blank",
+              )
+            }
           >
-            {__('Upgrade to Pro')}
+            {__("Upgrade to Pro")}
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
@@ -135,15 +152,17 @@ const DynamicPricingPremium: React.FC = () => {
         </div>
         <div className="flex items-center justify-center space-x-2 mb-4">
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-            {__('Dynamic Pricing')}
+            {__("Dynamic Pricing")}
           </h1>
           <div className="inline-flex items-center px-2 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold shadow-md">
             <Sparkles className="w-3 h-3 mr-1" />
-            {__('PRO')}
+            {__("PRO")}
           </div>
         </div>
         <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {__('Maximize your revenue with intelligent pricing that automatically adjusts based on demand, season, and booking patterns.')}
+          {__(
+            "Maximize your revenue with intelligent pricing that automatically adjusts based on demand, season, and booking patterns.",
+          )}
         </p>
       </div>
 
@@ -152,7 +171,10 @@ const DynamicPricingPremium: React.FC = () => {
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <Card key={index} className="border border-gray-200 dark:border-gray-700">
+            <Card
+              key={index}
+              className="border border-gray-200 dark:border-gray-700"
+            >
               <CardContent className="pt-6">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
@@ -176,13 +198,16 @@ const DynamicPricingPremium: React.FC = () => {
       {/* Features Grid */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-          {__('Powerful Features')}
+          {__("Powerful Features")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {features.map((feature, index) => {
             const Icon = feature.icon;
             return (
-              <Card key={index} className="border border-gray-200 dark:border-gray-700">
+              <Card
+                key={index}
+                className="border border-gray-200 dark:border-gray-700"
+              >
                 <CardContent className="pt-6">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
@@ -207,13 +232,16 @@ const DynamicPricingPremium: React.FC = () => {
       {/* Popular Rules */}
       <div className="mb-12">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-          {__('Popular Pricing Rules')}
+          {__("Popular Pricing Rules")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {popularRules.map((rule, index) => {
             const Icon = rule.icon;
             return (
-              <Card key={index} className="border border-gray-200 dark:border-gray-700">
+              <Card
+                key={index}
+                className="border border-gray-200 dark:border-gray-700"
+              >
                 <CardContent className="pt-6">
                   <div className="text-center">
                     <div className="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mx-auto mb-4">
@@ -239,10 +267,10 @@ const DynamicPricingPremium: React.FC = () => {
         <CardContent className="pt-6">
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {__('How It Works')}
+              {__("How It Works")}
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              {__('Intelligent pricing in 4 simple steps')}
+              {__("Intelligent pricing in 4 simple steps")}
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -250,39 +278,45 @@ const DynamicPricingPremium: React.FC = () => {
               <div className="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center mx-auto mb-4">
                 <Target className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
-              <h4 className="font-semibold mb-2">{__('1. Set Rules')}</h4>
+              <h4 className="font-semibold mb-2">{__("1. Set Rules")}</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Define pricing rules based on demand, season, and booking patterns')}
+                {__(
+                  "Define pricing rules based on demand, season, and booking patterns",
+                )}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mx-auto mb-4">
                 <Activity className="w-8 h-8 text-green-600 dark:text-green-400" />
               </div>
-              <h4 className="font-semibold mb-2">{__('2. Monitor Demand')}</h4>
+              <h4 className="font-semibold mb-2">{__("2. Monitor Demand")}</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('System tracks booking patterns and demand in real-time')}
+                {__("System tracks booking patterns and demand in real-time")}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center mx-auto mb-4">
                 <Zap className="w-8 h-8 text-purple-600 dark:text-purple-400" />
               </div>
-              <h4 className="font-semibold mb-2">{__('3. Auto-Adjust')}</h4>
+              <h4 className="font-semibold mb-2">{__("3. Auto-Adjust")}</h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Prices automatically adjust based on your predefined rules')}
+                {__(
+                  "Prices automatically adjust based on your predefined rules",
+                )}
               </p>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900 flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8 text-orange-600 dark:text-orange-400" />
               </div>
-              <h4 className="font-semibold mb-2">{__('4. Maximize Revenue')}</h4>
+              <h4 className="font-semibold mb-2">
+                {__("4. Maximize Revenue")}
+              </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {__('Optimize pricing for maximum revenue and occupancy')}
+                {__("Optimize pricing for maximum revenue and occupancy")}
               </p>
             </div>
           </div>
@@ -298,37 +332,50 @@ const DynamicPricingPremium: React.FC = () => {
                 <Sparkles className="w-6 h-6 text-blue-600 dark:text-blue-400" />
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {__('Unlock Dynamic Pricing')}
+                {__("Unlock Dynamic Pricing")}
               </h3>
             </div>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
-              {__('Get intelligent price adjustments and maximize your revenue with Yatra Pro.')}
+              {__(
+                "Get intelligent price adjustments and maximize your revenue with Yatra Pro.",
+              )}
             </p>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">{__('Early bird discounts')}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {__("Early bird discounts")}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">{__('Last-minute deals')}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {__("Last-minute deals")}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                <span className="text-sm text-gray-600 dark:text-gray-400">{__('Demand-based pricing')}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  {__("Demand-based pricing")}
+                </span>
               </div>
             </div>
           </div>
           <div className="flex flex-col items-center">
-            <Button 
+            <Button
               className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 text-sm font-medium mb-3"
-              onClick={() => window.open('https://wpyatra.com/pricing?module=dynamic-pricing', '_blank')}
+              onClick={() =>
+                window.open(
+                  "https://wpyatra.com/pricing?module=dynamic-pricing",
+                  "_blank",
+                )
+              }
             >
-              {__('Upgrade to Pro')}
+              {__("Upgrade to Pro")}
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {__('14-day money-back guarantee')}
+              {__("14-day money-back guarantee")}
             </p>
           </div>
         </div>

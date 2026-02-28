@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, X, Search } from 'lucide-react';
-import { __ } from '../../lib/i18n';
-import { Input } from './input';
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronDown, X, Search } from "lucide-react";
+import { __ } from "../../lib/i18n";
+import { Input } from "./input";
 
 export interface SearchableSelectOption {
   value: string;
@@ -26,38 +26,42 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
   value,
   onChange,
   options,
-  placeholder = __('Select an option...', 'yatra'),
-  searchPlaceholder = __('Search...', 'yatra'),
-  className = '',
+  placeholder = __("Select an option...", "yatra"),
+  searchPlaceholder = __("Search...", "yatra"),
+  className = "",
   error = false,
   disabled = false,
   showValueId = true,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter options based on search term (search by both label and value)
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    option.value.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOptions = options.filter(
+    (option) =>
+      option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      option.value.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Get selected option
-  const selectedOption = options.find(opt => opt.value === value);
+  const selectedOption = options.find((opt) => opt.value === value);
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
-        setSearchTerm('');
+        setSearchTerm("");
       }
     };
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
       // Focus search input when dropdown opens
       setTimeout(() => {
         searchInputRef.current?.focus();
@@ -65,27 +69,31 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
   const handleSelect = (optionValue: string) => {
     onChange(optionValue);
     setIsOpen(false);
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange('');
-    setSearchTerm('');
+    onChange("");
+    setSearchTerm("");
   };
 
   return (
-    <div ref={containerRef} className={`relative ${className}`} style={{ zIndex: isOpen ? 9999 : 'auto' }}>
+    <div
+      ref={containerRef}
+      className={`relative ${className}`}
+      style={{ zIndex: isOpen ? 9999 : "auto" }}
+    >
       <div
         className={`flex h-11 w-full rounded-md border-2 ${
-          error ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
+          error ? "border-red-500" : "border-gray-300 dark:border-gray-600"
         } bg-white dark:bg-gray-800 px-4 py-2.5 text-base ring-offset-white focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:ring-offset-gray-900 dark:focus-within:ring-blue-400 transition-colors`}
       >
         <button
@@ -94,15 +102,23 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           disabled={disabled}
           className="flex-1 flex items-center justify-between text-left"
         >
-          <span className={selectedOption ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'}>
+          <span
+            className={
+              selectedOption
+                ? "text-gray-900 dark:text-white"
+                : "text-gray-500 dark:text-gray-400"
+            }
+          >
             {selectedOption ? (
               <div className="flex items-center justify-between w-full">
                 <span>{selectedOption.label}</span>
-                {showValueId && selectedOption.value && selectedOption.value !== '' && (
-                  <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
-                    ID: {selectedOption.value}
-                  </span>
-                )}
+                {showValueId &&
+                  selectedOption.value &&
+                  selectedOption.value !== "" && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
+                      ID: {selectedOption.value}
+                    </span>
+                  )}
               </div>
             ) : (
               placeholder
@@ -114,13 +130,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                 type="button"
                 onClick={handleClear}
                 className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                aria-label={__('Clear selection', 'yatra')}
+                aria-label={__("Clear selection", "yatra")}
               >
                 <X className="w-4 h-4 text-gray-400" />
               </button>
             )}
             <ChevronDown
-              className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
             />
           </div>
         </button>
@@ -148,7 +164,7 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
           <div className="max-h-48 overflow-y-auto overflow-x-visible">
             {filteredOptions.length === 0 ? (
               <div className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center">
-                {__('No options found', 'yatra')}
+                {__("No options found", "yatra")}
               </div>
             ) : (
               filteredOptions.map((option) => (
@@ -158,13 +174,13 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
                   onClick={() => handleSelect(option.value)}
                   className={`w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
                     value === option.value
-                      ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400'
-                      : 'text-gray-900 dark:text-white'
+                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400"
+                      : "text-gray-900 dark:text-white"
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <span>{option.label}</span>
-                    {showValueId && option.value && option.value !== '' && (
+                    {showValueId && option.value && option.value !== "" && (
                       <span className="text-xs text-gray-500 dark:text-gray-400 ml-2 font-medium">
                         ID: {option.value}
                       </span>
@@ -179,4 +195,3 @@ export const SearchableSelect: React.FC<SearchableSelectProps> = ({
     </div>
   );
 };
-

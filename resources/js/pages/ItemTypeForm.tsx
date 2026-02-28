@@ -3,28 +3,33 @@
  * Add/Edit Item Type form
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
-import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api-client';
-import { generateSlug } from '../lib/slug';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2, Edit2, X } from "lucide-react";
+import { __ } from "../lib/i18n";
+import { usePermissions } from "../hooks/usePermissions";
+import { useToast } from "../components/ui/toast";
+import { apiClient } from "../lib/api-client";
+import { generateSlug } from "../lib/slug";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 
 interface ItemTypeFormData {
   name: string;
   slug: string;
   description: string;
   icon: {
-    type: 'icon' | 'image';
+    type: "icon" | "image";
     value: string;
   } | null;
   color: string;
@@ -36,12 +41,12 @@ const ItemTypeForm: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   const [formData, setFormData] = useState<ItemTypeFormData>({
-    name: '',
-    slug: '',
-    description: '',
+    name: "",
+    slug: "",
+    description: "",
     icon: null,
-    color: 'blue',
-    status: 'publish',
+    color: "blue",
+    status: "publish",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,29 +54,32 @@ const ItemTypeForm: React.FC = () => {
 
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') || 'create';
+    return params.get("action") || "create";
   }, []);
 
   const typeId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
-  const isEditMode = action === 'edit' && typeId !== null;
+  const isEditMode = action === "edit" && typeId !== null;
 
   const { data: typeData, isLoading: isLoadingType } = useQuery({
-    queryKey: ['item-type', typeId],
+    queryKey: ["item-type", typeId],
     queryFn: async () => {
       if (!typeId) return null;
       try {
         const response = await apiClient.get(`/item-types/${typeId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load item type', 'yatra'), 'error');
+        showToast(
+          error?.message || __("Failed to load item type", "yatra"),
+          "error",
+        );
         throw error;
       }
     },
-    enabled: isEditMode && can('yatra_view_trips'),
+    enabled: isEditMode && can("yatra_view_trips"),
   });
 
   useEffect(() => {
@@ -79,22 +87,25 @@ const ItemTypeForm: React.FC = () => {
       // Handle icon - could be string (old format) or IconPickerValue (new format)
       let iconValue: IconPickerValue | null = null;
       if (typeData.icon) {
-        if (typeof typeData.icon === 'string') {
+        if (typeof typeData.icon === "string") {
           // Old format: just icon name string
-          iconValue = { type: 'icon', value: typeData.icon };
-        } else if (typeof typeData.icon === 'object' && typeData.icon !== null) {
+          iconValue = { type: "icon", value: typeData.icon };
+        } else if (
+          typeof typeData.icon === "object" &&
+          typeData.icon !== null
+        ) {
           // New format: IconPickerValue object
           iconValue = typeData.icon as IconPickerValue;
         }
       }
 
       setFormData({
-        name: typeData.name || '',
-        slug: typeData.slug || '',
-        description: typeData.description || '',
+        name: typeData.name || "",
+        slug: typeData.slug || "",
+        description: typeData.description || "",
         icon: iconValue,
-        color: typeData.color || 'blue',
-        status: typeData.status || 'publish',
+        color: typeData.color || "blue",
+        status: typeData.status || "publish",
       });
     }
   }, [typeData, isEditMode]);
@@ -104,28 +115,28 @@ const ItemTypeForm: React.FC = () => {
     // In EDIT mode, slug only changes if user explicitly edits it
     if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: value,
         slug: newSlug,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: value,
       }));
     }
     if (errors.name) {
-      setErrors(prev => ({ ...prev, name: '' }));
+      setErrors((prev) => ({ ...prev, name: "" }));
     }
   };
 
   const handleSlugChange = (value: string) => {
     // Only allow manual slug editing if edit mode is enabled
     if (isSlugEditable) {
-      setFormData(prev => ({ ...prev, slug: value }));
+      setFormData((prev) => ({ ...prev, slug: value }));
       if (errors.slug) {
-        setErrors(prev => ({ ...prev, slug: '' }));
+        setErrors((prev) => ({ ...prev, slug: "" }));
       }
     }
   };
@@ -134,15 +145,18 @@ const ItemTypeForm: React.FC = () => {
     if (isSlugEditable) {
       // If disabling edit, regenerate slug from name
       const newSlug = generateSlug(formData.name);
-      setFormData(prev => ({ ...prev, slug: newSlug }));
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
     setIsSlugEditable(!isSlugEditable);
   };
 
-  const handleFieldChange = (field: keyof ItemTypeFormData, value: string | IconPickerValue | null) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (
+    field: keyof ItemTypeFormData,
+    value: string | IconPickerValue | null,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -150,13 +164,16 @@ const ItemTypeForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'yatra');
+      newErrors.name = __("Name is required", "yatra");
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'yatra');
+      newErrors.slug = __("Slug is required", "yatra");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+      newErrors.slug = __(
+        "Slug can only contain lowercase letters, numbers, and hyphens",
+        "yatra",
+      );
     }
 
     setErrors(newErrors);
@@ -182,19 +199,19 @@ const ItemTypeForm: React.FC = () => {
       if (isEditMode && typeId) {
         return await apiClient.put(`/item-types/${typeId}`, payload);
       } else {
-        return await apiClient.post('/item-types', payload);
+        return await apiClient.post("/item-types", payload);
       }
     },
     onSuccess: (response: any) => {
-      queryClient.invalidateQueries({ queryKey: ['item-types'] });
-      queryClient.invalidateQueries({ queryKey: ['item-type', typeId] });
+      queryClient.invalidateQueries({ queryKey: ["item-types"] });
+      queryClient.invalidateQueries({ queryKey: ["item-type", typeId] });
       showToast(
-        isEditMode 
-          ? __('Item type updated successfully', 'yatra')
-          : __('Item type created successfully', 'yatra'),
-        'success'
+        isEditMode
+          ? __("Item type updated successfully", "yatra")
+          : __("Item type created successfully", "yatra"),
+        "success",
       );
-      
+
       if (isEditMode) {
         // Don't redirect on update - stay on edit page
         setIsSubmitting(false);
@@ -202,22 +219,24 @@ const ItemTypeForm: React.FC = () => {
         // Redirect to edit page after create
         setTimeout(() => {
           const newId = response?.id || typeId;
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${newId}`;
+          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types&action=edit&id=${newId}`;
         }, 1000);
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the item type', 'yatra');
-      showToast(errorMessage, 'error');
+      const errorMessage =
+        error?.message ||
+        __("An error occurred while saving the item type", "yatra");
+      showToast(errorMessage, "error");
       setIsSubmitting(false);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'yatra'), 'warning');
+      showToast(__("Please fix the form errors", "yatra"), "warning");
       return;
     }
 
@@ -227,17 +246,17 @@ const ItemTypeForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=itinerary&tab=item-types`;
   };
 
   const colorOptions = [
-    { value: 'blue', label: __('Blue', 'yatra') },
-    { value: 'green', label: __('Green', 'yatra') },
-    { value: 'purple', label: __('Purple', 'yatra') },
-    { value: 'orange', label: __('Orange', 'yatra') },
-    { value: 'red', label: __('Red', 'yatra') },
-    { value: 'yellow', label: __('Yellow', 'yatra') },
-    { value: 'gray', label: __('Gray', 'yatra') },
+    { value: "blue", label: __("Blue", "yatra") },
+    { value: "green", label: __("Green", "yatra") },
+    { value: "purple", label: __("Purple", "yatra") },
+    { value: "orange", label: __("Orange", "yatra") },
+    { value: "red", label: __("Red", "yatra") },
+    { value: "yellow", label: __("Yellow", "yatra") },
+    { value: "gray", label: __("Gray", "yatra") },
   ];
 
   if (isEditMode && isLoadingType) {
@@ -309,8 +328,19 @@ const ItemTypeForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Item Type', 'yatra') : __('Add New Item Type', 'yatra')}
-        description={isEditMode ? __('Update item type information', 'yatra') : __('Create a new category for organizing itinerary items', 'yatra')}
+        title={
+          isEditMode
+            ? __("Edit Item Type", "yatra")
+            : __("Add New Item Type", "yatra")
+        }
+        description={
+          isEditMode
+            ? __("Update item type information", "yatra")
+            : __(
+                "Create a new category for organizing itinerary items",
+                "yatra",
+              )
+        }
         actions={
           <Button
             variant="outline"
@@ -318,7 +348,7 @@ const ItemTypeForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'yatra')}
+            {__("Back", "yatra")}
           </Button>
         }
       />
@@ -329,20 +359,26 @@ const ItemTypeForm: React.FC = () => {
             <div className="lg:col-span-2 space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Basic Information", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Type Name', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Type Name", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('e.g., Activity', 'yatra')}
-                      className={errors.name ? 'border-red-500' : ''}
+                      placeholder={__("e.g., Activity", "yatra")}
+                      className={errors.name ? "border-red-500" : ""}
                       required
                     />
                     {errors.name && (
@@ -354,8 +390,12 @@ const ItemTypeForm: React.FC = () => {
 
                   <div>
                     <div>
-                      <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Slug', 'yatra')} <span className="text-red-500">*</span>
+                      <label
+                        htmlFor="slug"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Slug", "yatra")}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
                         <Input
@@ -363,8 +403,8 @@ const ItemTypeForm: React.FC = () => {
                           type="text"
                           value={formData.slug}
                           onChange={(e) => handleSlugChange(e.target.value)}
-                          placeholder={__('item-type-slug', 'yatra')}
-                          className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                          placeholder={__("item-type-slug", "yatra")}
+                          className={`pr-10 ${errors.slug ? "border-red-500" : ""} ${!isSlugEditable ? "bg-gray-50 dark:bg-gray-800 cursor-not-allowed" : ""}`}
                           disabled={!isSlugEditable}
                           required
                         />
@@ -372,7 +412,11 @@ const ItemTypeForm: React.FC = () => {
                           type="button"
                           onClick={handleToggleSlugEdit}
                           className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                          aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
+                          aria-label={
+                            isSlugEditable
+                              ? __("Cancel editing slug", "yatra")
+                              : __("Edit slug", "yatra")
+                          }
                         >
                           {isSlugEditable ? (
                             <X className="w-4 h-4" />
@@ -382,25 +426,41 @@ const ItemTypeForm: React.FC = () => {
                         </button>
                       </div>
                       {errors.slug && (
-                        <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
+                        <p className="mt-1 text-sm text-red-500">
+                          {errors.slug}
+                        </p>
                       )}
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                         {isSlugEditable
-                          ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
-                          : __('Auto-generated from name. Click edit icon to customize.', 'yatra')}
+                          ? __(
+                              "Manually editing slug. Click X to cancel and regenerate from name.",
+                              "yatra",
+                            )
+                          : __(
+                              "Auto-generated from name. Click edit icon to customize.",
+                              "yatra",
+                            )}
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Description', 'yatra')}
+                    <label
+                      htmlFor="description"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Description", "yatra")}
                     </label>
                     <textarea
                       id="description"
                       value={formData.description}
-                      onChange={(e) => handleFieldChange('description', e.target.value)}
-                      placeholder={__('Describe what this item type is used for...', 'yatra')}
+                      onChange={(e) =>
+                        handleFieldChange("description", e.target.value)
+                      }
+                      placeholder={__(
+                        "Describe what this item type is used for...",
+                        "yatra",
+                      )}
                       rows={4}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -412,15 +472,20 @@ const ItemTypeForm: React.FC = () => {
             <div className="space-y-3">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Appearance', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Appearance", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
                     <IconPicker
                       value={formData.icon}
-                      onChange={(value) => handleFieldChange('icon', value)}
-                      label={__('Icon', 'yatra')}
-                      helpText={__('Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.', 'yatra')}
+                      onChange={(value) => handleFieldChange("icon", value)}
+                      label={__("Icon", "yatra")}
+                      helpText={__(
+                        "Choose an icon to represent this item type visually. Icons help users quickly identify different types. You can also upload a custom image.",
+                        "yatra",
+                      )}
                       allowImageUpload={true}
                       allowIconSelection={true}
                       size="md"
@@ -428,13 +493,18 @@ const ItemTypeForm: React.FC = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="color" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Color', 'yatra')}
+                    <label
+                      htmlFor="color"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Color", "yatra")}
                     </label>
                     <Select
                       id="color"
                       value={formData.color}
-                      onChange={(e) => handleFieldChange('color', e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange("color", e.target.value)
+                      }
                     >
                       {colorOptions.map((color) => (
                         <option key={color.value} value={color.value}>
@@ -448,21 +518,28 @@ const ItemTypeForm: React.FC = () => {
 
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Status", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Item Type Status', 'yatra')}
+                    <label
+                      htmlFor="status"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Item Type Status", "yatra")}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
-                      onChange={(e) => handleFieldChange('status', e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange("status", e.target.value)
+                      }
                     >
-                      <option value="publish">{__('Publish', 'yatra')}</option>
-                      <option value="draft">{__('Draft', 'yatra')}</option>
-                      <option value="trash">{__('Trash', 'yatra')}</option>
+                      <option value="publish">{__("Publish", "yatra")}</option>
+                      <option value="draft">{__("Draft", "yatra")}</option>
+                      <option value="trash">{__("Trash", "yatra")}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -480,12 +557,14 @@ const ItemTypeForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'yatra')}
+                            {__("Saving...", "yatra")}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Type', 'yatra') : __('Create Type', 'yatra')}
+                            {isEditMode
+                              ? __("Update Type", "yatra")
+                              : __("Create Type", "yatra")}
                           </>
                         )}
                       </Button>
@@ -495,7 +574,7 @@ const ItemTypeForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'yatra')}
+                        {__("Cancel", "yatra")}
                       </Button>
                     </div>
                   </div>
@@ -510,4 +589,3 @@ const ItemTypeForm: React.FC = () => {
 };
 
 export default ItemTypeForm;
-

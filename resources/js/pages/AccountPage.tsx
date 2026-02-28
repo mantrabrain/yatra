@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../lib/api-client';
-import { API_ENDPOINTS } from '../lib/api-endpoints';
-import { __ } from '../lib/i18n';
+import React, { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "../lib/api-client";
+import { API_ENDPOINTS } from "../lib/api-endpoints";
+import { __ } from "../lib/i18n";
 import {
   LayoutDashboard,
   Calendar,
@@ -15,39 +15,50 @@ import {
   Heart,
   Package,
   DollarSign,
-} from 'lucide-react';
-import type { Section, Booking, Payment, TravelDocument, SupportTicket, CustomerProfile } from './account/types';
-import { formatDate } from './account/utils';
-import Dashboard from './account/Dashboard';
-import Bookings from './account/Bookings';
-import Payments from './account/Payments';
-import Documents from './account/Documents';
-import Profile from './account/Profile';
-import Support from './account/Support';
-import SavedTrips from './account/SavedTrips';
+} from "lucide-react";
+import type {
+  Section,
+  Booking,
+  Payment,
+  TravelDocument,
+  SupportTicket,
+  CustomerProfile,
+} from "./account/types";
+import { formatDate } from "./account/utils";
+import Dashboard from "./account/Dashboard";
+import Bookings from "./account/Bookings";
+import Payments from "./account/Payments";
+import Documents from "./account/Documents";
+import Profile from "./account/Profile";
+import Support from "./account/Support";
+import SavedTrips from "./account/SavedTrips";
 
-const navigation: Array<{ id: Section; label: string; icon: React.ElementType }> = [
-  { id: 'dashboard', label: __('Dashboard', 'yatra'), icon: LayoutDashboard },
-  { id: 'bookings', label: __('Bookings', 'yatra'), icon: Calendar },
-  { id: 'payments', label: __('Payments', 'yatra'), icon: CreditCard },
-  { id: 'documents', label: __('Documents', 'yatra'), icon: FileText },
-  { id: 'saved-trips', label: __('Saved Trips', 'yatra'), icon: Heart },
-  { id: 'profile', label: __('Profile', 'yatra'), icon: User },
-  { id: 'support', label: __('Support', 'yatra'), icon: LifeBuoy },
+const navigation: Array<{
+  id: Section;
+  label: string;
+  icon: React.ElementType;
+}> = [
+  { id: "dashboard", label: __("Dashboard", "yatra"), icon: LayoutDashboard },
+  { id: "bookings", label: __("Bookings", "yatra"), icon: Calendar },
+  { id: "payments", label: __("Payments", "yatra"), icon: CreditCard },
+  { id: "documents", label: __("Documents", "yatra"), icon: FileText },
+  { id: "saved-trips", label: __("Saved Trips", "yatra"), icon: Heart },
+  { id: "profile", label: __("Profile", "yatra"), icon: User },
+  { id: "support", label: __("Support", "yatra"), icon: LifeBuoy },
 ];
 
 const AccountPage: React.FC = () => {
   // Track URL changes
   const [urlKey, setUrlKey] = useState(0);
-  
+
   React.useEffect(() => {
     const handleLocationChange = () => {
-      setUrlKey(prev => prev + 1);
+      setUrlKey((prev) => prev + 1);
     };
 
     // Listen for popstate (back/forward button)
-    window.addEventListener('popstate', handleLocationChange);
-    
+    window.addEventListener("popstate", handleLocationChange);
+
     // Also check periodically (fallback for direct navigation)
     const interval = setInterval(() => {
       const currentSearch = window.location.search;
@@ -58,68 +69,98 @@ const AccountPage: React.FC = () => {
     }, 100);
 
     return () => {
-      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
       clearInterval(interval);
     };
   }, []);
 
   // Get section from URL parameter, localStorage, or default to 'dashboard'
   const getSectionFromUrl = (): Section => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      const tab = params.get('tab');
-      if (tab && ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'support', 'saved-trips'].includes(tab)) {
+      const tab = params.get("tab");
+      if (
+        tab &&
+        [
+          "dashboard",
+          "bookings",
+          "payments",
+          "documents",
+          "profile",
+          "support",
+          "saved-trips",
+        ].includes(tab)
+      ) {
         return tab as Section;
       }
       // Fallback to localStorage
-      const saved = localStorage.getItem('yatra-account-active-section');
-      if (saved && ['dashboard', 'bookings', 'payments', 'documents', 'profile', 'support', 'saved-trips'].includes(saved)) {
+      const saved = localStorage.getItem("yatra-account-active-section");
+      if (
+        saved &&
+        [
+          "dashboard",
+          "bookings",
+          "payments",
+          "documents",
+          "profile",
+          "support",
+          "saved-trips",
+        ].includes(saved)
+      ) {
         return saved as Section;
       }
     }
-    return 'dashboard';
+    return "dashboard";
   };
 
   const [section, setSection] = useState<Section>(getSectionFromUrl);
-  
+
   // Update section when URL changes
   React.useEffect(() => {
     const newSection = getSectionFromUrl();
     setSection(newSection);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlKey]);
-  
+
   // Update URL and localStorage when section changes
   const handleSectionChange = (newSection: Section) => {
     setSection(newSection);
-    
-    if (typeof window !== 'undefined') {
+
+    if (typeof window !== "undefined") {
       // Update URL
       const urlParams = new URLSearchParams(window.location.search);
-      urlParams.set('tab', newSection);
+      urlParams.set("tab", newSection);
       const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
-      window.history.pushState({}, '', newUrl);
-      
+      window.history.pushState({}, "", newUrl);
+
       // Save to localStorage
-      localStorage.setItem('yatra-account-active-section', newSection);
-      
+      localStorage.setItem("yatra-account-active-section", newSection);
+
       // Trigger URL change event
-      window.dispatchEvent(new PopStateEvent('popstate'));
+      window.dispatchEvent(new PopStateEvent("popstate"));
     }
   };
-  
+
   // State moved to individual components
 
   const unwrapArrayResponse = (response: any): any[] => {
     if (!response) return [];
 
     // Common WP pattern: { success: true, data: [...] }
-    if (typeof response === 'object' && response.success === true && Array.isArray(response.data)) {
+    if (
+      typeof response === "object" &&
+      response.success === true &&
+      Array.isArray(response.data)
+    ) {
       return response.data;
     }
 
     // Nested wrapper pattern: { data: { success: true, data: [...] } }
-    if (typeof response === 'object' && response.data && typeof response.data === 'object') {
+    if (
+      typeof response === "object" &&
+      response.data &&
+      typeof response.data === "object"
+    ) {
       const inner = response.data;
       if (inner.success === true && Array.isArray(inner.data)) {
         return inner.data;
@@ -135,191 +176,216 @@ const AccountPage: React.FC = () => {
     }
 
     // Some endpoints may return {data: [...]} without success
-    if (typeof response === 'object' && Array.isArray(response.data)) {
+    if (typeof response === "object" && Array.isArray(response.data)) {
       return response.data;
     }
 
     return [];
   };
 
-  const { data: profile, isLoading: isLoadingProfile } = useQuery<CustomerProfile | null>({
-    queryKey: ['account-profile'],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_ME);
-        // WP_REST_Response returns data directly when serialized
-        // Check if response has the expected profile structure
-        if (response && typeof response === 'object' && ('id' in response || 'name' in response || 'email' in response)) {
-          return response;
+  const { data: profile, isLoading: isLoadingProfile } =
+    useQuery<CustomerProfile | null>({
+      queryKey: ["account-profile"],
+      queryFn: async () => {
+        try {
+          const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_ME);
+          // WP_REST_Response returns data directly when serialized
+          // Check if response has the expected profile structure
+          if (
+            response &&
+            typeof response === "object" &&
+            ("id" in response || "name" in response || "email" in response)
+          ) {
+            return response;
+          }
+          // If wrapped in data property, extract it
+          if (response && typeof response === "object" && "data" in response) {
+            return response.data;
+          }
+          return response || null;
+        } catch (error) {
+          console.error("Error fetching profile:", error);
+          return null;
         }
-        // If wrapped in data property, extract it
-        if (response && typeof response === 'object' && 'data' in response) {
-          return response.data;
-        }
-        return response || null;
-      } catch (error) {
-        console.error('Error fetching profile:', error);
-        return null;
-      }
-    },
-    refetchOnMount: 'always',
-  });
+      },
+      refetchOnMount: "always",
+    });
 
   const displayProfile = profile;
 
   // Fetch bookings
   const { data: bookings = [] } = useQuery<Booking[]>({
-    queryKey: ['account-bookings'],
+    queryKey: ["account-bookings"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_BOOKINGS);
+        const response = await apiClient.get(
+          API_ENDPOINTS.CUSTOMER_MY_BOOKINGS,
+        );
         return unwrapArrayResponse(response) as Booking[];
       } catch (error) {
-        console.error('Error fetching bookings:', error);
+        console.error("Error fetching bookings:", error);
         return [];
       }
     },
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
   });
 
   // Fetch payments
   const { data: payments = [] } = useQuery<Payment[]>({
-    queryKey: ['account-payments'],
+    queryKey: ["account-payments"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_PAYMENTS);
+        const response = await apiClient.get(
+          API_ENDPOINTS.CUSTOMER_MY_PAYMENTS,
+        );
         return unwrapArrayResponse(response) as Payment[];
       } catch (error) {
-        console.error('Error fetching payments:', error);
+        console.error("Error fetching payments:", error);
         return [];
       }
     },
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
   });
 
   // Fetch documents
   const { data: documents = [] } = useQuery<TravelDocument[]>({
-    queryKey: ['account-documents'],
+    queryKey: ["account-documents"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_DOCUMENTS);
+        const response = await apiClient.get(
+          API_ENDPOINTS.CUSTOMER_MY_DOCUMENTS,
+        );
         return unwrapArrayResponse(response) as TravelDocument[];
       } catch (error) {
-        console.error('Error fetching documents:', error);
+        console.error("Error fetching documents:", error);
         return [];
       }
     },
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
   });
 
   // Fetch support tickets
   const { data: supportTickets = [] } = useQuery<SupportTicket[]>({
-    queryKey: ['account-support'],
+    queryKey: ["account-support"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get(API_ENDPOINTS.CUSTOMER_MY_SUPPORT_TICKETS);
+        const response = await apiClient.get(
+          API_ENDPOINTS.CUSTOMER_MY_SUPPORT_TICKETS,
+        );
         return unwrapArrayResponse(response) as SupportTicket[];
       } catch (error) {
-        console.error('Error fetching support tickets:', error);
+        console.error("Error fetching support tickets:", error);
         return [];
       }
     },
-    refetchOnMount: 'always',
+    refetchOnMount: "always",
   });
 
   // Notifications (empty for now)
   const notifications: any[] = [];
 
   // Fetch saved trips
-  const { data: savedTripsData, isLoading: isLoadingSavedTrips } = useQuery<any>({
-    queryKey: ['account-saved-trips'],
-    queryFn: async () => {
-      try {
-        const response = await apiClient.get(API_ENDPOINTS.SAVED_TRIPS);
-        // WordPress REST API returns: {success: true, data: [...]}
-        // apiClient might wrap it in response.data
-        let trips = [];
-        
-        if (response && typeof response === 'object') {
-          // Check if response has a data property (apiClient wrapper)
-          if (response.data && typeof response.data === 'object') {
-            // Check for success property first (WordPress REST API format)
-            if (response.data.success === true && Array.isArray(response.data.data)) {
-              trips = response.data.data;
+  const { data: savedTripsData, isLoading: isLoadingSavedTrips } =
+    useQuery<any>({
+      queryKey: ["account-saved-trips"],
+      queryFn: async () => {
+        try {
+          const response = await apiClient.get(API_ENDPOINTS.SAVED_TRIPS);
+          // WordPress REST API returns: {success: true, data: [...]}
+          // apiClient might wrap it in response.data
+          let trips = [];
+
+          if (response && typeof response === "object") {
+            // Check if response has a data property (apiClient wrapper)
+            if (response.data && typeof response.data === "object") {
+              // Check for success property first (WordPress REST API format)
+              if (
+                response.data.success === true &&
+                Array.isArray(response.data.data)
+              ) {
+                trips = response.data.data;
+              }
+              // Direct data property
+              else if (Array.isArray(response.data.data)) {
+                trips = response.data.data;
+              }
+              // Direct array in response.data
+              else if (Array.isArray(response.data)) {
+                trips = response.data;
+              }
+            }
+            // Check for success property directly
+            else if (
+              response.success === true &&
+              Array.isArray(response.data)
+            ) {
+              trips = response.data;
             }
             // Direct data property
-            else if (Array.isArray(response.data.data)) {
-              trips = response.data.data;
-            }
-            // Direct array in response.data
             else if (Array.isArray(response.data)) {
               trips = response.data;
             }
+            // Direct array response
+            else if (Array.isArray(response)) {
+              trips = response;
+            }
           }
-          // Check for success property directly
-          else if (response.success === true && Array.isArray(response.data)) {
-            trips = response.data;
+
+          // Debug: log first trip to see structure
+          if (trips.length > 0) {
           }
-          // Direct data property
-          else if (Array.isArray(response.data)) {
-            trips = response.data;
-          }
-          // Direct array response
-          else if (Array.isArray(response)) {
-            trips = response;
-          }
+
+          return trips;
+        } catch (error) {
+          console.error("Error fetching saved trips:", error);
+          return [];
         }
-        
-        // Debug: log first trip to see structure
-        if (trips.length > 0) {
-          console.log('Saved trips data sample:', trips[0]);
-        }
-        
-        return trips;
-      } catch (error) {
-        console.error('Error fetching saved trips:', error);
-        return [];
-      }
-    },
-  });
+      },
+    });
 
   const savedTrips = Array.isArray(savedTripsData) ? savedTripsData : [];
 
   // Booking details fetching moved to Bookings component
 
   const currency = (value: number) =>
-    new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(value);
+    new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: "USD",
+    }).format(value);
 
   // formatDate imported from ./account/utils
 
-
   const stats = useMemo(() => {
-    const outstanding = payments.filter((p: Payment) => p.status === 'pending').reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
-    const upcoming = bookings.filter((b: Booking) => new Date(b.travel_date) > new Date()).length;
-    
+    const outstanding = payments
+      .filter((p: Payment) => p.status === "pending")
+      .reduce((sum: number, payment: Payment) => sum + payment.amount, 0);
+    const upcoming = bookings.filter(
+      (b: Booking) => new Date(b.travel_date) > new Date(),
+    ).length;
+
     // Calculate from real data
     const totalSpent = displayProfile?.total_spent ?? 0;
     const totalBookings = bookings.length;
-    
+
     return [
       {
-        label: __('Total Bookings', 'yatra'),
+        label: __("Total Bookings", "yatra"),
         value: displayProfile?.total_bookings ?? totalBookings,
         icon: Package,
-        badge: displayProfile?.loyalty_tier || '',
+        badge: displayProfile?.loyalty_tier || "",
       },
       {
-        label: __('Upcoming Trips', 'yatra'),
+        label: __("Upcoming Trips", "yatra"),
         value: upcoming,
         icon: Calendar,
       },
       {
-        label: __('Outstanding Balance', 'yatra'),
+        label: __("Outstanding Balance", "yatra"),
         value: currency(outstanding),
         icon: DollarSign,
       },
       {
-        label: __('Total Spent', 'yatra'),
+        label: __("Total Spent", "yatra"),
         value: currency(totalSpent),
         icon: ShieldCheck,
       },
@@ -330,61 +396,51 @@ const AccountPage: React.FC = () => {
 
   // Old render functions removed - now using components from ./account/
 
-
-
   const renderSection = () => {
     switch (section) {
-      case 'dashboard':
-    return (
+      case "dashboard":
+        return (
           <Dashboard
             bookings={bookings}
             payments={payments}
             displayProfile={displayProfile || null}
             stats={stats}
             notifications={notifications}
-            onSectionChange={(section: string) => handleSectionChange(section as Section)}
+            onSectionChange={(section: string) =>
+              handleSectionChange(section as Section)
+            }
           />
         );
-      case 'bookings':
-    return (
+      case "bookings":
+        return (
           <Bookings
             bookings={bookings}
-            onSectionChange={(section: string) => handleSectionChange(section as Section)}
+            onSectionChange={(section: string) =>
+              handleSectionChange(section as Section)
+            }
           />
         );
-      case 'payments':
-    return (
+      case "payments":
+        return (
           <Payments
             payments={payments}
-            onSectionChange={(section: string) => handleSectionChange(section as Section)}
+            onSectionChange={(section: string) =>
+              handleSectionChange(section as Section)
+            }
           />
         );
-      case 'documents':
-    return (
-          <Documents
-            documents={documents}
-          />
-        );
-      case 'saved-trips':
-    return (
-          <SavedTrips
-            savedTrips={savedTrips}
-            isLoading={isLoadingSavedTrips}
-          />
-        );
-      case 'profile':
-    return (
-          <Profile
-            profile={displayProfile || null}
-            savedTrips={savedTrips}
-          />
-        );
-      case 'support':
+      case "documents":
+        return <Documents documents={documents} />;
+      case "saved-trips":
         return (
-          <Support
-            tickets={supportTickets}
-          />
+          <SavedTrips savedTrips={savedTrips} isLoading={isLoadingSavedTrips} />
         );
+      case "profile":
+        return (
+          <Profile profile={displayProfile || null} savedTrips={savedTrips} />
+        );
+      case "support":
+        return <Support tickets={supportTickets} />;
       default:
         return null;
     }
@@ -396,17 +452,30 @@ const AccountPage: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-800 rounded-xl shadow-sm p-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">{displayProfile?.registered_at ? formatDate(displayProfile.registered_at) : ''}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {displayProfile?.registered_at
+                  ? formatDate(displayProfile.registered_at)
+                  : ""}
+              </p>
               <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                {__('Hello,', 'yatra')} {displayProfile?.name || __('Guest', 'yatra')}
+                {__("Hello,", "yatra")}{" "}
+                {displayProfile?.name || __("Guest", "yatra")}
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {__('Manage bookings, payments, and documents – everything for your adventures in one place.', 'yatra')}
+                {__(
+                  "Manage bookings, payments, and documents – everything for your adventures in one place.",
+                  "yatra",
+                )}
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <div role="button" tabIndex={0} onClick={() => {}} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer text-sm">
-                <LogOut className="w-4 h-4" /> {__('Logout', 'yatra')}
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => {}}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 cursor-pointer text-sm"
+              >
+                <LogOut className="w-4 h-4" /> {__("Logout", "yatra")}
               </div>
             </div>
           </div>
@@ -424,8 +493,8 @@ const AccountPage: React.FC = () => {
                     onClick={() => handleSectionChange(item.id)}
                     className={`yatra-nav-item yatra-nav-item-${item.id} w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition cursor-pointer ${
                       section === item.id
-                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200'
-                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/40'
+                        ? "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
+                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900/40"
                     }`}
                   >
                     <item.icon className="w-4 h-4" />
@@ -435,10 +504,21 @@ const AccountPage: React.FC = () => {
               </div>
             </nav>
 
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 text-white space-y-2 shadow-xl" style={{ backgroundColor: '#2563eb', backgroundImage: 'linear-gradient(to bottom right, #2563eb, #4f46e5)' }}>
+            <div
+              className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl p-6 text-white space-y-2 shadow-xl"
+              style={{
+                backgroundColor: "#2563eb",
+                backgroundImage:
+                  "linear-gradient(to bottom right, #2563eb, #4f46e5)",
+              }}
+            >
               <ShieldCheck className="w-6 h-6 text-white" />
-              <p className="text-sm font-medium text-white">{__('Need help right away?', 'yatra')}</p>
-              <p className="font-semibold text-lg text-white">{__('Concierge Desk', 'yatra')}</p>
+              <p className="text-sm font-medium text-white">
+                {__("Need help right away?", "yatra")}
+              </p>
+              <p className="font-semibold text-lg text-white">
+                {__("Concierge Desk", "yatra")}
+              </p>
               <p className="text-sm font-medium text-white">+1-800-555-0199</p>
             </div>
           </aside>
@@ -453,11 +533,14 @@ const AccountPage: React.FC = () => {
                     <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
                   </div>
                 </div>
-                
+
                 {/* Stats Skeleton */}
                 <div className="flex flex-nowrap gap-6 overflow-x-auto">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1">
+                    <div
+                      key={i}
+                      className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-100 dark:border-gray-700 min-w-0 flex-1"
+                    >
                       <div className="animate-pulse">
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-3"></div>
                         <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16"></div>
@@ -465,11 +548,14 @@ const AccountPage: React.FC = () => {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Content Cards Skeleton */}
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
+                    <div
+                      key={i}
+                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6"
+                    >
                       <div className="animate-pulse">
                         <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-4"></div>
                         <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full mb-2"></div>
@@ -490,4 +576,3 @@ const AccountPage: React.FC = () => {
 };
 
 export default AccountPage;
-

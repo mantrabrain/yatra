@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '../ui/button';
-import { __ } from '../../lib/i18n';
+import React from "react";
+import { Button } from "../ui/button";
+import { __ } from "../../lib/i18n";
 
 interface PaginationProps {
   currentPage: number;
@@ -17,7 +17,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   totalItems,
   itemsPerPage,
   onPageChange,
-  itemName = 'items'
+  itemName = "items",
 }) => {
   // Generate page numbers with ellipsis
   const generatePageNumbers = () => {
@@ -25,7 +25,7 @@ export const Pagination: React.FC<PaginationProps> = ({
     const maxVisiblePages = 5;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
+
     // Adjust start if we're near the end
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
@@ -42,13 +42,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           className="h-8 w-8 p-0"
         >
           1
-        </Button>
+        </Button>,
       );
       if (startPage > 2) {
         pages.push(
           <span key="ellipsis1" className="px-2 text-gray-500">
             ...
-          </span>
+          </span>,
         );
       }
     }
@@ -64,7 +64,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           className="h-8 w-8 p-0"
         >
           {i}
-        </Button>
+        </Button>,
       );
     }
 
@@ -74,7 +74,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         pages.push(
           <span key="ellipsis2" className="px-2 text-gray-500">
             ...
-          </span>
+          </span>,
         );
       }
       pages.push(
@@ -86,7 +86,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           className="h-8 w-8 p-0"
         >
           {totalPages}
-        </Button>
+        </Button>,
       );
     }
 
@@ -96,19 +96,19 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className="flex items-center justify-between">
       <div className="text-sm text-gray-600 dark:text-gray-400">
-        {__('Showing', 'yatra')}{' '}
+        {__("Showing", "yatra")}{" "}
         <span className="font-medium text-gray-900 dark:text-white">
           {(currentPage - 1) * itemsPerPage + 1}
-        </span>
-        {' '}-{' '}
+        </span>{" "}
+        -{" "}
         <span className="font-medium text-gray-900 dark:text-white">
           {Math.min(currentPage * itemsPerPage, totalItems)}
-        </span>
-        {' '}{__('of', 'yatra')}{' '}
+        </span>{" "}
+        {__("of", "yatra")}{" "}
         <span className="font-medium text-gray-900 dark:text-white">
           {totalItems}
-        </span>
-        {' '}{itemName}
+        </span>{" "}
+        {itemName}
       </div>
       <div className="flex items-center gap-1">
         {/* Previous Button */}
@@ -119,7 +119,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage === 1}
           className="h-8 px-3"
         >
-          {__('Previous', 'yatra')}
+          {__("Previous", "yatra")}
         </Button>
 
         {/* Page Numbers */}
@@ -133,7 +133,7 @@ export const Pagination: React.FC<PaginationProps> = ({
           disabled={currentPage >= totalPages}
           className="h-8 px-3"
         >
-          {__('Next', 'yatra')}
+          {__("Next", "yatra")}
         </Button>
       </div>
     </div>

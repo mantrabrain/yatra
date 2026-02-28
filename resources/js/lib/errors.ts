@@ -11,17 +11,19 @@ export interface ErrorContext {
 
 export const getErrorContext = (error: unknown): ErrorContext => {
   if (!error) {
-    return { details: '' };
+    return { details: "" };
   }
 
-  const requestInfo = (error as any)?.requestInfo as ErrorRequestInfo | undefined;
+  const requestInfo = (error as any)?.requestInfo as
+    | ErrorRequestInfo
+    | undefined;
   const maybeResponse = (error as any)?.response;
 
   const serialize = (value: any): string => {
     if (value == null) {
-      return '';
+      return "";
     }
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value;
     }
     try {
@@ -38,7 +40,7 @@ export const getErrorContext = (error: unknown): ErrorContext => {
     };
   }
 
-  if (typeof error === 'string') {
+  if (typeof error === "string") {
     return {
       details: error,
       requestInfo,
@@ -47,7 +49,7 @@ export const getErrorContext = (error: unknown): ErrorContext => {
 
   if (error instanceof Error) {
     return {
-      details: error.stack || error.message || '',
+      details: error.stack || error.message || "",
       requestInfo,
     };
   }

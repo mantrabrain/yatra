@@ -7,7 +7,7 @@ export interface PaginationProps {
   itemName?: string;
 }
 
-export type SortOrder = 'asc' | 'desc';
+export type SortOrder = "asc" | "desc";
 
 export interface FilterOption {
   value: string;
@@ -85,7 +85,7 @@ export interface TableAction {
   icon: React.ReactNode;
   onClick: (item: any) => void;
   condition?: (item: any) => boolean;
-  variant?: 'default' | 'destructive' | 'outline';
+  variant?: "default" | "destructive" | "outline";
 }
 
 export interface TableProps {
@@ -114,5 +114,9 @@ export interface TableProps {
   expandedIds?: Set<string | number>;
   onToggleExpand?: (id: string | number) => void;
   getChildren?: (item: any) => any[];
-  renderRowContent?: (item: any, index: number, isChild?: boolean) => React.ReactNode[];
+  renderRowContent?: (
+    item: any,
+    index: number,
+    isChild?: boolean,
+  ) => React.ReactNode[];
 }

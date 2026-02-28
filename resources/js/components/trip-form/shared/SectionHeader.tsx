@@ -3,9 +3,9 @@
  * Reusable header for all trip form sections
  */
 
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
-import { __ } from '../../../lib/i18n';
+import React from "react";
+import { LucideIcon } from "lucide-react";
+import { __ } from "../../../lib/i18n";
 
 interface SectionHeaderProps {
   icon: LucideIcon;
@@ -34,4 +34,3 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
     </div>
   );
 };
-

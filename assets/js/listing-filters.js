@@ -161,11 +161,11 @@
             newClearButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Clear all filters clicked'); // Debug log
+                 // Debug log
                 clearAllFilters();
             });
         } else {
-            console.log('Clear filters button not found'); // Debug log
+             // Debug log
         }
 
         // Initialize individual section clear buttons
@@ -214,59 +214,39 @@
         const minSlider = document.getElementById('priceRangeMin');
         const maxSlider = document.getElementById('priceRangeMax');
         
-        console.log('PRICE FILTER DEBUG - Input values:', {
-            minPriceValue: minPrice ? minPrice.value : 'null',
-            maxPriceValue: maxPrice ? maxPrice.value : 'null',
-            minSliderValue: minSlider ? minSlider.value : 'null',
-            maxSliderValue: maxSlider ? maxSlider.value : 'null',
-            minSliderUserSet: minSlider ? minSlider.getAttribute('data-user-set') : 'null',
-            maxSliderUserSet: maxSlider ? maxSlider.getAttribute('data-user-set') : 'null'
-        });
+        
         
         // Check if user has actually entered values in input fields
         if (minPrice && minPrice.value && minPrice.value.trim() !== '') {
             filters.price_min = minPrice.value;
-            console.log('PRICE FILTER DEBUG - Added price_min from input:', minPrice.value);
+            
         }
         if (maxPrice && maxPrice.value && maxPrice.value.trim() !== '') {
             filters.price_max = maxPrice.value;
-            console.log('PRICE FILTER DEBUG - Added price_max from input:', maxPrice.value);
+            
         }
         
         // Check slider values only if user has explicitly moved them or they have user-set data
         if (minSlider && minSlider.value) {
             const isUserSet = minSlider.getAttribute('data-user-set') === 'true';
             const isDifferentFromDefault = minSlider.value !== minSlider.getAttribute('data-default');
-            console.log('PRICE FILTER DEBUG - Min slider check:', {
-                value: minSlider.value,
-                isUserSet: isUserSet,
-                isDifferentFromDefault: isDifferentFromDefault,
-                defaultValue: minSlider.getAttribute('data-default')
-            });
+            
             if (isUserSet || isDifferentFromDefault) {
                 filters.price_min = minSlider.value;
-                console.log('PRICE FILTER DEBUG - Added price_min from slider:', minSlider.value);
+                
             }
         }
         if (maxSlider && maxSlider.value) {
             const isUserSet = maxSlider.getAttribute('data-user-set') === 'true';
             const isDifferentFromDefault = maxSlider.value !== maxSlider.getAttribute('data-default');
-            console.log('PRICE FILTER DEBUG - Max slider check:', {
-                value: maxSlider.value,
-                isUserSet: isUserSet,
-                isDifferentFromDefault: isDifferentFromDefault,
-                defaultValue: maxSlider.getAttribute('data-default')
-            });
+            
             if (isUserSet || isDifferentFromDefault) {
                 filters.price_max = maxSlider.value;
-                console.log('PRICE FILTER DEBUG - Added price_max from slider:', maxSlider.value);
+                
             }
         }
         
-        console.log('PRICE FILTER DEBUG - Final price filters:', {
-            price_min: filters.price_min,
-            price_max: filters.price_max
-        });
+        
 
         // Radio button filters (trip type, etc.)
         const radioGroups = {
@@ -418,9 +398,9 @@
      * Clear all filters and reload page
      */
     function clearAllFilters() {
-        console.log('clearAllFilters called'); // Debug log
+         // Debug log
         const url = new URL(window.location);
-        console.log('Current URL:', url.toString()); // Debug log
+         // Debug log
         
         // Remove all filter parameters (both single and array formats)
         const filterParams = ['price_min', 'price_max', 'trip_type', 'difficulty', 'categories', 'destinations',
@@ -432,7 +412,7 @@
             url.searchParams.delete(param + '[]'); // Also clear array format
         });
         
-        console.log('URL after clearing filters:', url.toString()); // Debug log
+         // Debug log
 
         // Reload page without filters
         window.location.href = url.toString();

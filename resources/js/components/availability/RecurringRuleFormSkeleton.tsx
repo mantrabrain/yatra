@@ -3,8 +3,8 @@
  * Shows a skeleton UI while the form data is loading
  */
 
-import React from 'react';
-import { Card, CardContent, CardHeader } from '../ui/card';
+import React from "react";
+import { Card, CardContent, CardHeader } from "../ui/card";
 
 export const RecurringRuleFormSkeleton: React.FC = () => {
   return (
@@ -61,7 +61,10 @@ export const RecurringRuleFormSkeleton: React.FC = () => {
                 <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-28 mb-3"></div>
                 <div className="flex flex-wrap gap-2">
                   {[...Array(7)].map((_, i) => (
-                    <div key={i} className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                    <div
+                      key={i}
+                      className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-24"
+                    ></div>
                   ))}
                 </div>
               </div>
@@ -210,7 +213,10 @@ export const RecurringRuleFormSkeleton: React.FC = () => {
               <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-full mb-4 animate-pulse"></div>
               <div className="space-y-2 animate-pulse">
                 {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-6 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div
+                    key={i}
+                    className="h-6 bg-gray-200 dark:bg-gray-700 rounded"
+                  ></div>
                 ))}
               </div>
             </CardContent>
@@ -238,4 +244,3 @@ export const RecurringRuleFormSkeleton: React.FC = () => {
 };
 
 export default RecurringRuleFormSkeleton;
-

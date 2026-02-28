@@ -4,9 +4,9 @@
  * Supports role-based action visibility
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { ConditionalRender } from '../ui/conditional-render';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { ConditionalRender } from "../ui/conditional-render";
 
 interface PageHeaderProps {
   title?: string; // Optional - title is now shown in top bar
@@ -18,7 +18,7 @@ interface PageHeaderProps {
 
 /**
  * Page Header Component
- * 
+ *
  * @example
  * <PageHeader
  *   title={__('Trips', 'yatra')}
@@ -37,18 +37,18 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     <div className="flex items-center justify-between mb-8">
       <div>
         {description && (
-          <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {description}
+          </p>
         )}
       </div>
-      
+
       {actions && (
         <ConditionalRender
           capability={actionCapability}
           requirePro={actionRequirePro}
         >
-          <div className="flex items-center gap-3">
-            {actions}
-          </div>
+          <div className="flex items-center gap-3">{actions}</div>
         </ConditionalRender>
       )}
     </div>
@@ -56,4 +56,3 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 };
 
 export default PageHeader;
-

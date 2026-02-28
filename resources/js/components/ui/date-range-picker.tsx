@@ -3,16 +3,16 @@ import { format, parse, isWithinInterval, isSameDay } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { Button } from "./button";
-import { 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  eachDayOfInterval, 
-  isSameMonth, 
-  addMonths, 
-  subMonths, 
-  isToday 
+import {
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  addMonths,
+  subMonths,
+  isToday,
 } from "date-fns";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -42,11 +42,11 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
   const [open, setOpen] = React.useState(false);
   const [currentMonth, setCurrentMonth] = React.useState(new Date());
   const [hoverDate, setHoverDate] = React.useState<Date | undefined>();
-  
+
   // Parse dates safely
   let fromDate: Date | undefined = undefined;
   let toDate: Date | undefined = undefined;
-  
+
   if (dateFrom && dateFrom.trim()) {
     try {
       const parsed = parse(dateFrom, "yyyy-MM-dd", new Date());
@@ -57,7 +57,7 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       fromDate = undefined;
     }
   }
-  
+
   if (dateTo && dateTo.trim()) {
     try {
       const parsed = parse(dateTo, "yyyy-MM-dd", new Date());
@@ -99,10 +99,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
     if (!fromDate) return false;
     const endDate = toDate || hoverDate;
     if (!endDate) return false;
-    
+
     const start = fromDate < endDate ? fromDate : endDate;
     const end = fromDate < endDate ? endDate : fromDate;
-    
+
     try {
       return isWithinInterval(date, { start, end });
     } catch {
@@ -155,7 +155,10 @@ export const DateRangePicker: React.FC<DateRangePickerProps> = ({
       </div>
       <div className="grid grid-cols-7 gap-1 mb-2">
         {weekDays.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 p-2">
+          <div
+            key={day}
+            className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 p-2"
+          >
             {day}
           </div>
         ))}

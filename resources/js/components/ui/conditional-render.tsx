@@ -4,8 +4,8 @@
  * Supports extensibility for Pro version modifications
  */
 
-import React from 'react';
-import { usePermissions } from '../../hooks/usePermissions';
+import React from "react";
+import { usePermissions } from "../../hooks/usePermissions";
 
 interface ConditionalRenderProps {
   children: React.ReactNode;
@@ -18,12 +18,12 @@ interface ConditionalRenderProps {
 
 /**
  * Conditionally renders content based on permissions, roles, or Pro status
- * 
+ *
  * @example
  * <ConditionalRender capability="yatra_edit_trips">
  *   <EditButton />
  * </ConditionalRender>
- * 
+ *
  * @example
  * <ConditionalRender requirePro fallback={<UpgradeMessage />}>
  *   <ProFeature />
@@ -35,7 +35,7 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
   role,
   requirePro = false,
   fallback = null,
-  className = '',
+  className = "",
 }) => {
   const { can, hasRole, isPro } = usePermissions();
 
@@ -62,4 +62,3 @@ export const ConditionalRender: React.FC<ConditionalRenderProps> = ({
 };
 
 export default ConditionalRender;
-

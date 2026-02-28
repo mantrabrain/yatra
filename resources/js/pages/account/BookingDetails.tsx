@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Calendar as CalendarIcon,
   Users,
@@ -11,57 +11,212 @@ import {
   ArrowRight,
   ExternalLink,
   Download,
-} from 'lucide-react';
-import { __ } from '../../lib/i18n';
-import { formatDate, getBadge, formatPriceForBooking } from './utils';
+} from "lucide-react";
+import { __ } from "../../lib/i18n";
+import { formatDate, getBadge, formatPriceForBooking } from "./utils";
 
 // Country code to name mapping
 const COUNTRY_NAMES: Record<string, string> = {
-  'AF': 'Afghanistan', 'AL': 'Albania', 'DZ': 'Algeria', 'AD': 'Andorra', 'AO': 'Angola',
-  'AG': 'Antigua and Barbuda', 'AR': 'Argentina', 'AM': 'Armenia', 'AU': 'Australia', 'AT': 'Austria',
-  'AZ': 'Azerbaijan', 'BS': 'Bahamas', 'BH': 'Bahrain', 'BD': 'Bangladesh', 'BB': 'Barbados',
-  'BY': 'Belarus', 'BE': 'Belgium', 'BZ': 'Belize', 'BJ': 'Benin', 'BT': 'Bhutan',
-  'BO': 'Bolivia', 'BA': 'Bosnia and Herzegovina', 'BW': 'Botswana', 'BR': 'Brazil', 'BN': 'Brunei',
-  'BG': 'Bulgaria', 'BF': 'Burkina Faso', 'BI': 'Burundi', 'KH': 'Cambodia', 'CM': 'Cameroon',
-  'CA': 'Canada', 'CV': 'Cape Verde', 'CF': 'Central African Republic', 'TD': 'Chad', 'CL': 'Chile',
-  'CN': 'China', 'CO': 'Colombia', 'KM': 'Comoros', 'CG': 'Congo', 'CD': 'DR Congo',
-  'CR': 'Costa Rica', 'CI': 'Ivory Coast', 'HR': 'Croatia', 'CU': 'Cuba', 'CY': 'Cyprus',
-  'CZ': 'Czech Republic', 'DK': 'Denmark', 'DJ': 'Djibouti', 'DM': 'Dominica', 'DO': 'Dominican Republic',
-  'EC': 'Ecuador', 'EG': 'Egypt', 'SV': 'El Salvador', 'GQ': 'Equatorial Guinea', 'ER': 'Eritrea',
-  'EE': 'Estonia', 'SZ': 'Eswatini', 'ET': 'Ethiopia', 'FJ': 'Fiji', 'FI': 'Finland',
-  'FR': 'France', 'GA': 'Gabon', 'GM': 'Gambia', 'GE': 'Georgia', 'DE': 'Germany',
-  'GH': 'Ghana', 'GR': 'Greece', 'GD': 'Grenada', 'GT': 'Guatemala', 'GN': 'Guinea',
-  'GW': 'Guinea-Bissau', 'GY': 'Guyana', 'HT': 'Haiti', 'HN': 'Honduras', 'HU': 'Hungary',
-  'IS': 'Iceland', 'IN': 'India', 'ID': 'Indonesia', 'IR': 'Iran', 'IQ': 'Iraq',
-  'IE': 'Ireland', 'IL': 'Israel', 'IT': 'Italy', 'JM': 'Jamaica', 'JP': 'Japan',
-  'JO': 'Jordan', 'KZ': 'Kazakhstan', 'KE': 'Kenya', 'KI': 'Kiribati', 'KP': 'North Korea',
-  'KR': 'South Korea', 'KW': 'Kuwait', 'KG': 'Kyrgyzstan', 'LA': 'Laos', 'LV': 'Latvia',
-  'LB': 'Lebanon', 'LS': 'Lesotho', 'LR': 'Liberia', 'LY': 'Libya', 'LI': 'Liechtenstein',
-  'LT': 'Lithuania', 'LU': 'Luxembourg', 'MG': 'Madagascar', 'MW': 'Malawi', 'MY': 'Malaysia',
-  'MV': 'Maldives', 'ML': 'Mali', 'MT': 'Malta', 'MH': 'Marshall Islands', 'MR': 'Mauritania',
-  'MU': 'Mauritius', 'MX': 'Mexico', 'FM': 'Micronesia', 'MD': 'Moldova', 'MC': 'Monaco',
-  'MN': 'Mongolia', 'ME': 'Montenegro', 'MA': 'Morocco', 'MZ': 'Mozambique', 'MM': 'Myanmar',
-  'NA': 'Namibia', 'NR': 'Nauru', 'NP': 'Nepal', 'NL': 'Netherlands', 'NZ': 'New Zealand',
-  'NI': 'Nicaragua', 'NE': 'Niger', 'NG': 'Nigeria', 'MK': 'North Macedonia', 'NO': 'Norway',
-  'OM': 'Oman', 'PK': 'Pakistan', 'PW': 'Palau', 'PS': 'Palestine', 'PA': 'Panama',
-  'PG': 'Papua New Guinea', 'PY': 'Paraguay', 'PE': 'Peru', 'PH': 'Philippines', 'PL': 'Poland',
-  'PT': 'Portugal', 'QA': 'Qatar', 'RO': 'Romania', 'RU': 'Russia', 'RW': 'Rwanda',
-  'KN': 'Saint Kitts and Nevis', 'LC': 'Saint Lucia', 'VC': 'Saint Vincent and the Grenadines',
-  'WS': 'Samoa', 'SM': 'San Marino', 'ST': 'Sao Tome and Principe', 'SA': 'Saudi Arabia',
-  'SN': 'Senegal', 'RS': 'Serbia', 'SC': 'Seychelles', 'SL': 'Sierra Leone', 'SG': 'Singapore',
-  'SK': 'Slovakia', 'SI': 'Slovenia', 'SB': 'Solomon Islands', 'SO': 'Somalia', 'ZA': 'South Africa',
-  'SS': 'South Sudan', 'ES': 'Spain', 'LK': 'Sri Lanka', 'SD': 'Sudan', 'SR': 'Suriname',
-  'SE': 'Sweden', 'CH': 'Switzerland', 'SY': 'Syria', 'TW': 'Taiwan', 'TJ': 'Tajikistan',
-  'TZ': 'Tanzania', 'TH': 'Thailand', 'TL': 'Timor-Leste', 'TG': 'Togo', 'TO': 'Tonga',
-  'TT': 'Trinidad and Tobago', 'TN': 'Tunisia', 'TR': 'Turkey', 'TM': 'Turkmenistan',
-  'TV': 'Tuvalu', 'UG': 'Uganda', 'UA': 'Ukraine', 'AE': 'United Arab Emirates',
-  'GB': 'United Kingdom', 'US': 'United States', 'UY': 'Uruguay', 'UZ': 'Uzbekistan',
-  'VU': 'Vanuatu', 'VA': 'Vatican City', 'VE': 'Venezuela', 'VN': 'Vietnam', 'YE': 'Yemen',
-  'ZM': 'Zambia', 'ZW': 'Zimbabwe'
+  AF: "Afghanistan",
+  AL: "Albania",
+  DZ: "Algeria",
+  AD: "Andorra",
+  AO: "Angola",
+  AG: "Antigua and Barbuda",
+  AR: "Argentina",
+  AM: "Armenia",
+  AU: "Australia",
+  AT: "Austria",
+  AZ: "Azerbaijan",
+  BS: "Bahamas",
+  BH: "Bahrain",
+  BD: "Bangladesh",
+  BB: "Barbados",
+  BY: "Belarus",
+  BE: "Belgium",
+  BZ: "Belize",
+  BJ: "Benin",
+  BT: "Bhutan",
+  BO: "Bolivia",
+  BA: "Bosnia and Herzegovina",
+  BW: "Botswana",
+  BR: "Brazil",
+  BN: "Brunei",
+  BG: "Bulgaria",
+  BF: "Burkina Faso",
+  BI: "Burundi",
+  KH: "Cambodia",
+  CM: "Cameroon",
+  CA: "Canada",
+  CV: "Cape Verde",
+  CF: "Central African Republic",
+  TD: "Chad",
+  CL: "Chile",
+  CN: "China",
+  CO: "Colombia",
+  KM: "Comoros",
+  CG: "Congo",
+  CD: "DR Congo",
+  CR: "Costa Rica",
+  CI: "Ivory Coast",
+  HR: "Croatia",
+  CU: "Cuba",
+  CY: "Cyprus",
+  CZ: "Czech Republic",
+  DK: "Denmark",
+  DJ: "Djibouti",
+  DM: "Dominica",
+  DO: "Dominican Republic",
+  EC: "Ecuador",
+  EG: "Egypt",
+  SV: "El Salvador",
+  GQ: "Equatorial Guinea",
+  ER: "Eritrea",
+  EE: "Estonia",
+  SZ: "Eswatini",
+  ET: "Ethiopia",
+  FJ: "Fiji",
+  FI: "Finland",
+  FR: "France",
+  GA: "Gabon",
+  GM: "Gambia",
+  GE: "Georgia",
+  DE: "Germany",
+  GH: "Ghana",
+  GR: "Greece",
+  GD: "Grenada",
+  GT: "Guatemala",
+  GN: "Guinea",
+  GW: "Guinea-Bissau",
+  GY: "Guyana",
+  HT: "Haiti",
+  HN: "Honduras",
+  HU: "Hungary",
+  IS: "Iceland",
+  IN: "India",
+  ID: "Indonesia",
+  IR: "Iran",
+  IQ: "Iraq",
+  IE: "Ireland",
+  IL: "Israel",
+  IT: "Italy",
+  JM: "Jamaica",
+  JP: "Japan",
+  JO: "Jordan",
+  KZ: "Kazakhstan",
+  KE: "Kenya",
+  KI: "Kiribati",
+  KP: "North Korea",
+  KR: "South Korea",
+  KW: "Kuwait",
+  KG: "Kyrgyzstan",
+  LA: "Laos",
+  LV: "Latvia",
+  LB: "Lebanon",
+  LS: "Lesotho",
+  LR: "Liberia",
+  LY: "Libya",
+  LI: "Liechtenstein",
+  LT: "Lithuania",
+  LU: "Luxembourg",
+  MG: "Madagascar",
+  MW: "Malawi",
+  MY: "Malaysia",
+  MV: "Maldives",
+  ML: "Mali",
+  MT: "Malta",
+  MH: "Marshall Islands",
+  MR: "Mauritania",
+  MU: "Mauritius",
+  MX: "Mexico",
+  FM: "Micronesia",
+  MD: "Moldova",
+  MC: "Monaco",
+  MN: "Mongolia",
+  ME: "Montenegro",
+  MA: "Morocco",
+  MZ: "Mozambique",
+  MM: "Myanmar",
+  NA: "Namibia",
+  NR: "Nauru",
+  NP: "Nepal",
+  NL: "Netherlands",
+  NZ: "New Zealand",
+  NI: "Nicaragua",
+  NE: "Niger",
+  NG: "Nigeria",
+  MK: "North Macedonia",
+  NO: "Norway",
+  OM: "Oman",
+  PK: "Pakistan",
+  PW: "Palau",
+  PS: "Palestine",
+  PA: "Panama",
+  PG: "Papua New Guinea",
+  PY: "Paraguay",
+  PE: "Peru",
+  PH: "Philippines",
+  PL: "Poland",
+  PT: "Portugal",
+  QA: "Qatar",
+  RO: "Romania",
+  RU: "Russia",
+  RW: "Rwanda",
+  KN: "Saint Kitts and Nevis",
+  LC: "Saint Lucia",
+  VC: "Saint Vincent and the Grenadines",
+  WS: "Samoa",
+  SM: "San Marino",
+  ST: "Sao Tome and Principe",
+  SA: "Saudi Arabia",
+  SN: "Senegal",
+  RS: "Serbia",
+  SC: "Seychelles",
+  SL: "Sierra Leone",
+  SG: "Singapore",
+  SK: "Slovakia",
+  SI: "Slovenia",
+  SB: "Solomon Islands",
+  SO: "Somalia",
+  ZA: "South Africa",
+  SS: "South Sudan",
+  ES: "Spain",
+  LK: "Sri Lanka",
+  SD: "Sudan",
+  SR: "Suriname",
+  SE: "Sweden",
+  CH: "Switzerland",
+  SY: "Syria",
+  TW: "Taiwan",
+  TJ: "Tajikistan",
+  TZ: "Tanzania",
+  TH: "Thailand",
+  TL: "Timor-Leste",
+  TG: "Togo",
+  TO: "Tonga",
+  TT: "Trinidad and Tobago",
+  TN: "Tunisia",
+  TR: "Turkey",
+  TM: "Turkmenistan",
+  TV: "Tuvalu",
+  UG: "Uganda",
+  UA: "Ukraine",
+  AE: "United Arab Emirates",
+  GB: "United Kingdom",
+  US: "United States",
+  UY: "Uruguay",
+  UZ: "Uzbekistan",
+  VU: "Vanuatu",
+  VA: "Vatican City",
+  VE: "Venezuela",
+  VN: "Vietnam",
+  YE: "Yemen",
+  ZM: "Zambia",
+  ZW: "Zimbabwe",
 };
 
 const getCountryName = (code: string): string => {
-  if (!code) return '';
+  if (!code) return "";
   const upperCode = code.toUpperCase();
   return COUNTRY_NAMES[upperCode] || code;
 };
@@ -113,13 +268,19 @@ interface BookingDetailsProps {
   onBack: () => void;
 }
 
-const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onBack }) => {
+const BookingDetails: React.FC<BookingDetailsProps> = ({
+  booking,
+  isLoading,
+  onBack,
+}) => {
   if (isLoading) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {__("Booking Details", "yatra")}
+            </h2>
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
@@ -138,7 +299,9 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              {__("Booking Details", "yatra")}
+            </h2>
           </div>
           <div
             role="button"
@@ -147,11 +310,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
           >
             <ArrowRight className="w-4 h-4 rotate-180" />
-            {__('Back to Bookings', 'yatra')}
+            {__("Back to Bookings", "yatra")}
           </div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6 text-center text-red-500">
-          {__('Booking not found or error loading booking', 'yatra')}
+          {__("Booking not found or error loading booking", "yatra")}
         </div>
       </div>
     );
@@ -159,16 +322,17 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 
   const normalizeRecord = (value: any): Record<string, any> | null => {
     if (!value) return null;
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       try {
         const parsed = JSON.parse(value);
-        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed as Record<string, any>;
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed))
+          return parsed as Record<string, any>;
       } catch {
         return null;
       }
       return null;
     }
-    if (typeof value === 'object' && !Array.isArray(value)) {
+    if (typeof value === "object" && !Array.isArray(value)) {
       return value as Record<string, any>;
     }
     return null;
@@ -180,9 +344,11 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{__('Booking Details', 'yatra')}</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {__("Booking Details", "yatra")}
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-            {__('Complete booking information', 'yatra')}
+            {__("Complete booking information", "yatra")}
           </p>
         </div>
         <div
@@ -192,7 +358,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer"
         >
           <ArrowRight className="w-4 h-4 rotate-180" />
-          {__('Back to Bookings', 'yatra')}
+          {__("Back to Bookings", "yatra")}
         </div>
       </div>
 
@@ -202,16 +368,28 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           {/* Booking Overview */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('Booking Overview', 'yatra')}</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                {__("Booking Overview", "yatra")}
+              </h3>
               <div className="flex items-center gap-2">
-                <span className={getBadge(booking.booking_status)}>{__(booking.booking_status || 'pending', booking.booking_status || 'pending')}</span>
-                <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
+                <span className={getBadge(booking.booking_status)}>
+                  {__(
+                    booking.booking_status || "pending",
+                    booking.booking_status || "pending",
+                  )}
+                </span>
+                <span className={getBadge(booking.payment_status)}>
+                  {__(
+                    booking.payment_status || "pending",
+                    booking.payment_status || "pending",
+                  )}
+                </span>
               </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Booking Number', 'yatra')}
+                  {__("Booking Number", "yatra")}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {booking.booking_number || `#${booking.id}`}
@@ -219,7 +397,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Trip', 'yatra')}
+                  {__("Trip", "yatra")}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                   {booking.trip_title}
@@ -230,14 +408,14 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
                     className="mt-2 inline-flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    {__('View Trip', 'yatra')}
+                    {__("View Trip", "yatra")}
                   </a>
                 ) : null}
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <CalendarIcon className="w-3 h-3" />
-                  {__('Booking Date', 'yatra')}
+                  {__("Booking Date", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.booking_date || booking.created_at)}
@@ -246,7 +424,7 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <CalendarIcon className="w-3 h-3" />
-                  {__('Travel Date', 'yatra')}
+                  {__("Travel Date", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.travel_date)}
@@ -255,19 +433,25 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <Users className="w-3 h-3" />
-                  {__('Number of Travelers', 'yatra')}
+                  {__("Number of Travelers", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
-                  {booking.travelers} {booking.travelers === 1 ? __('Traveler', 'yatra') : __('Travelers', 'yatra')}
+                  {booking.travelers}{" "}
+                  {booking.travelers === 1
+                    ? __("Traveler", "yatra")
+                    : __("Travelers", "yatra")}
                 </div>
               </div>
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                   <DollarSignIcon className="w-3 h-3" />
-                  {__('Total Amount', 'yatra')}
+                  {__("Total Amount", "yatra")}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {formatPriceForBooking(booking.total_amount, booking.currency)}
+                  {formatPriceForBooking(
+                    booking.total_amount,
+                    booking.currency,
+                  )}
                 </div>
               </div>
             </div>
@@ -275,7 +459,9 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 
           {/* Customer Information */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Customer Information', 'yatra')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {__("Customer Information", "yatra")}
+            </h3>
             <div className="space-y-3">
               <div>
                 <div className="text-sm font-medium text-gray-900 dark:text-white mb-1">
@@ -304,74 +490,116 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Users className="w-5 h-5" />
-                {__('Travelers Information', 'yatra')}
+                {__("Travelers Information", "yatra")}
                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
-                  ({booking.travelers_data.length} {booking.travelers_data.length === 1 ? __('traveler', 'yatra') : __('travelers', 'yatra')})
+                  ({booking.travelers_data.length}{" "}
+                  {booking.travelers_data.length === 1
+                    ? __("traveler", "yatra")
+                    : __("travelers", "yatra")}
+                  )
                 </span>
               </h3>
               <div className="space-y-4">
                 {booking.travelers_data.map((traveler: any, index: number) => {
                   // Extract fields from traveler - handle both flat structure and nested fields property
                   const travelerFieldsData = traveler.fields || traveler;
-                  const systemFields = ['id', 'booking_id', 'traveller_index', 'is_lead', 'created_at', 'updated_at', 'fields'];
-                  
+                  const systemFields = [
+                    "id",
+                    "booking_id",
+                    "traveller_index",
+                    "is_lead",
+                    "created_at",
+                    "updated_at",
+                    "fields",
+                  ];
+
                   // Get all non-empty fields from the traveler data, excluding system fields
-                  const travelerEntries = Object.entries(travelerFieldsData)
-                    .filter(([key, value]) => {
-                      // Exclude system fields
-                      if (systemFields.includes(key)) return false;
-                      // Exclude empty values
-                      if (!value || (typeof value === 'string' && value.trim() === '')) return false;
-                      // Exclude objects (they should be in fields)
-                      if (typeof value === 'object' && !Array.isArray(value)) return false;
-                      return true;
-                    });
-                  
+                  const travelerEntries = Object.entries(
+                    travelerFieldsData,
+                  ).filter(([key, value]) => {
+                    // Exclude system fields
+                    if (systemFields.includes(key)) return false;
+                    // Exclude empty values
+                    if (
+                      !value ||
+                      (typeof value === "string" && value.trim() === "")
+                    )
+                      return false;
+                    // Exclude objects (they should be in fields)
+                    if (typeof value === "object" && !Array.isArray(value))
+                      return false;
+                    return true;
+                  });
+
                   // Get name from fields or direct properties
-                  const firstName = travelerFieldsData.first_name || traveler.first_name || '';
-                  const lastName = travelerFieldsData.last_name || traveler.last_name || '';
-                  
+                  const firstName =
+                    travelerFieldsData.first_name || traveler.first_name || "";
+                  const lastName =
+                    travelerFieldsData.last_name || traveler.last_name || "";
+
                   return (
-                    <div 
-                      key={index} 
-                      className={`p-4 rounded-lg ${index === 0 ? 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800' : 'bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700'}`}
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg ${index === 0 ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800" : "bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"}`}
                     >
                       <div className="flex items-center justify-between mb-3">
                         <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
-                          {index === 0 ? __('Lead Traveler', 'yatra') : `${__('Traveler', 'yatra')} ${index + 1}`}
+                          {index === 0
+                            ? __("Lead Traveler", "yatra")
+                            : `${__("Traveler", "yatra")} ${index + 1}`}
                           {(firstName || lastName) && (
                             <span className="font-normal text-gray-500 dark:text-gray-400 ml-2">
-                              - {[firstName, lastName].filter(Boolean).join(' ')}
+                              -{" "}
+                              {[firstName, lastName].filter(Boolean).join(" ")}
                             </span>
                           )}
                         </h4>
                         {index === 0 && (
                           <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-2 py-0.5 rounded">
-                            {__('Primary Contact', 'yatra')}
+                            {__("Primary Contact", "yatra")}
                           </span>
                         )}
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {travelerEntries.map(([fieldId, fieldValue]) => {
-                          if (fieldId === 'first_name' || fieldId === 'last_name') return null;
-                          const label = fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                          if (
+                            fieldId === "first_name" ||
+                            fieldId === "last_name"
+                          )
+                            return null;
+                          const label = fieldId
+                            .replace(/_/g, " ")
+                            .replace(/\b\w/g, (l) => l.toUpperCase());
                           let displayValue = String(fieldValue);
-                          if (fieldId.includes('date') || fieldId.includes('expiry')) {
+                          if (
+                            fieldId.includes("date") ||
+                            fieldId.includes("expiry")
+                          ) {
                             try {
                               displayValue = formatDate(fieldValue as string);
                             } catch {
                               displayValue = String(fieldValue);
                             }
                           }
-                          
+
                           // Format country/nationality fields - convert code to full name
-                          if ((fieldId === 'nationality' || fieldId === 'country') && fieldValue && typeof fieldValue === 'string' && fieldValue.length === 2) {
+                          if (
+                            (fieldId === "nationality" ||
+                              fieldId === "country") &&
+                            fieldValue &&
+                            typeof fieldValue === "string" &&
+                            fieldValue.length === 2
+                          ) {
                             displayValue = getCountryName(fieldValue);
                           }
                           return (
                             <div key={fieldId}>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
-                              <div className={`text-sm text-gray-900 dark:text-white ${fieldId === 'passport' ? 'font-mono' : ''}`}>
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                                {label}
+                              </div>
+                              <div
+                                className={`text-sm text-gray-900 dark:text-white ${fieldId === "passport" ? "font-mono" : ""}`}
+                              >
                                 {displayValue}
                               </div>
                             </div>
@@ -386,36 +614,45 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           )}
 
           {/* Emergency Contact */}
-          {emergencyContact && Object.values(emergencyContact).some((v: any) => v && String(v).trim() !== '') && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                {__('Emergency Contact', 'yatra')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                {Object.entries(emergencyContact)
-                  .filter(([_, value]) => value && String(value).trim() !== '')
-                  .map(([fieldId, fieldValue]) => {
-                    const label = fieldId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                    return (
-                      <div key={fieldId}>
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">{label}</div>
-                        <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {String(fieldValue)}
+          {emergencyContact &&
+            Object.values(emergencyContact).some(
+              (v: any) => v && String(v).trim() !== "",
+            ) && (
+              <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5" />
+                  {__("Emergency Contact", "yatra")}
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {Object.entries(emergencyContact)
+                    .filter(
+                      ([_, value]) => value && String(value).trim() !== "",
+                    )
+                    .map(([fieldId, fieldValue]) => {
+                      const label = fieldId
+                        .replace(/_/g, " ")
+                        .replace(/\b\w/g, (l) => l.toUpperCase());
+                      return (
+                        <div key={fieldId}>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                            {label}
+                          </div>
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            {String(fieldValue)}
+                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Special Requests */}
           {booking.notes && (
             <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <FileTextIcon className="w-5 h-5" />
-                {__('Special Requests', 'yatra')}
+                {__("Special Requests", "yatra")}
               </h3>
               <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                 {booking.notes}
@@ -424,66 +661,83 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
           )}
 
           {/* Downloads */}
-          {Array.isArray((booking as any).downloads) && (booking as any).downloads.length > 0 && (
-            <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                <Download className="w-5 h-5" />
-                {__('Downloads', 'yatra')}
-              </h3>
-              <div className="space-y-3">
-                {(booking as any).downloads.map((d: any) => (
-                  <div key={d.id} className="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white truncate">{d.title}</div>
-                      {d.access_label ? (
-                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{d.access_label}</div>
-                      ) : null}
-                      {d.locked && d.locked_reason ? (
-                        <div className="text-xs text-amber-700 dark:text-amber-300 mt-1">{d.locked_reason}</div>
-                      ) : null}
-                    </div>
-                    {d.locked || !d.url ? (
-                      <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium cursor-not-allowed">
-                        <Download className="w-4 h-4" />
-                        {__('Not Available', 'yatra')}
+          {Array.isArray((booking as any).downloads) &&
+            (booking as any).downloads.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Download className="w-5 h-5" />
+                  {__("Downloads", "yatra")}
+                </h3>
+                <div className="space-y-3">
+                  {(booking as any).downloads.map((d: any) => (
+                    <div
+                      key={d.id}
+                      className="flex items-center justify-between gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {d.title}
+                        </div>
+                        {d.access_label ? (
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {d.access_label}
+                          </div>
+                        ) : null}
+                        {d.locked && d.locked_reason ? (
+                          <div className="text-xs text-amber-700 dark:text-amber-300 mt-1">
+                            {d.locked_reason}
+                          </div>
+                        ) : null}
                       </div>
-                    ) : (
-                      <a
-                        href={d.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
-                      >
-                        <Download className="w-4 h-4" />
-                        {__('Download', 'yatra')}
-                      </a>
-                    )}
-                  </div>
-                ))}
+                      {d.locked || !d.url ? (
+                        <div className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-sm font-medium cursor-not-allowed">
+                          <Download className="w-4 h-4" />
+                          {__("Not Available", "yatra")}
+                        </div>
+                      ) : (
+                        <a
+                          href={d.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm font-medium"
+                        >
+                          <Download className="w-4 h-4" />
+                          {__("Download", "yatra")}
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Payment Information */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Payment Information', 'yatra')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {__("Payment Information", "yatra")}
+            </h3>
             <div className="space-y-3">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Payment Status', 'yatra')}
+                  {__("Payment Status", "yatra")}
                 </div>
                 <div className="mt-1">
-                  <span className={getBadge(booking.payment_status)}>{__(booking.payment_status || 'pending', booking.payment_status || 'pending')}</span>
+                  <span className={getBadge(booking.payment_status)}>
+                    {__(
+                      booking.payment_status || "pending",
+                      booking.payment_status || "pending",
+                    )}
+                  </span>
                 </div>
               </div>
               {booking.payment_method && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1 flex items-center gap-1">
                     <CreditCard className="w-3 h-3" />
-                    {__('Payment Method', 'yatra')}
+                    {__("Payment Method", "yatra")}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
                     {booking.payment_method}
@@ -492,29 +746,38 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
               )}
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Total Amount', 'yatra')}
+                  {__("Total Amount", "yatra")}
                 </div>
                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {formatPriceForBooking(booking.total_amount, booking.currency)}
+                  {formatPriceForBooking(
+                    booking.total_amount,
+                    booking.currency,
+                  )}
                 </div>
               </div>
               {booking.amount_paid > 0 && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Amount Paid', 'yatra')}
+                    {__("Amount Paid", "yatra")}
                   </div>
                   <div className="text-sm text-gray-900 dark:text-white">
-                    {formatPriceForBooking(booking.amount_paid, booking.currency)}
+                    {formatPriceForBooking(
+                      booking.amount_paid,
+                      booking.currency,
+                    )}
                   </div>
                 </div>
               )}
               {booking.amount_due > 0 && (
                 <div>
                   <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Amount Due', 'yatra')}
+                    {__("Amount Due", "yatra")}
                   </div>
                   <div className="text-sm font-semibold text-amber-600 dark:text-amber-400">
-                    {formatPriceForBooking(booking.amount_due, booking.currency)}
+                    {formatPriceForBooking(
+                      booking.amount_due,
+                      booking.currency,
+                    )}
                   </div>
                 </div>
               )}
@@ -523,26 +786,29 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 
           {/* Timeline */}
           <div className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-sm p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{__('Timeline', 'yatra')}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              {__("Timeline", "yatra")}
+            </h3>
             <div className="space-y-3">
               <div>
                 <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                  {__('Created', 'yatra')}
+                  {__("Created", "yatra")}
                 </div>
                 <div className="text-sm text-gray-900 dark:text-white">
                   {formatDate(booking.created_at || booking.booking_date)}
                 </div>
               </div>
-              {booking.updated_at && booking.updated_at !== booking.created_at && (
-                <div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
-                    {__('Last Updated', 'yatra')}
+              {booking.updated_at &&
+                booking.updated_at !== booking.created_at && (
+                  <div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+                      {__("Last Updated", "yatra")}
+                    </div>
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {formatDate(booking.updated_at)}
+                    </div>
                   </div>
-                  <div className="text-sm text-gray-900 dark:text-white">
-                    {formatDate(booking.updated_at)}
-                  </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
         </div>
@@ -552,4 +818,3 @@ const BookingDetails: React.FC<BookingDetailsProps> = ({ booking, isLoading, onB
 };
 
 export default BookingDetails;
-

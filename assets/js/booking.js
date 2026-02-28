@@ -838,7 +838,7 @@
          * @param {object} handler - Handler object with methods: canHandle, handlePayment
          */
         window.yatraRegisterPaymentGateway = function(gatewayId, handler) {
-            console.log('[Yatra] Registering payment gateway:', gatewayId);
+            
             window.yatraPaymentGateways[gatewayId] = handler;
         };
         
@@ -846,35 +846,35 @@
          * Handle payment response from server
          */
         function handlePaymentResponse(response, originalBtnHtml) {
-            console.log('[Yatra Booking] Response:', response);
-            console.log('[Yatra Booking] Response success:', response.success);
+            
+            
             
             if (!response.success) {
-                console.log('[Yatra Booking] Showing error:', response.message);
+                
                 showFormError(response.message || 'An error occurred. Please try again.');
                 $submitBtn.prop('disabled', false).html(originalBtnHtml);
                 return;
             }
             
             const data = response.data || {};
-            console.log('[Yatra Booking] Response data:', data);
+            
             
             // Check for redirect URLs first (PayPal, eSewa, Khalti, etc.)
             if (data.payment_url) {
-                console.log('[Yatra Booking] Redirecting to payment_url:', data.payment_url);
+                
                 window.location.href = data.payment_url;
                 return;
             }
             
             if (data.redirect_url && !data.requires_action) {
-                console.log('[Yatra Booking] Redirecting to redirect_url:', data.redirect_url);
+                
                 window.location.href = data.redirect_url;
                 return;
             }
             
             // Check for client-side payment actions (Stripe, Razorpay, Square, etc.)
             if (data.requires_action) {
-                console.log('[Yatra Booking] requires_action detected:', data.requires_action);
+                
                 
                 // Dispatch unified payment event
                 const paymentEvent = new CustomEvent('yatra_payment_response', {
@@ -953,7 +953,7 @@
                 cancelable: true
             });
             
-            console.log('[Yatra Booking] Dispatching yatra_booking_submit for gateway:', selectedGateway);
+            
             const shouldProceed = document.dispatchEvent(submitEvent);
             
             // If event was not cancelled, proceed with server submission
@@ -1327,7 +1327,7 @@
             .then(response => {
                 if (response.success) {
                     // Session updated successfully
-                    console.log('Services updated in session:', serviceIds);
+                    
                 }
             })
             .catch(error => {

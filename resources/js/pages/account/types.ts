@@ -1,4 +1,11 @@
-export type Section = 'dashboard' | 'bookings' | 'payments' | 'documents' | 'profile' | 'support' | 'saved-trips';
+export type Section =
+  | "dashboard"
+  | "bookings"
+  | "payments"
+  | "documents"
+  | "profile"
+  | "support"
+  | "saved-trips";
 
 export interface Booking {
   id: number;
@@ -11,8 +18,8 @@ export interface Booking {
   total_amount: number;
   amount_paid?: number | null;
   amount_due?: number | null;
-  payment_status: 'paid' | 'pending' | 'partial' | 'refunded';
-  booking_status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+  payment_status: "paid" | "pending" | "partial" | "refunded";
+  booking_status: "confirmed" | "pending" | "cancelled" | "completed";
   destination?: string;
   created_at?: string;
 }
@@ -23,10 +30,10 @@ export interface Payment {
   booking_number: string;
   booking_id?: number;
   amount: number;
-  status: 'paid' | 'pending' | 'failed' | 'refunded' | 'completed';
+  status: "paid" | "pending" | "failed" | "refunded" | "completed";
   method: string;
   date: string;
-  type: 'deposit' | 'balance' | 'installment';
+  type: "deposit" | "balance" | "installment";
   booking_amount_due?: number | null;
   booking_amount_paid?: number | null;
   booking_total_amount?: number | null;
@@ -36,14 +43,14 @@ export interface TravelDocument {
   id: string | number;
   name: string;
   trip_title: string;
-  category: 'itinerary' | 'voucher' | 'invoice' | 'downloads';
+  category: "itinerary" | "voucher" | "invoice" | "downloads";
   updated_at: string;
   url: string;
 
   // Optional metadata for Pro downloads
   trip_id?: number;
   booking_id?: number;
-  access?: 'public' | 'logged_in' | 'booked_only' | 'paid_only';
+  access?: "public" | "logged_in" | "booked_only" | "paid_only";
   access_label?: string;
   locked?: boolean;
   locked_reason?: string;
@@ -52,7 +59,7 @@ export interface TravelDocument {
 export interface SupportTicket {
   id: number;
   subject: string;
-  status: 'open' | 'awaiting_response' | 'resolved';
+  status: "open" | "awaiting_response" | "resolved";
   updated_at: string;
 }
 
@@ -69,4 +76,3 @@ export interface CustomerProfile {
   total_spent: number;
   loyalty_tier?: string;
 }
-

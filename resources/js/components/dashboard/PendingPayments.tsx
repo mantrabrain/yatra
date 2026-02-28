@@ -3,14 +3,14 @@
  * Displays bookings with pending payments
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { DollarSign, Clock, User } from 'lucide-react';
-import { ConditionalRender } from '../ui/conditional-render';
-import { getCurrencySymbol } from '../../data/currencies';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { DollarSign, Clock, User } from "lucide-react";
+import { ConditionalRender } from "../ui/conditional-render";
+import { getCurrencySymbol } from "../../data/currencies";
 
 interface PendingPayment {
   id: number;
@@ -40,31 +40,40 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
   onCollect,
 }) => {
   // Get global currency settings
-  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
-  const currencyPosition = (window as any)?.yatraAdmin?.currencyPosition || (window as any)?.yatraAdmin?.currency_position || 'before';
-  const decimalPlaces = Number((window as any)?.yatraAdmin?.decimalPlaces || (window as any)?.yatraAdmin?.currency_decimals || 2);
-  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
+  const currencyPosition =
+    (window as any)?.yatraAdmin?.currencyPosition ||
+    (window as any)?.yatraAdmin?.currency_position ||
+    "before";
+  const decimalPlaces = Number(
+    (window as any)?.yatraAdmin?.decimalPlaces ||
+      (window as any)?.yatraAdmin?.currency_decimals ||
+      2,
+  );
+  const thousandSeparator =
+    (window as any)?.yatraAdmin?.thousandSeparator || ",";
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
 
   const formatCurrency = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + '0';
-    
+    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + "0";
+
     const numPrice = Number(amount) || 0;
-    
+
     // Format the number with proper separators
     const formattedAmount = new Intl.NumberFormat(undefined, {
       minimumFractionDigits: decimalPlaces,
       maximumFractionDigits: decimalPlaces,
-    }).format(numPrice)
-      .replace(/,/g, 'TEMP_THOUSAND')
+    })
+      .format(numPrice)
+      .replace(/,/g, "TEMP_THOUSAND")
       .replace(/\./g, decimalSeparator)
       .replace(/TEMP_THOUSAND/g, thousandSeparator);
-    
+
     // Get currency symbol
     const currencySymbol = getCurrencySymbol(globalCurrency);
-    
+
     // Apply currency position
-    if (currencyPosition === 'after' || currencyPosition === 'right') {
+    if (currencyPosition === "after" || currencyPosition === "right") {
       return `${formattedAmount} ${currencySymbol}`;
     } else {
       return `${currencySymbol}${formattedAmount}`;
@@ -81,11 +90,11 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Pending Payments', 'yatra')}</CardTitle>
+          <CardTitle>{__("Pending Payments", "yatra")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'yatra')}
+            {__("Loading...", "yatra")}
           </div>
         </CardContent>
       </Card>
@@ -96,7 +105,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>{__('Pending Payments', 'yatra')}</CardTitle>
+          <CardTitle>{__("Pending Payments", "yatra")}</CardTitle>
           {totalPending > 0 && (
             <Badge variant="warning" className="text-sm">
               {formatCurrency(totalPending)}
@@ -120,7 +129,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                       </h4>
                       {payment.days_overdue && payment.days_overdue > 0 && (
                         <Badge variant="error" className="text-xs">
-                          {payment.days_overdue} {__('days overdue', 'yatra')}
+                          {payment.days_overdue} {__("days overdue", "yatra")}
                         </Badge>
                       )}
                     </div>
@@ -130,7 +139,9 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                       <Clock className="w-3 h-3" />
-                      <span>{__('Due', 'yatra')}: {formatDate(payment.due_date)}</span>
+                      <span>
+                        {__("Due", "yatra")}: {formatDate(payment.due_date)}
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
@@ -144,7 +155,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                     )}
                   </div>
                 </div>
-                
+
                 <ConditionalRender capability="yatra_edit_bookings">
                   <div className="flex gap-2 mt-2">
                     {onView && (
@@ -154,7 +165,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                         onClick={() => onView(payment)}
                         className="flex-1"
                       >
-                        {__('View', 'yatra')}
+                        {__("View", "yatra")}
                       </Button>
                     )}
                     {onCollect && (
@@ -164,7 +175,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
                         className="flex-1"
                       >
                         <DollarSign className="w-4 h-4 mr-1" />
-                        {__('Collect', 'yatra')}
+                        {__("Collect", "yatra")}
                       </Button>
                     )}
                   </div>
@@ -174,7 +185,7 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No pending payments', 'yatra')}
+            {__("No pending payments", "yatra")}
           </p>
         )}
       </CardContent>
@@ -183,4 +194,3 @@ export const PendingPayments: React.FC<PendingPaymentsProps> = ({
 };
 
 export default PendingPayments;
-

@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../lib/api-client';
-import { __ } from '../lib/i18n';
-import { useToast } from '../components/ui/toast';
-import { 
-  Key, 
-  Check, 
-  XCircle, 
-  ExternalLink, 
-  Eye, 
-  EyeOff, 
+import React, { useState, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "../lib/api-client";
+import { __ } from "../lib/i18n";
+import { useToast } from "../components/ui/toast";
+import {
+  Key,
+  Check,
+  XCircle,
+  ExternalLink,
+  Eye,
+  EyeOff,
   RefreshCw,
   Bug,
-  ChevronDown
-} from 'lucide-react';
+  ChevronDown,
+} from "lucide-react";
 
 interface LicenseInfo {
   key: string;
@@ -36,7 +36,7 @@ interface LicenseData {
 }
 
 const License: React.FC = () => {
-  const [licenseKey, setLicenseKey] = useState('');
+  const [licenseKey, setLicenseKey] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [debugMode, setDebugMode] = useState(false);
   const [debugData, setDebugData] = useState<any>(null);
@@ -50,27 +50,19 @@ const License: React.FC = () => {
 
   // Fetch license data
   const { data: licenseData, isLoading } = useQuery<LicenseData>({
-    queryKey: ['license'],
+    queryKey: ["license"],
     queryFn: async () => {
-      const response = await apiClient.get('/license');
-      console.log('License API Response:', response);
-      console.log('License Data:', response);
-      console.log('License Info:', response?.license_info);
-      console.log('License Key:', response?.license_info?.key);
+      const response = await apiClient.get("/license");
+
       return response;
     },
   });
 
   // Set license key from data
   useEffect(() => {
-    console.log('useEffect - licenseData:', licenseData);
-    console.log('useEffect - license_info:', licenseData?.license_info);
-    console.log('useEffect - key:', licenseData?.license_info?.key);
     if (licenseData?.license_info?.key) {
-      console.log('Setting license key to:', licenseData.license_info.key);
       setLicenseKey(licenseData.license_info.key);
     } else {
-      console.log('No license key found in data');
     }
   }, [licenseData]);
 
@@ -78,57 +70,54 @@ const License: React.FC = () => {
   const activateMutation = useMutation({
     mutationFn: async (key: string) => {
       try {
-        console.log('Sending license activation request:', { license_key: key });
-        const response = await apiClient.post('/license/activate', { license_key: key });
-        console.log('Raw API response:', response);
-        console.log('Response type:', typeof response);
-        console.log('Response is null?', response === null);
-        console.log('Response is undefined?', response === undefined);
+        const response = await apiClient.post("/license/activate", {
+          license_key: key,
+        });
+
         return response;
       } catch (error) {
-        console.error('License activation error:', error);
+        console.error("License activation error:", error);
         throw error;
       }
     },
     onSuccess: (data) => {
       // Always store debug data (will be shown if debug mode is enabled)
-      console.log('License activation response:', data);
-      console.log('Has edd_api_request?', !!data?.edd_api_request);
-      console.log('Has edd_api_response?', !!data?.edd_api_response);
-      console.log('Response keys:', Object.keys(data || {}));
-      
-      const debugInfo = { 
-        type: 'activate', 
-        request: { license_key: licenseKey }, 
-        response: data, 
-        timestamp: new Date().toISOString() 
+
+      const debugInfo = {
+        type: "activate",
+        request: { license_key: licenseKey },
+        response: data,
+        timestamp: new Date().toISOString(),
       };
-      console.log('Setting debug data:', debugInfo);
-      console.log('Debug data response keys:', Object.keys(debugInfo.response || {}));
+
       setDebugData(debugInfo);
-      
-      if (data?.status === 'valid') {
-        showToast(data.notice || 'License activated successfully!', 'success');
+
+      if (data?.status === "valid") {
+        showToast(data.notice || "License activated successfully!", "success");
         // Refetch license data to get updated status
-        queryClient.invalidateQueries({ queryKey: ['license'] });
+        queryClient.invalidateQueries({ queryKey: ["license"] });
         // Dispatch event for real-time badge update
-        window.dispatchEvent(new CustomEvent('yatra-license-status-updated', { 
-          detail: { status: 'active' } 
-        }));
+        window.dispatchEvent(
+          new CustomEvent("yatra-license-status-updated", {
+            detail: { status: "active" },
+          }),
+        );
       } else {
-        showToast(data?.notice || 'License activation failed.', 'error');
+        showToast(data?.notice || "License activation failed.", "error");
       }
     },
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.message || 'Failed to activate license. Please try again.';
-      showToast(errorMsg, 'error');
+      const errorMsg =
+        error.response?.data?.message ||
+        "Failed to activate license. Please try again.";
+      showToast(errorMsg, "error");
       // Always store debug data (will be shown if debug mode is enabled)
-      setDebugData({ 
-        type: 'activate', 
-        request: { license_key: licenseKey }, 
+      setDebugData({
+        type: "activate",
+        request: { license_key: licenseKey },
         response: error.response?.data,
-        error: error.response?.data || error.message, 
-        timestamp: new Date().toISOString() 
+        error: error.response?.data || error.message,
+        timestamp: new Date().toISOString(),
       });
     },
   });
@@ -136,37 +125,41 @@ const License: React.FC = () => {
   // Deactivate license mutation
   const deactivateMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post('/license/deactivate');
+      const response = await apiClient.post("/license/deactivate");
       return response.data;
     },
     onSuccess: (data) => {
       // Always store debug data (will be shown if debug mode is enabled)
-      setDebugData({ 
-        type: 'deactivate', 
-        request: {}, 
-        response: data, 
-        timestamp: new Date().toISOString() 
+      setDebugData({
+        type: "deactivate",
+        request: {},
+        response: data,
+        timestamp: new Date().toISOString(),
       });
-      
-      setLicenseKey('');
-      showToast(data?.notice || 'License deactivated successfully!', 'success');
+
+      setLicenseKey("");
+      showToast(data?.notice || "License deactivated successfully!", "success");
       // Refetch license data to get updated status
-      queryClient.invalidateQueries({ queryKey: ['license'] });
+      queryClient.invalidateQueries({ queryKey: ["license"] });
       // Dispatch event for real-time badge update
-      window.dispatchEvent(new CustomEvent('yatra-license-status-updated', { 
-        detail: { status: 'inactive' } 
-      }));
+      window.dispatchEvent(
+        new CustomEvent("yatra-license-status-updated", {
+          detail: { status: "inactive" },
+        }),
+      );
     },
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.message || 'Failed to deactivate license. Please try again.';
-      showToast(errorMsg, 'error');
+      const errorMsg =
+        error.response?.data?.message ||
+        "Failed to deactivate license. Please try again.";
+      showToast(errorMsg, "error");
       // Always store debug data (will be shown if debug mode is enabled)
-      setDebugData({ 
-        type: 'deactivate', 
-        request: {}, 
+      setDebugData({
+        type: "deactivate",
+        request: {},
         response: error.response?.data,
-        error: error.response?.data || error.message, 
-        timestamp: new Date().toISOString() 
+        error: error.response?.data || error.message,
+        timestamp: new Date().toISOString(),
       });
     },
   });
@@ -174,55 +167,61 @@ const License: React.FC = () => {
   // Save license mutation
   const saveMutation = useMutation({
     mutationFn: async (key: string) => {
-      const response = await apiClient.post('/license/save', { license_key: key });
+      const response = await apiClient.post("/license/save", {
+        license_key: key,
+      });
       return response;
     },
     onSuccess: (data) => {
-      showToast(data?.notice || 'License key saved successfully!', 'success');
+      showToast(data?.notice || "License key saved successfully!", "success");
       // Refetch license data to show the saved key
-      queryClient.invalidateQueries({ queryKey: ['license'] });
+      queryClient.invalidateQueries({ queryKey: ["license"] });
     },
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.message || 'Failed to save license key.';
-      showToast(errorMsg, 'error');
+      const errorMsg =
+        error.response?.data?.message || "Failed to save license key.";
+      showToast(errorMsg, "error");
     },
   });
 
   // Check license mutation
   const checkMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiClient.post('/license/check');
+      const response = await apiClient.post("/license/check");
       return response;
     },
     onSuccess: (data) => {
       // Always store debug data (will be shown if debug mode is enabled)
-      setDebugData({ 
-        type: 'check', 
-        request: {}, 
-        response: data, 
-        timestamp: new Date().toISOString() 
+      setDebugData({
+        type: "check",
+        request: {},
+        response: data,
+        timestamp: new Date().toISOString(),
       });
-      
-      showToast(data?.notice || 'License status updated.', 'success');
+
+      showToast(data?.notice || "License status updated.", "success");
       // Refetch license data to get updated status
-      queryClient.invalidateQueries({ queryKey: ['license'] });
+      queryClient.invalidateQueries({ queryKey: ["license"] });
       // Dispatch event for real-time badge update with actual status from response
       if (data?.license_info?.status) {
-        window.dispatchEvent(new CustomEvent('yatra-license-status-updated', { 
-          detail: { status: data.license_info.status } 
-        }));
+        window.dispatchEvent(
+          new CustomEvent("yatra-license-status-updated", {
+            detail: { status: data.license_info.status },
+          }),
+        );
       }
     },
     onError: (error: any) => {
-      const errorMsg = error.response?.data?.message || 'Failed to check license status.';
-      showToast(errorMsg, 'error');
+      const errorMsg =
+        error.response?.data?.message || "Failed to check license status.";
+      showToast(errorMsg, "error");
       // Always store debug data (will be shown if debug mode is enabled)
-      setDebugData({ 
-        type: 'check', 
-        request: {}, 
+      setDebugData({
+        type: "check",
+        request: {},
         response: error.response?.data,
-        error: error.response?.data || error.message, 
-        timestamp: new Date().toISOString() 
+        error: error.response?.data || error.message,
+        timestamp: new Date().toISOString(),
       });
     },
   });
@@ -230,7 +229,7 @@ const License: React.FC = () => {
   const handleActivate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!licenseKey.trim()) {
-      showToast('Please enter a license key.', 'error');
+      showToast("Please enter a license key.", "error");
       return;
     }
     activateMutation.mutate(licenseKey);
@@ -239,7 +238,7 @@ const License: React.FC = () => {
   const handleDeactivate = () => {
     setShowDeactivateConfirm(true);
   };
-  
+
   const confirmDeactivate = () => {
     setShowDeactivateConfirm(false);
     deactivateMutation.mutate();
@@ -251,23 +250,52 @@ const License: React.FC = () => {
 
   const maskLicenseKey = (key: string) => {
     if (!key || key.length < 8) return key;
-    return key.substring(0, 4) + '••••••••••••' + key.substring(key.length - 4);
+    return key.substring(0, 4) + "••••••••••••" + key.substring(key.length - 4);
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
-      active: { bg: 'bg-green-100 dark:bg-green-900/20', text: 'text-green-800 dark:text-green-400', label: 'Active' },
-      valid: { bg: 'bg-green-100 dark:bg-green-900/20', text: 'text-green-800 dark:text-green-400', label: 'Active' },
-      inactive: { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-800 dark:text-gray-300', label: 'Inactive' },
-      expired: { bg: 'bg-red-100 dark:bg-red-900/20', text: 'text-red-800 dark:text-red-400', label: 'Expired' },
-      disabled: { bg: 'bg-red-100 dark:bg-red-900/20', text: 'text-red-800 dark:text-red-400', label: 'Disabled' },
-      invalid: { bg: 'bg-yellow-100 dark:bg-yellow-900/20', text: 'text-yellow-800 dark:text-yellow-400', label: 'Invalid' },
+    const statusConfig: Record<
+      string,
+      { bg: string; text: string; label: string }
+    > = {
+      active: {
+        bg: "bg-green-100 dark:bg-green-900/20",
+        text: "text-green-800 dark:text-green-400",
+        label: "Active",
+      },
+      valid: {
+        bg: "bg-green-100 dark:bg-green-900/20",
+        text: "text-green-800 dark:text-green-400",
+        label: "Active",
+      },
+      inactive: {
+        bg: "bg-gray-100 dark:bg-gray-800",
+        text: "text-gray-800 dark:text-gray-300",
+        label: "Inactive",
+      },
+      expired: {
+        bg: "bg-red-100 dark:bg-red-900/20",
+        text: "text-red-800 dark:text-red-400",
+        label: "Expired",
+      },
+      disabled: {
+        bg: "bg-red-100 dark:bg-red-900/20",
+        text: "text-red-800 dark:text-red-400",
+        label: "Disabled",
+      },
+      invalid: {
+        bg: "bg-yellow-100 dark:bg-yellow-900/20",
+        text: "text-yellow-800 dark:text-yellow-400",
+        label: "Invalid",
+      },
     };
 
     const config = statusConfig[status] || statusConfig.inactive;
 
     return (
-      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
+      <span
+        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}
+      >
         {config.label}
       </span>
     );
@@ -313,7 +341,9 @@ const License: React.FC = () => {
           <div className="border-b border-gray-200 dark:border-gray-700 px-6 py-4">
             <div className="flex items-center gap-3">
               <Key className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{__('License', 'yatra')}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                {__("License", "yatra")}
+              </h1>
             </div>
           </div>
 
@@ -323,13 +353,14 @@ const License: React.FC = () => {
               <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full mb-4">
                 <Key className="w-8 h-8 text-blue-600 dark:text-blue-400" />
               </div>
-              
+
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                 Yatra Free Version
               </h2>
-              
+
               <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-                You're using the free version of Yatra. No license is required for the free version.
+                You're using the free version of Yatra. No license is required
+                for the free version.
               </p>
 
               <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
@@ -342,19 +373,27 @@ const License: React.FC = () => {
                 <ul className="text-left space-y-2 mb-6">
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">Dynamic Pricing & Revenue Management</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Dynamic Pricing & Revenue Management
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">{__('Advanced Booking Management', 'yatra')}</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {__("Advanced Booking Management", "yatra")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">{__('Premium Payment Gateways', 'yatra')}</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {__("Premium Payment Gateways", "yatra")}
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-5 h-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 dark:text-gray-300">Priority Support & Updates</span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      Priority Support & Updates
+                    </span>
                   </li>
                 </ul>
                 <a
@@ -376,7 +415,8 @@ const License: React.FC = () => {
 
   // Yatra Pro - Show license management
   const licenseInfo = licenseData?.license_info;
-  const isActive = licenseInfo?.status === 'active' || licenseInfo?.status === 'valid';
+  const isActive =
+    licenseInfo?.status === "active" || licenseInfo?.status === "valid";
 
   return (
     <div className="max-w-4xl mx-auto p-6">
@@ -386,16 +426,18 @@ const License: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Key className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">{__('License Management', 'yatra')}</h1>
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                {__("License Management", "yatra")}
+              </h1>
             </div>
             <div className="flex items-center gap-3">
               {licenseInfo?.status && getStatusBadge(licenseInfo.status)}
               <button
                 onClick={() => setDebugMode(!debugMode)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  debugMode 
-                    ? 'bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400' 
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  debugMode
+                    ? "bg-purple-100 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400"
+                    : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600"
                 }`}
                 title="Toggle debug mode to see API requests and responses"
               >
@@ -416,7 +458,10 @@ const License: React.FC = () => {
               </h2>
               <form onSubmit={handleActivate} className="space-y-4">
                 <div>
-                  <label htmlFor="license-key" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label
+                    htmlFor="license-key"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                  >
                     License Key
                   </label>
                   <input
@@ -435,13 +480,15 @@ const License: React.FC = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       if (!licenseKey.trim()) {
-                        showToast('Please enter a license key.', 'error');
+                        showToast("Please enter a license key.", "error");
                         return;
                       }
                       // Save the license key without activating
                       saveMutation.mutate(licenseKey);
                     }}
-                    disabled={activateMutation.isPending || saveMutation.isPending}
+                    disabled={
+                      activateMutation.isPending || saveMutation.isPending
+                    }
                     className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-gray-900 hover:bg-black dark:bg-gray-800 dark:hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg border border-gray-800 dark:border-gray-700"
                   >
                     {saveMutation.isPending ? (
@@ -476,7 +523,7 @@ const License: React.FC = () => {
                 </div>
               </form>
               <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                Don't have a license key?{' '}
+                Don't have a license key?{" "}
                 <a
                   href="https://store.mantrabrain.com/account/"
                   target="_blank"
@@ -495,7 +542,9 @@ const License: React.FC = () => {
               {/* License Key Display */}
               <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{__('License Key', 'yatra')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {__("License Key", "yatra")}
+                  </h3>
                   <button
                     onClick={() => setShowKey(!showKey)}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
@@ -522,7 +571,9 @@ const License: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {licenseInfo.server_response?.customer_name && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Licensed To', 'yatra')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {__("Licensed To", "yatra")}
+                    </div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {licenseInfo.server_response.customer_name}
                     </div>
@@ -531,45 +582,61 @@ const License: React.FC = () => {
 
                 {licenseInfo.server_response?.customer_email && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Email', 'yatra')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {__("Email", "yatra")}
+                    </div>
                     <div className="font-medium text-gray-900 dark:text-white">
                       {licenseInfo.server_response.customer_email}
                     </div>
                   </div>
                 )}
 
-                {licenseInfo.server_response?.expires && licenseInfo.server_response.expires !== 'lifetime' && (
-                  <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Expires', 'yatra')}</div>
-                    <div className="font-medium text-gray-900 dark:text-white">
-                      {(() => {
-                        try {
-                          const date = new Date(licenseInfo.server_response.expires);
-                          return isNaN(date.getTime()) 
-                            ? licenseInfo.server_response.expires 
-                            : date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-                        } catch {
-                          return licenseInfo.server_response.expires;
-                        }
-                      })()}
+                {licenseInfo.server_response?.expires &&
+                  licenseInfo.server_response.expires !== "lifetime" && (
+                    <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        {__("Expires", "yatra")}
+                      </div>
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        {(() => {
+                          try {
+                            const date = new Date(
+                              licenseInfo.server_response.expires,
+                            );
+                            return isNaN(date.getTime())
+                              ? licenseInfo.server_response.expires
+                              : date.toLocaleDateString(undefined, {
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                });
+                          } catch {
+                            return licenseInfo.server_response.expires;
+                          }
+                        })()}
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                {licenseInfo.server_response?.expires === 'lifetime' && (
+                  )}
+
+                {licenseInfo.server_response?.expires === "lifetime" && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Expires', 'yatra')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {__("Expires", "yatra")}
+                    </div>
                     <div className="font-medium text-green-600 dark:text-green-400">
-                      {__('Lifetime License', 'yatra')}
+                      {__("Lifetime License", "yatra")}
                     </div>
                   </div>
                 )}
 
                 {licenseInfo.server_response?.site_count !== undefined && (
                   <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
-                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{__('Active Sites', 'yatra')}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      {__("Active Sites", "yatra")}
+                    </div>
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {licenseInfo.server_response.site_count} / {licenseInfo.server_response.license_limit || '∞'}
+                      {licenseInfo.server_response.site_count} /{" "}
+                      {licenseInfo.server_response.license_limit || "∞"}
                     </div>
                   </div>
                 )}
@@ -618,9 +685,12 @@ const License: React.FC = () => {
 
           {/* Help Section */}
           <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Need Help?</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">
+              Need Help?
+            </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-              If you're having trouble with your license, please contact our support team.
+              If you're having trouble with your license, please contact our
+              support team.
             </p>
             <div className="flex flex-wrap gap-3">
               <a
@@ -657,11 +727,11 @@ const License: React.FC = () => {
                     onClick={() => setDebugData(null)}
                     className="text-xs text-purple-600 dark:text-purple-400 hover:underline"
                   >
-                    {__('Clear', 'yatra')}
+                    {__("Clear", "yatra")}
                   </button>
                 )}
               </div>
-              
+
               {debugData ? (
                 <div className="space-y-3">
                   {/* Operation Type */}
@@ -685,13 +755,25 @@ const License: React.FC = () => {
                       </div>
                       <button
                         onClick={() => {
-                          navigator.clipboard.writeText(JSON.stringify(debugData.response, null, 2));
-                          showToast('Response copied to clipboard!', 'success');
+                          navigator.clipboard.writeText(
+                            JSON.stringify(debugData.response, null, 2),
+                          );
+                          showToast("Response copied to clipboard!", "success");
                         }}
                         className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                       >
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                          />
                         </svg>
                         Copy
                       </button>
@@ -715,20 +797,43 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(JSON.stringify(debugData.response.edd_api_request, null, 2));
-                            showToast('Request copied to clipboard!', 'success');
+                            navigator.clipboard.writeText(
+                              JSON.stringify(
+                                debugData.response.edd_api_request,
+                                null,
+                                2,
+                              ),
+                            );
+                            showToast(
+                              "Request copied to clipboard!",
+                              "success",
+                            );
                           }}
                           className="text-xs text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
                         >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
                           </svg>
                           Copy
                         </button>
                       </div>
                       <pre className="bg-white dark:bg-gray-900 border border-purple-200 dark:border-purple-800 rounded p-3 text-xs overflow-x-auto">
                         <code className="text-gray-800 dark:text-gray-200">
-                          {JSON.stringify(debugData.response.edd_api_request, null, 2)}
+                          {JSON.stringify(
+                            debugData.response.edd_api_request,
+                            null,
+                            2,
+                          )}
                         </code>
                       </pre>
                     </div>
@@ -746,20 +851,43 @@ const License: React.FC = () => {
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(JSON.stringify(debugData.response.edd_api_response, null, 2));
-                            showToast('Response copied to clipboard!', 'success');
+                            navigator.clipboard.writeText(
+                              JSON.stringify(
+                                debugData.response.edd_api_response,
+                                null,
+                                2,
+                              ),
+                            );
+                            showToast(
+                              "Response copied to clipboard!",
+                              "success",
+                            );
                           }}
                           className="text-xs text-green-600 dark:text-green-400 hover:underline flex items-center gap-1"
                         >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
                           </svg>
                           Copy
                         </button>
                       </div>
                       <pre className="bg-white dark:bg-gray-900 border border-green-200 dark:border-green-800 rounded p-3 text-xs overflow-x-auto">
                         <code className="text-gray-800 dark:text-gray-200">
-                          {JSON.stringify(debugData.response.edd_api_response, null, 2)}
+                          {JSON.stringify(
+                            debugData.response.edd_api_response,
+                            null,
+                            2,
+                          )}
                         </code>
                       </pre>
                     </div>
@@ -771,17 +899,31 @@ const License: React.FC = () => {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <ChevronDown className="w-3 h-3 text-red-600 dark:text-red-400" />
-                          <span className="text-xs font-semibold text-red-700 dark:text-red-300">Error Data:</span>
+                          <span className="text-xs font-semibold text-red-700 dark:text-red-300">
+                            Error Data:
+                          </span>
                         </div>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(JSON.stringify(debugData.error, null, 2));
-                            showToast('Error copied to clipboard!', 'success');
+                            navigator.clipboard.writeText(
+                              JSON.stringify(debugData.error, null, 2),
+                            );
+                            showToast("Error copied to clipboard!", "success");
                           }}
                           className="text-xs text-red-600 dark:text-red-400 hover:underline flex items-center gap-1"
                         >
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                          <svg
+                            className="w-3 h-3"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                            />
                           </svg>
                           Copy
                         </button>
@@ -796,14 +938,15 @@ const License: React.FC = () => {
                 </div>
               ) : (
                 <p className="text-sm text-purple-600 dark:text-purple-400">
-                  Perform a license operation (activate, deactivate, or check status) to see debug information here.
+                  Perform a license operation (activate, deactivate, or check
+                  status) to see debug information here.
                 </p>
               )}
             </div>
           )}
         </div>
       </div>
-      
+
       {/* Deactivate Confirmation Dialog */}
       {showDeactivateConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
@@ -819,7 +962,8 @@ const License: React.FC = () => {
                   Deactivate License
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                  Are you sure you want to deactivate this license? You will lose support and updates for Yatra Pro.
+                  Are you sure you want to deactivate this license? You will
+                  lose support and updates for Yatra Pro.
                 </p>
                 <div className="flex gap-3 justify-end">
                   <button
@@ -839,7 +983,7 @@ const License: React.FC = () => {
                         Deactivating...
                       </>
                     ) : (
-                      'Deactivate'
+                      "Deactivate"
                     )}
                   </button>
                 </div>

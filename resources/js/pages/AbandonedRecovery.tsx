@@ -1,43 +1,54 @@
 /**
  * Abandoned Booking Recovery Page
- * 
+ *
  * Premium module for tracking and recovering abandoned bookings.
  * This page displays the UI shell in the free plugin with a premium gate.
  * The actual functionality is provided by the Yatra Pro plugin.
- * 
+ *
  * @package Yatra
  * @since 3.0.0
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Badge } from '../components/ui/badge';
-import { Label } from '../components/ui/label';
-import { Input } from '../components/ui/input';
-import { Toggle } from '../components/ui/toggle';
-import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { Modal } from '../components/ui/modal';
-import { Skeleton } from '../components/ui/skeleton';
-import { PageHeader } from '../components/common/PageHeader';
-import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
-import { useToast } from '../components/ui/toast';
-import { __ } from '../lib/i18n';
-import { apiService } from '../lib/api-client';
-import { getCurrencySymbol, getCurrency } from '../data/currencies';
-import PremiumUpgradeCard from './premium-pages/AbandonedRecovery';
-import { 
-  TrendingUp, 
-  DollarSign, 
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
+import { Label } from "../components/ui/label";
+import { Input } from "../components/ui/input";
+import { Toggle } from "../components/ui/toggle";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { Modal } from "../components/ui/modal";
+import { Skeleton } from "../components/ui/skeleton";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Pagination,
+  SearchFilterToolbar,
+  BulkActionToolbar,
+  Table as SharedTable,
+} from "../components/shared";
+import { useToast } from "../components/ui/toast";
+import { __ } from "../lib/i18n";
+import { apiService } from "../lib/api-client";
+import { getCurrencySymbol, getCurrency } from "../data/currencies";
+import PremiumUpgradeCard from "./premium-pages/AbandonedRecovery";
+import {
+  TrendingUp,
+  DollarSign,
   CheckCircle,
   BarChart,
   Settings,
   Send,
   AlertCircle,
   Eye,
-  Trash2
-} from 'lucide-react';
+  Trash2,
+} from "lucide-react";
 
 // Skeleton components
 const SkeletonStatCard = () => (
@@ -78,13 +89,13 @@ const isModuleAvailable = (): boolean => {
 
 // Currency formatting helper
 const formatPrice = (price: number, currencyCode?: string): string => {
-  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
   const currency = currencyCode || globalCurrency;
-  
+
   const symbol = getCurrencySymbol(currency);
   const currencyData = getCurrency(currency);
   const decimals = currencyData?.decimalDigits ?? 2;
-  
+
   return `${symbol}${Number(price).toFixed(decimals)}`;
 };
 
@@ -92,80 +103,82 @@ const formatPrice = (price: number, currencyCode?: string): string => {
 const AbandonedRecoveryPage: React.FC = () => {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Check URL parameters for action and id
   const urlParams = new URLSearchParams(window.location.search);
-  const action = urlParams.get('action');
-  const bookingId = urlParams.get('id');
-  
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'settings'>('dashboard');
+  const action = urlParams.get("action");
+  const bookingId = urlParams.get("id");
+
+  const [activeTab, setActiveTab] = useState<
+    "dashboard" | "bookings" | "settings"
+  >("dashboard");
   const [page, setPage] = useState(1);
   const [perPage] = useState(20);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [bulkAction, setBulkAction] = useState('');
+  const [bulkAction, setBulkAction] = useState("");
   const [settings, setSettings] = useState({
     enabled: true,
     tracking_enabled: true,
     first_email_delay_hours: 1,
     second_email_delay_hours: 24,
     final_email_delay_hours: 72,
-    first_email_subject: '',
-    second_email_subject: '',
-    final_email_subject: '',
-    first_email_message: '',
-    second_email_message: '',
-    final_email_message: '',
+    first_email_subject: "",
+    second_email_subject: "",
+    final_email_subject: "",
+    first_email_message: "",
+    second_email_message: "",
+    final_email_message: "",
   });
   const [isSavingSettings, setIsSavingSettings] = useState(false);
-  
+
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
     title: string;
     message: string;
     onConfirm: () => void;
-  }>({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+  }>({ isOpen: false, title: "", message: "", onConfirm: () => {} });
 
   // Email preview state
   const [emailPreview, setEmailPreview] = useState<{
     isOpen: boolean;
-    type: 'first' | 'second' | 'final';
+    type: "first" | "second" | "final";
     subject: string;
     message: string;
-  }>({ isOpen: false, type: 'first', subject: '', message: '' });
+  }>({ isOpen: false, type: "first", subject: "", message: "" });
 
   // Function to replace placeholders with sample data
   const replaceEmailPlaceholders = (text: string): string => {
     const placeholders: Record<string, string> = {
-      '{customer_name}': 'John Doe',
-      '{trip_name}': 'Everest Base Camp Trek',
-      '{trip_url}': 'https://example.com/trips/everest-base-camp',
-      '{booking_amount}': '$2,500',
-      '{departure_date}': 'March 15, 2025',
-      '{recovery_link}': 'https://example.com/complete-booking?token=abc123',
-      '{site_name}': 'Yatra Travel',
-      '{site_url}': 'https://example.com',
+      "{customer_name}": "John Doe",
+      "{trip_name}": "Everest Base Camp Trek",
+      "{trip_url}": "https://example.com/trips/everest-base-camp",
+      "{booking_amount}": "$2,500",
+      "{departure_date}": "March 15, 2025",
+      "{recovery_link}": "https://example.com/complete-booking?token=abc123",
+      "{site_name}": "Yatra Travel",
+      "{site_url}": "https://example.com",
     };
 
     let result = text;
     Object.entries(placeholders).forEach(([placeholder, value]) => {
-      result = result.replace(new RegExp(placeholder, 'g'), value);
+      result = result.replace(new RegExp(placeholder, "g"), value);
     });
     return result;
   };
 
   // Function to show email preview
-  const showEmailPreview = (type: 'first' | 'second' | 'final') => {
+  const showEmailPreview = (type: "first" | "second" | "final") => {
     const subjectKey = `${type}_email_subject` as keyof typeof settings;
     const messageKey = `${type}_email_message` as keyof typeof settings;
-    
+
     setEmailPreview({
       isOpen: true,
       type,
-      subject: replaceEmailPlaceholders(String(settings[subjectKey] || '')),
-      message: replaceEmailPlaceholders(String(settings[messageKey] || '')),
+      subject: replaceEmailPlaceholders(String(settings[subjectKey] || "")),
+      message: replaceEmailPlaceholders(String(settings[messageKey] || "")),
     });
   };
 
@@ -185,7 +198,7 @@ const AbandonedRecoveryPage: React.FC = () => {
       params.search = searchTerm;
     }
 
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       params.status = statusFilter;
     }
 
@@ -194,13 +207,13 @@ const AbandonedRecoveryPage: React.FC = () => {
 
   // Fetch abandoned bookings
   const { data: bookingsData, isLoading } = useQuery({
-    queryKey: ['abandoned-bookings', queryParams],
+    queryKey: ["abandoned-bookings", queryParams],
     queryFn: async () => {
       const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== undefined) paramsObj[key] = value;
       });
-      
+
       const response = await apiService.getAbandonedBookings(paramsObj);
       return response;
     },
@@ -208,17 +221,17 @@ const AbandonedRecoveryPage: React.FC = () => {
 
   // Fetch single booking details if viewing
   const { data: bookingDetailsData, isLoading: isLoadingDetails } = useQuery({
-    queryKey: ['abandoned-booking-details', bookingId],
+    queryKey: ["abandoned-booking-details", bookingId],
     queryFn: async () => {
       const response = await apiService.getAbandonedBooking(bookingId!);
       return response;
     },
-    enabled: action === 'view' && !!bookingId,
+    enabled: action === "view" && !!bookingId,
   });
 
   // Fetch settings
-  const { data: settingsData } = useQuery({  
-    queryKey: ['abandoned-recovery-settings'],
+  const { data: settingsData } = useQuery({
+    queryKey: ["abandoned-recovery-settings"],
     queryFn: async () => {
       const response = await apiService.getAbandonedBookingsSettings();
       return response;
@@ -234,7 +247,7 @@ const AbandonedRecoveryPage: React.FC = () => {
 
   // Fetch statistics
   const { data: statsData } = useQuery({
-    queryKey: ['abandoned-statistics'],
+    queryKey: ["abandoned-statistics"],
     queryFn: async () => {
       const response = await apiService.getAbandonedBookingsStatistics();
       return response;
@@ -247,105 +260,117 @@ const AbandonedRecoveryPage: React.FC = () => {
       return await apiService.sendAbandonedBookingEmail(id);
     },
     onSuccess: () => {
-      showToast(__('Recovery email sent successfully'), 'success');
-      queryClient.invalidateQueries({ queryKey: ['abandoned-bookings'] });
+      showToast(__("Recovery email sent successfully"), "success");
+      queryClient.invalidateQueries({ queryKey: ["abandoned-bookings"] });
     },
     onError: () => {
-      showToast(__('Failed to send recovery email'), 'error');
+      showToast(__("Failed to send recovery email"), "error");
     },
   });
 
   const stats = statsData?.data || {};
   const bookings = bookingsData?.data || [];
-  const pagination = bookingsData?.pagination || { total: 0, current_page: 1, total_pages: 1, per_page: perPage };
+  const pagination = bookingsData?.pagination || {
+    total: 0,
+    current_page: 1,
+    total_pages: 1,
+    per_page: perPage,
+  };
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (ids: (string | number)[]) => {
-      await Promise.all(ids.map(id => apiService.deleteAbandonedBooking(id)));
+      await Promise.all(ids.map((id) => apiService.deleteAbandonedBooking(id)));
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['abandoned-bookings'] });
+      queryClient.invalidateQueries({ queryKey: ["abandoned-bookings"] });
       setSelectedIds([]);
-      showToast(__('Bookings deleted successfully'), 'success');
+      showToast(__("Bookings deleted successfully"), "success");
     },
     onError: () => {
-      showToast(__('Failed to delete bookings'), 'error');
-    }
+      showToast(__("Failed to delete bookings"), "error");
+    },
   });
 
   // Helper functions
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first'), 'warning');
+      showToast(__("Select a bulk action first"), "warning");
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one booking'), 'warning');
+      showToast(__("Select at least one booking"), "warning");
       return;
     }
 
-    if (bulkAction === 'delete') {
+    if (bulkAction === "delete") {
       setConfirmDialog({
         isOpen: true,
-        title: __('Delete Bookings'),
-        message: __('Are you sure you want to delete {count} booking(s)?').replace('{count}', selectedIds.length.toString()),
+        title: __("Delete Bookings"),
+        message: __(
+          "Are you sure you want to delete {count} booking(s)?",
+        ).replace("{count}", selectedIds.length.toString()),
         onConfirm: () => {
           deleteMutation.mutate(selectedIds);
-          setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-        }
+          setConfirmDialog({
+            isOpen: false,
+            title: "",
+            message: "",
+            onConfirm: () => {},
+          });
+        },
       });
     }
   };
 
   const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
+    setSearchTerm("");
+    setStatusFilter("all");
     setPage(1);
     setSelectedIds([]);
-    setBulkAction('');
+    setBulkAction("");
   };
 
-  const hasFilters = Boolean(searchTerm || statusFilter !== 'all');
+  const hasFilters = Boolean(searchTerm || statusFilter !== "all");
 
   const viewFilters = [
-    { key: 'all', label: __('All'), count: pagination.total },
-    { key: 'abandoned', label: __('Abandoned'), count: 0 },
-    { key: 'contacted', label: __('Contacted'), count: 0 },
-    { key: 'recovered', label: __('Recovered'), count: 0 },
-    { key: 'expired', label: __('Expired'), count: 0 },
+    { key: "all", label: __("All"), count: pagination.total },
+    { key: "abandoned", label: __("Abandoned"), count: 0 },
+    { key: "contacted", label: __("Contacted"), count: 0 },
+    { key: "recovered", label: __("Recovered"), count: 0 },
+    { key: "expired", label: __("Expired"), count: 0 },
   ];
 
   // Column definitions for SharedTable
   const columns = [
     {
-      key: 'customer',
-      label: __('Customer'),
+      key: "customer",
+      label: __("Customer"),
       render: (booking: any) => (
         <div>
           <div className="font-medium text-gray-900 dark:text-white">
-            {booking.customer_name || __('Unknown')}
+            {booking.customer_name || __("Unknown")}
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400">
             {booking.customer_email}
           </div>
         </div>
-      )
+      ),
     },
     {
-      key: 'trip',
-      label: __('Trip'),
+      key: "trip",
+      label: __("Trip"),
       render: (booking: any) => {
-        const tripBase = (window as any)?.yatraAdmin?.tripBase || 'trip';
-        const siteUrl = (window as any)?.yatraAdmin?.siteUrl || '';
-        const tripUrl = booking.trip_slug 
+        const tripBase = (window as any)?.yatraAdmin?.tripBase || "trip";
+        const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
+        const tripUrl = booking.trip_slug
           ? `${siteUrl}/${tripBase}/${booking.trip_slug}`
           : `${siteUrl}/?p=${booking.trip_id}`;
-        
+
         return (
           <div className="text-sm">
-            <a 
+            <a
               href={tripUrl}
               target="_blank"
               rel="noopener noreferrer"
@@ -358,91 +383,105 @@ const AbandonedRecoveryPage: React.FC = () => {
             </div>
           </div>
         );
-      }
+      },
     },
     {
-      key: 'amount',
-      label: __('Amount'),
+      key: "amount",
+      label: __("Amount"),
       render: (booking: any) => (
         <div className="text-sm font-medium text-gray-900 dark:text-white">
           {formatPrice(booking.total_amount)}
         </div>
-      )
+      ),
     },
     {
-      key: 'emails_sent',
-      label: __('Emails Sent'),
+      key: "emails_sent",
+      label: __("Emails Sent"),
       render: (booking: any) => (
         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
           {booking.recovery_emails_sent || 0}
         </span>
-      )
+      ),
     },
     {
-      key: 'status',
-      label: __('Status'),
+      key: "status",
+      label: __("Status"),
       render: (booking: any) => (
-        <Badge variant={booking.status === 'recovered' ? 'success' : 'default'}>
+        <Badge variant={booking.status === "recovered" ? "success" : "default"}>
           {booking.status}
         </Badge>
-      )
+      ),
     },
     {
-      key: 'date',
-      label: __('Date'),
+      key: "date",
+      label: __("Date"),
       render: (booking: any) => (
         <div className="text-sm text-gray-500 dark:text-gray-400">
           {new Date(booking.created_at).toLocaleDateString()}
         </div>
-      )
-    }
+      ),
+    },
   ];
 
   // Static actions array for SharedTable
   const actions = [
     {
-      key: 'view',
-      label: __('View Details'),
+      key: "view",
+      label: __("View Details"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: any) => {
         // Navigate to details page
-        window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery&action=view&id=${item.id}`;
-      }
+        window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery&action=view&id=${item.id}`;
+      },
     },
     {
-      key: 'send-email',
-      label: __('Send Email'),
+      key: "send-email",
+      label: __("Send Email"),
       icon: <Send className="w-4 h-4" />,
       onClick: (item: any) => {
         setConfirmDialog({
           isOpen: true,
-          title: __('Send Recovery Email'),
-          message: __('Are you sure you want to send a recovery email to {email}?').replace('{email}', item.customer_email),
+          title: __("Send Recovery Email"),
+          message: __(
+            "Are you sure you want to send a recovery email to {email}?",
+          ).replace("{email}", item.customer_email),
           onConfirm: () => {
             sendEmailMutation.mutate(item.id);
-            setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-          }
+            setConfirmDialog({
+              isOpen: false,
+              title: "",
+              message: "",
+              onConfirm: () => {},
+            });
+          },
         });
       },
-      condition: (item: any) => item.status !== 'recovered'
+      condition: (item: any) => item.status !== "recovered",
     },
     {
-      key: 'delete',
-      label: __('Delete'),
+      key: "delete",
+      label: __("Delete"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (item: any) => {
         setConfirmDialog({
           isOpen: true,
-          title: __('Delete Booking'),
-          message: __('Are you sure you want to delete this abandoned booking?'),
+          title: __("Delete Booking"),
+          message: __(
+            "Are you sure you want to delete this abandoned booking?",
+          ),
           onConfirm: () => {
             deleteMutation.mutate([item.id]);
-            setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-          }
+            setConfirmDialog({
+              isOpen: false,
+              title: "",
+              message: "",
+              onConfirm: () => {},
+            });
+          },
         });
       },
-      variant: 'destructive' as const
-    }
+      variant: "destructive" as const,
+    },
   ];
 
   // Save settings mutation
@@ -451,12 +490,14 @@ const AbandonedRecoveryPage: React.FC = () => {
       return await apiService.saveAbandonedBookingsSettings(data);
     },
     onSuccess: () => {
-      showToast(__('Settings saved successfully'), 'success');
-      queryClient.invalidateQueries({ queryKey: ['abandoned-recovery-settings'] });
+      showToast(__("Settings saved successfully"), "success");
+      queryClient.invalidateQueries({
+        queryKey: ["abandoned-recovery-settings"],
+      });
       setIsSavingSettings(false);
     },
     onError: () => {
-      showToast(__('Failed to save settings'), 'error');
+      showToast(__("Failed to save settings"), "error");
       setIsSavingSettings(false);
     },
   });
@@ -467,20 +508,17 @@ const AbandonedRecoveryPage: React.FC = () => {
   };
 
   const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   // If viewing a specific booking, show details page
-  if (action === 'view' && bookingId) {
+  if (action === "view" && bookingId) {
     const booking = bookingDetailsData?.data;
-    
+
     if (isLoadingDetails) {
       return (
         <div className="space-y-6">
-          <PageHeader
-            title={__('Loading Booking Details...')}
-            description=""
-          />
+          <PageHeader title={__("Loading Booking Details...")} description="" />
           <Card>
             <CardContent className="p-6">
               <div className="space-y-4">
@@ -498,18 +536,19 @@ const AbandonedRecoveryPage: React.FC = () => {
     if (!booking) {
       return (
         <div className="space-y-6">
-          <PageHeader
-            title={__('Booking Not Found')}
-            description=""
-          />
+          <PageHeader title={__("Booking Not Found")} description="" />
           <Card>
             <CardContent className="p-6">
-              <p className="text-gray-500">{__('The booking you are looking for does not exist.')}</p>
-              <Button 
+              <p className="text-gray-500">
+                {__("The booking you are looking for does not exist.")}
+              </p>
+              <Button
                 className="mt-4"
-                onClick={() => window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`}
+                onClick={() =>
+                  (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`)
+                }
               >
-                {__('Back to Abandoned Bookings')}
+                {__("Back to Abandoned Bookings")}
               </Button>
             </CardContent>
           </Card>
@@ -520,14 +559,16 @@ const AbandonedRecoveryPage: React.FC = () => {
     return (
       <div className="space-y-6">
         <PageHeader
-          title={__('Abandoned Booking Details')}
+          title={__("Abandoned Booking Details")}
           description={`Booking ID: ${booking.id}`}
           actions={
-            <Button 
+            <Button
               variant="outline"
-              onClick={() => window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`}
+              onClick={() =>
+                (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`)
+              }
             >
-              {__('Back to List')}
+              {__("Back to List")}
             </Button>
           }
         />
@@ -538,25 +579,31 @@ const AbandonedRecoveryPage: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Customer Information')}</CardTitle>
+                <CardTitle>{__("Customer Information")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Name')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Name")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                      {booking.customer_name || __('Unknown')}
+                      {booking.customer_name || __("Unknown")}
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Email')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Email")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                       {booking.customer_email}
                     </p>
                   </div>
                   {booking.customer_phone && (
                     <div>
-                      <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Phone')}</Label>
+                      <Label className="text-sm text-gray-500 dark:text-gray-400">
+                        {__("Phone")}
+                      </Label>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                         {booking.customer_phone}
                       </p>
@@ -569,32 +616,40 @@ const AbandonedRecoveryPage: React.FC = () => {
             {/* Trip Information */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Trip Information')}</CardTitle>
+                <CardTitle>{__("Trip Information")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Trip Name')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Trip Name")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                       {booking.trip_name}
                     </p>
                   </div>
                   {booking.departure_date && (
                     <div>
-                      <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Departure Date')}</Label>
+                      <Label className="text-sm text-gray-500 dark:text-gray-400">
+                        {__("Departure Date")}
+                      </Label>
                       <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                         {new Date(booking.departure_date).toLocaleDateString()}
                       </p>
                     </div>
                   )}
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Travelers')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Travelers")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                       {booking.travelers_count || 1}
                     </p>
                   </div>
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Total Amount')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Total Amount")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                       {formatPrice(booking.total_amount)}
                     </p>
@@ -607,7 +662,7 @@ const AbandonedRecoveryPage: React.FC = () => {
             {booking.booking_data && (
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Additional Details')}</CardTitle>
+                  <CardTitle>{__("Additional Details")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
@@ -625,32 +680,44 @@ const AbandonedRecoveryPage: React.FC = () => {
             {/* Status Card */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Booking Status')}</CardTitle>
+                <CardTitle>{__("Booking Status")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Status')}</Label>
+                  <Label className="text-sm text-gray-500 dark:text-gray-400">
+                    {__("Status")}
+                  </Label>
                   <div className="mt-1">
-                    <Badge variant={booking.status === 'recovered' ? 'success' : 'default'}>
+                    <Badge
+                      variant={
+                        booking.status === "recovered" ? "success" : "default"
+                      }
+                    >
                       {booking.status}
                     </Badge>
                   </div>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Recovery Emails Sent')}</Label>
+                  <Label className="text-sm text-gray-500 dark:text-gray-400">
+                    {__("Recovery Emails Sent")}
+                  </Label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                     {booking.recovery_emails_sent || 0}
                   </p>
                 </div>
                 <div>
-                  <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Created At')}</Label>
+                  <Label className="text-sm text-gray-500 dark:text-gray-400">
+                    {__("Created At")}
+                  </Label>
                   <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                     {new Date(booking.created_at).toLocaleString()}
                   </p>
                 </div>
                 {booking.last_email_sent_at && (
                   <div>
-                    <Label className="text-sm text-gray-500 dark:text-gray-400">{__('Last Email Sent')}</Label>
+                    <Label className="text-sm text-gray-500 dark:text-gray-400">
+                      {__("Last Email Sent")}
+                    </Label>
                     <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
                       {new Date(booking.last_email_sent_at).toLocaleString()}
                     </p>
@@ -662,7 +729,7 @@ const AbandonedRecoveryPage: React.FC = () => {
             {/* Actions Card */}
             <Card>
               <CardHeader>
-                <CardTitle>{__('Actions')}</CardTitle>
+                <CardTitle>{__("Actions")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Button
@@ -670,18 +737,28 @@ const AbandonedRecoveryPage: React.FC = () => {
                   onClick={() => {
                     setConfirmDialog({
                       isOpen: true,
-                      title: __('Send Recovery Email'),
-                      message: __('Are you sure you want to send a recovery email to {email}?').replace('{email}', booking.customer_email),
+                      title: __("Send Recovery Email"),
+                      message: __(
+                        "Are you sure you want to send a recovery email to {email}?",
+                      ).replace("{email}", booking.customer_email),
                       onConfirm: () => {
                         sendEmailMutation.mutate(booking.id);
-                        setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-                      }
+                        setConfirmDialog({
+                          isOpen: false,
+                          title: "",
+                          message: "",
+                          onConfirm: () => {},
+                        });
+                      },
                     });
                   }}
-                  disabled={booking.status === 'recovered' || sendEmailMutation.isPending}
+                  disabled={
+                    booking.status === "recovered" ||
+                    sendEmailMutation.isPending
+                  }
                 >
                   <Send className="w-4 h-4 mr-2" />
-                  {__('Send Recovery Email')}
+                  {__("Send Recovery Email")}
                 </Button>
                 <Button
                   variant="destructive"
@@ -689,22 +766,29 @@ const AbandonedRecoveryPage: React.FC = () => {
                   onClick={() => {
                     setConfirmDialog({
                       isOpen: true,
-                      title: __('Delete Booking'),
-                      message: __('Are you sure you want to delete this abandoned booking?'),
+                      title: __("Delete Booking"),
+                      message: __(
+                        "Are you sure you want to delete this abandoned booking?",
+                      ),
                       onConfirm: () => {
                         deleteMutation.mutate([booking.id]);
-                        setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
+                        setConfirmDialog({
+                          isOpen: false,
+                          title: "",
+                          message: "",
+                          onConfirm: () => {},
+                        });
                         // Redirect after delete
                         setTimeout(() => {
-                          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`;
+                          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`;
                         }, 1000);
-                      }
+                      },
                     });
                   }}
                   disabled={deleteMutation.isPending}
                 >
                   <Trash2 className="w-4 h-4 mr-2" />
-                  {__('Delete Booking')}
+                  {__("Delete Booking")}
                 </Button>
               </CardContent>
             </Card>
@@ -717,8 +801,10 @@ const AbandonedRecoveryPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={__('Abandoned Booking Recovery')}
-        description={__('Track and recover abandoned bookings with automated email campaigns')}
+        title={__("Abandoned Booking Recovery")}
+        description={__(
+          "Track and recover abandoned bookings with automated email campaigns",
+        )}
       />
 
       {/* Tabs with Action Button */}
@@ -726,44 +812,44 @@ const AbandonedRecoveryPage: React.FC = () => {
         <div className="flex items-center justify-between">
           <nav className="-mb-px flex space-x-8">
             <button
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => setActiveTab("dashboard")}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'dashboard'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                activeTab === "dashboard"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
               }`}
             >
               <BarChart className="w-5 h-5 inline-block mr-2" />
-              {__('Dashboard')}
+              {__("Dashboard")}
             </button>
             <button
-            onClick={() => setActiveTab('bookings')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'bookings'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <AlertCircle className="w-5 h-5 inline-block mr-2" />
-            {__('Abandoned Bookings')}
-          </button>
-          <button
-            onClick={() => setActiveTab('settings')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'settings'
-                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-            }`}
-          >
-            <Settings className="w-5 h-5 inline-block mr-2" />
-            {__('Settings')}
-          </button>
-        </nav>
-      </div>
+              onClick={() => setActiveTab("bookings")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "bookings"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
+            >
+              <AlertCircle className="w-5 h-5 inline-block mr-2" />
+              {__("Abandoned Bookings")}
+            </button>
+            <button
+              onClick={() => setActiveTab("settings")}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === "settings"
+                  ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              }`}
+            >
+              <Settings className="w-5 h-5 inline-block mr-2" />
+              {__("Settings")}
+            </button>
+          </nav>
+        </div>
       </div>
 
       {/* Dashboard Tab */}
-      {activeTab === 'dashboard' && (
+      {activeTab === "dashboard" && (
         <div className="space-y-6">
           {/* Stats Cards */}
           {isLoading ? (
@@ -774,64 +860,80 @@ const AbandonedRecoveryPage: React.FC = () => {
               <SkeletonStatCard />
             </div>
           ) : (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{__('Total Abandoned')}</p>
-                    <p className="text-3xl font-bold">{stats.total_abandoned || 0}</p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__("Total Abandoned")}
+                      </p>
+                      <p className="text-3xl font-bold">
+                        {stats.total_abandoned || 0}
+                      </p>
+                    </div>
+                    <AlertCircle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
                   </div>
-                  <AlertCircle className="w-8 h-8 text-orange-600 dark:text-orange-400" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{__('Recovered')}</p>
-                    <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.total_recovered || 0}</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__("Recovered")}
+                      </p>
+                      <p className="text-3xl font-bold text-green-600 dark:text-green-400">
+                        {stats.total_recovered || 0}
+                      </p>
+                    </div>
+                    <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
                   </div>
-                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{__('Recovery Rate')}</p>
-                    <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.recovery_rate || 0}%</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__("Recovery Rate")}
+                      </p>
+                      <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                        {stats.recovery_rate || 0}%
+                      </p>
+                    </div>
+                    <TrendingUp className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <TrendingUp className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{__('Revenue Recovered')}</p>
-                    <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
-                      ${(stats.total_recovered_value || 0).toLocaleString()}
-                    </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {__("Revenue Recovered")}
+                      </p>
+                      <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                        ${(stats.total_recovered_value || 0).toLocaleString()}
+                      </p>
+                    </div>
+                    <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
                   </div>
-                  <DollarSign className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {/* Recent Abandoned Bookings */}
           <Card>
             <CardHeader>
-              <CardTitle>{__('Recent Abandoned Bookings')}</CardTitle>
-              <CardDescription>{__('Latest bookings that were started but not completed')}</CardDescription>
+              <CardTitle>{__("Recent Abandoned Bookings")}</CardTitle>
+              <CardDescription>
+                {__("Latest bookings that were started but not completed")}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading ? (
@@ -843,21 +945,40 @@ const AbandonedRecoveryPage: React.FC = () => {
                   <SkeletonBookingCard />
                 </div>
               ) : bookings.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">{__('No abandoned bookings found')}</div>
+                <div className="text-center py-8 text-gray-500">
+                  {__("No abandoned bookings found")}
+                </div>
               ) : (
                 <div className="space-y-4">
                   {bookings.slice(0, 5).map((booking: any) => (
-                    <div key={booking.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div
+                      key={booking.id}
+                      className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+                    >
                       <div className="flex-1">
-                        <p className="font-medium">{booking.customer_name || __('Unknown Customer')}</p>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">{booking.customer_email}</p>
-                        <p className="text-sm text-gray-500">{booking.trip_name}</p>
+                        <p className="font-medium">
+                          {booking.customer_name || __("Unknown Customer")}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {booking.customer_email}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {booking.trip_name}
+                        </p>
                       </div>
                       <div className="text-right mr-4">
-                        <p className="font-semibold">{formatPrice(booking.total_amount)}</p>
-                        <p className="text-sm text-gray-500">{booking.travelers_count} {__('travelers')}</p>
+                        <p className="font-semibold">
+                          {formatPrice(booking.total_amount)}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {booking.travelers_count} {__("travelers")}
+                        </p>
                       </div>
-                      <Badge variant={booking.status === 'recovered' ? 'success' : 'default'}>
+                      <Badge
+                        variant={
+                          booking.status === "recovered" ? "success" : "default"
+                        }
+                      >
                         {booking.status}
                       </Badge>
                       <Button
@@ -867,18 +988,25 @@ const AbandonedRecoveryPage: React.FC = () => {
                         onClick={() => {
                           setConfirmDialog({
                             isOpen: true,
-                            title: __('Send Recovery Email'),
-                            message: __('Are you sure you want to send a recovery email to {email}?').replace('{email}', booking.customer_email),
+                            title: __("Send Recovery Email"),
+                            message: __(
+                              "Are you sure you want to send a recovery email to {email}?",
+                            ).replace("{email}", booking.customer_email),
                             onConfirm: () => {
                               sendEmailMutation.mutate(booking.id);
-                              setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} });
-                            }
+                              setConfirmDialog({
+                                isOpen: false,
+                                title: "",
+                                message: "",
+                                onConfirm: () => {},
+                              });
+                            },
                           });
                         }}
                         disabled={sendEmailMutation.isPending}
                       >
                         <Send className="w-4 h-4 mr-2" />
-                        {__('Send Email')}
+                        {__("Send Email")}
                       </Button>
                     </div>
                   ))}
@@ -890,9 +1018,8 @@ const AbandonedRecoveryPage: React.FC = () => {
       )}
 
       {/* Bookings Tab */}
-      {activeTab === 'bookings' && (
+      {activeTab === "bookings" && (
         <div className="space-y-3">
-          
           {/* Search and Filters */}
           <Card>
             <CardContent className="p-3">
@@ -904,26 +1031,26 @@ const AbandonedRecoveryPage: React.FC = () => {
                   setStatusFilter(value);
                   setPage(1);
                   setSelectedIds([]);
-                  setBulkAction('');
+                  setBulkAction("");
                 }}
                 statusOptions={[
-                  { value: "all", label: __('All Status') },
-                  { value: "abandoned", label: __('Abandoned') },
-                  { value: "contacted", label: __('Contacted') },
-                  { value: "recovered", label: __('Recovered') },
-                  { value: "expired", label: __('Expired') }
+                  { value: "all", label: __("All Status") },
+                  { value: "abandoned", label: __("Abandoned") },
+                  { value: "contacted", label: __("Contacted") },
+                  { value: "recovered", label: __("Recovered") },
+                  { value: "expired", label: __("Expired") },
                 ]}
                 sortBy="created_at"
                 onSortByChange={() => {}}
                 sortOrder="desc"
                 onSortOrderChange={() => {}}
                 sortOptions={[
-                  { value: "created_at", label: __('Date') },
-                  { value: "customer_email", label: __('Email') }
+                  { value: "created_at", label: __("Date") },
+                  { value: "customer_email", label: __("Email") },
                 ]}
                 onResetFilters={handleResetFilters}
                 hasFilters={hasFilters}
-                placeholder={__('Search by customer email...')}
+                placeholder={__("Search by customer email...")}
               />
             </CardContent>
           </Card>
@@ -940,14 +1067,14 @@ const AbandonedRecoveryPage: React.FC = () => {
               setStatusFilter(value);
               setPage(1);
               setSelectedIds([]);
-              setBulkAction('');
+              setBulkAction("");
             }}
             statusOptions={viewFilters}
             bulkMutationPending={deleteMutation.isPending}
             totalItems={bookings.length}
             bulkActionOptions={[
-              { value: '', label: __('Bulk Actions') },
-              { value: 'delete', label: __('Delete') }
+              { value: "", label: __("Bulk Actions") },
+              { value: "delete", label: __("Delete") },
             ]}
             showColumnsDropdown={false}
             setShowColumnsDropdown={() => {}}
@@ -968,7 +1095,9 @@ const AbandonedRecoveryPage: React.FC = () => {
                   if (checked) {
                     setSelectedIds([...selectedIds, id]);
                   } else {
-                    setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
+                    setSelectedIds(
+                      selectedIds.filter((selectedId) => selectedId !== id),
+                    );
                   }
                 }}
                 onSelectAll={(checked) => {
@@ -978,9 +1107,13 @@ const AbandonedRecoveryPage: React.FC = () => {
                     setSelectedIds([]);
                   }
                 }}
-                isAllSelected={selectedIds.length === bookings.length && bookings.length > 0}
-                emptyText={__('No abandoned bookings found')}
-                emptyDescription={__('Abandoned bookings will appear here when customers start but don\'t complete the booking process')}
+                isAllSelected={
+                  selectedIds.length === bookings.length && bookings.length > 0
+                }
+                emptyText={__("No abandoned bookings found")}
+                emptyDescription={__(
+                  "Abandoned bookings will appear here when customers start but don't complete the booking process",
+                )}
               />
             </CardContent>
           </Card>
@@ -995,32 +1128,38 @@ const AbandonedRecoveryPage: React.FC = () => {
               itemsPerPage={perPage}
             />
           )}
-
         </div>
       )}
 
       {/* Settings Tab */}
-      {activeTab === 'settings' && (
+      {activeTab === "settings" && (
         <div className="space-y-6">
           {/* General Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>{__('General Settings')}</CardTitle>
-              <CardDescription>{__('Configure abandoned booking tracking')}</CardDescription>
+              <CardTitle>{__("General Settings")}</CardTitle>
+              <CardDescription>
+                {__("Configure abandoned booking tracking")}
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <Label htmlFor="tracking_enabled" className="text-base font-medium">
-                    {__('Enable Tracking')}
+                  <Label
+                    htmlFor="tracking_enabled"
+                    className="text-base font-medium"
+                  >
+                    {__("Enable Tracking")}
                   </Label>
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Track when customers abandon the booking process')}
+                    {__("Track when customers abandon the booking process")}
                   </p>
                 </div>
                 <Toggle
                   checked={settings.tracking_enabled}
-                  onChange={(checked) => handleSettingChange('tracking_enabled', checked)}
+                  onChange={(checked) =>
+                    handleSettingChange("tracking_enabled", checked)
+                  }
                 />
               </div>
             </CardContent>
@@ -1029,52 +1168,75 @@ const AbandonedRecoveryPage: React.FC = () => {
           {/* Email Timing Settings */}
           <Card>
             <CardHeader>
-              <CardTitle>{__('Email Timing')}</CardTitle>
-              <CardDescription>{__('Configure when recovery emails are sent')}</CardDescription>
+              <CardTitle>{__("Email Timing")}</CardTitle>
+              <CardDescription>
+                {__("Configure when recovery emails are sent")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="first_email_delay">{__('First Email Delay (hours)')}</Label>
+                <Label htmlFor="first_email_delay">
+                  {__("First Email Delay (hours)")}
+                </Label>
                 <Input
                   id="first_email_delay"
                   type="number"
                   min="0"
                   value={settings.first_email_delay_hours}
-                  onChange={(e) => handleSettingChange('first_email_delay_hours', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "first_email_delay_hours",
+                      parseInt(e.target.value),
+                    )
+                  }
                   placeholder="1"
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {__('Send first recovery email after this many hours')}
+                  {__("Send first recovery email after this many hours")}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="second_email_delay">{__('Second Email Delay (hours)')}</Label>
+                <Label htmlFor="second_email_delay">
+                  {__("Second Email Delay (hours)")}
+                </Label>
                 <Input
                   id="second_email_delay"
                   type="number"
                   min="0"
                   value={settings.second_email_delay_hours}
-                  onChange={(e) => handleSettingChange('second_email_delay_hours', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "second_email_delay_hours",
+                      parseInt(e.target.value),
+                    )
+                  }
                   placeholder="24"
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {__('Send second recovery email after this many hours')}
+                  {__("Send second recovery email after this many hours")}
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="final_email_delay">{__('Final Email Delay (hours)')}</Label>
+                <Label htmlFor="final_email_delay">
+                  {__("Final Email Delay (hours)")}
+                </Label>
                 <Input
                   id="final_email_delay"
                   type="number"
                   min="0"
                   value={settings.final_email_delay_hours}
-                  onChange={(e) => handleSettingChange('final_email_delay_hours', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    handleSettingChange(
+                      "final_email_delay_hours",
+                      parseInt(e.target.value),
+                    )
+                  }
                   placeholder="72"
                 />
                 <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {__('Send final recovery email after this many hours')}
+                  {__("Send final recovery email after this many hours")}
                 </p>
               </div>
             </CardContent>
@@ -1083,82 +1245,104 @@ const AbandonedRecoveryPage: React.FC = () => {
           {/* Email Templates */}
           <Card>
             <CardHeader>
-              <CardTitle>{__('Email Templates')}</CardTitle>
-              <CardDescription>{__('Customize recovery email subjects and messages')}</CardDescription>
+              <CardTitle>{__("Email Templates")}</CardTitle>
+              <CardDescription>
+                {__("Customize recovery email subjects and messages")}
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* First Email */}
               <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__('First Recovery Email')}</h4>
+                <h4 className="font-medium">{__("First Recovery Email")}</h4>
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="first_email_subject">{__('Subject')}</Label>
+                    <Label htmlFor="first_email_subject">{__("Subject")}</Label>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => showEmailPreview('first')}
+                      onClick={() => showEmailPreview("first")}
                       className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      {__('Preview')}
+                      {__("Preview")}
                     </Button>
                   </div>
                   <Input
                     id="first_email_subject"
                     value={settings.first_email_subject}
-                    onChange={(e) => handleSettingChange('first_email_subject', e.target.value)}
-                    placeholder={__('Complete Your Booking - {trip_name}')}
+                    onChange={(e) =>
+                      handleSettingChange("first_email_subject", e.target.value)
+                    }
+                    placeholder={__("Complete Your Booking - {trip_name}")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="first_email_message">{__('Message')}</Label>
+                  <Label htmlFor="first_email_message">{__("Message")}</Label>
                   <textarea
                     id="first_email_message"
                     value={settings.first_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleSettingChange('first_email_message', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      handleSettingChange("first_email_message", e.target.value)
+                    }
                     rows={4}
-                    placeholder={__('Hi {customer_name}, we noticed you started booking {trip_name}...')}
+                    placeholder={__(
+                      "Hi {customer_name}, we noticed you started booking {trip_name}...",
+                    )}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {__('Available placeholders: {customer_name}, {trip_name}, {recovery_link}')}
+                    {__(
+                      "Available placeholders: {customer_name}, {trip_name}, {recovery_link}",
+                    )}
                   </p>
                 </div>
               </div>
 
               {/* Second Email */}
               <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__('Second Recovery Email')}</h4>
+                <h4 className="font-medium">{__("Second Recovery Email")}</h4>
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="second_email_subject">{__('Subject')}</Label>
+                    <Label htmlFor="second_email_subject">
+                      {__("Subject")}
+                    </Label>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => showEmailPreview('second')}
+                      onClick={() => showEmailPreview("second")}
                       className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      {__('Preview')}
+                      {__("Preview")}
                     </Button>
                   </div>
                   <Input
                     id="second_email_subject"
                     value={settings.second_email_subject}
-                    onChange={(e) => handleSettingChange('second_email_subject', e.target.value)}
-                    placeholder={__('Still Interested? Complete Your Booking')}
+                    onChange={(e) =>
+                      handleSettingChange(
+                        "second_email_subject",
+                        e.target.value,
+                      )
+                    }
+                    placeholder={__("Still Interested? Complete Your Booking")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="second_email_message">{__('Message')}</Label>
+                  <Label htmlFor="second_email_message">{__("Message")}</Label>
                   <textarea
                     id="second_email_message"
                     value={settings.second_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleSettingChange('second_email_message', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      handleSettingChange(
+                        "second_email_message",
+                        e.target.value,
+                      )
+                    }
                     rows={4}
-                    placeholder={__('Still interested in {trip_name}?')}
+                    placeholder={__("Still interested in {trip_name}?")}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -1166,36 +1350,42 @@ const AbandonedRecoveryPage: React.FC = () => {
 
               {/* Final Email */}
               <div className="space-y-4 p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-                <h4 className="font-medium">{__('Final Recovery Email')}</h4>
+                <h4 className="font-medium">{__("Final Recovery Email")}</h4>
                 <div>
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="final_email_subject">{__('Subject')}</Label>
+                    <Label htmlFor="final_email_subject">{__("Subject")}</Label>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => showEmailPreview('final')}
+                      onClick={() => showEmailPreview("final")}
                       className="h-8 mb-2"
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      {__('Preview')}
+                      {__("Preview")}
                     </Button>
                   </div>
                   <Input
                     id="final_email_subject"
                     value={settings.final_email_subject}
-                    onChange={(e) => handleSettingChange('final_email_subject', e.target.value)}
-                    placeholder={__('Last Chance - Your Booking Expires Soon')}
+                    onChange={(e) =>
+                      handleSettingChange("final_email_subject", e.target.value)
+                    }
+                    placeholder={__("Last Chance - Your Booking Expires Soon")}
                   />
                 </div>
                 <div>
-                  <Label htmlFor="final_email_message">{__('Message')}</Label>
+                  <Label htmlFor="final_email_message">{__("Message")}</Label>
                   <textarea
                     id="final_email_message"
                     value={settings.final_email_message}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleSettingChange('final_email_message', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                      handleSettingChange("final_email_message", e.target.value)
+                    }
                     rows={4}
-                    placeholder={__('This is your last chance to complete your booking for {trip_name}')}
+                    placeholder={__(
+                      "This is your last chance to complete your booking for {trip_name}",
+                    )}
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -1210,7 +1400,7 @@ const AbandonedRecoveryPage: React.FC = () => {
               disabled={isSavingSettings}
               size="lg"
             >
-              {isSavingSettings ? __('Saving...') : __('Save Settings')}
+              {isSavingSettings ? __("Saving...") : __("Save Settings")}
             </Button>
           </div>
         </div>
@@ -1219,7 +1409,14 @@ const AbandonedRecoveryPage: React.FC = () => {
       {/* Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmDialog.isOpen}
-        onClose={() => setConfirmDialog({ isOpen: false, title: '', message: '', onConfirm: () => {} })}
+        onClose={() =>
+          setConfirmDialog({
+            isOpen: false,
+            title: "",
+            message: "",
+            onConfirm: () => {},
+          })
+        }
         onConfirm={confirmDialog.onConfirm}
         title={confirmDialog.title}
         message={confirmDialog.message}
@@ -1230,20 +1427,26 @@ const AbandonedRecoveryPage: React.FC = () => {
         isOpen={emailPreview.isOpen}
         onClose={() => setEmailPreview({ ...emailPreview, isOpen: false })}
         title={
-          emailPreview.type === 'first' && __('First Recovery Email Preview') ||
-          emailPreview.type === 'second' && __('Second Recovery Email Preview') ||
-          emailPreview.type === 'final' && __('Final Recovery Email Preview')
+          (emailPreview.type === "first" &&
+            __("First Recovery Email Preview")) ||
+          (emailPreview.type === "second" &&
+            __("Second Recovery Email Preview")) ||
+          (emailPreview.type === "final" && __("Final Recovery Email Preview"))
         }
-        description={__('This is how your email will look to customers. Placeholders are replaced with sample data.')}
+        description={__(
+          "This is how your email will look to customers. Placeholders are replaced with sample data.",
+        )}
         size="xl"
         showCloseButton={true}
         footer={
           <div className="flex justify-end">
-            <Button 
-              variant="outline" 
-              onClick={() => setEmailPreview({ ...emailPreview, isOpen: false })}
+            <Button
+              variant="outline"
+              onClick={() =>
+                setEmailPreview({ ...emailPreview, isOpen: false })
+              }
             >
-              {__('Close')}
+              {__("Close")}
             </Button>
           </div>
         }
@@ -1251,18 +1454,28 @@ const AbandonedRecoveryPage: React.FC = () => {
         <div className="space-y-4 max-h-[60vh] overflow-y-auto">
           {/* Email Subject */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Subject:')}</Label>
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {__("Subject:")}
+            </Label>
             <div className="mt-1 p-3 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
-              <p className="text-gray-900 dark:text-white">{emailPreview.subject}</p>
+              <p className="text-gray-900 dark:text-white">
+                {emailPreview.subject}
+              </p>
             </div>
           </div>
 
           {/* Email Message */}
           <div>
-            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">{__('Message:')}</Label>
+            <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {__("Message:")}
+            </Label>
             <div className="mt-1 p-4 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700">
               <div className="prose prose-sm max-w-none dark:prose-invert">
-                <div dangerouslySetInnerHTML={{ __html: emailPreview.message.replace(/\n/g, '<br>') }} />
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: emailPreview.message.replace(/\n/g, "<br>"),
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -1270,27 +1483,40 @@ const AbandonedRecoveryPage: React.FC = () => {
           {/* Available Placeholders */}
           <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
             <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-              {__('Available Placeholders:')}
+              {__("Available Placeholders:")}
             </Label>
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{customer_name}'}</code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{trip_name}'}</code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{booking_amount}'}</code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{departure_date}'}</code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{recovery_link}'}</code>
-              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">{'{site_name}'}</code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{customer_name}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{trip_name}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{booking_amount}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{departure_date}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{recovery_link}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{site_name}"}
+              </code>
             </div>
           </div>
 
           {/* Email Footer */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              {__('Note: This preview uses sample data. Actual emails will contain customer-specific information.')}
+              {__(
+                "Note: This preview uses sample data. Actual emails will contain customer-specific information.",
+              )}
             </p>
           </div>
         </div>
       </Modal>
-
     </div>
   );
 };

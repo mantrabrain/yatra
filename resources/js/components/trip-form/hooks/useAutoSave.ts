@@ -2,7 +2,7 @@
  * Custom hook for auto-save functionality
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from "react";
 
 interface UseAutoSaveOptions {
   delay?: number;
@@ -37,4 +37,3 @@ export const useAutoSave = (options: UseAutoSaveOptions = {}) => {
     autoSave,
   };
 };
-

@@ -3,8 +3,8 @@
  * Ultra-minimal SaaS-style stat card
  */
 
-import React from 'react';
-import { LucideIcon } from 'lucide-react';
+import React from "react";
+import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -14,7 +14,7 @@ interface StatCardProps {
     value: number;
     isPositive: boolean;
   };
-  color?: 'blue' | 'green' | 'purple' | 'orange';
+  color?: "blue" | "green" | "purple" | "orange";
   loading?: boolean;
 }
 
@@ -26,7 +26,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   value,
   icon: Icon,
   trend,
-  color = 'blue',
+  color = "blue",
   loading = false,
 }) => {
   return (
@@ -45,8 +45,10 @@ export const StatCard: React.FC<StatCardProps> = ({
           )}
           {trend && !loading && (
             <div className="flex items-center gap-1 mt-2">
-              <span className={`text-xs font-medium ${trend.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                {trend.isPositive ? '↑' : '↓'} {Math.abs(trend.value)}%
+              <span
+                className={`text-xs font-medium ${trend.isPositive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}
+              >
+                {trend.isPositive ? "↑" : "↓"} {Math.abs(trend.value)}%
               </span>
               <span className="text-xs text-gray-400 dark:text-gray-500">
                 vs last month
@@ -55,12 +57,17 @@ export const StatCard: React.FC<StatCardProps> = ({
           )}
         </div>
         <div className={`p-2.5 rounded-lg bg-gray-50 dark:bg-gray-700/50`}>
-          <Icon className={`w-4 h-4 ${
-            color === 'blue' ? 'text-blue-600 dark:text-blue-400' :
-            color === 'green' ? 'text-green-600 dark:text-green-400' :
-            color === 'purple' ? 'text-purple-600 dark:text-purple-400' :
-            'text-orange-600 dark:text-orange-400'
-          }`} />
+          <Icon
+            className={`w-4 h-4 ${
+              color === "blue"
+                ? "text-blue-600 dark:text-blue-400"
+                : color === "green"
+                  ? "text-green-600 dark:text-green-400"
+                  : color === "purple"
+                    ? "text-purple-600 dark:text-purple-400"
+                    : "text-orange-600 dark:text-orange-400"
+            }`}
+          />
         </div>
       </div>
     </div>

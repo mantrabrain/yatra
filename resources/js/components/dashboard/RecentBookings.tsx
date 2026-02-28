@@ -3,12 +3,12 @@
  * Displays recent bookings list
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Calendar, User, ArrowRight } from 'lucide-react';
-import { getCurrencySymbol } from '../../data/currencies';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Calendar, User, ArrowRight } from "lucide-react";
+import { getCurrencySymbol } from "../../data/currencies";
 
 interface Booking {
   id: number;
@@ -17,7 +17,7 @@ interface Booking {
   trip_title: string;
   booking_date: string;
   total_amount: number;
-  status: 'confirmed' | 'pending' | 'cancelled' | 'completed';
+  status: "confirmed" | "pending" | "cancelled" | "completed";
 }
 
 interface RecentBookingsProps {
@@ -35,39 +35,48 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
   onView,
 }) => {
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
     });
   };
 
   // Get global currency settings
-  const globalCurrency = (window as any)?.yatraAdmin?.currency || 'USD';
-  const currencyPosition = (window as any)?.yatraAdmin?.currencyPosition || (window as any)?.yatraAdmin?.currency_position || 'before';
-  const decimalPlaces = Number((window as any)?.yatraAdmin?.decimalPlaces || (window as any)?.yatraAdmin?.currency_decimals || 2);
-  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+  const globalCurrency = (window as any)?.yatraAdmin?.currency || "USD";
+  const currencyPosition =
+    (window as any)?.yatraAdmin?.currencyPosition ||
+    (window as any)?.yatraAdmin?.currency_position ||
+    "before";
+  const decimalPlaces = Number(
+    (window as any)?.yatraAdmin?.decimalPlaces ||
+      (window as any)?.yatraAdmin?.currency_decimals ||
+      2,
+  );
+  const thousandSeparator =
+    (window as any)?.yatraAdmin?.thousandSeparator || ",";
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
 
   const formatCurrency = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + '0';
-    
+    if (!amount || amount === 0) return getCurrencySymbol(globalCurrency) + "0";
+
     const numPrice = Number(amount) || 0;
-    
+
     // Format the number with proper separators
     const formattedAmount = new Intl.NumberFormat(undefined, {
       minimumFractionDigits: decimalPlaces,
       maximumFractionDigits: decimalPlaces,
-    }).format(numPrice)
-      .replace(/,/g, 'TEMP_THOUSAND')
+    })
+      .format(numPrice)
+      .replace(/,/g, "TEMP_THOUSAND")
       .replace(/\./g, decimalSeparator)
       .replace(/TEMP_THOUSAND/g, thousandSeparator);
-    
+
     // Get currency symbol
     const currencySymbol = getCurrencySymbol(globalCurrency);
-    
+
     // Apply currency position
-    if (currencyPosition === 'after' || currencyPosition === 'right') {
+    if (currencyPosition === "after" || currencyPosition === "right") {
       return `${formattedAmount} ${currencySymbol}`;
     } else {
       return `${currencySymbol}${formattedAmount}`;
@@ -76,16 +85,16 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed':
-        return 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400';
-      case 'cancelled':
-        return 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400';
-      case 'completed':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400';
+      case "confirmed":
+        return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400";
+      case "pending":
+        return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400";
+      case "cancelled":
+        return "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400";
+      case "completed":
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400";
       default:
-        return 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400';
+        return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400";
     }
   };
 
@@ -93,11 +102,11 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>{__('Recent Bookings', 'yatra')}</CardTitle>
+          <CardTitle>{__("Recent Bookings", "yatra")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-sm text-gray-500 dark:text-gray-400">
-            {__('Loading...', 'yatra')}
+            {__("Loading...", "yatra")}
           </div>
         </CardContent>
       </Card>
@@ -107,7 +116,7 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{__('Recent Bookings', 'yatra')}</CardTitle>
+        <CardTitle>{__("Recent Bookings", "yatra")}</CardTitle>
       </CardHeader>
       <CardContent>
         {bookings && bookings.length > 0 ? (
@@ -124,14 +133,18 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
                       <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
                         {booking.trip_title}
                       </h4>
-                      <Badge className={`text-xs ${getStatusColor(booking.status)}`}>
+                      <Badge
+                        className={`text-xs ${getStatusColor(booking.status)}`}
+                      >
                         {booking.status}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center gap-1">
                         <User className="w-3 h-3" />
-                        <span className="truncate">{booking.customer_name}</span>
+                        <span className="truncate">
+                          {booking.customer_name}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3" />
@@ -156,7 +169,7 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
           </div>
         ) : (
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {__('No recent bookings', 'yatra')}
+            {__("No recent bookings", "yatra")}
           </p>
         )}
       </CardContent>
@@ -165,4 +178,3 @@ export const RecentBookings: React.FC<RecentBookingsProps> = ({
 };
 
 export default RecentBookings;
-

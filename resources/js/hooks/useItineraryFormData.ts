@@ -2,12 +2,12 @@
  * Custom hook for fetching all data needed by ItineraryForm
  */
 
-import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
-import { apiClient } from '../lib/api-client';
-import { API_ENDPOINTS } from '../lib/api-endpoints';
-import { usePermissions } from './usePermissions';
-import { __ } from '../lib/i18n';
+import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { apiClient } from "../lib/api-client";
+import { API_ENDPOINTS } from "../lib/api-endpoints";
+import { usePermissions } from "./usePermissions";
+import { __ } from "../lib/i18n";
 
 interface UseItineraryFormDataParams {
   entryId: number | null;
@@ -34,54 +34,55 @@ export const useItineraryFormData = ({
 
   // Fetch trips
   const { data: tripsData, isLoading: isLoadingTrips } = useQuery({
-    queryKey: ['trips-simple'],
+    queryKey: ["trips-simple"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/trips', {
+        const response = await apiClient.get("/trips", {
           params: {
             per_page: 100,
-            status: 'all'
-          }
+            status: "all",
+          },
         });
         const trips = response?.data?.data || response?.data || response || [];
         return Array.isArray(trips) ? trips : [];
       } catch (error: any) {
-        console.error('Failed to load trips:', error);
+        console.error("Failed to load trips:", error);
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Fetch item types
   const { data: typesData } = useQuery({
-    queryKey: ['item-types-published'],
+    queryKey: ["item-types-published"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/item-types', { 
-          params: { 
+        const response = await apiClient.get("/item-types", {
+          params: {
             per_page: 100,
-            status: 'publish'
-          } 
+            status: "publish",
+          },
         });
         const types = response?.data?.data || response?.data || response || [];
         return Array.isArray(types) ? types : [];
       } catch (error: any) {
-        console.error('Failed to load item types:', error);
+        console.error("Failed to load item types:", error);
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
   // Fetch items - in day mode fetch all items, in activity mode fetch by type
-  const itemsQueryKey = useMemo(() => 
-    isAddDayMode 
-      ? ['items-all-published']
-      : ['items-by-type', formDataItemTypeId],
-    [isAddDayMode, formDataItemTypeId]
+  const itemsQueryKey = useMemo(
+    () =>
+      isAddDayMode
+        ? ["items-all-published"]
+        : ["items-by-type", formDataItemTypeId],
+    [isAddDayMode, formDataItemTypeId],
   );
 
   const { data: itemsData } = useQuery({
@@ -89,57 +90,57 @@ export const useItineraryFormData = ({
     queryFn: async () => {
       try {
         if (isAddDayMode) {
-          const response = await apiClient.get('/items', { 
-            params: { 
+          const response = await apiClient.get("/items", {
+            params: {
               per_page: 1000,
-              status: 'publish'
-            } 
+              status: "publish",
+            },
           });
-          const items = response?.data?.data || response?.data || response || [];
+          const items =
+            response?.data?.data || response?.data || response || [];
           return Array.isArray(items) ? items : [];
         }
-        
+
         if (!formDataItemTypeId) return [];
-        
-        const response = await apiClient.get('/items', { 
-          params: { 
+
+        const response = await apiClient.get("/items", {
+          params: {
             per_page: 1000,
             type_id: formDataItemTypeId,
-            status: 'publish'
-          } 
+            status: "publish",
+          },
         });
         const items = response?.data?.data || response?.data || response || [];
         return Array.isArray(items) ? items : [];
       } catch (error: any) {
-        console.error('Failed to load items:', error);
+        console.error("Failed to load items:", error);
         return [];
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
 
   // Fetch entry data when editing
   const { data: entryData, isLoading: isLoadingEntryData } = useQuery({
-    queryKey: ['itinerary-entry', entryId, isEditDayMode ? 'day' : 'activity'],
+    queryKey: ["itinerary-entry", entryId, isEditDayMode ? "day" : "activity"],
     queryFn: async () => {
       if (!entryId) return null;
       try {
         // Pass mode parameter to API based on isEditDayMode
-        const mode = isEditDayMode ? 'day' : 'activity';
+        const mode = isEditDayMode ? "day" : "activity";
         const endpoint = API_ENDPOINTS.ITINERARY_GET(entryId, mode);
         const response = await apiClient.get(endpoint);
         const result = response?.data?.data || response?.data || response;
-        console.log('[YATRA DEBUG] useItineraryFormData - API response (mode: ' + mode + '):', result);
-        console.log('[YATRA DEBUG] useItineraryFormData - day_description in API response:', result?.day_description);
+
         return result;
       } catch (error: any) {
-        console.error('Failed to load itinerary entry:', error);
+        console.error("Failed to load itinerary entry:", error);
         return null;
       }
     },
-    enabled: isEditMode && !!entryId && can('yatra_view_trips'),
+    enabled: isEditMode && !!entryId && can("yatra_view_trips"),
   });
 
   // Extract identifiers from the initially loaded entry (could be activity)
@@ -148,35 +149,50 @@ export const useItineraryFormData = ({
   // Check if entryData is an activity (has non-zero item_type_id and item_id)
   // Day entries have item_type_id: 0 and item_id: 0
   const isActivityEntry = useMemo(() => {
-    return entryData && 
-           entryData.item_type_id !== null && 
-           entryData.item_type_id !== undefined && 
-           entryData.item_type_id !== 0 &&
-           entryData.item_id !== null && 
-           entryData.item_id !== undefined &&
-           entryData.item_id !== 0;
+    return (
+      entryData &&
+      entryData.item_type_id !== null &&
+      entryData.item_type_id !== undefined &&
+      entryData.item_type_id !== 0 &&
+      entryData.item_id !== null &&
+      entryData.item_id !== undefined &&
+      entryData.item_id !== 0
+    );
   }, [entryData]);
 
   // Fetch day entry when editing a day and entryData is an activity
   const { data: dayEntryData } = useQuery({
-    queryKey: ['day-entry-by-day-id', entryDayId],
+    queryKey: ["day-entry-by-day-id", entryDayId],
     queryFn: async () => {
       if (!entryDayId || !isEditDayMode) return null;
       try {
-        const response = await apiClient.get(`/itinerary/day-entry-by-day-id/${entryDayId}`);
-        const dayEntryId = response?.data?.day_entry_id || response?.day_entry_id || response?.data?.id || response?.id || null;
+        const response = await apiClient.get(
+          `/itinerary/day-entry-by-day-id/${entryDayId}`,
+        );
+        const dayEntryId =
+          response?.data?.day_entry_id ||
+          response?.day_entry_id ||
+          response?.data?.id ||
+          response?.id ||
+          null;
         if (dayEntryId) {
           // Fetch the actual day entry data
           const entryResponse = await apiClient.get(`/itinerary/${dayEntryId}`);
-          return entryResponse?.data?.data || entryResponse?.data || entryResponse;
+          return (
+            entryResponse?.data?.data || entryResponse?.data || entryResponse
+          );
         }
         return null;
       } catch (error: any) {
-        console.error('Failed to load day entry:', error);
+        console.error("Failed to load day entry:", error);
         return null;
       }
     },
-    enabled: isEditDayMode && !!entryDayId && isActivityEntry && can('yatra_view_trips'),
+    enabled:
+      isEditDayMode &&
+      !!entryDayId &&
+      isActivityEntry &&
+      can("yatra_view_trips"),
   });
 
   // Determine the effective entry data (day entry when editing a day)
@@ -188,32 +204,39 @@ export const useItineraryFormData = ({
   }, [isEditDayMode, isActivityEntry, dayEntryData, entryData]);
 
   // Extract stable primitive values from the effective entry data
-  const entryTripId = useMemo(() => effectiveEntryData?.trip_id, [effectiveEntryData?.trip_id]);
-  const entryDay = useMemo(() => effectiveEntryData?.day, [effectiveEntryData?.day]);
+  const entryTripId = useMemo(
+    () => effectiveEntryData?.trip_id,
+    [effectiveEntryData?.trip_id],
+  );
+  const entryDay = useMemo(
+    () => effectiveEntryData?.day,
+    [effectiveEntryData?.day],
+  );
 
   // Fetch trip data for day editing to get all activities
   const { data: dayTripData } = useQuery({
-    queryKey: ['trip-for-day-edit', entryTripId, entryDay],
+    queryKey: ["trip-for-day-edit", entryTripId, entryDay],
     queryFn: async () => {
       if (!entryTripId || !isEditDayMode) return null;
       try {
         const response = await apiClient.get(`/trips/${entryTripId}`);
         return response?.data || response;
       } catch (error: any) {
-        console.error('Failed to load trip data for day edit:', error);
+        console.error("Failed to load trip data for day edit:", error);
         return null;
       }
     },
-    enabled: isEditDayMode && !!entryTripId && !!entryDay && can('yatra_view_trips'),
+    enabled:
+      isEditDayMode && !!entryTripId && !!entryDay && can("yatra_view_trips"),
   });
 
   // Fetch trip data to get day title when in activity mode, and to check existing days in day mode
   // Use tripIdParam if available (from URL), otherwise use formDataTripId (from dropdown selection)
-  const effectiveTripIdForQuery = tripIdParam || formDataTripId || '';
-  
-  const tripDataQueryKey = useMemo(() => 
-    ['trip-for-day', effectiveTripIdForQuery, dayParam || ''],
-    [effectiveTripIdForQuery, dayParam]
+  const effectiveTripIdForQuery = tripIdParam || formDataTripId || "";
+
+  const tripDataQueryKey = useMemo(
+    () => ["trip-for-day", effectiveTripIdForQuery, dayParam || ""],
+    [effectiveTripIdForQuery, dayParam],
   );
 
   const { data: tripDataForDay } = useQuery({
@@ -221,14 +244,17 @@ export const useItineraryFormData = ({
     queryFn: async () => {
       if (!effectiveTripIdForQuery) return null;
       try {
-        const response = await apiClient.get(`/trips/${effectiveTripIdForQuery}`);
+        const response = await apiClient.get(
+          `/trips/${effectiveTripIdForQuery}`,
+        );
         return response?.data || response;
       } catch (error) {
-        console.error('Failed to fetch trip data:', error);
+        console.error("Failed to fetch trip data:", error);
         return null;
       }
     },
-    enabled: !isEditDayMode && !!effectiveTripIdForQuery && can('yatra_view_trips'),
+    enabled:
+      !isEditDayMode && !!effectiveTripIdForQuery && can("yatra_view_trips"),
   });
 
   // Use dayTripData when in edit day mode, otherwise use tripDataForDay
@@ -248,4 +274,3 @@ export const useItineraryFormData = ({
     entryDay,
   };
 };
-

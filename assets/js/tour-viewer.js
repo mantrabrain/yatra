@@ -168,6 +168,6 @@
   window.YatraTourViewer = new YatraTourViewer();
   
   // Log successful initialization
-  console.log('Yatra Tour Viewer module loaded successfully');
+  
 
 })();

@@ -485,10 +485,10 @@
 
     showYoutubeContent(link, img) {
       const youtubeVideos = this.mediaData.youtube_videos || [];
-      console.log('showYoutubeContent called, videos:', youtubeVideos);
+      
       if (youtubeVideos.length > 0) {
         const video = youtubeVideos[0];
-        console.log('Showing YouTube video:', video);
+        
         // Show YouTube thumbnail
         img.src = video.thumbnail || img.src; // Keep current image if no thumbnail
         img.alt = video.title || 'YouTube Video';
@@ -588,7 +588,7 @@
       overlay.addEventListener('click', (e) => {
         // Only handle real user clicks, not programmatic ones
         if (!e.isTrusted) {
-          console.log('Ignoring non-trusted click event');
+          
           return;
         }
         
@@ -596,10 +596,10 @@
         e.stopPropagation();
         e.stopImmediatePropagation();
         
-        console.log('YouTube overlay clicked', video);
-        console.log('YatraVideoPlayer available:', !!window.YatraVideoPlayer);
+        
+        
         if (video.url && window.YatraVideoPlayer) {
-          console.log('Playing video:', video);
+          
           window.YatraVideoPlayer.play(video);
         } else {
           console.error('Cannot play video - missing url or YatraVideoPlayer', {
@@ -644,7 +644,7 @@
       overlay.addEventListener('click', (e) => {
         // Only handle real user clicks, not programmatic ones
         if (!e.isTrusted) {
-          console.log('Ignoring non-trusted click event');
+          
           return;
         }
         
@@ -652,10 +652,10 @@
         e.stopPropagation();
         e.stopImmediatePropagation();
         
-        console.log('Tour overlay clicked', tour);
-        console.log('YatraTourViewer available:', !!window.YatraTourViewer);
+        
+        
         if (tour.url && window.YatraTourViewer) {
-          console.log('Viewing tour:', tour);
+          
           window.YatraTourViewer.view(tour);
         } else {
           console.error('Cannot view tour - missing url or YatraTourViewer', {
@@ -1187,7 +1187,7 @@
     }
 
     handleCheckAvailability() {
-      console.log('Check Availability clicked');
+      
 
       // Get form values - support regular pricing (num_travelers), old structure (adults/children), and traveler-based pricing
       const dateInput = document.getElementById('travel_date');
@@ -1217,7 +1217,7 @@
         totalTravelers = adults + children;
       }
 
-      console.log('Form values:', { date, totalTravelers, travelerInputsCount: travelerInputs.length });
+      
 
       // Basic validation
       if (!date) {
@@ -1272,7 +1272,7 @@
       }
       const nonce = (window.yatraTripData && window.yatraTripData.nonce) || '';
 
-      console.log('Fetching availability from:', restUrl);
+      
 
       fetch(restUrl, {
         method: 'GET',
@@ -1283,7 +1283,7 @@
         credentials: 'omit',
       })
           .then(response => {
-            console.log('Response status:', response.status);
+            
             if (!response.ok) {
               // Try to get error message from response
               return response.json().then(err => {
@@ -1296,7 +1296,7 @@
             return response.json();
           })
           .then(data => {
-            console.log('Response data:', data);
+            
             if (!data || !data.html) {
               throw new Error('No HTML returned from server');
             }

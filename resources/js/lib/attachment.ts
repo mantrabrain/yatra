@@ -8,16 +8,18 @@
  * @param attachmentId - WordPress attachment ID
  * @returns Image URL or null if invalid
  */
-export const getAttachmentUrl = (attachmentId: string | number | null | undefined): string | null => {
+export const getAttachmentUrl = (
+  attachmentId: string | number | null | undefined,
+): string | null => {
   if (!attachmentId) return null;
-  
+
   const id = String(attachmentId);
-  
+
   // If it's already a URL (for backward compatibility), return it
-  if (id.startsWith('http://') || id.startsWith('https://')) {
+  if (id.startsWith("http://") || id.startsWith("https://")) {
     return id;
   }
-  
+
   // If it's a numeric attachment ID, use wp_get_attachment_image_url
   // This will be handled by the backend API
   // For frontend, we'll use a REST API endpoint or inline script
@@ -27,7 +29,7 @@ export const getAttachmentUrl = (attachmentId: string | number | null | undefine
     // The backend should convert attachment IDs to URLs
     return null;
   }
-  
+
   return null;
 };
 
@@ -44,6 +46,5 @@ export const isAttachmentId = (value: string | null | undefined): boolean => {
  */
 export const isUrl = (value: string | null | undefined): boolean => {
   if (!value) return false;
-  return value.startsWith('http://') || value.startsWith('https://');
+  return value.startsWith("http://") || value.startsWith("https://");
 };
-

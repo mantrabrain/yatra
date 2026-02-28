@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
 
@@ -13,7 +13,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
     React.useEffect(() => {
       // Check if dark mode is active
       const checkDarkMode = () => {
-        setIsDark(document.documentElement.classList.contains('dark'));
+        setIsDark(document.documentElement.classList.contains("dark"));
       };
 
       // Initial check
@@ -23,7 +23,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       const observer = new MutationObserver(checkDarkMode);
       observer.observe(document.documentElement, {
         attributes: true,
-        attributeFilter: ['class']
+        attributeFilter: ["class"],
       });
 
       return () => observer.disconnect();
@@ -34,24 +34,23 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         className={`flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 text-base text-gray-900 ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:focus-visible:ring-blue-400 transition-colors cursor-pointer ${className}`}
         ref={ref}
         style={{
-          paddingRight: '2.5rem',
-          WebkitAppearance: 'none',
-          MozAppearance: 'none',
-          appearance: 'none',
+          paddingRight: "2.5rem",
+          WebkitAppearance: "none",
+          MozAppearance: "none",
+          appearance: "none",
           backgroundImage: isDark ? dropdownArrowDark : dropdownArrowLight,
-          backgroundRepeat: 'no-repeat',
-          backgroundPosition: 'right 0.75rem center',
-          backgroundSize: '16px 16px',
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "right 0.75rem center",
+          backgroundSize: "16px 16px",
           ...style,
         }}
         {...props}
       >
         {children}
       </select>
-    )
-  }
-)
-Select.displayName = "Select"
+    );
+  },
+);
+Select.displayName = "Select";
 
-export { Select }
-
+export { Select };

@@ -3,29 +3,34 @@
  * Add/Edit Destination form with clean, minimal SaaS-style design
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Edit2, X } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
-import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api-client';
-import { generateSlug } from '../lib/slug';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { IconPicker, IconPickerValue } from '../components/ui/icon-picker';
-import { RichTextEditor } from '../components/ui/rich-text-editor';
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2, Edit2, X } from "lucide-react";
+import { __ } from "../lib/i18n";
+import { usePermissions } from "../hooks/usePermissions";
+import { useToast } from "../components/ui/toast";
+import { apiClient } from "../lib/api-client";
+import { generateSlug } from "../lib/slug";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
+import { RichTextEditor } from "../components/ui/rich-text-editor";
 
 interface DestinationFormData {
   name: string;
   slug: string;
   description: string;
   icon: {
-    type: 'icon' | 'image';
+    type: "icon" | "image";
     value: string;
   } | null;
   status: string;
@@ -36,11 +41,11 @@ const DestinationForm: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
   const [formData, setFormData] = useState<DestinationFormData>({
-    name: '',
-    slug: '',
-    description: '',
+    name: "",
+    slug: "",
+    description: "",
     icon: null,
-    status: 'publish',
+    status: "publish",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -49,41 +54,44 @@ const DestinationForm: React.FC = () => {
   // Get action and id from URL
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') || 'create';
+    return params.get("action") || "create";
   }, []);
 
   const destinationId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
-  const isEditMode = action === 'edit' && destinationId !== null;
+  const isEditMode = action === "edit" && destinationId !== null;
 
   // Fetch destination data if editing
   const { data: destinationData, isLoading: isLoadingDestination } = useQuery({
-    queryKey: ['destination', destinationId],
+    queryKey: ["destination", destinationId],
     queryFn: async () => {
       if (!destinationId) return null;
       try {
         const response = await apiClient.get(`/destinations/${destinationId}`);
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load destination', 'yatra'), 'error');
+        showToast(
+          error?.message || __("Failed to load destination", "yatra"),
+          "error",
+        );
         throw error;
       }
     },
-    enabled: isEditMode && can('yatra_view_trips'),
+    enabled: isEditMode && can("yatra_view_trips"),
   });
 
   // Load destination data into form when editing
   useEffect(() => {
     if (destinationData && isEditMode) {
       setFormData({
-        name: destinationData.name || '',
-        slug: destinationData.slug || '',
-        description: destinationData.description || '',
+        name: destinationData.name || "",
+        slug: destinationData.slug || "",
+        description: destinationData.description || "",
         icon: (destinationData.icon as IconPickerValue) || null,
-        status: destinationData.status || 'draft',
+        status: destinationData.status || "draft",
       });
     }
   }, [destinationData, isEditMode]);
@@ -93,28 +101,28 @@ const DestinationForm: React.FC = () => {
     // In EDIT mode, slug only changes if user explicitly edits it
     if (!isEditMode && !isSlugEditable) {
       const newSlug = generateSlug(value);
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: value,
         slug: newSlug,
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         name: value,
       }));
     }
     if (errors.name) {
-      setErrors(prev => ({ ...prev, name: '' }));
+      setErrors((prev) => ({ ...prev, name: "" }));
     }
   };
 
   const handleSlugChange = (value: string) => {
     // Only allow manual slug editing if edit mode is enabled
     if (isSlugEditable) {
-      setFormData(prev => ({ ...prev, slug: value }));
+      setFormData((prev) => ({ ...prev, slug: value }));
       if (errors.slug) {
-        setErrors(prev => ({ ...prev, slug: '' }));
+        setErrors((prev) => ({ ...prev, slug: "" }));
       }
     }
   };
@@ -123,15 +131,18 @@ const DestinationForm: React.FC = () => {
     if (isSlugEditable) {
       // If disabling edit, regenerate slug from name
       const newSlug = generateSlug(formData.name);
-      setFormData(prev => ({ ...prev, slug: newSlug }));
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
     }
     setIsSlugEditable(!isSlugEditable);
   };
 
-  const handleFieldChange = (field: keyof DestinationFormData, value: string | IconPickerValue | null) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (
+    field: keyof DestinationFormData,
+    value: string | IconPickerValue | null,
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -139,13 +150,16 @@ const DestinationForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = __('Name is required', 'yatra');
+      newErrors.name = __("Name is required", "yatra");
     }
 
     if (!formData.slug.trim()) {
-      newErrors.slug = __('Slug is required', 'yatra');
+      newErrors.slug = __("Slug is required", "yatra");
     } else if (!/^[a-z0-9-]+$/.test(formData.slug)) {
-      newErrors.slug = __('Slug can only contain lowercase letters, numbers, and hyphens', 'yatra');
+      newErrors.slug = __(
+        "Slug can only contain lowercase letters, numbers, and hyphens",
+        "yatra",
+      );
     }
 
     setErrors(newErrors);
@@ -171,42 +185,46 @@ const DestinationForm: React.FC = () => {
       if (isEditMode && destinationId) {
         return await apiClient.put(`/destinations/${destinationId}`, payload);
       } else {
-        return await apiClient.post('/destinations', payload);
+        return await apiClient.post("/destinations", payload);
       }
     },
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['destinations'] });
-      queryClient.invalidateQueries({ queryKey: ['destination', destinationId] });
+      queryClient.invalidateQueries({ queryKey: ["destinations"] });
+      queryClient.invalidateQueries({
+        queryKey: ["destination", destinationId],
+      });
       showToast(
-        isEditMode 
-          ? __('Destination updated successfully', 'yatra')
-          : __('Destination created successfully', 'yatra'),
-        'success'
+        isEditMode
+          ? __("Destination updated successfully", "yatra")
+          : __("Destination created successfully", "yatra"),
+        "success",
       );
       setIsSubmitting(false);
 
       if (!isEditMode) {
         const newId = response?.id;
         if (newId) {
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${newId}`;
+          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${newId}`;
         } else {
           // Fallback to list if ID missing
-          window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
+          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
         }
       }
     },
     onError: (error: any) => {
-      const errorMessage = error?.message || __('An error occurred while saving the destination', 'yatra');
-      showToast(errorMessage, 'error');
+      const errorMessage =
+        error?.message ||
+        __("An error occurred while saving the destination", "yatra");
+      showToast(errorMessage, "error");
       setIsSubmitting(false);
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
-      showToast(__('Please fix the form errors', 'yatra'), 'warning');
+      showToast(__("Please fix the form errors", "yatra"), "warning");
       return;
     }
 
@@ -216,7 +234,7 @@ const DestinationForm: React.FC = () => {
   };
 
   const handleCancel = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations`;
   };
 
   if (isEditMode && isLoadingDestination) {
@@ -276,8 +294,16 @@ const DestinationForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Destination', 'yatra') : __('Add New Destination', 'yatra')}
-        description={isEditMode ? __('Update destination information', 'yatra') : __('Create a new travel destination', 'yatra')}
+        title={
+          isEditMode
+            ? __("Edit Destination", "yatra")
+            : __("Add New Destination", "yatra")
+        }
+        description={
+          isEditMode
+            ? __("Update destination information", "yatra")
+            : __("Create a new travel destination", "yatra")
+        }
         actions={
           <Button
             variant="outline"
@@ -285,7 +311,7 @@ const DestinationForm: React.FC = () => {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'yatra')}
+            {__("Back", "yatra")}
           </Button>
         }
       />
@@ -298,21 +324,27 @@ const DestinationForm: React.FC = () => {
               {/* Basic Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Basic Information', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Basic Information", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Name */}
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Name', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Name", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <Input
                       id="name"
                       type="text"
                       value={formData.name}
                       onChange={(e) => handleNameChange(e.target.value)}
-                      placeholder={__('Enter destination name', 'yatra')}
-                      className={errors.name ? 'border-red-500' : ''}
+                      placeholder={__("Enter destination name", "yatra")}
+                      className={errors.name ? "border-red-500" : ""}
                       required
                     />
                     {errors.name && (
@@ -322,8 +354,12 @@ const DestinationForm: React.FC = () => {
 
                   {/* Slug */}
                   <div>
-                    <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Slug', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="slug"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Slug", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <Input
@@ -331,8 +367,8 @@ const DestinationForm: React.FC = () => {
                         type="text"
                         value={formData.slug}
                         onChange={(e) => handleSlugChange(e.target.value)}
-                        placeholder={__('destination-slug', 'yatra')}
-                        className={`pr-10 ${errors.slug ? 'border-red-500' : ''} ${!isSlugEditable ? 'bg-gray-50 dark:bg-gray-800 cursor-not-allowed' : ''}`}
+                        placeholder={__("destination-slug", "yatra")}
+                        className={`pr-10 ${errors.slug ? "border-red-500" : ""} ${!isSlugEditable ? "bg-gray-50 dark:bg-gray-800 cursor-not-allowed" : ""}`}
                         disabled={!isSlugEditable}
                         required
                       />
@@ -340,7 +376,11 @@ const DestinationForm: React.FC = () => {
                         type="button"
                         onClick={handleToggleSlugEdit}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors rounded"
-                        aria-label={isSlugEditable ? __('Cancel editing slug', 'yatra') : __('Edit slug', 'yatra')}
+                        aria-label={
+                          isSlugEditable
+                            ? __("Cancel editing slug", "yatra")
+                            : __("Edit slug", "yatra")
+                        }
                       >
                         {isSlugEditable ? (
                           <X className="w-4 h-4" />
@@ -353,25 +393,37 @@ const DestinationForm: React.FC = () => {
                       <p className="mt-1 text-sm text-red-500">{errors.slug}</p>
                     )}
                     <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      {isSlugEditable 
-                        ? __('Manually editing slug. Click X to cancel and regenerate from name.', 'yatra')
-                        : __('Auto-generated from name. Click edit icon to customize.', 'yatra')
-                      }
+                      {isSlugEditable
+                        ? __(
+                            "Manually editing slug. Click X to cancel and regenerate from name.",
+                            "yatra",
+                          )
+                        : __(
+                            "Auto-generated from name. Click edit icon to customize.",
+                            "yatra",
+                          )}
                     </p>
                   </div>
 
                   {/* Description */}
                   <RichTextEditor
-                    label={__('Description', 'yatra')}
-                    value={formData.description || ''}
-                    onChange={(value) => handleFieldChange('description', value)}
-                    placeholder={__('Write a rich description (supports formatting, lists, links...)', 'yatra')}
-                    helperText={__('Use formatting, bullet lists, and links to create a compelling description. HTML is supported.', 'yatra')}
+                    label={__("Description", "yatra")}
+                    value={formData.description || ""}
+                    onChange={(value) =>
+                      handleFieldChange("description", value)
+                    }
+                    placeholder={__(
+                      "Write a rich description (supports formatting, lists, links...)",
+                      "yatra",
+                    )}
+                    helperText={__(
+                      "Use formatting, bullet lists, and links to create a compelling description. HTML is supported.",
+                      "yatra",
+                    )}
                     minHeight={360}
                     maxHeight={720}
                   />
-
-                                  </CardContent>
+                </CardContent>
               </Card>
             </div>
 
@@ -380,22 +432,29 @@ const DestinationForm: React.FC = () => {
               {/* Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Status', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Status", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <label htmlFor="status" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Status', 'yatra')}
+                    <label
+                      htmlFor="status"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Status", "yatra")}
                     </label>
                     <Select
                       id="status"
                       value={formData.status}
-                      onChange={(e) => handleFieldChange('status', e.target.value)}
+                      onChange={(e) =>
+                        handleFieldChange("status", e.target.value)
+                      }
                       className="w-full h-10"
                     >
-                      <option value="draft">{__('Draft', 'yatra')}</option>
-                      <option value="publish">{__('Publish', 'yatra')}</option>
-                      <option value="trash">{__('Trash', 'yatra')}</option>
+                      <option value="draft">{__("Draft", "yatra")}</option>
+                      <option value="publish">{__("Publish", "yatra")}</option>
+                      <option value="trash">{__("Trash", "yatra")}</option>
                     </Select>
                   </div>
                 </CardContent>
@@ -404,14 +463,19 @@ const DestinationForm: React.FC = () => {
               {/* Icon/Image Picker */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Destination Icon or Image', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Destination Icon or Image", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <IconPicker
                     value={formData.icon}
-                    onChange={(value) => handleFieldChange('icon', value)}
-                    label={__('Select Icon or Upload Image', 'yatra')}
-                    helpText={__('Choose a library icon or upload a custom image to visually represent this destination.', 'yatra')}
+                    onChange={(value) => handleFieldChange("icon", value)}
+                    label={__("Select Icon or Upload Image", "yatra")}
+                    helpText={__(
+                      "Choose a library icon or upload a custom image to visually represent this destination.",
+                      "yatra",
+                    )}
                     allowImageUpload={true}
                     allowIconSelection={true}
                     size="md"
@@ -432,12 +496,14 @@ const DestinationForm: React.FC = () => {
                         {isSubmitting ? (
                           <>
                             <Loader2 className="w-4 h-4 animate-spin" />
-                            {__('Saving...', 'yatra')}
+                            {__("Saving...", "yatra")}
                           </>
                         ) : (
                           <>
                             <Save className="w-4 h-4" />
-                            {isEditMode ? __('Update Destination', 'yatra') : __('Create Destination', 'yatra')}
+                            {isEditMode
+                              ? __("Update Destination", "yatra")
+                              : __("Create Destination", "yatra")}
                           </>
                         )}
                       </Button>
@@ -447,7 +513,7 @@ const DestinationForm: React.FC = () => {
                         onClick={handleCancel}
                         disabled={isSubmitting}
                       >
-                        {__('Cancel', 'yatra')}
+                        {__("Cancel", "yatra")}
                       </Button>
                     </div>
                   </div>

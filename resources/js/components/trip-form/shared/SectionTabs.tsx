@@ -3,8 +3,8 @@
  * Reusable tab navigation for sections with multiple tabs
  */
 
-import React from 'react';
-import { __ } from '../../../lib/i18n';
+import React from "react";
+import { __ } from "../../../lib/i18n";
 
 export interface Tab {
   id: string;
@@ -32,8 +32,8 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
             onClick={() => onTabChange(tab.id)}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400"
+                : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             {__(tab.label, tab.label)}
@@ -43,4 +43,3 @@ export const SectionTabs: React.FC<SectionTabsProps> = ({
     </div>
   );
 };
-

@@ -3,26 +3,31 @@
  * Add/Edit Payment form
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Save, Loader2, Info } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { apiService } from '../lib/api-client';
-import { usePermissions } from '../hooks/usePermissions';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { HelpText } from '../components/ui/help-text';
-import { Alert } from '../components/ui/alert';
+import React, { useState, useEffect, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ArrowLeft, Save, Loader2, Info } from "lucide-react";
+import { __ } from "../lib/i18n";
+import { apiService } from "../lib/api-client";
+import { usePermissions } from "../hooks/usePermissions";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { HelpText } from "../components/ui/help-text";
+import { Alert } from "../components/ui/alert";
 
 interface PaymentFormData {
   booking_id: string;
   amount: string;
   payment_method: string;
-  payment_status: 'pending' | 'completed' | 'failed' | 'refunded' | 'partial';
+  payment_status: "pending" | "completed" | "failed" | "refunded" | "partial";
   payment_date: string;
   transaction_id: string;
   notes: string;
@@ -32,13 +37,13 @@ const PaymentForm: React.FC = () => {
   const queryClient = useQueryClient();
   const { can } = usePermissions();
   const [formData, setFormData] = useState<PaymentFormData>({
-    booking_id: '',
-    amount: '',
-    payment_method: 'Credit Card',
-    payment_status: 'pending',
-    payment_date: new Date().toISOString().split('T')[0],
-    transaction_id: '',
-    notes: '',
+    booking_id: "",
+    amount: "",
+    payment_method: "Credit Card",
+    payment_status: "pending",
+    payment_date: new Date().toISOString().split("T")[0],
+    transaction_id: "",
+    notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,30 +51,30 @@ const PaymentForm: React.FC = () => {
   // Get action and id from URL
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action') || 'create';
+    return params.get("action") || "create";
   }, []);
 
   const paymentId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
-  const isEditMode = action === 'edit' && paymentId !== null;
+  const isEditMode = action === "edit" && paymentId !== null;
 
   // Fetch payment data if editing
   const { data: paymentData, isLoading: isLoadingPayment } = useQuery({
-    queryKey: ['payment', paymentId],
+    queryKey: ["payment", paymentId],
     queryFn: async () => {
       if (!paymentId) return null;
-      
+
       const result = await apiService.getPayment(paymentId);
 
       if (!result) {
-        throw new Error('Failed to fetch payment');
+        throw new Error("Failed to fetch payment");
       }
-      
+
       if (!result.success) {
-        throw new Error(result.message || 'Payment not found');
+        throw new Error(result.message || "Payment not found");
       }
 
       const data = result.data;
@@ -79,33 +84,37 @@ const PaymentForm: React.FC = () => {
         amount: data.amount,
         payment_method: data.gateway,
         payment_status: data.status,
-        payment_date: data.processed_at ? data.processed_at.split(' ')[0] : new Date().toISOString().split('T')[0],
-        transaction_id: data.transaction_id || '',
-        notes: data.notes || '',
+        payment_date: data.processed_at
+          ? data.processed_at.split(" ")[0]
+          : new Date().toISOString().split("T")[0],
+        transaction_id: data.transaction_id || "",
+        notes: data.notes || "",
       };
     },
-    enabled: isEditMode && can('yatra_view_bookings'),
+    enabled: isEditMode && can("yatra_view_bookings"),
   });
 
   // Load payment data into form when editing
   useEffect(() => {
     if (paymentData && isEditMode) {
       setFormData({
-        booking_id: paymentData.booking_id?.toString() || '',
-        amount: paymentData.amount?.toString() || '',
-        payment_method: paymentData.payment_method || 'Credit Card',
-        payment_status: (paymentData.payment_status || 'pending') as PaymentFormData['payment_status'],
-        payment_date: paymentData.payment_date || new Date().toISOString().split('T')[0],
-        transaction_id: paymentData.transaction_id || '',
-        notes: paymentData.notes || '',
+        booking_id: paymentData.booking_id?.toString() || "",
+        amount: paymentData.amount?.toString() || "",
+        payment_method: paymentData.payment_method || "Credit Card",
+        payment_status: (paymentData.payment_status ||
+          "pending") as PaymentFormData["payment_status"],
+        payment_date:
+          paymentData.payment_date || new Date().toISOString().split("T")[0],
+        transaction_id: paymentData.transaction_id || "",
+        notes: paymentData.notes || "",
       });
     }
   }, [paymentData, isEditMode]);
 
   const handleFieldChange = (field: keyof PaymentFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
   };
 
@@ -113,29 +122,32 @@ const PaymentForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.booking_id.trim()) {
-      newErrors.booking_id = __('Booking is required', 'yatra');
+      newErrors.booking_id = __("Booking is required", "yatra");
     } else {
       const bookingId = parseInt(formData.booking_id);
       if (isNaN(bookingId) || bookingId <= 0) {
-        newErrors.booking_id = __('Valid booking ID is required', 'yatra');
+        newErrors.booking_id = __("Valid booking ID is required", "yatra");
       }
     }
 
     if (!formData.amount.trim()) {
-      newErrors.amount = __('Payment amount is required', 'yatra');
+      newErrors.amount = __("Payment amount is required", "yatra");
     } else {
       const amount = parseFloat(formData.amount);
       if (isNaN(amount) || amount <= 0) {
-        newErrors.amount = __('Payment amount must be a positive number', 'yatra');
+        newErrors.amount = __(
+          "Payment amount must be a positive number",
+          "yatra",
+        );
       }
     }
 
     if (!formData.payment_method.trim()) {
-      newErrors.payment_method = __('Payment method is required', 'yatra');;
+      newErrors.payment_method = __("Payment method is required", "yatra");
     }
 
     if (!formData.payment_date.trim()) {
-      newErrors.payment_date = __('Payment date is required', 'yatra');;
+      newErrors.payment_date = __("Payment date is required", "yatra");
     }
 
     setErrors(newErrors);
@@ -160,20 +172,22 @@ const PaymentForm: React.FC = () => {
         : await apiService.createPayment(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      queryClient.invalidateQueries({ queryKey: ["payments"] });
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       // Redirect to payments list
-      window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=payments`;
+      window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=payments`;
     },
     onError: (error: any) => {
-      console.error('Error saving payment:', error);
-      setErrors({ submit: error.message || __('Failed to save payment', 'yatra') });
+      console.error("Error saving payment:", error);
+      setErrors({
+        submit: error.message || __("Failed to save payment", "yatra"),
+      });
     },
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -189,7 +203,7 @@ const PaymentForm: React.FC = () => {
   };
 
   const handleBack = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=payments`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=payments`;
   };
 
   if (isLoadingPayment) {
@@ -203,12 +217,24 @@ const PaymentForm: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={isEditMode ? __('Edit Payment', 'yatra') : __('Add New Payment', 'yatra')}
-        description={isEditMode ? __('Update payment details', 'yatra') : __('Record a new payment for a booking', 'yatra')}
+        title={
+          isEditMode
+            ? __("Edit Payment", "yatra")
+            : __("Add New Payment", "yatra")
+        }
+        description={
+          isEditMode
+            ? __("Update payment details", "yatra")
+            : __("Record a new payment for a booking", "yatra")
+        }
         actions={
-          <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            className="flex items-center gap-2"
+          >
             <ArrowLeft className="w-4 h-4" />
-            {__('Back', 'yatra')}
+            {__("Back", "yatra")}
           </Button>
         }
       />
@@ -221,25 +247,36 @@ const PaymentForm: React.FC = () => {
               {/* Payment Information */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Payment Information', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Payment Information", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {/* Booking ID */}
                   <div>
-                    <label htmlFor="booking_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Booking', 'yatra')} <span className="text-red-500">*</span>
+                    <label
+                      htmlFor="booking_id"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Booking", "yatra")}{" "}
+                      <span className="text-red-500">*</span>
                     </label>
-                    <HelpText 
-                      text={__('Select the booking this payment is for. You can search by booking number or customer name.', 'yatra')}
+                    <HelpText
+                      text={__(
+                        "Select the booking this payment is for. You can search by booking number or customer name.",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <Input
                       id="booking_id"
                       type="text"
                       value={formData.booking_id}
-                      onChange={(e) => handleFieldChange('booking_id', e.target.value)}
-                      placeholder={__('Enter booking ID or search...', 'yatra')}
-                      className={errors.booking_id ? 'border-red-500' : ''}
+                      onChange={(e) =>
+                        handleFieldChange("booking_id", e.target.value)
+                      }
+                      placeholder={__("Enter booking ID or search...", "yatra")}
+                      className={errors.booking_id ? "border-red-500" : ""}
                       required
                     />
                     {errors.booking_id && (
@@ -254,24 +291,32 @@ const PaymentForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Amount */}
                     <div>
-                      <label htmlFor="amount" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Payment Amount', 'yatra')} <span className="text-red-500">*</span>
+                      <label
+                        htmlFor="amount"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Payment Amount", "yatra")}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
-                      <HelpText 
-                        text={__('Enter the payment amount received.', 'yatra')}
+                      <HelpText
+                        text={__("Enter the payment amount received.", "yatra")}
                         className="mb-2"
                       />
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">$</span>
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                          $
+                        </span>
                         <Input
                           id="amount"
                           type="number"
                           min="0"
                           step="0.01"
                           value={formData.amount}
-                          onChange={(e) => handleFieldChange('amount', e.target.value)}
-                          placeholder={__('e.g., 2500.00', 'yatra')}
-                          className={`pl-7 ${errors.amount ? 'border-red-500' : ''}`}
+                          onChange={(e) =>
+                            handleFieldChange("amount", e.target.value)
+                          }
+                          placeholder={__("e.g., 2500.00", "yatra")}
+                          className={`pl-7 ${errors.amount ? "border-red-500" : ""}`}
                           required
                         />
                       </div>
@@ -285,27 +330,44 @@ const PaymentForm: React.FC = () => {
 
                     {/* Payment Method */}
                     <div>
-                      <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Payment Method', 'yatra')} <span className="text-red-500">*</span>
+                      <label
+                        htmlFor="payment_method"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Payment Method", "yatra")}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
-                      <HelpText 
-                        text={__('Select the payment method used for this transaction.', 'yatra')}
+                      <HelpText
+                        text={__(
+                          "Select the payment method used for this transaction.",
+                          "yatra",
+                        )}
                         className="mb-2"
                       />
                       <Select
                         id="payment_method"
                         value={formData.payment_method}
-                        onChange={(e) => handleFieldChange('payment_method', e.target.value)}
-                        className={errors.payment_method ? 'border-red-500' : ''}
+                        onChange={(e) =>
+                          handleFieldChange("payment_method", e.target.value)
+                        }
+                        className={
+                          errors.payment_method ? "border-red-500" : ""
+                        }
                         required
                       >
-                        <option value="Credit Card">{__('Credit Card', 'yatra')}</option>
-                        <option value="Debit Card">{__('Debit Card', 'yatra')}</option>
-                        <option value="PayPal">{__('PayPal', 'yatra')}</option>
-                        <option value="Bank Transfer">{__('Bank Transfer', 'yatra')}</option>
-                        <option value="Cash">{__('Cash', 'yatra')}</option>
-                        <option value="Check">{__('Check', 'yatra')}</option>
-                        <option value="Other">{__('Other', 'yatra')}</option>
+                        <option value="Credit Card">
+                          {__("Credit Card", "yatra")}
+                        </option>
+                        <option value="Debit Card">
+                          {__("Debit Card", "yatra")}
+                        </option>
+                        <option value="PayPal">{__("PayPal", "yatra")}</option>
+                        <option value="Bank Transfer">
+                          {__("Bank Transfer", "yatra")}
+                        </option>
+                        <option value="Cash">{__("Cash", "yatra")}</option>
+                        <option value="Check">{__("Check", "yatra")}</option>
+                        <option value="Other">{__("Other", "yatra")}</option>
                       </Select>
                       {errors.payment_method && (
                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -320,19 +382,28 @@ const PaymentForm: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {/* Payment Date */}
                     <div>
-                      <label htmlFor="payment_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Payment Date', 'yatra')} <span className="text-red-500">*</span>
+                      <label
+                        htmlFor="payment_date"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Payment Date", "yatra")}{" "}
+                        <span className="text-red-500">*</span>
                       </label>
-                      <HelpText 
-                        text={__('Date when the payment was received.', 'yatra')}
+                      <HelpText
+                        text={__(
+                          "Date when the payment was received.",
+                          "yatra",
+                        )}
                         className="mb-2"
                       />
                       <Input
                         id="payment_date"
                         type="date"
                         value={formData.payment_date}
-                        onChange={(e) => handleFieldChange('payment_date', e.target.value)}
-                        className={errors.payment_date ? 'border-red-500' : ''}
+                        onChange={(e) =>
+                          handleFieldChange("payment_date", e.target.value)
+                        }
+                        className={errors.payment_date ? "border-red-500" : ""}
                         required
                       />
                       {errors.payment_date && (
@@ -345,20 +416,30 @@ const PaymentForm: React.FC = () => {
 
                     {/* Transaction ID */}
                     <div>
-                      <label htmlFor="transaction_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                        {__('Transaction ID', 'yatra')}
+                      <label
+                        htmlFor="transaction_id"
+                        className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                      >
+                        {__("Transaction ID", "yatra")}
                       </label>
-                      <HelpText 
-                        text={__('Optional transaction ID or reference number from the payment gateway.', 'yatra')}
+                      <HelpText
+                        text={__(
+                          "Optional transaction ID or reference number from the payment gateway.",
+                          "yatra",
+                        )}
                         className="mb-2"
                       />
                       <Input
                         id="transaction_id"
                         type="text"
                         value={formData.transaction_id}
-                        onChange={(e) => handleFieldChange('transaction_id', e.target.value)}
-                        placeholder={__('e.g., TXN123456789', 'yatra')}
-                        className={errors.transaction_id ? 'border-red-500' : ''}
+                        onChange={(e) =>
+                          handleFieldChange("transaction_id", e.target.value)
+                        }
+                        placeholder={__("e.g., TXN123456789", "yatra")}
+                        className={
+                          errors.transaction_id ? "border-red-500" : ""
+                        }
                       />
                       {errors.transaction_id && (
                         <p className="mt-1.5 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
@@ -371,18 +452,29 @@ const PaymentForm: React.FC = () => {
 
                   {/* Notes */}
                   <div>
-                    <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                      {__('Notes', 'yatra')}
+                    <label
+                      htmlFor="notes"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5"
+                    >
+                      {__("Notes", "yatra")}
                     </label>
-                    <HelpText 
-                      text={__('Optional notes about this payment for internal reference.', 'yatra')}
+                    <HelpText
+                      text={__(
+                        "Optional notes about this payment for internal reference.",
+                        "yatra",
+                      )}
                       className="mb-2"
                     />
                     <textarea
                       id="notes"
                       value={formData.notes}
-                      onChange={(e) => handleFieldChange('notes', e.target.value)}
-                      placeholder={__('e.g., Full payment received, Partial payment - balance pending', 'yatra')}
+                      onChange={(e) =>
+                        handleFieldChange("notes", e.target.value)
+                      }
+                      placeholder={__(
+                        "e.g., Full payment received, Partial payment - balance pending",
+                        "yatra",
+                      )}
                       rows={3}
                       className="flex w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:ring-offset-gray-900 dark:placeholder:text-gray-400 dark:focus-visible:ring-blue-400 resize-none"
                     />
@@ -396,25 +488,45 @@ const PaymentForm: React.FC = () => {
               {/* Payment Status */}
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base">{__('Payment Status', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Payment Status", "yatra")}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Select
                     value={formData.payment_status}
-                    onChange={(e) => handleFieldChange('payment_status', e.target.value as PaymentFormData['payment_status'])}
+                    onChange={(e) =>
+                      handleFieldChange(
+                        "payment_status",
+                        e.target.value as PaymentFormData["payment_status"],
+                      )
+                    }
                   >
-                    <option value="pending">{__('Pending', 'yatra')}</option>
-                    <option value="completed">{__('Completed', 'yatra')}</option>
-                    <option value="partial">{__('Partial', 'yatra')}</option>
-                    <option value="failed">{__('Failed', 'yatra')}</option>
-                    <option value="refunded">{__('Refunded', 'yatra')}</option>
+                    <option value="pending">{__("Pending", "yatra")}</option>
+                    <option value="completed">
+                      {__("Completed", "yatra")}
+                    </option>
+                    <option value="partial">{__("Partial", "yatra")}</option>
+                    <option value="failed">{__("Failed", "yatra")}</option>
+                    <option value="refunded">{__("Refunded", "yatra")}</option>
                   </Select>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {formData.payment_status === 'completed' && __('Payment has been successfully processed.', 'yatra')}
-                    {formData.payment_status === 'pending' && __('Payment is pending confirmation.', 'yatra')}
-                    {formData.payment_status === 'partial' && __('Partial payment recorded. Balance may be pending.', 'yatra')}
-                    {formData.payment_status === 'failed' && __('Payment processing failed. Please check the details.', 'yatra')}
-                    {formData.payment_status === 'refunded' && __('Payment has been refunded to the customer.', 'yatra')}
+                    {formData.payment_status === "completed" &&
+                      __("Payment has been successfully processed.", "yatra")}
+                    {formData.payment_status === "pending" &&
+                      __("Payment is pending confirmation.", "yatra")}
+                    {formData.payment_status === "partial" &&
+                      __(
+                        "Partial payment recorded. Balance may be pending.",
+                        "yatra",
+                      )}
+                    {formData.payment_status === "failed" &&
+                      __(
+                        "Payment processing failed. Please check the details.",
+                        "yatra",
+                      )}
+                    {formData.payment_status === "refunded" &&
+                      __("Payment has been refunded to the customer.", "yatra")}
                   </p>
                 </CardContent>
               </Card>
@@ -435,7 +547,7 @@ const PaymentForm: React.FC = () => {
               onClick={handleBack}
               disabled={isSubmitting}
             >
-              {__('Cancel', 'yatra')}
+              {__("Cancel", "yatra")}
             </Button>
             <Button
               type="submit"
@@ -445,12 +557,14 @@ const PaymentForm: React.FC = () => {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  {__('Saving...', 'yatra')}
+                  {__("Saving...", "yatra")}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  {isEditMode ? __('Update Payment', 'yatra') : __('Record Payment', 'yatra')}
+                  {isEditMode
+                    ? __("Update Payment", "yatra")
+                    : __("Record Payment", "yatra")}
                 </>
               )}
             </Button>
@@ -462,4 +576,3 @@ const PaymentForm: React.FC = () => {
 };
 
 export default PaymentForm;
-

@@ -1,11 +1,11 @@
-import React from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select } from '../ui/select';
-import { X, Search, ArrowUp, ArrowDown } from 'lucide-react';
-import { __ } from '../../lib/i18n';
+import React from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Select } from "../ui/select";
+import { X, Search, ArrowUp, ArrowDown } from "lucide-react";
+import { __ } from "../../lib/i18n";
 
-type SortOrder = 'asc' | 'desc';
+type SortOrder = "asc" | "desc";
 
 interface FilterOption {
   value: string;
@@ -46,7 +46,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
   sortOptions,
   onResetFilters,
   hasFilters,
-  placeholder = 'Search...'
+  placeholder = "Search...",
 }) => {
   return (
     <div className="flex flex-col lg:flex-row gap-2 items-stretch lg:items-center">
@@ -68,7 +68,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
         onChange={(e) => onStatusChange(e.target.value)}
         className="w-full lg:w-48 lg:flex-none"
       >
-        {statusOptions.map(option => (
+        {statusOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
           </option>
@@ -81,14 +81,15 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
         onChange={(e) => onSortByChange(e.target.value)}
         className="w-full lg:w-48 lg:flex-none"
       >
-        {sortOptions.map(option => (
+        {sortOptions.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
-            {sortBy === option.value && (
-              sortOrder === 'asc' 
-                ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-                : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-            )}
+            {sortBy === option.value &&
+              (sortOrder === "asc" ? (
+                <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+              ) : (
+                <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+              ))}
           </option>
         ))}
       </Select>
@@ -96,16 +97,22 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
       {/* Sort Order */}
       <Button
         variant="outline"
-        onClick={() => onSortOrderChange(sortOrder === 'asc' ? 'desc' : 'asc')}
+        onClick={() => onSortOrderChange(sortOrder === "asc" ? "desc" : "asc")}
         className="h-11 px-4 flex items-center gap-1.5 flex-shrink-0"
-        title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
+        title={
+          sortOrder === "asc"
+            ? __("Ascending", "yatra")
+            : __("Descending", "yatra")
+        }
       >
-        {sortOrder === 'asc' ? (
+        {sortOrder === "asc" ? (
           <ArrowUp className="w-4 h-4" />
         ) : (
           <ArrowDown className="w-4 h-4" />
         )}
-        <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
+        <span className="text-xs">
+          {sortOrder === "asc" ? __("Asc", "yatra") : __("Desc", "yatra")}
+        </span>
       </Button>
 
       {/* Reset Button */}
@@ -116,7 +123,7 @@ export const SearchFilterToolbar: React.FC<SearchFilterToolbarProps> = ({
           className="h-11 flex items-center gap-2 flex-shrink-0"
         >
           <X className="w-4 h-4" />
-          {__('Reset', 'yatra')}
+          {__("Reset", "yatra")}
         </Button>
       )}
     </div>

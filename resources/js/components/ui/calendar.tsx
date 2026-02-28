@@ -1,6 +1,18 @@
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, isToday } from "date-fns";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+  isToday,
+} from "date-fns";
 
 export interface CalendarProps {
   selected?: Date;
@@ -98,11 +110,12 @@ export const Calendar: React.FC<CalendarProps> = ({
               className={`
                 h-9 w-9 text-sm rounded-md transition-colors
                 ${isCurrentMonth ? "text-gray-900 dark:text-white" : "text-gray-400 dark:text-gray-600"}
-                ${isSelected
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : isTodayDate
-                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold"
-                  : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                ${
+                  isSelected
+                    ? "bg-blue-600 text-white hover:bg-blue-700"
+                    : isTodayDate
+                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold"
+                      : "hover:bg-gray-100 dark:hover:bg-gray-700"
                 }
                 ${isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
               `}
@@ -115,4 +128,3 @@ export const Calendar: React.FC<CalendarProps> = ({
     </div>
   );
 };
-

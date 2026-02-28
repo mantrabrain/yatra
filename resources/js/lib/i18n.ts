@@ -58,7 +58,10 @@ declare global {
         trackAddToCart?: boolean;
         useConversionsApi?: boolean;
         testEventCode?: string;
-        eventConfig?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+        eventConfig?: Record<
+          string,
+          { enabled: boolean; custom_params?: string[] }
+        >;
         parameterMapping?: Record<string, string>;
       };
       googleAnalytics?: {
@@ -70,8 +73,15 @@ declare global {
         trackPurchase?: boolean;
         useMeasurementProtocol?: boolean;
         debugMode?: boolean;
-        customDimensions?: Array<{ name: string; yatra_field: string; scope?: string }>;
-        eventConfig?: Record<string, { enabled: boolean; custom_params?: string[] }>;
+        customDimensions?: Array<{
+          name: string;
+          yatra_field: string;
+          scope?: string;
+        }>;
+        eventConfig?: Record<
+          string,
+          { enabled: boolean; custom_params?: string[] }
+        >;
       };
       googleCalendar?: {
         client_id?: string;
@@ -91,28 +101,28 @@ declare global {
  * Handles translations for UI text
  */
 
-import { __ as wpI18n__, _x as wpI18n_x } from '@wordpress/i18n';
+import { __ as wpI18n__, _x as wpI18n_x } from "@wordpress/i18n";
 
 function __(key: string): string;
 function __(key: string, textDomain: string): string;
 function __(key: string, textDomain?: string): string {
-    // Use direct WordPress i18n function which is working correctly
-    if (typeof window !== 'undefined' && (window as any).wp?.i18n?.__) {
-        return (window as any).wp.i18n.__(key, textDomain || 'yatra');
-    }
-    // Fallback to @wordpress/i18n
-    return wpI18n__(key, textDomain || 'yatra');
+  // Use direct WordPress i18n function which is working correctly
+  if (typeof window !== "undefined" && (window as any).wp?.i18n?.__) {
+    return (window as any).wp.i18n.__(key, textDomain || "yatra");
+  }
+  // Fallback to @wordpress/i18n
+  return wpI18n__(key, textDomain || "yatra");
 }
 
 function _x(key: string, context: string): string;
 function _x(key: string, context: string, textDomain: string): string;
 function _x(key: string, context: string, textDomain?: string): string {
-    // Use direct WordPress i18n function which is working correctly
-    if (typeof window !== 'undefined' && (window as any).wp?.i18n?._x) {
-        return (window as any).wp.i18n._x(key, context, textDomain || 'yatra');
-    }
-    // Fallback to @wordpress/i18n
-    return wpI18n_x(key, context, textDomain || 'yatra');
+  // Use direct WordPress i18n function which is working correctly
+  if (typeof window !== "undefined" && (window as any).wp?.i18n?._x) {
+    return (window as any).wp.i18n._x(key, context, textDomain || "yatra");
+  }
+  // Fallback to @wordpress/i18n
+  return wpI18n_x(key, context, textDomain || "yatra");
 }
 
 export { __, _x };
@@ -127,4 +137,3 @@ export { __, _x };
 export const _n = (single: string, plural: string, number: number): string => {
   return number === 1 ? __(single) : __(plural);
 };
-

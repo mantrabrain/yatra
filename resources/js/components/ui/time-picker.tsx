@@ -69,7 +69,9 @@ export const TimePicker: React.FC<TimePickerProps> = ({
   };
 
   const hourOptions = Array.from({ length: 12 }, (_, i) => (i + 1).toString());
-  const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0"));
+  const minuteOptions = Array.from({ length: 60 }, (_, i) =>
+    i.toString().padStart(2, "0"),
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -81,13 +83,17 @@ export const TimePicker: React.FC<TimePickerProps> = ({
           className={`w-full justify-start text-left font-normal ${error ? "border-red-500" : ""} ${!value ? "text-gray-500" : ""} ${className}`}
         >
           <Clock className="mr-2 h-4 w-4" />
-          {formatDisplayTime() || <span className="text-gray-500">{placeholder}</span>}
+          {formatDisplayTime() || (
+            <span className="text-gray-500">{placeholder}</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-4" align="start">
         <div className="flex items-center gap-4">
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Hour</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Hour
+            </label>
             <div className="grid grid-cols-3 gap-1 max-h-48 overflow-y-auto">
               {hourOptions.map((h) => (
                 <button
@@ -111,7 +117,9 @@ export const TimePicker: React.FC<TimePickerProps> = ({
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Minute</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Minute
+            </label>
             <div className="grid grid-cols-3 gap-1 max-h-48 overflow-y-auto">
               {minuteOptions.map((m) => (
                 <button
@@ -135,7 +143,9 @@ export const TimePicker: React.FC<TimePickerProps> = ({
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">AM/PM</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              AM/PM
+            </label>
             <div className="flex flex-col gap-1">
               <button
                 type="button"
@@ -187,4 +197,3 @@ export const TimePicker: React.FC<TimePickerProps> = ({
     </Popover>
   );
 };
-

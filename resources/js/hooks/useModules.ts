@@ -1,7 +1,12 @@
-import { useQuery, UseQueryOptions, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiClient } from '../lib/api-client';
-import { __ } from '../lib/i18n';
-import { useToast } from '../components/ui/toast';
+import {
+  useQuery,
+  UseQueryOptions,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { apiClient } from "../lib/api-client";
+import { __ } from "../lib/i18n";
+import { useToast } from "../components/ui/toast";
 
 export interface ModuleDefinition {
   slug: string;
@@ -27,7 +32,7 @@ interface ModulesResponse {
 }
 
 const fetchModules = async (): Promise<ModuleDefinition[]> => {
-  const response: ModulesResponse = await apiClient.get('/modules');
+  const response: ModulesResponse = await apiClient.get("/modules");
   if (Array.isArray(response)) {
     return response;
   }
@@ -37,9 +42,11 @@ const fetchModules = async (): Promise<ModuleDefinition[]> => {
   return [];
 };
 
-export const useModulesQuery = (options?: Partial<UseQueryOptions<ModuleDefinition[], Error>>) => {
+export const useModulesQuery = (
+  options?: Partial<UseQueryOptions<ModuleDefinition[], Error>>,
+) => {
   return useQuery<ModuleDefinition[], Error>({
-    queryKey: ['modules'],
+    queryKey: ["modules"],
     queryFn: fetchModules,
     staleTime: 0,
     ...options,
@@ -54,9 +61,9 @@ interface TogglePayload {
 
 const formatNamesList = (names: string[]) => {
   if (names.length <= 2) {
-    return names.join(', ');
+    return names.join(", ");
   }
-  return `${names.slice(0, 2).join(', ')} ${__('and', 'yatra')} ${names.length - 2} ${__('more', 'yatra')}`;
+  return `${names.slice(0, 2).join(", ")} ${__("and", "yatra")} ${names.length - 2} ${__("more", "yatra")}`;
 };
 
 export const useToggleModule = () => {
@@ -65,59 +72,77 @@ export const useToggleModule = () => {
 
   return useMutation({
     mutationFn: async ({ slug, enabled }: TogglePayload) => {
-      const response: ModulesResponse = await apiClient.post(`/modules/${slug}/toggle`, { enabled });
+      const response: ModulesResponse = await apiClient.post(
+        `/modules/${slug}/toggle`,
+        { enabled },
+      );
       return Array.isArray(response?.data) ? response.data : [];
     },
     onSuccess: (data, variables) => {
-      queryClient.setQueryData(['modules'], data);
-      
+      queryClient.setQueryData(["modules"], data);
+
       // Update global admin variables for navigation
       if (window.yatraAdmin) {
         // Update module-specific flags based on the enabled modules
-        const enabledModules = data.filter(m => m.enabled);
-        
+        const enabledModules = data.filter((m) => m.enabled);
+
         // Check for specific modules that affect navigation
-        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(m => 
-          m.slug === 'email_automation' || m.slug === 'email-automation'
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation",
         );
-        window.yatraAdmin.tripConsentEnabled = enabledModules.some(m => 
-          m.slug === 'trip_consent' || m.slug === 'trip-consent'
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent",
         );
-        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
-          m.slug === 'additional_services' || m.slug === 'additional-services'
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "additional_services" ||
+            m.slug === "additional-services",
         );
-        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(m => 
-          m.slug === 'abandoned_booking_recovery' || m.slug === 'abandoned-booking-recovery'
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "abandoned_booking_recovery" ||
+            m.slug === "abandoned-booking-recovery",
         );
-        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(m => 
-          m.slug === 'dynamic_pricing' || m.slug === 'dynamic-pricing'
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing",
         );
-                // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
-        
+        // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
+
         // Trigger a navigation refresh by updating a custom event
-        window.dispatchEvent(new CustomEvent('yatra-modules-updated', { 
-          detail: { 
-            enabledModules: enabledModules,
-            updatedModule: variables 
-          } 
-        }));
-        
+        window.dispatchEvent(
+          new CustomEvent("yatra-modules-updated", {
+            detail: {
+              enabledModules: enabledModules,
+              updatedModule: variables,
+            },
+          }),
+        );
+
         // Force a layout re-render by updating the URL key
         const urlKey = (window as any).__yatraUrlKey || 0;
         (window as any).__yatraUrlKey = urlKey + 1;
-        window.dispatchEvent(new CustomEvent('yatra-force-nav-refresh'));
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
       }
-      
+
       const label = variables.name || variables.slug;
       showToast(
         variables.enabled
-          ? __('{module} enabled successfully.', 'yatra').replace('{module}', label)
-          : __('{module} disabled successfully.', 'yatra').replace('{module}', label),
-        'success'
+          ? __("{module} enabled successfully.", "yatra").replace(
+              "{module}",
+              label,
+            )
+          : __("{module} disabled successfully.", "yatra").replace(
+              "{module}",
+              label,
+            ),
+        "success",
       );
     },
     onError: (error: Error) => {
-      showToast(error.message || __('Failed to update module.', 'yatra'), 'error');
+      showToast(
+        error.message || __("Failed to update module.", "yatra"),
+        "error",
+      );
     },
   });
 };
@@ -128,64 +153,74 @@ export const useBulkToggleModules = () => {
 
   return useMutation({
     mutationFn: async (items: TogglePayload[]) => {
-      const response: ModulesResponse = await apiClient.post('/modules/bulk-toggle', { items });
+      const response: ModulesResponse = await apiClient.post(
+        "/modules/bulk-toggle",
+        { items },
+      );
       return Array.isArray(response?.data) ? response.data : [];
     },
     onSuccess: (data, variables = []) => {
-      queryClient.setQueryData(['modules'], data);
-      
+      queryClient.setQueryData(["modules"], data);
+
       // Update global admin variables for navigation
       if (window.yatraAdmin && data) {
         // Update module-specific flags based on the enabled modules
-        const enabledModules = data.filter(m => m.enabled);
-        
+        const enabledModules = data.filter((m) => m.enabled);
+
         // Check for specific modules that affect navigation
-        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(m => 
-          m.slug === 'email_automation' || m.slug === 'email-automation'
+        window.yatraAdmin.emailAutomationEnabled = enabledModules.some(
+          (m) => m.slug === "email_automation" || m.slug === "email-automation",
         );
-        window.yatraAdmin.tripConsentEnabled = enabledModules.some(m => 
-          m.slug === 'trip_consent' || m.slug === 'trip-consent'
+        window.yatraAdmin.tripConsentEnabled = enabledModules.some(
+          (m) => m.slug === "trip_consent" || m.slug === "trip-consent",
         );
-        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(m => 
-          m.slug === 'additional_services' || m.slug === 'additional-services'
+        window.yatraAdmin.additionalServicesEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "additional_services" ||
+            m.slug === "additional-services",
         );
-        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(m => 
-          m.slug === 'abandoned_booking_recovery' || m.slug === 'abandoned-booking-recovery'
+        window.yatraAdmin.abandonedBookingRecoveryEnabled = enabledModules.some(
+          (m) =>
+            m.slug === "abandoned_booking_recovery" ||
+            m.slug === "abandoned-booking-recovery",
         );
-        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(m => 
-          m.slug === 'dynamic_pricing' || m.slug === 'dynamic-pricing'
+        window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
+          (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing",
         );
-                // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
-        
+        // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
+
         // Trigger a navigation refresh by updating a custom event
-        window.dispatchEvent(new CustomEvent('yatra-modules-updated', { 
-          detail: { 
-            enabledModules: enabledModules,
-            updatedModules: variables || []
-          } 
-        }));
-        
+        window.dispatchEvent(
+          new CustomEvent("yatra-modules-updated", {
+            detail: {
+              enabledModules: enabledModules,
+              updatedModules: variables || [],
+            },
+          }),
+        );
+
         // Force a layout re-render by updating the URL key
         const urlKey = (window as any).__yatraUrlKey || 0;
         (window as any).__yatraUrlKey = urlKey + 1;
-        window.dispatchEvent(new CustomEvent('yatra-force-nav-refresh'));
+        window.dispatchEvent(new CustomEvent("yatra-force-nav-refresh"));
       }
-      
+
       if (variables.length > 0) {
         const names = variables.map((item) => item.name || item.slug);
         const summary = formatNamesList(names);
         const message = variables[0].enabled
-          ? __('Enabled: {modules}', 'yatra').replace('{modules}', summary)
-          : __('Disabled: {modules}', 'yatra').replace('{modules}', summary);
-        showToast(message, 'success');
+          ? __("Enabled: {modules}", "yatra").replace("{modules}", summary)
+          : __("Disabled: {modules}", "yatra").replace("{modules}", summary);
+        showToast(message, "success");
       } else {
-        showToast(__('Modules updated successfully.', 'yatra'), 'success');
+        showToast(__("Modules updated successfully.", "yatra"), "success");
       }
     },
     onError: (error: Error) => {
-      showToast(error.message || __('Failed to update modules.', 'yatra'), 'error');
+      showToast(
+        error.message || __("Failed to update modules.", "yatra"),
+        "error",
+      );
     },
   });
 };
-
-

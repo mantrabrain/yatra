@@ -3,36 +3,41 @@
  * Clean, minimal SaaS-style dashboard with proper alignment
  */
 
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { 
-  MapPin, 
-  Calendar, 
-  DollarSign, 
-  Users, 
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  MapPin,
+  Calendar,
+  DollarSign,
+  Users,
   Plane,
   TrendingUp,
   Info,
   Activity,
   Clock,
-  CheckCircle
+  CheckCircle,
   // AlertCircle available for future use
-} from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
-import { StatCard } from '../components/common/StatCard';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { Skeleton } from '../components/ui/skeleton';
-import { SimpleBarChart } from '../components/charts/SimpleBarChart';
-import BookingsOverviewChart from '../components/charts/BookingsOverviewChart';
-import BookingStatusChart from '../components/charts/BookingStatusChart';
-import { UpcomingDepartures } from '../components/dashboard/UpcomingDepartures';
-import { PendingPayments } from '../components/dashboard/PendingPayments';
-import { RecentBookings } from '../components/dashboard/RecentBookings';
-import { apiClient } from '../lib/api-client';
-import { getCurrencySymbol } from '../data/currencies';
+} from "lucide-react";
+import { __ } from "../lib/i18n";
+import { usePermissions } from "../hooks/usePermissions";
+import { StatCard } from "../components/common/StatCard";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { Skeleton } from "../components/ui/skeleton";
+import { SimpleBarChart } from "../components/charts/SimpleBarChart";
+import BookingsOverviewChart from "../components/charts/BookingsOverviewChart";
+import BookingStatusChart from "../components/charts/BookingStatusChart";
+import { UpcomingDepartures } from "../components/dashboard/UpcomingDepartures";
+import { PendingPayments } from "../components/dashboard/PendingPayments";
+import { RecentBookings } from "../components/dashboard/RecentBookings";
+import { apiClient } from "../lib/api-client";
+import { getCurrencySymbol } from "../data/currencies";
 
 // Skeleton components
 const SkeletonStatCard = () => (
@@ -65,12 +70,12 @@ const Dashboard: React.FC = () => {
   const defaultCurrency =
     (window as any)?.yatraAdmin?.currency ||
     (window as any)?.yatraBookingData?.currency ||
-    'USD';
+    "USD";
 
   const currencyPosition =
     (window as any)?.yatraAdmin?.currency_position ||
     (window as any)?.yatraBookingData?.currency_position ||
-    'left';
+    "left";
 
   const currencyDecimalsRaw =
     (window as any)?.yatraAdmin?.currency_decimals ||
@@ -80,29 +85,32 @@ const Dashboard: React.FC = () => {
     : 2;
 
   // Get additional currency settings
-  const thousandSeparator = (window as any)?.yatraAdmin?.thousandSeparator || ',';
-  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || '.';
+  const thousandSeparator =
+    (window as any)?.yatraAdmin?.thousandSeparator || ",";
+  const decimalSeparator = (window as any)?.yatraAdmin?.decimalSeparator || ".";
 
   // Comprehensive currency formatting function
   const formatCurrencyAmount = (amount: number) => {
-    if (!amount || amount === 0) return getCurrencySymbol(defaultCurrency) + '0';
-    
+    if (!amount || amount === 0)
+      return getCurrencySymbol(defaultCurrency) + "0";
+
     const numPrice = Number(amount) || 0;
-    
+
     // Format the number with proper separators
     const formattedAmount = new Intl.NumberFormat(undefined, {
       minimumFractionDigits: currencyDecimals,
       maximumFractionDigits: currencyDecimals,
-    }).format(numPrice)
-      .replace(/,/g, 'TEMP_THOUSAND')
+    })
+      .format(numPrice)
+      .replace(/,/g, "TEMP_THOUSAND")
       .replace(/\./g, decimalSeparator)
       .replace(/TEMP_THOUSAND/g, thousandSeparator);
-    
+
     // Get currency symbol
     const currencySymbol = getCurrencySymbol(defaultCurrency);
-    
+
     // Apply currency position
-    if (currencyPosition === 'after' || currencyPosition === 'right') {
+    if (currencyPosition === "after" || currencyPosition === "right") {
       return `${formattedAmount} ${currencySymbol}`;
     } else {
       return `${currencySymbol}${formattedAmount}`;
@@ -111,9 +119,9 @@ const Dashboard: React.FC = () => {
 
   // Fetch booking statistics (totals, revenue, status breakdown, upcoming)
   const { data: bookingStats, isLoading } = useQuery({
-    queryKey: ['dashboard-booking-stats'],
+    queryKey: ["dashboard-booking-stats"],
     queryFn: async () => {
-      const response = await apiClient.get('/bookings/stats');
+      const response = await apiClient.get("/bookings/stats");
       // Shape: { success: true, data: { total, by_status, total_revenue, total_collected, this_month, upcoming } }
       return response?.data || {};
     },
@@ -121,33 +129,37 @@ const Dashboard: React.FC = () => {
 
   // Fetch total trips count
   const { data: tripsSummary } = useQuery({
-    queryKey: ['dashboard-trips-total'],
+    queryKey: ["dashboard-trips-total"],
     queryFn: async () => {
-      const response = await apiClient.get('/trips', { params: { per_page: 1 } });
+      const response = await apiClient.get("/trips", {
+        params: { per_page: 1 },
+      });
       return { total: response?.total ?? 0 };
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Fetch total customers count
   const { data: customersSummary } = useQuery({
-    queryKey: ['dashboard-customers-total'],
+    queryKey: ["dashboard-customers-total"],
     queryFn: async () => {
-      const response = await apiClient.get('/customers', { params: { per_page: 1 } });
+      const response = await apiClient.get("/customers", {
+        params: { per_page: 1 },
+      });
       return { total: response?.total ?? 0 };
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   // Fetch bookings chart data: bookings per month for the last 6 months (including current)
   const { data: bookingsData } = useQuery({
-    queryKey: ['bookings-chart'],
+    queryKey: ["bookings-chart"],
     queryFn: async () => {
       const now = new Date();
-      const pad = (n: number) => String(n).padStart(2, '0');
+      const pad = (n: number) => String(n).padStart(2, "0");
 
       // Get a recent batch of bookings and aggregate by created_at month
-      const response = await apiClient.get('/bookings', {
+      const response = await apiClient.get("/bookings", {
         params: {
           per_page: 500,
         },
@@ -174,8 +186,8 @@ const Dashboard: React.FC = () => {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const ym = `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
         const label = d.toLocaleDateString(undefined, {
-          month: 'short',
-          year: 'numeric',
+          month: "short",
+          year: "numeric",
         });
         months.push({
           label,
@@ -186,7 +198,7 @@ const Dashboard: React.FC = () => {
 
       return months;
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   // Derive booking status breakdown from bookingStats.by_status
@@ -199,24 +211,44 @@ const Dashboard: React.FC = () => {
       if (!entry) return 0;
       // entry is an object like { status: 'pending', count: '5' }
       const raw = (entry as any).count;
-      const n = typeof raw === 'string' ? parseInt(raw, 10) : Number(raw ?? 0);
+      const n = typeof raw === "string" ? parseInt(raw, 10) : Number(raw ?? 0);
       return Number.isNaN(n) ? 0 : n;
     };
 
     return [
-      { label: __('Pending', 'yatra'), value: getCount('pending'), color: '#f59e0b' },
-      { label: __('Confirmed', 'yatra'), value: getCount('confirmed'), color: '#10b981' },
-      { label: __('Completed', 'yatra'), value: getCount('completed'), color: '#3b82f6' },
-      { label: __('Cancelled', 'yatra'), value: getCount('cancelled'), color: '#ef4444' },
-      { label: __('Refunded', 'yatra'), value: getCount('refunded'), color: '#a855f7' },
+      {
+        label: __("Pending", "yatra"),
+        value: getCount("pending"),
+        color: "#f59e0b",
+      },
+      {
+        label: __("Confirmed", "yatra"),
+        value: getCount("confirmed"),
+        color: "#10b981",
+      },
+      {
+        label: __("Completed", "yatra"),
+        value: getCount("completed"),
+        color: "#3b82f6",
+      },
+      {
+        label: __("Cancelled", "yatra"),
+        value: getCount("cancelled"),
+        color: "#ef4444",
+      },
+      {
+        label: __("Refunded", "yatra"),
+        value: getCount("refunded"),
+        color: "#a855f7",
+      },
     ];
   }, [bookingStats]);
 
   // Fetch popular destinations (aggregate from trips API)
   const { data: destinationsData } = useQuery({
-    queryKey: ['popular-destinations'],
+    queryKey: ["popular-destinations"],
     queryFn: async () => {
-      const response = await apiClient.get('/trips', {
+      const response = await apiClient.get("/trips", {
         params: {
           per_page: 50,
         },
@@ -229,13 +261,20 @@ const Dashboard: React.FC = () => {
       trips.forEach((trip: any) => {
         const destinations = trip.destinations || [];
         destinations.forEach((dest: any) => {
-          const name = dest?.name || dest?.destination_name || '';
+          const name = dest?.name || dest?.destination_name || "";
           if (!name) return;
           counts[name] = (counts[name] || 0) + 1;
         });
       });
 
-      const palette = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#6366f1', '#14b8a6'];
+      const palette = [
+        "#3b82f6",
+        "#10b981",
+        "#f59e0b",
+        "#ef4444",
+        "#6366f1",
+        "#14b8a6",
+      ];
       const entries = Object.entries(counts)
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6);
@@ -246,19 +285,19 @@ const Dashboard: React.FC = () => {
         color: palette[index % palette.length],
       }));
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Fetch upcoming departures (real data from /departures)
   const { data: departures } = useQuery({
-    queryKey: ['upcoming-departures'],
+    queryKey: ["upcoming-departures"],
     queryFn: async () => {
       const today = new Date();
-      const todayStr = today.toISOString().split('T')[0];
+      const todayStr = today.toISOString().split("T")[0];
 
-      const response = await apiClient.get('/departures', {
+      const response = await apiClient.get("/departures", {
         params: {
-          status: 'upcoming',
+          status: "upcoming",
           date_from: todayStr,
           include_past: false,
         },
@@ -268,10 +307,22 @@ const Dashboard: React.FC = () => {
 
       // Map API departures into widget-friendly shape
       return items.map((d: any) => {
-        const tripTitle = d?.trip?.title || d?.trip_title || d?.title || '';
-        const destination = (d?.trip?.destinations && d.trip.destinations[0]?.name) || d?.destination || undefined;
-        const totalSpots = d?.total_spots ?? d?.capacity ?? d?.total_seats ?? d?.max_travelers ?? 0;
-        const availableSpots = d?.available_spots ?? d?.available_seats ?? d?.remaining_slots ?? (totalSpots - (d?.bookings_count || 0));
+        const tripTitle = d?.trip?.title || d?.trip_title || d?.title || "";
+        const destination =
+          (d?.trip?.destinations && d.trip.destinations[0]?.name) ||
+          d?.destination ||
+          undefined;
+        const totalSpots =
+          d?.total_spots ??
+          d?.capacity ??
+          d?.total_seats ??
+          d?.max_travelers ??
+          0;
+        const availableSpots =
+          d?.available_spots ??
+          d?.available_seats ??
+          d?.remaining_slots ??
+          totalSpots - (d?.bookings_count || 0);
 
         return {
           id: d.id,
@@ -280,35 +331,34 @@ const Dashboard: React.FC = () => {
           departure_date: d.start_date || d.date || d.departure_date,
           available_spots: Number.isFinite(availableSpots) ? availableSpots : 0,
           total_spots: Number.isFinite(totalSpots) ? totalSpots : 0,
-          status: d.status || 'upcoming',
+          status: d.status || "upcoming",
           destination,
         };
       });
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Fetch pending payments (real data)
   const { data: pendingPayments } = useQuery({
-    queryKey: ['pending-payments'],
+    queryKey: ["pending-payments"],
     queryFn: async () => {
-      const response = await apiClient.get('/payments', {
+      const response = await apiClient.get("/payments", {
         params: {
-          status: 'pending',
+          status: "pending",
           per_page: 5,
         },
       });
       return response?.data || [];
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
-
 
   // Fetch recent bookings (real data, latest 5) and map to widget shape
   const { data: recentBookings } = useQuery({
-    queryKey: ['recent-bookings'],
+    queryKey: ["recent-bookings"],
     queryFn: async () => {
-      const response = await apiClient.get('/bookings', {
+      const response = await apiClient.get("/bookings", {
         params: {
           per_page: 5,
         },
@@ -318,15 +368,19 @@ const Dashboard: React.FC = () => {
       return items.map((b: any) => ({
         id: b.id,
         booking_id: b.reference || `BK-${b.id}`,
-        customer_name: b.customer_name || b.contact_first_name || '',
-        trip_title: b.trip_title || '',
+        customer_name: b.customer_name || b.contact_first_name || "",
+        trip_title: b.trip_title || "",
         // Prefer created_at, fallback to travel_date, otherwise empty string
-        booking_date: b.created_at || b.travel_date || '',
+        booking_date: b.created_at || b.travel_date || "",
         total_amount: b.total_amount ?? 0,
-        status: (b.status || 'pending') as 'confirmed' | 'pending' | 'cancelled' | 'completed',
+        status: (b.status || "pending") as
+          | "confirmed"
+          | "pending"
+          | "cancelled"
+          | "completed",
       }));
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   // Show skeleton while loading - AFTER all hooks
@@ -429,16 +483,19 @@ const Dashboard: React.FC = () => {
               <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-1">
-                  {__('Welcome to Yatra Dashboard', 'yatra')}
+                  {__("Welcome to Yatra Dashboard", "yatra")}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300">
-                  {__('Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.', 'yatra')}
+                  {__(
+                    "Real-time insights for your travel booking business. Monitor performance, track bookings, and manage operations efficiently.",
+                    "yatra",
+                  )}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <Activity className="w-4 h-4" />
-              <span>{__('Live Data', 'yatra')}</span>
+              <span>{__("Live Data", "yatra")}</span>
             </div>
           </div>
         </CardContent>
@@ -448,7 +505,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-nowrap gap-3 overflow-x-auto pb-1">
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Trips', 'yatra')}
+            title={__("Total Trips", "yatra")}
             value={tripsSummary?.total || 0}
             icon={MapPin}
             color="blue"
@@ -458,7 +515,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Bookings', 'yatra')}
+            title={__("Total Bookings", "yatra")}
             value={bookingStats?.total || 0}
             icon={Calendar}
             color="green"
@@ -468,7 +525,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Booked Revenue', 'yatra')}
+            title={__("Booked Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_revenue || 0)}
             icon={DollarSign}
             color="purple"
@@ -478,7 +535,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Collected Revenue', 'yatra')}
+            title={__("Collected Revenue", "yatra")}
             value={formatCurrencyAmount(bookingStats?.total_collected || 0)}
             icon={DollarSign}
             color="green"
@@ -488,7 +545,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Total Customers', 'yatra')}
+            title={__("Total Customers", "yatra")}
             value={customersSummary?.total || 0}
             icon={Users}
             color="orange"
@@ -498,7 +555,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Confirmed Bookings', 'yatra')}
+            title={__("Confirmed Bookings", "yatra")}
             value={(bookingStats as any)?.by_status?.confirmed?.count || 0}
             icon={CheckCircle}
             color="green"
@@ -508,7 +565,7 @@ const Dashboard: React.FC = () => {
 
         <div className="flex-1 min-w-0">
           <StatCard
-            title={__('Pending Bookings', 'yatra')}
+            title={__("Pending Bookings", "yatra")}
             value={(bookingStats as any)?.by_status?.pending?.count || 0}
             icon={Clock}
             color="orange"
@@ -525,7 +582,7 @@ const Dashboard: React.FC = () => {
           <ConditionalRender capability="yatra_view_bookings">
             <Card>
               <CardHeader>
-                <CardTitle>{__('Bookings Overview', 'yatra')}</CardTitle>
+                <CardTitle>{__("Bookings Overview", "yatra")}</CardTitle>
               </CardHeader>
               <CardContent className="pb-2">
                 <BookingsOverviewChart
@@ -543,7 +600,7 @@ const Dashboard: React.FC = () => {
             <ConditionalRender capability="yatra_view_bookings">
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Booking Status', 'yatra')}</CardTitle>
+                  <CardTitle>{__("Booking Status", "yatra")}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
                   <BookingStatusChart data={statusData || []} />
@@ -554,7 +611,7 @@ const Dashboard: React.FC = () => {
             <ConditionalRender capability="yatra_view_trips">
               <Card>
                 <CardHeader>
-                  <CardTitle>{__('Popular Destinations', 'yatra')}</CardTitle>
+                  <CardTitle>{__("Popular Destinations", "yatra")}</CardTitle>
                 </CardHeader>
                 <CardContent className="pb-2">
                   <SimpleBarChart
@@ -572,7 +629,7 @@ const Dashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <ConditionalRender capability="yatra_view_bookings">
               <StatCard
-                title={__('Pending Bookings', 'yatra')}
+                title={__("Pending Bookings", "yatra")}
                 value={(bookingStats as any)?.by_status?.pending?.count || 0}
                 icon={TrendingUp}
                 color="orange"
@@ -582,7 +639,7 @@ const Dashboard: React.FC = () => {
 
             <ConditionalRender capability="yatra_view_trips">
               <StatCard
-                title={__('Upcoming Departures', 'yatra')}
+                title={__("Upcoming Departures", "yatra")}
                 value={bookingStats?.upcoming || 0}
                 icon={Plane}
                 color="green"
@@ -598,7 +655,7 @@ const Dashboard: React.FC = () => {
               loading={isLoading}
               onView={(booking) => {
                 const admin = (window as any)?.yatraAdmin;
-                const baseUrl = admin?.siteUrl || '';
+                const baseUrl = admin?.siteUrl || "";
                 window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=bookings&action=view&id=${booking.id}`;
               }}
             />
@@ -609,7 +666,7 @@ const Dashboard: React.FC = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
-                {__('Quick Actions', 'yatra')}
+                {__("Quick Actions", "yatra")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -619,51 +676,53 @@ const Dashboard: React.FC = () => {
                   className="h-auto p-4 flex flex-col items-center gap-2"
                   onClick={() => {
                     const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || '';
+                    const baseUrl = admin?.siteUrl || "";
                     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=trips&action=add`;
                   }}
                 >
                   <MapPin className="w-5 h-5" />
-                  <span className="text-xs">{__('Add Trip', 'yatra')}</span>
+                  <span className="text-xs">{__("Add Trip", "yatra")}</span>
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   className="h-auto p-4 flex flex-col items-center gap-2"
                   onClick={() => {
                     const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || '';
+                    const baseUrl = admin?.siteUrl || "";
                     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=bookings`;
                   }}
                 >
                   <Calendar className="w-5 h-5" />
-                  <span className="text-xs">{__('View Bookings', 'yatra')}</span>
+                  <span className="text-xs">
+                    {__("View Bookings", "yatra")}
+                  </span>
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   className="h-auto p-4 flex flex-col items-center gap-2"
                   onClick={() => {
                     const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || '';
+                    const baseUrl = admin?.siteUrl || "";
                     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=customers`;
                   }}
                 >
                   <Users className="w-5 h-5" />
-                  <span className="text-xs">{__('Customers', 'yatra')}</span>
+                  <span className="text-xs">{__("Customers", "yatra")}</span>
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   className="h-auto p-4 flex flex-col items-center gap-2"
                   onClick={() => {
                     const admin = (window as any)?.yatraAdmin;
-                    const baseUrl = admin?.siteUrl || '';
+                    const baseUrl = admin?.siteUrl || "";
                     window.location.href = `${baseUrl}/wp-admin/admin.php?page=yatra&subpage=reports`;
                   }}
                 >
                   <Activity className="w-5 h-5" />
-                  <span className="text-xs">{__('Reports', 'yatra')}</span>
+                  <span className="text-xs">{__("Reports", "yatra")}</span>
                 </Button>
               </div>
             </CardContent>

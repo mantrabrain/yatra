@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   CartesianGrid,
   Legend,
-} from 'recharts';
+} from "recharts";
 
 export interface BookingsOverviewPoint {
   label: string;
@@ -26,20 +26,20 @@ interface BookingsOverviewChartProps {
 const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
   data,
   currency,
-  currencyPosition = 'left',
+  currencyPosition = "left",
   currencyDecimals = 2,
 }) => {
   const currencySymbolMap: Record<string, string> = {
-    USD: '$',
-    EUR: '€',
-    GBP: '£',
-    INR: '₹',
-    GHS: '₵',
-    AUD: 'A$',
-    CAD: 'C$',
+    USD: "$",
+    EUR: "€",
+    GBP: "£",
+    INR: "₹",
+    GHS: "₵",
+    AUD: "A$",
+    CAD: "C$",
   };
 
-  const symbol = currencySymbolMap[currency] || currency || '';
+  const symbol = currencySymbolMap[currency] || currency || "";
 
   const formatAmount = (value: number, { compact }: { compact: boolean }) => {
     const v = Number(value) || 0;
@@ -57,13 +57,13 @@ const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
     const core = formatCore(v, useK);
 
     switch (currencyPosition) {
-      case 'right':
+      case "right":
         return `${core}${symbol}`;
-      case 'left_space':
+      case "left_space":
         return `${symbol} ${core}`;
-      case 'right_space':
+      case "right_space":
         return `${core} ${symbol}`;
-      case 'left':
+      case "left":
       default:
         return `${symbol}${core}`;
     }
@@ -96,32 +96,36 @@ const BookingsOverviewChart: React.FC<BookingsOverviewChartProps> = ({
             dataKey="month"
             tickLine={false}
             axisLine={false}
-            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+            tick={{ fontFamily: "inherit", fontSize: 11, fill: "#6b7280" }}
           />
           <YAxis
             yAxisId="left"
             allowDecimals={false}
             tickLine={false}
-            axisLine={{ stroke: '#e5e7eb' }}
-            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+            axisLine={{ stroke: "#e5e7eb" }}
+            tick={{ fontFamily: "inherit", fontSize: 11, fill: "#6b7280" }}
           />
           <YAxis
             yAxisId="right"
             orientation="right"
             tickLine={false}
             axisLine={false}
-            tickFormatter={(value: number) => formatAmount(value, { compact: true })}
-            tick={{ fontFamily: 'inherit', fontSize: 11, fill: '#6b7280' }}
+            tickFormatter={(value: number) =>
+              formatAmount(value, { compact: true })
+            }
+            tick={{ fontFamily: "inherit", fontSize: 11, fill: "#6b7280" }}
           />
           <Tooltip
-            cursor={{ fill: 'rgba(148, 163, 184, 0.12)' }}
+            cursor={{ fill: "rgba(148, 163, 184, 0.12)" }}
             formatter={(value: any, name: any) => {
-              if (name === 'Bookings') {
-                return [value, 'Bookings'];
+              if (name === "Bookings") {
+                return [value, "Bookings"];
               }
-              if (name === 'Amount') {
-                const formatted = formatAmount(Number(value) || 0, { compact: false });
-                return [formatted, 'Amount'];
+              if (name === "Amount") {
+                const formatted = formatAmount(Number(value) || 0, {
+                  compact: false,
+                });
+                return [formatted, "Amount"];
               }
               return [value, name];
             }}

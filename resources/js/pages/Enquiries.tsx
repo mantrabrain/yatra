@@ -3,24 +3,43 @@
  * Clean, minimal SaaS-style enquiries management page using shared components
  */
 
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Search, X, ArrowUpDown, ArrowUp, ArrowDown, Eye, Edit, Trash2, Mail, Phone, MessageSquare, MapPin, Send, Loader2 } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { apiService } from '../lib/api-client';
-import { formatDate as formatDateUtil } from '../lib/dateFormat';
-import { usePermissions } from '../hooks/usePermissions';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Select } from '../components/ui/select';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { useNavigate } from '../hooks/useNavigate';
-import { Pagination, Table as SharedTable, BulkActionToolbar } from '../components/shared';
-import { getErrorContext } from '../lib/errors';
-import { Modal } from '../components/ui/modal';
-import { useToast } from '../components/ui/toast';
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Search,
+  X,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Eye,
+  Edit,
+  Trash2,
+  Mail,
+  Phone,
+  MessageSquare,
+  MapPin,
+  Send,
+  Loader2,
+} from "lucide-react";
+import { __ } from "../lib/i18n";
+import { apiService } from "../lib/api-client";
+import { formatDate as formatDateUtil } from "../lib/dateFormat";
+import { usePermissions } from "../hooks/usePermissions";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Select } from "../components/ui/select";
+import { PageHeader } from "../components/common/PageHeader";
+import { Card, CardContent } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { useNavigate } from "../hooks/useNavigate";
+import {
+  Pagination,
+  Table as SharedTable,
+  BulkActionToolbar,
+} from "../components/shared";
+import { getErrorContext } from "../lib/errors";
+import { Modal } from "../components/ui/modal";
+import { useToast } from "../components/ui/toast";
 
 interface Enquiry {
   id: number;
@@ -34,40 +53,42 @@ interface Enquiry {
   metadata?: any;
   travel_date?: string;
   status:
-    | 'new'
-    | 'pending'
-    | 'responded'
-    | 'closed'
-    | 'converted'
-    | 'read'
-    | 'archived'
-    | 'spam'
-    | 'trash'
-    | '';
+    | "new"
+    | "pending"
+    | "responded"
+    | "closed"
+    | "converted"
+    | "read"
+    | "archived"
+    | "spam"
+    | "trash"
+    | "";
   created_at: string;
   responded_at?: string;
   response_notes?: string;
 }
 
 const Enquiries: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
-  const [responseMessage, setResponseMessage] = useState('');
+  const [responseMessage, setResponseMessage] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [enquiryToDelete, setEnquiryToDelete] = useState<Enquiry | null>(null);
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [bulkAction, setBulkAction] = useState('');
+  const [bulkAction, setBulkAction] = useState("");
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false);
   const [bulkApplying, setBulkApplying] = useState(false);
-  const [pendingBulkAction, setPendingBulkAction] = useState<string | null>(null);
+  const [pendingBulkAction, setPendingBulkAction] = useState<string | null>(
+    null,
+  );
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState(() => {
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       return {
         customer: true,
         trip: true,
@@ -79,7 +100,9 @@ const Enquiries: React.FC = () => {
       };
     }
 
-    const saved = window.localStorage.getItem('yatra-enquiries-visible-columns');
+    const saved = window.localStorage.getItem(
+      "yatra-enquiries-visible-columns",
+    );
     return saved
       ? JSON.parse(saved)
       : {
@@ -94,23 +117,21 @@ const Enquiries: React.FC = () => {
   });
 
   const bulkActionOptions = useMemo(() => {
-    if (statusFilter === 'trash') {
-      return [
-        { value: 'delete', label: __('Delete Permanently', 'yatra') },
-      ];
+    if (statusFilter === "trash") {
+      return [{ value: "delete", label: __("Delete Permanently", "yatra") }];
     }
 
-    if (statusFilter === 'spam') {
+    if (statusFilter === "spam") {
       return [
-        { value: 'mark_trash', label: __('Move to Trash', 'yatra') },
-        { value: 'delete', label: __('Delete Permanently', 'yatra') },
+        { value: "mark_trash", label: __("Move to Trash", "yatra") },
+        { value: "delete", label: __("Delete Permanently", "yatra") },
       ];
     }
 
     return [
-      { value: 'mark_spam', label: __('Mark as Spam', 'yatra') },
-      { value: 'mark_trash', label: __('Move to Trash', 'yatra') },
-      { value: 'delete', label: __('Delete Permanently', 'yatra') },
+      { value: "mark_spam", label: __("Mark as Spam", "yatra") },
+      { value: "mark_trash", label: __("Move to Trash", "yatra") },
+      { value: "delete", label: __("Delete Permanently", "yatra") },
     ];
   }, [statusFilter]);
 
@@ -132,7 +153,7 @@ const Enquiries: React.FC = () => {
       params.search = searchTerm;
     }
 
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       params.status = statusFilter;
     }
 
@@ -141,11 +162,11 @@ const Enquiries: React.FC = () => {
 
   // Enquiry stats for status tabs
   const { data: statsData } = useQuery({
-    queryKey: ['enquiries-stats'],
+    queryKey: ["enquiries-stats"],
     queryFn: async () => {
       return await apiService.getEnquiriesStats();
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   const statusCounts = {
@@ -175,18 +196,18 @@ const Enquiries: React.FC = () => {
     }
     setBulkApplying(true);
     try {
-      if (['delete', 'mark_spam', 'mark_trash'].includes(pendingBulkAction)) {
+      if (["delete", "mark_spam", "mark_trash"].includes(pendingBulkAction)) {
         await apiService.bulkEnquiriesAction(pendingBulkAction, selectedIds);
-        queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+        queryClient.invalidateQueries({ queryKey: ["enquiries"] });
       }
     } catch (error) {
-      console.error('Bulk enquiry action error', error);
+      console.error("Bulk enquiry action error", error);
     } finally {
       setBulkApplying(false);
       setBulkConfirmOpen(false);
       setPendingBulkAction(null);
       setSelectedIds([]);
-      setBulkAction('');
+      setBulkAction("");
     }
   };
 
@@ -196,75 +217,100 @@ const Enquiries: React.FC = () => {
       [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
     };
     setVisibleColumns(newVisible);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('yatra-enquiries-visible-columns', JSON.stringify(newVisible));
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(
+        "yatra-enquiries-visible-columns",
+        JSON.stringify(newVisible),
+      );
     }
   };
 
   const columnOptions = [
-    { key: 'customer', label: __('Customer', 'yatra'), visible: visibleColumns.customer },
-    { key: 'trip', label: __('Trip', 'yatra'), visible: visibleColumns.trip },
-    { key: 'message', label: __('Message', 'yatra'), visible: visibleColumns.message },
-    { key: 'travelers', label: __('Travelers', 'yatra'), visible: visibleColumns.travelers },
-    { key: 'preferred_date', label: __('Preferred Date', 'yatra'), visible: visibleColumns.preferred_date },
-    { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
-    { key: 'date', label: __('Date', 'yatra'), visible: visibleColumns.date },
+    {
+      key: "customer",
+      label: __("Customer", "yatra"),
+      visible: visibleColumns.customer,
+    },
+    { key: "trip", label: __("Trip", "yatra"), visible: visibleColumns.trip },
+    {
+      key: "message",
+      label: __("Message", "yatra"),
+      visible: visibleColumns.message,
+    },
+    {
+      key: "travelers",
+      label: __("Travelers", "yatra"),
+      visible: visibleColumns.travelers,
+    },
+    {
+      key: "preferred_date",
+      label: __("Preferred Date", "yatra"),
+      visible: visibleColumns.preferred_date,
+    },
+    {
+      key: "status",
+      label: __("Status", "yatra"),
+      visible: visibleColumns.status,
+    },
+    { key: "date", label: __("Date", "yatra"), visible: visibleColumns.date },
   ];
 
   const actions = [
     {
-      key: 'view',
-      label: __('View', 'yatra'),
+      key: "view",
+      label: __("View", "yatra"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleView(enquiry),
-      condition: () => can('yatra_view_bookings'),
+      condition: () => can("yatra_view_bookings"),
     },
     {
-      key: 'respond',
-      label: __('Respond', 'yatra'),
+      key: "respond",
+      label: __("Respond", "yatra"),
       icon: <Send className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleRespond(enquiry),
       // Only allow respond on active enquiries (not closed, spam, trash, or archived)
       condition: (enquiry: Enquiry) =>
-        can('yatra_edit_bookings') &&
-        !['closed', 'spam', 'trash', 'archived'].includes(enquiry.status),
+        can("yatra_edit_bookings") &&
+        !["closed", "spam", "trash", "archived"].includes(enquiry.status),
     },
     {
-      key: 'edit',
-      label: __('Edit', 'yatra'),
+      key: "edit",
+      label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleEdit(enquiry),
-      condition: () => can('yatra_edit_bookings'),
+      condition: () => can("yatra_edit_bookings"),
     },
     {
-      key: 'delete',
-      label: __('Delete', 'yatra'),
+      key: "delete",
+      label: __("Delete", "yatra"),
       icon: <Trash2 className="w-4 h-4" />,
       onClick: (enquiry: Enquiry) => handleDelete(enquiry),
-      variant: 'destructive' as const,
-      condition: () => can('yatra_delete_bookings'),
+      variant: "destructive" as const,
+      condition: () => can("yatra_delete_bookings"),
     },
   ];
 
   // Fetch enquiries from API
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ['enquiries', queryParams],
+    queryKey: ["enquiries", queryParams],
     queryFn: async () => {
       // Check URL parameter for error simulation (for testing)
       const urlParams = new URLSearchParams(window.location.search);
-      if (urlParams.get('simulate_error') === 'true') {
-        throw new Error('Simulated API error for testing error UI functionality');
+      if (urlParams.get("simulate_error") === "true") {
+        throw new Error(
+          "Simulated API error for testing error UI functionality",
+        );
       }
-      
+
       const paramsObj: Record<string, any> = {};
       Object.entries(queryParams).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           paramsObj[key] = value;
         }
       });
-      
+
       const response = await apiService.getEnquiries(paramsObj);
-      
+
       return {
         data: response.data || [],
         total: response.meta?.total || response.total || 0,
@@ -272,7 +318,7 @@ const Enquiries: React.FC = () => {
         per_page: response.meta?.per_page || response.per_page || 10,
       };
     },
-    enabled: can('yatra_view_bookings'),
+    enabled: can("yatra_view_bookings"),
   });
 
   // Delete mutation
@@ -281,7 +327,7 @@ const Enquiries: React.FC = () => {
       await apiService.deleteEnquiry(id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+      queryClient.invalidateQueries({ queryKey: ["enquiries"] });
       setDeleteDialogOpen(false);
       setEnquiryToDelete(null);
     },
@@ -293,17 +339,22 @@ const Enquiries: React.FC = () => {
       return await apiService.respondToEnquiry(id, { response: message });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enquiries'] });
+      queryClient.invalidateQueries({ queryKey: ["enquiries"] });
       setRespondDialogOpen(false);
       setSelectedEnquiry(null);
-      setResponseMessage('');
-      showToast(__('Response sent successfully.', 'yatra'), 'success');
+      setResponseMessage("");
+      showToast(__("Response sent successfully.", "yatra"), "success");
     },
   });
 
   const enquiriesResponse: any = data;
-  const enquiries: Enquiry[] = enquiriesResponse?.data || enquiriesResponse?.enquiries || [];
-  const total = enquiriesResponse?.meta?.total ?? enquiriesResponse?.total ?? enquiries.length ?? 0;
+  const enquiries: Enquiry[] =
+    enquiriesResponse?.data || enquiriesResponse?.enquiries || [];
+  const total =
+    enquiriesResponse?.meta?.total ??
+    enquiriesResponse?.total ??
+    enquiries.length ??
+    0;
   const perPage = enquiriesResponse?.meta?.per_page ?? 10;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
@@ -322,38 +373,46 @@ const Enquiries: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'new': {
-        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('New', 'yatra'),
+      new: {
+        className:
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+        label: __("New", "yatra"),
       },
-      'pending': {
-        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Pending', 'yatra'),
+      pending: {
+        className:
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Pending", "yatra"),
       },
-      'responded': {
-        className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Responded', 'yatra'),
+      responded: {
+        className:
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+        label: __("Responded", "yatra"),
       },
-      'converted': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Converted', 'yatra'),
+      converted: {
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+        label: __("Converted", "yatra"),
       },
-      'closed': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Closed', 'yatra'),
+      closed: {
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
+        label: __("Closed", "yatra"),
       },
-      'spam': {
-        className: 'bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400',
-        label: __('Spam', 'yatra'),
+      spam: {
+        className:
+          "bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400",
+        label: __("Spam", "yatra"),
       },
-      'trash': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 line-through',
-        label: __('Trash', 'yatra'),
+      trash: {
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-900/40 dark:text-gray-300 line-through",
+        label: __("Trash", "yatra"),
       },
     };
 
     const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      className:
+        "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
       label: status,
     };
 
@@ -365,11 +424,11 @@ const Enquiries: React.FC = () => {
   };
 
   const handleView = (enquiry: Enquiry) => {
-    navigate({ subpage: 'enquiries', action: 'view', id: enquiry.id });
+    navigate({ subpage: "enquiries", action: "view", id: enquiry.id });
   };
 
   const handleEdit = (enquiry: Enquiry) => {
-    navigate({ subpage: 'enquiries', action: 'edit', id: enquiry.id });
+    navigate({ subpage: "enquiries", action: "edit", id: enquiry.id });
   };
 
   const handleDelete = (enquiry: Enquiry) => {
@@ -385,7 +444,7 @@ const Enquiries: React.FC = () => {
 
   const handleRespond = (enquiry: Enquiry) => {
     setSelectedEnquiry(enquiry);
-    setResponseMessage('');
+    setResponseMessage("");
     setRespondDialogOpen(true);
   };
 
@@ -400,10 +459,10 @@ const Enquiries: React.FC = () => {
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(field);
-      setSortOrder('desc');
+      setSortOrder("desc");
     }
   };
 
@@ -411,26 +470,32 @@ const Enquiries: React.FC = () => {
     if (sortBy !== field) {
       return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-gray-400" />;
     }
-    return sortOrder === 'asc' 
-      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    ) : (
+      <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    );
   };
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'created_at' || sortOrder !== 'desc';
+  const hasFilters =
+    searchTerm ||
+    statusFilter !== "all" ||
+    sortBy !== "created_at" ||
+    sortOrder !== "desc";
 
   const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setSortBy('created_at');
-    setSortOrder('desc');
+    setSearchTerm("");
+    setStatusFilter("all");
+    setSortBy("created_at");
+    setSortOrder("desc");
     setPage(1);
   };
 
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Enquiries', 'yatra')}
-        description={__('Manage customer enquiries and inquiries', 'yatra')}
+        title={__("Enquiries", "yatra")}
+        description={__("Manage customer enquiries and inquiries", "yatra")}
       />
 
       {/* Filters, Search, and Sorting - Always Visible */}
@@ -442,7 +507,7 @@ const Enquiries: React.FC = () => {
               <Search className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <Input
                 type="text"
-                placeholder={__('Search enquiries...', 'yatra')}
+                placeholder={__("Search enquiries...", "yatra")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-9"
@@ -455,14 +520,14 @@ const Enquiries: React.FC = () => {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="all">{__('All Status', 'yatra')}</option>
-              <option value="new">{__('New', 'yatra')}</option>
-              <option value="pending">{__('Pending', 'yatra')}</option>
-              <option value="responded">{__('Responded', 'yatra')}</option>
-              <option value="converted">{__('Converted', 'yatra')}</option>
-              <option value="closed">{__('Closed', 'yatra')}</option>
-              <option value="spam">{__('Spam', 'yatra')}</option>
-              <option value="trash">{__('Trash', 'yatra')}</option>
+              <option value="all">{__("All Status", "yatra")}</option>
+              <option value="new">{__("New", "yatra")}</option>
+              <option value="pending">{__("Pending", "yatra")}</option>
+              <option value="responded">{__("Responded", "yatra")}</option>
+              <option value="converted">{__("Converted", "yatra")}</option>
+              <option value="closed">{__("Closed", "yatra")}</option>
+              <option value="spam">{__("Spam", "yatra")}</option>
+              <option value="trash">{__("Trash", "yatra")}</option>
             </Select>
 
             {/* Sort By */}
@@ -471,26 +536,32 @@ const Enquiries: React.FC = () => {
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full md:w-40"
             >
-              <option value="created_at">{__('Date', 'yatra')}</option>
-              <option value="name">{__('Name', 'yatra')}</option>
-              <option value="email">{__('Email', 'yatra')}</option>
-              <option value="trip_title">{__('Trip', 'yatra')}</option>
-              <option value="status">{__('Status', 'yatra')}</option>
+              <option value="created_at">{__("Date", "yatra")}</option>
+              <option value="name">{__("Name", "yatra")}</option>
+              <option value="email">{__("Email", "yatra")}</option>
+              <option value="trip_title">{__("Trip", "yatra")}</option>
+              <option value="status">{__("Status", "yatra")}</option>
             </Select>
 
             {/* Sort Order */}
             <Button
               variant="outline"
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              onClick={() => setSortOrder(sortOrder === "asc" ? "desc" : "asc")}
               className="px-3 flex items-center gap-1.5"
-              title={sortOrder === 'asc' ? __('Ascending', 'yatra') : __('Descending', 'yatra')}
+              title={
+                sortOrder === "asc"
+                  ? __("Ascending", "yatra")
+                  : __("Descending", "yatra")
+              }
             >
-              {sortOrder === 'asc' ? (
+              {sortOrder === "asc" ? (
                 <ArrowUp className="w-4 h-4" />
               ) : (
                 <ArrowDown className="w-4 h-4" />
               )}
-              <span className="text-xs">{sortOrder === 'asc' ? __('Asc', 'yatra') : __('Desc', 'yatra')}</span>
+              <span className="text-xs">
+                {sortOrder === "asc" ? __("Asc", "yatra") : __("Desc", "yatra")}
+              </span>
             </Button>
 
             {/* Reset Button */}
@@ -501,7 +572,7 @@ const Enquiries: React.FC = () => {
                 className="flex items-center gap-2"
               >
                 <X className="w-4 h-4" />
-                {__('Reset', 'yatra')}
+                {__("Reset", "yatra")}
               </Button>
             )}
           </div>
@@ -520,17 +591,37 @@ const Enquiries: React.FC = () => {
           setStatusFilter(value);
           setPage(1);
           setSelectedIds([]);
-          setBulkAction('');
+          setBulkAction("");
         }}
         statusOptions={[
-          { key: 'all', label: __('All', 'yatra'), count: statusCounts.all },
-          { key: 'new', label: __('New', 'yatra'), count: statusCounts.new },
-          { key: 'pending', label: __('Pending', 'yatra'), count: statusCounts.pending },
-          { key: 'responded', label: __('Responded', 'yatra'), count: statusCounts.responded },
-          { key: 'converted', label: __('Converted', 'yatra'), count: statusCounts.converted },
-          { key: 'closed', label: __('Closed', 'yatra'), count: statusCounts.closed },
-          { key: 'spam', label: __('Spam', 'yatra'), count: statusCounts.spam },
-          { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash },
+          { key: "all", label: __("All", "yatra"), count: statusCounts.all },
+          { key: "new", label: __("New", "yatra"), count: statusCounts.new },
+          {
+            key: "pending",
+            label: __("Pending", "yatra"),
+            count: statusCounts.pending,
+          },
+          {
+            key: "responded",
+            label: __("Responded", "yatra"),
+            count: statusCounts.responded,
+          },
+          {
+            key: "converted",
+            label: __("Converted", "yatra"),
+            count: statusCounts.converted,
+          },
+          {
+            key: "closed",
+            label: __("Closed", "yatra"),
+            count: statusCounts.closed,
+          },
+          { key: "spam", label: __("Spam", "yatra"), count: statusCounts.spam },
+          {
+            key: "trash",
+            label: __("Trash", "yatra"),
+            count: statusCounts.trash,
+          },
         ]}
         showColumnsDropdown={showColumnsDropdown}
         setShowColumnsDropdown={setShowColumnsDropdown}
@@ -547,8 +638,8 @@ const Enquiries: React.FC = () => {
             data={enquiries}
             columns={[
               visibleColumns.customer && {
-                key: 'customer',
-                label: __('Customer', 'yatra'),
+                key: "customer",
+                label: __("Customer", "yatra"),
                 render: (enquiry: Enquiry) => (
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white text-sm">
@@ -570,9 +661,9 @@ const Enquiries: React.FC = () => {
                 ),
               },
               visibleColumns.trip && {
-                key: 'trip',
-                label: __('Trip', 'yatra'),
-                render: (enquiry: Enquiry) => (
+                key: "trip",
+                label: __("Trip", "yatra"),
+                render: (enquiry: Enquiry) =>
                   enquiry.trip_title ? (
                     <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                       <MapPin className="w-3.5 h-3.5" />
@@ -580,14 +671,13 @@ const Enquiries: React.FC = () => {
                     </div>
                   ) : (
                     <span className="text-sm text-gray-400 dark:text-gray-500 italic">
-                      {__('General enquiry', 'yatra')}
+                      {__("General enquiry", "yatra")}
                     </span>
-                  )
-                ),
+                  ),
               },
               visibleColumns.message && {
-                key: 'message',
-                label: __('Message', 'yatra'),
+                key: "message",
+                label: __("Message", "yatra"),
                 render: (enquiry: Enquiry) => (
                   <div className="flex items-start gap-2">
                     <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -598,31 +688,33 @@ const Enquiries: React.FC = () => {
                 ),
               },
               visibleColumns.travelers && {
-                key: 'travelers',
-                label: __('Travelers', 'yatra'),
+                key: "travelers",
+                label: __("Travelers", "yatra"),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-600 dark:text-gray-400 text-sm">
-                    {enquiry.travelers_count || '-'}
+                    {enquiry.travelers_count || "-"}
                   </span>
                 ),
               },
               visibleColumns.preferred_date && {
-                key: 'preferred_date',
-                label: __('Preferred Date', 'yatra'),
+                key: "preferred_date",
+                label: __("Preferred Date", "yatra"),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-500 dark:text-gray-400 text-sm">
-                    {enquiry.travel_date ? formatDate(enquiry.travel_date) : '-'}
+                    {enquiry.travel_date
+                      ? formatDate(enquiry.travel_date)
+                      : "-"}
                   </span>
                 ),
               },
               visibleColumns.status && {
-                key: 'status',
-                label: __('Status', 'yatra'),
+                key: "status",
+                label: __("Status", "yatra"),
                 render: (enquiry: Enquiry) => getStatusBadge(enquiry.status),
               },
               visibleColumns.date && {
-                key: 'date',
-                label: __('Date', 'yatra'),
+                key: "date",
+                label: __("Date", "yatra"),
                 render: (enquiry: Enquiry) => (
                   <span className="text-gray-500 dark:text-gray-400 text-sm">
                     {formatDate(enquiry.created_at)}
@@ -633,24 +725,37 @@ const Enquiries: React.FC = () => {
             actions={actions}
             isLoading={isLoading}
             isError={isEnquiriesError}
-            errorText={__('Error loading enquiries')}
-            errorDescription={__('We couldn\'t connect to the enquiries service. Please refresh or try again shortly.')}
+            errorText={__("Error loading enquiries")}
+            errorDescription={__(
+              "We couldn't connect to the enquiries service. Please refresh or try again shortly.",
+            )}
             errorDetails={derivedErrorDetails}
             errorRequestInfo={errorContext.requestInfo}
             onRetry={() => refetch()}
-            emptyText={__('No enquiries found')}
-            emptyDescription={hasFilters
-              ? __('Try adjusting your search or filter criteria to find what you\'re looking for.', 'Try adjusting your search or filter criteria to find what you\'re looking for.')
-              : __('When customers submit enquiries, they will appear here.', 'yatra')
+            emptyText={__("No enquiries found")}
+            emptyDescription={
+              hasFilters
+                ? __(
+                    "Try adjusting your search or filter criteria to find what you're looking for.",
+                    "Try adjusting your search or filter criteria to find what you're looking for.",
+                  )
+                : __(
+                    "When customers submit enquiries, they will appear here.",
+                    "yatra",
+                  )
             }
             onSort={handleSort}
             getSortIcon={getSortIcon}
             selectedItemIds={selectedIds}
             onSelectItem={(id: string | number, checked: boolean) => {
               if (checked) {
-                setSelectedIds(prev => (prev.includes(id) ? prev : [...prev, id]));
+                setSelectedIds((prev) =>
+                  prev.includes(id) ? prev : [...prev, id],
+                );
               } else {
-                setSelectedIds(prev => prev.filter(existingId => existingId !== id));
+                setSelectedIds((prev) =>
+                  prev.filter((existingId) => existingId !== id),
+                );
               }
             }}
             onSelectAll={(checked: boolean) => {
@@ -660,7 +765,9 @@ const Enquiries: React.FC = () => {
                 setSelectedIds([]);
               }
             }}
-            isAllSelected={enquiries.length > 0 && selectedIds.length === enquiries.length}
+            isAllSelected={
+              enquiries.length > 0 && selectedIds.length === enquiries.length
+            }
             getItemId={(enquiry: Enquiry) => enquiry.id}
             capability="yatra_view_bookings"
             skeletonRows={5}
@@ -676,7 +783,7 @@ const Enquiries: React.FC = () => {
           totalItems={total}
           itemsPerPage={perPage}
           onPageChange={setPage}
-          itemName={__('enquiries', 'yatra')}
+          itemName={__("enquiries", "yatra")}
         />
       )}
 
@@ -689,12 +796,12 @@ const Enquiries: React.FC = () => {
             setPendingBulkAction(null);
           }
         }}
-        title={__('Apply Bulk Action', 'yatra')}
+        title={__("Apply Bulk Action", "yatra")}
         description={
           pendingBulkAction
             ? __(
                 `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
-                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`
+                `Are you sure you want to apply "${pendingBulkAction}" to the selected enquiries?`,
               )
             : undefined
         }
@@ -711,19 +818,16 @@ const Enquiries: React.FC = () => {
               }}
               disabled={bulkApplying}
             >
-              {__('Cancel', 'yatra')}
+              {__("Cancel", "yatra")}
             </Button>
-            <Button
-              onClick={confirmBulkApply}
-              disabled={bulkApplying}
-            >
+            <Button onClick={confirmBulkApply} disabled={bulkApplying}>
               {bulkApplying ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Applying...', 'yatra')}
+                  {__("Applying...", "yatra")}
                 </>
               ) : (
-                __('Apply', 'yatra')
+                __("Apply", "yatra")
               )}
             </Button>
           </div>
@@ -741,14 +845,14 @@ const Enquiries: React.FC = () => {
             setEnquiryToDelete(null);
           }
         }}
-        title={__('Delete Enquiry', 'yatra')}
+        title={__("Delete Enquiry", "yatra")}
         description={
           enquiryToDelete
             ? __(
                 `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`,
-                `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`
+                `Are you sure you want to delete the enquiry from "${enquiryToDelete.name}"? This action cannot be undone.`,
               )
-            : __('Are you sure you want to delete this enquiry?', 'yatra')
+            : __("Are you sure you want to delete this enquiry?", "yatra")
         }
         size="sm"
         panelClassName="yatra-model-ui"
@@ -763,7 +867,7 @@ const Enquiries: React.FC = () => {
               }}
               disabled={deleteMutation.isPending}
             >
-              {__('Cancel', 'yatra')}
+              {__("Cancel", "yatra")}
             </Button>
             <Button
               variant="destructive"
@@ -773,10 +877,10 @@ const Enquiries: React.FC = () => {
               {deleteMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Deleting...', 'yatra')}
+                  {__("Deleting...", "yatra")}
                 </>
               ) : (
-                __('Delete', 'yatra')
+                __("Delete", "yatra")
               )}
             </Button>
           </div>
@@ -791,11 +895,12 @@ const Enquiries: React.FC = () => {
         onClose={() => {
           if (!respondMutation.isPending) setRespondDialogOpen(false);
         }}
-        title={__('Respond to Enquiry', 'yatra')}
+        title={__("Respond to Enquiry", "yatra")}
         description={
           selectedEnquiry ? (
             <span>
-              {__('Send a response to', 'yatra')} <strong>{selectedEnquiry.name}</strong>
+              {__("Send a response to", "yatra")}{" "}
+              <strong>{selectedEnquiry.name}</strong>
             </span>
           ) : null
         }
@@ -808,7 +913,7 @@ const Enquiries: React.FC = () => {
               onClick={() => setRespondDialogOpen(false)}
               disabled={respondMutation.isPending}
             >
-              {__('Cancel', 'yatra')}
+              {__("Cancel", "yatra")}
             </Button>
             <Button
               onClick={sendResponse}
@@ -817,12 +922,12 @@ const Enquiries: React.FC = () => {
               {respondMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Sending...', 'yatra')}
+                  {__("Sending...", "yatra")}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {__('Send Response', 'yatra')}
+                  {__("Send Response", "yatra")}
                 </>
               )}
             </Button>
@@ -835,29 +940,36 @@ const Enquiries: React.FC = () => {
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.email}</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  {selectedEnquiry.email}
+                </span>
               </div>
               {selectedEnquiry.trip_title && (
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-400">{selectedEnquiry.trip_title}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {selectedEnquiry.trip_title}
+                  </span>
                 </div>
               )}
               <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <strong>{__('Original Message', 'yatra')}:</strong>
-                <p className="mt-1 text-gray-600 dark:text-gray-400">{selectedEnquiry.message}</p>
+                <strong>{__("Original Message", "yatra")}:</strong>
+                <p className="mt-1 text-gray-600 dark:text-gray-400">
+                  {selectedEnquiry.message}
+                </p>
               </div>
             </div>
 
             {/* Response Message */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Your Response', 'yatra')} <span className="text-red-500">*</span>
+                {__("Your Response", "yatra")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}
-                placeholder={__('Type your response here...', 'yatra')}
+                placeholder={__("Type your response here...", "yatra")}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={5}
                 disabled={respondMutation.isPending}
@@ -866,7 +978,8 @@ const Enquiries: React.FC = () => {
 
             {respondMutation.isError && (
               <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'yatra')}
+                {respondMutation.error?.message ||
+                  __("Failed to send response. Please try again.", "yatra")}
               </div>
             )}
           </div>

@@ -3,14 +3,34 @@
  * Displays availability dates in a calendar grid with color coding
  */
 
-import React, { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Users, Bell, Ban, Edit, Eye } from 'lucide-react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, eachDayOfInterval, isSameMonth, addMonths, subMonths, isToday, parseISO } from 'date-fns';
-import { __ } from '../../lib/i18n';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
-import { useNavigate } from '../../hooks/useNavigate';
+import React, { useState, useMemo } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Users,
+  Bell,
+  Ban,
+  Edit,
+  Eye,
+} from "lucide-react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  eachDayOfInterval,
+  isSameMonth,
+  addMonths,
+  subMonths,
+  isToday,
+  parseISO,
+} from "date-fns";
+import { __ } from "../../lib/i18n";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useNavigate } from "../../hooks/useNavigate";
 
 interface AvailabilityDate {
   id: string;
@@ -22,7 +42,13 @@ interface AvailabilityDate {
   booked_seats: number;
   available_seats: number;
   waitlist_count: number;
-  status: 'available' | 'sold_out' | 'limited' | 'closed' | 'blocked' | 'cancelled';
+  status:
+    | "available"
+    | "sold_out"
+    | "limited"
+    | "closed"
+    | "blocked"
+    | "cancelled";
   is_blocked?: boolean;
   block_reason?: string;
   alert_threshold?: number;
@@ -32,15 +58,15 @@ interface AvailabilityDate {
 
 interface AvailabilityCalendarProps {
   dates: AvailabilityDate[];
-  tripType?: 'single_day' | 'multi_day';
+  tripType?: "single_day" | "multi_day";
   currency?: string;
   onDateClick?: (date: AvailabilityDate) => void;
 }
 
 export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   dates,
-  tripType = 'multi_day',
-  currency = 'USD',
+  tripType = "multi_day",
+  currency = "USD",
   onDateClick,
 }) => {
   const { navigate } = useNavigate();
@@ -49,7 +75,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
   // Group dates by departure date
   const datesByDate = useMemo(() => {
     const grouped: Record<string, AvailabilityDate[]> = {};
-    dates.forEach(date => {
+    dates.forEach((date) => {
       const key = date.departure_date;
       if (!grouped[key]) {
         grouped[key] = [];
@@ -61,43 +87,49 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
 
   // Get availability info for a specific date
   const getDateAvailability = (date: Date): AvailabilityDate[] => {
-    const dateKey = format(date, 'yyyy-MM-dd');
+    const dateKey = format(date, "yyyy-MM-dd");
     return datesByDate[dateKey] || [];
   };
 
   // Get color class based on availability status
-  const getDateColorClass = (dateAvailabilities: AvailabilityDate[]): string => {
+  const getDateColorClass = (
+    dateAvailabilities: AvailabilityDate[],
+  ): string => {
     if (dateAvailabilities.length === 0) {
-      return 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700';
+      return "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700";
     }
 
     // Check if any date is blocked
-    if (dateAvailabilities.some(d => d.is_blocked)) {
-      return 'bg-red-100 dark:bg-red-900/20 border-red-300 dark:border-red-800';
+    if (dateAvailabilities.some((d) => d.is_blocked)) {
+      return "bg-red-100 dark:bg-red-900/20 border-red-300 dark:border-red-800";
     }
 
     // Check if all are sold out
-    if (dateAvailabilities.every(d => d.available_seats === 0 || d.status === 'sold_out')) {
-      return 'bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600';
+    if (
+      dateAvailabilities.every(
+        (d) => d.available_seats === 0 || d.status === "sold_out",
+      )
+    ) {
+      return "bg-gray-200 dark:bg-gray-700 border-gray-300 dark:border-gray-600";
     }
 
     // Check if any has low availability (below threshold)
-    const hasLowAvailability = dateAvailabilities.some(d => {
+    const hasLowAvailability = dateAvailabilities.some((d) => {
       const threshold = d.alert_threshold || 5;
       return d.available_seats > 0 && d.available_seats <= threshold;
     });
 
     if (hasLowAvailability) {
-      return 'bg-yellow-100 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-800';
+      return "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-800";
     }
 
     // Check if any has limited availability
-    if (dateAvailabilities.some(d => d.status === 'limited')) {
-      return 'bg-orange-100 dark:bg-orange-900/20 border-orange-300 dark:border-orange-800';
+    if (dateAvailabilities.some((d) => d.status === "limited")) {
+      return "bg-orange-100 dark:bg-orange-900/20 border-orange-300 dark:border-orange-800";
     }
 
     // Available
-    return 'bg-green-100 dark:bg-green-900/20 border-green-300 dark:border-green-800';
+    return "bg-green-100 dark:bg-green-900/20 border-green-300 dark:border-green-800";
   };
 
   const monthStart = startOfMonth(currentMonth);
@@ -114,33 +146,33 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
     setCurrentMonth(addMonths(currentMonth, 1));
   };
 
-  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   const formatTime = (timeString: string) => {
-    if (!timeString) return '';
-    const [hours, minutes] = timeString.split(':');
+    if (!timeString) return "";
+    const [hours, minutes] = timeString.split(":");
     const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const ampm = hour >= 12 ? "PM" : "AM";
     return `${hour % 12 || 12}:${minutes} ${ampm}`;
   };
 
   const formatTimeForDisplay = (timeString: string): string => {
-    if (!timeString) return '';
+    if (!timeString) return "";
     const time = new Date(`1970-01-01T${timeString}`);
-    const timeStringFormatted = time.toLocaleTimeString('en-US', {
+    const timeStringFormatted = time.toLocaleTimeString("en-US", {
       hour12: false,
-      hour: 'numeric',
-      minute: '2-digit'
+      hour: "numeric",
+      minute: "2-digit",
     });
     return timeStringFormatted;
   };
 
   const getCurrencySymbol = (currency: string) => {
     const symbols: Record<string, string> = {
-      'USD': '$',
-      'EUR': '€',
-      'GBP': '£',
-      'INR': '₹',
+      USD: "$",
+      EUR: "€",
+      GBP: "£",
+      INR: "₹",
     };
     return symbols[currency] || currency;
   };
@@ -158,7 +190,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
           <ChevronLeft className="w-4 h-4" />
         </Button>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {format(currentMonth, 'MMMM yyyy')}
+          {format(currentMonth, "MMMM yyyy")}
         </h3>
         <Button
           variant="outline"
@@ -198,7 +230,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                 key={dayIdx}
                 className={`
                   min-h-[80px] p-1 border-r border-b border-gray-200 dark:border-gray-700
-                  ${isCurrentMonth ? '' : 'bg-gray-50 dark:bg-gray-900/50 opacity-50'}
+                  ${isCurrentMonth ? "" : "bg-gray-50 dark:bg-gray-900/50 opacity-50"}
                   ${colorClass}
                 `}
               >
@@ -208,11 +240,11 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                     <span
                       className={`
                         text-xs font-medium
-                        ${isTodayDate ? 'bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center' : ''}
-                        ${isCurrentMonth ? 'text-gray-900 dark:text-white' : 'text-gray-400 dark:text-gray-600'}
+                        ${isTodayDate ? "bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center" : ""}
+                        ${isCurrentMonth ? "text-gray-900 dark:text-white" : "text-gray-400 dark:text-gray-600"}
                       `}
                     >
-                      {isTodayDate ? format(day, 'd') : format(day, 'd')}
+                      {isTodayDate ? format(day, "d") : format(day, "d")}
                     </span>
                     {hasMultipleSlots && (
                       <Badge className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400">
@@ -227,7 +259,10 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                       {dateAvailabilities.slice(0, 2).map((availability) => {
                         const isBlocked = availability.is_blocked;
                         const isSoldOut = availability.available_seats === 0;
-                        const isLow = availability.available_seats > 0 && availability.available_seats <= (availability.alert_threshold || 5);
+                        const isLow =
+                          availability.available_seats > 0 &&
+                          availability.available_seats <=
+                            (availability.alert_threshold || 5);
 
                         return (
                           <Popover key={availability.id}>
@@ -237,11 +272,14 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 className="w-full text-left p-1 rounded text-xs hover:bg-white/50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer"
                               >
                                 <div className="flex items-center gap-1 mb-0.5">
-                                  {tripType === 'single_day' && availability.departure_time && (
-                                    <span className="text-xs font-medium">
-                                      {formatTime(availability.departure_time)}
-                                    </span>
-                                  )}
+                                  {tripType === "single_day" &&
+                                    availability.departure_time && (
+                                      <span className="text-xs font-medium">
+                                        {formatTime(
+                                          availability.departure_time,
+                                        )}
+                                      </span>
+                                    )}
                                   {isBlocked && (
                                     <Ban className="w-3 h-3 text-red-600 dark:text-red-400" />
                                   )}
@@ -251,13 +289,15 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Users className="w-3 h-3 text-gray-400" />
-                                  <span className={`text-xs font-semibold ${
-                                    isSoldOut
-                                      ? 'text-red-600 dark:text-red-400'
-                                      : isLow
-                                      ? 'text-yellow-600 dark:text-yellow-400'
-                                      : 'text-green-600 dark:text-green-400'
-                                  }`}>
+                                  <span
+                                    className={`text-xs font-semibold ${
+                                      isSoldOut
+                                        ? "text-red-600 dark:text-red-400"
+                                        : isLow
+                                          ? "text-yellow-600 dark:text-yellow-400"
+                                          : "text-green-600 dark:text-green-400"
+                                    }`}
+                                  >
                                     {availability.available_seats}
                                   </span>
                                   {availability.waitlist_count > 0 && (
@@ -268,11 +308,18 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                 </div>
                               </button>
                             </PopoverTrigger>
-                            <PopoverContent className="w-80 p-4 z-50" align="start" side="right">
+                            <PopoverContent
+                              className="w-80 p-4 z-50"
+                              align="start"
+                              side="right"
+                            >
                               <div className="space-y-3">
                                 <div className="flex items-center justify-between">
                                   <h4 className="font-semibold text-sm text-gray-900 dark:text-white">
-                                    {format(parseISO(availability.departure_date), 'EEEE, MMMM d, yyyy')}
+                                    {format(
+                                      parseISO(availability.departure_date),
+                                      "EEEE, MMMM d, yyyy",
+                                    )}
                                   </h4>
                                   <Button
                                     variant="ghost"
@@ -281,7 +328,12 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                       if (onDateClick) {
                                         onDateClick(availability);
                                       } else {
-                                        navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: availability.id });
+                                        navigate({
+                                          subpage: "trips",
+                                          tab: "availability",
+                                          action: "edit",
+                                          id: availability.id,
+                                        });
                                       }
                                     }}
                                     className="h-7 w-7 p-0"
@@ -289,38 +341,68 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                     <Edit className="w-3.5 h-3.5" />
                                   </Button>
                                 </div>
-                                
-                                {tripType === 'single_day' && availability.departure_time && (
-                                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                                    {__('Time', 'yatra')}: {formatTimeForDisplay(availability.departure_time)} - {availability.arrival_time ? formatTimeForDisplay(availability.arrival_time) : ''}
-                                  </div>
-                                )}
+
+                                {tripType === "single_day" &&
+                                  availability.departure_time && (
+                                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                                      {__("Time", "yatra")}:{" "}
+                                      {formatTimeForDisplay(
+                                        availability.departure_time,
+                                      )}{" "}
+                                      -{" "}
+                                      {availability.arrival_time
+                                        ? formatTimeForDisplay(
+                                            availability.arrival_time,
+                                          )
+                                        : ""}
+                                    </div>
+                                  )}
 
                                 <div className="grid grid-cols-2 gap-3 text-xs">
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Capacity', 'yatra')}</div>
-                                    <div className="font-semibold text-gray-900 dark:text-white">{availability.total_seats}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">
+                                      {__("Capacity", "yatra")}
+                                    </div>
+                                    <div className="font-semibold text-gray-900 dark:text-white">
+                                      {availability.total_seats}
+                                    </div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Booked', 'yatra')}</div>
-                                    <div className="font-semibold text-orange-600 dark:text-orange-400">{availability.booked_seats}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">
+                                      {__("Booked", "yatra")}
+                                    </div>
+                                    <div className="font-semibold text-orange-600 dark:text-orange-400">
+                                      {availability.booked_seats}
+                                    </div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Available', 'yatra')}</div>
-                                    <div className={`font-semibold ${
-                                      availability.available_seats === 0
-                                        ? 'text-red-600 dark:text-red-400'
-                                        : availability.available_seats <= (availability.alert_threshold || 5)
-                                        ? 'text-yellow-600 dark:text-yellow-400'
-                                        : 'text-green-600 dark:text-green-400'
-                                    }`}>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">
+                                      {__("Available", "yatra")}
+                                    </div>
+                                    <div
+                                      className={`font-semibold ${
+                                        availability.available_seats === 0
+                                          ? "text-red-600 dark:text-red-400"
+                                          : availability.available_seats <=
+                                              (availability.alert_threshold ||
+                                                5)
+                                            ? "text-yellow-600 dark:text-yellow-400"
+                                            : "text-green-600 dark:text-green-400"
+                                      }`}
+                                    >
                                       {availability.available_seats}
                                     </div>
                                   </div>
                                   <div>
-                                    <div className="text-gray-500 dark:text-gray-400 mb-1">{__('Price', 'yatra')}</div>
+                                    <div className="text-gray-500 dark:text-gray-400 mb-1">
+                                      {__("Price", "yatra")}
+                                    </div>
                                     <div className="font-semibold text-gray-900 dark:text-white">
-                                      {getCurrencySymbol(currency)}{parseFloat(availability.discounted_price || availability.original_price).toLocaleString()}
+                                      {getCurrencySymbol(currency)}
+                                      {parseFloat(
+                                        availability.discounted_price ||
+                                          availability.original_price,
+                                      ).toLocaleString()}
                                     </div>
                                   </div>
                                 </div>
@@ -329,17 +411,22 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                   <div className="flex items-center gap-2 text-xs">
                                     <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                                     <span className="text-gray-600 dark:text-gray-400">
-                                      {availability.waitlist_count} {__('people on waitlist', 'yatra')}
+                                      {availability.waitlist_count}{" "}
+                                      {__("people on waitlist", "yatra")}
                                     </span>
                                   </div>
                                 )}
 
-                                {availability.is_blocked && availability.block_reason && (
-                                  <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
-                                    <Ban className="w-4 h-4" />
-                                    <span>{__('Blocked', 'yatra')}: {availability.block_reason}</span>
-                                  </div>
-                                )}
+                                {availability.is_blocked &&
+                                  availability.block_reason && (
+                                    <div className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400">
+                                      <Ban className="w-4 h-4" />
+                                      <span>
+                                        {__("Blocked", "yatra")}:{" "}
+                                        {availability.block_reason}
+                                      </span>
+                                    </div>
+                                  )}
 
                                 <div className="flex items-center gap-2 pt-2 border-t border-gray-200 dark:border-gray-700">
                                   <Button
@@ -349,22 +436,34 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                                       if (onDateClick) {
                                         onDateClick(availability);
                                       } else {
-                                        navigate({ subpage: 'trips', tab: 'availability', action: 'edit', id: availability.id });
+                                        navigate({
+                                          subpage: "trips",
+                                          tab: "availability",
+                                          action: "edit",
+                                          id: availability.id,
+                                        });
                                       }
                                     }}
                                     className="flex-1 text-xs h-7"
                                   >
                                     <Edit className="w-3 h-3 mr-1" />
-                                    {__('Edit', 'yatra')}
+                                    {__("Edit", "yatra")}
                                   </Button>
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => navigate({ subpage: 'trips', tab: 'availability', action: 'view', id: availability.id })}
+                                    onClick={() =>
+                                      navigate({
+                                        subpage: "trips",
+                                        tab: "availability",
+                                        action: "view",
+                                        id: availability.id,
+                                      })
+                                    }
                                     className="flex-1 text-xs h-7"
                                   >
                                     <Eye className="w-3 h-3 mr-1" />
-                                    {__('View', 'yatra')}
+                                    {__("View", "yatra")}
                                   </Button>
                                 </div>
                               </div>
@@ -374,7 +473,7 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
                       })}
                       {dateAvailabilities.length > 2 && (
                         <div className="text-xs text-gray-500 dark:text-gray-400 text-center pt-1">
-                          +{dateAvailabilities.length - 2} {__('more', 'yatra')}
+                          +{dateAvailabilities.length - 2} {__("more", "yatra")}
                         </div>
                       )}
                     </div>
@@ -390,30 +489,41 @@ export const AvailabilityCalendar: React.FC<AvailabilityCalendarProps> = ({
       <div className="flex flex-wrap items-center gap-4 text-xs">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-green-300 dark:border-green-800 bg-green-100 dark:bg-green-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Available', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Available", "yatra")}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-yellow-300 dark:border-yellow-800 bg-yellow-100 dark:bg-yellow-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Low Availability', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Low Availability", "yatra")}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-orange-300 dark:border-orange-800 bg-orange-100 dark:bg-orange-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Limited', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Limited", "yatra")}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Sold Out', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Sold Out", "yatra")}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-red-300 dark:border-red-800 bg-red-100 dark:bg-red-900/20"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Blocked', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Blocked", "yatra")}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded border-2 border-gray-300 dark:border-gray-600 bg-gray-200 dark:bg-gray-700"></div>
-          <span className="text-gray-600 dark:text-gray-400">{__('Not Available', 'yatra')}</span>
+          <span className="text-gray-600 dark:text-gray-400">
+            {__("Not Available", "yatra")}
+          </span>
         </div>
       </div>
     </div>
   );
 };
-

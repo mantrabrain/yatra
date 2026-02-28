@@ -10,34 +10,34 @@
 (function() {
     'use strict';
     
-    console.log('[Yatra Razorpay] Script loaded');
+    
 
     const __ = (window.wp && window.wp.i18n && window.wp.i18n.__) ? window.wp.i18n.__ : (text => text);
 
     class YatraRazorpay {
         constructor() {
-            console.log('[Yatra Razorpay] Constructor called');
+            
             this.razorpayLoaded = false;
             this.init();
         }
 
         init() {
-            console.log('[Yatra Razorpay] Init called, adding event listeners');
+            
             
             // Listen for payment response from server (new unified event)
             document.addEventListener('yatra_payment_response', (event) => {
-                console.log('[Yatra Razorpay] yatra_payment_response received:', event.detail);
+                
                 if (event.detail && event.detail.requires_action === 'razorpay_checkout') {
-                    console.log('[Yatra Razorpay] Opening checkout...');
+                    
                     this.openCheckout(event.detail);
                 }
             });
             
             // Also listen for legacy event for backward compatibility
             document.addEventListener('yatra_payment_action', (event) => {
-                console.log('[Yatra Razorpay] yatra_payment_action received:', event.detail);
+                
                 if (event.detail && event.detail.requires_action === 'razorpay_checkout') {
-                    console.log('[Yatra Razorpay] Opening checkout (legacy)...');
+                    
                     this.openCheckout(event.detail);
                 }
             });

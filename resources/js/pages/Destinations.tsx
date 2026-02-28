@@ -3,23 +3,36 @@
  * Clean, minimal SaaS-style destinations management page
  */
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ArrowUpDown, ArrowUp, ArrowDown, RotateCcw, Edit, Trash2 } from 'lucide-react';
-import { Pagination, SearchFilterToolbar, BulkActionToolbar, Table as SharedTable } from '../components/shared';
-import { getDefaultBulkStatusOptions } from '../components/shared/bulkStatusOptions';
-import { __ } from '../lib/i18n';
-import { usePermissions } from '../hooks/usePermissions';
-import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api-client';
-import { getErrorContext } from '../lib/errors';
-import { Button } from '../components/ui/button';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { ConfirmationDialog } from '../components/ui/confirmation-dialog';
-import { IconSelector } from '../components/ui/icon-selector';
-import type { IconPickerValue } from '../components/ui/icon-picker';
+import React, { useState, useMemo, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Plus,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  RotateCcw,
+  Edit,
+  Trash2,
+} from "lucide-react";
+import {
+  Pagination,
+  SearchFilterToolbar,
+  BulkActionToolbar,
+  Table as SharedTable,
+} from "../components/shared";
+import { getDefaultBulkStatusOptions } from "../components/shared/bulkStatusOptions";
+import { __ } from "../lib/i18n";
+import { usePermissions } from "../hooks/usePermissions";
+import { useToast } from "../components/ui/toast";
+import { apiClient } from "../lib/api-client";
+import { getErrorContext } from "../lib/errors";
+import { Button } from "../components/ui/button";
+import { PageHeader } from "../components/common/PageHeader";
+import { Card, CardContent } from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { IconSelector } from "../components/ui/icon-selector";
+import type { IconPickerValue } from "../components/ui/icon-picker";
 
 interface Destination {
   id: string | number;
@@ -38,14 +51,14 @@ interface Destination {
 }
 
 const Destinations: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [showColumnsDropdown, setShowColumnsDropdown] = useState(false);
-  const [sortBy, setSortBy] = useState('id');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState("id");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState("all");
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
-  const [bulkAction, setBulkAction] = useState('');
+  const [bulkAction, setBulkAction] = useState("");
   const [visibleColumns, setVisibleColumns] = useState(() => {
     const defaultColumns = {
       name: true,
@@ -57,10 +70,13 @@ const Destinations: React.FC = () => {
       created_by_name: false,
       updated_by_name: false,
     };
-    const saved = localStorage.getItem('yatra_destinations_visible_columns');
+    const saved = localStorage.getItem("yatra_destinations_visible_columns");
     return saved ? { ...defaultColumns, ...JSON.parse(saved) } : defaultColumns;
   });
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; destination: Destination | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    destination: Destination | null;
+  }>({
     isOpen: false,
     destination: null,
   });
@@ -72,13 +88,16 @@ const Destinations: React.FC = () => {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('[data-columns-trigger]') && !target.closest('[data-columns-content]')) {
+      if (
+        !target.closest("[data-columns-trigger]") &&
+        !target.closest("[data-columns-content]")
+      ) {
         setShowColumnsDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Build query params
@@ -94,7 +113,7 @@ const Destinations: React.FC = () => {
       params.search = searchTerm;
     }
 
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       params.status = statusFilter;
     }
 
@@ -103,31 +122,36 @@ const Destinations: React.FC = () => {
 
   // Fetch status counts from API
   const { data: statsData } = useQuery({
-    queryKey: ['destinations-stats'],
+    queryKey: ["destinations-stats"],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/destinations/stats');
+        const response = await apiClient.get("/destinations/stats");
         return response;
       } catch (error: any) {
         return { all: 0, publish: 0, draft: 0, trash: 0 };
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Fetch destinations from API
   const { data, isLoading, error } = useQuery({
-    queryKey: ['destinations', queryParams],
+    queryKey: ["destinations", queryParams],
     queryFn: async () => {
       try {
-        const response = await apiClient.get('/destinations', { params: queryParams });
+        const response = await apiClient.get("/destinations", {
+          params: queryParams,
+        });
         return response;
       } catch (error: any) {
-        showToast(error?.message || __('Failed to load destinations', 'yatra'), 'error');
+        showToast(
+          error?.message || __("Failed to load destinations", "yatra"),
+          "error",
+        );
         throw error;
       }
     },
-    enabled: can('yatra_view_trips'),
+    enabled: can("yatra_view_trips"),
   });
 
   // Delete mutation
@@ -136,13 +160,16 @@ const Destinations: React.FC = () => {
       return await apiClient.delete(`/destinations/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['destinations'] });
-      queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
-      showToast(__('Destination deleted successfully', 'yatra'), 'success');
+      queryClient.invalidateQueries({ queryKey: ["destinations"] });
+      queryClient.invalidateQueries({ queryKey: ["destinations-stats"] });
+      showToast(__("Destination deleted successfully", "yatra"), "success");
       setDeleteConfirm({ isOpen: false, destination: null });
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to delete destination', 'yatra'), 'error');
+      showToast(
+        error?.message || __("Failed to delete destination", "yatra"),
+        "error",
+      );
     },
   });
 
@@ -152,7 +179,7 @@ const Destinations: React.FC = () => {
   const errorContext = getErrorContext(error);
 
   const handleEdit = (destination: Destination) => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`;
   };
 
   const handleDelete = (destination: Destination) => {
@@ -166,23 +193,23 @@ const Destinations: React.FC = () => {
   };
 
   const handleCreateDestination = () => {
-    window.location.href = `${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=create`;
+    window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=create`;
   };
 
   const handleResetFilters = () => {
-    setSearchTerm('');
-    setStatusFilter('all');
-    setSortBy('id');
-    setSortOrder('desc');
+    setSearchTerm("");
+    setStatusFilter("all");
+    setSortBy("id");
+    setSortOrder("desc");
     setPage(1);
   };
 
   const handleSort = (field: string) => {
     if (sortBy === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortBy(field);
-      setSortOrder(field === 'id' ? 'desc' : 'asc');
+      setSortOrder(field === "id" ? "desc" : "asc");
     }
   };
 
@@ -190,19 +217,24 @@ const Destinations: React.FC = () => {
     if (sortBy !== field) {
       return <ArrowUpDown className="w-3.5 h-3.5 ml-1 text-gray-400" />;
     }
-    return sortOrder === 'asc' 
-      ? <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
-      : <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />;
+    return sortOrder === "asc" ? (
+      <ArrowUp className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    ) : (
+      <ArrowDown className="w-3.5 h-3.5 ml-1 text-gray-600 dark:text-gray-300" />
+    );
   };
 
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
       ...visibleColumns,
-      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns]
+      [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
     };
     setVisibleColumns(newVisibleColumns);
-    localStorage.setItem('yatra_destinations_visible_columns', JSON.stringify(newVisibleColumns));
+    localStorage.setItem(
+      "yatra_destinations_visible_columns",
+      JSON.stringify(newVisibleColumns),
+    );
   };
 
   // Status counts from stats API
@@ -225,29 +257,38 @@ const Destinations: React.FC = () => {
 
   // Bulk actions mutation
   const bulkMutation = useMutation({
-    mutationFn: async ({ action, ids }: { action: string; ids: (string | number)[] }) => {
-      return await apiClient.post('/destinations/bulk', { action, ids });
+    mutationFn: async ({
+      action,
+      ids,
+    }: {
+      action: string;
+      ids: (string | number)[];
+    }) => {
+      return await apiClient.post("/destinations/bulk", { action, ids });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['destinations'] });
-      queryClient.invalidateQueries({ queryKey: ['destinations-stats'] });
-      showToast(__('Bulk action completed successfully', 'yatra'), 'success');
+      queryClient.invalidateQueries({ queryKey: ["destinations"] });
+      queryClient.invalidateQueries({ queryKey: ["destinations-stats"] });
+      showToast(__("Bulk action completed successfully", "yatra"), "success");
       setSelectedIds([]);
-      setBulkAction('');
+      setBulkAction("");
     },
     onError: (error: any) => {
-      showToast(error?.message || __('Failed to perform bulk action', 'yatra'), 'error');
+      showToast(
+        error?.message || __("Failed to perform bulk action", "yatra"),
+        "error",
+      );
     },
   });
 
   const handleBulkApply = () => {
     if (!bulkAction) {
-      showToast(__('Select a bulk action first.', 'yatra'), 'warning');
+      showToast(__("Select a bulk action first.", "yatra"), "warning");
       return;
     }
 
     if (selectedIds.length === 0) {
-      showToast(__('Select at least one destination.', 'yatra'), 'warning');
+      showToast(__("Select at least one destination.", "yatra"), "warning");
       return;
     }
 
@@ -256,13 +297,29 @@ const Destinations: React.FC = () => {
   };
 
   const viewFilters = [
-    { key: 'all', label: __('All', 'yatra'), count: statusCounts.all ?? 0 },
-    { key: 'publish', label: __('Published', 'yatra'), count: statusCounts.publish ?? 0 },
-    { key: 'draft', label: __('Draft', 'yatra'), count: statusCounts.draft ?? 0 },
-    { key: 'trash', label: __('Trash', 'yatra'), count: statusCounts.trash ?? 0 },
+    { key: "all", label: __("All", "yatra"), count: statusCounts.all ?? 0 },
+    {
+      key: "publish",
+      label: __("Published", "yatra"),
+      count: statusCounts.publish ?? 0,
+    },
+    {
+      key: "draft",
+      label: __("Draft", "yatra"),
+      count: statusCounts.draft ?? 0,
+    },
+    {
+      key: "trash",
+      label: __("Trash", "yatra"),
+      count: statusCounts.trash ?? 0,
+    },
   ];
 
-  const hasFilters = searchTerm || statusFilter !== 'all' || sortBy !== 'id' || sortOrder !== 'desc';
+  const hasFilters =
+    searchTerm ||
+    statusFilter !== "all" ||
+    sortBy !== "id" ||
+    sortOrder !== "desc";
 
   return (
     <div className="space-y-3">
@@ -271,24 +328,35 @@ const Destinations: React.FC = () => {
         isOpen={deleteConfirm.isOpen}
         onClose={() => setDeleteConfirm({ isOpen: false, destination: null })}
         onConfirm={confirmDelete}
-        title={__('Delete Destination', 'yatra')}
-        message={deleteConfirm.destination 
-          ? __('Are you sure you want to delete "{name}"? This action cannot be undone.', 'yatra').replace('{name}', deleteConfirm.destination.name)
-          : __('Are you sure you want to delete this destination? This action cannot be undone.', 'yatra')}
-        confirmText={__('Delete', 'yatra')}
-        cancelText={__('Cancel', 'yatra')}
+        title={__("Delete Destination", "yatra")}
+        message={
+          deleteConfirm.destination
+            ? __(
+                'Are you sure you want to delete "{name}"? This action cannot be undone.',
+                "yatra",
+              ).replace("{name}", deleteConfirm.destination.name)
+            : __(
+                "Are you sure you want to delete this destination? This action cannot be undone.",
+                "yatra",
+              )
+        }
+        confirmText={__("Delete", "yatra")}
+        cancelText={__("Cancel", "yatra")}
         variant="danger"
         isLoading={deleteMutation.isPending}
       />
 
       <PageHeader
-        title={__('Destinations', 'yatra')}
-        description={__('Manage your travel destinations', 'yatra')}
+        title={__("Destinations", "yatra")}
+        description={__("Manage your travel destinations", "yatra")}
         actionCapability="yatra_edit_trips"
         actions={
-          <Button onClick={handleCreateDestination} className="flex items-center gap-2">
+          <Button
+            onClick={handleCreateDestination}
+            className="flex items-center gap-2"
+          >
             <Plus className="w-4 h-4" />
-            {__('Add New Destination', 'yatra')}
+            {__("Add New Destination", "yatra")}
           </Button>
         }
       />
@@ -304,27 +372,27 @@ const Destinations: React.FC = () => {
               setStatusFilter(value);
               setPage(1);
               setSelectedIds([]);
-              setBulkAction('');
+              setBulkAction("");
             }}
             statusOptions={[
-              { value: "all", label: __('All Status', 'yatra') },
-              { value: "publish", label: __('Published', 'yatra') },
-              { value: "draft", label: __('Draft', 'yatra') },
-              { value: "trash", label: __('Trash', 'yatra') }
+              { value: "all", label: __("All Status", "yatra") },
+              { value: "publish", label: __("Published", "yatra") },
+              { value: "draft", label: __("Draft", "yatra") },
+              { value: "trash", label: __("Trash", "yatra") },
             ]}
             sortBy={sortBy}
             onSortByChange={setSortBy}
             sortOrder={sortOrder}
             onSortOrderChange={setSortOrder}
             sortOptions={[
-              { value: "name", label: __('Name', 'yatra') },
-              { value: "status", label: __('Status', 'yatra') },
-              { value: "created_at", label: __('Created At', 'yatra') },
-              { value: "updated_at", label: __('Updated At', 'yatra') }
+              { value: "name", label: __("Name", "yatra") },
+              { value: "status", label: __("Status", "yatra") },
+              { value: "created_at", label: __("Created At", "yatra") },
+              { value: "updated_at", label: __("Updated At", "yatra") },
             ]}
             onResetFilters={handleResetFilters}
             hasFilters={!!hasFilters}
-            placeholder={__('Search destinations...', 'yatra')}
+            placeholder={__("Search destinations...", "yatra")}
           />
         </CardContent>
       </Card>
@@ -341,20 +409,52 @@ const Destinations: React.FC = () => {
             setStatusFilter(value);
             setPage(1);
             setSelectedIds([]);
-            setBulkAction('');
+            setBulkAction("");
           }}
           statusOptions={viewFilters}
           showColumnsDropdown={showColumnsDropdown}
           setShowColumnsDropdown={setShowColumnsDropdown}
           columnOptions={[
-            { key: 'name', label: __('Destination', 'yatra'), visible: visibleColumns.name },
-            { key: 'description', label: __('Description', 'yatra'), visible: visibleColumns.description },
-            { key: 'trips', label: __('Trips', 'yatra'), visible: visibleColumns.trips },
-            { key: 'status', label: __('Status', 'yatra'), visible: visibleColumns.status },
-            { key: 'created_at', label: __('Created Date', 'yatra'), visible: visibleColumns.created_at },
-            { key: 'updated_at', label: __('Updated Date', 'yatra'), visible: visibleColumns.updated_at },
-            { key: 'created_by_name', label: __('Created By', 'yatra'), visible: visibleColumns.created_by_name },
-            { key: 'updated_by_name', label: __('Updated By', 'yatra'), visible: visibleColumns.updated_by_name }
+            {
+              key: "name",
+              label: __("Destination", "yatra"),
+              visible: visibleColumns.name,
+            },
+            {
+              key: "description",
+              label: __("Description", "yatra"),
+              visible: visibleColumns.description,
+            },
+            {
+              key: "trips",
+              label: __("Trips", "yatra"),
+              visible: visibleColumns.trips,
+            },
+            {
+              key: "status",
+              label: __("Status", "yatra"),
+              visible: visibleColumns.status,
+            },
+            {
+              key: "created_at",
+              label: __("Created Date", "yatra"),
+              visible: visibleColumns.created_at,
+            },
+            {
+              key: "updated_at",
+              label: __("Updated Date", "yatra"),
+              visible: visibleColumns.updated_at,
+            },
+            {
+              key: "created_by_name",
+              label: __("Created By", "yatra"),
+              visible: visibleColumns.created_by_name,
+            },
+            {
+              key: "updated_by_name",
+              label: __("Updated By", "yatra"),
+              visible: visibleColumns.updated_by_name,
+            },
           ]}
           onToggleColumn={toggleColumn}
           bulkMutationPending={bulkMutation.isPending}
@@ -368,227 +468,305 @@ const Destinations: React.FC = () => {
           <Card className="overflow-visible">
             <CardContent className="p-0 overflow-visible">
               <SharedTable
-                  data={destinations}
-                  columns={[
-                    {
-                      key: 'name',
-                      label: __('Destination', 'yatra'),
-                      sortable: true,
-                      visible: visibleColumns.name,
-                      render: (destination: Destination) => (
-                        <div className="flex items-center gap-3">
-                          {/* Icon/Image */}
-                          <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
-                            {destination.icon ? (
-                              destination.icon.type === 'image' ? (
-                                <img 
-                                  src={destination.icon.value} 
-                                  alt={destination.name}
-                                  className="w-full h-full object-cover rounded-lg"
-                                />
-                              ) : (
-                                <IconSelector 
-                                  iconName={destination.icon.value} 
-                                  className="w-5 h-5 text-blue-600 dark:text-blue-400" 
-                                />
-                              )
+                data={destinations}
+                columns={[
+                  {
+                    key: "name",
+                    label: __("Destination", "yatra"),
+                    sortable: true,
+                    visible: visibleColumns.name,
+                    render: (destination: Destination) => (
+                      <div className="flex items-center gap-3">
+                        {/* Icon/Image */}
+                        <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                          {destination.icon ? (
+                            destination.icon.type === "image" ? (
+                              <img
+                                src={destination.icon.value}
+                                alt={destination.name}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
                             ) : (
-                              <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
-                                {destination.name.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
-                          {/* Text */}
-                          <div>
-                            <a 
-                              href={`${window.yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`}
-                              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-                            >
-                              {destination.name}
-                            </a>
-                            <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-                              <span>{destination.slug}</span>
-                              <span className="text-[11px] text-gray-400 dark:text-gray-500">
-                                ({__('ID:', 'yatra')} {destination.id})
-                              </span>
+                              <IconSelector
+                                iconName={destination.icon.value}
+                                className="w-5 h-5 text-blue-600 dark:text-blue-400"
+                              />
+                            )
+                          ) : (
+                            <div className="w-5 h-5 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-semibold">
+                              {destination.name.charAt(0).toUpperCase()}
                             </div>
+                          )}
+                        </div>
+                        {/* Text */}
+                        <div>
+                          <a
+                            href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=destinations&action=edit&id=${destination.id}`}
+                            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                          >
+                            {destination.name}
+                          </a>
+                          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                            <span>{destination.slug}</span>
+                            <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                              ({__("ID:", "yatra")} {destination.id})
+                            </span>
                           </div>
                         </div>
+                      </div>
+                    ),
+                  },
+                  {
+                    key: "trips",
+                    label: __("Trips", "yatra"),
+                    sortable: false,
+                    visible: visibleColumns.trips,
+                    render: (destination: Destination) => (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+                        {typeof destination.trip_count === "number"
+                          ? destination.trip_count
+                          : 0}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "description",
+                    label: __("Description", "yatra"),
+                    visible: visibleColumns.description,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {destination.description ||
+                          __("No description", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "status",
+                    label: __("Status", "yatra"),
+                    sortable: true,
+                    visible: visibleColumns.status,
+                    render: (destination: Destination) => (
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400"
+                            : destination.status === "publish"
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                        }`}
+                      >
+                        {destination.status === "trash" ||
+                        statusFilter === "trash"
+                          ? __("Trash", "yatra")
+                          : destination.status === "publish"
+                            ? __("Published", "yatra")
+                            : __("Draft", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "created_at",
+                    label: __("Created Date", "yatra"),
+                    sortable: true,
+                    visible: visibleColumns.created_at,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {new Date(destination.created_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "updated_at",
+                    label: __("Updated Date", "yatra"),
+                    sortable: true,
+                    visible: visibleColumns.updated_at,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {new Date(destination.updated_at).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          },
+                        )}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "created_by_name",
+                    label: __("Created By", "yatra"),
+                    visible: visibleColumns.created_by_name,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {destination.created_by_name || __("Unknown", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "updated_by_name",
+                    label: __("Updated By", "yatra"),
+                    visible: visibleColumns.updated_by_name,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {destination.updated_by_name || __("Unknown", "yatra")}
+                      </span>
+                    ),
+                  },
+                ]}
+                actions={[
+                  {
+                    key: "edit",
+                    label: __("Edit", "yatra"),
+                    icon: <Edit className="w-4 h-4" />,
+                    onClick: handleEdit,
+                    condition: () => can("yatra_edit_trips"),
+                  },
+                  {
+                    key: "restore",
+                    label: __("Restore", "yatra"),
+                    icon: <RotateCcw className="w-4 h-4" />,
+                    onClick: (destination: Destination) => {
+                      // Handle restore action
+                      bulkMutation.mutate({
+                        action: "restore",
+                        ids: [destination.id],
+                      });
+                    },
+                    condition: (destination: Destination) =>
+                      (destination.status === "trash" ||
+                        statusFilter === "trash") &&
+                      can("yatra_edit_trips"),
+                  },
+                  {
+                    key: "trash",
+                    label: __("Move to Trash", "yatra"),
+                    icon: <Trash2 className="w-4 h-4" />,
+                    onClick: (destination: Destination) => {
+                      bulkMutation.mutate({
+                        action: "trash",
+                        ids: [destination.id],
+                      });
+                    },
+                    condition: (destination: Destination) =>
+                      destination.status !== "trash" &&
+                      statusFilter !== "trash" &&
+                      can("yatra_edit_trips"),
+                  },
+                  {
+                    key: "delete",
+                    label: __("Delete Permanently", "yatra"),
+                    icon: <Trash2 className="w-4 h-4" />,
+                    onClick: handleDelete,
+                    condition: (destination: Destination) =>
+                      (destination.status === "trash" ||
+                        statusFilter === "trash") &&
+                      can("yatra_delete_trips"),
+                    variant: "destructive",
+                  },
+                ]}
+                isLoading={isLoading}
+                isError={!!error}
+                errorText={__("Error loading destinations", "yatra")}
+                errorDescription={__(
+                  "We couldn’t connect to the destinations service. Please refresh or try again shortly.",
+                  "yatra",
+                )}
+                onRetry={() =>
+                  queryClient.invalidateQueries({ queryKey: ["destinations"] })
+                }
+                errorDetails={errorContext.details}
+                errorRequestInfo={errorContext.requestInfo}
+                emptyText={__("No destinations found", "yatra")}
+                emptyDescription={
+                  hasFilters
+                    ? __(
+                        "Try adjusting your filters to see more results.",
+                        "yatra",
                       )
-                    },
-                    {
-                      key: 'trips',
-                      label: __('Trips', 'yatra'),
-                      sortable: false,
-                      visible: visibleColumns.trips,
-                      render: (destination: Destination) => (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-                          {typeof destination.trip_count === 'number' ? destination.trip_count : 0}
-                        </span>
+                    : __(
+                        "Get started by creating your first destination.",
+                        "yatra",
                       )
-                    },
-                    {
-                      key: 'description',
-                      label: __('Description', 'yatra'),
-                      visible: visibleColumns.description,
-                      render: (destination: Destination) => (
-                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.description || __('No description', 'yatra')}
-                        </span>
-                      )
-                    },
-                    {
-                      key: 'status',
-                      label: __('Status', 'yatra'),
-                      sortable: true,
-                      visible: visibleColumns.status,
-                      render: (destination: Destination) => (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          destination.status === 'trash' || statusFilter === 'trash'
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                            : destination.status === 'publish'
-                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                              : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                        }`}>
-                          {destination.status === 'trash' || statusFilter === 'trash'
-                            ? __('Trash', 'yatra')
-                            : destination.status === 'publish'
-                              ? __('Published', 'yatra')
-                              : __('Draft', 'yatra')
-                          }
-                        </span>
-                      )
-                    },
-                    {
-                      key: 'created_at',
-                      label: __('Created Date', 'yatra'),
-                      sortable: true,
-                      visible: visibleColumns.created_at,
-                      render: (destination: Destination) => (
-                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {new Date(destination.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      )
-                    },
-                    {
-                      key: 'updated_at',
-                      label: __('Updated Date', 'yatra'),
-                      sortable: true,
-                      visible: visibleColumns.updated_at,
-                      render: (destination: Destination) => (
-                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {new Date(destination.updated_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                      )
-                    },
-                    {
-                      key: 'created_by_name',
-                      label: __('Created By', 'yatra'),
-                      visible: visibleColumns.created_by_name,
-                      render: (destination: Destination) => (
-                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.created_by_name || __('Unknown', 'yatra')}
-                        </span>
-                      )
-                    },
-                    {
-                      key: 'updated_by_name',
-                      label: __('Updated By', 'yatra'),
-                      visible: visibleColumns.updated_by_name,
-                      render: (destination: Destination) => (
-                        <span className={destination.status === 'trash' || statusFilter === 'trash' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-600 dark:text-gray-400'}>
-                          {destination.updated_by_name || __('Unknown', 'yatra')}
-                        </span>
-                      )
-                    }
-                  ]}
-                  actions={[
-                    {
-                      key: 'edit',
-                      label: __('Edit', 'yatra'),
-                      icon: <Edit className="w-4 h-4" />,
-                      onClick: handleEdit,
-                      condition: () => can('yatra_edit_trips'),
-                    },
-                    {
-                      key: 'restore',
-                      label: __('Restore', 'yatra'),
-                      icon: <RotateCcw className="w-4 h-4" />,
-                      onClick: (destination: Destination) => {
-                        // Handle restore action
-                        bulkMutation.mutate({ action: 'restore', ids: [destination.id] });
-                      },
-                      condition: (destination: Destination) => (destination.status === 'trash' || statusFilter === 'trash') && can('yatra_edit_trips'),
-                    },
-                    {
-                      key: 'trash',
-                      label: __('Move to Trash', 'yatra'),
-                      icon: <Trash2 className="w-4 h-4" />,
-                      onClick: (destination: Destination) => {
-                        bulkMutation.mutate({ action: 'trash', ids: [destination.id] });
-                      },
-                      condition: (destination: Destination) => destination.status !== 'trash' && statusFilter !== 'trash' && can('yatra_edit_trips'),
-                    },
-                    {
-                      key: 'delete',
-                      label: __('Delete Permanently', 'yatra'),
-                      icon: <Trash2 className="w-4 h-4" />,
-                      onClick: handleDelete,
-                      condition: (destination: Destination) => (destination.status === 'trash' || statusFilter === 'trash') && can('yatra_delete_trips'),
-                      variant: 'destructive',
-                    }
-                  ]}
-                  isLoading={isLoading}
-                  isError={!!error}
-                  errorText={__('Error loading destinations', 'yatra')}
-                  errorDescription={__(
-                    'We couldn’t connect to the destinations service. Please refresh or try again shortly.',
-                    'yatra'
-                  )}
-                  onRetry={() => queryClient.invalidateQueries({ queryKey: ['destinations'] })}
-                  errorDetails={errorContext.details}
-                  errorRequestInfo={errorContext.requestInfo}
-                  emptyText={__('No destinations found', 'yatra')}
-                  emptyDescription={hasFilters 
-                    ? __('Try adjusting your filters to see more results.', 'yatra')
-                    : __('Get started by creating your first destination.', 'yatra')
+                }
+                onCreateClick={
+                  can("yatra_edit_trips") ? handleCreateDestination : undefined
+                }
+                onSort={handleSort}
+                getSortIcon={getSortIcon}
+                selectedItemIds={selectedIds}
+                onSelectItem={(id: string | number, checked: boolean) => {
+                  if (checked) {
+                    setSelectedIds([...selectedIds, id]);
+                  } else {
+                    setSelectedIds(
+                      selectedIds.filter((selectedId) => selectedId !== id),
+                    );
                   }
-                  onCreateClick={can('yatra_edit_trips') ? handleCreateDestination : undefined}
-                  onSort={handleSort}
-                  getSortIcon={getSortIcon}
-                  selectedItemIds={selectedIds}
-                  onSelectItem={(id: string | number, checked: boolean) => {
-                    if (checked) {
-                      setSelectedIds([...selectedIds, id]);
-                    } else {
-                      setSelectedIds(selectedIds.filter(selectedId => selectedId !== id));
-                    }
-                  }}
-                  onSelectAll={(checked: boolean) => {
-                    if (checked) {
-                      setSelectedIds(destinations.map((d: Destination) => d.id));
-                    } else {
-                      setSelectedIds([]);
-                    }
-                  }}
-                  isAllSelected={destinations.length > 0 && selectedIds.length === destinations.length}
-                  getItemId={(destination: Destination) => destination.id}
-                  getItemStatus={(destination: Destination) => destination.status}
-                  statusFilter={statusFilter}
-                  skeletonRows={5}
-                />
+                }}
+                onSelectAll={(checked: boolean) => {
+                  if (checked) {
+                    setSelectedIds(destinations.map((d: Destination) => d.id));
+                  } else {
+                    setSelectedIds([]);
+                  }
+                }}
+                isAllSelected={
+                  destinations.length > 0 &&
+                  selectedIds.length === destinations.length
+                }
+                getItemId={(destination: Destination) => destination.id}
+                getItemStatus={(destination: Destination) => destination.status}
+                statusFilter={statusFilter}
+                skeletonRows={5}
+              />
             </CardContent>
           </Card>
         </>
@@ -603,7 +781,7 @@ const Destinations: React.FC = () => {
             totalItems={total}
             itemsPerPage={10}
             onPageChange={(newPage) => setPage(newPage)}
-            itemName={__('destinations', 'yatra')}
+            itemName={__("destinations", "yatra")}
           />
         </div>
       )}

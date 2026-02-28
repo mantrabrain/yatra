@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   PieChart,
   Pie,
@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Legend,
-} from 'recharts';
+} from "recharts";
 
 export interface BookingStatusPoint {
   label: string;
@@ -81,15 +81,17 @@ const BookingStatusChart: React.FC<BookingStatusChartProps> = ({ data }) => {
             ))}
           </Pie>
           <Tooltip
-            formatter={(_value: any, _name: any, props: any) => `${props.payload.percent.toFixed(1)}%`}
-            contentStyle={{ fontFamily: 'inherit', fontSize: 11 }}
+            formatter={(_value: any, _name: any, props: any) =>
+              `${props.payload.percent.toFixed(1)}%`
+            }
+            contentStyle={{ fontFamily: "inherit", fontSize: 11 }}
           />
           <Legend
             verticalAlign="middle"
             align="right"
             layout="vertical"
             iconType="circle"
-            wrapperStyle={{ fontFamily: 'inherit', fontSize: 11 }}
+            wrapperStyle={{ fontFamily: "inherit", fontSize: 11 }}
             content={renderLegend}
           />
         </PieChart>

@@ -91,7 +91,7 @@
         return;
       }
 
-      console.log('YatraVideoPlayer.play() called with:', video);
+      
       this.currentVideo = video;
       
       // Determine the embed URL
@@ -118,13 +118,13 @@
         embedUrl = video.url;
       }
 
-      console.log('Embed URL:', embedUrl);
-      console.log('Modal element:', this.modal);
-      console.log('Iframe element:', this.iframe);
+      
+      
+      
 
       // Add load event handlers for debugging
       this.iframe.onload = () => {
-        console.log('YouTube iframe loaded successfully');
+        
       };
       
       this.iframe.onerror = (error) => {
@@ -132,18 +132,13 @@
       };
       
       // Set iframe source
-      console.log('Setting iframe src to:', embedUrl);
+      
       this.iframe.src = embedUrl;
       
       // Verify iframe src was set
       setTimeout(() => {
-        console.log('Iframe src after setting:', this.iframe.src);
-        console.log('Iframe attributes:', {
-          width: this.iframe.width,
-          height: this.iframe.height,
-          allowfullscreen: this.iframe.allowFullscreen,
-          allow: this.iframe.allow
-        });
+        
+        
       }, 100);
       
       // Show modal
@@ -174,11 +169,11 @@
     }
 
     open() {
-      console.log('YatraVideoPlayer.open() called');
-      console.log('Setting modal display to flex');
+      
+      
       this.modal.style.display = 'flex';
       document.body.style.overflow = 'hidden';
-      console.log('Modal should now be visible');
+      
     }
 
     close() {
@@ -195,6 +190,6 @@
   window.YatraVideoPlayer = new YatraVideoPlayer();
   
   // Log successful initialization
-  console.log('Yatra Video Player module loaded successfully');
+  
 
 })();

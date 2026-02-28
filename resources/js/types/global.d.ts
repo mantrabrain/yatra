@@ -1,9 +1,6 @@
 declare global {
-  function __(
-    text: string,
-    domain?: string
-  ): string;
-  
+  function __(text: string, domain?: string): string;
+
   interface Window {
     yatraAdmin?: {
       apiUrl: string;
@@ -20,7 +17,7 @@ declare global {
       additionalServicesEnabled: boolean;
       abandonedBookingRecoveryEnabled: boolean;
       dynamicPricingEnabled: boolean;
-          };
+    };
     yatraBookingData?: {
       currency: string;
     };

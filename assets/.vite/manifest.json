@@ -3,28 +3,8 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-CCWiQomn.js": {
-    "file": "dist/js/index-CCWiQomn.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-Dh6fXFdf.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-Ccg4GdWb.js": {
-    "file": "dist/js/index-Ccg4GdWb.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-Dh6fXFdf.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-CrKkASqN.js": {
-    "file": "dist/js/index-CrKkASqN.js",
+  "_index-DWmYutN-.js": {
+    "file": "dist/js/index-DWmYutN-.js",
     "name": "index",
     "imports": [
       "_react-vendor-Dh6fXFdf.js"
@@ -51,7 +31,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Dh6fXFdf.js",
-      "_index-CCWiQomn.js"
+      "_index-DWmYutN-.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -61,7 +41,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Dh6fXFdf.js",
-      "_index-CCWiQomn.js"
+      "_index-DWmYutN-.js"
     ]
   }
 }

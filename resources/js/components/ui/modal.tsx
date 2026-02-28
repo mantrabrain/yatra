@@ -1,15 +1,15 @@
-import React, { ReactNode, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import React, { ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 
-type ModalSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
 
 const sizeClasses: Record<ModalSize, string> = {
-  sm: 'max-w-md',
-  md: 'max-w-xl',
-  lg: 'max-w-2xl',
-  xl: 'max-w-4xl',
-  full: 'max-w-6xl',
+  sm: "max-w-md",
+  md: "max-w-xl",
+  lg: "max-w-2xl",
+  xl: "max-w-4xl",
+  full: "max-w-6xl",
 };
 
 interface ModalProps {
@@ -41,9 +41,9 @@ export const Modal: React.FC<ModalProps> = ({
   description,
   children,
   footer,
-  size = 'xl',
+  size = "xl",
   maxWidthClassName,
-  panelClassName = '',
+  panelClassName = "",
   bodyClassName,
   showCloseButton = true,
   closeOnOverlayClick = true,
@@ -61,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
     }
 
     const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = originalOverflow;
@@ -73,7 +73,7 @@ export const Modal: React.FC<ModalProps> = ({
   }
 
   const panelWidthClass = maxWidthClassName || sizeClasses[size];
-  const bodyClasses = bodyClassName ?? 'px-6 py-5';
+  const bodyClasses = bodyClassName ?? "px-6 py-5";
   const zIndex = customZIndex || 999999;
 
   // Default loading skeleton
@@ -93,8 +93,18 @@ export const Modal: React.FC<ModalProps> = ({
   const defaultErrorComponent = error ? (
     <div className="text-center py-8">
       <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/20 mb-4">
-        <svg className="w-6 h-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg
+          className="w-6 h-6 text-red-600 dark:text-red-400"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
         </svg>
       </div>
       <p className="text-red-600 dark:text-red-400 font-medium mb-2">Error</p>
@@ -103,7 +113,10 @@ export const Modal: React.FC<ModalProps> = ({
   ) : null;
 
   return createPortal(
-    <div className="fixed inset-0 flex items-center justify-center px-4" style={{ zIndex }}>
+    <div
+      className="fixed inset-0 flex items-center justify-center px-4"
+      style={{ zIndex }}
+    >
       <div
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={() => {
@@ -120,10 +133,14 @@ export const Modal: React.FC<ModalProps> = ({
           <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-800">
             <div>
               {title && (
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h2>
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {title}
+                </h2>
               )}
               {description && (
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                  {description}
+                </p>
               )}
             </div>
             {showCloseButton && (
@@ -140,9 +157,15 @@ export const Modal: React.FC<ModalProps> = ({
           </div>
         )}
 
-        <div className={`${bodyClasses} max-h-[70vh] overflow-y-auto custom-scrollbar`}>
+        <div
+          className={`${bodyClasses} max-h-[70vh] overflow-y-auto custom-scrollbar`}
+        >
           <div className="w-full">
-            {loading ? (loadingSkeleton || defaultLoadingSkeleton) : error ? (errorComponent || defaultErrorComponent) : children}
+            {loading
+              ? loadingSkeleton || defaultLoadingSkeleton
+              : error
+                ? errorComponent || defaultErrorComponent
+                : children}
           </div>
         </div>
 
@@ -153,6 +176,6 @@ export const Modal: React.FC<ModalProps> = ({
         )}
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };

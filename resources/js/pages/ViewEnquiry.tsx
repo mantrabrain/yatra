@@ -3,21 +3,38 @@
  * Display enquiry details in a clean, minimal SaaS-style design
  */
 
-import React, { useMemo, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, Mail, Phone, Calendar, MessageSquare, Edit, ExternalLink, MapPin, Users, Send, Loader2 } from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { apiService } from '../lib/api-client';
-import { usePermissions } from '../hooks/usePermissions';
-import { Button } from '../components/ui/button';
-import { PageHeader } from '../components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { Badge } from '../components/ui/badge';
-import { useNavigate } from '../hooks/useNavigate';
-import { Skeleton } from '../components/ui/skeleton';
-import { Modal } from '../components/ui/modal';
-import { useToast } from '../components/ui/toast';
+import React, { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  Mail,
+  Phone,
+  Calendar,
+  MessageSquare,
+  Edit,
+  ExternalLink,
+  MapPin,
+  Users,
+  Send,
+  Loader2,
+} from "lucide-react";
+import { __ } from "../lib/i18n";
+import { apiService } from "../lib/api-client";
+import { usePermissions } from "../hooks/usePermissions";
+import { Button } from "../components/ui/button";
+import { PageHeader } from "../components/common/PageHeader";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { Badge } from "../components/ui/badge";
+import { useNavigate } from "../hooks/useNavigate";
+import { Skeleton } from "../components/ui/skeleton";
+import { Modal } from "../components/ui/modal";
+import { useToast } from "../components/ui/toast";
 
 interface Enquiry {
   id: number;
@@ -30,7 +47,14 @@ interface Enquiry {
   message: string;
   travelers_count?: number;
   travel_date?: string;
-  status: 'new' | 'pending' | 'responded' | 'closed' | 'converted' | '' | string;
+  status:
+    | "new"
+    | "pending"
+    | "responded"
+    | "closed"
+    | "converted"
+    | ""
+    | string;
   created_at: string;
   responded_at?: string;
   response?: string;
@@ -42,24 +66,28 @@ const ViewEnquiry: React.FC = () => {
   const queryClient = useQueryClient();
   const { showToast } = useToast();
   const [respondDialogOpen, setRespondDialogOpen] = useState(false);
-  const [responseMessage, setResponseMessage] = useState('');
+  const [responseMessage, setResponseMessage] = useState("");
 
   // Get enquiry id from URL
   const enquiryId = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('id') ? parseInt(params.get('id') || '0') : null;
+    return params.get("id") ? parseInt(params.get("id") || "0") : null;
   }, []);
 
   // Fetch enquiry data from API
-  const { data: enquiry, isLoading, error } = useQuery<Enquiry | null>({
-    queryKey: ['enquiry', enquiryId],
+  const {
+    data: enquiry,
+    isLoading,
+    error,
+  } = useQuery<Enquiry | null>({
+    queryKey: ["enquiry", enquiryId],
     queryFn: async () => {
       if (!enquiryId) return null;
       const response = await apiService.getEnquiry(enquiryId!);
       // Some endpoints return { success, data }, others return the object directly
       return (response as any)?.data ?? response;
     },
-    enabled: !!enquiryId && can('yatra_view_bookings'),
+    enabled: !!enquiryId && can("yatra_view_bookings"),
   });
 
   // Respond mutation
@@ -68,48 +96,54 @@ const ViewEnquiry: React.FC = () => {
       return await apiService.respondToEnquiry(id, { response: message });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['enquiry', enquiryId] });
+      queryClient.invalidateQueries({ queryKey: ["enquiry", enquiryId] });
       setRespondDialogOpen(false);
-      setResponseMessage('');
-      showToast(__('Response sent successfully.', 'yatra'), 'success');
+      setResponseMessage("");
+      showToast(__("Response sent successfully.", "yatra"), "success");
     },
   });
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { className: string; label: string }> = {
-      'new': {
-        className: 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400',
-        label: __('New', 'yatra'),
+      new: {
+        className:
+          "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400",
+        label: __("New", "yatra"),
       },
-      'pending': {
-        className: 'bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400',
-        label: __('Pending', 'yatra'),
+      pending: {
+        className:
+          "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400",
+        label: __("Pending", "yatra"),
       },
-      'responded': {
-        className: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400',
-        label: __('Responded', 'yatra'),
+      responded: {
+        className:
+          "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400",
+        label: __("Responded", "yatra"),
       },
-      'converted': {
-        className: 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400',
-        label: __('Converted', 'yatra'),
+      converted: {
+        className:
+          "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400",
+        label: __("Converted", "yatra"),
       },
-      'closed': {
-        className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
-        label: __('Closed', 'yatra'),
+      closed: {
+        className:
+          "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
+        label: __("Closed", "yatra"),
       },
     };
 
     const statusInfo = statusMap[status] || {
-      className: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400',
+      className:
+        "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-400",
       label: status,
     };
 
@@ -121,23 +155,28 @@ const ViewEnquiry: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate({ subpage: 'enquiries' });
+    navigate({ subpage: "enquiries" });
   };
 
   const handleEdit = () => {
     if (enquiryId) {
-      navigate({ subpage: 'enquiries', action: 'edit', id: enquiryId });
+      navigate({ subpage: "enquiries", action: "edit", id: enquiryId });
     }
   };
 
   const handleViewTrip = () => {
     if (enquiry?.trip_id) {
-      navigate({ subpage: 'trips', tab: 'all', action: 'edit', id: enquiry.trip_id });
+      navigate({
+        subpage: "trips",
+        tab: "all",
+        action: "edit",
+        id: enquiry.trip_id,
+      });
     }
   };
 
   const handleRespond = () => {
-    setResponseMessage('');
+    setResponseMessage("");
     setRespondDialogOpen(true);
   };
 
@@ -154,7 +193,7 @@ const ViewEnquiry: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Enquiry Details', 'yatra')}
+          title={__("Enquiry Details", "yatra")}
           actions={
             <div className="flex items-center gap-2">
               <Skeleton className="h-10 w-24" />
@@ -220,17 +259,24 @@ const ViewEnquiry: React.FC = () => {
     return (
       <div className="space-y-3">
         <PageHeader
-          title={__('Enquiry Not Found', 'yatra')}
+          title={__("Enquiry Not Found", "yatra")}
           actions={
-            <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back to Enquiries', 'yatra')}
+              {__("Back to Enquiries", "yatra")}
             </Button>
           }
         />
         <Card>
           <CardContent className="p-8 text-center text-red-500">
-            {__('Enquiry not found or you do not have permission to view it.', 'yatra')}
+            {__(
+              "Enquiry not found or you do not have permission to view it.",
+              "yatra",
+            )}
           </CardContent>
         </Card>
       </div>
@@ -240,29 +286,37 @@ const ViewEnquiry: React.FC = () => {
   return (
     <div className="space-y-3">
       <PageHeader
-        title={__('Enquiry Details', 'yatra')}
-        description={__('View complete enquiry information', 'yatra')}
+        title={__("Enquiry Details", "yatra")}
+        description={__("View complete enquiry information", "yatra")}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleBack}
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="w-4 h-4" />
-              {__('Back', 'yatra')}
+              {__("Back", "yatra")}
             </Button>
             <ConditionalRender capability="yatra_edit_bookings">
               <div className="flex items-center gap-2">
-                {enquiry.status !== 'responded' && enquiry.status !== 'closed' && (
-                  <Button 
-                    variant="outline" 
-                    onClick={handleRespond} 
-                    className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
-                  >
-                    <Send className="w-4 h-4" />
-                    {__('Send Response', 'yatra')}
-                  </Button>
-                )}
-                <Button onClick={handleEdit} className="flex items-center gap-2">
+                {enquiry.status !== "responded" &&
+                  enquiry.status !== "closed" && (
+                    <Button
+                      variant="outline"
+                      onClick={handleRespond}
+                      className="flex items-center gap-2 text-blue-600 border-blue-300 hover:bg-blue-50 dark:text-blue-400 dark:border-blue-700 dark:hover:bg-blue-900/20"
+                    >
+                      <Send className="w-4 h-4" />
+                      {__("Send Response", "yatra")}
+                    </Button>
+                  )}
+                <Button
+                  onClick={handleEdit}
+                  className="flex items-center gap-2"
+                >
                   <Edit className="w-4 h-4" />
-                  {__('Edit Enquiry', 'yatra')}
+                  {__("Edit Enquiry", "yatra")}
                 </Button>
               </div>
             </ConditionalRender>
@@ -278,14 +332,16 @@ const ViewEnquiry: React.FC = () => {
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{__('Enquiry Information', 'yatra')}</CardTitle>
+                  <CardTitle className="text-base">
+                    {__("Enquiry Information", "yatra")}
+                  </CardTitle>
                   {getStatusBadge(enquiry.status)}
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                    {__('Message', 'yatra')}
+                    {__("Message", "yatra")}
                   </label>
                   <div className="flex items-start gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
@@ -299,7 +355,7 @@ const ViewEnquiry: React.FC = () => {
                   {enquiry.travelers_count && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                        {__('Number of Travelers', 'yatra')}
+                        {__("Number of Travelers", "yatra")}
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Users className="w-4 h-4 text-gray-400" />
@@ -312,7 +368,7 @@ const ViewEnquiry: React.FC = () => {
                   {enquiry.travel_date && (
                     <div>
                       <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                        {__('Preferred Travel Date', 'yatra')}
+                        {__("Preferred Travel Date", "yatra")}
                       </label>
                       <div className="mt-1 flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-gray-400" />
@@ -327,7 +383,7 @@ const ViewEnquiry: React.FC = () => {
                 {enquiry.response && (
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 block">
-                      {__('Response', 'yatra')}
+                      {__("Response", "yatra")}
                     </label>
                     <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
                       {enquiry.response}
@@ -342,7 +398,9 @@ const ViewEnquiry: React.FC = () => {
               <Card>
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">{__('Related Trip', 'yatra')}</CardTitle>
+                    <CardTitle className="text-base">
+                      {__("Related Trip", "yatra")}
+                    </CardTitle>
                     {enquiry.trip_id && (
                       <Button
                         variant="ghost"
@@ -350,7 +408,7 @@ const ViewEnquiry: React.FC = () => {
                         onClick={handleViewTrip}
                         className="flex items-center gap-1.5 text-sm"
                       >
-                        {__('View Trip', 'yatra')}
+                        {__("View Trip", "yatra")}
                         <ExternalLink className="w-3.5 h-3.5" />
                       </Button>
                     )}
@@ -359,7 +417,7 @@ const ViewEnquiry: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Trip', 'yatra')}
+                      {__("Trip", "yatra")}
                     </label>
                     <div className="mt-1 flex items-center gap-2">
                       <MapPin className="w-4 h-4 text-gray-400" />
@@ -378,7 +436,9 @@ const ViewEnquiry: React.FC = () => {
             {/* Customer Information */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Customer', 'yatra')}</CardTitle>
+                <CardTitle className="text-base">
+                  {__("Customer", "yatra")}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
@@ -402,12 +462,14 @@ const ViewEnquiry: React.FC = () => {
             {/* Enquiry Timeline */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">{__('Timeline', 'yatra')}</CardTitle>
+                <CardTitle className="text-base">
+                  {__("Timeline", "yatra")}
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div>
                   <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                    {__('Submitted', 'yatra')}
+                    {__("Submitted", "yatra")}
                   </label>
                   <p className="mt-1 text-sm text-gray-900 dark:text-white">
                     {formatDate(enquiry.created_at)}
@@ -416,7 +478,7 @@ const ViewEnquiry: React.FC = () => {
                 {enquiry.responded_at && (
                   <div>
                     <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                      {__('Responded', 'yatra')}
+                      {__("Responded", "yatra")}
                     </label>
                     <p className="mt-1 text-sm text-gray-900 dark:text-white">
                       {formatDate(enquiry.responded_at)}
@@ -435,11 +497,12 @@ const ViewEnquiry: React.FC = () => {
         onClose={() => {
           if (!respondMutation.isPending) setRespondDialogOpen(false);
         }}
-        title={__('Respond to Enquiry', 'yatra')}
+        title={__("Respond to Enquiry", "yatra")}
         description={
           enquiry ? (
             <span>
-              {__('Send a response to', 'yatra')} <strong>{enquiry.name}</strong>
+              {__("Send a response to", "yatra")}{" "}
+              <strong>{enquiry.name}</strong>
             </span>
           ) : null
         }
@@ -451,7 +514,7 @@ const ViewEnquiry: React.FC = () => {
               onClick={() => setRespondDialogOpen(false)}
               disabled={respondMutation.isPending}
             >
-              {__('Cancel', 'yatra')}
+              {__("Cancel", "yatra")}
             </Button>
             <Button
               onClick={sendResponse}
@@ -460,12 +523,12 @@ const ViewEnquiry: React.FC = () => {
               {respondMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  {__('Sending...', 'yatra')}
+                  {__("Sending...", "yatra")}
                 </>
               ) : (
                 <>
                   <Send className="w-4 h-4 mr-2" />
-                  {__('Send Response', 'yatra')}
+                  {__("Send Response", "yatra")}
                 </>
               )}
             </Button>
@@ -478,29 +541,36 @@ const ViewEnquiry: React.FC = () => {
             <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="w-4 h-4 text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-400">{enquiry.email}</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  {enquiry.email}
+                </span>
               </div>
               {enquiry.trip_title && (
                 <div className="flex items-center gap-2 text-sm">
                   <MapPin className="w-4 h-4 text-gray-400" />
-                  <span className="text-gray-600 dark:text-gray-400">{enquiry.trip_title}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {enquiry.trip_title}
+                  </span>
                 </div>
               )}
               <div className="text-sm text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <strong>{__('Original Message:', 'yatra')}</strong>
-                <p className="mt-1 text-gray-600 dark:text-gray-400">{enquiry.message}</p>
+                <strong>{__("Original Message:", "yatra")}</strong>
+                <p className="mt-1 text-gray-600 dark:text-gray-400">
+                  {enquiry.message}
+                </p>
               </div>
             </div>
 
             {/* Response Message */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                {__('Your Response', 'yatra')} <span className="text-red-500">*</span>
+                {__("Your Response", "yatra")}{" "}
+                <span className="text-red-500">*</span>
               </label>
               <textarea
                 value={responseMessage}
                 onChange={(e) => setResponseMessage(e.target.value)}
-                placeholder={__('Type your response here...', 'yatra')}
+                placeholder={__("Type your response here...", "yatra")}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                 rows={5}
                 disabled={respondMutation.isPending}
@@ -509,7 +579,8 @@ const ViewEnquiry: React.FC = () => {
 
             {respondMutation.isError && (
               <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
-                {respondMutation.error?.message || __('Failed to send response. Please try again.', 'yatra')}
+                {respondMutation.error?.message ||
+                  __("Failed to send response. Please try again.", "yatra")}
               </div>
             )}
           </div>
@@ -520,4 +591,3 @@ const ViewEnquiry: React.FC = () => {
 };
 
 export default ViewEnquiry;
-

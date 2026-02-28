@@ -3,8 +3,8 @@
  * Lightweight pie/donut chart for displaying proportions
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
+import React from "react";
+import { __ } from "../../lib/i18n";
 
 interface PieData {
   label: string;
@@ -33,7 +33,7 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-        {__('No data available', 'yatra')}
+        {__("No data available", "yatra")}
       </div>
     );
   }
@@ -42,7 +42,7 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   if (total <= 0) {
     return (
       <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-        {__('No data available', 'yatra')}
+        {__("No data available", "yatra")}
       </div>
     );
   }
@@ -66,13 +66,17 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
 
     const largeArcFlag = angle > 180 ? 1 : 0;
 
-    let pathData = '';
+    let pathData = "";
     if (donut && innerRadius > 0) {
       // Donut chart
-      const innerStartX = center + innerRadius * Math.cos((startAngle * Math.PI) / 180);
-      const innerStartY = center + innerRadius * Math.sin((startAngle * Math.PI) / 180);
-      const innerEndX = center + innerRadius * Math.cos((endAngle * Math.PI) / 180);
-      const innerEndY = center + innerRadius * Math.sin((endAngle * Math.PI) / 180);
+      const innerStartX =
+        center + innerRadius * Math.cos((startAngle * Math.PI) / 180);
+      const innerStartY =
+        center + innerRadius * Math.sin((startAngle * Math.PI) / 180);
+      const innerEndX =
+        center + innerRadius * Math.cos((endAngle * Math.PI) / 180);
+      const innerEndY =
+        center + innerRadius * Math.sin((endAngle * Math.PI) / 180);
 
       pathData = `M ${startX} ${startY} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} L ${innerEndX} ${innerEndY} A ${innerRadius} ${innerRadius} 0 ${largeArcFlag} 0 ${innerStartX} ${innerStartY} Z`;
     } else {
@@ -94,7 +98,9 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
   return (
     <div className="w-full h-full">
       {title && (
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">
+          {title}
+        </h3>
       )}
       <div className="flex flex-col md:flex-row items-center gap-6">
         <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
@@ -136,4 +142,3 @@ export const SimplePieChart: React.FC<SimplePieChartProps> = ({
 };
 
 export default SimplePieChart;
-

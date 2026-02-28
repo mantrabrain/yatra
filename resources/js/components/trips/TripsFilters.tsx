@@ -3,12 +3,12 @@
  * Modular filter component for trips
  */
 
-import React from 'react';
-import { __ } from '../../lib/i18n';
-import { Input } from '../ui/input';
-import { Select } from '../ui/select';
-import { Button } from '../ui/button';
-import { Search, X } from 'lucide-react';
+import React from "react";
+import { __ } from "../../lib/i18n";
+import { Input } from "../ui/input";
+import { Select } from "../ui/select";
+import { Button } from "../ui/button";
+import { Search, X } from "lucide-react";
 
 interface TripsFiltersProps {
   search: string;
@@ -28,7 +28,7 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
   onStatusChange,
   onReset,
 }) => {
-  const hasFilters = search || status !== 'all';
+  const hasFilters = search || status !== "all";
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 mb-6">
@@ -37,22 +37,22 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
             type="text"
-            placeholder={__('Search trips...', 'yatra')}
+            placeholder={__("Search trips...", "yatra")}
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10"
           />
         </div>
-        
+
         <Select
           value={status}
           onChange={(e) => onStatusChange(e.target.value)}
           className="w-full md:w-48"
         >
-          <option value="all">{__('All Status', 'yatra')}</option>
-          <option value="active">{__('Active', 'yatra')}</option>
-          <option value="draft">{__('Draft', 'yatra')}</option>
-          <option value="inactive">{__('Inactive', 'yatra')}</option>
+          <option value="all">{__("All Status", "yatra")}</option>
+          <option value="active">{__("Active", "yatra")}</option>
+          <option value="draft">{__("Draft", "yatra")}</option>
+          <option value="inactive">{__("Inactive", "yatra")}</option>
         </Select>
 
         {hasFilters && (
@@ -62,7 +62,7 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
             className="flex items-center gap-2"
           >
             <X className="w-4 h-4" />
-            {__('Reset', 'yatra')}
+            {__("Reset", "yatra")}
           </Button>
         )}
       </div>
@@ -71,4 +71,3 @@ export const TripsFilters: React.FC<TripsFiltersProps> = ({
 };
 
 export default TripsFilters;
-

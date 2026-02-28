@@ -9,13 +9,13 @@
 (function() {
     'use strict';
     
-    console.log('[Yatra Square] Script loaded');
+    
 
     const __ = (window.wp && window.wp.i18n && window.wp.i18n.__) ? window.wp.i18n.__ : (text => text);
 
     class YatraSquare {
         constructor() {
-            console.log('[Yatra Square] Constructor called');
+            
             this.payments = null;
             this.card = null;
             this.cardMounted = false;
@@ -24,7 +24,7 @@
         }
 
         init() {
-            console.log('[Yatra Square] Init called');
+            
             
             // Check if Square gateway option exists
             if (!document.querySelector('input[name="payment_gateway"][value="square"]')) {
@@ -65,7 +65,7 @@
             
             // Check if container already exists
             if (document.getElementById('square-card-container')) {
-                console.log('[Yatra Square] Container already exists, skipping');
+                
                 return;
             }
             
@@ -121,7 +121,7 @@
             try {
                 // Check if Square SDK is loaded
                 if (typeof Square === 'undefined') {
-                    console.log('[Yatra Square] SDK not loaded yet, waiting...');
+                    
                     // SDK should be loaded by WordPress enqueue
                     return;
                 }
@@ -135,7 +135,7 @@
                     return;
                 }
                 
-                console.log('[Yatra Square] Initializing with app:', applicationId);
+                
                 this.payments = Square.payments(applicationId, locationId);
                 
                 // Create card payment method
@@ -143,7 +143,7 @@
                 await this.card.attach('#square-card-container');
                 this.cardMounted = true;
                 
-                console.log('[Yatra Square] Card form mounted successfully');
+                
                 
             } catch (error) {
                 console.error('[Yatra Square] Initialization error:', error);
@@ -156,7 +156,7 @@
                 return; // Let other gateways handle
             }
             
-            console.log('[Yatra Square] Intercepting form submission');
+            
             
             // Prevent default submission - we'll handle it
             event.preventDefault();
@@ -178,7 +178,7 @@
                 this.hideError();
                 
                 // Tokenize the card
-                console.log('[Yatra Square] Tokenizing card...');
+                
                 const tokenResult = await this.card.tokenize();
                 
                 if (tokenResult.status !== 'OK') {
@@ -189,7 +189,7 @@
                     throw new Error(errorMessage);
                 }
                 
-                console.log('[Yatra Square] Card tokenized successfully');
+                
                 
                 // Add the token to booking data
                 bookingData.square_source_id = tokenResult.token;
@@ -225,7 +225,7 @@
                 });
                 
                 const result = await response.json();
-                console.log('[Yatra Square] Booking response:', result);
+                
                 
                 if (result.success) {
                     // Check if we need to complete payment with the token
@@ -255,7 +255,7 @@
             const apiUrl = window.yatraBookingData?.apiUrl || '/wp-json/yatra/v1';
             const nonce = window.yatraBookingData?.nonce || '';
             
-            console.log('[Yatra Square] Completing payment with token...');
+            
             
             const response = await fetch(apiUrl + '/payment/square/complete', {
                 method: 'POST',
@@ -275,7 +275,7 @@
             const result = await response.json();
             
             if (result.success) {
-                console.log('[Yatra Square] Payment completed:', result);
+                
                 document.dispatchEvent(new CustomEvent('yatra_payment_success', {
                     detail: { gateway: 'square', ...result }
                 }));

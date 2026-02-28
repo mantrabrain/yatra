@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import React, { useMemo } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 export interface RichTextEditorProps {
   value: string;
@@ -23,28 +23,35 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
   minHeight = 280,
   maxHeight = 600,
 }) => {
-  const modules = useMemo(() => ({
-    toolbar: [
-      [{ 'header': [1, 2, 3, false] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      [{ 'align': [] }],
-      ['link'],
-      ['clean']
-    ],
-  }), []);
+  const modules = useMemo(
+    () => ({
+      toolbar: [
+        [{ header: [1, 2, 3, false] }],
+        ["bold", "italic", "underline", "strike"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["link"],
+        ["clean"],
+      ],
+    }),
+    [],
+  );
 
   const formats = [
-    'header',
-    'bold', 'italic', 'underline', 'strike',
-    'list', 'bullet',
-    'align',
-    'link'
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "align",
+    "link",
   ];
 
   const handleChange = (content: string) => {
     // Normalize empty content
-    const normalized = content === '<p><br></p>' ? '' : content;
+    const normalized = content === "<p><br></p>" ? "" : content;
     onChange(normalized);
   };
 
@@ -56,10 +63,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
         </label>
       )}
 
-      <div className={`yatra-quill-editor ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`}>
+      <div
+        className={`yatra-quill-editor ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
+      >
         <ReactQuill
           theme="snow"
-          value={value || ''}
+          value={value || ""}
           onChange={handleChange}
           modules={modules}
           formats={formats}

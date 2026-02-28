@@ -4,7 +4,7 @@
  * Supports both Lucide React icons and custom image uploads
  */
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Upload,
   X,
@@ -12,29 +12,29 @@ import {
   Image as ImageLucide,
   Sparkles,
   Check,
-} from 'lucide-react';
-import { getIconOptions, type IconName } from '../../lib/icons';
-import { __ } from '../../lib/i18n';
-import { Button } from './button';
-import { Input } from './input';
-import { Card, CardContent } from './card';
-import { Badge } from './badge';
-import { useWordPressMedia } from '../../hooks/useWordPressMedia';
+} from "lucide-react";
+import { getIconOptions, type IconName } from "../../lib/icons";
+import { __ } from "../../lib/i18n";
+import { Button } from "./button";
+import { Input } from "./input";
+import { Card, CardContent } from "./card";
+import { Badge } from "./badge";
+import { useWordPressMedia } from "../../hooks/useWordPressMedia";
 
 // Use centralized icon system
 const iconOptions = getIconOptions();
 
 const categoryLabels: Record<string, string> = {
-  activity: 'Activities',
-  travel: 'Travel',
-  food: 'Food & Dining',
-  accommodation: 'Accommodation',
-  transport: 'Transportation',
-  general: 'General',
+  activity: "Activities",
+  travel: "Travel",
+  food: "Food & Dining",
+  accommodation: "Accommodation",
+  transport: "Transportation",
+  general: "General",
 };
 
 export type IconPickerValue = {
-  type: 'icon' | 'image';
+  type: "icon" | "image";
   value: string; // icon name for type 'icon', attachment ID for type 'image'
 };
 
@@ -47,7 +47,7 @@ interface IconPickerProps {
   required?: boolean;
   allowImageUpload?: boolean;
   allowIconSelection?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
@@ -60,30 +60,37 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   required = false,
   allowImageUpload = true,
   allowIconSelection = true,
-  size = 'md',
-  className = '',
+  size = "md",
+  className = "",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'icons' | 'upload'>('icons');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
+  const [activeTab, setActiveTab] = useState<"icons" | "upload">("icons");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
   const [imagePreview, setImagePreview] = useState<string | null>(
-    value?.type === 'image' ? (value.value.startsWith('http') ? value.value : null) : null
+    value?.type === "image"
+      ? value.value.startsWith("http")
+        ? value.value
+        : null
+      : null,
   );
-  
+
   // Update preview when value changes and fetch URL if it's an attachment ID
   useEffect(() => {
-    if (value?.type === 'image') {
+    if (value?.type === "image") {
       // If it's already a URL, use it directly
-      if (value.value.startsWith('http://') || value.value.startsWith('https://')) {
+      if (
+        value.value.startsWith("http://") ||
+        value.value.startsWith("https://")
+      ) {
         setImagePreview(value.value);
       } else if (/^\d+$/.test(value.value) && window.yatraAdmin?.apiUrl) {
         // It's an attachment ID, fetch the URL from WordPress REST API
-        const apiUrl = window.yatraAdmin.apiUrl.replace('/yatra/v1', '');
+        const apiUrl = window.yatraAdmin.apiUrl.replace("/yatra/v1", "");
         fetch(`${apiUrl}/wp/v2/media/${value.value}`)
-          .then(res => res.json())
-          .then(data => {
+          .then((res) => res.json())
+          .then((data) => {
             if (data && data.source_url) {
               setImagePreview(data.source_url);
             }
@@ -96,42 +103,47 @@ export const IconPicker: React.FC<IconPickerProps> = ({
       setImagePreview(null);
     }
   }, [value]);
-  
+
   // WordPress media library hook
   const { openMediaLibrary } = useWordPressMedia({
-    title: __('Select or Upload Image', 'yatra'),
-    buttonText: __('Use this image', 'yatra'),
+    title: __("Select or Upload Image", "yatra"),
+    buttonText: __("Use this image", "yatra"),
     multiple: false,
-    library: { type: 'image' },
+    library: { type: "image" },
   });
 
   const sizeClasses = {
-    sm: 'w-8 h-8',
-    md: 'w-12 h-12',
-    lg: 'w-16 h-16',
+    sm: "w-8 h-8",
+    md: "w-12 h-12",
+    lg: "w-16 h-16",
   };
 
   const iconSizeClasses = {
-    sm: 'w-4 h-4',
-    md: 'w-6 h-6',
-    lg: 'w-8 h-8',
+    sm: "w-4 h-4",
+    md: "w-6 h-6",
+    lg: "w-8 h-8",
   };
 
   // Filter icons by search and category
-  const filteredIcons = iconOptions.filter(icon => {
-    const matchesSearch = icon.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         icon.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || icon.category === selectedCategory;
+  const filteredIcons = iconOptions.filter((icon) => {
+    const matchesSearch =
+      icon.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      icon.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory =
+      selectedCategory === "all" || icon.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
   // Get unique categories
-  const categories = ['all', ...Array.from(new Set(iconOptions.map(icon => icon.category)))];
+  const categories = [
+    "all",
+    ...Array.from(new Set(iconOptions.map((icon) => icon.category))),
+  ];
 
   const handleIconSelect = (iconName: IconName) => {
-    onChange({ type: 'icon', value: iconName });
+    onChange({ type: "icon", value: iconName });
     setIsOpen(false);
-    setSearchTerm('');
+    setSearchTerm("");
   };
 
   const handleWordPressMediaSelect = useCallback(() => {
@@ -140,7 +152,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
         // Store attachment ID instead of URL
         const attachmentId = String(attachment.id);
         setImagePreview(attachment.url); // Use URL for preview
-        onChange({ type: 'image', value: attachmentId });
+        onChange({ type: "image", value: attachmentId });
         setIsOpen(false);
       }
     });
@@ -154,15 +166,15 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const handleImageUrlChange = (url: string) => {
     if (url.trim()) {
       setImagePreview(url);
-      onChange({ type: 'image', value: url.trim() });
+      onChange({ type: "image", value: url.trim() });
     } else {
       handleRemoveImage();
     }
   };
 
   const getCurrentIcon = () => {
-    if (!value || value.type !== 'icon') return null;
-    const icon = iconOptions.find(opt => opt.name === value.value);
+    if (!value || value.type !== "icon") return null;
+    const icon = iconOptions.find((opt) => opt.name === value.value);
     return icon?.component || null;
   };
 
@@ -175,22 +187,26 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}
-      
+
       {helpText && (
         <p className="text-xs text-gray-500 dark:text-gray-400">{helpText}</p>
       )}
 
       {/* Current Selection Display */}
       <div className="flex items-center gap-3">
-        <div className={`${sizeClasses[size]} rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden`}>
-          {value?.type === 'image' && imagePreview ? (
-            <img 
-              src={imagePreview} 
-              alt="Selected" 
+        <div
+          className={`${sizeClasses[size]} rounded-lg border-2 border-gray-300 dark:border-gray-600 flex items-center justify-center bg-gray-50 dark:bg-gray-800 overflow-hidden`}
+        >
+          {value?.type === "image" && imagePreview ? (
+            <img
+              src={imagePreview}
+              alt="Selected"
               className="w-full h-full object-cover"
             />
-          ) : value?.type === 'icon' && CurrentIcon ? (
-            <CurrentIcon className={`${iconSizeClasses[size]} text-gray-700 dark:text-gray-300`} />
+          ) : value?.type === "icon" && CurrentIcon ? (
+            <CurrentIcon
+              className={`${iconSizeClasses[size]} text-gray-700 dark:text-gray-300`}
+            />
           ) : (
             <ImageLucide className={`${iconSizeClasses[size]} text-gray-400`} />
           )}
@@ -203,11 +219,11 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             onClick={() => setIsOpen(!isOpen)}
             className="w-full justify-start"
           >
-            {value?.type === 'icon' 
-              ? `${__('Icon', 'yatra')}: ${iconOptions.find(i => i.name === value.value)?.label || value.value}`
-              : value?.type === 'image'
-              ? __('Custom Image', 'yatra')
-              : __('Select Icon or Upload Image', 'yatra')}
+            {value?.type === "icon"
+              ? `${__("Icon", "yatra")}: ${iconOptions.find((i) => i.name === value.value)?.label || value.value}`
+              : value?.type === "image"
+                ? __("Custom Image", "yatra")
+                : __("Select Icon or Upload Image", "yatra")}
           </Button>
         </div>
 
@@ -233,8 +249,11 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
       {/* Icon Picker Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setIsOpen(false)}>
-          <Card 
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setIsOpen(false)}
+        >
+          <Card
             className="w-full max-w-2xl max-h-[80vh] bg-white dark:bg-gray-800 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
@@ -244,29 +263,29 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 {allowIconSelection && (
                   <button
                     type="button"
-                    onClick={() => setActiveTab('icons')}
+                    onClick={() => setActiveTab("icons")}
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                      activeTab === 'icons'
-                        ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      activeTab === "icons"
+                        ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     <Sparkles className="w-4 h-4 inline mr-2" />
-                    {__('Icons', 'yatra')}
+                    {__("Icons", "yatra")}
                   </button>
                 )}
                 {allowImageUpload && (
                   <button
                     type="button"
-                    onClick={() => setActiveTab('upload')}
+                    onClick={() => setActiveTab("upload")}
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-                      activeTab === 'upload'
-                        ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      activeTab === "upload"
+                        ? "border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                        : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
                     }`}
                   >
                     <Upload className="w-4 h-4 inline mr-2" />
-                    {__('Upload Image', 'yatra')}
+                    {__("Upload Image", "yatra")}
                   </button>
                 )}
                 <button
@@ -280,14 +299,14 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
               {/* Content */}
               <div className="p-4 max-h-[60vh] overflow-y-auto">
-                {activeTab === 'icons' && allowIconSelection && (
+                {activeTab === "icons" && allowIconSelection && (
                   <div className="space-y-4">
                     {/* Search */}
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                       <Input
                         type="text"
-                        placeholder={__('Search icons...', 'yatra')}
+                        placeholder={__("Search icons...", "yatra")}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9"
@@ -296,23 +315,28 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
                     {/* Category Filter */}
                     <div className="flex flex-wrap gap-2">
-                      {categories.map(category => (
+                      {categories.map((category) => (
                         <Badge
                           key={category}
-                          variant={selectedCategory === category ? 'info' : 'outline'}
+                          variant={
+                            selectedCategory === category ? "info" : "outline"
+                          }
                           className="cursor-pointer"
                           onClick={() => setSelectedCategory(category)}
                         >
-                          {category === 'all' ? __('All', 'yatra') : categoryLabels[category] || category}
+                          {category === "all"
+                            ? __("All", "yatra")
+                            : categoryLabels[category] || category}
                         </Badge>
                       ))}
                     </div>
 
                     {/* Icons Grid */}
                     <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 gap-3">
-                      {filteredIcons.map(icon => {
+                      {filteredIcons.map((icon) => {
                         const IconComponent = icon.component;
-                        const isSelected = value?.type === 'icon' && value.value === icon.name;
+                        const isSelected =
+                          value?.type === "icon" && value.value === icon.name;
                         return (
                           <button
                             key={icon.name}
@@ -320,8 +344,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                             onClick={() => handleIconSelect(icon.name)}
                             className={`relative p-3 rounded-lg border-2 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 ${
                               isSelected
-                                ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                                : 'border-gray-200 dark:border-gray-700'
+                                ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
+                                : "border-gray-200 dark:border-gray-700"
                             }`}
                             title={icon.label}
                           >
@@ -338,13 +362,13 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
                     {filteredIcons.length === 0 && (
                       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                        {__('No icons found', 'yatra')}
+                        {__("No icons found", "yatra")}
                       </div>
                     )}
                   </div>
                 )}
 
-                {activeTab === 'upload' && allowImageUpload && (
+                {activeTab === "upload" && allowImageUpload && (
                   <div className="space-y-6 p-2">
                     {/* Image Preview or Upload Area */}
                     {imagePreview ? (
@@ -365,7 +389,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                                 className="bg-white/90 hover:bg-white text-gray-900 border-white"
                               >
                                 <Upload className="w-4 h-4 mr-2" />
-                                {__('Change Image', 'yatra')}
+                                {__("Change Image", "yatra")}
                               </Button>
                               <Button
                                 type="button"
@@ -375,7 +399,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                                 className="bg-red-500/90 hover:bg-red-600"
                               >
                                 <X className="w-4 h-4 mr-2" />
-                                {__('Remove', 'yatra')}
+                                {__("Remove", "yatra")}
                               </Button>
                             </div>
                           </div>
@@ -394,13 +418,19 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                             </div>
                             <div className="space-y-2">
                               <p className="text-base font-semibold text-gray-900 dark:text-white">
-                                {__('Upload Image', 'yatra')}
+                                {__("Upload Image", "yatra")}
                               </p>
                               <p className="text-sm text-gray-600 dark:text-gray-400">
-                                {__('Click to open WordPress Media Library', 'yatra')}
+                                {__(
+                                  "Click to open WordPress Media Library",
+                                  "yatra",
+                                )}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-500">
-                                {__('Select from library or upload new image', 'yatra')}
+                                {__(
+                                  "Select from library or upload new image",
+                                  "yatra",
+                                )}
                               </p>
                             </div>
                           </div>
@@ -413,7 +443,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                           </div>
                           <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-white dark:bg-gray-900 px-3 text-gray-500 dark:text-gray-400">
-                              {__('Or', 'yatra')}
+                              {__("Or", "yatra")}
                             </span>
                           </div>
                         </div>
@@ -421,13 +451,18 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                         {/* Image URL Input */}
                         <div className="space-y-3">
                           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {__('Enter Image URL', 'yatra')}
+                            {__("Enter Image URL", "yatra")}
                           </label>
                           <Input
                             type="url"
-                            placeholder={__('https://example.com/image.png', 'yatra')}
-                            value={value?.type === 'image' ? value.value : ''}
-                            onChange={(e) => handleImageUrlChange(e.target.value)}
+                            placeholder={__(
+                              "https://example.com/image.png",
+                              "yatra",
+                            )}
+                            value={value?.type === "image" ? value.value : ""}
+                            onChange={(e) =>
+                              handleImageUrlChange(e.target.value)
+                            }
                             className="h-11"
                           />
                         </div>
@@ -444,7 +479,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                   variant="outline"
                   onClick={() => setIsOpen(false)}
                 >
-                  {__('Close', 'yatra')}
+                  {__("Close", "yatra")}
                 </Button>
               </div>
             </CardContent>
@@ -456,4 +491,3 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 };
 
 export default IconPicker;
-

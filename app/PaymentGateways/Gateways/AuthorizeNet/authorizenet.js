@@ -6,21 +6,21 @@
 (function() {
     'use strict';
     
-    console.log('[Yatra AuthorizeNet] Script loaded');
+    
 
     const __ = (window.wp && window.wp.i18n && window.wp.i18n.__) ? window.wp.i18n.__ : (text => text);
 
     class YatraAuthorizeNet {
         constructor() {
-            console.log('[Yatra AuthorizeNet] Constructor called');
+            
             this.config = window.yatraBookingData?.gateways?.authorize_net || {};
-            console.log('[Yatra AuthorizeNet] Config:', this.config);
+            
             this.acceptJsLoaded = false;
             this.init();
         }
 
         init() {
-            console.log('[Yatra AuthorizeNet] Init called');
+            
             
             // Check if Authorize.net gateway option exists
             if (!document.querySelector('input[name="payment_gateway"][value="authorize_net"]')) {
@@ -164,7 +164,7 @@
                     : 'https://js.authorize.net/v1/Accept.js';
                 script.onload = () => {
                     this.acceptJsLoaded = true;
-                    console.log('[Yatra AuthorizeNet] Accept.js loaded');
+                    
                     resolve();
                 };
                 script.onerror = () => reject(new Error('Failed to load Accept.js'));
@@ -177,7 +177,7 @@
                 return;
             }
             
-            console.log('[Yatra AuthorizeNet] Intercepting form submission');
+            
             event.preventDefault();
             event.stopImmediatePropagation(); // Prevent booking.js from also submitting
             
@@ -209,10 +209,10 @@
                 }
                 
                 // Tokenize card with Accept.js
-                console.log('[Yatra AuthorizeNet] Tokenizing card...');
+                
                 const tokenResult = await this.tokenizeCard(cardNumber, expMonth, '20' + expYear, cvv);
                 
-                console.log('[Yatra AuthorizeNet] Card tokenized successfully');
+                
                 
                 // Add token to booking data
                 bookingData.authnet_data_descriptor = tokenResult.dataDescriptor;
@@ -234,10 +234,7 @@
 
         tokenizeCard(cardNumber, expMonth, expYear, cvv) {
             return new Promise((resolve, reject) => {
-                console.log('[Yatra AuthorizeNet] Tokenizing with config:', {
-                    apiLoginID: this.config.api_login_id,
-                    hasClientKey: !!this.config.public_client_key
-                });
+                
                 
                 const authData = {
                     clientKey: this.config.public_client_key,
@@ -286,7 +283,7 @@
                 });
                 
                 const result = await response.json();
-                console.log('[Yatra AuthorizeNet] Booking response:', result);
+                
                 
                 if (result.success) {
                     if (result.data?.redirect_url) {

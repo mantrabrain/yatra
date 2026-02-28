@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { 
-  LayoutDashboard, 
-  MapPin, 
-  Calendar, 
+import React, { useState, useMemo, useEffect, useRef } from "react";
+import {
+  LayoutDashboard,
+  MapPin,
+  Calendar,
   CalendarDays,
-  Star, 
-  BarChart3, 
+  Star,
+  BarChart3,
   Settings,
   Moon,
   FileText,
@@ -33,17 +33,27 @@ import {
   ArrowLeft,
   Loader2,
   Sun,
-  User
-} from 'lucide-react';
-import { __ } from '../lib/i18n';
-import { Button } from '../components/ui/button';
-import { ConditionalRender } from '../components/ui/conditional-render';
-import { useToast } from '../components/ui/toast';
-import { apiClient } from '../lib/api-client';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
-import { useModulesQuery, useToggleModule, type ModuleDefinition } from '../hooks/useModules';
-import { isProPluginActive, isModuleActive } from '../lib/plugin-utils';
+  User,
+} from "lucide-react";
+import { __ } from "../lib/i18n";
+import { Button } from "../components/ui/button";
+import { ConditionalRender } from "../components/ui/conditional-render";
+import { useToast } from "../components/ui/toast";
+import { apiClient } from "../lib/api-client";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import {
+  useModulesQuery,
+  useToggleModule,
+  type ModuleDefinition,
+} from "../hooks/useModules";
+import { isProPluginActive, isModuleActive } from "../lib/plugin-utils";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -52,31 +62,31 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   // Load dark mode preference from localStorage
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('yatra-dark-mode');
-    return saved === 'true';
+    const saved = localStorage.getItem("yatra-dark-mode");
+    return saved === "true";
   });
 
   // Apply dark mode to document on mount and when it changes
   useEffect(() => {
     const root = document.documentElement;
     if (darkMode) {
-      root.classList.add('dark');
-      localStorage.setItem('yatra-dark-mode', 'true');
+      root.classList.add("dark");
+      localStorage.setItem("yatra-dark-mode", "true");
     } else {
-      root.classList.remove('dark');
-      localStorage.setItem('yatra-dark-mode', 'false');
+      root.classList.remove("dark");
+      localStorage.setItem("yatra-dark-mode", "false");
     }
   }, [darkMode]);
-  
+
   const { showToast } = useToast();
 
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [isModulesPanelOpen, setIsModulesPanelOpen] = useState(false);
   const modulesPanelRef = useRef<HTMLDivElement | null>(null);
-  
+
   // License status state for real-time updates
   const [licenseStatus, setLicenseStatus] = useState<string | null>(
-    (window as any).yatraAdmin?.licenseStatus || null
+    (window as any).yatraAdmin?.licenseStatus || null,
   );
   const { data: modulesData, isLoading: isLoadingModules } = useModulesQuery({
     enabled: isModulesPanelOpen,
@@ -84,19 +94,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const toggleModuleMutation = useToggleModule();
   // Ensure modulesData is always an array before slicing
   const safeModulesData = Array.isArray(modulesData) ? modulesData : [];
-  const modulesPreview = useMemo<ModuleDefinition[]>(() => safeModulesData.slice(0, 3), [safeModulesData]);
+  const modulesPreview = useMemo<ModuleDefinition[]>(
+    () => safeModulesData.slice(0, 3),
+    [safeModulesData],
+  );
   const handleQuickToggle = (module: ModuleDefinition, enabled: boolean) => {
-    toggleModuleMutation.mutate({ slug: module.slug, enabled, name: module.name });
+    toggleModuleMutation.mutate({
+      slug: module.slug,
+      enabled,
+      name: module.name,
+    });
   };
 
   const handleRegenerateTables = async () => {
     if (isRegenerating) return;
     try {
       setIsRegenerating(true);
-      await apiClient.post('/maintenance/regenerate-tables');
-      showToast(__('Tables regenerated successfully.', 'yatra'), 'success');
+      await apiClient.post("/maintenance/regenerate-tables");
+      showToast(__("Tables regenerated successfully.", "yatra"), "success");
     } catch (error: any) {
-      showToast(error?.message || __('Failed to regenerate tables.', 'yatra'), 'error');
+      showToast(
+        error?.message || __("Failed to regenerate tables.", "yatra"),
+        "error",
+      );
     } finally {
       setIsRegenerating(false);
     }
@@ -108,12 +128,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const handleLocationChange = () => {
-      setUrlKey(prev => prev + 1);
+      setUrlKey((prev) => prev + 1);
     };
 
     // Listen for popstate (back/forward button)
-    window.addEventListener('popstate', handleLocationChange);
-    
+    window.addEventListener("popstate", handleLocationChange);
+
     // Also check periodically (fallback for direct navigation)
     const interval = setInterval(() => {
       const currentSearch = window.location.search;
@@ -124,7 +144,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }, 100);
 
     return () => {
-      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener("popstate", handleLocationChange);
       clearInterval(interval);
     };
   }, []);
@@ -133,16 +153,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     const handleModuleUpdate = () => {
       // Force re-render of menu items by updating navRefreshKey
-      setNavRefreshKey(prev => prev + 1);
+      setNavRefreshKey((prev) => prev + 1);
       // Also update urlKey to ensure all memoized values refresh
-      setUrlKey(prev => prev + 1);
+      setUrlKey((prev) => prev + 1);
     };
 
     const handleForceRefresh = () => {
-      setNavRefreshKey(prev => prev + 1);
-      setUrlKey(prev => prev + 1);
+      setNavRefreshKey((prev) => prev + 1);
+      setUrlKey((prev) => prev + 1);
     };
-    
+
     const handleLicenseStatusUpdate = (event: any) => {
       const newStatus = event.detail?.status;
       if (newStatus) {
@@ -150,14 +170,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       }
     };
 
-    window.addEventListener('yatra-modules-updated', handleModuleUpdate);
-    window.addEventListener('yatra-force-nav-refresh', handleForceRefresh);
-    window.addEventListener('yatra-license-status-updated', handleLicenseStatusUpdate);
+    window.addEventListener("yatra-modules-updated", handleModuleUpdate);
+    window.addEventListener("yatra-force-nav-refresh", handleForceRefresh);
+    window.addEventListener(
+      "yatra-license-status-updated",
+      handleLicenseStatusUpdate,
+    );
 
     return () => {
-      window.removeEventListener('yatra-modules-updated', handleModuleUpdate);
-      window.removeEventListener('yatra-force-nav-refresh', handleForceRefresh);
-      window.removeEventListener('yatra-license-status-updated', handleLicenseStatusUpdate);
+      window.removeEventListener("yatra-modules-updated", handleModuleUpdate);
+      window.removeEventListener("yatra-force-nav-refresh", handleForceRefresh);
+      window.removeEventListener(
+        "yatra-license-status-updated",
+        handleLicenseStatusUpdate,
+      );
     };
   }, []);
 
@@ -165,71 +191,79 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (!isModulesPanelOpen) return;
 
     const handleClickOutside = (event: MouseEvent) => {
-      if (modulesPanelRef.current && !modulesPanelRef.current.contains(event.target as Node)) {
+      if (
+        modulesPanelRef.current &&
+        !modulesPanelRef.current.contains(event.target as Node)
+      ) {
         setIsModulesPanelOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isModulesPanelOpen]);
-  
+
   // Get current subpage and tab from URL
   const currentSubpage = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('subpage') || 'dashboard';
+    return params.get("subpage") || "dashboard";
   }, [urlKey]);
 
   const currentTab = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('tab') || 'all';
+    return params.get("tab") || "all";
   }, [urlKey]);
 
   const currentAction = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('action');
+    return params.get("action");
   }, [urlKey]);
 
   // Check if we're on the trip form page
   const isTripFormPage = useMemo(() => {
-    return currentSubpage === 'trips' && 
-           (currentTab === 'all' || !currentTab) && 
-           (currentAction === 'create' || currentAction === 'edit');
+    return (
+      currentSubpage === "trips" &&
+      (currentTab === "all" || !currentTab) &&
+      (currentAction === "create" || currentAction === "edit")
+    );
   }, [currentSubpage, currentTab, currentAction, urlKey]);
 
   // Track expanded submenus - initialize based on current subpage
   const [expandedMenus, setExpandedMenus] = useState<string[]>(() => {
     const params = new URLSearchParams(window.location.search);
-    const subpage = params.get('subpage') || 'dashboard';
+    const subpage = params.get("subpage") || "dashboard";
     const menus: string[] = [];
-    
-    if (subpage === 'trips') {
-      menus.push('trips');
+
+    if (subpage === "trips") {
+      menus.push("trips");
     }
-    
-    if (subpage === 'itinerary') {
-      menus.push('itinerary');
+
+    if (subpage === "itinerary") {
+      menus.push("itinerary");
     }
-    
+
     return menus;
   });
 
   // Auto-expand menu when on submenu pages
   useEffect(() => {
     const menusToExpand: string[] = [];
-    
-    if (currentSubpage === 'trips') {
-      menusToExpand.push('trips');
+
+    if (currentSubpage === "trips") {
+      menusToExpand.push("trips");
     }
-    
-    if (currentSubpage === 'itinerary') {
-      menusToExpand.push('itinerary');
+
+    if (currentSubpage === "itinerary") {
+      menusToExpand.push("itinerary");
     }
-    
-    setExpandedMenus(prev => {
+
+    setExpandedMenus((prev) => {
       // Only update if the menus to expand are different
       const newMenus = [...new Set([...prev, ...menusToExpand])];
-      if (newMenus.length !== prev.length || !newMenus.every(m => prev.includes(m))) {
+      if (
+        newMenus.length !== prev.length ||
+        !newMenus.every((m) => prev.includes(m))
+      ) {
         return newMenus;
       }
       return prev;
@@ -238,66 +272,122 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Get base admin URL
   const baseUrl = useMemo(() => {
-    return window.yatraAdmin?.siteUrl 
+    return window.yatraAdmin?.siteUrl
       ? `${window.yatraAdmin.siteUrl}/wp-admin/admin.php?page=yatra`
-      : '/wp-admin/admin.php?page=yatra';
+      : "/wp-admin/admin.php?page=yatra";
   }, []);
 
   const modulesPageUrl = useMemo(() => `${baseUrl}&subpage=modules`, [baseUrl]);
 
-  const menuItems = useMemo(() => [
-    { subpage: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { 
-      subpage: 'trips', 
-      label: 'Trips', 
-      icon: MapPin,
-      submenu: [
-        { tab: 'all', label: 'All Trips', icon: List },
-        { tab: 'activities', label: 'Activities', icon: Activity },
-        { tab: 'destinations', label: 'Destinations', icon: Route },
-        { tab: 'categories', label: 'Categories', icon: FolderTree },
-        { tab: 'difficulty-levels', label: 'Difficulty Levels', icon: TrendingUp },
-        // Availability - FREE feature, always show
-        { tab: 'availability', label: 'Availability', icon: CalendarDays },
-        // Attributes - FREE feature, always show
-        { tab: 'attributes', label: 'Attributes', icon: Tag },
-        // Additional Services - show only if Pro plugin is active and module is enabled
-        ...(isProPluginActive() && isModuleActive('additional_services') ? [{ tab: 'additional-services', label: 'Additional Services', icon: Package, isPremium: true }] : []),
-        // Trip Consent - show only if Pro plugin is active and module is enabled
-        ...(isProPluginActive() && isModuleActive('trip_consent') ? [{ tab: 'trip-consent', label: 'Trip Consent', icon: FileSignature, isPremium: true }] : []),
-      ]
-    },
-    { subpage: 'traveler-categories', label: 'Traveler Categories', icon: UserCircle },
-    { 
-      subpage: 'itinerary', 
-      label: 'Itinerary', 
-      icon: FileText,
-      submenu: [
-        { tab: 'item-types', label: 'Item Types', icon: Tag },
-        { tab: 'items', label: 'Items', icon: Route },
-        { tab: 'itinerary', label: 'Itinerary', icon: FileText },
-      ]
-    },
-    // Departures - FREE feature, always show
-    { subpage: 'departures', label: 'Departures', icon: Calendar },
-    { subpage: 'discounts', label: 'Discounts', icon: BadgePercent },
-    { subpage: 'payments', label: 'Payments', icon: CreditCard },
-    { subpage: 'bookings', label: 'Bookings', icon: Calendar },
-    { subpage: 'customers', label: 'Customers', icon: UserCircle },
-    { subpage: 'travelers', label: 'Travelers', icon: Plane },
-    { subpage: 'enquiries', label: 'Enquiries', icon: MessageSquare },
-    { subpage: 'reviews', label: 'Reviews', icon: Star },
-    { subpage: 'reports', label: 'Reports', icon: BarChart3 },
-    // Email Automation - show only if Pro plugin is active and module is enabled
-    ...(isProPluginActive() && isModuleActive('email_automation') ? [{ subpage: 'email-automation', label: 'Email Automation', icon: Mail, isPremium: true }] : []),
-    // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
-    ...(isProPluginActive() && isModuleActive('abandoned_booking_recovery') ? [{ subpage: 'abandoned-recovery', label: 'Abandoned Recovery', icon: RefreshCw, isPremium: true }] : []),
-    // Dynamic Pricing - show only if Pro plugin is active and module is enabled
-    ...(isProPluginActive() && isModuleActive('dynamic_pricing') ? [{ subpage: 'dynamic-pricing', label: 'Dynamic Pricing', icon: TrendingUp, isPremium: true }] : []),
-    { subpage: 'modules', label: 'Modules', icon: Puzzle },
-    { subpage: 'license', label: 'License', icon: Key },
-    { subpage: 'settings', label: 'Settings', icon: Settings },
-  ], [navRefreshKey]); // Re-calculate when navRefreshKey changes
+  const menuItems = useMemo(
+    () => [
+      { subpage: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+      {
+        subpage: "trips",
+        label: "Trips",
+        icon: MapPin,
+        submenu: [
+          { tab: "all", label: "All Trips", icon: List },
+          { tab: "activities", label: "Activities", icon: Activity },
+          { tab: "destinations", label: "Destinations", icon: Route },
+          { tab: "categories", label: "Categories", icon: FolderTree },
+          {
+            tab: "difficulty-levels",
+            label: "Difficulty Levels",
+            icon: TrendingUp,
+          },
+          // Availability - FREE feature, always show
+          { tab: "availability", label: "Availability", icon: CalendarDays },
+          // Attributes - FREE feature, always show
+          { tab: "attributes", label: "Attributes", icon: Tag },
+          // Additional Services - show only if Pro plugin is active and module is enabled
+          ...(isProPluginActive() && isModuleActive("additional_services")
+            ? [
+                {
+                  tab: "additional-services",
+                  label: "Additional Services",
+                  icon: Package,
+                  isPremium: true,
+                },
+              ]
+            : []),
+          // Trip Consent - show only if Pro plugin is active and module is enabled
+          ...(isProPluginActive() && isModuleActive("trip_consent")
+            ? [
+                {
+                  tab: "trip-consent",
+                  label: "Trip Consent",
+                  icon: FileSignature,
+                  isPremium: true,
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        subpage: "traveler-categories",
+        label: "Traveler Categories",
+        icon: UserCircle,
+      },
+      {
+        subpage: "itinerary",
+        label: "Itinerary",
+        icon: FileText,
+        submenu: [
+          { tab: "item-types", label: "Item Types", icon: Tag },
+          { tab: "items", label: "Items", icon: Route },
+          { tab: "itinerary", label: "Itinerary", icon: FileText },
+        ],
+      },
+      // Departures - FREE feature, always show
+      { subpage: "departures", label: "Departures", icon: Calendar },
+      { subpage: "discounts", label: "Discounts", icon: BadgePercent },
+      { subpage: "payments", label: "Payments", icon: CreditCard },
+      { subpage: "bookings", label: "Bookings", icon: Calendar },
+      { subpage: "customers", label: "Customers", icon: UserCircle },
+      { subpage: "travelers", label: "Travelers", icon: Plane },
+      { subpage: "enquiries", label: "Enquiries", icon: MessageSquare },
+      { subpage: "reviews", label: "Reviews", icon: Star },
+      { subpage: "reports", label: "Reports", icon: BarChart3 },
+      // Email Automation - show only if Pro plugin is active and module is enabled
+      ...(isProPluginActive() && isModuleActive("email_automation")
+        ? [
+            {
+              subpage: "email-automation",
+              label: "Email Automation",
+              icon: Mail,
+              isPremium: true,
+            },
+          ]
+        : []),
+      // Abandoned Booking Recovery - show only if Pro plugin is active and module is enabled
+      ...(isProPluginActive() && isModuleActive("abandoned_booking_recovery")
+        ? [
+            {
+              subpage: "abandoned-recovery",
+              label: "Abandoned Recovery",
+              icon: RefreshCw,
+              isPremium: true,
+            },
+          ]
+        : []),
+      // Dynamic Pricing - show only if Pro plugin is active and module is enabled
+      ...(isProPluginActive() && isModuleActive("dynamic_pricing")
+        ? [
+            {
+              subpage: "dynamic-pricing",
+              label: "Dynamic Pricing",
+              icon: TrendingUp,
+              isPremium: true,
+            },
+          ]
+        : []),
+      { subpage: "modules", label: "Modules", icon: Puzzle },
+      { subpage: "license", label: "License", icon: Key },
+      { subpage: "settings", label: "Settings", icon: Settings },
+    ],
+    [navRefreshKey],
+  ); // Re-calculate when navRefreshKey changes
 
   const isActive = (subpage: string, tab?: string) => {
     if (tab) {
@@ -306,10 +396,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     // For parent menu items, check if current subpage matches
     // or if any submenu item is active
     if (currentSubpage === subpage) {
-      const menuItem = menuItems.find(item => item.subpage === subpage);
+      const menuItem = menuItems.find((item) => item.subpage === subpage);
       if (menuItem?.submenu) {
         // If it has submenu, check if any submenu item is active
-        return menuItem.submenu.some(sub => sub.tab === currentTab);
+        return menuItem.submenu.some((sub) => sub.tab === currentTab);
       }
       return true;
     }
@@ -321,15 +411,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const toggleMenu = (subpage: string) => {
-    setExpandedMenus(prev => 
-      prev.includes(subpage) 
-        ? prev.filter(m => m !== subpage)
-        : [...prev, subpage]
+    setExpandedMenus((prev) =>
+      prev.includes(subpage)
+        ? prev.filter((m) => m !== subpage)
+        : [...prev, subpage],
     );
   };
 
   const getUrl = (subpage: string, tab?: string) => {
-    if (subpage === 'dashboard') {
+    if (subpage === "dashboard") {
       return baseUrl;
     }
     if (tab) {
@@ -339,7 +429,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div
+      className={`min-h-screen ${darkMode ? "dark bg-gray-900" : "bg-gray-50"}`}
+    >
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
@@ -351,9 +443,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <span className="text-white font-bold text-lg">Y</span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-gray-900 dark:text-white">Yatra</span>
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">
+                    Yatra
+                  </span>
                   <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
-                    <span>v{window.yatraAdmin?.version || '1.0.0'}</span>
+                    <span>v{window.yatraAdmin?.version || "1.0.0"}</span>
                     {window.yatraAdmin?.proVersion && (
                       <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium">
                         Pro v{window.yatraAdmin.proVersion}
@@ -363,7 +457,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </div>
               </div>
               <a
-                href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'}
+                href={
+                  window.yatraAdmin?.siteUrl
+                    ? `${window.yatraAdmin.siteUrl}/wp-admin/`
+                    : "/wp-admin/"
+                }
                 className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
               >
                 <ArrowLeft className="w-3 h-3" />
@@ -379,7 +477,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               const isExpanded = hasSubmenu && isMenuExpanded(item.subpage);
               const active = isActive(item.subpage);
-              
+
               return (
                 <div key={item.subpage}>
                   {hasSubmenu ? (
@@ -388,8 +486,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         onClick={() => toggleMenu(item.subpage)}
                         className={`w-full flex items-center justify-between gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                           active || isExpanded
-                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
+                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -405,7 +503,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       {isExpanded && item.submenu && (
                         <div className="ml-4 mt-1 space-y-1">
                           {item.submenu.map((subItem) => {
-                            const subActive = isActive(item.subpage, subItem.tab);
+                            const subActive = isActive(
+                              item.subpage,
+                              subItem.tab,
+                            );
                             const SubIcon = subItem.icon;
                             return (
                               <a
@@ -413,17 +514,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 href={getUrl(item.subpage, subItem.tab)}
                                 className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors relative ${
                                   subActive
-                                    ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
+                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
                                   {SubIcon && (
                                     <div className="w-4 h-4">
-                                      {React.createElement(SubIcon, { className: "w-4 h-4" })}
+                                      {React.createElement(SubIcon, {
+                                        className: "w-4 h-4",
+                                      })}
                                     </div>
                                   )}
-                                  <span className="text-sm">{subItem.label}</span>
+                                  <span className="text-sm">
+                                    {subItem.label}
+                                  </span>
                                 </div>
                                 {subItem.isPremium && !isProPluginActive() && (
                                   <div className="absolute inset-y-0 right-2 flex items-center justify-center">
@@ -443,8 +548,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       href={getUrl(item.subpage)}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors relative ${
                         active
-                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
-                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                          ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium"
+                          : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -458,22 +563,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           </div>
                         </div>
                       )}
-                      {item.subpage === 'license' && isProPluginActive() && licenseStatus && (
-                        <Badge 
-                          variant={
-                            licenseStatus === 'active' ? 'success' :
-                            licenseStatus === 'expired' ? 'error' :
-                            licenseStatus === 'invalid' ? 'error' :
-                            'error'
-                          }
-                          className="text-[10px] px-2 py-0.5"
-                        >
-                          {licenseStatus === 'active' ? 'Active' :
-                           licenseStatus === 'expired' ? 'Expired' :
-                           licenseStatus === 'invalid' ? 'Invalid' :
-                           'Inactive'}
-                        </Badge>
-                      )}
+                      {item.subpage === "license" &&
+                        isProPluginActive() &&
+                        licenseStatus && (
+                          <Badge
+                            variant={
+                              licenseStatus === "active"
+                                ? "success"
+                                : licenseStatus === "expired"
+                                  ? "error"
+                                  : licenseStatus === "invalid"
+                                    ? "error"
+                                    : "error"
+                            }
+                            className="text-[10px] px-2 py-0.5"
+                          >
+                            {licenseStatus === "active"
+                              ? "Active"
+                              : licenseStatus === "expired"
+                                ? "Expired"
+                                : licenseStatus === "invalid"
+                                  ? "Invalid"
+                                  : "Inactive"}
+                          </Badge>
+                        )}
                     </a>
                   )}
                 </div>
@@ -484,19 +597,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Sticky bottom back link */}
           <div className="border-t border-gray-200 dark:border-gray-700 p-4">
             <a
-              href={window.yatraAdmin?.siteUrl ? `${window.yatraAdmin.siteUrl}/wp-admin/` : '/wp-admin/'}
+              href={
+                window.yatraAdmin?.siteUrl
+                  ? `${window.yatraAdmin.siteUrl}/wp-admin/`
+                  : "/wp-admin/"
+              }
               className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <span className="inline-flex items-center gap-2">
                 <ArrowLeft className="w-3 h-3" />
-                <span>{__('Back to WordPress', 'yatra')}</span>
+                <span>{__("Back to WordPress", "yatra")}</span>
               </span>
             </a>
           </div>
         </aside>
 
         {/* Main Content */}
-        <div className={`flex-1 flex flex-col ${isTripFormPage ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <div
+          className={`flex-1 flex flex-col ${isTripFormPage ? "overflow-hidden" : "overflow-y-auto"}`}
+        >
           {/* Top Bar */}
           <header className="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 flex items-center">
             <div className="flex items-center justify-between w-full">
@@ -504,18 +623,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 {(() => {
                   // Show specific text for trip form page
                   if (isTripFormPage) {
-                    return currentAction === 'create' ? 'Create Trip' : 'Edit Trip';
+                    return currentAction === "create"
+                      ? "Create Trip"
+                      : "Edit Trip";
                   }
-                  
-                  const activeItem = menuItems.find(item => isActive(item.subpage));
+
+                  const activeItem = menuItems.find((item) =>
+                    isActive(item.subpage),
+                  );
                   if (activeItem?.submenu && currentTab) {
-                    const activeSubItem = activeItem.submenu.find(sub => sub.tab === currentTab);
+                    const activeSubItem = activeItem.submenu.find(
+                      (sub) => sub.tab === currentTab,
+                    );
                     return activeSubItem?.label || activeItem.label;
                   }
-                  return activeItem?.label || 'Dashboard';
+                  return activeItem?.label || "Dashboard";
                 })()}
               </h1>
-              
+
               <div className="flex items-center gap-4">
                 <ConditionalRender capability="yatra_edit_trips">
                   <Button
@@ -524,34 +649,38 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     disabled={isRegenerating}
                     className="flex items-center gap-2"
                   >
-                    <RefreshCw className={`w-4 h-4 ${isRegenerating ? 'animate-spin' : ''}`} />
-                    {isRegenerating ? __('Regenerating...', 'yatra') : __('Regenerate Tables', 'yatra')}
+                    <RefreshCw
+                      className={`w-4 h-4 ${isRegenerating ? "animate-spin" : ""}`}
+                    />
+                    {isRegenerating
+                      ? __("Regenerating...", "yatra")
+                      : __("Regenerate Tables", "yatra")}
                   </Button>
                 </ConditionalRender>
                 <ConditionalRender capability="yatra_edit_trips">
                   <Button
-                    variant={currentSubpage === 'tools' ? 'default' : 'outline'}
+                    variant={currentSubpage === "tools" ? "default" : "outline"}
                     onClick={() => {
                       const admin = (window as any)?.yatraAdmin;
-                      const baseUrl = admin?.adminUrl || '';
+                      const baseUrl = admin?.adminUrl || "";
                       window.location.href = `${baseUrl}?page=yatra&subpage=tools`;
                     }}
                     className={`flex items-center gap-2 ${
-                      currentSubpage === 'tools' 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white border-blue-600' 
-                        : ''
+                      currentSubpage === "tools"
+                        ? "bg-blue-600 hover:bg-blue-700 text-white border-blue-600"
+                        : ""
                     }`}
                   >
                     <Settings className="w-4 h-4" />
-                    {__('Tools', 'yatra')}
+                    {__("Tools", "yatra")}
                   </Button>
                 </ConditionalRender>
                 <ConditionalRender capability="yatra_edit_trips">
                   <div className="relative">
                     <button
-                      onClick={() => setIsModulesPanelOpen(prev => !prev)}
-                      className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                      aria-label={__('Toggle modules panel', 'yatra')}
+                      onClick={() => setIsModulesPanelOpen((prev) => !prev)}
+                      className={`p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 ${isModulesPanelOpen ? "bg-gray-100 dark:bg-gray-700" : ""}`}
+                      aria-label={__("Toggle modules panel", "yatra")}
                     >
                       <Puzzle className="w-5 h-5" />
                     </button>
@@ -564,9 +693,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
                               <div>
-                                <CardTitle className="text-base">{__('Modules', 'yatra')}</CardTitle>
+                                <CardTitle className="text-base">
+                                  {__("Modules", "yatra")}
+                                </CardTitle>
                                 <CardDescription>
-                                  {__('Quickly enable or disable feature packs.', 'yatra')}
+                                  {__(
+                                    "Quickly enable or disable feature packs.",
+                                    "yatra",
+                                  )}
                                 </CardDescription>
                               </div>
                               <Button
@@ -577,7 +711,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                   window.location.href = modulesPageUrl;
                                 }}
                               >
-                                {__('Open', 'yatra')}
+                                {__("Open", "yatra")}
                               </Button>
                             </div>
                           </CardHeader>
@@ -585,14 +719,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                             {isLoadingModules && (
                               <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm">
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                {__('Loading modules…', 'yatra')}
+                                {__("Loading modules…", "yatra")}
                               </div>
                             )}
-                            {!isLoadingModules && modulesPreview.length === 0 && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
-                                {__('No modules found.', 'yatra')}
-                              </div>
-                            )}
+                            {!isLoadingModules &&
+                              modulesPreview.length === 0 && (
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  {__("No modules found.", "yatra")}
+                                </div>
+                              )}
                             {!isLoadingModules && modulesPreview.length > 0 && (
                               <div className="space-y-3">
                                 {modulesPreview.map((module) => (
@@ -604,33 +739,48 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                       <p className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
                                         {module.name}
                                         {module.is_core && (
-                                          <Badge variant="outline" className="text-[10px]">
-                                            {__('Core', 'yatra')}
+                                          <Badge
+                                            variant="outline"
+                                            className="text-[10px]"
+                                          >
+                                            {__("Core", "yatra")}
                                           </Badge>
                                         )}
                                       </p>
                                       <p className="text-xs text-gray-500 dark:text-gray-400">
                                         {module.enabled
-                                          ? __('Enabled', 'yatra')
-                                          : __('Disabled', 'yatra')}
+                                          ? __("Enabled", "yatra")
+                                          : __("Disabled", "yatra")}
                                       </p>
                                     </div>
                                     <button
-                                      onClick={() => handleQuickToggle(module, !module.enabled)}
-                                      disabled={module.is_core || toggleModuleMutation.isPending}
+                                      onClick={() =>
+                                        handleQuickToggle(
+                                          module,
+                                          !module.enabled,
+                                        )
+                                      }
+                                      disabled={
+                                        module.is_core ||
+                                        toggleModuleMutation.isPending
+                                      }
                                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
-                                        module.enabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
-                                      } ${module.is_core ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'}`}
+                                        module.enabled
+                                          ? "bg-blue-600"
+                                          : "bg-gray-300 dark:bg-gray-600"
+                                      } ${module.is_core ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
                                       aria-pressed={module.enabled}
                                       aria-label={
                                         module.enabled
-                                          ? __('Disable module', 'yatra')
-                                          : __('Enable module', 'yatra')
+                                          ? __("Disable module", "yatra")
+                                          : __("Enable module", "yatra")
                                       }
                                     >
                                       <span
                                         className={`inline-block h-5 w-5 transform rounded-full bg-white transition ${
-                                          module.enabled ? 'translate-x-5' : 'translate-x-1'
+                                          module.enabled
+                                            ? "translate-x-5"
+                                            : "translate-x-1"
                                         }`}
                                       />
                                     </button>
@@ -648,7 +798,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                   window.location.href = modulesPageUrl;
                                 }}
                               >
-                                {__('Manage all modules', 'yatra')}
+                                {__("Manage all modules", "yatra")}
                               </Button>
                             </div>
                           </CardContent>
@@ -662,23 +812,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     setDarkMode(!darkMode);
                   }}
                   className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400"
-                  aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                  aria-label={
+                    darkMode ? "Switch to light mode" : "Switch to dark mode"
+                  }
                 >
-                  {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                  {darkMode ? (
+                    <Sun className="w-5 h-5" />
+                  ) : (
+                    <Moon className="w-5 h-5" />
+                  )}
                 </button>
-                
+
                 <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-400 relative">
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
-                
+
                 <div className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700">
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                     <User className="w-5 h-5 text-white" />
                   </div>
                   <div className="text-sm">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {window.yatraAdmin?.currentUser || 'Admin'}
+                      {window.yatraAdmin?.currentUser || "Admin"}
                     </div>
                   </div>
                 </div>
@@ -687,43 +843,61 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </header>
 
           {/* License Warning Banner */}
-          {isProPluginActive() && licenseStatus && licenseStatus !== 'active' && (
-            <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-b-2 border-red-500">
-              <div className="px-6 py-3">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
-                      <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
+          {isProPluginActive() &&
+            licenseStatus &&
+            licenseStatus !== "active" && (
+              <div className="bg-red-50 dark:bg-red-950/30 border-l-4 border-b-2 border-red-500">
+                <div className="px-6 py-3">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg bg-red-500 flex items-center justify-center">
+                        <svg
+                          className="w-6 h-6 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
                     </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-red-800 dark:text-red-200">
+                        <span className="font-semibold">
+                          {licenseStatus === "expired"
+                            ? "License Expired: "
+                            : licenseStatus === "invalid"
+                              ? "Invalid License: "
+                              : "License Not Activated: "}
+                        </span>
+                        {licenseStatus === "expired"
+                          ? "Renew your license to continue receiving updates and support."
+                          : licenseStatus === "invalid"
+                            ? "Please check your license key."
+                            : "Activate your license to receive updates and support."}
+                      </p>
+                    </div>
+                    <a
+                      href={getUrl("license")}
+                      className="flex-shrink-0 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                    >
+                      {licenseStatus === "expired"
+                        ? "Renew Now"
+                        : "Activate Now"}
+                    </a>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-red-800 dark:text-red-200">
-                      <span className="font-semibold">
-                        {licenseStatus === 'expired' ? 'License Expired: ' : licenseStatus === 'invalid' ? 'Invalid License: ' : 'License Not Activated: '}
-                      </span>
-                      {licenseStatus === 'expired' 
-                        ? 'Renew your license to continue receiving updates and support.'
-                        : licenseStatus === 'invalid'
-                        ? 'Please check your license key.'
-                        : 'Activate your license to receive updates and support.'}
-                    </p>
-                  </div>
-                  <a
-                    href={getUrl('license')}
-                    className="flex-shrink-0 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
-                  >
-                    {licenseStatus === 'expired' ? 'Renew Now' : 'Activate Now'}
-                  </a>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
           {/* Page Content */}
-          <main className={`flex-1 ${isTripFormPage ? 'p-0 h-full min-h-0' : 'p-6 overflow-y-auto'}`}>
-            <div className={currentSubpage === 'tools' ? '' : 'space-y-6'}>
+          <main
+            className={`flex-1 ${isTripFormPage ? "p-0 h-full min-h-0" : "p-6 overflow-y-auto"}`}
+          >
+            <div className={currentSubpage === "tools" ? "" : "space-y-6"}>
               {children}
             </div>
           </main>
@@ -734,4 +908,3 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
-
