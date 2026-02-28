@@ -292,20 +292,27 @@ jobs:
       - name: PHP Syntax Check (Lint)
         run: |
           echo "Checking PHP syntax for PHP ${{ matrix.php }}..." >&2
-          find app includes templates -name "*.php" -print0 | xargs -0 -n1 php -l > php${{ matrix.php }}-lint.txt 2>&1 || true
           
-          # Check for actual syntax errors
-          if grep -q "Parse error\|Fatal error\|syntax error\|No syntax errors detected" php${{ matrix.php }}-lint.txt; then
-            if grep -q "Parse error\|Fatal error\|syntax error" php${{ matrix.php }}-lint.txt; then
-              echo "❌ PHP ${{ matrix.php }} syntax errors found" | tee -a php${{ matrix.php }}-compat.txt
-              cat php${{ matrix.php }}-lint.txt >> php${{ matrix.php }}-compat.txt
-              exit 1
+          # Run syntax check and capture output
+          SYNTAX_OUTPUT=""
+          SYNTAX_ERRORS=0
+          
+          while IFS= read -r -d '' file; do
+            OUTPUT=$(php -l "$file" 2>&1)
+            if [ $? -ne 0 ]; then
+              echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
+              SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
             else
-              echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee -a php${{ matrix.php }}-compat.txt
+              echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
             fi
+          done < <(find app includes templates -name "*.php" -print0)
+          
+          if [ $SYNTAX_ERRORS -gt 0 ]; then
+            echo "❌ PHP ${{ matrix.php }}: Found $SYNTAX_ERRORS files with syntax errors" | tee -a php${{ matrix.php }}-compat.txt
+            exit 1
           else
-            # No output means all files passed syntax check
-            echo "✅ PHP ${{ matrix.php }} syntax check passed" | tee -a php${{ matrix.php }}-compat.txt
+            echo "✅ PHP ${{ matrix.php }} syntax check passed - All files valid" | tee -a php${{ matrix.php }}-compat.txt
           fi
           
       - name: Check Deprecated Functions (PHP ${{ matrix.php }})
