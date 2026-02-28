@@ -112,8 +112,12 @@ jobs:
           # Re-enable strict error handling
           set -e
           
-          # Debug: Check what specific file is still causing issues
+          # Debug: Show what specific file is still causing issues
           echo "DEBUG: Total syntax errors found: $(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)" >&2
+          echo "DEBUG: Syntax error count file contents:" >&2
+          cat /tmp/syntax_error_count 2>/dev/null || echo "DEBUG: No syntax error count file" >&2
+          echo "DEBUG: Error file contents before final check:" >&2
+          cat "$ERROR_FILE" 2>/dev/null || echo "DEBUG: No error file contents" >&2
           
           # Debug: Check for files with BOM that might cause issues
           echo "DEBUG: Checking for BOM issues..." >&2
