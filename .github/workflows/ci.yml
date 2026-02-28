@@ -1,0 +1,290 @@
+name: Yatra CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Code Quality and Standards Compliance
+  quality-check:
+    name: Code Quality (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.1, 8.2]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl, json
+          coverage: none
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-${{ matrix.php }}-
+            ${{ runner.os }}-composer-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+        
+      - name: Validate Composer
+        run: composer validate --strict
+        
+      - name: PHP Lint (Syntax Check)
+        run: |
+          echo "Running PHP syntax check..."
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -print0 | xargs -0 -n1 -P4 php -l
+          
+      - name: Run PHP_CodeSniffer (WordPress Standards)
+        run: |
+          echo "Running WordPress coding standards check..."
+          vendor/bin/phpcs \
+            --standard=phpcs.xml \
+            --report=full \
+            --report-file=phpcs-report.txt
+            
+      - name: Upload PHPCS Report
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: phpcs-report-php${{ matrix.php }}
+          path: phpcs-report.txt
+          
+                
+      - name: Run PHPStan Static Analysis
+        run: |
+          echo "Running PHPStan static analysis..."
+          vendor/bin/phpstan analyse --no-progress --error-format=table --memory-limit=1G
+          
+      - name: Composer Audit (Security Check)
+        run: composer audit
+        
+      - name: Check for disallowed functions
+        run: |
+          echo "Checking for disallowed functions..."
+          disallowed_functions=(
+            "eval("
+            "exec("
+            "shell_exec("
+            "system("
+            "passthru("
+            "file_get_contents("
+            "fopen("
+            "fwrite("
+            "curl_exec("
+          )
+          
+          for func in "${disallowed_functions[@]}"; do
+            if grep -r "$func" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
+              echo "❌ Disallowed function $func found!"
+              exit 1
+            fi
+          done
+          echo "✅ No disallowed functions found"
+
+  # Security Scanning
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: quality-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-security-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-security-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+        
+      - name: Run Composer Security Audit
+        run: composer audit
+        
+      - name: Check for hardcoded secrets
+        run: |
+          echo "Checking for potential secrets..."
+          # Check for common secret patterns
+          if grep -r -i "password\|secret\|key\|token\|api" . --include="*.php" --include="*.js" --include="*.json" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "// password\|# password\|// secret\|# secret\|// key\|# key"; then
+            echo "⚠️  Potential secrets found. Please review the output above."
+            exit 1
+          fi
+          echo "✅ No obvious secrets found"
+
+  # Plugin Structure Validation
+  structure-check:
+    name: Plugin Structure Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Check plugin structure
+        run: |
+          echo "Checking Yatra plugin structure..."
+          
+          # Check main plugin file
+          if [ ! -f "yatra.php" ]; then
+            echo "❌ Main plugin file yatra.php not found"
+            exit 1
+          fi
+          
+          # Check required directories
+          required_dirs=("app" "assets" "templates" "includes")
+          for dir in "${required_dirs[@]}"; do
+            if [ ! -d "$dir" ]; then
+              echo "❌ Required directory $dir not found"
+              exit 1
+            fi
+          done
+          
+          # Check plugin header
+          if ! grep -q "Plugin Name:" yatra.php; then
+            echo "❌ Plugin header not found in yatra.php"
+            exit 1
+          fi
+          
+          # Check for composer.json
+          if [ ! -f "composer.json" ]; then
+            echo "❌ composer.json not found"
+            exit 1
+          fi
+          
+          echo "✅ Plugin structure is valid"
+          
+      - name: Check file permissions
+        run: |
+          echo "Checking file permissions..."
+          
+          # Ensure no executable permissions on PHP files (except for scripts)
+          find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -executable -exec echo "❌ Executable permission found: {}" \; && exit 1
+          
+          echo "✅ File permissions are correct"
+
+  # WordPress Compatibility Check
+  wordpress-compatibility:
+    name: WordPress Compatibility
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          extensions: dom, mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, gd, zip, curl
+          
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+        
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-wp-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-wp-
+            
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+        
+      - name: Check WordPress functions usage
+        run: |
+          echo "Checking WordPress function usage..."
+          
+          # Check for proper WordPress function prefixes
+          if grep -r "function.*wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
+            echo "❌ Custom functions with wp_ prefix found (should be unique)"
+            exit 1
+          fi
+          
+          # Check for proper text domain usage
+          if grep -r "__(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "'yatra'" | grep -v '"yatra"'; then
+            echo "❌ Translation functions without 'yatra' text domain found"
+            exit 1
+          fi
+          
+          echo "✅ WordPress compatibility checks passed"
+
+  # Build Summary
+  build-summary:
+    name: Build Summary
+    runs-on: ubuntu-latest
+    needs: [quality-check, security-scan, structure-check, wordpress-compatibility]
+    if: always()
+    
+    steps:
+      - name: Build Summary
+        run: |
+          echo "## 🚀 Yatra CI Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Quality Check Status
+          if [ "${{ needs.quality-check.result }}" == "success" ]; then
+            echo "✅ **Code Quality**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Code Quality**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Security Scan Status
+          if [ "${{ needs.security-scan.result }}" == "success" ]; then
+            echo "✅ **Security Scan**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Security Scan**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Structure Check Status
+          if [ "${{ needs.structure-check.result }}" == "success" ]; then
+            echo "✅ **Plugin Structure**: Valid" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Plugin Structure**: Invalid" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # WordPress Compatibility Status
+          if [ "${{ needs.wordpress-compatibility.result }}" == "success" ]; then
+            echo "✅ **WordPress Compatibility**: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **WordPress Compatibility**: Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Test Matrix" >> $GITHUB_STEP_SUMMARY
+          echo "| PHP Version | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| 8.1 | ${{ contains(needs.quality-check.result, 'success') && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 8.2 | ${{ contains(needs.quality-check.result, 'success') && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
