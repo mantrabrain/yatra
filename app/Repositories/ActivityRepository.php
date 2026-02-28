@@ -9,6 +9,7 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Utils\Cache;
 use Yatra\Utils\QueryCache;
 
 /**

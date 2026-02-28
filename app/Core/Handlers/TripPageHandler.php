@@ -33,7 +33,7 @@ class TripPageHandler extends BasePageHandler
             return false;
         }
 
-        // Set up global trip object
+        // Set up global trip object for template compatibility
         global $trip;
         $trip = $trip_data;
 
@@ -48,7 +48,8 @@ class TripPageHandler extends BasePageHandler
         $asset_manager = new TripAssetManager();
         $template_path = TemplateRenderer::getTemplatePath('single-trip');
 
-        if (!TemplateRenderer::render($template_path, ['trip' => $trip], $asset_manager)) {
+        // Render template with global $trip already set
+        if (!TemplateRenderer::render($template_path, [], $asset_manager)) {
             return false;
         }
 
