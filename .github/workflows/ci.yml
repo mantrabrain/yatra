@@ -302,13 +302,13 @@ jobs:
           
           # Debug: Check if PHP files exist
           echo "PHP files found:" >&2
-          find app includes templates -name "*.php" | wc -l >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" | wc -l >&2
           
           # Initialize error counter
           SYNTAX_ERRORS=0
           
           # Get list of PHP files and check each one
-          find app includes templates -name "*.php" > php_files_list.txt 2>/dev/null || {
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" > php_files_list.txt 2>/dev/null || {
             echo "❌ No PHP files found to check" | tee -a php${{ matrix.php }}-compat.txt
             exit 1
           }
