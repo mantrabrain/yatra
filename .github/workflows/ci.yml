@@ -101,6 +101,9 @@ jobs:
                 echo "DEBUG: Syntax error in $file: $OUTPUT" >&2
                 echo "DEBUG: File with syntax error: $file" >&2
                 echo "DEBUG: Error details: $OUTPUT" >&2
+                echo "DEBUG: PHP exit code: $PHP_EXIT_CODE" >&2
+                echo "DEBUG: Error file contents:" >&2
+                cat "$ERROR_FILE" >&2
                 echo 1 >> /tmp/syntax_error_count
               fi
             fi
