@@ -83,39 +83,8 @@ jobs:
             --report-gitblame=phpcs-gitblame.txt \
             -q || true
           
-          # Parse JSON and create readable error report
-          if [ -f phpcs-report.json ]; then
-            php -r '
-              $json = json_decode(file_get_contents("phpcs-report.json"), true);
-              $output = "";
-              $totalErrors = 0;
-              $totalWarnings = 0;
-              if (isset($json["files"])) {
-                foreach ($json["files"] as $file => $data) {
-                  $totalErrors += $data["errors"] ?? 0;
-                  $totalWarnings += $data["warnings"] ?? 0;
-                  if (isset($data["messages"]) && !empty($data["messages"])) {
-                    $output .= "FILE: " . $file . " (Errors: " . ($data["errors"] ?? 0) . ", Warnings: " . ($data["warnings"] ?? 0) . ")\n";
-                    foreach ($data["messages"] as $msg) {
-                      $type = $msg["type"] === "ERROR" ? "ERROR" : "WARNING";
-                      $output .= "  Line " . $msg["line"] . " [" . $type . "]: " . $msg["message"] . " (" . $msg["source"] . ")\n";
-                    }
-                    $output .= "\n";
-                  }
-                }
-              }
-              if ($totalErrors === 0 && $totalWarnings === 0) {
-                $output = "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards.\n";
-              } else {
-                $output .= "TOTAL: " . $totalErrors . " errors, " . $totalWarnings . " warnings\n";
-              }
-              file_put_contents("phpcs-errors-readable.txt", $output);
-              echo $output;
-              if ($totalErrors > 0) { exit(1); }
-            '
-          else
-            echo "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards." > phpcs-errors-readable.txt
-          fi
+          # Parse PHPCS report using bash script
+          bash .github/scripts/parse-phpcs-report.sh
                 
       - name: Run PHPStan Static Analysis
         id: phpstan
@@ -127,43 +96,8 @@ jobs:
             --error-format=json \
             --memory-limit=1G > phpstan-report.json 2>&1 || true
           
-          # Parse JSON and create readable error report
-          if [ -f phpstan-report.json ]; then
-            php -r '
-              $raw = file_get_contents("phpstan-report.json");
-              $json = json_decode($raw, true);
-              if ($json === null) {
-                file_put_contents("phpstan-errors-readable.txt", "PHPStan output (non-JSON):\n" . $raw . "\n");
-                echo $raw;
-                exit(0);
-              }
-              $output = "";
-              $totalErrors = 0;
-              if (isset($json["files"])) {
-                foreach ($json["files"] as $file => $data) {
-                  if (isset($data["messages"]) && !empty($data["messages"])) {
-                    $output .= "FILE: " . $file . "\n";
-                    foreach ($data["messages"] as $msg) {
-                      $totalErrors++;
-                      $output .= "  Line " . $msg["line"] . ": " . $msg["message"] . "\n";
-                    }
-                    $output .= "\n";
-                  }
-                }
-              }
-              $totals = $json["totals"]["errors"] ?? $totalErrors;
-              if ($totals === 0) {
-                $output = "✅ No PHPStan errors found. Code passes static analysis at level 5.\n";
-              } else {
-                $output .= "TOTAL ERRORS: " . $totals . "\n";
-              }
-              file_put_contents("phpstan-errors-readable.txt", $output);
-              echo $output;
-              if ($totals > 0) { exit(1); }
-            '
-          else
-            echo "✅ No PHPStan errors found. Code passes static analysis at level 5." > phpstan-errors-readable.txt
-          fi
+          # Parse PHPStan report using bash script
+          bash .github/scripts/parse-phpstan-report.sh
           
       - name: Composer Audit (Security Check)
         id: composer-audit
