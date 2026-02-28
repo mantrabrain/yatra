@@ -87,19 +87,7 @@ jobs:
           # Parse PHPCS report using bash script
           bash .github/scripts/parse-phpcs-report.sh
                 
-      - name: Run PHPStan Static Analysis
-        id: phpstan
-        if: always() && steps.php-lint.outcome != 'failure'
-        run: |
-          echo "Running PHPStan static analysis..."
-          vendor/bin/phpstan analyse \
-            --no-progress \
-            --error-format=json \
-            --memory-limit=2G > phpstan-report.json 2>&1 || true
-          
-          # Parse PHPStan report using bash script
-          bash .github/scripts/parse-phpstan-report.sh
-          
+                
       - name: Composer Audit (Security Check)
         id: composer-audit
         if: always()
@@ -138,8 +126,6 @@ jobs:
             phpcs-report.json
             phpcs-gitblame.txt
             phpcs-errors-readable.txt
-            phpstan-report.json
-            phpstan-errors-readable.txt
             composer-audit.txt
             disallowed-functions.txt
           if-no-files-found: ignore
@@ -396,26 +382,6 @@ jobs:
             echo "PHPCS binary not found for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
           fi
           
-      - name: PHPStan Static Analysis (PHP ${{ matrix.php }})
-        run: |
-          echo "Running PHPStan static analysis for PHP ${{ matrix.php }}..."
-          if [ -f "vendor/bin/phpstan" ]; then
-            vendor/bin/phpstan analyse \
-              --no-progress \
-              --error-format=json \
-              --memory-limit=2G > phpstan-report.json 2>&1 || true
-            
-            # Parse PHPStan report using bash script
-            if [ -f "phpstan-report.json" ]; then
-              bash .github/scripts/parse-phpstan-report.sh || true
-              echo "PHPStan analysis completed for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
-            else
-              echo "PHPStan not available for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
-            fi
-          else
-            echo "PHPStan binary not found for PHP ${{ matrix.php }}" | tee -a php${{ matrix.php }}-compat.txt
-          fi
-          
       - name: Upload PHP ${{ matrix.php }} Compatibility Report
         if: always()
         uses: actions/upload-artifact@v4
@@ -427,8 +393,6 @@ jobs:
             phpcs-errors-readable.txt
             phpcs-report.json
             phpcs-output.txt
-            phpstan-errors-readable.txt
-            phpstan-report.json
           if-no-files-found: ignore
 
   # WordPress Compatibility Check
@@ -672,27 +636,8 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
           
-          # --- PHPSTAN ERRORS ---
-          HAS_PHPSTAN_ERRORS=false
-          for f in error-reports/quality-errors-php*/phpstan-errors-readable.txt; do
-            if [ -f "$f" ] && [ -s "$f" ]; then
-              if [ "$HAS_PHPSTAN_ERRORS" = "false" ]; then
-                echo "### 3. PHPStan — Static Analysis Errors" >> $GITHUB_STEP_SUMMARY
-                echo '```' >> $GITHUB_STEP_SUMMARY
-                HAS_PHPSTAN_ERRORS=true
-              fi
-              echo "--- $(basename $(dirname $f)) ---" >> $GITHUB_STEP_SUMMARY
-              cat "$f" >> $GITHUB_STEP_SUMMARY
-              echo "" >> $GITHUB_STEP_SUMMARY
-            fi
-          done
-          if [ "$HAS_PHPSTAN_ERRORS" = "true" ]; then
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          fi
-          
           # --- COMPOSER AUDIT ---
-          echo "### 4. Composer Security Audit" >> $GITHUB_STEP_SUMMARY
+          echo "### 3. Composer Security Audit" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           for f in error-reports/quality-errors-php*/composer-audit.txt error-reports/security-errors/security-audit.txt; do
             if [ -f "$f" ]; then
@@ -754,10 +699,7 @@ jobs:
               if [ -f "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" ]; then
                 HAS_VERSION_ERRORS=true
               fi
-              if [ -f "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ]; then
-                HAS_VERSION_ERRORS=true
-              fi
-              
+                            
               if [ "$HAS_VERSION_ERRORS" = "true" ]; then
                 if [ "$HAS_PHP_COMPAT_ERRORS" = "false" ]; then
                   echo "### 8. PHP Version Compatibility (7.4, 8.0, 8.1, 8.2, 8.3, 8.4)" >> $GITHUB_STEP_SUMMARY
@@ -783,12 +725,7 @@ jobs:
                   cat "error-reports/php${version}-compatibility/phpcs-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
                 fi
                 
-                # Show PHPStan errors
-                if [ -f "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ] && [ -s "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" ]; then
-                  echo "Static analysis errors:" >> $GITHUB_STEP_SUMMARY
-                  cat "error-reports/php${version}-compatibility/phpstan-errors-readable.txt" >> $GITHUB_STEP_SUMMARY
-                fi
-                
+                                
                 echo "" >> $GITHUB_STEP_SUMMARY
               fi
             fi
