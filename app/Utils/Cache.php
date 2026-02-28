@@ -253,8 +253,8 @@ class Cache
         }
         
         // Clear memory cache
-        foreach (array_keys(self::$memoryCache) as $key) {
-            if (str_starts_with($key, $prefix)) {
+        foreach (self::$memoryCache as $key => $value) {
+            if (strpos($key, $prefix) === 0) {
                 unset(self::$memoryCache[$key]);
             }
         }
@@ -372,7 +372,7 @@ class Cache
     /**
      * Get available cache backends
      */
-    private static function getAvailableBackends(): array
+    public static function getAvailableBackends(): array
     {
         if (self::$availableBackends === null) {
             self::$availableBackends = [];
