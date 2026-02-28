@@ -107,8 +107,12 @@ jobs:
           # Re-enable strict error handling
           set -e
           
-          # Debug: Show error count before final check
+          # Debug: Check what specific file is still causing issues
           echo "DEBUG: Total syntax errors found: $(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)" >&2
+          
+          # Debug: Check for files with BOM that might cause issues
+          echo "DEBUG: Checking for BOM issues..." >&2
+          find . -type f -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -exec sh -c 'if [ "$(head -c 3 "$0" | od -tx1 -N1 | cut -d' ' -f1)" = 'efbbbf' ]; then echo "BOM found in $0"; fi' {} \; 2>/dev/null || echo "DEBUG: BOM check completed" >&2
           
           # Count errors
           SYNTAX_ERRORS=$(wc -l < /tmp/syntax_error_count 2>/dev/null || echo 0)
