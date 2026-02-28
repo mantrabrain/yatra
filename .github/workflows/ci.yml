@@ -299,9 +299,10 @@ jobs:
         run: |
           echo "Checking WordPress function usage..."
           
-          # Check for proper WordPress function prefixes
-          if grep -r "function.*wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
+          # Check for custom function definitions with wp_ prefix (not function_exists calls)
+          if grep -r "^function wp_\|^    function wp_\|^public function wp_\|^private function wp_\|^static function wp_" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
             echo "❌ Custom functions with wp_ prefix found (should be unique)"
+            echo "WordPress core functions should not be redefined. Use unique prefix for custom functions."
             exit 1
           fi
           
