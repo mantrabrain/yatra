@@ -54,11 +54,11 @@ parameters:
         - '#Static property .* is never read, only written#'
         # Logic analysis warnings (non-critical)
         - '#Else branch is unreachable.*#'
-        '#Right side of && is always true#'
-        '#Left side of && is always true#'
-        '#If condition is always false#'
-        '#Result of && is always false#'
-        '#Unreachable statement.*#'
+        - '#Right side of && is always true#'
+        - '#Left side of && is always true#'
+        - '#If condition is always false#'
+        - '#Result of && is always false#'
+        - '#Unreachable statement.*#'
         # Type comparison issues (non-critical)
         - '#Strict comparison using === between.* will always evaluate to false#'
         - '#Call to function is_.* with mixed will always evaluate to false#'
