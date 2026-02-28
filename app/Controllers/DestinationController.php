@@ -65,11 +65,17 @@ class DestinationController extends BaseController
             return true;
         }
 
-        return match ($request->get_method()) {
-            'GET' => current_user_can('yatra_view_trips'),
-            'POST', 'PUT', 'PATCH', 'DELETE' => current_user_can('yatra_edit_trips'),
-            default => current_user_can('manage_options'),
-        };
+        switch ($request->get_method()) {
+            case 'GET':
+                return current_user_can('yatra_view_trips');
+            case 'POST':
+            case 'PUT':
+            case 'PATCH':
+            case 'DELETE':
+                return current_user_can('yatra_edit_trips');
+            default:
+                return current_user_can('manage_options');
+        }
     }
 
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
@@ -232,14 +238,25 @@ class DestinationController extends BaseController
                 return $this->validation_error(__('No destinations selected', 'yatra'));
             }
 
-            $result = match ($action) {
-                'trash' => $this->service->bulkUpdateStatus($ids, 'trash'),
-                'publish' => $this->service->bulkUpdateStatus($ids, 'publish'),
-                'draft' => $this->service->bulkUpdateStatus($ids, 'draft'),
-                'restore' => $this->service->bulkUpdateStatus($ids, 'publish'),
-                'delete' => $this->service->bulkDelete($ids),
-                default => throw new \InvalidArgumentException(__('Invalid action', 'yatra'))
-            };
+            switch ($action) {
+                case 'trash':
+                    $result = $this->service->bulkUpdateStatus($ids, 'trash');
+                    break;
+                case 'publish':
+                    $result = $this->service->bulkUpdateStatus($ids, 'publish');
+                    break;
+                case 'draft':
+                    $result = $this->service->bulkUpdateStatus($ids, 'draft');
+                    break;
+                case 'restore':
+                    $result = $this->service->bulkUpdateStatus($ids, 'publish');
+                    break;
+                case 'delete':
+                    $result = $this->service->bulkDelete($ids);
+                    break;
+                default:
+                    throw new \InvalidArgumentException(__('Invalid action', 'yatra'));
+            }
 
             return $this->success_response($result);
         } catch (\InvalidArgumentException $e) {

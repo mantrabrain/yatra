@@ -213,11 +213,17 @@ class DiscountController extends BaseController
             return true;
         }
 
-        return match ($request->get_method()) {
-            'GET' => current_user_can('yatra_view_bookings'),
-            'POST', 'PUT', 'PATCH', 'DELETE' => current_user_can('yatra_edit_bookings'),
-            default => current_user_can('manage_options'),
-        };
+        switch ($request->get_method()) {
+            case 'GET':
+                return current_user_can('yatra_view_bookings');
+            case 'POST':
+            case 'PUT':
+            case 'PATCH':
+            case 'DELETE':
+                return current_user_can('yatra_edit_bookings');
+            default:
+                return current_user_can('manage_options');
+        }
     }
 
     public function get_items(WP_REST_Request $request): WP_REST_Response|WP_Error
