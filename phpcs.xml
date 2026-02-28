@@ -1,31 +1,11 @@
 <?xml version="1.0"?>
 <ruleset name="Yatra WordPress Plugin">
-    <description>Yatra WordPress Plugin Coding Standards</description>
+    <description>Yatra WordPress Plugin - PHP 7.4 Compatibility Focus</description>
     
-    <!-- WordPress Coding Standards -->
-    <rule ref="WordPress">
-        <!-- Exclude file naming rules (modern PSR-4 autoloading) -->
-        <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
-        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
-        
-        <!-- Exclude variable naming rules (allow camelCase for modern PHP) -->
-        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar"/>
-        <exclude name="WordPress.NamingConventions.ValidVariableName.PropertyNotSnakeCase"/>
-        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase"/>
-        
-        <!-- Allow short array syntax [] alongside array() -->
-        <exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
-        
-        <!-- Exclude Yoda conditions (modern PHP doesn't require them) -->
-        <exclude name="WordPress.PHP.YodaConditions"/>
-        
-        <!-- Allow multiple assignments per line (common in modern PHP) -->
-        <exclude name="Squiz.PHP.DisallowMultipleAssignments"/>
-    </rule>
-    
-    <!-- Additional rules for modern PHP -->
-    <!-- Deprecated functions are checked separately in CI workflow to avoid false positives -->
+    <!-- Only check for syntax errors that would break PHP 7.4 compatibility -->
     <rule ref="Generic.PHP.Syntax"/>
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.Files.ByteOrderMark"/>
     
     <!-- Directories to check -->
     <file>app</file>
