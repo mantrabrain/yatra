@@ -293,20 +293,29 @@ jobs:
         run: |
           echo "Checking PHP syntax for PHP ${{ matrix.php }}..." >&2
           
-          # Run syntax check and capture output
-          SYNTAX_OUTPUT=""
+          # Initialize error counter
           SYNTAX_ERRORS=0
           
-          while IFS= read -r -d '' file; do
-            OUTPUT=$(php -l "$file" 2>&1)
-            if [ $? -ne 0 ]; then
-              echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
-              echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
-              SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
-            else
+          # Get list of PHP files and check each one
+          find app includes templates -name "*.php" > php_files_list.txt
+          
+          while read -r file; do
+            if [ -f "$file" ]; then
+              OUTPUT=$(php -l "$file" 2>&1)
+              PHP_EXIT_CODE=$?
+              
               echo "$OUTPUT" >> php${{ matrix.php }}-lint.txt
+              
+              if [ $PHP_EXIT_CODE -ne 0 ]; then
+                echo "❌ Syntax error in $file:" | tee -a php${{ matrix.php }}-compat.txt
+                echo "$OUTPUT" | tee -a php${{ matrix.php }}-compat.txt
+                SYNTAX_ERRORS=$((SYNTAX_ERRORS + 1))
+              fi
             fi
-          done < <(find app includes templates -name "*.php" -print0)
+          done < php_files_list.txt
+          
+          # Clean up
+          rm -f php_files_list.txt
           
           if [ $SYNTAX_ERRORS -gt 0 ]; then
             echo "❌ PHP ${{ matrix.php }}: Found $SYNTAX_ERRORS files with syntax errors" | tee -a php${{ matrix.php }}-compat.txt
