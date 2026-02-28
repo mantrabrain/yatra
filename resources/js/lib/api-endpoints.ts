@@ -115,6 +115,8 @@ export const API_ENDPOINTS = {
   TOOLS_CRON_JOBS: '/tools/cron-jobs',
   TOOLS_CRON_RUN: (hook: string) => `/tools/cron-jobs/${hook}/run`,
   TOOLS_CLEAR_CACHE: '/tools/clear-cache',
+  TOOLS_CACHE_VIEW: '/cache/view',
+  TOOLS_CACHE_CLEAR_ITEM: '/cache/clear-item',
 
   // Migration
   MIGRATION_STATUS: '/migration/status',

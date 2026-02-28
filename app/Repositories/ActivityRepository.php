@@ -9,6 +9,7 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ReviewsTable;
+use Yatra\Utils\QueryCache;
 
 /**
  * Activity Repository
@@ -285,22 +286,27 @@ class ActivityRepository extends BaseRepository
      */
     public function getTripCount(int $activityId): int
     {
-        global $wpdb;
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $tripsTable = $tripRepository->getTableName();
+        // Use QueryCache for caching activity trip counts
+        $cacheKey = Cache::KEY_ACTIVITY_TRIP_COUNT . '_' . $activityId;
         
-        // Using hardcoded table name since there's no dedicated repository for trip activities
-        $tripActivitiesTable = TripClassificationsTable::getTableName();
-        
-        return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(DISTINCT t.id)
-             FROM `{$tripsTable}` t
-             INNER JOIN `{$tripActivitiesTable}` ta ON ta.trip_id = t.id
-             WHERE ta.classification_id = %d AND ta.classification_type = %s
-               AND t.status != 'trash'",
-            $activityId,
-            ClassificationTypes::ACTIVITY
-        ));
+        return Cache::remember($cacheKey, function() use ($activityId) {
+            global $wpdb;
+            $tripRepository = new \Yatra\Repositories\TripRepository();
+            $tripsTable = $tripRepository->getTableName();
+            
+            // Using hardcoded table name since there's no dedicated repository for trip activities
+            $tripActivitiesTable = TripClassificationsTable::getTableName();
+            
+            return (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(DISTINCT t.id)
+                 FROM `{$tripsTable}` t
+                 INNER JOIN `{$tripActivitiesTable}` ta ON ta.trip_id = t.id
+                 WHERE ta.classification_id = %d AND ta.classification_type = %s
+                   AND t.status != 'trash'",
+                $activityId,
+                ClassificationTypes::ACTIVITY
+            ));
+        }, Cache::DURATION_COUNTS); // Cache for 30 minutes
     }
 
     /**
@@ -311,16 +317,20 @@ class ActivityRepository extends BaseRepository
      */
     public function getTripCountDirect(int $activityId): int
     {
-        global $wpdb;
-        $tripRepository = new \Yatra\Repositories\TripRepository();
-        $tripTable = $tripRepository->getTableName();
+        // Use QueryCache for caching activity trip counts
+        $cacheKey = Cache::KEY_ACTIVITY_TRIP_COUNT_DIRECT . '_' . $activityId;
         
-        return (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT COUNT(*)
-             FROM `{$tripTable}` t
-             WHERE t.activity_id = %d
-               AND t.status != 'trash'",
-            $activityId
-        ));
+        return Cache::remember($cacheKey, function() use ($activityId) {
+            global $wpdb;
+            $tripRepository = new \Yatra\Repositories\TripRepository();
+            $tripTable = $tripRepository->getTableName();
+            
+            return (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT COUNT(*)
+                 FROM `{$tripTable}` t
+                 WHERE t.activity_id = %d",
+                $activityId
+            ));
+        }, Cache::DURATION_COUNTS); // Cache for 30 minutes
     }
 }

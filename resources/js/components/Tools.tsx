@@ -35,7 +35,8 @@ import {
   Settings,
   Database,
   Play,
-  Copy
+  Copy,
+  Eye
 } from 'lucide-react';
 
 interface SystemStatus {
@@ -144,6 +145,9 @@ const Tools: React.FC = () => {
   const [isLoadingJobs, setIsLoadingJobs] = useState(false);
   const [allJobs, setAllJobs] = useState<JobStatus[]>([]);
   const [isClearingCache, setIsClearingCache] = useState(false);
+  const [showCacheModal, setShowCacheModal] = useState(false);
+  const [cacheData, setCacheData] = useState<any[]>([]);
+  const [isLoadingCache, setIsLoadingCache] = useState(false);
   const [cronJobs, setCronJobs] = useState<CronJob[]>([]);
   const [cronInfo, setCronInfo] = useState<{ wp_cron_disabled: boolean; alternate_cron: boolean } | null>(null);
   const [isLoadingCronJobs, setIsLoadingCronJobs] = useState(false);
@@ -156,6 +160,15 @@ const Tools: React.FC = () => {
   const [showMigrationConfirm, setShowMigrationConfirm] = useState(false);
   const [showMigrationCompleteNotice, setShowMigrationCompleteNotice] = useState(true);
   const { showToast } = useToast();
+  
+  // Helper function to format bytes
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
   
   useEffect(() => {
     if (!migrationProgress?.started_at || !migrationProgress?.all_complete) {
@@ -685,6 +698,52 @@ const Tools: React.FC = () => {
     }
   };
 
+  // Load cache data for viewing
+  const loadCacheData = async () => {
+    setIsLoadingCache(true);
+    try {
+      console.log('Loading cache data...');
+      
+      const data = await apiService.getCacheView();
+      console.log('Cache data loaded:', data);
+      
+      // API returns consistent structure: {success, message, data}
+      if (data.success && data.data) {
+        setCacheData(data.data.cache_data || []);
+        showToast(data.message || 'Cache data loaded successfully', 'success');
+      } else {
+        showToast(data.message || 'Failed to load cache data', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to load cache data:', error);
+      showToast('Failed to load cache data', 'error');
+    } finally {
+      setIsLoadingCache(false);
+    }
+  };
+
+  // Clear individual cache item
+  const clearCacheItem = async (key: string, type: string) => {
+    try {
+      console.log(`Clearing cache item: ${key} (${type})`);
+      
+      const data = await apiService.clearCacheItem(key, type);
+      console.log('Cache item cleared response:', data);
+      
+      // API returns consistent structure: {success, message, data}
+      if (data.success) {
+        // Remove the item from the cache data
+        setCacheData(prev => prev.filter(item => item.key !== key));
+        showToast(data.message || `Cache item "${key}" cleared successfully`, 'success');
+      } else {
+        showToast(data.message || 'Failed to clear cache item', 'error');
+      }
+    } catch (error) {
+      console.error('Failed to clear cache item:', error);
+      showToast('Failed to clear cache item', 'error');
+    }
+  };
+
   // Clear all caches
   const clearAllCache = async () => {
     setIsClearingCache(true);
@@ -892,6 +951,17 @@ const Tools: React.FC = () => {
           >
             <RefreshCw className={`w-4 h-4 ${isClearingCache ? 'animate-spin' : ''}`} />
             {isClearingCache ? 'Clearing...' : 'Clear Cache'}
+          </Button>
+          <Button 
+            onClick={() => {
+              setShowCacheModal(true);
+              loadCacheData();
+            }} 
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Eye className="w-4 h-4" />
+            View Cache
           </Button>
         </div>
       </div>
@@ -2345,6 +2415,103 @@ const Tools: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
+      </Modal>
+
+      {/* Cache View Modal */}
+      <Modal
+        isOpen={showCacheModal}
+        onClose={() => setShowCacheModal(false)}
+        title="View Cache Data"
+        size="large"
+      >
+        <div className="space-y-4">
+          {isLoadingCache ? (
+            <div className="flex items-center justify-center py-8">
+              <RefreshCw className="w-6 h-6 animate-spin mr-2" />
+              <span>Loading cache data...</span>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {cacheData.length} cache items found
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadCacheData}
+                  disabled={isLoadingCache}
+                >
+                  <RefreshCw className={`w-4 h-4 mr-1 ${isLoadingCache ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+              </div>
+
+              {cacheData.length === 0 ? (
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  <Database className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>No cache data found</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Cache Key</th>
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Type</th>
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Size</th>
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Created</th>
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Expires</th>
+                        <th className="text-left p-3 font-medium text-gray-900 dark:text-white">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {cacheData.map((item, index) => (
+                        <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                          <td className="p-3">
+                            <div className="max-w-md truncate font-mono text-xs font-semibold" title={item.key}>
+                              {item.key}
+                            </div>
+                            <div className="text-xs text-gray-600 dark:text-gray-300 mt-2 max-h-32 overflow-auto bg-gray-50 dark:bg-gray-900 p-2 rounded border border-gray-200 dark:border-gray-700">
+                              <pre className="whitespace-pre-wrap break-words font-mono text-xs">
+                                {item.value}
+                              </pre>
+                            </div>
+                          </td>
+                          <td className="p-3">
+                            <Badge variant={item.type === 'transient' ? 'default' : 'secondary'}>
+                              {item.type}
+                            </Badge>
+                          </td>
+                          <td className="p-3 text-gray-600 dark:text-gray-400">
+                            {formatBytes(item.size)}
+                          </td>
+                          <td className="p-3 text-gray-600 dark:text-gray-400 text-xs">
+                            {item.created_at}
+                          </td>
+                          <td className="p-3 text-gray-600 dark:text-gray-400 text-xs">
+                            {item.expires_at}
+                          </td>
+                          <td className="p-3">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => clearCacheItem(item.key, item.type)}
+                              className="text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-3 h-3 mr-1" />
+                              Clear
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </Modal>
 

@@ -41,6 +41,14 @@ class CacheHooks
         add_action('yatra_activity_updated', [self::class, 'onActivityUpdated'], 10, 1);
         add_action('yatra_activity_deleted', [self::class, 'onActivityDeleted'], 10, 1);
 
+        // Itinerary-specific hooks
+        add_action('yatra_itinerary_day_created', [self::class, 'onItineraryDayCreated'], 10, 2);
+        add_action('yatra_itinerary_day_updated', [self::class, 'onItineraryDayUpdated'], 10, 2);
+        add_action('yatra_itinerary_day_deleted', [self::class, 'onItineraryDayDeleted'], 10, 1);
+        add_action('yatra_itinerary_activity_created', [self::class, 'onItineraryActivityCreated'], 10, 2);
+        add_action('yatra_itinerary_activity_updated', [self::class, 'onItineraryActivityUpdated'], 10, 2);
+        add_action('yatra_itinerary_activity_deleted', [self::class, 'onItineraryActivityDeleted'], 10, 1);
+
         // Destination-related hooks
         add_action('yatra_destination_created', [self::class, 'onDestinationCreated'], 10, 1);
         add_action('yatra_destination_updated', [self::class, 'onDestinationUpdated'], 10, 1);
@@ -299,5 +307,55 @@ class CacheHooks
             'stats' => Cache::getCacheStats(),
             'performance' => CacheService::getPerformanceMetrics(),
         ];
+    }
+
+    /**
+     * Itinerary Day event handlers
+     */
+    public static function onItineraryDayCreated(int $dayId, array $data): void
+    {
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary day creation", ['day_id' => $dayId]);
+    }
+
+    public static function onItineraryDayUpdated(int $dayId, array $data): void
+    {
+        Cache::delete(Cache::PREFIX_TRIP_DATA . ($data['trip_id'] ?? ''));
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary day update", ['day_id' => $dayId]);
+    }
+
+    public static function onItineraryDayDeleted(int $dayId): void
+    {
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary day deletion", ['day_id' => $dayId]);
+    }
+
+    /**
+     * Itinerary Activity event handlers
+     */
+    public static function onItineraryActivityCreated(int $activityId, array $data): void
+    {
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary activity creation", ['activity_id' => $activityId]);
+    }
+
+    public static function onItineraryActivityUpdated(int $activityId, array $data): void
+    {
+        Cache::delete(Cache::PREFIX_TRIP_DATA . ($data['trip_id'] ?? ''));
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary activity update", ['activity_id' => $activityId]);
+    }
+
+    public static function onItineraryActivityDeleted(int $activityId): void
+    {
+        self::invalidateListingCaches();
+        Cache::clearByPrefix('yatra_trip_');
+        Logger::info("Cache invalidated for itinerary activity deletion", ['activity_id' => $activityId]);
     }
 }

@@ -552,6 +552,8 @@ export const apiService = {
   getCronJobs: () => apiClient.get(API_ENDPOINTS.TOOLS_CRON_JOBS),
   runCronJob: (hook: string) => apiClient.post(API_ENDPOINTS.TOOLS_CRON_RUN(hook)),
   clearCache: () => apiClient.delete(API_ENDPOINTS.TOOLS_CLEAR_CACHE),
+  getCacheView: () => apiClient.get(API_ENDPOINTS.TOOLS_CACHE_VIEW),
+  clearCacheItem: (key: string, type: string) => apiClient.delete(`${API_ENDPOINTS.TOOLS_CACHE_CLEAR_ITEM}?key=${encodeURIComponent(key)}&type=${encodeURIComponent(type)}`),
 
   // Migration
   getMigrationStatus: () => apiClient.get(API_ENDPOINTS.MIGRATION_STATUS),

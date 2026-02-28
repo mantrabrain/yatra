@@ -6,6 +6,8 @@ namespace Yatra\Repositories;
 
 use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Utils\QueryCache;
+use Yatra\Utils\Cache;
 
 /**
  * Item Type Repository
@@ -154,22 +156,29 @@ class ItemTypeRepository extends BaseRepository
     }
 
     /**
-     * Count items by item type ID
+     * Count items by item type
+     * 
+     * @param int $item_type_id Item type ID
+     * @return int Number of items
      */
     public function countItemsByType(int $item_type_id): int
     {
-        global $wpdb;
+        // Use QueryCache for caching item counts
+        $cacheKey = Cache::KEY_ITEMS_COUNT_BY_TYPE . '_' . $item_type_id;
         
-        // Use ClassificationsTable for items with parent_id relationship
-        $table = ClassificationsTable::getTableName();
-        $count = $wpdb->get_var(
-            $wpdb->prepare(
-                "SELECT COUNT(*) FROM `{$table}` WHERE `type` = %s AND `parent_id` = %d",
-                ClassificationTypes::ITEM,
-                $item_type_id
-            )
-        );
-        return (int) $count;
+        return Cache::remember($cacheKey, function() use ($item_type_id) {
+            global $wpdb;
+            
+            // Use ClassificationsTable for items with parent_id relationship
+            $table = ClassificationsTable::getTableName();
+            $count = $wpdb->get_var(
+                $wpdb->prepare(
+                    "SELECT COUNT(*) FROM `{$table}` WHERE `type` = %s AND `parent_id` = %d",
+                    ClassificationTypes::ITEM,
+                    $item_type_id
+                )
+            );
+            return (int) $count;
+        }, Cache::DURATION_COUNTS); // Cache for 30 minutes
     }
 }
-

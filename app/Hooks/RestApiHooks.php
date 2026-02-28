@@ -19,6 +19,11 @@ class RestApiHooks
         // Authentication (login, register, email verification)
         add_action('rest_api_init', [\Yatra\Controllers\AuthController::class, 'registerRoutes']);
 
+        // Cache management
+        if (class_exists('\Yatra\Controllers\CacheController')) {
+            add_action('rest_api_init', [\Yatra\Controllers\CacheController::class, 'registerRoutes']);
+        }
+
         // Test endpoint to verify REST API is working
         add_action('rest_api_init', [self::class, 'registerTestEndpoint']);
     }

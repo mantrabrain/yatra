@@ -6,6 +6,7 @@ namespace Yatra\Repositories;
 
 use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
+use Yatra\Utils\QueryCache;
 
 /**
  * Attribute Repository
@@ -500,30 +501,33 @@ class AttributeRepository extends BaseRepository
             return [];
         }
         
-        $table = esc_sql($this->getTableName());
-        
-        $attributes = $this->wpdb->get_results(
-            $this->wpdb->prepare(
-                "SELECT id, name, JSON_EXTRACT(metadata, '$.field_type') as field_type, JSON_EXTRACT(metadata, '$.field_options') as field_options, icon, description 
-                 FROM {$table} 
-                 WHERE type = %s AND status = 'publish' 
-                 ORDER BY sorting ASC, name ASC",
-                ClassificationTypes::ATTRIBUTE
-            )
-        );
-        
-        $formattedAttributes = [];
-        foreach ($attributes as $attribute) {
-            $formattedAttributes[] = [
-                'id' => $attribute->id,
-                'name' => $attribute->name,
-                'field_type' => $attribute->field_type,
-                'field_options' => $attribute->field_options,
-                'icon' => $attribute->icon,
-                'description' => $attribute->description
-            ];
-        }
-        
-        return $formattedAttributes;
+        // Use QueryCache for caching attributes
+        return Cache::remember(Cache::KEY_AVAILABLE_ATTRIBUTES, function() {
+            $table = esc_sql($this->getTableName());
+            
+            $attributes = $this->wpdb->get_results(
+                $this->wpdb->prepare(
+                    "SELECT id, name, JSON_EXTRACT(metadata, '$.field_type') as field_type, JSON_EXTRACT(metadata, '$.field_options') as field_options, icon, description 
+                     FROM {$table} 
+                     WHERE type = %s AND status = 'publish' 
+                     ORDER BY sorting ASC, name ASC",
+                    ClassificationTypes::ATTRIBUTE
+                )
+            );
+            
+            $formattedAttributes = [];
+            foreach ($attributes as $attribute) {
+                $formattedAttributes[] = [
+                    'id' => $attribute->id,
+                    'name' => $attribute->name,
+                    'field_type' => $attribute->field_type,
+                    'field_options' => $attribute->field_options,
+                    'icon' => $attribute->icon,
+                    'description' => $attribute->description
+                ];
+            }
+            
+            return $formattedAttributes;
+        }, Cache::DURATION_ATTRIBUTES); // Cache for 1 hour
     }
 }

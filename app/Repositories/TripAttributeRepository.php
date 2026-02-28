@@ -7,6 +7,7 @@ namespace Yatra\Repositories;
 use Yatra\Database\Tables\TripsTable;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Database\Tables\TripClassificationsTable;
+use Yatra\Utils\QueryCache;
 
 /**
  * Trip Attribute Repository
@@ -35,133 +36,140 @@ class TripAttributeRepository extends BaseRepository
      */
     public function saveTripAttributes(int $tripId, array $attributes): bool
     {
-        global $wpdb;
-        $table_trip_classifications = $this->getTableNameInternal();
+        // Use QueryCache for caching trip attributes
+        $cacheKey = Cache::KEY_TRIP_ATTRIBUTES . '_' . $tripId . '_' . md5(serialize($attributes));
         
-        error_log("Yatra TripAttributeRepository: saveTripAttributes - START - trip_id={$tripId}, table={$table_trip_classifications}, attributes=" . json_encode($attributes));
-        
-        // Check if table exists first
-        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_trip_classifications}'");
-        if (!$table_exists) {
-            error_log("Yatra TripAttributeRepository: Table {$table_trip_classifications} does not exist");
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: Table {$table_trip_classifications} does not exist - cannot save attributes");
+        return Cache::remember($cacheKey, function() use ($tripId, $attributes) {
+            global $wpdb;
+            $table_trip_classifications = $this->getTableNameInternal();
+            
+            error_log("Yatra TripAttributeRepository: saveTripAttributes - START - trip_id={$tripId}, table={$table_trip_classifications}, attributes=" . json_encode($attributes));
+            
+            // Check if table exists first
+            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table_trip_classifications}'");
+            if (!$table_exists) {
+                error_log("Yatra TripAttributeRepository: Table {$table_trip_classifications} does not exist");
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("Yatra: Table {$table_trip_classifications} does not exist - cannot save attributes");
+                }
+                return false;
             }
-            return false;
-        }
-        
-        error_log("Yatra TripAttributeRepository: Table exists, starting transaction");
-        
-        $wpdb->query('START TRANSACTION');
-        
-        try {
-            // Delete existing attribute relationships for this trip
-            $wpdb->query($wpdb->prepare(
-                "DELETE FROM {$table_trip_classifications} 
-                 WHERE trip_id = %d 
-                 AND classification_type = 'attribute'",
-                $tripId
-            ));
             
-            error_log("Yatra TripAttributeRepository: Deleted existing attributes for trip_id={$tripId}");
+            error_log("Yatra TripAttributeRepository: Table exists, starting transaction");
             
-            // Insert new attribute relationships
-            $attributeCount = 0;
-            foreach ($attributes as $attributeId => $value) {
-                error_log("Yatra TripAttributeRepository: Processing attribute - key=" . var_export($attributeId, true) . ", value=" . var_export($value, true));
+            $wpdb->query('START TRANSACTION');
+            
+            try {
+                // Delete existing attribute relationships for this trip
+                $wpdb->query($wpdb->prepare(
+                    "DELETE FROM {$table_trip_classifications} 
+                     WHERE trip_id = %d 
+                     AND classification_type = 'attribute'",
+                    $tripId
+                ));
                 
-                // Handle both Record<number, any> format and array format
-                $actualAttributeId = null;
-                $fieldType = null;
-                $actualValue = null;
+                error_log("Yatra TripAttributeRepository: Deleted existing attributes for trip_id={$tripId}");
                 
-                if (is_numeric($attributeId) && is_array($value)) {
-                    // Record<number, any> format: {attribute_id: {field_type, value, ...}}
-                    $actualAttributeId = (int) $attributeId;
-                    $fieldType = $value['field_type'] ?? 'text';
-                    $actualValue = $value['value'] ?? '';
-                    error_log("Yatra TripAttributeRepository: Using Record<number, any> format - attribute_id={$actualAttributeId}");
-                } elseif (is_numeric($attributeId) && !is_array($value)) {
-                    // Simple format: {attribute_id: value}
-                    $actualAttributeId = (int) $attributeId;
-                    $fieldType = 'text'; // Default field type
-                    $actualValue = $value;
-                    error_log("Yatra TripAttributeRepository: Using simple format - attribute_id={$actualAttributeId}");
-                } elseif (is_array($value)) {
-                    // Array format: [attribute_data] or {id: 123, value: 'xxx'}
-                    $actualAttributeId = isset($value['id']) ? (int) $value['id'] : 
+                // Insert new attribute relationships
+                $attributeCount = 0;
+                foreach ($attributes as $attributeId => $value) {
+                    error_log("Yatra TripAttributeRepository: Processing attribute - key=" . var_export($attributeId, true) . ", value=" . var_export($value, true));
+                    
+                    // Handle both Record<number, any> format and array format
+                    $actualAttributeId = null;
+                    $fieldType = null;
+                    $actualValue = null;
+                    
+                    if (is_numeric($attributeId) && is_array($value)) {
+                        // Record<number, any> format: {attribute_id: {field_type, value, ...}}
+                        $actualAttributeId = (int) $attributeId;
+                        $fieldType = $value['field_type'] ?? 'text';
+                        $actualValue = $value['value'] ?? '';
+                        error_log("Yatra TripAttributeRepository: Using Record<number, any> format - attribute_id={$actualAttributeId}");
+                    } elseif (is_numeric($attributeId) && !is_array($value)) {
+                        // Simple format: {attribute_id: value}
+                        $actualAttributeId = (int) $attributeId;
+                        $fieldType = 'text'; // Default field type
+                        $actualValue = $value;
+                        error_log("Yatra TripAttributeRepository: Using simple format - attribute_id={$actualAttributeId}");
+                    } elseif (is_array($value)) {
+                        // Array format: [attribute_data] or {id: 123, value: 'xxx'}
+                        $actualAttributeId = isset($value['id']) ? (int) $value['id'] : 
                                        (isset($value['attribute_id']) ? (int) $value['attribute_id'] : null);
-                    $fieldType = $value['field_type'] ?? 'text';
-                    $actualValue = $value['value'] ?? '';
-                    error_log("Yatra TripAttributeRepository: Using array format - attribute_id={$actualAttributeId}");
+                        $fieldType = $value['field_type'] ?? 'text';
+                        $actualValue = $value['value'] ?? '';
+                        error_log("Yatra TripAttributeRepository: Using array format - attribute_id={$actualAttributeId}");
+                    } else {
+                        // Skip invalid format
+                        error_log("Yatra TripAttributeRepository: Skipping invalid format - key=" . var_export($attributeId, true) . ", value_type=" . gettype($value));
+                        continue;
+                    }
+                    
+                    if ($actualAttributeId === null) {
+                        error_log("Yatra TripAttributeRepository: Skipping attribute - no valid ID found");
+                        continue;
+                    }
+                    
+                    // Only save essential data: field_type and value
+                    $metadata = [
+                        'field_type' => $fieldType,
+                        'value' => $actualValue
+                    ];
+                    
+                    // Insert the relationship record
+                    $result = $wpdb->insert(
+                        $table_trip_classifications,
+                        [
+                            'trip_id' => $tripId,
+                            'classification_id' => $actualAttributeId,
+                            'classification_type' => 'attribute',
+                            'relationship_type' => 'primary',
+                            'metadata' => json_encode($metadata),
+                            'sort_order' => 0,
+                            'is_featured' => 0,
+                            'is_active' => 1,
+                            'created_at' => current_time('mysql'),
+                            'updated_at' => current_time('mysql')
+                        ],
+                        ['%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
+                    );
+                    
+                    error_log("Yatra TripAttributeRepository: Insert result=" . var_export($result, true) . ", last_error=" . $wpdb->last_error . ", inserted_id=" . $wpdb->insert_id);
+                    
+                    if ($result === false) {
+                        throw new \Exception('Failed to insert trip attribute relationship');
+                    }
+                    
+                    $attributeCount++;
+                }
+                
+                error_log("Yatra TripAttributeRepository: Processed {$attributeCount} attributes");
+                
+                if ($attributeCount > 0) {
+                    $wpdb->query('COMMIT');
+                    error_log("Yatra TripAttributeRepository: COMMIT SUCCESS");
+                    
+                    // Fire bulk update hook
+                    do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
+                    
+                    error_log("Yatra TripAttributeRepository: saveTripAttributes - SUCCESS - saved {$attributeCount} attributes");
+                    return true;
                 } else {
-                    // Skip invalid format
-                    error_log("Yatra TripAttributeRepository: Skipping invalid format - key=" . var_export($attributeId, true) . ", value_type=" . gettype($value));
-                    continue;
+                    $wpdb->query('ROLLBACK');
+                    error_log("Yatra TripAttributeRepository: ROLLBACK - no attributes to save");
+                    return false;
                 }
                 
-                if (!$actualAttributeId) {
-                    error_log("Yatra TripAttributeRepository: Skipping - no attribute_id");
-                    continue; // Skip invalid attribute ID
-                }
-                
-                // Only save essential data: field_type and value
-                $metadata = [
-                    'field_type' => $fieldType,
-                    'value' => $actualValue
-                ];
-                
-                // Insert the relationship record
-                $result = $wpdb->insert(
-                    $table_trip_classifications,
-                    [
-                        'trip_id' => $tripId,
-                        'classification_id' => $actualAttributeId,
-                        'classification_type' => 'attribute',
-                        'relationship_type' => 'primary',
-                        'metadata' => json_encode($metadata),
-                        'sort_order' => 0,
-                        'is_featured' => 0,
-                        'is_active' => 1,
-                        'created_at' => current_time('mysql'),
-                        'updated_at' => current_time('mysql')
-                    ],
-                    ['%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s']
-                );
-                
-                error_log("Yatra TripAttributeRepository: Insert result=" . var_export($result, true) . ", last_error=" . $wpdb->last_error . ", inserted_id=" . $wpdb->insert_id);
-                
-                if ($result === false) {
-                    throw new \Exception('Failed to insert trip attribute relationship');
-                }
-                
-                $attributeCount++;
-            }
-            
-            error_log("Yatra TripAttributeRepository: Processed {$attributeCount} attributes");
-            
-            if ($attributeCount > 0) {
-                $wpdb->query('COMMIT');
-                error_log("Yatra TripAttributeRepository: COMMIT SUCCESS");
-                
-                // Fire bulk update hook
-                do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
-                
-                error_log("Yatra TripAttributeRepository: saveTripAttributes - SUCCESS - saved {$attributeCount} attributes");
-                return true;
-            } else {
+            } catch (\Exception $e) {
                 $wpdb->query('ROLLBACK');
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log("Yatra: Error saving trip attributes: " . $e->getMessage());
+                }
                 error_log("Yatra TripAttributeRepository: ROLLBACK - no attributes to save");
                 return false;
             }
             
-        } catch (\Exception $e) {
-            $wpdb->query('ROLLBACK');
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log("Yatra: Error saving trip attributes: " . $e->getMessage());
-            }
-            return false;
-        }
+        }, Cache::DURATION_ATTRIBUTES); // Cache for 1 hour
     }
 
     /**

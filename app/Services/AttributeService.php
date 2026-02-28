@@ -775,57 +775,25 @@ class AttributeService extends BaseService
 
             error_log("Yatra AttributeService: bulkUpdateTripAttributes - START: trip_id={$tripId}, attribute_count=" . count($attributes));
 
-            global $wpdb;
-            $wpdb->query('START TRANSACTION');
-            
-            $success = true;
-            
-            foreach ($attributes as $key => $attributeData) {
-                // Handle both array with attribute_id key and simple key-value format
-                $attributeId = null;
-                $value = null;
-                
-                if (is_array($attributeData)) {
-                    // Array format: ['attribute_id' => 123, 'value' => 'some_value']
-                    $attributeId = $attributeData['attribute_id'] ?? $attributeData['id'] ?? null;
-                    $value = $attributeData['value'] ?? null;
-                } else {
-                    // Simple format: $attributeId => $value
-                    $attributeId = $key;
-                    $value = $attributeData;
-                }
-                
-                error_log("Yatra AttributeService: bulkUpdateTripAttributes - Processing: attribute_id={$attributeId}, value=" . var_export($value, true) . ", type=" . gettype($value));
-                
-                // Check if value is actually empty/null
-                if ($value === null || $value === '') {
-                    error_log("Yatra AttributeService: bulkUpdateTripAttributes - WARNING: Empty value detected for attribute_id={$attributeId}");
-                }
-                
-                if (!$this->setTripAttribute($tripId, $attributeId, $value)) {
-                    error_log("Yatra AttributeService: bulkUpdateTripAttributes - FAILED for attribute_id={$attributeId}");
-                    $success = false;
-                    break;
-                }
-            }
+            // Use repository layer for transaction handling
+            $success = $this->tripAttributeRepository->saveTripAttributes($tripId, $attributes);
             
             if ($success) {
-                $this->attributeRepository->wpdb->query('COMMIT');
                 error_log("Yatra AttributeService: bulkUpdateTripAttributes - COMMIT SUCCESS");
                 
                 // Fire bulk update hook
                 do_action('yatra_trip_attributes_bulk_updated', $tripId, $attributes);
                 
+                // Clear cache
+                $this->clearTripAttributeCache($tripId);
             } else {
-                $this->attributeRepository->wpdb->query('ROLLBACK');
-                error_log("Yatra AttributeService: bulkUpdateTripAttributes - ROLLBACK DUE TO FAILURE");
+                error_log("Yatra AttributeService: bulkUpdateTripAttributes - FAILED");
             }
             
             error_log("Yatra AttributeService: bulkUpdateTripAttributes - FINAL RESULT: " . var_export($success, true));
             return $success;
             
         } catch (\Exception $e) {
-            $this->attributeRepository->wpdb->query('ROLLBACK');
             Logger::error("Failed to bulk update trip attributes: " . $e->getMessage());
             return false;
         }

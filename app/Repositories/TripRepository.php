@@ -15,6 +15,7 @@ use Yatra\Database\Tables\TripsTable;
 use Yatra\Repositories\TripDownloadRepository;
 use Yatra\Models\Trip;
 use Yatra\Utils\Cache;
+use Yatra\Utils\QueryCache;
 use Yatra\Database\Tables\TripAvailabilityDatesTable;
 use Yatra\Database\Tables\TripAvailabilityRulesTable;
 use Yatra\Constants\ClassificationTypes;
@@ -279,7 +280,11 @@ class TripRepository extends BaseRepository
      */
     public function findWithFilters(array $filters = [], int $page = 1, int $perPage = 10): array
     {
-        global $wpdb;
+        // Create cache key based on filters and pagination
+        $cacheKey = Cache::KEY_TRIPS_WITH_FILTERS . '_' . md5(serialize($filters) . "_page_{$page}_per_page_{$perPage}");
+        
+        return Cache::remember($cacheKey, function() use ($filters, $page, $perPage) {
+            global $wpdb;
         
         // Table references
         $trip_table = $this->getTableName();
@@ -428,6 +433,7 @@ class TripRepository extends BaseRepository
             'page' => $page,
             'per_page' => $perPage
         ];
+        }, Cache::DURATION_QUERY_RESULT); // Cache for 10 minutes
     }
     
     /**

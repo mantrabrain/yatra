@@ -71,11 +71,7 @@ class Bootstrap
                 \Yatra\Services\DynamicPricingService::init();
             }
 
-            // Register Cache Controller AJAX handlers
-            if (class_exists('\Yatra\Controllers\CacheController')) {
-                \Yatra\Controllers\CacheController::registerAjaxHandlers();
-            }
-
+            
             // Register Setup Service activation hook
             if (class_exists('\Yatra\Services\SetupService')) {
                 \Yatra\Services\SetupService::registerActivationHook();
@@ -83,6 +79,11 @@ class Bootstrap
             
             // Initialize Action Scheduler
             $this->initializeActionScheduler();
+            
+            // Initialize REST API hooks
+            if (class_exists('\Yatra\Hooks\RestApiHooks')) {
+                \Yatra\Hooks\RestApiHooks::init();
+            }
             
             // Initialize core components
             $this->initializeCore();

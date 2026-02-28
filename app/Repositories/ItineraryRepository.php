@@ -7,6 +7,8 @@ namespace Yatra\Repositories;
 use Yatra\Repositories\BaseRepository;
 use Yatra\Database\Tables\TripItineraryDaysTable;
 use Yatra\Database\Tables\TripItineraryDayEntryTable;
+use Yatra\Utils\QueryCache;
+use Yatra\Utils\Cache;
 
 /**
  * Itinerary Repository
@@ -39,41 +41,53 @@ class ItineraryRepository extends BaseRepository
         error_log("[YATRA DEBUG]   day_description: " . ($dayDescription ?? 'NULL'));
         error_log("[YATRA DEBUG]   allowExisting: " . ($allowExisting ? 'TRUE' : 'FALSE'));
         
-        global $wpdb;
-        // Using table class for itinerary days
-        $tableDays = TripItineraryDaysTable::getTableName();
-
-        // Check if day exists
-        $existingDay = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT id FROM `{$tableDays}` 
-                 WHERE trip_id = %d AND day_number = %d
-                 LIMIT 1",
-                $tripId,
-                $dayNumber
-            )
-        );
+        // Use QueryCache for caching day existence checks
+        $cacheKey = Cache::KEY_DAY_EXISTS . "_{$tripId}_day_{$dayNumber}";
+        
+        $existingDay = Cache::remember($cacheKey, function() use ($tripId, $dayNumber) {
+            global $wpdb;
+            $tableDays = TripItineraryDaysTable::getTableName();
+            
+            return $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT * FROM `{$tableDays}` 
+                     WHERE trip_id = %d AND day_number = %d",
+                    $tripId,
+                    $dayNumber
+                )
+            );
+        }, Cache::DURATION_SHORT); // Cache for 10 minutes
 
         if ($existingDay) {
             // If not allowing existing days (for new day creation), throw error
             if (!$allowExisting) {
                 // Get all existing day numbers for this trip
-                $existingDays = $wpdb->get_col(
-                    $wpdb->prepare(
-                        "SELECT day_number FROM `{$tableDays}` 
-                         WHERE trip_id = %d 
-                         ORDER BY day_number ASC",
-                        $tripId
-                    )
-                ) ?: [];
+                $existingDays = Cache::remember(Cache::KEY_DAY_EXISTS . '_existing_days_trip_' . $tripId, function() use ($tripId) {
+                    global $wpdb;
+                    $tableDays = TripItineraryDaysTable::getTableName();
+                    
+                    return $wpdb->get_col(
+                        $wpdb->prepare(
+                            "SELECT day_number FROM `{$tableDays}` 
+                             WHERE trip_id = %d 
+                             ORDER BY day_number ASC",
+                            $tripId
+                        )
+                    ) ?: [];
+                }, Cache::DURATION_SHORT);
                 
                 // Get next available day number
-                $maxDay = $wpdb->get_var(
-                    $wpdb->prepare(
-                        "SELECT MAX(day_number) FROM `{$tableDays}` WHERE trip_id = %d",
-                        $tripId
-                    )
-                ) ?: 0;
+                $maxDay = Cache::remember(Cache::KEY_DAY_EXISTS . '_max_day_trip_' . $tripId, function() use ($tripId) {
+                    global $wpdb;
+                    $tableDays = TripItineraryDaysTable::getTableName();
+                    
+                    return $wpdb->get_var(
+                        $wpdb->prepare(
+                            "SELECT MAX(day_number) FROM `{$tableDays}` WHERE trip_id = %d",
+                            $tripId
+                        )
+                    ) ?: 0;
+                }, Cache::DURATION_SHORT);
                 $nextDay = (int) $maxDay + 1;
                 
                 // Format existing days list (e.g., "1, 2" or "1, 2, 3")
@@ -206,6 +220,9 @@ class ItineraryRepository extends BaseRepository
                 $dayId = (int) $wpdb->insert_id;
                 error_log("[YATRA DEBUG] Created day with ID: {$dayId}");
                 
+                // Fire hook for cache invalidation
+                do_action('yatra_itinerary_day_created', $dayId, $data);
+                
                 return $dayId;
             }
         } else {
@@ -276,6 +293,9 @@ class ItineraryRepository extends BaseRepository
             $entryId = (int) $wpdb->insert_id;
             error_log("[YATRA DEBUG] Created activity entry with ID: {$entryId}");
             
+            // Fire hook for cache invalidation
+            do_action('yatra_itinerary_activity_created', $entryId, $data);
+            
             return $entryId;
         }
     }
@@ -337,6 +357,9 @@ class ItineraryRepository extends BaseRepository
                 
                 // Re-enable error display
                 $wpdb->show_errors();
+                
+                // Fire hook for cache invalidation
+                do_action('yatra_itinerary_day_updated', $entryId, $data);
                 
                 return $result !== false;
             }
@@ -482,6 +505,9 @@ class ItineraryRepository extends BaseRepository
                 $updateFormat,
                 ['%d']
             );
+            
+            // Fire hook for cache invalidation
+            do_action('yatra_itinerary_activity_updated', $entryId, $data);
         }
 
         // Note: Images are stored in metadata in the new structure, not in a separate table
@@ -494,50 +520,52 @@ class ItineraryRepository extends BaseRepository
      */
     private function getItemIdsFromActivityType(string $activityType): ?array
     {
-        global $wpdb;
-        $itemRepository = new \Yatra\Repositories\ItemRepository();
-        $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
-        $tableItems = $itemRepository->getTableName();
-        $tableItemTypes = $itemTypeRepository->getTableName();
+        // Use QueryCache for caching activity type lookups
+        $cacheKey = Cache::KEY_ACTIVITY_TYPE_LOOKUP . '_' . md5($activityType);
+        
+        return Cache::remember($cacheKey, function() use ($activityType) {
+            global $wpdb;
+            $itemRepository = new \Yatra\Repositories\ItemRepository();
+            $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
+            $tableItems = $itemRepository->getTableName();
+            $tableItemTypes = $itemTypeRepository->getTableName();
 
-        // First try to find by item name (exact match)
-        $item = $wpdb->get_row(
-            $wpdb->prepare("SELECT id, type_id FROM `{$tableItems}` WHERE name = %s LIMIT 1", $activityType)
-        );
-
-        if ($item) {
-            return [
-                'item_type_id' => (int) $item->type_id,
-                'item_id' => (int) $item->id,
-            ];
-        }
-
-        // Fallback: try to find by item type name
-        $itemType = $wpdb->get_row(
-            $wpdb->prepare("SELECT id FROM `{$tableItemTypes}` WHERE name = %s LIMIT 1", $activityType)
-        );
-
-        if ($itemType) {
-            // Get first item of this type
-            $firstItem = $wpdb->get_row(
-                $wpdb->prepare("SELECT id FROM `{$tableItems}` WHERE type_id = %d LIMIT 1", (int) $itemType->id)
+            // First try to find by item name (exact match)
+            $item = $wpdb->get_row(
+                $wpdb->prepare("SELECT id, type_id FROM `{$tableItems}` WHERE name = %s LIMIT 1", $activityType)
             );
 
-            if ($firstItem) {
-                return [
-                    'item_type_id' => (int) $itemType->id,
-                    'item_id' => (int) $firstItem->id,
+            if ($item) {
+                return (object) [
+                    'item_type_id' => (int) $item->type_id,
+                    'item_id' => (int) $item->id,
                 ];
             }
 
-            // Return just the type if no items found
-            return [
-                'item_type_id' => (int) $itemType->id,
-                'item_id' => 0,
-            ];
-        }
+            // Fallback: try to find by item type name
+            $itemType = $wpdb->get_row(
+                $wpdb->prepare("SELECT id FROM `{$tableItemTypes}` WHERE name = %s LIMIT 1", $activityType)
+            );
 
-        return null;
+            if ($itemType) {
+                // Get first item of this type
+                $firstItem = $wpdb->get_row(
+                    $wpdb->prepare("SELECT id FROM `{$tableItems}` WHERE type_id = %d LIMIT 1", (int) $itemType->id)
+                );
+
+                if ($firstItem) {
+                    return (object) [
+                        'item_type_id' => (int) $itemType->id,
+                        'item_id' => (int) $firstItem->id,
+                    ];
+                }
+            }
+
+            return null;
+        }, Cache::DURATION_LOOKUPS) ? [
+            'item_type_id' => (int) $result->item_type_id,
+            'item_id' => (int) $result->item_id,
+        ] : null;
     }
 
     /**
@@ -549,27 +577,32 @@ class ItineraryRepository extends BaseRepository
             return null;
         }
 
-        global $wpdb;
-        $itemRepository = new \Yatra\Repositories\ItemRepository();
-        $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
-        $tableItems = $itemRepository->getTableName();
-        $tableItemTypes = $itemTypeRepository->getTableName();
+        // Use QueryCache for caching activity type lookups
+        $cacheKey = Cache::KEY_ACTIVITY_TYPE_FROM_ITEMS . '_' . $itemTypeId . '_' . $itemId;
+        
+        return Cache::remember($cacheKey, function() use ($itemTypeId, $itemId) {
+            global $wpdb;
+            $itemRepository = new \Yatra\Repositories\ItemRepository();
+            $itemTypeRepository = new \Yatra\Repositories\ItemTypeRepository();
+            $tableItems = $itemRepository->getTableName();
+            $tableItemTypes = $itemTypeRepository->getTableName();
 
-        // Get item name
-        $item = $wpdb->get_row(
-            $wpdb->prepare("SELECT name FROM `{$tableItems}` WHERE id = %d", $itemId)
-        );
+            // Get item name
+            $item = $wpdb->get_row(
+                $wpdb->prepare("SELECT name FROM `{$tableItems}` WHERE id = %d", $itemId)
+            );
 
-        if ($item && !empty($item->name)) {
-            return $item->name;
-        }
+            if ($item && !empty($item->name)) {
+                return $item->name;
+            }
 
-        // Fallback: get item type name
-        $itemType = $wpdb->get_row(
-            $wpdb->prepare("SELECT name FROM `{$tableItemTypes}` WHERE id = %d", $itemTypeId)
-        );
+            // Fallback: get item type name
+            $itemType = $wpdb->get_row(
+                $wpdb->prepare("SELECT name FROM `{$tableItemTypes}` WHERE id = %d", $itemTypeId)
+            );
 
-        return $itemType && !empty($itemType->name) ? $itemType->name : null;
+            return $itemType && !empty($itemType->name) ? $itemType->name : null;
+        }, Cache::DURATION_LOOKUPS);
     }
 
     /**
@@ -579,33 +612,37 @@ class ItineraryRepository extends BaseRepository
      */
     public function getActivityEntry(int $entryId): ?\stdClass
     {
-        global $wpdb;
-        $tableEntries = $this->getTableName();
-        $tableDays = TripItineraryDaysTable::getTableName();
-        $tableClassifications = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        // Use QueryCache for caching activity entry with joins
+        $cacheKey = Cache::KEY_ACTIVITY_ENTRY . '_' . $entryId;
         
-        $entry = $wpdb->get_row(
-            $wpdb->prepare(
-                "SELECT e.*, 
-                        i.name as item_name,
-                        it.name as item_type_name,
-                        it.icon as item_type_icon
-                 FROM `{$tableEntries}` e
-                 LEFT JOIN `{$tableClassifications}` i ON e.item_id = i.id AND i.type = 'item'
-                 LEFT JOIN `{$tableClassifications}` it ON e.item_type_id = it.id AND it.type = 'item_type'
-                 WHERE e.id = %d",
-                $entryId
-            )
-        );
-        
-        if (!$entry) {
-            return null;
-        }
-        
-        // Get day info
-        $day = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", (int) $entry->day_id)
-        );
+        return Cache::remember($cacheKey, function() use ($entryId) {
+            global $wpdb;
+            $tableEntries = $this->getTableName();
+            $tableDays = TripItineraryDaysTable::getTableName();
+            $tableClassifications = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+            
+            $entry = $wpdb->get_row(
+                $wpdb->prepare(
+                    "SELECT e.*, 
+                            i.name as item_name,
+                            it.name as item_type_name,
+                            it.icon as item_type_icon
+                     FROM `{$tableEntries}` e
+                     LEFT JOIN `{$tableClassifications}` i ON e.item_id = i.id AND i.type = 'item'
+                     LEFT JOIN `{$tableClassifications}` it ON e.item_type_id = it.id AND it.type = 'item_type'
+                     WHERE e.id = %d",
+                    $entryId
+                )
+            );
+            
+            if (!$entry) {
+                return null;
+            }
+            
+            // Get day info
+            $day = $wpdb->get_row(
+                $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", (int) $entry->day_id)
+            );
         
         if ($day) {
             $entry->day = (int) $day->day_number;
@@ -634,6 +671,7 @@ class ItineraryRepository extends BaseRepository
         }
         
         return $entry;
+        }, Cache::DURATION_ITINERARY); // Cache for 30 minutes
     }
     
     /**
@@ -643,16 +681,20 @@ class ItineraryRepository extends BaseRepository
      */
     public function getEntryWithRelations(int $entryId): ?\stdClass
     {
-        global $wpdb;
-        $tableEntries = $this->getTableName();
-        $tableDays = TripItineraryDaysTable::getTableName();
+        // Use QueryCache for caching this expensive query with joins
+        $cacheKey = Cache::KEY_ITINERARY_ENTRY_WITH_RELATIONS . '_' . $entryId;
         
-        // First check if this is a day entry (stored in days table)
-        $dayEntry = $wpdb->get_row(
-            $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $entryId)
-        );
-        
-        if ($dayEntry) {
+        return Cache::remember($cacheKey, function() use ($entryId) {
+            global $wpdb;
+            $tableEntries = $this->getTableName();
+            $tableDays = TripItineraryDaysTable::getTableName();
+            
+            // First check if this is a day entry (stored in days table)
+            $dayEntry = $wpdb->get_row(
+                $wpdb->prepare("SELECT * FROM `{$tableDays}` WHERE id = %d", $entryId)
+            );
+            
+            if ($dayEntry) {
             // This is a day entry - create entry object from day data
             $entry = (object) [
                 'id' => $dayEntry->id,
@@ -760,6 +802,7 @@ class ItineraryRepository extends BaseRepository
         }
 
         return $entry;
+        }, Cache::DURATION_ITINERARY); // Cache for 30 minutes
     }
 
     /**
@@ -816,6 +859,9 @@ class ItineraryRepository extends BaseRepository
             // Delete the day itself
             $result = $wpdb->delete($tableDays, ['id' => $id], ['%d']);
             
+            // Fire hook for cache invalidation
+            do_action('yatra_itinerary_day_deleted', $id);
+            
             return $result !== false;
         }
 
@@ -829,6 +875,9 @@ class ItineraryRepository extends BaseRepository
             error_log("[YATRA DEBUG] Deleting activity entry with ID: {$id}");
             
             $result = $wpdb->delete($tableEntries, ['id' => $id], ['%d']);
+            
+            // Fire hook for cache invalidation
+            do_action('yatra_itinerary_activity_deleted', $id);
             
             return $result !== false;
         }
@@ -1027,22 +1076,25 @@ class ItineraryRepository extends BaseRepository
      */
     public function getByTripId(int $tripId): array
     {
-        global $wpdb;
-        $tableEntries = $this->getTableName();
-        $tableDays = TripItineraryDaysTable::getTableName();
-        // Note: tableItems and tableImages are not used in new structure
+        // Use Cache for caching this expensive query with joins (Updated: 2026-02-28)
+        $cacheKey = Cache::KEY_ITINERARY_BY_TRIP_ID . '_' . $tripId;
         
-        // Get days for this trip first
-        $days = $wpdb->get_results($wpdb->prepare(
-            "SELECT * FROM `{$tableDays}` 
-             WHERE trip_id = %d
-             ORDER BY day_number ASC",
-            $tripId
-        )) ?: [];
-        
-        error_log('[ITINERARY REPOSITORY DEBUG] Days query: ' . $wpdb->last_query);
-        error_log('[ITINERARY REPOSITORY DEBUG] Days found: ' . count($days));
-        error_log('[ITINERARY REPOSITORY DEBUG] Days data: ' . json_encode($days));
+        return Cache::remember($cacheKey, function() use ($tripId) {
+            global $wpdb;
+            $tableEntries = $this->getTableName();
+            $tableDays = TripItineraryDaysTable::getTableName();
+            
+            // Get days for this trip first
+            $days = $wpdb->get_results($wpdb->prepare(
+                "SELECT * FROM `{$tableDays}` 
+                 WHERE trip_id = %d
+                 ORDER BY day_number ASC",
+                $tripId
+            )) ?: [];
+            
+            error_log('[ITINERARY REPOSITORY DEBUG] Days query: ' . $wpdb->last_query);
+            error_log('[ITINERARY REPOSITORY DEBUG] Days found: ' . count($days));
+            error_log('[ITINERARY REPOSITORY DEBUG] Days data: ' . json_encode($days));
         
         $allEntries = [];
         
@@ -1137,6 +1189,7 @@ class ItineraryRepository extends BaseRepository
         }
         
         return $allEntries;
+        }, Cache::DURATION_ITINERARY); // Cache for 30 minutes
     }
 
     /**

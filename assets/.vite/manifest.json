@@ -3,8 +3,18 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-57QYbBAu.js": {
-    "file": "dist/js/index-57QYbBAu.js",
+  "_index-CCWiQomn.js": {
+    "file": "dist/js/index-CCWiQomn.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-Dh6fXFdf.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_index-Ccg4GdWb.js": {
+    "file": "dist/js/index-Ccg4GdWb.js",
     "name": "index",
     "imports": [
       "_react-vendor-Dh6fXFdf.js"
@@ -23,60 +33,9 @@
       "admin/dist/css/index.css"
     ]
   },
-  "_index-CvnNrZyJ.js": {
-    "file": "dist/js/index-CvnNrZyJ.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-B37Vccnj.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-DeixANBj.js": {
-    "file": "dist/js/index-DeixANBj.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-CGU1oSWf.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-cXClGb-c.js": {
-    "file": "dist/js/index-cXClGb-c.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-BuVmUh7k.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
-  },
-  "_react-vendor-B37Vccnj.js": {
-    "file": "admin/dist/js/react-vendor-B37Vccnj.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
-  "_react-vendor-BuVmUh7k.js": {
-    "file": "admin/dist/js/react-vendor-BuVmUh7k.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
-  "_react-vendor-CGU1oSWf.js": {
-    "file": "admin/dist/js/react-vendor-CGU1oSWf.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
   },
   "_react-vendor-Dh6fXFdf.js": {
     "file": "admin/dist/js/react-vendor-Dh6fXFdf.js",
@@ -92,7 +51,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Dh6fXFdf.js",
-      "_index-CrKkASqN.js"
+      "_index-CCWiQomn.js"
     ]
   },
   "resources/js/main.tsx": {
@@ -102,7 +61,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-Dh6fXFdf.js",
-      "_index-CrKkASqN.js"
+      "_index-CCWiQomn.js"
     ]
   }
 }

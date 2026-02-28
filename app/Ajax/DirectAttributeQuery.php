@@ -7,8 +7,8 @@ use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Constants\ClassificationTypes;
 
 /**
- * Direct Attribute Query AJAX Handler
- * Bypasses all caching to get real database values
+ * Attribute Query AJAX Handler
+ * Uses repository layer with proper caching
  */
 class DirectAttributeQuery
 {
@@ -20,7 +20,7 @@ class DirectAttributeQuery
     }
 
     /**
-     * Handle AJAX request for direct attribute data
+     * Handle AJAX request for attribute data
      */
     public function handle()
     {
@@ -36,52 +36,43 @@ class DirectAttributeQuery
         }
 
         try {
-            // Direct database query - no caching
-            global $wpdb;
-            $table = ClassificationsTable::getTableName();
+            // Use repository layer with proper caching
+            $attribute = $this->attributeRepository->find($attributeId);
             
-            $query = $wpdb->prepare(
-                "SELECT * FROM `{$table}` WHERE type = %s AND id = %d",
-                ClassificationTypes::ATTRIBUTE,
-                $attributeId
-            );
-            
-            $result = $wpdb->get_row($query);
-            
-            if (!$result) {
+            if (!$attribute) {
                 wp_send_json_error('Attribute not found');
             }
 
-            // Log the actual database values
-            error_log('DIRECT QUERY - Attribute ID: ' . $attributeId);
-            error_log('DIRECT QUERY - required: ' . var_export($result->required, true));
-            error_log('DIRECT QUERY - show_on_frontend: ' . var_export($result->show_on_frontend, true));
-            error_log('DIRECT QUERY - show_in_filters: ' . var_export($result->show_in_filters, true));
-            error_log('DIRECT QUERY - searchable: ' . var_export($result->searchable, true));
+            // Log the cached values
+            error_log('CACHED QUERY - Attribute ID: ' . $attributeId);
+            error_log('CACHED QUERY - required: ' . var_export($attribute->required, true));
+            error_log('CACHED QUERY - show_on_frontend: ' . var_export($attribute->show_on_frontend, true));
+            error_log('CACHED QUERY - show_in_filters: ' . var_export($attribute->show_in_filters, true));
+            error_log('CACHED QUERY - searchable: ' . var_export($attribute->searchable, true));
 
             wp_send_json_success([
-                'id' => $result->id,
-                'name' => $result->name,
-                'slug' => $result->slug,
-                'description' => $result->description,
-                'field_type' => $result->field_type,
-                'field_options' => $result->field_options,
-                'default_value' => $result->default_value,
-                'placeholder' => $result->placeholder,
-                'required' => $result->required,
-                'validation_rules' => $result->validation_rules,
-                'display_order' => $result->display_order,
-                'show_on_frontend' => $result->show_on_frontend,
-                'show_in_filters' => $result->show_in_filters,
-                'filter_type' => $result->filter_type,
-                'searchable' => $result->searchable,
-                'status' => $result->status,
-                'created_at' => $result->created_at,
-                'updated_at' => $result->updated_at
+                'id' => $attribute->id,
+                'name' => $attribute->name,
+                'slug' => $attribute->slug,
+                'description' => $attribute->description,
+                'field_type' => $attribute->field_type,
+                'field_options' => $attribute->field_options,
+                'default_value' => $attribute->default_value,
+                'placeholder' => $attribute->placeholder,
+                'required' => $attribute->required,
+                'validation_rules' => $attribute->validation_rules,
+                'display_order' => $attribute->display_order,
+                'show_on_frontend' => $attribute->show_on_frontend,
+                'show_in_filters' => $attribute->show_in_filters,
+                'filter_type' => $attribute->filter_type,
+                'searchable' => $attribute->searchable,
+                'status' => $attribute->status,
+                'created_at' => $attribute->created_at,
+                'updated_at' => $attribute->updated_at
             ]);
 
         } catch (\Exception $e) {
-            error_log('Direct attribute query error: ' . $e->getMessage());
+            error_log('Attribute query error: ' . $e->getMessage());
             wp_send_json_error('Database query failed: ' . $e->getMessage());
         }
     }
