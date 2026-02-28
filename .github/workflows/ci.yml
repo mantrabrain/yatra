@@ -101,11 +101,17 @@ jobs:
                   }
                 }
               }
-              $output .= "TOTAL: " . $totalErrors . " errors, " . $totalWarnings . " warnings\n";
+              if ($totalErrors === 0 && $totalWarnings === 0) {
+                $output = "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards.\n";
+              } else {
+                $output .= "TOTAL: " . $totalErrors . " errors, " . $totalWarnings . " warnings\n";
+              }
               file_put_contents("phpcs-errors-readable.txt", $output);
               echo $output;
               if ($totalErrors > 0) { exit(1); }
             '
+          else
+            echo "✅ No PHPCS errors or warnings found. Code follows WordPress coding standards." > phpcs-errors-readable.txt
           fi
                 
       - name: Run PHPStan Static Analysis
@@ -143,11 +149,17 @@ jobs:
                 }
               }
               $totals = $json["totals"]["errors"] ?? $totalErrors;
-              $output .= "TOTAL ERRORS: " . $totals . "\n";
+              if ($totals === 0) {
+                $output = "✅ No PHPStan errors found. Code passes static analysis at level 5.\n";
+              } else {
+                $output .= "TOTAL ERRORS: " . $totals . "\n";
+              }
               file_put_contents("phpstan-errors-readable.txt", $output);
               echo $output;
               if ($totals > 0) { exit(1); }
             '
+          else
+            echo "✅ No PHPStan errors found. Code passes static analysis at level 5." > phpstan-errors-readable.txt
           fi
           
       - name: Composer Audit (Security Check)
