@@ -329,7 +329,15 @@ jobs:
           while IFS= read -r file; do
             if [ -f "$file" ] && [ -r "$file" ]; then
               echo "Checking: $file" >&2
-              OUTPUT=$(php -l "$file" 2>&1)
+              OUTPUT=$(php -l "$file" 2>&1) || {
+                # Handle PHP crash (exit code 255) or other failures
+                echo "❌ PHP crashed while checking $file - likely PHP ${{ matrix.php }} incompatibility" | tee -a php${{ matrix.php }}-compat.txt
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" | tee -a php${{ matrix.php }}-compat.txt
+                echo "❌ PHP crashed while checking $file - likely PHP ${{ matrix.php }} incompatibility" >> php${{ matrix.php }}-lint.txt
+                echo "This usually indicates PHP 8.0+ syntax (union types, match expressions, etc.)" >> php${{ matrix.php }}-lint.txt
+                echo 1 >> /tmp/syntax_error_count_${{ matrix.php }}
+                continue
+              }
               PHP_EXIT_CODE=$?
               
               # Only capture actual errors, not "No syntax errors detected"
