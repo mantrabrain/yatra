@@ -32,7 +32,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         
       - name: Cache Composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
@@ -41,7 +41,7 @@ jobs:
             ${{ runner.os }}-composer-
             
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+        run: composer install --prefer-dist --no-progress --optimize-autoloader
         
       - name: Validate Composer
         run: composer validate --strict
@@ -88,7 +88,7 @@ jobs:
             
       - name: Upload PHPCS Reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phpcs-reports-php${{ matrix.php }}
           path: |
@@ -130,7 +130,7 @@ jobs:
           
       - name: Upload PHPStan Reports
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phpstan-reports-php${{ matrix.php }}
           path: |
@@ -184,7 +184,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         
       - name: Cache Composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-security-${{ hashFiles('**/composer.lock') }}
@@ -192,7 +192,7 @@ jobs:
             ${{ runner.os }}-composer-security-
             
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist --no-progress
         
       - name: Run Composer Security Audit
         run: composer audit
@@ -278,7 +278,7 @@ jobs:
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
         
       - name: Cache Composer dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-wp-${{ hashFiles('**/composer.lock') }}
@@ -286,7 +286,7 @@ jobs:
             ${{ runner.os }}-composer-wp-
             
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest
+        run: composer install --prefer-dist --no-progress
         
       - name: Check WordPress functions usage
         run: |
