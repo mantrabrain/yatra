@@ -9,50 +9,19 @@ if (!defined('ABSPATH')) {
 <div class="yatra-sticky-nav">
     <div class="yatra-sticky-nav-container">
         <a href="#overview" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('book-open', 'yatra-icon-sm'); ?>
+            <?php echo yatra_svg_icon('book-open', 'yatra-sticky-nav-icon'); ?>
             <span><?php esc_html_e('Overview', 'yatra'); ?></span>
         </a>
-        <a href="#trip-details" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
-            <span><?php esc_html_e('Trip Details', 'yatra'); ?></span>
-        </a>
         <a href="#itinerary" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
+            <?php echo yatra_svg_icon('calendar', 'yatra-sticky-nav-icon'); ?>
             <span><?php esc_html_e('Itinerary', 'yatra'); ?></span>
         </a>
-        <a href="#included" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('check', 'yatra-icon-sm'); ?>
-            <span><?php esc_html_e('What\'s Included', 'yatra'); ?></span>
-        </a>
         <a href="#gallery" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('camera', 'yatra-icon-sm'); ?>
+            <?php echo yatra_svg_icon('camera', 'yatra-sticky-nav-icon'); ?>
             <span><?php esc_html_e('Gallery', 'yatra'); ?></span>
         </a>
-        <a href="#location" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('map-pin', 'yatra-icon-sm'); ?>
-            <span><?php esc_html_e('Location', 'yatra'); ?></span>
-        </a>
-        <a href="#faq" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('info', 'yatra-icon-sm'); ?>
-            <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
-        </a>
-        <?php if (!empty($trip->trip_story ?? '')): ?>
-            <a href="#trip-story" class="yatra-sticky-nav-item">
-                <?php echo yatra_svg_icon('book-open', 'yatra-icon-sm'); ?>
-                <span><?php esc_html_e('Story', 'yatra'); ?></span>
-            </a>
-        <?php endif; ?>
-        <?php 
-        $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
-        if (!empty($display_testimonials)): 
-        ?>
-            <a href="#testimonials" class="yatra-sticky-nav-item">
-                <?php echo yatra_svg_icon('heart', 'yatra-icon-sm'); ?>
-                <span><?php esc_html_e('Testimonials', 'yatra'); ?></span>
-            </a>
-        <?php endif; ?>
         <a href="#reviews" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('star', 'yatra-icon-sm'); ?>
+            <?php echo yatra_svg_icon('star', 'yatra-sticky-nav-icon'); ?>
             <span><?php esc_html_e('Reviews', 'yatra'); ?></span>
         </a>
         <div class="yatra-sticky-nav-price">

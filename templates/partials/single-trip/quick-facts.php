@@ -66,28 +66,7 @@ if (!defined('ABSPATH')) {
         </div>
     <?php endif; ?>
 
-    <!-- Seasonal Availability -->
-    <?php if (!empty($trip->seasonal_availability)): ?>
-        <div class="yatra-quick-fact">
-            <div class="yatra-quick-fact-icon">
-                <?php echo yatra_svg_icon('calendar', 'yatra-icon-lg'); ?>
-            </div>
-            <div class="yatra-quick-fact-content">
-                <div class="yatra-quick-fact-label"><?php echo esc_html__('Season', 'yatra'); ?></div>
-                <div class="yatra-quick-fact-value">
-                    <?php 
-                    // Show seasonal availability, but limit length for display
-                    $seasonal_text = $trip->seasonal_availability;
-                    if (strlen($seasonal_text) > 20) {
-                        $seasonal_text = substr($seasonal_text, 0, 20) . '...';
-                    }
-                    echo esc_html($seasonal_text); 
-                    ?>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
+    
     <!-- Group Size -->
     <div class="yatra-quick-fact">
         <div class="yatra-quick-fact-icon">

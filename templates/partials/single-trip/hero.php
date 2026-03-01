@@ -71,6 +71,12 @@ if (!defined('ABSPATH')) {
                     </span>
                 </div>
             <?php endif; ?>
+            <?php if (!empty($trip->seasonal_availability)): ?>
+                <div class="yatra-hero-season">
+                    <?php echo yatra_svg_icon('calendar', 'yatra-icon-sm'); ?>
+                    <span><?php echo esc_html($trip->seasonal_availability); ?></span>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 

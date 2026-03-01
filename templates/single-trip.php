@@ -164,18 +164,8 @@ window.yatraTripData = {
             <!-- Overview Section -->
             <?php yatra_get_template('partials/single-trip/content-overview', ['trip' => $trip, 'has_traveler_pricing' => $has_traveler_pricing, 'has_availability' => $has_availability, 'base_price' => $base_price]); ?>
 
-            <!-- Trip Story Section -->
-            <?php if (!empty($trip->trip_story ?? '')): ?>
-                <?php yatra_get_template('partials/single-trip/content-trip-story', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            <!-- What Makes This Trip Special Section -->
-            <?php if (!empty($trip->what_makes_special ?? '')): ?>
-                <?php yatra_get_template('partials/single-trip/content-whats-make-special', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            <!-- Trip Details Section -->
-            <?php yatra_get_template('partials/single-trip/content-trip-details', ['trip' => $trip]); ?>
+            
+            <!-- Itinerary Section -->
             <?php yatra_get_template('partials/single-trip/content-itinerary', ['trip' => $trip]); ?>
 
             <!-- What's Included/Excluded -->
@@ -190,13 +180,34 @@ window.yatraTripData = {
 
             <!-- Location/Map Section -->
             <?php yatra_get_template('partials/single-trip/content-location', ['trip' => $trip]); ?>
+
+            <!-- Important Information Section -->
             <?php yatra_get_template('partials/single-trip/content-important-info', ['trip' => $trip]); ?>
 
             <!-- FAQ Section -->
             <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
                 <?php yatra_get_template('partials/single-trip/content-faq', ['trip' => $trip]); ?>
             <?php endif; ?>
-        </div>
+
+            <!-- Trip Story Section -->
+            <?php if (!empty($trip->trip_story ?? '')): ?>
+                <?php yatra_get_template('partials/single-trip/content-trip-story', ['trip' => $trip]); ?>
+            <?php endif; ?>
+
+            <!-- What Makes This Trip Special Section -->
+            <?php if (!empty($trip->what_makes_special ?? '')): ?>
+                <?php yatra_get_template('partials/single-trip/content-whats-make-special', ['trip' => $trip]); ?>
+            <?php endif; ?>
+
+            <!-- Testimonials Section -->
+            <?php 
+            $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
+            if (!empty($display_testimonials)): 
+                yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]);
+            endif; 
+            ?>
+
+            </div>
 
         <!-- Sidebar - Booking Card -->
         <?php yatra_get_template('partials/single-trip/content-sidebar', ['trip' => $trip, 'has_availability' => $has_availability, 'has_traveler_pricing' => $has_traveler_pricing, 'base_price' => $base_price, 'pricing_type' => $pricing_type]); ?>

@@ -3677,8 +3677,8 @@
       if (!this.container) return;
 
       this.days = this.container.querySelectorAll('.yatra-itinerary-day');
-      this.expandAllBtn = document.getElementById('yatra-expand-all');
-      this.collapseAllBtn = document.getElementById('yatra-collapse-all');
+      this.toggleAllBtn = document.getElementById('yatra-toggle-all');
+      this.isAllExpanded = false;
       this.attachEventListeners();
       this.initializeDefaultState();
     }
@@ -3714,14 +3714,9 @@
     }
 
     attachEventListeners() {
-      // Expand All button
-      if (this.expandAllBtn) {
-        this.expandAllBtn.addEventListener('click', () => this.expandAll());
-      }
-
-      // Collapse All button
-      if (this.collapseAllBtn) {
-        this.collapseAllBtn.addEventListener('click', () => this.collapseAll());
+      // Toggle All button
+      if (this.toggleAllBtn) {
+        this.toggleAllBtn.addEventListener('click', () => this.toggleAll());
       }
 
       this.days.forEach(day => {
@@ -3761,36 +3756,61 @@
       }
     }
 
-    expandAll() {
-      this.days.forEach(day => {
-        const content = day.querySelector('.yatra-itinerary-day-content');
-        const toggle = day.querySelector('.yatra-day-toggle');
-        if (content) {
-          content.style.display = 'block';
-          day.setAttribute('data-expanded', 'true');
-          if (toggle) {
-            toggle.setAttribute('aria-expanded', 'true');
-            const icon = toggle.querySelector('.yatra-chevron-icon');
-            if (icon) icon.style.transform = 'rotate(0deg)';
+    toggleAll() {
+      if (this.isAllExpanded) {
+        // Collapse all
+        this.days.forEach(day => {
+          const content = day.querySelector('.yatra-itinerary-day-content');
+          const toggle = day.querySelector('.yatra-day-toggle');
+          if (content) {
+            content.style.display = 'none';
+            day.setAttribute('data-expanded', 'false');
+            if (toggle) {
+              toggle.setAttribute('aria-expanded', 'false');
+              const icon = toggle.querySelector('.yatra-chevron-icon');
+              if (icon) icon.style.transform = 'rotate(-90deg)';
+            }
           }
-        }
-      });
+        });
+        this.updateToggleButton(false);
+      } else {
+        // Expand all
+        this.days.forEach(day => {
+          const content = day.querySelector('.yatra-itinerary-day-content');
+          const toggle = day.querySelector('.yatra-day-toggle');
+          if (content) {
+            content.style.display = 'block';
+            day.setAttribute('data-expanded', 'true');
+            if (toggle) {
+              toggle.setAttribute('aria-expanded', 'true');
+              const icon = toggle.querySelector('.yatra-chevron-icon');
+              if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+          }
+        });
+        this.updateToggleButton(true);
+      }
+      this.isAllExpanded = !this.isAllExpanded;
     }
 
-    collapseAll() {
-      this.days.forEach(day => {
-        const content = day.querySelector('.yatra-itinerary-day-content');
-        const toggle = day.querySelector('.yatra-day-toggle');
-        if (content) {
-          content.style.display = 'none';
-          day.setAttribute('data-expanded', 'false');
-          if (toggle) {
-            toggle.setAttribute('aria-expanded', 'false');
-            const icon = toggle.querySelector('.yatra-chevron-icon');
-            if (icon) icon.style.transform = 'rotate(-90deg)';
-          }
-        }
-      });
+    updateToggleButton(isExpanded) {
+      if (!this.toggleAllBtn) return;
+      
+      const expandIcon = this.toggleAllBtn.querySelector('.expand-icon');
+      const collapseIcon = this.toggleAllBtn.querySelector('.collapse-icon');
+      const toggleText = this.toggleAllBtn.querySelector('.toggle-text');
+      
+      if (isExpanded) {
+        // Show collapse state
+        if (expandIcon) expandIcon.style.display = 'none';
+        if (collapseIcon) collapseIcon.style.display = 'block';
+        if (toggleText) toggleText.textContent = 'Collapse All';
+      } else {
+        // Show expand state
+        if (expandIcon) expandIcon.style.display = 'block';
+        if (collapseIcon) collapseIcon.style.display = 'none';
+        if (toggleText) toggleText.textContent = 'Expand All';
+      }
     }
   }
 
