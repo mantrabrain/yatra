@@ -41,6 +41,9 @@ export const useItineraryFormSave = ({
 
   const saveMutation = useMutation({
     mutationFn: async (data: ItineraryFormData) => {
+      console.log("🔍 DEBUG: saveMutation called with data:", data);
+      console.log("🔍 DEBUG: gallery data:", data.gallery);
+      console.log("🔍 DEBUG: video_url data:", data.video_url);
       // For day mode, create day and all activities
       if (isAddDayMode) {
         const tripId = parseInt(data.trip_id);
@@ -192,6 +195,8 @@ export const useItineraryFormSave = ({
             excluded_items: Array.isArray(activityData.excluded_items)
               ? activityData.excluded_items
               : [],
+            gallery: activityData.gallery || [],
+            video_url: activityData.video_url || "",
             status: activityData.status || "draft",
           });
 
@@ -348,6 +353,8 @@ export const useItineraryFormSave = ({
             excluded_items: Array.isArray(activityData.excluded_items)
               ? activityData.excluded_items
               : [],
+            gallery: activityData.gallery || [],
+            video_url: activityData.video_url || "",
             status: activityData.status || "draft",
           };
 
@@ -384,6 +391,8 @@ export const useItineraryFormSave = ({
         notes: data.notes.trim(),
         included_items: data.included_items,
         excluded_items: data.excluded_items,
+        gallery: data.gallery || [],
+        video_url: data.video_url || "",
         status: data.status || "draft", // Ensure status is always included
       };
 

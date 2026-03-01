@@ -1027,7 +1027,7 @@ const ItineraryForm: React.FC = () => {
               )}
             </div>
 
-            <div className="space-y-3">
+            <div className="sticky top-6 space-y-3 z-10 h-fit">
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-base">
