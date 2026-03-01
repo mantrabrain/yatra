@@ -1532,72 +1532,128 @@ class TripRepository extends BaseRepository
                     ],
                     ['%d', '%s', '%s', '%s', '%s', '%d', '%d']
                 );
-            }
+        }
+        
+        $processedDayIds[] = $dayId;
+        
+        // Process entries for this day
+        if (isset($day['entries']) && is_array($day['entries'])) {
+            $this->saveDayEntries($dayId, $day['entries'], $existingEntryMap[$dayId] ?? []);
         }
     }
-
-    /**
-     * Save itinerary days for a trip
-     */
-    public function saveItinerary(int $tripId, array $itineraryDays): void
-    {
-        global $wpdb;
+    
+    // Clean up orphaned days and entries (days that are no longer in the itinerary)
+    if (!empty($processedDayIds)) {
+        $placeholders = implode(',', array_fill(0, count($processedDayIds), '%d'));
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$tableEntries} WHERE day_id NOT IN ({$placeholders}) AND day_id IN (SELECT id FROM {$tableDays} WHERE trip_id = %d)",
+            $tripId,
+            ...$processedDayIds
+        ));
         
-        $tableDays = TripItineraryDaysTable::getTableName();
-        $tableEntries = TripItineraryDayEntryTable::getTableName();
-        
-        // Delete existing itinerary
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$tableDays} WHERE trip_id = %d AND id NOT IN ({$placeholders})",
+            $tripId,
+            ...$processedDayIds
+        ));
+    } else {
+        // If no days provided, delete all days and entries for this trip
         $wpdb->delete($tableEntries, ['trip_id' => $tripId], ['%d']);
         $wpdb->delete($tableDays, ['trip_id' => $tripId], ['%d']);
+    }
+}
+
+/**
+ * Save entries for a specific day using upsert strategy
+ */
+private function saveDayEntries(int $dayId, array $entries, array $existingEntries): void
+{
+    global $wpdb;
+    $tableEntries = TripItineraryDayEntryTable::getTableName();
+    
+    // Create lookup map for existing entries
+    $existingEntryMap = [];
+    foreach ($existingEntries as $entry) {
+        $key = $entry->title . '|' . ($entry->order ?? 0);
+        $existingEntryMap[$key] = $entry;
+    }
+    
+    $processedEntryIds = [];
+    foreach ($entries as $entryIndex => $entry) {
+        if (!is_array($entry) || empty($entry['title'])) continue;
         
-        // Insert new itinerary
-        if (!empty($itineraryDays)) {
-            foreach ($itineraryDays as $dayIndex => $day) {
-                if (is_array($day)) {
-                    $insertResult = $wpdb->insert(
-                        $tableDays,
-                        [
-                            'trip_id' => $tripId,
-                            'day_number' => $day['day_number'] ?? ($dayIndex + 1),
-                            'title' => isset($day['title']) ? sanitize_text_field($day['title']) : null,
-                            'description' => isset($day['description']) ? wp_kses_post($day['description']) : null,
-                            'order' => $dayIndex,
-                        ],
-                        ['%d', '%d', '%s', '%s', '%d']
-                    );
-                    
-                    // Save entries for this day
-                    if ($insertResult !== false && isset($day['entries']) && is_array($day['entries'])) {
-                        $dayId = $wpdb->insert_id;
-                        foreach ($day['entries'] as $entryIndex => $entry) {
-                            if (is_array($entry) && !empty($entry['title'])) {
-                                $wpdb->insert(
-                                    $tableEntries,
-                                    [
-                                        'trip_id' => $tripId,
-                                        'day_id' => $dayId,
-                                        'title' => sanitize_text_field($entry['title']),
-                                        'description' => isset($entry['description']) ? wp_kses_post($entry['description']) : null,
-                                        'time' => isset($entry['time']) ? sanitize_text_field($entry['time']) : null,
-                                        'location' => isset($entry['location']) ? sanitize_text_field($entry['location']) : null,
-                                        'item_type_id' => isset($entry['item_type_id']) ? (int) $entry['item_type_id'] : null,
-                                        'item_id' => isset($entry['item_id']) ? (int) $entry['item_id'] : null,
-                                        'order' => $entryIndex,
-                                    ],
-                                    ['%d', '%d', '%s', '%s', '%s', '%s', '%d', '%d', '%d']
-                                );
-                            }
-                        }
-                    }
-                }
-            }
+        $entryKey = $entry['title'] . '|' . $entryIndex;
+        $entryData = [
+            'title' => sanitize_text_field($entry['title']),
+            'description' => isset($entry['description']) ? wp_kses_post($entry['description']) : null,
+            'item_type_id' => isset($entry['item_type_id']) ? (int) $entry['item_type_id'] : null,
+            'item_id' => isset($entry['item_id']) ? (int) $entry['item_id'] : null,
+            'item_type' => isset($entry['item_type']) ? sanitize_text_field($entry['item_type']) : null,
+            'item_name' => isset($entry['item_name']) ? sanitize_text_field($entry['item_name']) : null,
+            'item_icon' => isset($entry['item_icon']) ? sanitize_text_field($entry['item_icon']) : null,
+            'time' => isset($entry['time']) ? sanitize_text_field($entry['time']) : null,
+            'start_time' => isset($entry['start_time']) ? sanitize_text_field($entry['start_time']) : null,
+            'end_time' => isset($entry['end_time']) ? sanitize_text_field($entry['end_time']) : null,
+            'time_type' => isset($entry['time_type']) ? sanitize_text_field($entry['time_type']) : 'exact',
+            'location' => isset($entry['location']) ? sanitize_text_field($entry['location']) : null,
+            'duration' => isset($entry['duration']) ? sanitize_text_field($entry['duration']) : null,
+            'cost' => isset($entry['cost']) ? floatval($entry['cost']) : null,
+            'cost_per_person' => isset($entry['cost_per_person']) ? (int) $entry['cost_per_person'] : 0,
+            'notes' => isset($entry['notes']) ? wp_kses_post($entry['notes']) : null,
+            'included_items' => isset($entry['included_items']) ? wp_json_encode($entry['included_items']) : null,
+            'excluded_items' => isset($entry['excluded_items']) ? wp_json_encode($entry['excluded_items']) : null,
+            'gallery' => isset($entry['gallery']) ? wp_json_encode($entry['gallery']) : null,
+            'video_url' => isset($entry['video_url']) ? esc_url_raw($entry['video_url']) : null,
+            'status' => isset($entry['status']) ? sanitize_text_field($entry['status']) : 'publish',
+            'order' => $entryIndex,
+            'updated_at' => current_time('mysql'),
+        ];
+        
+        // Update existing entry or insert new
+        if (isset($existingEntryMap[$entryKey])) {
+            $existingEntry = $existingEntryMap[$entryKey];
+            $wpdb->update($tableEntries, $entryData, ['id' => $existingEntry->id]);
+            $processedEntryIds[] = $existingEntry->id;
+        } else {
+            $entryData['day_id'] = $dayId;
+            $entryData['trip_id'] = $this->getTripIdByDayId($dayId);
+            $entryData['created_at'] = current_time('mysql');
+            $wpdb->insert($tableEntries, $entryData);
+            $processedEntryIds[] = $wpdb->insert_id;
         }
     }
+    
+    // Delete entries that are no longer present
+    if (!empty($processedEntryIds)) {
+        $placeholders = implode(',', array_fill(0, count($processedEntryIds), '%d'));
+        $wpdb->query($wpdb->prepare(
+            "DELETE FROM {$tableEntries} WHERE day_id = %d AND id NOT IN ({$placeholders})",
+            $dayId,
+            ...$processedEntryIds
+        ));
+    } else {
+        // If no entries provided, delete all entries for this day
+        $wpdb->delete($tableEntries, ['day_id' => $dayId], ['%d']);
+    }
+}
 
-    /**
-     * Save availability dates for a trip
-     */
-    public function saveAvailabilityDates(int $tripId, array $availabilityDates): void
+/**
+ * Get trip ID by day ID
+ */
+private function getTripIdByDayId(int $dayId): int
+{
+    global $wpdb;
+    $tableDays = TripItineraryDaysTable::getTableName();
+    return (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT trip_id FROM {$tableDays} WHERE id = %d",
+        $dayId
+    ));
+}
+
+/**
+ * Save availability dates for a trip
+ */
+public function saveAvailabilityDates(int $tripId, array $availabilityDates): void
     {
         global $wpdb;
         $table = TripAvailabilityDatesTable::getTableName();
@@ -1721,9 +1777,9 @@ class TripRepository extends BaseRepository
         $downloadRepo = new TripDownloadRepository();
         $downloadRepo->replaceForTrip($tripId, is_array($downloadableItems) ? $downloadableItems : []);
         
-        if (!empty($itineraryDays)) {
-            $this->saveItinerary($tripId, $itineraryDays);
-        }
+        // ITINERARY SHOULD NEVER BE PROCESSED DURING TRIP CREATION
+        // Itinerary should be created separately through dedicated itinerary endpoints
+        // This ensures complete separation of concerns and prevents data loss
         
         if (!empty($availabilityDates)) {
             $this->saveAvailabilityDates($tripId, $availabilityDates);
@@ -1743,7 +1799,7 @@ class TripRepository extends BaseRepository
      */
     public function updateWithRelations(int $id, array $data, array $relationships = []): bool
     {
-        // Extract relationship data
+        // Extract relationship data (excluding itinerary - handled separately)
         $destinations      = $relationships['destinations'] ?? null;
         $activities        = $relationships['activities'] ?? null;
         $tripCategories    = $relationships['trip_category'] ?? null;
@@ -1753,11 +1809,11 @@ class TripRepository extends BaseRepository
         $galleryImages     = $relationships['gallery_images'] ?? null;
         $faqs              = $relationships['faqs'] ?? null;
         $downloadableItems = $relationships['downloadable_items'] ?? null;
-        $itineraryDays     = $relationships['itinerary_days'] ?? null;
+        // ITINERARY IS HANDLED SEPARATELY - NEVER PROCESSED HERE
         $availabilityDates = $relationships['availability_dates'] ?? null;
         $attributes        = $relationships['attributes'] ?? null;
         
-        // Remove relationship data from main data (these should not be in the main table)
+        // Remove relationship data from main data (excluding itinerary - handled separately)
         unset(
             $data['destinations'], 
             $data['activities'], 
@@ -1767,7 +1823,7 @@ class TripRepository extends BaseRepository
             $data['landmarks'],
             $data['gallery_images'],
             $data['faqs'],
-            $data['itinerary_days'],
+            // ITINERARY IS HANDLED SEPARATELY - DO NOT UNSET
             $data['availability_dates'],
             $data['attributes']
         );
@@ -1813,9 +1869,9 @@ class TripRepository extends BaseRepository
             $downloadRepo->replaceForTrip($id, $downloadableItems);
         }
         
-        if ($itineraryDays !== null) {
-            $this->saveItinerary($id, $itineraryDays);
-        }
+        // ITINERARY SHOULD NEVER BE PROCESSED DURING TRIP UPDATES
+        // Itinerary updates should be handled separately through dedicated endpoints
+        // This ensures complete separation of concerns and prevents data loss
         
         if ($availabilityDates !== null) {
             $this->saveAvailabilityDates($id, $availabilityDates);

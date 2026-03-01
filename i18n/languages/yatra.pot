@@ -9,58 +9,58 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-01T07:05:32+00:00\n"
+"POT-Creation-Date: 2026-03-01T12:01:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:31314
+#: assets/admin/dist/js/app.js:31318
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31344
+#: assets/admin/dist/js/app.js:31348
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31346
+#: assets/admin/dist/js/app.js:31350
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31351
-#: templates/partials/single-trip/sticky-nav.php:51
+#: assets/admin/dist/js/app.js:31355
+#: templates/partials/single-trip/sticky-nav.php:56
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31352
+#: assets/admin/dist/js/app.js:31356
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31358
+#: assets/admin/dist/js/app.js:31362
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31369
+#: assets/admin/dist/js/app.js:31373
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31374
+#: assets/admin/dist/js/app.js:31378
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31375
+#: assets/admin/dist/js/app.js:31379
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31380
+#: assets/admin/dist/js/app.js:31384
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31389
+#: assets/admin/dist/js/app.js:31393
 #: templates/listing-trip.php:377
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31427
+#: assets/admin/dist/js/app.js:31431
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -325,7 +325,7 @@ msgstr ""
 
 #: assets/dist/js/account-page.js:1730
 #: templates/partials/single-trip/content-itinerary.php:10
-#: templates/partials/single-trip/sticky-nav.php:21
+#: templates/partials/single-trip/sticky-nav.php:17
 msgid "Itinerary"
 msgstr ""
 
@@ -2365,8 +2365,8 @@ msgstr ""
 msgid "Booking Confirmation"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1456
-#: app/Repositories/ItineraryRepository.php:1005
+#: app/Controllers/SingleTripController.php:1458
+#: app/Repositories/ItineraryRepository.php:1030
 #: app/Services/ItineraryService.php:50
 #, php-format
 msgid "Day %d"
@@ -3593,6 +3593,7 @@ msgid "Booking Status"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:387
+#: templates/partials/single-trip/content-itinerary.php:328
 #: templates/partials/single-trip/gallery-modal.php:29
 msgid "Loading..."
 msgstr ""
@@ -3614,13 +3615,11 @@ msgid "Free"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:395
-#: templates/partials/single-trip/quick-facts.php:115
+#: templates/partials/single-trip/quick-facts.php:94
 msgid "Price"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:398
-#: templates/partials/single-trip/content-trip-details.php:9
-#: templates/partials/single-trip/sticky-nav.php:17
 #: templates/pdf/itinerary.php:144
 msgid "Trip Details"
 msgstr ""
@@ -3641,7 +3640,7 @@ msgid "Difficulty"
 msgstr ""
 
 #: app/Providers/FrontendAssetsProvider.php:401
-#: templates/partials/single-trip/quick-facts.php:97
+#: templates/partials/single-trip/quick-facts.php:76
 #: templates/trip-listing-card.php:191
 msgid "Group Size"
 msgstr ""
@@ -5697,7 +5696,7 @@ msgstr ""
 
 #: templates/partials/availability-section.php:91
 #: templates/partials/availability-section.php:475
-#: templates/partials/single-trip/hero.php:241
+#: templates/partials/single-trip/hero.php:247
 msgid "Book Now"
 msgstr ""
 
@@ -5721,11 +5720,11 @@ msgstr ""
 
 #: templates/partials/availability-section.php:183
 #: templates/partials/booking-content.php:562
-#: templates/partials/single-trip/content-itinerary.php:121
+#: templates/partials/single-trip/content-itinerary.php:118
 #: templates/partials/single-trip/content-sidebar.php:193
 #: templates/partials/single-trip/content-sidebar.php:196
 #: templates/partials/single-trip/similar-trips.php:111
-#: templates/partials/single-trip/sticky-nav.php:66
+#: templates/partials/single-trip/sticky-nav.php:67
 #: templates/single-activity.php:220
 #: templates/single-destination.php:238
 msgid "per person"
@@ -5756,7 +5755,7 @@ msgid "Available"
 msgstr ""
 
 #: templates/partials/availability-section.php:239
-#: templates/partials/single-trip/content-itinerary.php:71
+#: templates/partials/single-trip/content-itinerary.php:68
 #: templates/pdf/itinerary.php:278
 msgid "Day"
 msgid_plural "Days"
@@ -6120,13 +6119,14 @@ msgid "per day"
 msgstr ""
 
 #: templates/partials/booking-content.php:566
-#: templates/partials/single-trip/content-itinerary.php:123
+#: templates/partials/single-trip/content-itinerary.php:120
 msgid "per booking"
 msgstr ""
 
 #: templates/partials/booking-content.php:569
 #: templates/partials/pricing-summary.php:129
 #: templates/partials/single-trip/content-included-excluded.php:16
+#: templates/partials/single-trip/sticky-nav.php:21
 msgid "Included"
 msgstr ""
 
@@ -6372,22 +6372,6 @@ msgstr ""
 msgid "Frequently Asked Questions"
 msgstr ""
 
-#: templates/partials/single-trip/content-faq.php:44
-msgid "Expand all FAQ items"
-msgstr ""
-
-#: templates/partials/single-trip/content-faq.php:48
-msgid "Expand All"
-msgstr ""
-
-#: templates/partials/single-trip/content-faq.php:50
-msgid "Collapse all FAQ items"
-msgstr ""
-
-#: templates/partials/single-trip/content-faq.php:54
-msgid "Collapse All"
-msgstr ""
-
 #: templates/partials/single-trip/content-gallery.php:9
 msgid "Photo Gallery"
 msgstr ""
@@ -6437,16 +6421,53 @@ msgstr ""
 msgid "Excluded"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:62
+#: templates/partials/single-trip/content-itinerary.php:59
 msgid "No Itinerary Available"
 msgstr ""
 
-#: templates/partials/single-trip/content-itinerary.php:64
+#: templates/partials/single-trip/content-itinerary.php:61
 msgid "Detailed itinerary information will be available soon. Please check back later or contact us for more details."
 msgstr ""
 
+#: templates/partials/single-trip/content-itinerary.php:166
+msgid "Photos"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:191
+#, php-format
+msgid "Itinerary Gallery Image %d"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:261
+msgid "Video thumbnail"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:297
+#: templates/partials/single-trip/content-itinerary.php:327
+msgid "Itinerary Gallery Image"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:308
+msgid "Itinerary Gallery"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:311
+#: templates/partials/single-trip/gallery-modal.php:12
+msgid "Close Gallery"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:316
+#: templates/partials/single-trip/gallery-modal.php:17
+msgid "Previous Image"
+msgstr ""
+
+#: templates/partials/single-trip/content-itinerary.php:321
+#: templates/partials/single-trip/gallery-modal.php:22
+msgid "Next Image"
+msgstr ""
+
 #: templates/partials/single-trip/content-location.php:8
-#: templates/partials/single-trip/sticky-nav.php:33
+#: templates/partials/single-trip/sticky-nav.php:25
 msgid "Location"
 msgstr ""
 
@@ -6641,21 +6662,9 @@ msgstr ""
 msgid "Trip Gallery"
 msgstr ""
 
-#: templates/partials/single-trip/gallery-modal.php:12
-msgid "Close Gallery"
-msgstr ""
-
-#: templates/partials/single-trip/gallery-modal.php:17
-msgid "Previous Image"
-msgstr ""
-
-#: templates/partials/single-trip/gallery-modal.php:22
-msgid "Next Image"
-msgstr ""
-
 #: templates/partials/single-trip/gallery-modal.php:28
-#: templates/partials/single-trip/hero.php:251
-#: templates/partials/single-trip/hero.php:270
+#: templates/partials/single-trip/hero.php:257
+#: templates/partials/single-trip/hero.php:276
 msgid "Gallery Image"
 msgstr ""
 
@@ -6721,7 +6730,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/partials/single-trip/hero.php:40
-#: templates/partials/single-trip/quick-facts.php:143
+#: templates/partials/single-trip/quick-facts.php:122
 msgid "Review"
 msgid_plural "Reviews"
 msgstr[0] ""
@@ -6731,21 +6740,21 @@ msgstr[1] ""
 msgid "No reviews yet"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:118
+#: templates/partials/single-trip/hero.php:124
 msgid "SAVE"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:172
+#: templates/partials/single-trip/hero.php:178
 #, php-format
 msgid "Main image for %s"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:183
+#: templates/partials/single-trip/hero.php:189
 #, php-format
 msgid "Placeholder image for %s"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:254
+#: templates/partials/single-trip/hero.php:260
 #: templates/partials/single-trip/similar-trips.php:63
 #: templates/single-activity.php:160
 #: templates/single-destination.php:160
@@ -6753,7 +6762,7 @@ msgstr ""
 msgid "Add to favorites"
 msgstr ""
 
-#: templates/partials/single-trip/hero.php:262
+#: templates/partials/single-trip/hero.php:268
 #, php-format
 msgid "View all %d photos"
 msgstr ""
@@ -6769,16 +6778,12 @@ msgid_plural "%d landmarks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: templates/partials/single-trip/quick-facts.php:76
-msgid "Season"
-msgstr ""
-
-#: templates/partials/single-trip/quick-facts.php:102
+#: templates/partials/single-trip/quick-facts.php:81
 #, php-format
 msgid "%d-%d travelers"
 msgstr ""
 
-#: templates/partials/single-trip/quick-facts.php:159
+#: templates/partials/single-trip/quick-facts.php:138
 #: templates/partials/single-trip/similar-trips.php:100
 msgid "review"
 msgid_plural "reviews"
@@ -6786,7 +6791,6 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: templates/partials/single-trip/reviews.php:15
-#: templates/partials/single-trip/sticky-nav.php:56
 msgid "Reviews"
 msgstr ""
 
@@ -6904,24 +6908,23 @@ msgstr ""
 msgid "Similar Adventures"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:25
-#: templates/pdf/itinerary.php:317
-msgid "What's Included"
-msgstr ""
-
 #: templates/partials/single-trip/sticky-nav.php:29
-msgid "Gallery"
+msgid "Important Info"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:37
+#: templates/partials/single-trip/sticky-nav.php:33
 msgid "FAQ"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:42
+#: templates/partials/single-trip/sticky-nav.php:41
+msgid "Special"
+msgstr ""
+
+#: templates/partials/single-trip/sticky-nav.php:47
 msgid "Story"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:60
+#: templates/partials/single-trip/sticky-nav.php:61
 msgid "Starting From"
 msgstr ""
 
@@ -7175,6 +7178,10 @@ msgstr ""
 
 #: templates/pdf/itinerary.php:304
 msgid "Weather Conditions"
+msgstr ""
+
+#: templates/pdf/itinerary.php:317
+msgid "What's Included"
 msgstr ""
 
 #: templates/pdf/itinerary.php:337

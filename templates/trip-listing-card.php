@@ -29,7 +29,9 @@ if (!($trip instanceof \Yatra\Models\Trip)) {
 $title = $trip->getTitle();
 $duration = $trip->getDuration();
 $difficulty = $trip->getDifficulty();
+// Get rating from TripListingService (now loads reviews like SingleTripController)
 $rating = $trip->getRating();
+
 $pricing = $trip->getPricing();
 $discount = $trip->getDiscount();
 $image = $trip->getImage();
@@ -148,9 +150,7 @@ try {
             <?php if ($duration['has_duration']): ?>
                 <div class="yatra-trip-stat">
                     <div class="yatra-stat-icon duration">
-                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6z" clip-rule="evenodd" />
-                        </svg>
+                        <?php echo yatra_svg_icon('calendar', ''); ?>
                     </div>
                     <div class="yatra-stat-content">
                         <span class="yatra-stat-value"><?php echo esc_html($duration['formatted']); ?></span>
@@ -159,26 +159,11 @@ try {
                 </div>
             <?php endif; ?>
 
-            <!-- Difficulty -->
-            <?php if ($difficulty['has_difficulty']): ?>
-                <div class="yatra-trip-stat">
-                    <div class="yatra-stat-icon difficulty">
-                        <?php echo yatra_svg_icon($difficulty['icon'], ''); ?>
-                    </div>
-                    <div class="yatra-stat-content">
-                        <span class="yatra-stat-value"><?php echo esc_html(ucfirst($difficulty['level'])); ?></span>
-                        <span class="yatra-stat-label"><?php esc_html_e('Difficulty', 'yatra'); ?></span>
-                    </div>
-                </div>
-            <?php endif; ?>
-
             <!-- Group Size -->
             <?php if (!empty($trip->min_travelers) || !empty($trip->max_travelers)): ?>
                 <div class="yatra-trip-stat">
                     <div class="yatra-stat-icon group">
-                        <svg width="14" height="14" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                        </svg>
+                        <?php echo yatra_svg_icon('users', ''); ?>
                     </div>
                     <div class="yatra-stat-content">
                         <span class="yatra-stat-value">
@@ -202,8 +187,21 @@ try {
                         </svg>
                     </div>
                     <div class="yatra-stat-content">
-                        <span class="yatra-stat-value"><?php echo esc_html(number_format($trip->bookings_count)); ?></span>
+                        <span class="yatra-stat-value"><?php echo esc_html($trip->bookings_count); ?></span>
                         <span class="yatra-stat-label"><?php esc_html_e('Bookings', 'yatra'); ?></span>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!-- Review (moved to end) -->
+            <?php if ($rating['has_rating'] && $rating['average_rating'] > 0): ?>
+                <div class="yatra-trip-stat">
+                    <div class="yatra-stat-icon rating">
+                        <?php echo yatra_svg_icon('star', ''); ?>
+                    </div>
+                    <div class="yatra-stat-content">
+                        <span class="yatra-stat-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
+                        <span class="yatra-stat-label"><?php esc_html_e('Review', 'yatra'); ?></span>
                     </div>
                 </div>
             <?php endif; ?>
@@ -392,54 +390,6 @@ try {
 .yatra-reviews-count {
     font-size: 0.75rem;
     color: #6b7280;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .yatra-trip-short-description {
-        color: #94a3b8;
-    }
-    
-    .yatra-trip-stats-row {
-        border-top-color: #374151;
-        border-bottom-color: #374151;
-    }
-    
-    .yatra-stat-icon.duration {
-        background: #1e3a8a;
-        color: #93c5fd;
-    }
-    
-    .yatra-stat-icon.difficulty {
-        background: #78350f;
-        color: #fcd34d;
-    }
-    
-    .yatra-stat-icon.group {
-        background: #14532d;
-        color: #86efac;
-    }
-    
-    .yatra-stat-icon.bookings {
-        background: #831843;
-        color: #f9a8d4;
-    }
-    
-    .yatra-stat-value {
-        color: #f9fafb;
-    }
-    
-    .yatra-stat-label {
-        color: #9ca3af;
-    }
-    
-    .yatra-rating-value {
-        color: #f9fafb;
-    }
-    
-    .yatra-reviews-count {
-        color: #9ca3af;
-    }
 }
 
 /* Responsive design */

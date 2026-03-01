@@ -24,12 +24,12 @@ if (!defined('ABSPATH')) {
                         <?php if (!empty($item_title)): ?>
                             <li>
                                 <?php echo yatra_svg_icon('check', 'yatra-included-icon'); ?>
-                                <span>
-                                    <?php echo esc_html($item_title); ?>
+                                <div class="yatra-item-content">
+                                    <div class="yatra-item-title"><?php echo esc_html($item_title); ?></div>
                                     <?php if (!empty($item_desc)): ?>
-                                        <small class="yatra-item-desc"><?php echo esc_html($item_desc); ?></small>
+                                        <div class="yatra-item-desc"><?php echo esc_html($item_desc); ?></div>
                                     <?php endif; ?>
-                                </span>
+                                </div>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -51,12 +51,12 @@ if (!defined('ABSPATH')) {
                         <?php if (!empty($item_title)): ?>
                             <li>
                                 <?php echo yatra_svg_icon('x', 'yatra-excluded-icon'); ?>
-                                <span>
-                                    <?php echo esc_html($item_title); ?>
+                                <div class="yatra-item-content">
+                                    <div class="yatra-item-title"><?php echo esc_html($item_title); ?></div>
                                     <?php if (!empty($item_desc)): ?>
-                                        <small class="yatra-item-desc"><?php echo esc_html($item_desc); ?></small>
+                                        <div class="yatra-item-desc"><?php echo esc_html($item_desc); ?></div>
                                     <?php endif; ?>
-                                </span>
+                                </div>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>

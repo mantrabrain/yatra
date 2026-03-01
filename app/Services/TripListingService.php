@@ -216,11 +216,24 @@ class TripListingService extends BaseService
         // Get filtered trips from repository
         $tripResult = $this->tripRepository->findWithFilters($filters, $page, $perPage);
         
+        // Load reviews for each trip (same approach as SingleTripController)
+        $tripsWithReviews = [];
+        foreach ($tripResult['trips'] as $trip) {
+            // Load reviews for this trip
+            $trip->reviews = $this->getReviewsForTrip((int) $trip->id);
+            
+            // Calculate rating stats (same as SingleTripController)
+            $trip->average_rating = $this->calculateAverageRating($trip->reviews);
+            $trip->review_count = count($trip->reviews);
+            
+            $tripsWithReviews[] = $trip;
+        }
+        
         // Get filter options for UI (cached separately)
         $filterOptions = $this->getFilterOptions();
         
         return [
-            'trips' => $tripResult['trips'],
+            'trips' => $tripsWithReviews,
             'total' => $tripResult['total'],
             'pages' => $tripResult['pages'],
             'page' => $tripResult['page'],
@@ -254,6 +267,42 @@ class TripListingService extends BaseService
                 'attributes' => $this->getAvailableAttributes()
             ];
         }
+    }
+
+    /**
+     * Get reviews for a specific trip (same as SingleTripController)
+     *
+     * @param int $trip_id Trip ID
+     * @return array Reviews
+     */
+    private function getReviewsForTrip(int $trip_id): array
+    {
+        // Check if reviews table exists
+        if (!$this->reviewRepository->tableExists()) {
+            return [];
+        }
+
+        return $this->reviewRepository->findApprovedByTripId($trip_id);
+    }
+
+    /**
+     * Calculate average rating from reviews (same as SingleTripController)
+     *
+     * @param array $reviews Reviews array
+     * @return float Average rating
+     */
+    private function calculateAverageRating(array $reviews): float
+    {
+        if (empty($reviews)) {
+            return 0.0;
+        }
+
+        $total = 0;
+        foreach ($reviews as $review) {
+            $total += (float) ($review->rating ?? 0);
+        }
+
+        return round($total / count($reviews), 1);
     }
 
     /**
@@ -328,8 +377,21 @@ class TripListingService extends BaseService
         
         $result = $this->tripRepository->findWithFilters($filters, 1, $limit);
         
+        // Load reviews for each trip (same approach as getFilteredTrips)
+        $tripsWithReviews = [];
+        foreach ($result['trips'] as $trip) {
+            // Load reviews for this trip
+            $trip->reviews = $this->getReviewsForTrip((int) $trip->id);
+            
+            // Calculate rating stats (same as SingleTripController)
+            $trip->average_rating = $this->calculateAverageRating($trip->reviews);
+            $trip->review_count = count($trip->reviews);
+            
+            $tripsWithReviews[] = $trip;
+        }
+        
         return [
-            'trips' => $result['trips'],
+            'trips' => $tripsWithReviews,
             'total' => $result['total']
         ];
     }

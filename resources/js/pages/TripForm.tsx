@@ -44,6 +44,7 @@ import {
   Search,
   Settings,
   CheckCircle2,
+  CheckSquare,
   FileText,
   DollarSign,
   AlertCircle,
@@ -90,6 +91,7 @@ import TripAttributesSection from "../components/trip-form/TripAttributesSection
 import { HelpText } from "../components/ui/help-text";
 import { getCurrencySymbol } from "../data/currencies";
 import { ItinerarySection } from "../components/trip-form/sections/ItinerarySection";
+import { IncludedSection } from "../components/trip-form/sections/IncludedSection";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { useToast } from "../components/ui/toast";
 import { MultiSelect } from "../components/ui/multi-select";
@@ -1847,6 +1849,15 @@ const TripForm: React.FC = () => {
       return;
     }
 
+    // Preserve current itinerary_days and gallery_images if they exist and have content
+    // This prevents wiping out data when user updates trip in itinerary builder
+    const currentItineraryDays = formData.itinerary_days || [];
+    const currentGalleryImages = formData.gallery_images || [];
+    
+    // Only use database data if current data is empty or if this is initial load
+    const shouldPreserveItinerary = currentItineraryDays.length > 0;
+    const shouldPreserveGallery = currentGalleryImages.length > 0;
+
     setFormData({
       title: tripData.title || "",
       slug: tripData.slug || "",
@@ -1924,8 +1935,10 @@ const TripForm: React.FC = () => {
       vaccination_requirements: tripData.vaccination_requirements || "",
       included_items: normalizeAmenityItems(tripData.included_items),
       excluded_items: normalizeAmenityItems(tripData.excluded_items),
-      itinerary_days: normalizeItineraryDays(tripData.itinerary_days),
-      gallery_images: normalizeGalleryImages(tripData.gallery_images),
+      // Preserve current itinerary data if it exists, otherwise use database data
+      itinerary_days: shouldPreserveItinerary ? currentItineraryDays : normalizeItineraryDays(tripData.itinerary_days),
+      // Preserve current gallery data if it exists, otherwise use database data
+      gallery_images: shouldPreserveGallery ? currentGalleryImages : normalizeGalleryImages(tripData.gallery_images),
       featured_image: tripData.featured_image
         ? Number(tripData.featured_image)
         : null,
@@ -2174,16 +2187,26 @@ const TripForm: React.FC = () => {
       hasErrors: getSectionErrors("attributes").length > 0,
     },
 
-    // Step 7: Itinerary Builder (includes Included/Excluded, now optional)
+    // Step 7: Itinerary Builder (now optional)
     {
       id: "itinerary",
       label: __("Itinerary Builder", "yatra"),
       icon: Calendar,
       required: false,
-      completed:
-        formData.itinerary_days.length > 0 ||
-        formData.included_items.length > 0,
+      completed: formData.itinerary_days.length > 0,
       hasErrors: getSectionErrors("itinerary").length > 0,
+    },
+
+    // Step 8: What's Included & Excluded
+    {
+      id: "included",
+      label: __("Included & Excluded", "yatra"),
+      icon: CheckSquare,
+      required: false,
+      completed:
+        formData.included_items.length > 0 ||
+        formData.excluded_items.length > 0,
+      hasErrors: getSectionErrors("included").length > 0,
     },
   ];
 
@@ -6344,19 +6367,11 @@ const TripForm: React.FC = () => {
         );
 
       case "included":
-        // Redirect to itinerary section (included/excluded are now merged there)
-        if (currentSection === "included") {
-          setTimeout(() => setCurrentSection("itinerary"), 100);
-        }
         return (
-          <div className="space-y-4">
-            <Alert>
-              {__(
-                "What's Included & Excluded has been moved to the Itinerary Builder section.",
-                "What's Included & Excluded has been moved to the Itinerary Builder section.",
-              )}
-            </Alert>
-          </div>
+          <IncludedSection
+            formData={formData}
+            onFieldChange={handleFieldChange}
+          />
         );
 
       case "faqs":
