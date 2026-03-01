@@ -2,6 +2,16 @@
  * Shared types for Trip Form components
  */
 
+export interface MediaItem {
+  id: string;
+  attachment_id: number;
+  type: "image" | "video";
+  url?: string;
+  thumbnail_url?: string;
+  alt_text?: string;
+  caption?: string;
+}
+
 export interface FAQ {
   question: string;
   answer: string;
@@ -81,6 +91,8 @@ export interface ItineraryEntry {
   included_items: string[];
   excluded_items: string[];
   images: string[];
+  gallery: MediaItem[];
+  video_url?: string;
   status?: "active" | "inactive";
 }
 

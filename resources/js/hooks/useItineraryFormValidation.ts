@@ -23,6 +23,8 @@ export interface ItineraryFormData {
   notes: string;
   included_items: string[];
   excluded_items: string[];
+  gallery: any[];
+  video_url: string;
   status: string;
 }
 

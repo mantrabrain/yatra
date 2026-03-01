@@ -95,6 +95,8 @@ const ItineraryForm: React.FC = () => {
     notes: "",
     included_items: [],
     excluded_items: [],
+    gallery: [],
+    video_url: "",
     status: "publish",
   });
 
@@ -313,6 +315,8 @@ const ItineraryForm: React.FC = () => {
         notes: entryData.notes || "",
         included_items: entryData.included_items || [],
         excluded_items: entryData.excluded_items || [],
+        gallery: entryData.gallery || [],
+        video_url: entryData.video_url || "",
         status: entryData.status || "publish",
       });
     } else if (isEditDayMode) {
@@ -329,6 +333,8 @@ const ItineraryForm: React.FC = () => {
         day: entryData.day?.toString() || dayParam || prev.day,
         day_title: entryData.day_title || prev.day_title,
         day_description: entryData.day_description || prev.day_description,
+        gallery: entryData.gallery || prev.gallery,
+        video_url: entryData.video_url || prev.video_url,
         status: entryData.status || prev.status,
       }));
     }
@@ -995,6 +1001,8 @@ const ItineraryForm: React.FC = () => {
                       notes: formData.notes,
                       included_items: formData.included_items,
                       excluded_items: formData.excluded_items,
+                      gallery: formData.gallery,
+                      video_url: formData.video_url,
                     }}
                     errors={errors}
                     itemTypes={typesData}

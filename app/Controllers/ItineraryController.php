@@ -294,10 +294,48 @@ class ItineraryController extends BaseController
             'excluded_items' => $excludedItems,
             'status' => $item->status ?? 'draft',
             'images' => $item->images ?? [],
+            'gallery' => $this->decodeGallery($item->gallery ?? null),
+            'video_url' => $item->video_url ?? null,
             'order' => (int) ($item->order ?? 0),
             'created_at' => $item->created_at ?? null,
             'updated_at' => $item->updated_at ?? null,
         ];
+    }
+
+    /**
+     * Decode gallery JSON from database and convert attachment IDs to URLs
+     */
+    private function decodeGallery(?string $galleryJson): array
+    {
+        if (empty($galleryJson)) {
+            return [];
+        }
+
+        $gallery = json_decode($galleryJson, true);
+        if (!is_array($gallery)) {
+            return [];
+        }
+
+        // Convert attachment IDs to URLs for frontend compatibility
+        foreach ($gallery as &$item) {
+            if (isset($item['attachment_id']) && $item['attachment_id'] > 0) {
+                // Get attachment URL from WordPress
+                $attachment_url = wp_get_attachment_url($item['attachment_id']);
+                if ($attachment_url) {
+                    $item['url'] = $attachment_url;
+                }
+                
+                // Get thumbnail URL for images
+                if (isset($item['type']) && $item['type'] === 'image') {
+                    $thumbnail_url = wp_get_attachment_image_src($item['attachment_id'], 'medium');
+                    if ($thumbnail_url) {
+                        $item['thumbnail_url'] = $thumbnail_url[0];
+                    }
+                }
+            }
+        }
+
+        return $gallery;
     }
 }
 

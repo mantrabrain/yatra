@@ -447,6 +447,41 @@ class ItineraryRepository extends BaseRepository
             $updateFormat[] = '%s';
         }
 
+        if (isset($data['gallery'])) {
+            if (!empty($data['gallery']) && is_array($data['gallery'])) {
+                // Process gallery items to ensure attachment IDs are properly saved
+                $processedGallery = [];
+                foreach ($data['gallery'] as $item) {
+                    $processedItem = [
+                        'id' => $item['id'] ?? '',
+                        'attachment_id' => isset($item['attachment_id']) ? (int) $item['attachment_id'] : 0,
+                        'type' => $item['type'] ?? 'image',
+                        'alt_text' => $item['alt_text'] ?? '',
+                        'caption' => $item['caption'] ?? '',
+                    ];
+                    
+                    // Keep URL and thumbnail_url for reference but they'll be regenerated from attachment_id
+                    if (isset($item['url'])) {
+                        $processedItem['url'] = $item['url'];
+                    }
+                    if (isset($item['thumbnail_url'])) {
+                        $processedItem['thumbnail_url'] = $item['thumbnail_url'];
+                    }
+                    
+                    $processedGallery[] = $processedItem;
+                }
+                $updateData['gallery'] = json_encode($processedGallery);
+            } else {
+                $updateData['gallery'] = null;
+            }
+            $updateFormat[] = '%s';
+        }
+
+        if (isset($data['video_url'])) {
+            $updateData['video_url'] = !empty($data['video_url']) ? esc_url_raw($data['video_url']) : null;
+            $updateFormat[] = '%s';
+        }
+
         if (isset($data['item_type_id'])) {
             $updateData['item_type_id'] = !empty($data['item_type_id']) ? (int) $data['item_type_id'] : null;
             $updateFormat[] = '%d';

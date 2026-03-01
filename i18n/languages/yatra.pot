@@ -9,58 +9,58 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-01T05:57:52+00:00\n"
+"POT-Creation-Date: 2026-03-01T07:05:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
 
-#: assets/admin/dist/js/app.js:30896
+#: assets/admin/dist/js/app.js:31314
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30926
+#: assets/admin/dist/js/app.js:31344
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30928
+#: assets/admin/dist/js/app.js:31346
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30933
+#: assets/admin/dist/js/app.js:31351
 #: templates/partials/single-trip/sticky-nav.php:51
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30934
+#: assets/admin/dist/js/app.js:31352
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30940
+#: assets/admin/dist/js/app.js:31358
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30951
+#: assets/admin/dist/js/app.js:31369
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30956
+#: assets/admin/dist/js/app.js:31374
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30957
+#: assets/admin/dist/js/app.js:31375
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30962
+#: assets/admin/dist/js/app.js:31380
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:30971
+#: assets/admin/dist/js/app.js:31389
 #: templates/listing-trip.php:377
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31009
+#: assets/admin/dist/js/app.js:31427
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -955,11 +955,15 @@ msgstr ""
 msgid "Emergency Contact"
 msgstr ""
 
+#: assets/dist/js/index-DGrp-_D2.js:910
 #: assets/dist/js/index-DWmYutN-.js:910
+#: assets/dist/js/index-vIsapb5p.js:910
 msgid "Close"
 msgstr ""
 
+#: assets/dist/js/index-DGrp-_D2.js:522
 #: assets/dist/js/index-DWmYutN-.js:522
+#: assets/dist/js/index-vIsapb5p.js:522
 msgctxt "text direction"
 msgid "ltr"
 msgstr ""
@@ -2362,7 +2366,7 @@ msgid "Booking Confirmation"
 msgstr ""
 
 #: app/Controllers/SingleTripController.php:1456
-#: app/Repositories/ItineraryRepository.php:995
+#: app/Repositories/ItineraryRepository.php:1005
 #: app/Services/ItineraryService.php:50
 #, php-format
 msgid "Day %d"

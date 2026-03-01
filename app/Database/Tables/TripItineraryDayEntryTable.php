@@ -56,6 +56,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `notes` text DEFAULT NULL COMMENT 'Additional notes',
     `included_items` longtext DEFAULT NULL COMMENT 'JSON: Array of included items',
     `excluded_items` longtext DEFAULT NULL COMMENT 'JSON: Array of excluded items',
+    `gallery` longtext DEFAULT NULL COMMENT 'JSON: Array of gallery images with metadata',
+    `video_url` varchar(2048) DEFAULT NULL COMMENT 'Video URL (YouTube, Vimeo, etc.)',
     `status` varchar(20) DEFAULT 'publish' COMMENT 'Entry status (publish, draft, etc.)',
     `order` smallint(5) unsigned DEFAULT 0 COMMENT 'Order within the day',
     `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
