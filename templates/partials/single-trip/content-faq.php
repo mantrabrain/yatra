@@ -37,21 +37,18 @@ if (!defined('ABSPATH')) {
     </script>
     <div class="faq-header">
         <h2 class="yatra-trip-section-title">
-            <?php echo yatra_svg_icon('help-circle', 'yatra-trip-section-title-icon'); ?>
+            <?php echo yatra_svg_icon('users', 'yatra-trip-section-title-icon'); ?>
             <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
         </h2>
         <div class="faq-controls">
-            <button class="faq-btn" onclick="expandAll()" aria-label="<?php esc_attr_e('Expand all FAQ items', 'yatra'); ?>">
-                <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 9l-7 7-7-7"/>
+            <button type="button" class="faq-toggle-btn" id="faq-toggle-all">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon expand-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
                 </svg>
-                <?php esc_html_e('Expand All', 'yatra'); ?>
-            </button>
-            <button class="faq-btn" onclick="collapseAll()" aria-label="<?php esc_attr_e('Collapse all FAQ items', 'yatra'); ?>">
-                <svg class="faq-btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 9l-7 7-7-7"/>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="toggle-icon collapse-icon" style="display: none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"/>
                 </svg>
-                <?php esc_html_e('Collapse All', 'yatra'); ?>
+                <span class="toggle-text">Expand All</span>
             </button>
         </div>
     </div>
@@ -113,27 +110,57 @@ function toggleFAQ(button) {
     }
 }
 
-function expandAll() {
-    document.querySelectorAll('.faq-item').forEach(item => {
-        const answer = item.querySelector('.faq-answer');
-        const arrow = item.querySelector('.faq-arrow');
+// FAQ Toggle All functionality
+let faqIsAllExpanded = false;
+
+function toggleAll() {
+    const toggleBtn = document.getElementById('faq-toggle-all');
+    const expandIcon = toggleBtn.querySelector('.expand-icon');
+    const collapseIcon = toggleBtn.querySelector('.collapse-icon');
+    const toggleText = toggleBtn.querySelector('.toggle-text');
+    
+    if (faqIsAllExpanded) {
+        // Collapse all
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const answer = item.querySelector('.faq-answer');
+            const arrow = item.querySelector('.faq-arrow');
+            
+            item.classList.remove('active');
+            answer.style.maxHeight = '0';
+            arrow.style.transform = 'rotate(0deg)';
+        });
         
-        item.classList.add('active');
-        answer.style.maxHeight = answer.scrollHeight + 'px';
-        arrow.style.transform = 'rotate(180deg)';
-    });
+        // Update button to show expand state
+        expandIcon.style.display = 'block';
+        collapseIcon.style.display = 'none';
+        toggleText.textContent = 'Expand All';
+    } else {
+        // Expand all
+        document.querySelectorAll('.faq-item').forEach(item => {
+            const answer = item.querySelector('.faq-answer');
+            const arrow = item.querySelector('.faq-arrow');
+            
+            item.classList.add('active');
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            arrow.style.transform = 'rotate(180deg)';
+        });
+        
+        // Update button to show collapse state
+        expandIcon.style.display = 'none';
+        collapseIcon.style.display = 'block';
+        toggleText.textContent = 'Collapse All';
+    }
+    
+    faqIsAllExpanded = !faqIsAllExpanded;
 }
 
-function collapseAll() {
-    document.querySelectorAll('.faq-item').forEach(item => {
-        const answer = item.querySelector('.faq-answer');
-        const arrow = item.querySelector('.faq-arrow');
-        
-        item.classList.remove('active');
-        answer.style.maxHeight = '0';
-        arrow.style.transform = 'rotate(0deg)';
-    });
-}
+// Initialize FAQ toggle button
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.getElementById('faq-toggle-all');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleAll);
+    }
+});
 </script>
 
 <style>

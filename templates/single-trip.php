@@ -173,11 +173,7 @@ window.yatraTripData = {
                 <?php yatra_get_template('partials/single-trip/content-included-excluded', ['trip' => $trip]); ?>
             <?php endif; ?>
 
-            <!-- Gallery Section -->
-            <?php if (!empty($trip->gallery_images) && is_array($trip->gallery_images)): ?>
-                <?php yatra_get_template('partials/single-trip/content-gallery', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
+            
             <!-- Location/Map Section -->
             <?php yatra_get_template('partials/single-trip/content-location', ['trip' => $trip]); ?>
 

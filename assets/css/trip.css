@@ -968,31 +968,28 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-trip-section {
-    background: #fff;
-    border-radius: 16px;
-    padding: 48px;
-    margin-bottom: 32px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 40px;
+    margin-bottom: 24px;
     border: 1px solid #e5e7eb;
 }
 
 .yatra-trip-section-title {
-    font-size: 32px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 600;
     color: #111827;
-    margin: 0 0 32px 0;
-    padding-bottom: 20px;
-    border-bottom: 3px solid #3b82f6;
+    margin: 0 0 24px 0;
     display: flex;
     align-items: center;
-    gap: 16px;
-    letter-spacing: -0.01em;
+    gap: 12px;
+    line-height: 1.2;
 }
 
 .yatra-trip-section-title-icon {
-    width: 32px;
-    height: 32px;
-    color: #3b82f6;
+    width: 24px;
+    height: 24px;
+    color: #6b7280;
     flex-shrink: 0;
 }
 
@@ -1156,20 +1153,19 @@ button.yatra-booking-button svg path {
 .yatra-itinerary-day {
     background: #fff;
     border: 1px solid #e5e7eb;
-    border-radius: 16px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .yatra-itinerary-day-header {
     display: flex;
     align-items: center;
     gap: 16px;
-    padding: 20px 24px;
+    padding: 16px 20px;
     background: #f9fafb;
     border-bottom: 1px solid #e5e7eb;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: background 0.2s ease;
 }
 
 .yatra-itinerary-day-header:hover {
@@ -1234,7 +1230,7 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-itinerary-day-content {
-    padding: 24px;
+    padding: 20px;
     display: none; /* Hidden by default */
 }
 
@@ -1612,25 +1608,26 @@ button.yatra-booking-button svg path {
 .yatra-included-excluded {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 40px;
+    gap: 32px;
 }
 
 .yatra-included-section,
 .yatra-excluded-section {
     background: #f9fafb;
-    border-radius: 12px;
+    border-radius: 8px;
     padding: 24px;
+    border: 1px solid #e5e7eb;
 }
 
 .yatra-included-section h3,
 .yatra-excluded-section h3 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 18px;
+    font-weight: 600;
     color: #111827;
-    margin: 0 0 20px 0;
+    margin: 0 0 16px 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .yatra-included-list,
@@ -1642,13 +1639,14 @@ button.yatra-booking-button svg path {
 
 .yatra-included-list li,
 .yatra-excluded-list li {
-    padding: 12px 0;
+    padding: 10px 0;
     font-size: 15px;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    align-items: flex-start;
+    gap: 10px;
     border-bottom: 1px solid #e5e7eb;
     color: #374151;
+    line-height: 1.5;
 }
 
 .yatra-included-list li:last-child,
@@ -1658,17 +1656,18 @@ button.yatra-booking-button svg path {
 
 .yatra-included-icon,
 .yatra-excluded-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
 .yatra-included-icon {
-    color: #10b981;
+    color: #059669;
 }
 
 .yatra-excluded-icon {
-    color: #ef4444;
+    color: #dc2626;
 }
 
 /* ============================================
@@ -1678,22 +1677,22 @@ button.yatra-booking-button svg path {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
-    margin-top: 32px;
+    margin-top: 24px;
 }
 
 .yatra-gallery-item {
     position: relative;
     aspect-ratio: 4/3;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: transform 0.2s ease;
     background: #f3f4f6;
 }
 
 .yatra-gallery-item:hover {
-    transform: scale(1.03);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .yatra-gallery-item img {
@@ -1939,7 +1938,7 @@ button.yatra-booking-button svg path {
 
 .yatra-faq-item {
     border-bottom: 1px solid #e5e7eb;
-    padding: 24px 0;
+    padding: 20px 0;
 }
 
 .yatra-faq-item:first-child {
@@ -1952,29 +1951,27 @@ button.yatra-booking-button svg path {
 }
 
 .yatra-faq-question {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: #111827;
-    margin: 0;
+    margin: 0 0 12px 0;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    user-select: none;
-    transition: color 0.3s ease;
+    transition: color 0.2s ease;
 }
 
 .yatra-faq-question:hover {
-    color: #3b82f6;
+    color: #374151;
 }
 
 .yatra-faq-toggle {
-    width: 24px;
-    height: 24px;
-    color: #3b82f6;
+    width: 20px;
+    height: 20px;
+    color: #6b7280;
     flex-shrink: 0;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .yatra-faq-item.active .yatra-faq-toggle {
@@ -1983,19 +1980,19 @@ button.yatra-booking-button svg path {
 
 .yatra-faq-answer {
     font-size: 16px;
-    line-height: 1.8;
+    line-height: 1.6;
     color: #4b5563;
-    margin: 0;
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.4s ease, margin 0.4s ease, padding 0.4s ease;
+    transition: max-height 0.2s ease, margin 0.2s ease, padding 0.2s ease;
+    margin: 0;
     padding: 0;
 }
 
 .yatra-faq-item.active .yatra-faq-answer {
     max-height: 1000px;
-    margin-top: 16px;
-    padding-top: 16px;
+    margin-top: 12px;
+    padding-top: 12px;
     border-top: 1px solid #f3f4f6;
 }
 
@@ -5189,7 +5186,7 @@ input.yatra-datepicker,
     }
 
     .yatra-trip-section-title {
-        font-size: 26px;
+        font-size: 24px;
     }
 
     .yatra-trip-gallery {
@@ -5220,6 +5217,10 @@ input.yatra-datepicker,
 
     .yatra-trip-section {
         padding: 24px 20px;
+    }
+
+    .yatra-trip-section-title {
+        font-size: 22px;
     }
 
     .yatra-booking-card {
@@ -8723,6 +8724,39 @@ a.yatra-card-book-btn:hover {
     gap: 6px;
     color: #6b7280;
     font-size: 15px;
+    font-weight: 500;
+}
+
+/* FAQ Toggle Button Styles */
+.faq-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.faq-toggle-btn:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.faq-toggle-btn .toggle-icon {
+    width: 16px;
+    height: 16px;
+    color: #6b7280;
+}
+
+.faq-toggle-btn .toggle-text {
+    font-size: 14px;
     font-weight: 500;
 }
 
