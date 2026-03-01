@@ -3256,12 +3256,20 @@
     opacity: 0.8;
 }
 
+/* Play Button Overlay Styles */
+.yatra-media-play-overlay {
+    pointer-events: auto;
+    cursor: pointer;
+}
+
 /* YouTube Overlay Styles */
 .yatra-media-youtube-overlay {
     background: rgba(0, 0, 0, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .yatra-youtube-play-button {
@@ -3285,6 +3293,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
 }
 
 .yatra-tour-info {

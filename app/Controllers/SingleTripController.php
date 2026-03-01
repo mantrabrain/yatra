@@ -1448,6 +1448,8 @@ class SingleTripController
                     'cost' => !empty($entry->cost) ? (float) $entry->cost : null,
                     'cost_per_person' => !empty($entry->cost_per_person) ? true : false,
                     'included' => !empty($entry->included_items) ? json_decode($entry->included_items, true) : [],
+                    'gallery' => !empty($entry->gallery) ? $this->decodeGallery($entry->gallery) : [],
+                    'video_url' => $entry->video_url ?: '',
                 ];
             }
 
@@ -1480,6 +1482,45 @@ class SingleTripController
         }
 
         return $time;
+    }
+
+    /**
+     * Decode gallery JSON data and convert attachment IDs to URLs
+     *
+     * @param string|null $galleryJson JSON string from database
+     * @return array Gallery items with URLs
+     */
+    private function decodeGallery(?string $galleryJson): array
+    {
+        if (empty($galleryJson)) {
+            return [];
+        }
+
+        $gallery = json_decode($galleryJson, true);
+        if (!is_array($gallery)) {
+            return [];
+        }
+
+        // Convert attachment IDs to URLs for frontend compatibility
+        foreach ($gallery as &$item) {
+            if (isset($item['attachment_id']) && $item['attachment_id'] > 0) {
+                // Get attachment URL from WordPress
+                $attachment_url = wp_get_attachment_url($item['attachment_id']);
+                if ($attachment_url) {
+                    $item['url'] = $attachment_url;
+                }
+                
+                // Get thumbnail URL for images
+                if (isset($item['type']) && $item['type'] === 'image') {
+                    $thumbnail_url = wp_get_attachment_image_src($item['attachment_id'], 'medium');
+                    if ($thumbnail_url) {
+                        $item['thumbnail_url'] = $thumbnail_url[0];
+                    }
+                }
+            }
+        }
+
+        return $gallery;
     }
 
     /**

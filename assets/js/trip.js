@@ -86,6 +86,7 @@
       this.collectImages();
       this.createThumbnails();
       this.attachEventListeners();
+      this.attachItineraryVideoListeners();
     }
 
     collectImages() {
@@ -100,7 +101,7 @@
         });
       });
 
-      // Collect from gallery section
+      // Collect from gallery section (hero gallery only, NOT itinerary)
       const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img');
       galleryItems.forEach((img) => {
         const exists = this.images.some(i => i.src === img.src);
@@ -215,6 +216,12 @@
       }
     }
 
+    attachItineraryVideoListeners() {
+      // This method is called from setup() but the actual event listeners
+      // are handled in the inline script in content-itinerary.php
+      // This is just a placeholder to prevent errors
+    }
+
     attachEventListeners() {
       // Close button
       const closeBtn = this.modal.querySelector('.yatra-gallery-modal-close');
@@ -292,6 +299,228 @@
           this.open(0); // Open with featured image as first image
         });
       }
+    }
+  }
+
+  /**
+   * Itinerary Gallery Modal Class
+   * Separate gallery modal for itinerary section - independent from hero gallery
+   */
+  class ItineraryGalleryModal {
+    constructor() {
+      this.modal = null;
+      this.images = [];
+      this.currentIndex = 0;
+      this.init();
+    }
+
+    init() {
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.setup());
+      } else {
+        this.setup();
+      }
+    }
+
+    setup() {
+      this.modal = document.getElementById('itinerary-gallery');
+      if (!this.modal) {
+        console.warn('Itinerary gallery modal not found');
+        return;
+      }
+
+      console.log('Itinerary gallery modal found, collecting images...');
+      this.collectImages();
+      console.log('Itinerary gallery images collected:', this.images.length);
+      this.createThumbnails();
+      this.attachEventListeners();
+    }
+
+    collectImages() {
+      this.images = [];
+
+      // Collect from itinerary gallery section (hidden gallery)
+      const galleryItems = document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item img');
+      galleryItems.forEach((img) => {
+        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
+        this.images.push({
+          src: fullSizeUrl,
+          alt: img.alt || `Itinerary Image ${this.images.length + 1}`
+        });
+      });
+
+      // Collect from visible itinerary gallery items
+      const itineraryGalleryItems = document.querySelectorAll('.yatra-entry-gallery .yatra-media-card img');
+      itineraryGalleryItems.forEach((img) => {
+        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
+        const exists = this.images.some(i => i.src === fullSizeUrl);
+        if (!exists) {
+          this.images.push({
+            src: fullSizeUrl,
+            alt: img.alt || `Itinerary Gallery Image ${this.images.length + 1}`
+          });
+        }
+      });
+
+      // Collect from itinerary video items
+      const itineraryVideoItems = document.querySelectorAll('.yatra-entry-video .yatra-media-card img, .yatra-entry-gallery .yatra-itinerary-video-link img');
+      itineraryVideoItems.forEach((img) => {
+        const fullSizeUrl = img.getAttribute('data-full-size') || img.src;
+        const exists = this.images.some(i => i.src === fullSizeUrl);
+        if (!exists) {
+          this.images.push({
+            src: fullSizeUrl,
+            alt: img.alt || `Itinerary Video Image ${this.images.length + 1}`
+          });
+        }
+      });
+    }
+
+    createThumbnails() {
+      const container = this.modal.querySelector('.yatra-gallery-thumbnails-container');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const totalCount = this.modal.querySelector('.yatra-gallery-total-count');
+      if (totalCount) {
+        totalCount.textContent = this.images.length;
+      }
+
+      this.images.forEach((image, index) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'yatra-gallery-thumbnail';
+        thumb.innerHTML = `<img src="${image.src}" alt="${image.alt}">`;
+        thumb.addEventListener('click', () => this.showImage(index));
+        container.appendChild(thumb);
+      });
+    }
+
+    showImage(index) {
+      if (index < 0 || index >= this.images.length) return;
+
+      this.currentIndex = index;
+      const image = this.images[index];
+      const modalImage = this.modal.querySelector('.yatra-gallery-modal-image');
+      const modalLoader = this.modal.querySelector('.yatra-gallery-modal-loader');
+      const currentIndexSpan = this.modal.querySelector('.yatra-gallery-current-index');
+      const prevBtn = this.modal.querySelector('.yatra-gallery-modal-prev');
+      const nextBtn = this.modal.querySelector('.yatra-gallery-modal-next');
+
+      if (currentIndexSpan) {
+        currentIndexSpan.textContent = index + 1;
+      }
+
+      // Show loader
+      if (modalLoader) modalLoader.classList.add('active');
+      if (modalImage) modalImage.classList.remove('loaded');
+
+      // Load image
+      const img = new Image();
+      img.onload = () => {
+        if (modalImage) {
+          modalImage.src = image.src;
+          modalImage.alt = image.alt;
+          modalImage.classList.add('loaded');
+        }
+        if (modalLoader) modalLoader.classList.remove('active');
+      };
+      img.onerror = () => {
+        if (modalLoader) modalLoader.classList.remove('active');
+        if (modalImage) modalImage.src = image.src;
+      };
+      img.src = image.src;
+
+      // Update button states
+      if (prevBtn) {
+        prevBtn.style.opacity = index === 0 ? '0.5' : '1';
+        prevBtn.style.pointerEvents = index === 0 ? 'none' : 'auto';
+      }
+      if (nextBtn) {
+        nextBtn.style.opacity = index === this.images.length - 1 ? '0.5' : '1';
+        nextBtn.style.pointerEvents = index === this.images.length - 1 ? 'none' : 'auto';
+      }
+
+      // Update thumbnails
+      const thumbnails = this.modal.querySelectorAll('.yatra-gallery-thumbnail');
+      thumbnails.forEach((thumb, i) => {
+        thumb.classList.toggle('active', i === index);
+      });
+    }
+
+    open(startIndex = 0) {
+      if (this.images.length === 0) return;
+      this.modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      this.showImage(startIndex);
+    }
+
+    close() {
+      this.modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    next() {
+      if (this.currentIndex < this.images.length - 1) {
+        this.showImage(this.currentIndex + 1);
+      }
+    }
+
+    prev() {
+      if (this.currentIndex > 0) {
+        this.showImage(this.currentIndex - 1);
+      }
+    }
+
+    attachEventListeners() {
+      // Close button
+      const closeBtn = this.modal.querySelector('.yatra-gallery-modal-close');
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => this.close());
+      }
+
+      // Overlay
+      const overlay = this.modal.querySelector('.yatra-gallery-modal-overlay');
+      if (overlay) {
+        overlay.addEventListener('click', () => this.close());
+      }
+
+      // Navigation buttons
+      const prevBtn = this.modal.querySelector('.yatra-gallery-modal-prev');
+      const nextBtn = this.modal.querySelector('.yatra-gallery-modal-next');
+      if (prevBtn) prevBtn.addEventListener('click', () => this.prev());
+      if (nextBtn) nextBtn.addEventListener('click', () => this.next());
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        if (!this.modal.classList.contains('active')) return;
+        if (e.key === 'Escape') this.close();
+        if (e.key === 'ArrowLeft') this.prev();
+        if (e.key === 'ArrowRight') this.next();
+      });
+
+      // Attach click handlers to itinerary gallery links
+      const galleryLinks = document.querySelectorAll('.yatra-itinerary-gallery-link');
+      console.log('Attaching listeners to itinerary gallery links:', galleryLinks.length);
+      galleryLinks.forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const imageIndex = parseInt(link.getAttribute('data-image-index') || '0');
+          console.log('Itinerary gallery link clicked, opening at index:', imageIndex);
+          this.open(imageIndex);
+        });
+      });
+
+      // Attach click handlers to itinerary gallery items in hidden section
+      const galleryItems = document.querySelectorAll('.yatra-itinerary-trip-gallery .yatra-gallery-item');
+      galleryItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+          const img = item.querySelector('img');
+          if (img) {
+            const imageIndex = this.images.findIndex(i => i.src === img.src);
+            this.open(imageIndex >= 0 ? imageIndex : index);
+          }
+        });
+      });
     }
   }
 
@@ -479,6 +708,12 @@
           link.href = video.url || '#';
           link.dataset.videoUrl = video.url;
           link.dataset.videoTitle = video.title || '';
+          
+          // Prevent link from opening in new tab
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            return false;
+          });
         }
       }
     }
@@ -488,6 +723,14 @@
       
       if (youtubeVideos.length > 0) {
         const video = youtubeVideos[0];
+        
+        // Prevent link from opening in new tab
+        if (link) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            return false;
+          });
+        }
         
         // Show YouTube thumbnail
         img.src = video.thumbnail || img.src; // Keep current image if no thumbnail
@@ -509,9 +752,18 @@
     }
 
     showTourContent(link, img) {
-      const virtualTours = this.mediaData.virtual_tours || [];
-      if (virtualTours.length > 0) {
-        const tour = virtualTours[0];
+      const tours = this.mediaData.virtual_tours || [];
+      
+      if (tours.length > 0) {
+        const tour = tours[0];
+        
+        // Prevent link from opening in new tab
+        if (link) {
+          link.addEventListener('click', (e) => {
+            e.preventDefault();
+            return false;
+          });
+        }
         // Show tour thumbnail or keep current image
         if (tour.thumbnail) {
           img.src = tour.thumbnail;
@@ -565,6 +817,30 @@
           </svg>
         </div>
       `;
+      
+      // Add click handler to play video using YatraVideoPlayer module
+      overlay.addEventListener('click', (e) => {
+        // Only handle real user clicks, not programmatic ones
+        if (!e.isTrusted) {
+          return;
+        }
+        
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        // Get the video data from the current media type
+        const videos = this.mediaData.videos || [];
+        if (videos.length > 0 && window.YatraVideoPlayer) {
+          window.YatraVideoPlayer.play(videos[0]);
+        } else {
+          console.error('Cannot play video - missing video data or YatraVideoPlayer', {
+            hasVideo: videos.length > 0,
+            hasPlayer: !!window.YatraVideoPlayer
+          });
+        }
+      }, { capture: false });
+      
       container.appendChild(overlay);
     }
 
@@ -4092,6 +4368,7 @@ class TripPage {
   init() {
     // Create all feature instances
     this.instances.galleryModal = new GalleryModal();
+    this.instances.itineraryGalleryModal = new ItineraryGalleryModal();
     this.instances.heroMediaSwitcher = new HeroMediaSwitcher();
     this.instances.bookingSidebar = new BookingSidebar();
     this.instances.enquiryModal = new EnquiryModal();
@@ -4140,12 +4417,90 @@ class TripPage {
   }
 
   static bootstrap() {
-    const start = () => new TripPage().init();
+    const start = () => {
+      new TripPage().init();
+      new ItineraryVideoHandler(); // Initialize itinerary video handler
+    };
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', start);
     } else {
       start();
     }
+  }
+}
+
+/**
+ * Itinerary Video Handler Class
+ * Handles video player functionality for itinerary section
+ */
+class ItineraryVideoHandler {
+  constructor() {
+    this.init();
+  }
+
+  init() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.setup());
+    } else {
+      this.setup();
+    }
+  }
+
+  setup() {
+    // Handle itinerary video clicks on overlay (both in gallery and separate video section)
+    const videoOverlays = document.querySelectorAll('.yatra-entry-gallery .yatra-media-overlay, .yatra-entry-video .yatra-media-overlay');
+    videoOverlays.forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        
+        const link = overlay.closest('a');
+        if (!link) return;
+        
+        const videoUrl = link.getAttribute('href');
+        if (!videoUrl || videoUrl === '#') return;
+        
+        const img = overlay.closest('.yatra-media-card').querySelector('img');
+        const videoTitle = img ? img.alt : 'Itinerary Video';
+        
+        // Extract video ID from URL
+        let videoId = '';
+        if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+          // YouTube video ID extraction
+          const matches = videoUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/);
+          videoId = matches ? matches[1] : '';
+        } else if (videoUrl.includes('vimeo.com')) {
+          // Vimeo video ID extraction
+          const matches = videoUrl.match(/vimeo\.com\/(?:.*#|.\/videos\/)?([0-9]+)/);
+          videoId = matches ? matches[1] : '';
+        }
+        
+        // Play video using YatraVideoPlayer
+        if (window.YatraVideoPlayer) {
+          const videoData = {
+            url: videoUrl,
+            title: videoTitle
+          };
+          
+          // Only add video_id for YouTube videos, let player detect URL type for others
+          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+            videoData.video_id = videoId;
+          }
+          
+          window.YatraVideoPlayer.play(videoData);
+        }
+      });
+    });
+    
+    // Prevent video links from opening in new tab (both in gallery and separate video section)
+    const videoLinks = document.querySelectorAll('.yatra-entry-gallery .yatra-itinerary-video-link, .yatra-entry-video .yatra-itinerary-video-link');
+    videoLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        return false;
+      });
+    });
   }
 }
 

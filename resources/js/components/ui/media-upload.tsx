@@ -29,7 +29,6 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
   description = __("Add images and videos to showcase this activity", "yatra"),
   className = "",
 }) => {
-  
   const getMediaType = (acceptTypes: string): string => {
     switch (acceptTypes) {
       case "images":
@@ -84,8 +83,7 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
 
         selection.each((attachment: any) => {
           const mediaType = attachment.get("type");
-          console.log("Media attachment:", attachment.toJSON()); // Debug log
-          
+
           const mediaItem: MediaItem = {
             id: attachment.get("id").toString(),
             attachment_id: attachment.get("id"),
@@ -97,15 +95,15 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
 
           if (mediaType === "image") {
             const sizes = attachment.get("sizes");
-            mediaItem.thumbnail_url = sizes?.medium?.url || sizes?.thumbnail?.url || attachment.get("url");
-            console.log("Image sizes:", sizes); // Debug log
+            mediaItem.thumbnail_url =
+              sizes?.medium?.url ||
+              sizes?.thumbnail?.url ||
+              attachment.get("url");
           }
 
-          console.log("Created media item:", mediaItem); // Debug log
           newItems.push(mediaItem);
         });
 
-        console.log("New items to add:", newItems); // Debug log
         if (newItems.length > 0) {
           onChange([...items, ...newItems]);
         }
@@ -117,22 +115,29 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
       const input = document.createElement("input");
       input.type = "file";
       input.multiple = true;
-      input.accept = acceptTypes === "videos" ? "video/*" : acceptTypes === "images" ? "image/*" : "image/*,video/*";
-      
+      input.accept =
+        acceptTypes === "videos"
+          ? "video/*"
+          : acceptTypes === "images"
+            ? "image/*"
+            : "image/*,video/*";
+
       input.onchange = (e) => {
         const files = Array.from((e.target as HTMLInputElement).files || []);
-        const newItems: MediaItem[] = files.slice(0, maxItems - items.length).map((file, index) => ({
-          id: `temp_${Date.now()}_${index}`,
-          attachment_id: 0, // Temporary files don't have attachment IDs
-          url: URL.createObjectURL(file),
-          type: file.type.startsWith("video/") ? "video" : "image",
-          alt_text: file.name,
-          caption: file.name,
-        }));
-        
+        const newItems: MediaItem[] = files
+          .slice(0, maxItems - items.length)
+          .map((file, index) => ({
+            id: `temp_${Date.now()}_${index}`,
+            attachment_id: 0, // Temporary files don't have attachment IDs
+            url: URL.createObjectURL(file),
+            type: file.type.startsWith("video/") ? "video" : "image",
+            alt_text: file.name,
+            caption: file.name,
+          }));
+
         onChange([...items, ...newItems]);
       };
-      
+
       input.click();
     }
   };
@@ -141,11 +146,8 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
     onChange(items.filter((_, i) => i !== index));
   };
 
-  
   const isImage = (item: MediaItem) => item.type === "image";
 
-  console.log("MediaUpload render - items:", items); // Debug log
-  
   return (
     <Card className={className}>
       <CardContent className="p-6">
@@ -177,14 +179,16 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                         onError={(e) => {
                           console.error("Image load error:", e, "Item:", item); // Debug log
                           // Fallback to placeholder or broken image icon
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          const parent = (e.target as HTMLImageElement).parentElement;
+                          (e.target as HTMLImageElement).style.display = "none";
+                          const parent = (e.target as HTMLImageElement)
+                            .parentElement;
                           if (parent) {
-                            parent.innerHTML = '<div class="flex items-center justify-center w-full h-full"><div class="text-gray-400 text-center"><div class="text-4xl mb-2">🖼️</div><div class="text-sm">Image not available</div></div></div>';
+                            parent.innerHTML =
+                              '<div class="flex items-center justify-center w-full h-full"><div class="text-gray-400 text-center"><div class="text-4xl mb-2">🖼️</div><div class="text-sm">Image not available</div></div></div>';
                           }
                         }}
                         onLoad={() => {
-                          console.log("Image loaded successfully:", item.url); // Debug log
+                          // Image loaded successfully
                         }}
                       />
                     ) : (
@@ -218,7 +222,9 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
                   {/* Caption */}
                   {item.caption && (
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-2">
-                      <p className="text-xs text-white truncate">{item.caption}</p>
+                      <p className="text-xs text-white truncate">
+                        {item.caption}
+                      </p>
                     </div>
                   )}
                 </div>
@@ -232,11 +238,15 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
               <Button
                 type="button"
                 onClick={handleMediaAdd}
-                                variant="outline"
+                variant="outline"
                 className="w-full md:w-auto"
               >
                 <Plus className="w-4 h-4 mr-2" />
-                {acceptTypes === "videos" ? __("Add Video", "yatra") : acceptTypes === "images" ? __("Add Image", "yatra") : __("Add Media", "yatra")}
+                {acceptTypes === "videos"
+                  ? __("Add Video", "yatra")
+                  : acceptTypes === "images"
+                    ? __("Add Image", "yatra")
+                    : __("Add Media", "yatra")}
               </Button>
             </div>
           )}
@@ -245,7 +255,10 @@ export const MediaUpload: React.FC<MediaUploadProps> = ({
             <div className="text-center py-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
               <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-400">
-                {__("No media items yet. Click 'Add Media' to get started.", "yatra")}
+                {__(
+                  "No media items yet. Click 'Add Media' to get started.",
+                  "yatra",
+                )}
               </p>
             </div>
           )}

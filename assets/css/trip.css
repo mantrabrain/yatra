@@ -8343,3 +8343,259 @@ a.yatra-card-book-btn:hover {
 
 /* End of Attribute Filter Styles */
 
+
+/* ============================================
+   ITINERARY SECTION STYLES
+   ============================================ */
+
+/* Empty State */
+.yatra-empty-itinerary {
+    text-align: center;
+    padding: 60px 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.yatra-empty-state-icon {
+    margin-bottom: 20px;
+    color: #6b7280;
+}
+
+.yatra-empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.yatra-empty-state-description {
+    color: #6b7280;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Gallery Styles - Itinerary Specific */
+.yatra-entry-gallery {
+    margin-top: 20px;
+}
+
+.yatra-gallery-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 12px;
+}
+
+.yatra-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.yatra-gallery-item-link {
+    display: block;
+    text-decoration: none;
+}
+
+.yatra-gallery-item {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    background: #f3f4f6;
+}
+
+.yatra-gallery-item:hover {
+    opacity: 0.8;
+}
+
+.yatra-media-card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.yatra-media-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Itinerary Specific Overlay Styles */
+.yatra-entry-gallery .yatra-media-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yatra-entry-gallery .yatra-media-overlay:hover {
+    background: rgba(0, 0, 0, 0.5);
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* Smaller YouTube button for itinerary gallery - same as hero */
+.yatra-entry-gallery .yatra-youtube-play-button svg {
+    width: 24px !important;
+    height: 24px !important;
+}
+
+.yatra-entry-gallery .yatra-youtube-play-button svg circle {
+    fill: rgba(255, 0, 0, 0.9) !important;
+    stroke: white !important;
+    stroke-width: 1px !important;
+}
+
+.yatra-entry-gallery .yatra-youtube-play-button svg path {
+    fill: white !important;
+}
+
+/* Remove separate video section - videos now in gallery */
+.yatra-entry-video {
+    display: none;
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .yatra-gallery-title {
+        color: #f9fafb;
+    }
+    
+    .yatra-gallery-item {
+        background: #374151;
+    }
+    
+    .yatra-entry-gallery .yatra-media-overlay {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    
+    .yatra-entry-gallery .yatra-media-overlay:hover {
+        background: rgba(0, 0, 0, 0.9);
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .yatra-gallery-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+        width: 100%;
+    }
+    
+    .yatra-entry-gallery .yatra-media-overlay {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg circle {
+        fill: rgba(255, 0, 0, 0.9) !important;
+        stroke: white !important;
+        stroke-width: 0.5px !important;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg path {
+        fill: white !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+        width: 100%;
+    }
+    
+    .yatra-entry-gallery .yatra-media-overlay {
+        width: 10px;
+        height: 10px;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg {
+        width: 14px !important;
+        height: 14px !important;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg circle {
+        fill: rgba(255, 0, 0, 0.9) !important;
+        stroke: white !important;
+        stroke-width: 0.5px !important;
+    }
+    
+    .yatra-entry-gallery .yatra-youtube-play-button svg path {
+        fill: white !important;
+    }
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .yatra-empty-itinerary {
+        background: #1f2937;
+        border-color: #374151;
+    }
+    
+    .yatra-empty-state-icon {
+        color: #9ca3af;
+    }
+    
+    .yatra-empty-state-title {
+        color: #f9fafb;
+    }
+    
+    .yatra-empty-state-description {
+        color: #9ca3af;
+    }
+    
+    .yatra-gallery-title,
+    .yatra-video-title {
+        color: #f9fafb;
+    }
+    
+    .yatra-video-link {
+        background: #1d4ed8;
+    }
+    
+    .yatra-video-link:hover {
+        background: #1e40af;
+    }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .yatra-gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+    
+    .yatra-play-overlay {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* End of Itinerary Section Styles */

@@ -41,9 +41,6 @@ export const useItineraryFormSave = ({
 
   const saveMutation = useMutation({
     mutationFn: async (data: ItineraryFormData) => {
-      console.log("🔍 DEBUG: saveMutation called with data:", data);
-      console.log("🔍 DEBUG: gallery data:", data.gallery);
-      console.log("🔍 DEBUG: video_url data:", data.video_url);
       // For day mode, create day and all activities
       if (isAddDayMode) {
         const tripId = parseInt(data.trip_id);

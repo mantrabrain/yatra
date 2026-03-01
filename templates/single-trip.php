@@ -52,6 +52,64 @@ $group_discounts = yatra_single_trip_get_group_discounts($trip->id);
 $destinations = isset($trip->destinations) ? $trip->destinations : [];
 $activities = isset($trip->activities) ? $trip->activities : [];
 $trip_categories = isset($trip->trip_categories) ? $trip->trip_categories : [];
+
+// Set up global itinerary gallery data for modal (simple URL array like hero)
+global $yatra_itinerary_gallery_images;
+$yatra_itinerary_gallery_images = [];
+if (!empty($trip->itinerary_days)) {
+    foreach ($trip->itinerary_days as $day) {
+        if (!empty($day['entries'])) {
+            foreach ($day['entries'] as $entry) {
+                // Add gallery images
+                if (!empty($entry['gallery']) && is_array($entry['gallery'])) {
+                    foreach ($entry['gallery'] as $media) {
+                        // Always use full-size URL for gallery popup
+                        $yatra_itinerary_gallery_images[] = $media['url'] ?? '';
+                    }
+                }
+                // Add video thumbnail
+                if (!empty($entry['video_url'])) {
+                    $video_url = esc_url($entry['video_url']);
+                    $video_id = '';
+                    $thumbnail_url = '';
+                    
+                    // Extract video ID and thumbnail
+                    if (strpos($video_url, 'youtube.com') !== false || strpos($video_url, 'youtu.be') !== false) {
+                        // YouTube thumbnail extraction
+                        preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/', $video_url, $matches);
+                        $video_id = $matches[1] ?? '';
+                        $thumbnail_url = "https://img.youtube.com/vi/{$video_id}/maxresdefault.jpg";
+                    } elseif (strpos($video_url, 'vimeo.com') !== false) {
+                        // Vimeo thumbnail extraction
+                        preg_match('#vimeo\.com\/.*?(\d+)#', $video_url, $matches);
+                        $video_id = $matches[1] ?? '';
+                        if ($video_id) {
+                            // Get Vimeo thumbnail via oEmbed API
+                            $oembed_url = "https://vimeo.com/api/oembed.json?url=" . urlencode($video_url);
+                            $response = wp_remote_get($oembed_url);
+                            if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
+                                $body = wp_remote_retrieve_body($response);
+                                $data = json_decode($body, true);
+                                if ($data && isset($data['thumbnail_url'])) {
+                                    $thumbnail_url = $data['thumbnail_url'];
+                                }
+                            }
+                            
+                            // Fallback if API fails
+                            if (empty($thumbnail_url)) {
+                                $thumbnail_url = 'https://i.vimeocdn.com/video/' . $video_id . '_640.jpg';
+                            }
+                        }
+                    }
+                    
+                    if ($thumbnail_url) {
+                        $yatra_itinerary_gallery_images[] = $thumbnail_url;
+                    }
+                }
+            }
+        }
+    }
+}
 ?>
 
 <!-- Flatpickr CSS -->
@@ -93,8 +151,11 @@ window.yatraTripData = {
     <!-- Sticky Navigation Bar -->
     <?php yatra_get_template('partials/single-trip/sticky-nav', ['trip' => $trip, 'base_price' => $base_price, 'has_availability' => $has_availability, 'has_traveler_pricing' => $has_traveler_pricing]); ?>
 
-    <!-- Gallery Modal -->
+    <!-- Hero Gallery Modal -->
     <?php yatra_get_template('partials/single-trip/gallery-modal', ['trip' => $trip]); ?>
+
+    <!-- Itinerary Gallery Modal -->
+    <?php yatra_get_template('partials/single-trip/itinerary-gallery-modal', ['trip' => $trip]); ?>
 
     <!-- Main Container -->
     <div class="yatra-trip-container">

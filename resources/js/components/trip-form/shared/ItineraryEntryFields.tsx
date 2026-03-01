@@ -61,30 +61,23 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
   showCardWrapper = false,
   onRefreshData,
 }) => {
-  // Debug: Log entry changes
-  React.useEffect(() => {
-    console.log("ItineraryEntryFields - entry.gallery changed:", entry.gallery);
-  }, [entry.gallery]);
-
   // Local state for gallery (workaround for parent state issue)
   const [localGallery, setLocalGallery] = React.useState<MediaItem[]>([]);
-  
+
   // Local state for video_url (workaround for parent state issue)
   const [localVideoUrl, setLocalVideoUrl] = React.useState<string>("");
-  
+
   // Sync local state with entry.gallery changes (including initial load)
   React.useEffect(() => {
-    console.log("Syncing localGallery with entry.gallery:", entry.gallery); // Debug log
     if (entry.gallery && Array.isArray(entry.gallery)) {
       setLocalGallery(entry.gallery);
     } else {
       setLocalGallery([]);
     }
   }, [entry.gallery]);
-  
+
   // Sync local state with entry.video_url changes (including initial load)
   React.useEffect(() => {
-    console.log("Syncing localVideoUrl with entry.video_url:", entry.video_url); // Debug log
     if (entry.video_url !== undefined && entry.video_url !== null) {
       setLocalVideoUrl(entry.video_url);
     } else {
@@ -419,25 +412,25 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 className="mb-2"
               />
               <TimePicker
-                  value={entry.start_time || ""}
-                  onChange={(value) => {
-                    onFieldChange("start_time", value);
-                    // Auto-calculate duration if function provided
-                    if (calculateDuration && entry.end_time) {
-                      const newDuration = calculateDuration(
-                        value,
-                        entry.end_time,
-                        entry.time_type || "exact",
-                      );
-                      if (newDuration && !entry.duration) {
-                        onFieldChange("duration", newDuration);
-                      }
+                value={entry.start_time || ""}
+                onChange={(value) => {
+                  onFieldChange("start_time", value);
+                  // Auto-calculate duration if function provided
+                  if (calculateDuration && entry.end_time) {
+                    const newDuration = calculateDuration(
+                      value,
+                      entry.end_time,
+                      entry.time_type || "exact",
+                    );
+                    if (newDuration && !entry.duration) {
+                      onFieldChange("duration", newDuration);
                     }
-                  }}
-                  placeholder="08:00"
-                  className="w-full"
-                  error={!!errors?.start_time}
-                />
+                  }
+                }}
+                placeholder="08:00"
+                className="w-full"
+                error={!!errors?.start_time}
+              />
               {errors.start_time && (
                 <p
                   className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}
@@ -738,69 +731,71 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
             </div>
           </div>
 
-        {/* Gallery Section */}
-        <div className="space-y-4">
-          <div>
-            <label
-              className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}
-            >
-              {__("Photo Gallery", "yatra")}
-            </label>
-            <HelpText
-              text={__("Add photos to showcase this activity", "yatra")}
-              className="mb-2"
-            />
-            <MediaUpload
-              items={localGallery}
-              onChange={(mediaItems) => {
-                console.log("Gallery onChange - mediaItems:", mediaItems); // Debug log
-                console.log("onFieldChange function:", typeof onFieldChange); // Debug log
-                setLocalGallery(mediaItems); // Update local state immediately
-                onFieldChange("gallery", mediaItems); // Still call parent for data persistence
-                console.log("Called onFieldChange with gallery data"); // Debug log
-              }}
-              maxItems={6}
-              acceptTypes="images"
-              title={__("Activity Photos", "yatra")}
-              description={__("Upload photos to showcase this activity", "yatra")}
-              className="w-full"
-            />
-          </div>
-        </div>
-
-        {/* Video Section */}
-        <div className="space-y-4">
-          <div>
-            <label
-              className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}
-            >
-              {__("Video URL", "yatra")}
-            </label>
-            <HelpText
-              text={__("Add a video URL to showcase this activity (YouTube, Vimeo, etc.)", "yatra")}
-              className="mb-2"
-            />
-            <input
-              type="text"
-              value={localVideoUrl}
-              onChange={(e) => {
-                console.log("Video URL onChange:", e.target.value); // Debug log
-                setLocalVideoUrl(e.target.value); // Update local state immediately
-                onFieldChange("video_url", e.target.value); // Still call parent for data persistence
-              }}
-              placeholder={__("https://youtube.com/watch?v=...", "yatra")}
-              className={`flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 transition-colors ${textSize}`}
-            />
-            {errors.video_url && (
-              <p
-                className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}
+          {/* Gallery Section */}
+          <div className="space-y-4">
+            <div>
+              <label
+                className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}
               >
-                <Info className="w-4 h-4" />
-                {errors.video_url}
-              </p>
-            )}
+                {__("Photo Gallery", "yatra")}
+              </label>
+              <HelpText
+                text={__("Add photos to showcase this activity", "yatra")}
+                className="mb-2"
+              />
+              <MediaUpload
+                items={localGallery}
+                onChange={(mediaItems) => {
+                  setLocalGallery(mediaItems); // Update local state immediately
+                  onFieldChange("gallery", mediaItems); // Still call parent for data persistence
+                }}
+                maxItems={6}
+                acceptTypes="images"
+                title={__("Activity Photos", "yatra")}
+                description={__(
+                  "Upload photos to showcase this activity",
+                  "yatra",
+                )}
+                className="w-full"
+              />
+            </div>
           </div>
-        </div>
+
+          {/* Video Section */}
+          <div className="space-y-4">
+            <div>
+              <label
+                className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}
+              >
+                {__("Video URL", "yatra")}
+              </label>
+              <HelpText
+                text={__(
+                  "Add a video URL to showcase this activity (YouTube, Vimeo, etc.)",
+                  "yatra",
+                )}
+                className="mb-2"
+              />
+              <input
+                type="text"
+                value={localVideoUrl}
+                onChange={(e) => {
+                  setLocalVideoUrl(e.target.value); // Update local state immediately
+                  onFieldChange("video_url", e.target.value); // Still call parent for data persistence
+                }}
+                placeholder={__("https://youtube.com/watch?v=...", "yatra")}
+                className={`flex h-11 w-full rounded-md border-2 border-gray-300 bg-white px-4 py-2.5 text-base font-normal text-gray-900 ring-offset-white file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-gray-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:ring-offset-gray-900 dark:placeholder:text-gray-500 dark:focus-visible:ring-blue-400 transition-colors ${textSize}`}
+              />
+              {errors.video_url && (
+                <p
+                  className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}
+                >
+                  <Info className="w-4 h-4" />
+                  {errors.video_url}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
