@@ -13,6 +13,7 @@ import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
 import { Button } from "../../components/ui/button";
+import { TimePicker } from "../../components/ui/time-picker";
 
 interface Attribute {
   id: number;
@@ -259,13 +260,13 @@ const TripAttributesSection: React.FC<TripAttributesSectionProps> = ({
 
       case "time":
         return (
-          <Input
-            type="time"
+          <TimePicker
             value={value}
-            onChange={(e) =>
-              handleAttributeValueChange(attribute.id, e.target.value)
+            onChange={(newValue) =>
+              handleAttributeValueChange(attribute.id, newValue)
             }
-            className="mt-2"
+            placeholder="Select time"
+            className="mt-2 w-full"
           />
         );
 

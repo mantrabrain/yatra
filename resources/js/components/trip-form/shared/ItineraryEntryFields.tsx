@@ -13,6 +13,7 @@ import { Button } from "../../ui/button";
 import { Badge } from "../../ui/badge";
 import { HelpText } from "../../ui/help-text";
 import { Card, CardContent } from "../../ui/card";
+import { TimePicker } from "../../ui/time-picker";
 import { Modal } from "../../ui/modal";
 import { getCurrencySymbol } from "../../../data/currencies";
 
@@ -385,17 +386,14 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 text={__("When does this activity start?", "yatra")}
                 className="mb-2"
               />
-              <div className="relative">
-                <Clock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  type="time"
+              <TimePicker
                   value={entry.start_time || ""}
-                  onChange={(e) => {
-                    onFieldChange("start_time", e.target.value);
+                  onChange={(value) => {
+                    onFieldChange("start_time", value);
                     // Auto-calculate duration if function provided
                     if (calculateDuration && entry.end_time) {
                       const newDuration = calculateDuration(
-                        e.target.value,
+                        value,
                         entry.end_time,
                         entry.time_type || "exact",
                       );
@@ -404,9 +402,10 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                       }
                     }
                   }}
-                  className={`${errors.start_time ? "border-red-500 pl-9" : "pl-9"} ${textSize}`}
+                  placeholder="08:00"
+                  className="w-full"
+                  error={!!errors?.start_time}
                 />
-              </div>
               {errors.start_time && (
                 <p
                   className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}
@@ -427,28 +426,26 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
                 text={__("When does this activity end?", "yatra")}
                 className="mb-2"
               />
-              <div className="relative">
-                <Clock className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input
-                  type="time"
-                  value={entry.end_time || ""}
-                  onChange={(e) => {
-                    onFieldChange("end_time", e.target.value);
-                    // Auto-calculate duration if function provided
-                    if (calculateDuration && entry.start_time) {
-                      const newDuration = calculateDuration(
-                        entry.start_time,
-                        e.target.value,
-                        entry.time_type || "exact",
-                      );
-                      if (newDuration && !entry.duration) {
-                        onFieldChange("duration", newDuration);
-                      }
+              <TimePicker
+                value={entry.end_time || ""}
+                onChange={(value) => {
+                  onFieldChange("end_time", value);
+                  // Auto-calculate duration if function provided
+                  if (calculateDuration && entry.start_time) {
+                    const newDuration = calculateDuration(
+                      entry.start_time,
+                      value,
+                      entry.time_type || "exact",
+                    );
+                    if (newDuration && !entry.duration) {
+                      onFieldChange("duration", newDuration);
                     }
-                  }}
-                  className={`${errors.end_time ? "border-red-500 pl-9" : "pl-9"} ${textSize}`}
-                />
-              </div>
+                  }
+                }}
+                placeholder="17:00"
+                className="w-full"
+                error={!!errors?.end_time}
+              />
               {errors.end_time && (
                 <p
                   className={`mt-1.5 ${textSize} text-red-600 dark:text-red-400 flex items-center gap-1`}

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-28T13:06:46+00:00\n"
+"POT-Creation-Date: 2026-03-01T05:57:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -2056,27 +2056,27 @@ msgstr ""
 msgid "Unknown"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:127
+#: app/Controllers/ItemTypeController.php:128
 msgid "Item type not found"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:148
+#: app/Controllers/ItemTypeController.php:149
 msgid "Item type created successfully"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:164
+#: app/Controllers/ItemTypeController.php:165
 msgid "Failed to update item type"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:168
+#: app/Controllers/ItemTypeController.php:169
 msgid "Item type updated successfully"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:183
+#: app/Controllers/ItemTypeController.php:184
 msgid "Failed to delete item type"
 msgstr ""
 
-#: app/Controllers/ItemTypeController.php:187
+#: app/Controllers/ItemTypeController.php:188
 msgid "Item type deleted successfully"
 msgstr ""
 
