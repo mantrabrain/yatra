@@ -6370,7 +6370,8 @@ const TripForm: React.FC = () => {
         return (
           <IncludedSection
             formData={formData}
-            onFieldChange={handleFieldChange}
+            errors={errors}
+            handleFieldChange={handleFieldChange as any}
           />
         );
 

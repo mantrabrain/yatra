@@ -8580,24 +8580,6 @@ a.yatra-card-book-btn:hover {
     display: none;
 }
 
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-    .yatra-gallery-title {
-        color: #f9fafb;
-    }
-    
-    .yatra-gallery-item {
-        background: #374151;
-    }
-    
-    .yatra-entry-gallery .yatra-media-overlay {
-        background: rgba(0, 0, 0, 0.8);
-    }
-    
-    .yatra-entry-gallery .yatra-media-overlay:hover {
-        background: rgba(0, 0, 0, 0.9);
-    }
-}
 
 /* Responsive styles */
 @media (max-width: 768px) {
@@ -8656,38 +8638,6 @@ a.yatra-card-book-btn:hover {
     }
 }
 
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-    .yatra-empty-itinerary {
-        background: #1f2937;
-        border-color: #374151;
-    }
-    
-    .yatra-empty-state-icon {
-        color: #9ca3af;
-    }
-    
-    .yatra-empty-state-title {
-        color: #f9fafb;
-    }
-    
-    .yatra-empty-state-description {
-        color: #9ca3af;
-    }
-    
-    .yatra-gallery-title,
-    .yatra-video-title {
-        color: #f9fafb;
-    }
-    
-    .yatra-video-link {
-        background: #1d4ed8;
-    }
-    
-    .yatra-video-link:hover {
-        background: #1e40af;
-    }
-}
 
 /* Responsive styles */
 @media (max-width: 768px) {

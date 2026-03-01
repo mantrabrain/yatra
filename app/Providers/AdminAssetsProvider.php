@@ -140,7 +140,7 @@ class AdminAssetsProvider
         $appJs = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
 
         if (file_exists($appJs)) {
-            $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.currency-fix';
+            $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
 
             // Enqueue our script with media library as dependency
             wp_enqueue_script(

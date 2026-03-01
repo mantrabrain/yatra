@@ -37,7 +37,6 @@ interface TripAmenityItem {
 
 interface IncludedSectionProps extends TripFormSectionProps {
   formData: any;
-  onFieldChange: (field: string, value: any) => void;
 }
 
 export const IncludedSection: React.FC<IncludedSectionProps> = ({

@@ -13,6 +13,8 @@ import {
   RotateCcw,
   Edit,
   Trash2,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 import {
   Pagination,
@@ -189,6 +191,21 @@ const Activities: React.FC = () => {
     enabled: can("yatra_view_trips"),
   });
 
+  // Fetch settings for permalink handling
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/settings");
+        return response;
+      } catch (error) {
+        return null;
+      }
+    },
+    enabled: can("manage_yatra"),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
   const activities = data?.data || [];
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 10);
@@ -240,6 +257,47 @@ const Activities: React.FC = () => {
 
   const handleEdit = (activity: Activity) => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`;
+  };
+
+  const handleView = async (activity: Activity) => {
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
+    const activityBase = settings?.activity_base || "activity";
+    const activitySlug = activity.slug || "";
+    let apiPermalink = (activity as any)?.permalink || (activity as any)?.url;
+    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
+    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
+    const isPlainPermalink = permalinkStructure === "plain";
+
+    if (!activitySlug && !apiPermalink) {
+      showToast(__("Activity slug is missing", "yatra"), "error");
+      return;
+    }
+
+    // If permalink is missing, try fetching the single activity to get the backend-computed permalink
+    if (!apiPermalink && activity.id) {
+      try {
+        const detail = await apiClient.get(`/activities/${activity.id}`);
+        apiPermalink =
+          (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
+      } catch (e) {
+        // Ignore and fall back to pretty URL
+      }
+    }
+
+    // Prefer server-provided permalink when available (respects current permalink structure)
+    if (apiPermalink) {
+      window.open(apiPermalink, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Fallback: Pretty permalink path
+    const baseSite = siteUrl.replace(/\/$/, "");
+    const prettyUrl = `${baseSite}/${activityBase}/${activitySlug}`;
+    const plainUrl = `${baseSite}/?${activityBase}=${encodeURIComponent(activitySlug)}`;
+
+    // Honor site permalink structure (default to plain when unknown)
+    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
   };
 
   const handlePermanentDelete = (activity: Activity) => {
@@ -579,12 +637,27 @@ const Activities: React.FC = () => {
                         </div>
                         {/* Text */}
                         <div>
-                          <a
-                            href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`}
-                            className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-                          >
-                            {activity.name}
-                          </a>
+                          <div className="flex items-center gap-1">
+                            <a
+                              href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=activities&action=edit&id=${activity.id}`}
+                              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                            >
+                              {activity.name}
+                            </a>
+                            {can("yatra_view_trips") && activity.status !== "trash" && (
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleView(activity);
+                                }}
+                                className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                                title={__("View activity in new tab", "yatra")}
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <span>{activity.slug}</span>
                             <span className="text-[11px] text-gray-400 dark:text-gray-500">
@@ -739,6 +812,17 @@ const Activities: React.FC = () => {
                   },
                 ]}
                 actions={[
+                  {
+                    key: "view",
+                    label: __("View", "yatra"),
+                    icon: <Eye className="w-4 h-4" />,
+                    onClick: (activity: Activity) => {
+                      // Open activity in new tab
+                      const activityUrl = `${window.yatraAdmin?.siteUrl || ""}/activity/${activity.slug}`;
+                      window.open(activityUrl, '_blank');
+                    },
+                    condition: () => true, // Always show view action
+                  },
                   {
                     key: "edit",
                     label: __("Edit", "yatra"),

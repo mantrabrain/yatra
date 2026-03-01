@@ -817,7 +817,8 @@ class Trip
         return [
             'average_rating' => $average_rating,
             'review_count' => $review_count,
-            'formatted_rating' => number_format($average_rating, 1)
+            'formatted_rating' => number_format($average_rating, 1),
+            'has_rating' => $average_rating > 0 && $review_count > 0
         ];
     }
 
@@ -1043,12 +1044,23 @@ class Trip
         $image_url = '';
         $has_image = false;
         
-        // Match the exact logic from the working listing-trip.php template
-        if (!empty($this->featured_image_url)) {
+        // Handle featured_image attachment ID
+        if (!empty($this->featured_image) && is_numeric($this->featured_image)) {
+            $attachment_url = wp_get_attachment_image_url((int) $this->featured_image, 'large');
+            if ($attachment_url) {
+                $image_url = $attachment_url;
+                $has_image = true;
+            }
+        }
+        
+        // Fallback to featured_image_url if it exists (for backward compatibility)
+        if (empty($image_url) && !empty($this->featured_image_url)) {
             $image_url = $this->featured_image_url;
             $has_image = true;
-        } else {
-            // Use placeholder SVG when no image exists
+        }
+        
+        // Use placeholder SVG when no image exists
+        if (empty($image_url)) {
             $image_url = plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE);
             $has_image = false;
         }

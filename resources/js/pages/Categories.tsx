@@ -5,7 +5,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Edit, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2, ExternalLink } from "lucide-react";
 import {
   SearchFilterToolbar,
   Table as SharedTable,
@@ -46,7 +46,8 @@ interface Category {
   __subOnly?: boolean;
 }
 
-const Categories: React.FC = () => {
+export const Categories: React.FC = () => {
+  const { can } = usePermissions();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [parentFilter, setParentFilter] = useState<
@@ -82,7 +83,6 @@ const Categories: React.FC = () => {
   });
 
   const queryClient = useQueryClient();
-  const { can } = usePermissions();
   const { showToast } = useToast();
 
   // Build query params
@@ -154,7 +154,8 @@ const Categories: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 50);
   const errorContext = getErrorContext(error);
-
+  
+  
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
@@ -364,6 +365,21 @@ const Categories: React.FC = () => {
     return filtered;
   }, [categories, parentFilter, statusFilter, searchTerm]);
 
+  // Fetch settings for permalink handling
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/settings");
+        return response;
+      } catch (error) {
+        return null;
+      }
+    },
+    enabled: can("manage_yatra"),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
   // Expand all parent categories that have subcategories by default
   useEffect(() => {
     if (expandedCategories.size > 0) return;
@@ -485,6 +501,47 @@ const Categories: React.FC = () => {
     window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`;
   };
 
+  const handleView = async (category: Category) => {
+    const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
+    const categoryBase = settings?.trip_category_base || "trip-categories";
+    const categorySlug = category.slug || "";
+    let apiPermalink = (category as any)?.permalink || (category as any)?.url;
+    // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
+    const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
+    const isPlainPermalink = permalinkStructure === "plain";
+
+    if (!categorySlug && !apiPermalink) {
+      showToast(__("Category slug is missing", "yatra"), "error");
+      return;
+    }
+
+    // If permalink is missing, try fetching the single category to get the backend-computed permalink
+    if (!apiPermalink && category.id) {
+      try {
+        const detail = await apiClient.get(`/trip-categories/${category.id}`);
+        apiPermalink =
+          (detail as any)?.permalink || (detail as any)?.url || apiPermalink;
+      } catch (e) {
+        // Ignore and fall back to pretty URL
+      }
+    }
+
+    // Prefer server-provided permalink when available (respects current permalink structure)
+    if (apiPermalink) {
+      window.open(apiPermalink, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    // Fallback: Pretty permalink path
+    const baseSite = siteUrl.replace(/\/$/, "");
+    const prettyUrl = `${baseSite}/${categoryBase}/${categorySlug}`;
+    const plainUrl = `${baseSite}/?${categoryBase}=${encodeURIComponent(categorySlug)}`;
+
+    // Honor site permalink structure (default to plain when unknown)
+    const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
+  };
+
   const confirmDelete = () => {
     if (deleteConfirm.category) {
       deleteMutation.mutate(deleteConfirm.category.id);
@@ -518,6 +575,47 @@ const Categories: React.FC = () => {
       label: __("Name", "yatra"),
       sortable: true,
       visible: visibleColumns.name,
+      render: (category: Category) => {
+        const editUrl = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`;
+        return (
+          <div className="flex items-start gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1">
+                <a
+                  href={editUrl}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEdit(category);
+                  }}
+                  className="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline-offset-2 hover:underline truncate"
+                >
+                  {category.name}
+                </a>
+                {can("yatra_view_trips") && category.status !== "trash" && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleView(category);
+                    }}
+                    className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                    title={__("View category in new tab", "yatra")}
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                {category.slug}
+                <span className="ml-1 text-[11px] text-gray-400 dark:text-gray-500">
+                  (ID: {category.id})
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      },
     },
     {
       key: "trips",
@@ -591,6 +689,17 @@ const Categories: React.FC = () => {
   // Define actions for the shared table - dynamic based on item status
   const actions = [
     {
+      key: "view",
+      label: __("View (frontend)", "yatra"),
+      icon: <ExternalLink className="w-4 h-4" />,
+      onClick: (category: Category) => {
+        // Open category in new tab
+        const categoryUrl = `${window.yatraAdmin?.siteUrl || ""}/trip-category/${category.slug}`;
+        window.open(categoryUrl, '_blank');
+      },
+      condition: (category: Category) => category.status !== "trash", // Hide for trash categories
+    },
+    {
       key: "edit",
       label: __("Edit", "yatra"),
       icon: <Edit className="w-4 h-4" />,
@@ -648,7 +757,7 @@ const Categories: React.FC = () => {
       <div className="flex items-center gap-2">
         {renderIcon(category.icon)}
         <div>
-          <div className="font-medium text-gray-900 dark:text-white">
+          <div className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
             {isChild && <span className="text-gray-400 mr-1">└─</span>}
             <a
               href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
@@ -656,6 +765,19 @@ const Categories: React.FC = () => {
             >
               {category.name}
             </a>
+            {can("yatra_view_trips") && category.status !== "trash" && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleView(category);
+                }}
+                className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                title={__("View category in new tab", "yatra")}
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
           <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
             <span>{category.slug}</span>

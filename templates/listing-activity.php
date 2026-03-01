@@ -69,7 +69,6 @@ $current_page = min($current_page, $total_pages);
 $offset             = ($current_page - 1) * $per_page;
 $paged_activities = $total_items > 0 ? array_slice($activities, $offset, $per_page) : [];
 
-yatra_get_header();
 ?>
 
 <style>
@@ -251,6 +250,7 @@ yatra_get_header();
                         </div>
                         <?php if (!empty($permalink)) : ?>
                             <a class="yatra-destination-btn" href="<?php echo esc_url($permalink); ?>">
+                                <?php echo yatra_svg_icon('eye', 'yatra-btn-icon'); ?>
                                 <?php echo esc_html__('View Trips', 'yatra'); ?>
                             </a>
                         <?php endif; ?>
@@ -306,7 +306,7 @@ yatra_get_header();
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Grid/List view toggle functionality
+    // Grid/List view toggle functionality wowwowowowo
     const viewButtons = document.querySelectorAll('.yatra-view-btn');
     const activityGrid = document.getElementById('activity-grid');
     
@@ -329,7 +329,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
-
-<?php yatra_get_header(); ?>
 
 <?php yatra_get_footer(); ?>

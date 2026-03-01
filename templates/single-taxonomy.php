@@ -286,8 +286,8 @@ yatra_get_header();
     </div>
 </div>
 
-    }
-    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
     // View toggle
     const viewBtns = document.querySelectorAll('.yatra-view-btn');
     const tripGrid = document.getElementById('trip-grid');
