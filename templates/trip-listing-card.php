@@ -21,7 +21,23 @@ if (!isset($trip) || !is_object($trip)) {
 
 // Convert stdClass to Trip model instance if needed
 if (!($trip instanceof \Yatra\Models\Trip)) {
+    // Preserve review data before conversion
+    $original_reviews = $trip->reviews ?? null;
+    $original_average_rating = $trip->average_rating ?? null;
+    $original_review_count = $trip->review_count ?? null;
+    
     $trip = \Yatra\Models\Trip::fromStdClass($trip);
+    
+    // Restore review data after conversion
+    if ($original_reviews !== null) {
+        $trip->reviews = $original_reviews;
+    }
+    if ($original_average_rating !== null) {
+        $trip->average_rating = $original_average_rating;
+    }
+    if ($original_review_count !== null) {
+        $trip->review_count = $original_review_count;
+    }
 }
 
 
@@ -29,8 +45,25 @@ if (!($trip instanceof \Yatra\Models\Trip)) {
 $title = $trip->getTitle();
 $duration = $trip->getDuration();
 $difficulty = $trip->getDifficulty();
-// Get rating from TripListingService (now loads reviews like SingleTripController)
-$rating = $trip->getRating();
+// Calculate rating directly from reviews array (working correctly)
+$reviews = $trip->reviews ?? [];
+$review_count = count($reviews);
+$average_rating = 0;
+
+if ($review_count > 0) {
+    $total_rating = 0;
+    foreach ($reviews as $review) {
+        $total_rating += (float) ($review->rating ?? 0);
+    }
+    $average_rating = round($total_rating / $review_count, 1);
+}
+
+$rating = [
+    'average_rating' => $average_rating,
+    'review_count' => $review_count,
+    'formatted_rating' => number_format($average_rating, 1),
+    'has_rating' => $average_rating > 0 && $review_count > 0
+];
 
 $pricing = $trip->getPricing();
 $discount = $trip->getDiscount();
@@ -193,33 +226,21 @@ try {
                 </div>
             <?php endif; ?>
 
-            <!-- Review (moved to end) -->
-            <?php if ($rating['has_rating'] && $rating['average_rating'] > 0): ?>
-                <div class="yatra-trip-stat">
-                    <div class="yatra-stat-icon rating">
-                        <?php echo yatra_svg_icon('star', ''); ?>
-                    </div>
-                    <div class="yatra-stat-content">
-                        <span class="yatra-stat-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
-                        <span class="yatra-stat-label"><?php esc_html_e('Review', 'yatra'); ?></span>
-                    </div>
+        <!-- Review (moved to end) -->
+        <?php if ($rating['has_rating'] && $rating['average_rating'] > 0): ?>
+            <div class="yatra-trip-stat">
+                <div class="yatra-stat-icon rating">
+                    <?php echo yatra_svg_icon('star', ''); ?>
                 </div>
+                <div class="yatra-stat-content">
+                    <span class="yatra-stat-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
+                    <span class="yatra-stat-label"><?php esc_html_e('Review', 'yatra'); ?></span>
+                </div>
+            </div>
             <?php endif; ?>
         </div>
 
-        <!-- Rating Row -->
-        <?php if ($rating['has_rating']): ?>
-            <div class="yatra-trip-rating-row">
-                <div class="yatra-rating-stars">
-                    <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                    <span class="yatra-rating-value"><?php echo esc_html($rating['formatted_rating']); ?></span>
-                </div>
-                <span class="yatra-reviews-count">(<?php echo esc_html($rating['review_count']); ?> <?php esc_html_e('reviews', 'yatra'); ?>)</span>
-            </div>
-        <?php endif; ?>
-
+        
         <!-- Activities Only -->
         <?php if (!empty($activities)) : ?>
             <div class="yatra-trip-activities">
@@ -304,8 +325,6 @@ try {
     gap: 16px;
     margin: 12px 0;
     padding: 12px 0;
-    border-top: 1px solid #e5e7eb;
-    border-bottom: 1px solid #e5e7eb;
 }
 
 .yatra-trip-stat {

@@ -89,6 +89,21 @@ class TaxonomyPageHandler extends BasePageHandler
         // Add trips to taxonomy data
         $taxonomy_data->trips = $trips_data['data'] ?? [];
         
+        // Load reviews for each trip (same approach as SingleTripController)
+        $tripsWithReviews = [];
+        foreach ($taxonomy_data->trips as $trip) {
+            // Load reviews for this trip
+            $trip->reviews = $this->getReviewsForTrip((int) $trip->id);
+            
+            // Calculate rating stats (same as SingleTripController)
+            $trip->average_rating = $this->calculateAverageRating($trip->reviews);
+            $trip->review_count = count($trip->reviews);
+            
+            $tripsWithReviews[] = $trip;
+        }
+        
+        $taxonomy_data->trips = $tripsWithReviews;
+        
         // Debug: Log trips count
         $trips_count = count($taxonomy_data->trips);
         error_log("Yatra TaxonomyPageHandler: Found {$trips_count} trips for {$taxonomy_type} '{$slug}'");
@@ -212,5 +227,63 @@ class TaxonomyPageHandler extends BasePageHandler
             default:
                 return $taxonomy_type;
         }
+    }
+
+    /**
+     * Get reviews for a specific trip (same as SingleTripController)
+     *
+     * @param int $trip_id Trip ID
+     * @return array Reviews
+     */
+    private function getReviewsForTrip(int $trip_id): array
+    {
+        global $wpdb;
+        
+        $reviewsTable = \Yatra\Database\Tables\ReviewsTable::getTableName();
+        
+        // Check if reviews table exists
+        $table_exists = $wpdb->get_var(
+            $wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $reviewsTable
+            )
+        );
+        
+        if (!$table_exists) {
+            return [];
+        }
+
+        $sql = $wpdb->prepare(
+            "SELECT * FROM {$reviewsTable} 
+             WHERE trip_id = %d 
+             AND status = 'approved' 
+             ORDER BY created_at DESC 
+             LIMIT 10",
+            $trip_id
+        );
+        
+        $reviews = $wpdb->get_results($sql);
+        
+        return $reviews ?: [];
+    }
+
+    /**
+     * Calculate average rating from reviews (same as SingleTripController)
+     *
+     * @param array $reviews Reviews array
+     * @return float Average rating
+     */
+    private function calculateAverageRating(array $reviews): float
+    {
+        if (empty($reviews)) {
+            return 0.0;
+        }
+
+        $total = 0;
+        foreach ($reviews as $review) {
+            $total += (float) ($review->rating ?? 0);
+        }
+
+        return round($total / count($reviews), 1);
     }
 }
