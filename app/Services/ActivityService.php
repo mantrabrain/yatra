@@ -7,6 +7,7 @@ namespace Yatra\Services;
 use Yatra\Repositories\ActivityRepository;
 use Yatra\Helpers\SlugHelper;
 use Yatra\Helpers\FormatHelper;
+use Yatra\Database\Tables\ClassificationsTable;
 
 /**
  * Activity Service

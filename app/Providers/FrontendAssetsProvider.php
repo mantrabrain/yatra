@@ -68,7 +68,6 @@ class FrontendAssetsProvider
     {
         $cssFiles = [
             'common' => 'common.css',
-            'booking' => 'booking.css',
             'listing' => 'listing.css',
             'stripe' => 'stripe.css',
             'trip' => 'trip.css',
@@ -102,7 +101,6 @@ class FrontendAssetsProvider
         $jsFiles = [
             'video-player' => 'video-player.js',
             'tour-viewer' => 'tour-viewer.js',
-            'booking' => 'booking.js',
             'listing' => 'listing.js',
             'listing-filters' => 'listing-filters.js',
             'listing-wishlist' => 'listing-wishlist.js',
@@ -181,7 +179,18 @@ class FrontendAssetsProvider
      */
     private function enqueueTripDetailAssets(): void
     {
-        // Trip detail assets are already enqueued in common assets
+        // Enqueue booking assets for trip detail pages (booking forms)
+        $bookingJs = YATRA_PLUGIN_PATH . 'assets/js/booking.js';
+        if (file_exists($bookingJs)) {
+            wp_enqueue_script(
+                'yatra-booking',
+                YATRA_PLUGIN_URL . 'assets/js/booking.js',
+                ['jquery'],
+                YATRA_VERSION . '.' . filemtime($bookingJs),
+                true
+            );
+        }
+        
         // Localize trip page data for JS (trip.js, booking.js)
         global $trip;
 
@@ -269,7 +278,29 @@ class FrontendAssetsProvider
      */
     private function enqueueBookingAssets(): void
     {
-        // Booking assets are already enqueued in common assets
+        // Enqueue booking-specific CSS
+        $bookingCss = YATRA_PLUGIN_PATH . 'assets/css/booking.css';
+        if (file_exists($bookingCss)) {
+            wp_enqueue_style(
+                'yatra-booking',
+                YATRA_PLUGIN_URL . 'assets/css/booking.css',
+                [],
+                YATRA_VERSION . '.' . filemtime($bookingCss)
+            );
+        }
+        
+        // Enqueue booking-specific JavaScript
+        $bookingJs = YATRA_PLUGIN_PATH . 'assets/js/booking.js';
+        if (file_exists($bookingJs)) {
+            wp_enqueue_script(
+                'yatra-booking',
+                YATRA_PLUGIN_URL . 'assets/js/booking.js',
+                ['jquery'],
+                YATRA_VERSION . '.' . filemtime($bookingJs),
+                true
+            );
+        }
+        
         // Localize booking data for booking.js
         $permalink_structure = get_option('permalink_structure') ?: '';
         $is_plain = empty($permalink_structure);

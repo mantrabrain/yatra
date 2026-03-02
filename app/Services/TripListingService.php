@@ -530,7 +530,7 @@ class TripListingService extends BaseService
         $result = [];
 
         foreach ($categories as $category) {
-            $count = $this->tripRepository->countByCategory($category->id);
+            $count = $this->tripRepository->countByCategory((int) $category->id);
             $result[] = (object) [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -547,11 +547,11 @@ class TripListingService extends BaseService
      */
     private function getDestinationOptions(): array
     {
-        $destinations = $this->destinationRepository->getPublishedDestinations();
+        $destinations = $this->destinationRepository->getPublished();
         $result = [];
 
         foreach ($destinations as $destination) {
-            $count = $this->tripRepository->countByCategory($destination->id);
+            $count = $this->tripRepository->countByCategory((int) $destination->id);
             $result[] = (object) [
                 'id' => $destination->id,
                 'name' => $destination->name,
@@ -568,11 +568,11 @@ class TripListingService extends BaseService
      */
     private function getActivityOptions(): array
     {
-        $activities = $this->activityRepository->getPublishedActivities();
+        $activities = $this->activityRepository->getPublished();
         $result = [];
 
         foreach ($activities as $activity) {
-            $count = $this->tripRepository->countByCategory($activity->id);
+            $count = $this->tripRepository->countByCategory((int) $activity->id);
             $result[] = (object) [
                 'id' => $activity->id,
                 'name' => $activity->name,
@@ -690,5 +690,15 @@ class TripListingService extends BaseService
         }
         
         return $booking_options;
+    }
+
+    /**
+     * Get price statistics for trips
+     * 
+     * @return object|null Price stats with min and max prices
+     */
+    public function getPriceStats(): ?object
+    {
+        return $this->tripRepository->getPriceStats();
     }
 }

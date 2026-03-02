@@ -142,7 +142,6 @@ if (is_array($yatra_trip_list) && !empty($yatra_trip_list['trips'])) {
     $trip_current_page = 1;
     $trip_dest_options = [];
     $trip_act_options = [];
-    
 }
 
 yatra_get_header();

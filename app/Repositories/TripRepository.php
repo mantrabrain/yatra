@@ -320,6 +320,15 @@ class TripRepository extends BaseRepository
             $params[] = $filters['activity'];
         }
         
+        // Trip Category filter
+        if (!empty($filters['trip_category'])) {
+            $joins[] = "LEFT JOIN {$tripClassificationsTable} tcc ON tcc.trip_id = t.id";
+            $joins[] = "LEFT JOIN {$classificationsTable} cat ON cat.id = tcc.classification_id";
+            $wheres[] = "cat.type = %s AND cat.slug = %s";
+            $params[] = ClassificationTypes::CATEGORY;
+            $params[] = $filters['trip_category'];
+        }
+        
         // Price range filter
         if (!empty($filters['price_min']) && $filters['price_min'] > 0) {
             $wheres[] = "CAST(t.original_price AS DECIMAL(10,2)) >= %f";
@@ -413,11 +422,10 @@ class TripRepository extends BaseRepository
                       GROUP BY t.id
                       {$having_sql}
                       {$order_clause}
-                      LIMIT {$perPage} OFFSET {$offset}";
+                      LIMIT %d OFFSET %d";
         
-        $main_query_params = array_merge($params, $rating_params);
-        $prepared_query = empty($main_query_params) ? $query_sql : 
-            $wpdb->prepare($query_sql, ...$main_query_params);
+        $main_query_params = array_merge($params, $rating_params, [$perPage, $offset]);
+        $prepared_query = $wpdb->prepare($query_sql, ...$main_query_params);
         
         $trips = $wpdb->get_results($prepared_query) ?: [];
         
@@ -2315,7 +2323,7 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
         return (int) $this->wpdb->get_var($this->wpdb->prepare(
             "SELECT COUNT(DISTINCT t.id) FROM {$table} t 
              INNER JOIN {$categoryTable} ttc ON t.id = ttc.trip_id 
-             WHERE ttc.category_id = %d AND t.status = 'publish'",
+             WHERE ttc.classification_id = %d AND ttc.classification_type = 'category' AND t.status = 'publish'",
             $categoryId
         ));
     }
@@ -2390,22 +2398,80 @@ public function saveAvailabilityDates(int $tripId, array $availabilityDates): vo
     /**
      * Get price statistics for filter sidebar
      */
-    public function getPriceStats(): object
+    public function getPriceStats(): ?object
     {
         global $wpdb;
+        
         $table = $this->getTableName();
         
-        return $wpdb->get_row(
-            "SELECT 
+        $result = $wpdb->get_row("
+            SELECT 
                 MIN(CAST(original_price AS DECIMAL(10,2))) as min_price,
-                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price
-             FROM {$table}
-             WHERE status = 'publish' AND original_price IS NOT NULL AND original_price > 0"
-        ) ?: (object) ['min_price' => 0, 'max_price' => 1000];
+                MAX(CAST(original_price AS DECIMAL(10,2))) as max_price,
+                AVG(CAST(original_price AS DECIMAL(10,2))) as avg_price
+            FROM {$table} 
+            WHERE status = 'publish' AND original_price > 0
+        ");
+        
+        return $result ? (object) [
+            'min_price' => (float) $result->min_price,
+            'max_price' => (float) $result->max_price,
+            'avg_price' => (float) $result->avg_price
+        ] : null;
     }
 
     /**
-     * Get available trip types
+     * Get accommodation types (placeholder)
+     * 
+     * @return array
+     */
+    public function getAccommodationTypes(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get included services (placeholder)
+     * 
+     * @return array
+     */
+    public function getIncludedServices(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get duration options (placeholder)
+     * 
+     * @return array
+     */
+    public function getDurationOptions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get group size options (placeholder)
+     * 
+     * @return array
+     */
+    public function getGroupSizeOptions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get physical grades (placeholder)
+     * 
+     * @return array
+     */
+    public function getPhysicalGrades(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get trip types
      */
     public function getTripTypes(): array
     {

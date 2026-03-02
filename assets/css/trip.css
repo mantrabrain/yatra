@@ -358,6 +358,7 @@ button.yatra-booking-button svg path {
 
 .yatra-star {
     display: inline-block;
+    font-size:20px;
 }
 
 .yatra-star.filled {

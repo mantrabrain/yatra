@@ -23,8 +23,8 @@ if (!isset($trip) || !is_object($trip)) {
 if (!($trip instanceof \Yatra\Models\Trip)) {
     // Preserve review data before conversion
     $original_reviews = $trip->reviews ?? null;
-    $original_average_rating = $trip->average_rating ?? null;
-    $original_review_count = $trip->review_count ?? null;
+    $original_average_rating = $trip->avg_rating ?? null;
+    $original_review_count = $trip->reviews_count ?? null;
     
     $trip = \Yatra\Models\Trip::fromStdClass($trip);
     
@@ -33,10 +33,10 @@ if (!($trip instanceof \Yatra\Models\Trip)) {
         $trip->reviews = $original_reviews;
     }
     if ($original_average_rating !== null) {
-        $trip->average_rating = $original_average_rating;
+        $trip->avg_rating = $original_average_rating;
     }
     if ($original_review_count !== null) {
-        $trip->review_count = $original_review_count;
+        $trip->reviews_count = $original_review_count;
     }
 }
 

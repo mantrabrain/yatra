@@ -243,7 +243,12 @@ if (!function_exists('yatra_single_trip_seo_meta_tags')) {
  */
 if (!function_exists('yatra_single_destination_seo_meta_tags')) {
     function yatra_single_destination_seo_meta_tags() {
-        global $destination;
+        global $destination, $yatra_taxonomy_data;
+        
+        // Get destination from taxonomy data if available
+        if (isset($yatra_taxonomy_data) && !empty($yatra_taxonomy_data) && $yatra_taxonomy_data->type === 'destination') {
+            $destination = $yatra_taxonomy_data;
+        }
         
         // Only run on single destination pages
         if (!isset($destination) || empty($destination)) {
@@ -359,7 +364,12 @@ if (!function_exists('yatra_single_destination_seo_meta_tags')) {
  */
 if (!function_exists('yatra_single_activity_seo_meta_tags')) {
     function yatra_single_activity_seo_meta_tags() {
-        global $activity;
+        global $activity, $yatra_taxonomy_data;
+        
+        // Get activity from taxonomy data if available
+        if (isset($yatra_taxonomy_data) && !empty($yatra_taxonomy_data) && $yatra_taxonomy_data->type === 'activity') {
+            $activity = $yatra_taxonomy_data;
+        }
         
         // Only run on single activity pages
         if (!isset($activity) || empty($activity)) {

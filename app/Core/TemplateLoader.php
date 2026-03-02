@@ -7,6 +7,7 @@ namespace Yatra\Core;
 use Yatra\Core\Routing\Router;
 use Yatra\Services\SettingsService;
 use Yatra\Core\Handlers\TripPageHandler;
+use Yatra\Core\Handlers\TaxonomyPageHandler;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Repositories\BookingRepository;
 
@@ -117,24 +118,74 @@ class TemplateLoader
 
         // If router didn't handle it, let WordPress continue normally
         if (!$handled) {
-            // Plain permalink fallback: handle ?yatra_trip_slug= or ?trip= requests
-            $slug = get_query_var('yatra_trip_slug') ?: ($_GET['yatra_trip_slug'] ?? ($_GET['trip'] ?? ''));
+            // Get dynamic bases for plain permalink support
+            $trip_base = SettingsService::getTripBase();
+            $destination_base = SettingsService::getString('destination_base', 'destination');
+            $activity_base = SettingsService::getString('activity_base', 'activity');
+            $category_base = SettingsService::getString('trip_category_base', 'trip-category');
+
+            // Plain permalink fallback: handle ?yatra_trip_slug= or ?{trip_base}= requests
+            $slug = get_query_var('yatra_trip_slug') ?: (get_query_var($trip_base) ?: ($_GET['yatra_trip_slug'] ?? ($_GET[$trip_base] ?? '')));
             if (!empty($slug)) {
                 $handler = new TripPageHandler();
                 $handled = $handler->handle([
                     'type' => 'trip',
                     'slug' => sanitize_title($slug),
-                    'base' => SettingsService::getTripBase(),
+                    'base' => $trip_base,
                 ]);
             }
 
+            // Plain permalink fallback: handle ?yatra_activity_slug= or ?{activity_base}= requests
+            if (!$handled) {
+                $slug = get_query_var('yatra_activity_slug') ?: (get_query_var($activity_base) ?: ($_GET['yatra_activity_slug'] ?? ($_GET[$activity_base] ?? '')));
+                if (!empty($slug)) {
+                    $handler = new TaxonomyPageHandler();
+                    $handled = $handler->handle([
+                        'type' => 'taxonomy',
+                        'taxonomy_type' => 'activity',
+                        'slug' => sanitize_title($slug),
+                        'base' => $activity_base,
+                    ]);
+                }
+            }
+
+            // Plain permalink fallback: handle ?yatra_destination_slug= or ?{destination_base}= requests
+            if (!$handled) {
+                $slug = get_query_var('yatra_destination_slug') ?: (get_query_var($destination_base) ?: ($_GET['yatra_destination_slug'] ?? ($_GET[$destination_base] ?? '')));
+                if (!empty($slug)) {
+                    $handler = new TaxonomyPageHandler();
+                    $handled = $handler->handle([
+                        'type' => 'taxonomy',
+                        'taxonomy_type' => 'destination',
+                        'slug' => sanitize_title($slug),
+                        'base' => $destination_base,
+                    ]);
+                }
+            }
+
+            // Plain permalink fallback: handle ?yatra_category_slug= or ?{category_base}= requests
+            if (!$handled) {
+                $slug = get_query_var('yatra_category_slug') ?: (get_query_var($category_base) ?: ($_GET['yatra_category_slug'] ?? ($_GET[$category_base] ?? '')));
+                if (!empty($slug)) {
+                    $handler = new TaxonomyPageHandler();
+                    $handled = $handler->handle([
+                        'type' => 'taxonomy',
+                        'taxonomy_type' => 'category',
+                        'slug' => sanitize_title($slug),
+                        'base' => $category_base,
+                    ]);
+                }
+            }
+
             // Plain permalink fallback: handle ?yatra_booking_confirmation=
-            $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? '');
-            if (!$handled && !empty($confirmationId)) {
-                $handler = new BookingConfirmationPageHandler();
-                $handled = $handler->handle([
-                    'confirmation_id' => sanitize_text_field($confirmationId),
-                ]);
+            if (!$handled) {
+                $confirmationId = get_query_var('yatra_booking_confirmation') ?: ($_GET['yatra_booking_confirmation'] ?? '');
+                if (!empty($confirmationId)) {
+                    $handler = new BookingConfirmationPageHandler();
+                    $handled = $handler->handle([
+                        'confirmation_id' => sanitize_text_field($confirmationId),
+                    ]);
+                }
             }
         }
 
@@ -252,6 +303,17 @@ class TemplateLoader
             'yatra_activity_slug',
             'yatra_category_slug',
         ];
+
+        // Add dynamic base names for plain permalink support
+        $trip_base = SettingsService::getTripBase();
+        $destination_base = SettingsService::getString('destination_base', 'destination');
+        $activity_base = SettingsService::getString('activity_base', 'activity');
+        $category_base = SettingsService::getString('trip_category_base', 'trip-category');
+
+        $yatra_vars[] = $trip_base;
+        $yatra_vars[] = $destination_base;
+        $yatra_vars[] = $activity_base;
+        $yatra_vars[] = $category_base;
 
         return array_merge($vars, $yatra_vars);
     }

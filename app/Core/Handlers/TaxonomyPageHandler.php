@@ -43,51 +43,34 @@ class TaxonomyPageHandler extends BasePageHandler
         $filter_key = $this->getFilterKey($taxonomy_type);
         
         error_log("Yatra TaxonomyPageHandler: Using filter key '{$filter_key}' with value '{$slug}'");
+        error_log("Yatra TaxonomyPageHandler: Taxonomy type: '{$taxonomy_type}'");
         
         // Temporarily add debugging to TripRepository by modifying the query
-        add_filter('query', function($query) {
-            if (strpos($query, 'tca') !== false && strpos($query, 'act') !== false) {
-                error_log("Yatra TaxonomyPageHandler Trip Query: {$query}");
+        add_filter('query', function($query) use ($taxonomy_type, $filter_key, $slug) {
+            if (strpos($query, 'yatra_trips') !== false && strpos($query, 'yatra_classifications') !== false) {
+                error_log("Yatra TaxonomyPageHandler Trip Query ({$taxonomy_type}): {$query}");
+                error_log("Yatra TaxonomyPageHandler: Looking for {$filter_key} = '{$slug}'");
             }
             return $query;
         });
         
-        // Temporarily use working query directly instead of TripRepository
-        global $wpdb;
-        $tripsTable = \Yatra\Database\Tables\TripsTable::getTableName();
-        $tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
-        $classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
+        // Also debug the final SQL that gets executed
+        add_filter('query', function($query) {
+            if (strpos($query, 'SELECT') !== false && strpos($query, 'FROM') !== false && strpos($query, 'yatra_trips') !== false) {
+                error_log("Yatra TaxonomyPageHandler FINAL SQL: {$query}");
+            }
+            return $query;
+        });
         
-        $working_sql = $wpdb->prepare(
-            "SELECT t.* 
-             FROM {$tripsTable} t 
-             LEFT JOIN {$tripClassificationsTable} tca ON tca.trip_id = t.id 
-             LEFT JOIN {$classificationsTable} act ON act.id = tca.classification_id 
-             WHERE t.status IN ('publish', 'published') 
-             AND (t.deleted_at IS NULL OR t.deleted_at = '0000-00-00 00:00:00') 
-             AND act.type = %s 
-             AND act.slug = %s",
-            'activity',
-            $slug
-        );
+        $trips_data = $tripRepository->findWithFilters([$filter_key => $slug], 1, 50);
         
-        error_log("Yatra TaxonomyPageHandler: Using working query: {$working_sql}");
-        $trips = $wpdb->get_results($working_sql);
-        
-        $trips_data = [
-            'data' => $trips,
-            'total' => count($trips),
-            'pages' => 1
-        ];
-        
-        // Keep the original for debugging
-        //$trips_data = $tripRepository->findWithFilters([$filter_key => $slug], 1, 50);
+        error_log("Yatra TaxonomyPageHandler: TripRepository returned " . count($trips_data['trips'] ?? []) . " trips");
         
         // Remove the filter
         remove_all_filters('query');
         
         // Add trips to taxonomy data
-        $taxonomy_data->trips = $trips_data['data'] ?? [];
+        $taxonomy_data->trips = $trips_data['trips'] ?? [];
         
         // Load reviews for each trip (same approach as SingleTripController)
         $tripsWithReviews = [];
@@ -118,13 +101,13 @@ class TaxonomyPageHandler extends BasePageHandler
              FROM {$tripClassificationsTable} tc 
              LEFT JOIN {$classificationsTable} c ON c.id = tc.classification_id 
              WHERE c.type = %s AND c.slug = %s",
-            'activity',
+            $taxonomy_type,
             $slug
         );
         
         error_log("Yatra TaxonomyPageHandler Relationship SQL: {$relationship_sql}");
         $relationships = $wpdb->get_results($relationship_sql);
-        error_log("Yatra TaxonomyPageHandler: Found " . count($relationships) . " trip-activity relationships");
+        error_log("Yatra TaxonomyPageHandler: Found " . count($relationships) . " trip-{$taxonomy_type} relationships");
         
         // Debug: Check each trip's status
         foreach ($relationships as $rel) {
@@ -147,7 +130,7 @@ class TaxonomyPageHandler extends BasePageHandler
              AND act.type = %s 
              AND act.slug = %s 
              LIMIT 1",
-            'activity',
+            $taxonomy_type,
             $slug
         );
         

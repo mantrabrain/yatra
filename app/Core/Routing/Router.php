@@ -169,6 +169,15 @@ class Router
                 ];
             }
         }
+        
+        // 5b. Trip listing page
+        if ($path === $trip_base) {
+            return [
+                'type' => 'listing',
+                'listing_type' => 'trip',
+                'base' => $trip_base
+            ];
+        }
 
         // 6. Booking confirmation
         if (preg_match('/^book\/confirmation\/([a-zA-Z0-9_-]+)$/', $path, $matches)) {

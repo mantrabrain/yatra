@@ -7,6 +7,7 @@ namespace Yatra\Repositories;
 use Yatra\Constants\ClassificationTypes;
 use Yatra\Database\Tables\ClassificationsTable;
 use Yatra\Utils\QueryCache;
+use Yatra\Utils\Cache;
 
 /**
  * Attribute Repository

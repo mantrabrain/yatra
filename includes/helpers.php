@@ -459,6 +459,11 @@ function yatra_is_booking_page(): bool
         }
     }
     
+    // Check for booking page query var (set by BookingPageHandler)
+    if (!empty($wp_query->get('yatra_booking_page'))) {
+        return true;
+    }
+    
     // Check for dynamic booking URL
     return !empty($wp_query->get('yatra_booking_trip_slug'));
 }
@@ -1271,15 +1276,37 @@ if (!function_exists('yatra_is_trip_page')) {
 
 if (!function_exists('yatra_is_destination_page')) {
     function yatra_is_destination_page() {
-        global $destination;
-        return isset($destination) && !empty($destination);
+        global $destination, $yatra_taxonomy_data;
+        
+        // Check direct global first
+        if (isset($destination) && !empty($destination)) {
+            return true;
+        }
+        
+        // Check taxonomy data
+        if (isset($yatra_taxonomy_data) && !empty($yatra_taxonomy_data) && $yatra_taxonomy_data->type === 'destination') {
+            return true;
+        }
+        
+        return false;
     }
 }
 
 if (!function_exists('yatra_is_activity_page')) {
     function yatra_is_activity_page() {
-        global $activity;
-        return isset($activity) && !empty($activity);
+        global $activity, $yatra_taxonomy_data;
+        
+        // Check direct global first
+        if (isset($activity) && !empty($activity)) {
+            return true;
+        }
+        
+        // Check taxonomy data
+        if (isset($yatra_taxonomy_data) && !empty($yatra_taxonomy_data) && $yatra_taxonomy_data->type === 'activity') {
+            return true;
+        }
+        
+        return false;
     }
 }
 
