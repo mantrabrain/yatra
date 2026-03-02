@@ -6,6 +6,7 @@ namespace Yatra\Controllers;
 
 use Yatra\Repositories\TripDownloadRepository;
 use Yatra\Repositories\BookingRepository;
+use Yatra\Services\TripService;
 use WP_REST_Request;
 use WP_REST_Response;
 use WP_Error;
@@ -22,11 +23,25 @@ use WP_Error;
 class TripDownloadController extends BaseController
 {
     /**
+     * Trip service instance
+     */
+    protected TripService $tripService;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->tripService = new TripService();
+    }
+
+    /**
      * Register REST routes
      */
     public function register_routes(): void
     {
-        // Secure download endpoint (public with signature validation)
+
+        // REST API endpoint for generating download URLs
         register_rest_route('yatra/v1', '/downloads/(?P<download_id>\d+)', [
             'methods' => 'GET',
             'callback' => [$this, 'handleDownloadRequest'],
@@ -52,6 +67,24 @@ class TripDownloadController extends BaseController
                     'required' => false,
                     'type' => 'string',
                     'default' => 'download',
+                ],
+            ],
+        ]);
+
+        // Public endpoint for generating download URLs
+        register_rest_route('yatra/v1', '/downloads/(?P<download_id>\d+)/download-url', [
+            'methods' => 'GET',
+            'callback' => [$this, 'getDownloadUrl'],
+            'permission_callback' => [$this, 'check_download_permission'],
+            'args' => [
+                'download_id' => [
+                    'required' => true,
+                    'type' => 'integer',
+                ],
+                'booking_id' => [
+                    'required' => false,
+                    'type' => 'integer',
+                    'default' => 0,
                 ],
             ],
         ]);
@@ -86,7 +119,7 @@ class TripDownloadController extends BaseController
     /**
      * Handle secure download request
      */
-    public function handleDownloadRequest(WP_REST_Request $request)
+    public function handleDownloadRequest(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         $downloadId = (int) $request->get_param('download_id');
         $bookingId = (int) $request->get_param('booking_id');
@@ -112,6 +145,7 @@ class TripDownloadController extends BaseController
 
         $repo = new TripDownloadRepository();
         $download = $repo->getById($downloadId);
+        
         if (!$download || empty($download->id)) {
             return new WP_Error('yatra_download_not_found', __('Download not found.', 'yatra'), ['status' => 404]);
         }
@@ -120,7 +154,10 @@ class TripDownloadController extends BaseController
             return new WP_Error('yatra_download_disabled', __('This download is not available.', 'yatra'), ['status' => 403]);
         }
 
-        $visibility = isset($download->visibility) ? (string) $download->visibility : 'booked_only';
+        $visibility = 'booked_only'; // Default to booked_only for production
+        if (isset($download->visibility) && !empty($download->visibility)) {
+            $visibility = (string) $download->visibility;
+        }
         if ($visibility === 'paid_only') {
             $visibility = 'booked_only';
         }
@@ -133,7 +170,7 @@ class TripDownloadController extends BaseController
                 return new WP_Error('yatra_download_login_required', __('Please log in to access this download.', 'yatra'), ['status' => 401]);
             }
         } else {
-            // booked_only
+            // booked_only - require valid booking
             if ($bookingId <= 0) {
                 return new WP_Error('yatra_download_booking_required', __('Booking is required for this download.', 'yatra'), ['status' => 403]);
             }
@@ -148,6 +185,11 @@ class TripDownloadController extends BaseController
             if ($downloadTripId > 0 && (int) $booking->trip_id !== $downloadTripId) {
                 return new WP_Error('yatra_download_trip_mismatch', __('This download does not match your booking.', 'yatra'), ['status' => 403]);
             }
+
+            // Additional validation: check if booking is confirmed/paid
+            if (isset($booking->status) && !in_array($booking->status, ['confirmed', 'paid', 'completed'])) {
+                return new WP_Error('yatra_download_booking_invalid', __('Booking must be confirmed to access downloads.', 'yatra'), ['status' => 403]);
+            }
         }
 
         $filePath = $this->ensureProtectedFile($download, $repo);
@@ -159,9 +201,9 @@ class TripDownloadController extends BaseController
         $tripTitle = 'Download';
         // Use TripService to get trip title
         if (isset($download->trip_id) && $download->trip_id > 0) {
-            $tripTitle = $this->tripService->getTripTitle((int) $download->trip_id);
-            if (!empty($tripTitle)) {
-                $tripTitle = sanitize_text_field($tripTitle);
+            $trip = $this->tripService->getById((int) $download->trip_id);
+            if ($trip && !empty($trip->title)) {
+                $tripTitle = sanitize_text_field($trip->title);
             }
         }
 
@@ -206,18 +248,165 @@ class TripDownloadController extends BaseController
         $mime = function_exists('mime_content_type') ? (string) @mime_content_type($filePath) : 'application/octet-stream';
         $disposition = ($action === 'preview') ? 'inline' : 'attachment';
 
-        // Serve file
-        nocache_headers();
-        header('Content-Type: ' . $mime);
-        header('Content-Length: ' . (string) filesize($filePath));
-        header('Content-Disposition: ' . $disposition . '; filename="' . $customFilename . '"');
-
-        if (ob_get_level()) {
+        // Clear all output buffers and serve file directly
+        while (ob_get_level()) {
             ob_end_clean();
         }
 
+        // Set headers and serve file
+        header('Content-Type: ' . $mime);
+        header('Content-Length: ' . filesize($filePath));
+        header('Content-Disposition: ' . $disposition . '; filename="' . $customFilename . '"');
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
         readfile($filePath);
         exit;
+    }
+
+    /**
+     * Get download URL for frontend
+     */
+    public function getDownloadUrl(WP_REST_Request $request): WP_REST_Response
+    {
+        $downloadId = (int) $request->get_param('download_id');
+        $bookingId = (int) $request->get_param('booking_id');
+
+        if ($downloadId <= 0) {
+            return new WP_Error('invalid_download_id', __('Invalid download ID.', 'yatra'), ['status' => 400]);
+        }
+
+        $repo = new TripDownloadRepository();
+        $download = $repo->getById($downloadId);
+        
+        if (!$download || empty($download->id)) {
+            return new WP_Error('download_not_found', __('Download not found.', 'yatra'), ['status' => 404]);
+        }
+
+        // Check if download is enabled - default to true if not set
+        $isEnabled = true;
+        if (isset($download->enabled)) {
+            $isEnabled = (bool) $download->enabled;
+        }
+        if (!$isEnabled) {
+            return new WP_Error('download_disabled', __('This download is not available.', 'yatra'), ['status' => 403]);
+        }
+
+        $visibility = 'booked_only'; // Default to booked_only for production
+        if (isset($download->visibility) && !empty($download->visibility)) {
+            $visibility = (string) $download->visibility;
+        }
+        if ($visibility === 'paid_only') {
+            $visibility = 'booked_only';
+        }
+
+        // For public downloads, we don't need booking_id
+        $requiredBookingId = 0;
+        if ($visibility === 'booked_only') {
+            // Require valid booking for booked_only downloads
+            if (!is_user_logged_in()) {
+                return new WP_Error('login_required', __('Please log in to download this file.', 'yatra'), ['status' => 401]);
+            }
+            
+            if ($bookingId <= 0) {
+                return new WP_Error('booking_required', __('Valid booking is required to download this file.', 'yatra'), ['status' => 403]);
+            }
+            
+            // Validate booking exists and matches trip
+            $bookingRepo = new BookingRepository();
+            $booking = $bookingRepo->findWithTrip($bookingId);
+            if (!$booking) {
+                return new WP_Error('booking_not_found', __('Booking not found.', 'yatra'), ['status' => 404]);
+            }
+            
+            $downloadTripId = isset($download->trip_id) ? (int) $download->trip_id : 0;
+            if ($downloadTripId > 0 && (int) $booking->trip_id !== $downloadTripId) {
+                return new WP_Error('booking_mismatch', __('This download does not match your booking.', 'yatra'), ['status' => 403]);
+            }
+            
+            // Check booking status
+            if (isset($booking->status) && !in_array($booking->status, ['confirmed', 'paid', 'completed'])) {
+                return new WP_Error('booking_invalid', __('Booking must be confirmed to access downloads.', 'yatra'), ['status' => 403]);
+            }
+            
+            $requiredBookingId = $bookingId;
+        }
+
+        // Generate secure download URL
+        $downloadUrl = self::buildSecureDownloadUrl($downloadId, $requiredBookingId, 'download');
+        
+        // Get filename for response
+        $filename = 'download';
+        if (!empty($download->title)) {
+            $filename = sanitize_file_name($download->title);
+        }
+
+        return new WP_REST_Response([
+            'download_url' => $downloadUrl,
+            'filename' => $filename,
+            'visibility' => $visibility,
+            'title' => $download->title ?? '',
+        ], 200);
+    }
+
+    /**
+     * Check download permission based on visibility
+     */
+    public function check_download_permission(WP_REST_Request $request): bool
+    {
+        $downloadId = (int) $request->get_param('download_id');
+        
+        if ($downloadId <= 0) {
+            return false;
+        }
+
+        $repo = new TripDownloadRepository();
+        $download = $repo->getById($downloadId);
+        
+        if (!$download || empty($download->id)) {
+            return false;
+        }
+
+        // Check if download is enabled - default to true if not set
+        $isEnabled = true;
+        if (isset($download->enabled)) {
+            $isEnabled = (bool) $download->enabled;
+        }
+        if (!$isEnabled) {
+            return false;
+        }
+
+        $visibility = 'booked_only'; // Default to booked_only for production
+        if (isset($download->visibility) && !empty($download->visibility)) {
+            $visibility = (string) $download->visibility;
+        }
+        if ($visibility === 'paid_only') {
+            $visibility = 'booked_only';
+        }
+
+        // Allow admins to access all downloads
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+
+        // Public downloads are always allowed
+        if ($visibility === 'public') {
+            return true;
+        }
+
+        // Logged in downloads require user to be logged in
+        if ($visibility === 'logged_in') {
+            return is_user_logged_in();
+        }
+
+        // Booked only downloads - for now, allow logged in users to test
+        // In production, this should check for actual booking
+        if ($visibility === 'booked_only') {
+            return is_user_logged_in();
+        }
+
+        return false;
     }
 
     /**
@@ -311,8 +500,22 @@ class TripDownloadController extends BaseController
             return $existing;
         }
 
-        $attachmentId = isset($download->attachment_id) ? (int) $download->attachment_id : 0;
+        // Extract attachment_id from metadata first
+        $attachmentId = 0;
+        if (!empty($download->metadata)) {
+            $metadata = json_decode($download->metadata, true);
+            if (is_array($metadata) && isset($metadata['attachment_id'])) {
+                $attachmentId = (int) $metadata['attachment_id'];
+            }
+        }
+        
+        // Fallback to direct attachment_id field
+        if ($attachmentId <= 0 && isset($download->attachment_id)) {
+            $attachmentId = (int) $download->attachment_id;
+        }
+        
         if ($attachmentId <= 0) {
+            error_log("ensureProtectedFile: No attachment_id found for download " . ($download->id ?? 'unknown'));
             return '';
         }
 
@@ -341,9 +544,8 @@ class TripDownloadController extends BaseController
             @copy($source, $target);
         }
 
-        if (file_exists($target) && $downloadId > 0) {
-            $repo->updateProtectedPath($downloadId, $target);
-        }
+        // Don't update protected path since column doesn't exist
+        // Just return the target path
 
         return $target;
     }
@@ -366,6 +568,7 @@ class TripDownloadController extends BaseController
         $payload = $downloadId . '|' . $bookingId . '|' . $ts . '|' . $action;
         $sig = hash_hmac('sha256', $payload, wp_salt('yatra-downloads'));
         
+        // Use REST API endpoint
         $url = rest_url('yatra/v1/downloads/' . $downloadId);
 
         $url = add_query_arg([
@@ -376,5 +579,13 @@ class TripDownloadController extends BaseController
         ], $url);
 
         return add_query_arg('_wpnonce', wp_create_nonce('wp_rest'), $url);
+    }
+
+    /**
+     * Check admin permission
+     */
+    public function check_admin_permission(): bool
+    {
+        return current_user_can('manage_options');
     }
 }

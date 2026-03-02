@@ -54,14 +54,16 @@ class TripDownloadRepository
             return [];
         }
 
-        $rows = $wpdb->get_results(
-            $wpdb->prepare(
-                "SELECT * FROM {$table} WHERE trip_id = %d AND content_type = 'download' ORDER BY sort_order ASC, id ASC",
-                $tripId
-            )
-        ) ?: [];
+        $sql = $wpdb->prepare(
+            "SELECT * FROM {$table} WHERE trip_id = %d AND content_type = 'download' ORDER BY sort_order ASC, id ASC",
+            $tripId
+        );
+        
+                
+        $rows = $wpdb->get_results($sql) ?: [];
 
-        // Normalize metadata back into expected fields
+        // Normalize metadata back into expected fields - match TripRepository structure
+        $normalizedRows = [];
         foreach ($rows as $row) {
             $metadata = [];
             if (!empty($row->metadata)) {
@@ -70,18 +72,44 @@ class TripDownloadRepository
                     $metadata = $decoded;
                 }
             }
-            $row->attachment_id = $metadata['attachment_id'] ?? null;
-            $row->protected_path = $metadata['protected_path'] ?? null;
-            // Map access_level back to visibility for UI
-            $row->visibility = 'booked_only';
-            if ($row->access_level === 'public') {
-                $row->visibility = 'public';
-            } elseif ($row->access_level === 'registered') {
-                $row->visibility = 'logged_in';
+
+            $attachmentId = $metadata['attachment_id'] ?? null;
+            $protectedPath = $metadata['protected_path'] ?? null;
+            $visibilityMeta = $metadata['visibility'] ?? null;
+
+            // Use visibility from metadata as primary source of truth
+            // Fall back to access_level mapping only if metadata is missing
+            $visibility = $visibilityMeta ?? 'booked_only';
+            if ($visibilityMeta === null) {
+                // Only use access_level if visibility metadata is not set
+                if ($row->access_level === 'public') {
+                    $visibility = 'public';
+                } elseif ($row->access_level === 'registered') {
+                    $visibility = 'logged_in';
+                } elseif ($row->access_level === 'customer') {
+                    $visibility = 'booked_only';
+                }
             }
+
+            // Create normalized object matching TripRepository structure
+            $normalizedRows[] = (object) [
+                'id' => isset($row->id) ? (int) $row->id : 0,
+                'title' => $row->title ?? '',
+                'description' => $row->description ?? '',
+                'attachment_id' => $attachmentId ? (int) $attachmentId : null,
+                'protected_path' => $protectedPath,
+                'content_url' => $row->content_url ?? '',
+                'file_path' => $row->file_path ?? null,
+                'file_size' => isset($row->file_size) ? (int) $row->file_size : null,
+                'file_type' => $row->file_type ?? null,
+                'thumbnail_url' => $row->thumbnail_url ?? null,
+                'visibility' => $visibility,
+                'is_downloadable' => isset($row->is_downloadable) ? (bool) $row->is_downloadable : true,
+                'sort_order' => isset($row->sort_order) ? (int) $row->sort_order : 0,
+            ];
         }
 
-        return $rows;
+        return $normalizedRows;
     }
 
     /**
@@ -207,7 +235,7 @@ class TripDownloadRepository
                 'visibility' => $visibility,
             ];
 
-            $wpdb->insert(
+            $result = $wpdb->insert(
                 $table,
                 [
                     'trip_id' => $tripId,
@@ -222,7 +250,7 @@ class TripDownloadRepository
                     'thumbnail_url' => $thumbnailUrl,
                     'display_options' => isset($item['display_options']) ? wp_json_encode($item['display_options']) : null,
                     'access_level' => $accessLevel,
-                    'is_downloadable' => 1,
+                    'is_downloadable' => isset($item['enabled']) ? (int) (bool) $item['enabled'] : 1,
                     'is_public' => $isPublic,
                     'requires_login' => $requiresLogin,
                     'sort_order' => isset($item['sort_order']) ? (int) $item['sort_order'] : $order,
@@ -251,6 +279,7 @@ class TripDownloadRepository
                 ]
             );
 
+            
             $order++;
         }
     }
