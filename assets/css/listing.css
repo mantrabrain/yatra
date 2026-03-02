@@ -16,6 +16,7 @@
     width: 100%;
     min-height: 100vh;
     background: var(--yatra-bg-page, #f9fafb);
+    padding:50px 0;
 }
 
 .yatra-listing-wrapper {
