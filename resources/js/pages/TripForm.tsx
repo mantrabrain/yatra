@@ -1584,7 +1584,7 @@ const TripForm: React.FC = () => {
       }
     },
     enabled: !!tripId && isEditMode,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    staleTime: 0, // Always fetch fresh data to ensure downloadable items persist after save
   });
 
   // Build error context for edit error state
@@ -1716,10 +1716,10 @@ const TripForm: React.FC = () => {
         ).toString();
         const attachmentIdRaw =
           row.attachment_id ?? row.download_file ?? row.downlaod_file;
-        const attachmentUrl = (row.attachment_url ?? "").toString();
+        const attachmentUrl = (row.attachment_url ?? row.content_url ?? "").toString();
         const attachmentTitle = (row.attachment_title ?? "").toString();
         const enabledRaw =
-          row.enabled ?? row.download_enabled ?? row.downlaod_enabled;
+          row.enabled ?? row.is_downloadable ?? row.download_enabled ?? row.downlaod_enabled;
 
         return {
           id: row.id != null ? Number(row.id) : null,
@@ -1942,9 +1942,7 @@ const TripForm: React.FC = () => {
       featured_image: tripData.featured_image
         ? Number(tripData.featured_image)
         : null,
-      downloadable_items: normalizeDownloadableItems(
-        tripData.downloadable_items,
-      ),
+      downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
       faqs: normalizeFaqs(tripData.faqs),
       frontend_tabs: Array.isArray(tripData.frontend_tabs)
         ? tripData.frontend_tabs
@@ -3009,6 +3007,8 @@ const TripForm: React.FC = () => {
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["trips"] });
       queryClient.invalidateQueries({ queryKey: ["trip", tripId] });
+      // Force refetch the trip data immediately
+      queryClient.refetchQueries({ queryKey: ["trip", tripId] });
       setIsSubmitting(false);
 
       // Show success message - different for edit vs create mode

@@ -227,47 +227,9 @@ class TripRepository extends BaseRepository
     public function getDownloads(int $tripId): array
     {
         $repo = new TripDownloadRepository();
-        $rows = $repo->getByTripId($tripId);
-
-        return array_map(function ($row) {
-            $metadata = [];
-            if (!empty($row->metadata)) {
-                $decoded = json_decode($row->metadata, true);
-                if (is_array($decoded)) {
-                    $metadata = $decoded;
-                }
-            }
-
-            $attachmentId = $metadata['attachment_id'] ?? null;
-            $protectedPath = $metadata['protected_path'] ?? null;
-            $visibilityMeta = $metadata['visibility'] ?? null;
-
-            // Map access_level to visibility used by UI
-            $visibility = 'booked_only';
-            if ($row->access_level === 'public') {
-                $visibility = 'public';
-            } elseif ($row->access_level === 'registered') {
-                $visibility = 'logged_in';
-            } elseif ($visibilityMeta) {
-                $visibility = $visibilityMeta;
-            }
-
-            return (object) [
-                'id' => isset($row->id) ? (int) $row->id : 0,
-                'title' => $row->title ?? '',
-                'description' => $row->description ?? '',
-                'attachment_id' => $attachmentId ? (int) $attachmentId : null,
-                'protected_path' => $protectedPath,
-                'content_url' => $row->content_url ?? '',
-                'file_path' => $row->file_path ?? null,
-                'file_size' => isset($row->file_size) ? (int) $row->file_size : null,
-                'file_type' => $row->file_type ?? null,
-                'thumbnail_url' => $row->thumbnail_url ?? null,
-                'visibility' => $visibility,
-                'is_downloadable' => isset($row->is_downloadable) ? (bool) $row->is_downloadable : true,
-                'sort_order' => isset($row->sort_order) ? (int) $row->sort_order : 0,
-            ];
-        }, $rows);
+        // TripDownloadRepository already normalizes the data correctly
+        // No need to normalize again
+        return $repo->getByTripId($tripId);
     }
 
     /**
@@ -1541,33 +1503,6 @@ class TripRepository extends BaseRepository
                     ['%d', '%s', '%s', '%s', '%s', '%d', '%d']
                 );
         }
-        
-        $processedDayIds[] = $dayId;
-        
-        // Process entries for this day
-        if (isset($day['entries']) && is_array($day['entries'])) {
-            $this->saveDayEntries($dayId, $day['entries'], $existingEntryMap[$dayId] ?? []);
-        }
-    }
-    
-    // Clean up orphaned days and entries (days that are no longer in the itinerary)
-    if (!empty($processedDayIds)) {
-        $placeholders = implode(',', array_fill(0, count($processedDayIds), '%d'));
-        $wpdb->query($wpdb->prepare(
-            "DELETE FROM {$tableEntries} WHERE day_id NOT IN ({$placeholders}) AND day_id IN (SELECT id FROM {$tableDays} WHERE trip_id = %d)",
-            $tripId,
-            ...$processedDayIds
-        ));
-        
-        $wpdb->query($wpdb->prepare(
-            "DELETE FROM {$tableDays} WHERE trip_id = %d AND id NOT IN ({$placeholders})",
-            $tripId,
-            ...$processedDayIds
-        ));
-    } else {
-        // If no days provided, delete all days and entries for this trip
-        $wpdb->delete($tableEntries, ['trip_id' => $tripId], ['%d']);
-        $wpdb->delete($tableDays, ['trip_id' => $tripId], ['%d']);
     }
 }
 

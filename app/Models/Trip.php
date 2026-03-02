@@ -230,6 +230,7 @@ class Trip
     public array $reviews = [];
     public array $departures = [];
     public array $bookings = [];
+    public array $downloadable_items = [];
 
 
     // Timestamps
@@ -435,6 +436,7 @@ class Trip
         $trip->price_types = self::parseJsonField($data['price_types'] ?? null);
         $trip->itinerary_days = self::parseJsonField($data['itinerary_days'] ?? null);
         $trip->faqs = self::parseJsonField($data['faqs'] ?? null);
+        $trip->downloadable_items = self::parseJsonField($data['downloadable_items'] ?? null);
         $trip->frontend_tabs = self::parseJsonField($data['frontend_tabs'] ?? null);
         $trip->availability_dates = self::parseJsonField($data['availability_dates'] ?? null);
         $trip->custom_fields = self::parseJsonField($data['custom_fields'] ?? null, []);

@@ -3,51 +3,51 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-makepot\n"
 
-#: assets/admin/dist/js/app.js:31539
+#: assets/admin/dist/js/app.js:31525
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31569
+#: assets/admin/dist/js/app.js:31555
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31571
+#: assets/admin/dist/js/app.js:31557
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31576
+#: assets/admin/dist/js/app.js:31562
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31577
+#: assets/admin/dist/js/app.js:31563
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31583
+#: assets/admin/dist/js/app.js:31569
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31594
+#: assets/admin/dist/js/app.js:31580
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31599
+#: assets/admin/dist/js/app.js:31585
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31600
+#: assets/admin/dist/js/app.js:31586
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31605
+#: assets/admin/dist/js/app.js:31591
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31614
+#: assets/admin/dist/js/app.js:31600
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31652
+#: assets/admin/dist/js/app.js:31638
 msgid "Selected as testimonial"
 msgstr ""
 

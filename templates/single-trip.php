@@ -128,7 +128,20 @@ window.yatraTripData = {
     }, $trip->availability_dates ?? [])); ?>,
     groupDiscountsUrl: '<?php echo esc_url(rest_url('yatra/v1/discounts/group-discounts')); ?>'
 };
+
+// WordPress REST API nonce
+window.yatraVars = {
+    nonce: '<?php echo wp_create_nonce('wp_rest'); ?>'
+};
 </script>
+
+<!-- Downloads JavaScript -->
+<?php 
+$downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
+if (!empty($downloads)): 
+?>
+<script src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__)) . 'assets/js/downloads-list.js'); ?>"></script>
+<?php endif; ?>
 
 <div class="yatra-single-trip">
     
@@ -179,6 +192,9 @@ window.yatraTripData = {
 
             <!-- Important Information Section -->
             <?php yatra_get_template('partials/single-trip/content-important-info', ['trip' => $trip]); ?>
+
+            <!-- Downloads Section -->
+            <?php yatra_get_template('partials/single-trip/content-downloads', ['trip' => $trip]); ?>
 
             <!-- FAQ Section -->
             <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>

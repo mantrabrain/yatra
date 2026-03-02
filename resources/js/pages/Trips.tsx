@@ -43,6 +43,7 @@ import { Pagination } from "../components/shared/Pagination";
 import { Table as SharedTable } from "../components/shared/Table";
 import { BulkActionToolbar } from "../components/shared/BulkActionToolbar";
 import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
+import { Modal } from "../components/ui/modal";
 import { useNavigate } from "../hooks/useNavigate";
 
 interface Trip {
@@ -1573,139 +1574,132 @@ const Trips: React.FC = () => {
         </ConditionalRender>
       </div>
 
-      {isCreateModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
-          onClick={() => {
-            if (!createTripMutation.isPending) {
-              setIsCreateModalOpen(false);
-              setCreateTripError(null);
-            }
-          }}
-        >
-          <div
-            className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-2xl p-6 space-y-5"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {__("Create Trip Draft", "yatra")}
-                </h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {__(
-                    "Give your trip a name. We'll create a draft and take you to the builder.",
-                    "Give your trip a name. We'll create a draft and take you to the builder.",
-                  )}
-                </p>
-              </div>
-              <button
-                className="text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-                onClick={() => {
-                  if (!createTripMutation.isPending) {
-                    setIsCreateModalOpen(false);
-                    setCreateTripError(null);
-                  }
-                }}
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Create Trip Modal - Using same Modal component as Discounts */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => {
+          if (!createTripMutation.isPending) {
+            setIsCreateModalOpen(false);
+            setCreateTripError(null);
+          }
+        }}
+        title={__("Create New Trip", "yatra")}
+        description={__(
+          "Give your trip a name and URL. We'll create a draft and take you to the trip builder.",
+          "yatra",
+        )}
+        size="lg"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                if (!createTripMutation.isPending) {
+                  setIsCreateModalOpen(false);
+                  setCreateTripError(null);
+                }
+              }}
+              disabled={createTripMutation.isPending}
+            >
+              {__("Cancel", "yatra")}
+            </Button>
+            <Button
+              onClick={handleCreateTripConfirm}
+              className="flex items-center gap-2"
+              disabled={createTripMutation.isPending}
+            >
+              {createTripMutation.isPending && (
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              )}
+              {createTripMutation.isPending
+                ? __("Creating…", "yatra")
+                : __("Create & Continue", "yatra")}
+            </Button>
+          </div>
+        }
+      >
+        <div className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+              {__("Trip Title", "yatra")}
+              <span className="text-red-500">*</span>
+            </label>
+            <Input
+              value={newTripTitle}
+              onChange={(e) => handleNewTripTitleChange(e.target.value)}
+              placeholder={__("e.g., Bali Beach Retreat", "yatra")}
+              disabled={createTripMutation.isPending}
+              className="text-base"
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {__(
+                "A catchy title that describes your trip. Recommended: 50-60 characters for best SEO results.",
+                "yatra",
+              )}
+            </p>
+          </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                  {__("Trip Title", "yatra")}
-                </label>
-                <Input
-                  value={newTripTitle}
-                  onChange={(e) => handleNewTripTitleChange(e.target.value)}
-                  placeholder={__("e.g., Bali Beach Retreat", "yatra")}
-                  disabled={createTripMutation.isPending}
-                  className="text-base"
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                    {__("Trip Slug", "yatra")}
-                    <span className="text-[10px] font-normal text-gray-400">
-                      {__("(URL friendly)", "yatra")}
-                    </span>
-                  </label>
-                  {!isSlugManuallyEdited && (
-                    <button
-                      type="button"
-                      onClick={enableSlugEditing}
-                      className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-                    >
-                      {__("Customize URL", "yatra")}
-                    </button>
-                  )}
-                </div>
-                <Input
-                  value={newTripSlug}
-                  onChange={(e) => handleNewTripSlugChange(e.target.value)}
-                  placeholder={__("bali-beach-retreat", "yatra")}
-                  disabled={createTripMutation.isPending}
-                  readOnly={!isSlugManuallyEdited}
-                  className={`font-mono text-sm ${!isSlugManuallyEdited ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {isSlugManuallyEdited
-                    ? __(
-                        "Editing slug manually. Keep it short, lowercase, and hyphen-separated.",
-                        "yatra",
-                      )
-                    : __(
-                        'Auto-generated from the title. Click "Customize URL" if you need a custom slug.',
-                        "yatra",
-                      )}
-                </p>
-                {(newTripSlug || newTripTitle) && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-mono">
-                    {(window as any).yatraAdmin?.siteUrl ||
-                      "https://example.com"}
-                    /trips/{newTripSlug || generateSlug(newTripTitle)}
-                  </p>
-                )}
-              </div>
-              {createTripError && (
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {createTripError}
-                </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-1">
+                {__("Trip URL", "yatra")}
+                <span className="text-red-500">*</span>
+                <span className="text-[10px] font-normal text-gray-400">
+                  {__("(URL friendly)", "yatra")}
+                </span>
+              </label>
+              {!isSlugManuallyEdited && (
+                <button
+                  type="button"
+                  onClick={enableSlugEditing}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {__("Customize URL", "yatra")}
+                </button>
               )}
             </div>
-
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  if (!createTripMutation.isPending) {
-                    setIsCreateModalOpen(false);
-                    setCreateTripError(null);
-                  }
-                }}
-                disabled={createTripMutation.isPending}
-              >
-                {__("Cancel", "yatra")}
-              </Button>
-              <Button
-                onClick={handleCreateTripConfirm}
-                className="flex items-center gap-2"
-                disabled={createTripMutation.isPending}
-              >
-                {createTripMutation.isPending && (
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                )}
-                {createTripMutation.isPending
-                  ? __("Creating…", "yatra")
-                  : __("Create & Continue", "yatra")}
-              </Button>
-            </div>
+            <Input
+              value={newTripSlug}
+              onChange={(e) => handleNewTripSlugChange(e.target.value)}
+              placeholder={__("bali-beach-retreat", "yatra")}
+              disabled={createTripMutation.isPending}
+              readOnly={!isSlugManuallyEdited}
+              className={`font-mono text-sm ${!isSlugManuallyEdited ? "bg-gray-100 dark:bg-gray-800 cursor-not-allowed" : ""}`}
+            />
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {isSlugManuallyEdited
+                ? __(
+                    "Editing slug manually. Keep it short, lowercase, and hyphen-separated.",
+                    "yatra",
+                  )
+                : __(
+                    'Auto-generated from the title. Click "Customize URL" if you need a custom slug.',
+                    "yatra",
+                  )}
+            </p>
+            {(newTripSlug || newTripTitle) && (
+              <div className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+                  {__("Preview:", "yatra")}
+                </p>
+                <p className="text-xs text-gray-900 dark:text-white font-mono break-all">
+                  {(window as any).yatraAdmin?.siteUrl ||
+                    "https://example.com"}
+                  /trips/{newTripSlug || generateSlug(newTripTitle)}
+                </p>
+              </div>
+            )}
           </div>
+
+          {createTripError && (
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-sm text-red-600 dark:text-red-400">
+                {createTripError}
+              </p>
+            </div>
+          )}
         </div>
-      )}
+      </Modal>
 
       {/* Permanent Delete Confirmation (for Trash only) */}
       <ConfirmationDialog

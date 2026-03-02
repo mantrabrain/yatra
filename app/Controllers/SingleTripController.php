@@ -168,6 +168,9 @@ class SingleTripController
         // Get FAQs from TripContentTable
         $trip->faqs = $this->getFaqs((int) $trip->id);
         
+        // Get downloadable items from TripContentTable
+        $trip->downloadable_items = $this->getDownloadableItems((int) $trip->id);
+        
         // Get videos, YouTube videos, virtual tours, and documents from TripContentTable
         $trip->videos = $this->getVideos((int) $trip->id);
         $trip->youtube_videos = $this->getYoutubeVideos((int) $trip->id);
@@ -1032,6 +1035,76 @@ class SingleTripController
         );
         
         return $faqs ?: [];
+    }
+
+    /**
+     * Get downloadable items for a trip
+     *
+     * @param int $trip_id Trip ID
+     * @return array Array of downloadable item objects
+     */
+    private function getDownloadableItems(int $trip_id): array
+    {
+        $tripContentTable = \Yatra\Database\Tables\TripContentTable::getTableName();
+        
+        // Check if table exists
+        $table_exists = $this->wpdb->get_var(
+            $this->wpdb->prepare(
+                "SHOW TABLES LIKE %s",
+                $tripContentTable
+            )
+        ) === $tripContentTable;
+        
+        if (!$table_exists) {
+            return [];
+        }
+        
+        $downloads = $this->wpdb->get_results(
+            $this->wpdb->prepare(
+                "SELECT * FROM {$tripContentTable} 
+                 WHERE trip_id = %d AND content_type = 'download'
+                 ORDER BY sort_order ASC, id ASC",
+                $trip_id
+            )
+        );
+        
+        if (!$downloads) {
+            return [];
+        }
+        
+        // Normalize downloads to match expected format
+        $normalized = [];
+        foreach ($downloads as $download) {
+            $metadata = [];
+            if (!empty($download->metadata)) {
+                $decoded = json_decode($download->metadata, true);
+                if (is_array($decoded)) {
+                    $metadata = $decoded;
+                }
+            }
+            
+            $attachmentId = $metadata['attachment_id'] ?? null;
+            $protectedPath = $metadata['protected_path'] ?? null;
+            $visibility = $metadata['visibility'] ?? 'booked_only';
+            
+            $normalized[] = (object) [
+                'id' => isset($download->id) ? (int) $download->id : 0,
+                'title' => $download->title ?? '',
+                'description' => $download->description ?? '',
+                'attachment_id' => $attachmentId ? (int) $attachmentId : null,
+                'protected_path' => $protectedPath,
+                'content_url' => $download->content_url ?? '',
+                'file_path' => $download->file_path ?? null,
+                'file_size' => isset($download->file_size) ? (int) $download->file_size : null,
+                'file_type' => $download->file_type ?? null,
+                'thumbnail_url' => $download->thumbnail_url ?? null,
+                'visibility' => $visibility,
+                'is_downloadable' => isset($download->is_downloadable) ? (bool) $download->is_downloadable : true,
+                'sort_order' => isset($download->sort_order) ? (int) $download->sort_order : 0,
+            ];
+        }
+        
+        return $normalized;
     }
 
     /**

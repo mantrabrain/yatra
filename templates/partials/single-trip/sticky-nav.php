@@ -28,10 +28,27 @@ if (!defined('ABSPATH')) {
             <?php echo yatra_svg_icon('file-text', 'yatra-sticky-nav-icon'); ?>
             <span><?php esc_html_e('Important Info', 'yatra'); ?></span>
         </a>
-        <a href="#faq" class="yatra-sticky-nav-item">
-            <?php echo yatra_svg_icon('users', 'yatra-sticky-nav-icon'); ?>
-            <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
-        </a>
+        <?php 
+        $downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
+        if (!empty($downloads)): 
+        ?>
+            <a href="#downloads" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('download', 'yatra-sticky-nav-icon'); ?>
+                <span><?php esc_html_e('Downloads', 'yatra'); ?></span>
+            </a>
+        <?php endif; ?>
+        <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
+            <a href="#faq" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('users', 'yatra-sticky-nav-icon'); ?>
+                <span><?php esc_html_e('FAQ', 'yatra'); ?></span>
+            </a>
+        <?php endif; ?>
+        <?php if (!empty($trip->trip_story ?? '')): ?>
+            <a href="#trip-story" class="yatra-sticky-nav-item">
+                <?php echo yatra_svg_icon('book', 'yatra-sticky-nav-icon'); ?>
+                <span><?php esc_html_e('Story', 'yatra'); ?></span>
+            </a>
+        <?php endif; ?>
         <?php 
         $special_content = $trip->what_makes_special ?? '';
         if (!empty($special_content)): 
@@ -39,12 +56,6 @@ if (!defined('ABSPATH')) {
             <a href="#what-makes-special" class="yatra-sticky-nav-item">
                 <?php echo yatra_svg_icon('globe', 'yatra-sticky-nav-icon'); ?>
                 <span><?php esc_html_e('Special', 'yatra'); ?></span>
-            </a>
-        <?php endif; ?>
-        <?php if (!empty($trip->trip_story ?? '')): ?>
-            <a href="#trip-story" class="yatra-sticky-nav-item">
-                <?php echo yatra_svg_icon('book', 'yatra-sticky-nav-icon'); ?>
-                <span><?php esc_html_e('Story', 'yatra'); ?></span>
             </a>
         <?php endif; ?>
         <?php 

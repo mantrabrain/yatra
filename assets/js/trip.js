@@ -2470,7 +2470,9 @@
 
       this.sidebar = document.querySelector('.yatra-trip-sidebar');
       this.navItems = this.nav.querySelectorAll('.yatra-sticky-nav-item');
-      this.sections = ['overview', 'trip-details', 'itinerary', 'included', 'availability'];
+      
+      // Update sections to match actual page hierarchy
+      this.sections = this.getActualSections();
 
       // Calculate nav height
       this.navHeight = this.nav.offsetHeight || 60;
@@ -2479,6 +2481,22 @@
       this.handleScroll(); // Initial check
       this.updateActiveNav(); // Initial check
       this.updateSidebarPosition(); // Initial check
+    }
+
+    getActualSections() {
+      // Base sections that are always present in order
+      const baseSections = ['overview', 'itinerary', 'included', 'location', 'important-info'];
+      
+      // Conditional sections that may or may not be present
+      const conditionalSections = ['downloads', 'faq', 'trip-story', 'what-makes-special', 'testimonials'];
+      
+      // Combine all sections and filter to only include those that actually exist on the page
+      const allSections = [...baseSections, ...conditionalSections];
+      
+      return allSections.filter(sectionId => {
+        const element = document.getElementById(sectionId);
+        return element && element.offsetParent !== null; // Check if element exists and is visible
+      });
     }
 
     attachEventListeners() {
@@ -2539,6 +2557,40 @@
       if (!section) return;
 
       const offset = 100; // Account for sticky header
+      const elementPosition = section.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+
+    scrollToSection(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (!section) {
+        console.warn(`Section with ID "${sectionId}" not found`);
+        return;
+      }
+
+      // Calculate offset - account for sticky nav and admin bar
+      let offset = 100; // Base offset
+      const isNavVisible = this.nav.classList.contains('visible');
+      if (isNavVisible) {
+        offset += this.navHeight;
+      }
+
+      // Check for WordPress admin bar
+      const adminBar = document.getElementById('wpadminbar');
+      if (adminBar) {
+        // Check if mobile admin bar (782px breakpoint)
+        if (window.innerWidth <= 782) {
+          offset += 46; // Mobile admin bar
+        } else {
+          offset += 32; // Desktop admin bar
+        }
+      }
+
       const elementPosition = section.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - offset;
 
@@ -4562,6 +4614,238 @@ class ItineraryVideoHandler {
     });
   }
 }
+
+/**
+ * Downloads Handler Class
+ * Handles download section interactions including preview modal
+ */
+class DownloadsHandler {
+  constructor() {
+    this.previewModal = null;
+    this.currentDownloadId = null;
+    this.init();
+  }
+
+  init() {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => this.setup());
+    } else {
+      this.setup();
+    }
+  }
+
+  setup() {
+    this.previewModal = document.getElementById('download-preview-modal');
+    if (!this.previewModal) return;
+
+    this.attachEventListeners();
+  }
+
+  attachEventListeners() {
+    // Handle download button clicks
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.yatra-download-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.yatra-download-btn');
+        const downloadId = btn.dataset.downloadId;
+        if (downloadId) {
+          this.downloadFile(downloadId);
+        }
+      }
+
+      // Handle view/preview link clicks
+      if (e.target.closest('.yatra-download-view-link, .yatra-download-preview-link')) {
+        e.preventDefault();
+        const link = e.target.closest('.yatra-download-view-link, .yatra-download-preview-link');
+        const downloadId = link.dataset.downloadId;
+        if (downloadId) {
+          this.previewFile(downloadId);
+        }
+      }
+
+      // Handle modal close
+      if (e.target.closest('.yatra-preview-modal-close, .yatra-preview-close-btn')) {
+        this.closePreviewModal();
+      }
+
+      // Handle modal overlay click
+      if (e.target.classList.contains('yatra-preview-modal-overlay')) {
+        this.closePreviewModal();
+      }
+
+      // Handle preview modal download button
+      if (e.target.closest('#preview-download-btn')) {
+        if (this.currentDownloadId) {
+          this.downloadFile(this.currentDownloadId);
+        }
+      }
+    });
+
+    // Handle ESC key to close modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.previewModal.style.display === 'block') {
+        this.closePreviewModal();
+      }
+    });
+  }
+
+  async downloadFile(downloadId) {
+    try {
+      // Get download URL with signature
+      const response = await fetch(`/wp-json/yatra/v1/downloads/${downloadId}/download`);
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.download_url) {
+        // Create temporary link and trigger download
+        const link = document.createElement('a');
+        link.href = data.download_url;
+        link.download = ''; // Let server determine filename
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        throw new Error('Download URL not found');
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      // Show error message to user
+      this.showNotification('Download failed. Please try again.', 'error');
+    }
+  }
+
+  async previewFile(downloadId) {
+    try {
+      this.currentDownloadId = downloadId;
+      this.showPreviewModal();
+
+      // Get download info
+      const response = await fetch(`/wp-json/yatra/v1/downloads/${downloadId}/download`);
+      if (!response.ok) {
+        throw new Error('Failed to get file info');
+      }
+
+      const data = await response.json();
+      
+      if (data.download_url) {
+        this.loadPreview(data.download_url, data.title || 'Preview');
+      } else {
+        throw new Error('File URL not found');
+      }
+    } catch (error) {
+      console.error('Preview error:', error);
+      this.closePreviewModal();
+      this.showNotification('Failed to load preview. Please try again.', 'error');
+    }
+  }
+
+  loadPreview(fileUrl, title) {
+    const previewContent = document.getElementById('preview-content');
+    const modalTitle = document.querySelector('.yatra-preview-modal-title');
+    
+    if (modalTitle) {
+      modalTitle.textContent = title;
+    }
+
+    if (!previewContent) return;
+
+    // Hide loading and show preview
+    const loading = previewContent.querySelector('.yatra-preview-loading');
+    if (loading) {
+      loading.style.display = 'none';
+    }
+
+    // Check file type and load appropriate preview
+    const fileType = this.getFileType(fileUrl);
+    
+    if (fileType === 'image') {
+      previewContent.innerHTML = `<img src="${fileUrl}" alt="${title}" style="max-width: 100%; height: auto;">`;
+    } else if (fileType === 'pdf') {
+      previewContent.innerHTML = `
+        <iframe src="${fileUrl}" style="width: 100%; height: 500px; border: none; border-radius: 8px;"></iframe>
+      `;
+    } else {
+      previewContent.innerHTML = `
+        <div style="text-align: center; padding: 40px;">
+          <div style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;">📄</div>
+          <p style="color: #6b7280; margin-bottom: 16px;">Preview not available for this file type</p>
+          <p style="color: #9ca3af; font-size: 14px;">Please download the file to view its contents</p>
+        </div>
+      `;
+    }
+  }
+
+  getFileType(url) {
+    const extension = url.split('.').pop().toLowerCase();
+    const imageTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+    const pdfTypes = ['pdf'];
+    
+    if (imageTypes.includes(extension)) return 'image';
+    if (pdfTypes.includes(extension)) return 'pdf';
+    return 'other';
+  }
+
+  showPreviewModal() {
+    if (this.previewModal) {
+      this.previewModal.style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      
+      // Reset loading state
+      const previewContent = document.getElementById('preview-content');
+      if (previewContent) {
+        previewContent.innerHTML = `
+          <div class="yatra-preview-loading">
+            <div class="yatra-preview-spinner"></div>
+            <p>Loading preview...</p>
+          </div>
+        `;
+      }
+    }
+  }
+
+  closePreviewModal() {
+    if (this.previewModal) {
+      this.previewModal.style.display = 'none';
+      document.body.style.overflow = '';
+      this.currentDownloadId = null;
+    }
+  }
+
+  showNotification(message, type = 'info') {
+    // Simple notification - you can enhance this with a proper notification system
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'error' ? '#ef4444' : '#3b82f6'};
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      font-size: 14px;
+      font-weight: 500;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+      notification.style.opacity = '0';
+      notification.style.transition = 'opacity 0.3s ease';
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+}
+
+// Initialize downloads handler
+new DownloadsHandler();
 
 // Kick things off
 TripPage.bootstrap();

@@ -680,6 +680,7 @@ class TripController extends BaseController
                 $data['landmarks'],
                 $data['gallery_images'],
                 $data['faqs'],
+                $data['downloadable_items'],
                 $data['itinerary_days'],
                 $data['availability_dates'],
                 $data['attributes']
@@ -1182,6 +1183,25 @@ class TripController extends BaseController
             }, $item->faqs);
         } else {
             $data['faqs'] = [];
+        }
+
+        // Handle downloadable_items relationship (already normalized in repository)
+        if (isset($item->downloadable_items)) {
+            $data['downloadable_items'] = array_map(function ($download) {
+                return [
+                    'id' => isset($download->id) ? (int) $download->id : null,
+                    'title' => $download->title ?? '',
+                    'description' => $download->description ?? '',
+                    'attachment_id' => isset($download->attachment_id) ? (int) $download->attachment_id : null,
+                    'attachment_url' => $download->content_url ?? '',
+                    'attachment_title' => $download->title ?? '',
+                    'visibility' => $download->visibility ?? 'booked_only',
+                    'enabled' => isset($download->is_downloadable) ? (bool) $download->is_downloadable : true,
+                    'sort_order' => isset($download->sort_order) ? (int) $download->sort_order : 0,
+                ];
+            }, $item->downloadable_items);
+        } else {
+            $data['downloadable_items'] = [];
         }
 
         if (isset($item->itinerary_days)) {
