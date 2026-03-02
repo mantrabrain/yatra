@@ -80,8 +80,20 @@
     }
 
     setup() {
+      // Wait for DOM to be ready if needed
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => this.initializeGallery());
+      } else {
+        this.initializeGallery();
+      }
+    }
+
+    initializeGallery() {
       this.modal = document.getElementById('hero-gallery');
-      if (!this.modal) return;
+      if (!this.modal) {
+        console.warn('Hero gallery modal not found');
+        return;
+      }
 
       this.collectImages();
       this.createThumbnails();
@@ -94,6 +106,7 @@
 
       // Collect from hero slides
       const heroSlides = document.querySelectorAll('.yatra-trip-hero-slide img');
+      console.log('Hero slides found:', heroSlides.length);
       heroSlides.forEach((img, index) => {
         this.images.push({
           src: img.src,
@@ -103,15 +116,41 @@
 
       // Collect from gallery section (hero gallery only, NOT itinerary)
       const galleryItems = document.querySelectorAll('.yatra-trip-gallery .yatra-gallery-item img');
+      console.log('Gallery items found:', galleryItems.length);
       galleryItems.forEach((img) => {
         const exists = this.images.some(i => i.src === img.src);
         if (!exists) {
           this.images.push({
             src: img.src,
-            alt: img.alt || `Gallery Image ${this.images.length + 1}`
+            alt: img.alt || 'Gallery Image'
           });
         }
       });
+
+      // Collect from hero main image
+      const heroMainImg = document.querySelector('.yatra-hero-main-img');
+      console.log('Hero main image found:', !!heroMainImg);
+      if (heroMainImg && !this.images.some(i => i.src === heroMainImg.src)) {
+        this.images.push({
+          src: heroMainImg.src,
+          alt: heroMainImg.alt || 'Main Image'
+        });
+      }
+
+      // Collect from side images
+      const sideImages = document.querySelectorAll('.yatra-side-image-item img');
+      console.log('Side images found:', sideImages.length);
+      sideImages.forEach((img) => {
+        const exists = this.images.some(i => i.src === img.src);
+        if (!exists) {
+          this.images.push({
+            src: img.src,
+            alt: img.alt || 'Side Image'
+          });
+        }
+      });
+
+      console.log('Total gallery images collected:', this.images.length);
     }
 
     createThumbnails() {
