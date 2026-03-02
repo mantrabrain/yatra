@@ -31,86 +31,166 @@ if (!defined('ABSPATH')) {
                 <?php
                 // Use dynamic similar trips from controller, with fallback to sample data
                 $similar_trips_data = !empty($trip->similar_trips) ? $trip->similar_trips : [];
-
+                
                 // Only show real trips from database - no dummy data
 
                 foreach ($similar_trips_data as $similar_trip) {
-                    // Handle both object and array format
-                    $st_title = is_object($similar_trip) ? $similar_trip->title : ($similar_trip['title'] ?? '');
-                    $st_slug = is_object($similar_trip) ? ($similar_trip->slug ?? sanitize_title($st_title)) : ($similar_trip['slug'] ?? sanitize_title($st_title));
-                    $st_image = is_object($similar_trip) ? ($similar_trip->featured_image_url ?? '') : ($similar_trip['featured_image_url'] ?? '');
-                    $st_duration_days = is_object($similar_trip) ? ($similar_trip->duration_days ?? 1) : ($similar_trip['duration_days'] ?? 1);
-                    $st_duration_nights = is_object($similar_trip) ? ($similar_trip->duration_nights ?? 0) : ($similar_trip['duration_nights'] ?? 0);
-                    $st_sale_price = is_object($similar_trip) ? ($similar_trip->sale_price ?? 0) : ($similar_trip['sale_price'] ?? 0);
-                    $st_original_price = is_object($similar_trip) ? ($similar_trip->original_price ?? 0) : ($similar_trip['original_price'] ?? 0);
-                    $st_currency = is_object($similar_trip) ? ($similar_trip->currency ?? 'USD') : ($similar_trip['currency'] ?? 'USD');
-                    $st_discount = is_object($similar_trip) ? ($similar_trip->discount_percentage ?? 0) : ($similar_trip['discount_percentage'] ?? 0);
-                    $st_difficulty = is_object($similar_trip) ? ($similar_trip->difficulty_level ?? 'Moderate') : ($similar_trip['difficulty_level'] ?? 'Moderate');
-                    $st_location = is_object($similar_trip) ? ($similar_trip->location ?? '') : ($similar_trip['location'] ?? '');
-                    $st_rating = is_object($similar_trip) ? ($similar_trip->rating ?? 0) : ($similar_trip['rating'] ?? 0);
-                    $st_reviews_count = is_object($similar_trip) ? ($similar_trip->reviews_count ?? 0) : ($similar_trip['reviews_count'] ?? 0);
-                    $st_highlights = is_object($similar_trip) ? ($similar_trip->highlights ?? []) : ($similar_trip['highlights'] ?? []);
+                    // Convert to Trip model if needed
+                    if (!($similar_trip instanceof \Yatra\Models\Trip)) {
+                        $similar_trip = \Yatra\Models\Trip::fromStdClass((object) $similar_trip);
+                    }
+                    
+                    // Set required properties for the template
+                    if (!isset($similar_trip->featured_image_url)) {
+                        $similar_trip->featured_image_url = $similar_trip->featured_image ?? '';
+                    }
+                    
+                    // Get trip data using Trip model methods
+                    $title = $similar_trip->getTitle();
+                    $duration = $similar_trip->getDuration();
+                    $difficulty = $similar_trip->getDifficulty();
+                    $pricing = $similar_trip->getPricing();
+                    $discount = $similar_trip->getDiscount();
+                    $image = $similar_trip->getImage();
+                    $permalink = $similar_trip->getPermalink();
+                    $destinations = $similar_trip->getDestinations();
+                    $categories = $similar_trip->getCategories();
+                    $activities = $similar_trip->getActivities();
+                    
+                    // Calculate rating directly from reviews array
+                    $reviews = $similar_trip->reviews ?? [];
+                    $review_count = count($reviews);
+                    $average_rating = 0;
+
+                    if ($review_count > 0) {
+                        $total_rating = 0;
+                        foreach ($reviews as $review) {
+                            $total_rating += (float) ($review->rating ?? 0);
+                        }
+                        $average_rating = round($total_rating / $review_count, 1);
+                    }
+
+                    $rating = [
+                        'average_rating' => $average_rating,
+                        'review_count' => $review_count,
+                        'formatted_rating' => number_format($average_rating, 1),
+                        'has_rating' => $average_rating > 0 && $review_count > 0
+                    ];
                     ?>
                     <div class="yatra-carousel-item">
-                        <div class="yatra-trip-card">
-                            <div class="yatra-trip-image">
-                                <img src="<?php echo esc_url($st_image ?: plugins_url('assets/images/trip-placeholder.svg', YATRA_PLUGIN_FILE)); ?>" alt="<?php echo esc_attr($st_title); ?>" loading="lazy">
-                                <?php if ($st_discount > 0): ?>
-                                    <div class="yatra-discount-badge">
-                                        <?php echo esc_html($st_discount); ?>% <?php echo esc_html__('OFF', 'yatra'); ?>
+                        <div class="yatra-similar-trip-card">
+                            <div class="yatra-similar-trip-image">
+                                <?php if (!empty($permalink)): ?>
+                                    <a href="<?php echo esc_url($permalink); ?>" class="yatra-similar-image-link">
+                                        <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+                                    </a>
+                                <?php else: ?>
+                                    <img src="<?php echo esc_url($image['url']); ?>" alt="<?php echo esc_attr($image['alt']); ?>">
+                                <?php endif; ?>
+                                
+                                <?php if ($discount['has_discount']): ?>
+                                <div class="yatra-similar-discount-badge">
+                                    <?php echo esc_html($discount['discount_text']); ?> OFF
+                                </div>
+                                <?php endif; ?>
+                                
+                                <button class="yatra-similar-favorite-btn" data-trip-id="<?php echo esc_attr($similar_trip->id); ?>" title="<?php esc_attr_e('Add to favorites', 'yatra'); ?>">
+                                    <?php echo yatra_svg_icon('heart', ''); ?>
+                                </button>
+                                
+                                <?php if ($difficulty['has_difficulty'] && !empty($difficulty['icon'])): ?>
+                                    <div class="yatra-similar-difficulty-overlay">
+                                        <?php echo yatra_svg_icon($difficulty['icon'], 'similar-difficulty-icon'); ?>
+                                        <?php echo ' ' . esc_html($difficulty['level']); ?>
                                     </div>
                                 <?php endif; ?>
-                                <button class="yatra-favorite-btn" title="<?php echo esc_attr__('Add to favorites', 'yatra'); ?>">
-                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                    </svg>
-                                </button>
                             </div>
-
-                            <div class="yatra-trip-content">
-                                <div class="yatra-trip-meta">
-                                    <?php if ($st_location): ?>
-                                        <span class="yatra-trip-location"><?php echo esc_html($st_location); ?></span>
-                                        <span class="yatra-trip-separator">•</span>
+                            
+                            <div class="yatra-similar-trip-content">
+                                <!-- Destination -->
+                                <?php if (!empty($destinations)) : ?>
+                                    <div class="yatra-similar-destinations">
+                                        <?php echo yatra_svg_icon('map-pin', 'similar-location-icon'); ?>
+                                        <?php 
+                                        $destination_names = [];
+                                        foreach ($destinations as $destination) {
+                                            if (isset($destination->name)) {
+                                                $destination_permalink = function_exists('yatra_get_destination_permalink') 
+                                                    ? yatra_get_destination_permalink($destination) 
+                                                    : '#';
+                                                $destination_names[] = '<a href="' . esc_url($destination_permalink) . '" class="similar-destination-link">' . esc_html($destination->name) . '</a>';
+                                            }
+                                        }
+                                        echo implode(', ', $destination_names);
+                                        ?>
+                                    </div>
+                                <?php endif; ?>
+                                
+                                <h3 class="yatra-similar-trip-title">
+                                    <?php if (!empty($permalink)): ?>
+                                        <a href="<?php echo esc_url($permalink); ?>" class="yatra-similar-title-link"><?php echo esc_html($title); ?></a>
+                                    <?php else: ?>
+                                        <?php echo esc_html($title); ?>
                                     <?php endif; ?>
-                                    <span class="yatra-trip-duration"><?php echo esc_html(yatra_format_duration($st_duration_days, $st_duration_nights)); ?></span>
-                                    <span class="yatra-trip-separator">•</span>
-                                    <span class="yatra-trip-difficulty"><?php echo esc_html(ucfirst($st_difficulty)); ?></span>
+                                </h3>
+                                
+                                <!-- Trip Stats -->
+                                <div class="yatra-similar-trip-stats">
+                                    <?php if ($duration['has_duration']): ?>
+                                        <div class="yatra-similar-stat">
+                                            <?php echo yatra_svg_icon('calendar', 'similar-stat-icon'); ?>
+                                            <span><?php echo esc_html($duration['formatted']); ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if (!empty($similar_trip->min_travelers) || !empty($similar_trip->max_travelers)): ?>
+                                        <div class="yatra-similar-stat">
+                                            <?php echo yatra_svg_icon('users', 'similar-stat-icon'); ?>
+                                            <span>
+                                                <?php 
+                                                $min_travelers = $similar_trip->min_travelers ?? 1;
+                                                $max_travelers = $similar_trip->max_travelers ?? 20;
+                                                echo esc_html($min_travelers . '-' . $max_travelers); 
+                                                ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ($rating['has_rating'] && $rating['average_rating'] > 0): ?>
+                                        <div class="yatra-similar-stat">
+                                            <?php echo yatra_svg_icon('star', 'similar-stat-icon'); ?>
+                                            <span><?php echo esc_html($rating['formatted_rating']); ?></span>
+                                        </div>
+                                    <?php endif; ?>
                                 </div>
-
-                                <h3 class="yatra-trip-title"><?php echo esc_html($st_title); ?></h3>
-
-                                <?php if (!empty($st_highlights) && is_array($st_highlights)): ?>
-                                    <div class="yatra-trip-highlights">
-                                        <?php foreach (array_slice($st_highlights, 0, 2) as $highlight): ?>
-                                            <span class="yatra-highlight-badge"><?php echo esc_html($highlight); ?></span>
+                                
+                                <!-- Categories -->
+                                <?php if (!empty($categories)) : ?>
+                                    <div class="yatra-similar-categories">
+                                        <?php foreach (array_slice($categories, 0, 2) as $category) : ?>
+                                            <a href="<?php echo esc_url(yatra_get_category_permalink($category)); ?>" class="yatra-similar-category-tag">
+                                                <?php echo esc_html($category->name); ?>
+                                            </a>
                                         <?php endforeach; ?>
                                     </div>
                                 <?php endif; ?>
-
-                                <?php if ($st_rating > 0): ?>
-                                    <div class="yatra-trip-rating">
-                                        <div class="yatra-rating-stars">
-                                            <svg width="16" height="16" fill="#fbbf24" viewBox="0 0 24 24">
-                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                            </svg>
-                                            <span class="yatra-rating-value"><?php echo esc_html(number_format($st_rating, 1)); ?></span>
-                                        </div>
-                                        <?php if ($st_reviews_count > 0): ?>
-                                            <span class="yatra-reviews-count">(<?php echo esc_html(number_format($st_reviews_count)); ?> <?php echo esc_html(_n('review', 'reviews', $st_reviews_count, 'yatra')); ?>)</span>
-                                        <?php endif; ?>
+                                
+                                <div class="yatra-similar-trip-footer">
+                                    <div class="yatra-similar-price">
+                                        <span class="yatra-similar-trip-price">
+                                            <?php if ($pricing['has_price']): ?>
+                                                <?php echo esc_html($pricing['price_prefix'] . $pricing['current_price']); ?>
+                                                <?php if ($pricing['has_discount'] && !empty($pricing['original_price'])): ?>
+                                                    <span class="yatra-similar-original-price"><?php echo esc_html($pricing['original_price']); ?></span>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <?php esc_html_e('Contact for pricing', 'yatra'); ?>
+                                            <?php endif; ?>
+                                        </span>
                                     </div>
-                                <?php endif; ?>
-
-                                <div class="yatra-trip-footer">
-                                    <div class="yatra-trip-price">
-                                        <?php if ($st_original_price > $st_sale_price): ?>
-                                            <div class="yatra-original-price"><?php echo esc_html(yatra_format_price($st_original_price)); ?></div>
-                                        <?php endif; ?>
-                                        <div class="yatra-current-price"><?php echo esc_html(yatra_format_price($st_sale_price)); ?></div>
-                                        <div class="yatra-price-note"><?php echo esc_html__('per person', 'yatra'); ?></div>
-                                    </div>
-                                    <a href="<?php echo esc_url(home_url('/trip/' . $st_slug)); ?>" class="yatra-card-view-btn"><?php echo esc_html__('View Details', 'yatra'); ?></a>
+                                    <?php if (!empty($permalink)): ?>
+                                        <a href="<?php echo esc_url($permalink); ?>" class="yatra-similar-view-btn"><?php esc_html_e('View Details', 'yatra'); ?></a>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
