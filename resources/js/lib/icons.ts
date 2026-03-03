@@ -39,6 +39,14 @@ import {
   Star,
   Zap,
   Flame,
+  FileText,
+  Download,
+  Users,
+  Globe,
+  HelpCircle,
+  MessageCircle,
+  Check,
+  Info,
 } from "lucide-react";
 
 // Map icon names to Lucide components
@@ -76,6 +84,14 @@ const lucideIconMap: Record<
   shopping: ShoppingBag,
   heart: Heart,
   star: Star,
+  "file-text": FileText,
+  download: Download,
+  users: Users,
+  globe: Globe,
+  "help-circle": HelpCircle,
+  "message-circle": MessageCircle,
+  check: Check,
+  info: Info,
 };
 
 export type IconName = keyof typeof lucideIconMap;
@@ -182,6 +198,14 @@ function getCategoryForIcon(iconName: IconName): IconOption["category"] {
     shopping: "general",
     heart: "general",
     star: "general",
+    "file-text": "general",
+    download: "general",
+    users: "general",
+    globe: "general",
+    "help-circle": "general",
+    "message-circle": "general",
+    check: "general",
+    info: "general",
   };
 
   return categoryMap[iconName] || "general";

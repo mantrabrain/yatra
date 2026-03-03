@@ -6,8 +6,8 @@ if (!defined('ABSPATH')) {
 <section class="yatra-trip-section" id="itinerary" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-section-header-with-actions">
         <h2 class="yatra-trip-section-title">
-            <?php echo yatra_svg_icon('calendar', 'yatra-trip-section-title-icon'); ?>
-            <?php echo esc_html__('Itinerary', 'yatra'); ?>
+            <?php echo yatra_svg_icon($tab->icon ?? 'calendar', 'yatra-trip-section-title-icon'); ?>
+            <?php echo esc_html(isset($tab->label) ? $tab->label : __('Itinerary', 'yatra')); ?>
         </h2>
         <div class="yatra-itinerary-actions">
             <button type="button" class="yatra-toggle-all-btn" id="yatra-toggle-all">

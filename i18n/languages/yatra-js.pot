@@ -3,51 +3,51 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "X-Generator: babel-plugin-makepot\n"
 
-#: assets/admin/dist/js/app.js:31525
+#: assets/admin/dist/js/app.js:32098
 msgid "Failed to load reviews. Please try again."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31555
+#: assets/admin/dist/js/app.js:32128
 msgid "Select reviews to display as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31557
+#: assets/admin/dist/js/app.js:32130
 msgid "Save the trip first to select testimonials from reviews"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31562
+#: assets/admin/dist/js/app.js:32135
 msgid "Testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31563
+#: assets/admin/dist/js/app.js:32136
 msgid "Select approved reviews to display as testimonials on the trip page"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31569
+#: assets/admin/dist/js/app.js:32142
 msgid "Loading reviews..."
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31580
+#: assets/admin/dist/js/app.js:32153
 msgid "Retry"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31585
+#: assets/admin/dist/js/app.js:32158
 msgid "No approved reviews yet"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31586
+#: assets/admin/dist/js/app.js:32159
 msgid "Reviews will appear here once customers submit and they are approved"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31591
+#: assets/admin/dist/js/app.js:32164
 msgid "Select reviews to feature as testimonials"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31600
+#: assets/admin/dist/js/app.js:32173
 msgid "Clear all"
 msgstr ""
 
-#: assets/admin/dist/js/app.js:31638
+#: assets/admin/dist/js/app.js:32211
 msgid "Selected as testimonial"
 msgstr ""
 
@@ -793,6 +793,8 @@ msgstr ""
 msgid "Emergency Contact"
 msgstr ""
 
+#: assets/dist/js/index-BE3T6zQK.js:910
+#: assets/dist/js/index-D2OoPDJe.js:910
 #: assets/dist/js/index-DGrp-_D2.js:910
 #: assets/dist/js/index-DWmYutN-.js:910
 #: assets/dist/js/index-usfgp7gv.js:910
@@ -800,6 +802,8 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
+#: assets/dist/js/index-BE3T6zQK.js:522
+#: assets/dist/js/index-D2OoPDJe.js:522
 #: assets/dist/js/index-DGrp-_D2.js:522
 #: assets/dist/js/index-DWmYutN-.js:522
 #: assets/dist/js/index-usfgp7gv.js:522

@@ -6,19 +6,17 @@ if (!defined('ABSPATH')) {
 // Downloads Section - List View with Download Icons
 // Expected variables: $trip
 ?>
-<?php 
-$downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
-if (!empty($downloads)): 
-?>
 <section class="yatra-trip-section" id="downloads">
     <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon('download', 'yatra-trip-section-title-icon'); ?>
-        <?php echo esc_html__('Downloads', 'yatra'); ?>
+        <?php echo yatra_svg_icon($tab->icon ?? 'download', 'yatra-trip-section-title-icon'); ?>
+        <?php echo esc_html(isset($tab->label) ? $tab->label : __('Downloads', 'yatra')); ?>
     </h2>
     
     <div class="yatra-downloads-container">
         <div class="yatra-downloads-list">
-            <?php foreach ($downloads as $download): ?>
+            <?php 
+            $downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
+            foreach ($downloads as $download): ?>
                 <div class="yatra-download-item" data-download-id="<?php echo esc_attr($download->id); ?>">
                     <div class="yatra-download-icon">
                         <?php 
@@ -139,7 +137,13 @@ if (!empty($downloads)):
                     </div>
                 </div>
             <?php endforeach; ?>
+            <?php if (empty($downloads)): ?>
+                <div class="yatra-no-downloads">
+                    <p class="text-gray-500 text-center py-8">
+                        <?php echo esc_html__('No downloads available for this trip.', 'yatra'); ?>
+                    </p>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
-<?php endif; ?>

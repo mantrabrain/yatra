@@ -231,7 +231,10 @@ class SingleTripController
         }
         
         // FAQs are now loaded from TripContentTable in getFaqs() method
-        $trip->frontend_tabs = $this->decodeJson($trip->frontend_tabs ?? '');
+        $db_frontend_tabs = $this->decodeJson($trip->frontend_tabs ?? '');
+        
+        // Merge database data with complete default array to ensure all sections are available
+        $trip->frontend_tabs = $this->mergeFrontendTabsWithDefaults($db_frontend_tabs);
         
         // Fetch availability dates from database table
         $trip->availability_dates = $this->getAvailabilityDates((int) $trip->id);
@@ -1610,6 +1613,383 @@ class SingleTripController
 
         $booking_base = get_option('yatra_booking_base', 'book');
         return home_url("/{$booking_base}/{$slug}/");
+    }
+
+    /**
+     * Render tabs based on frontend_tabs configuration
+     *
+     * @param object $trip Trip object with frontend_tabs data
+     * @return void
+     */
+    public static function renderFrontendTabs($trip)
+    {
+        $frontend_tabs = isset($trip->frontend_tabs) ? $trip->frontend_tabs : [];
+        
+        // Use the same merge logic as getStickyNavigationItems to ensure consistency
+        if (!empty($frontend_tabs)) {
+            $frontend_tabs = self::mergeFrontendTabsWithDefaults($frontend_tabs);
+        } else {
+            // Use default tabs if no database data exists
+            $frontend_tabs = [
+                // Core sections (always present)
+                (object) ['id' => 'overview', 'label' => 'Overview', 'enabled' => true, 'order' => 1, 'content_type' => 'overview', 'icon' => 'book'],
+                (object) ['id' => 'itinerary', 'label' => 'Itinerary', 'enabled' => true, 'order' => 2, 'content_type' => 'itinerary', 'icon' => 'calendar'],
+                (object) ['id' => 'included', 'label' => 'Included', 'enabled' => true, 'order' => 3, 'content_type' => 'included_excluded', 'icon' => 'check'],
+                (object) ['id' => 'location', 'label' => 'Location', 'enabled' => true, 'order' => 4, 'content_type' => 'location', 'icon' => 'map-pin'],
+                (object) ['id' => 'important_info', 'label' => 'Important Info', 'enabled' => true, 'order' => 5, 'content_type' => 'important_info', 'icon' => 'info'],
+                
+                // Conditional sections (enabled by default, shown conditionally on frontend)
+                (object) ['id' => 'downloads', 'label' => 'Downloads', 'enabled' => true, 'order' => 6, 'content_type' => 'downloads', 'icon' => 'download'],
+                (object) ['id' => 'faq', 'label' => 'FAQ', 'enabled' => true, 'order' => 7, 'content_type' => 'faq', 'icon' => 'help-circle'],
+                (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
+                (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
+                (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+            ];
+        }
+        
+        // Sort tabs by order and filter enabled tabs
+        $enabled_tabs = array_filter($frontend_tabs, function($tab) {
+            return isset($tab->enabled) && filter_var($tab->enabled, FILTER_VALIDATE_BOOLEAN);
+        });
+        
+        usort($enabled_tabs, function($a, $b) {
+            return ($a->order ?? 999) - ($b->order ?? 999);
+        });
+
+        // Render each enabled tab
+        foreach ($enabled_tabs as $tab) {
+            self::renderTabContent($tab, $trip);
+        }
+    }
+
+    /**
+     * Render individual tab content based on content type
+     *
+     * @param object $tab Tab configuration
+     * @param object $trip Trip object
+     * @return void
+     */
+    private static function renderTabContent($tab, $trip)
+    {
+        switch ($tab->content_type) {
+            case 'overview':
+                yatra_get_template('partials/single-trip/content-overview', ['trip' => $trip, 'tab' => $tab, 'has_traveler_pricing' => true, 'has_availability' => true, 'base_price' => $trip->original_price]);
+                break;
+
+            case 'itinerary':
+                yatra_get_template('partials/single-trip/content-itinerary', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'included_excluded':
+                yatra_get_template('partials/single-trip/content-included-excluded', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'location':
+                yatra_get_template('partials/single-trip/content-location', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'important_info':
+                yatra_get_template('partials/single-trip/content-important-info', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'downloads':
+                yatra_get_template('partials/single-trip/content-downloads', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'faq':
+                yatra_get_template('partials/single-trip/content-faq', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'trip_story':
+                yatra_get_template('partials/single-trip/content-trip-story', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'what_makes_special':
+                yatra_get_template('partials/single-trip/content-whats-make-special', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'testimonials':
+                yatra_get_template('partials/single-trip/content-testimonials', ['trip' => $trip, 'tab' => $tab]);
+                break;
+
+            case 'custom':
+                // Always show custom tab if enabled, even if content is empty
+                echo '<section class="yatra-trip-section" id="' . esc_attr($tab->id) . '">';
+                echo '<h2 class="yatra-trip-section-title">';
+                echo yatra_svg_icon('book', 'yatra-trip-section-title-icon');
+                echo esc_html($tab->label);
+                echo '</h2>';
+                echo '<div class="yatra-custom-content">';
+                
+                // Display custom content if it exists, otherwise show empty message
+                $custom_content = $tab->custom_content ?? '';
+                if (!empty($custom_content)) {
+                    echo wp_kses_post($custom_content);
+                } else {
+                    echo '<p class="text-gray-500 text-center py-8">' . esc_html__('No custom content available for this section.', 'yatra') . '</p>';
+                }
+                
+                echo '</div>';
+                echo '</section>';
+                break;
+        }
+    }
+
+    /**
+     * Get sticky navigation items based on frontend_tabs configuration
+     *
+     * @param object $trip Trip object with frontend_tabs data
+     * @return array Navigation items
+     */
+    public static function getStickyNavigationItems($trip)
+    {
+        $frontend_tabs = isset($trip->frontend_tabs) ? $trip->frontend_tabs : [];
+        
+        // Use the same merge logic as renderFrontendTabs to ensure consistency
+        if (!empty($frontend_tabs)) {
+            $frontend_tabs = self::mergeFrontendTabsWithDefaults($frontend_tabs);
+        } else {
+            // Use default tabs if no database data exists
+            $frontend_tabs = [
+                // Core sections (always present)
+                (object) ['id' => 'overview', 'label' => 'Overview', 'enabled' => true, 'order' => 1, 'content_type' => 'overview', 'icon' => 'book'],
+                (object) ['id' => 'itinerary', 'label' => 'Itinerary', 'enabled' => true, 'order' => 2, 'content_type' => 'itinerary', 'icon' => 'calendar'],
+                (object) ['id' => 'included', 'label' => 'Included', 'enabled' => true, 'order' => 3, 'content_type' => 'included_excluded', 'icon' => 'check'],
+                (object) ['id' => 'location', 'label' => 'Location', 'enabled' => true, 'order' => 4, 'content_type' => 'location', 'icon' => 'map-pin'],
+                (object) ['id' => 'important_info', 'label' => 'Important Info', 'enabled' => true, 'order' => 5, 'content_type' => 'important_info', 'icon' => 'info'],
+                
+                // Conditional sections (enabled by default, shown conditionally on frontend)
+                (object) ['id' => 'downloads', 'label' => 'Downloads', 'enabled' => true, 'order' => 6, 'content_type' => 'downloads', 'icon' => 'download'],
+                (object) ['id' => 'faq', 'label' => 'FAQ', 'enabled' => true, 'order' => 7, 'content_type' => 'faq', 'icon' => 'help-circle'],
+                (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
+                (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
+                (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+            ];
+        }
+
+        // Sort tabs by order and filter enabled tabs
+        $enabled_tabs = array_filter($frontend_tabs, function($tab) {
+            return isset($tab->enabled) && $tab->enabled;
+        });
+        
+        usort($enabled_tabs, function($a, $b) {
+            return ($a->order ?? 999) - ($b->order ?? 999);
+        });
+
+        $navigation_items = [];
+        
+        foreach ($enabled_tabs as $tab) {
+            $nav_item = self::getNavigationItemForTab($tab, $trip);
+            if ($nav_item) {
+                $navigation_items[] = $nav_item;
+            }
+        }
+
+        return $navigation_items;
+    }
+
+    /**
+     * Get navigation item for a specific tab
+     *
+     * @param object $tab Tab configuration
+     * @param object $trip Trip object
+     * @return array|null Navigation item data
+     */
+    private static function getNavigationItemForTab($tab, $trip)
+    {
+        // Only check if tab is enabled - content existence is handled by templates
+        // All tabs should appear in navigation if enabled, regardless of content
+
+        // Map content types to icons and hrefs
+        $icon_map = [
+            'overview' => 'book',
+            'itinerary' => 'calendar',
+            'included_excluded' => 'check',
+            'location' => 'map-pin',
+            'important_info' => 'info',
+            'downloads' => 'download',
+            'faq' => 'help-circle',
+            'trip_story' => 'book',
+            'what_makes_special' => 'star',
+            'testimonials' => 'message-circle',
+            'custom' => 'book'
+        ];
+
+        $href_map = [
+            'overview' => '#overview',
+            'itinerary' => '#itinerary',
+            'included' => '#included',
+            'location' => '#location',
+            'important_info' => '#important-info',
+            'downloads' => '#downloads',
+            'faq' => '#faq',
+            'trip_story' => '#trip-story',
+            'what_makes_special' => '#what-makes-special',
+            'testimonials' => '#testimonials',
+            'custom' => '#custom'
+        ];
+
+        // For custom tabs, use the actual tab ID to ensure unique anchors
+        $href = isset($href_map[$tab->id]) ? $href_map[$tab->id] : '#' . $tab->id;
+        
+        // Use custom icon if available, otherwise fallback to default icon mapping
+        $icon = 'book'; // default fallback
+        if (isset($tab->icon) && !empty($tab->icon)) {
+            // Handle both array and object formats for icon
+            if (is_array($tab->icon) && isset($tab->icon['value'])) {
+                $icon = $tab->icon['value'];
+            } elseif (is_string($tab->icon)) {
+                $icon = $tab->icon;
+            } elseif (is_object($tab->icon) && isset($tab->icon->value)) {
+                $icon = $tab->icon->value;
+            }
+        } else {
+            // Fallback to default icon mapping
+            $icon = $icon_map[$tab->content_type] ?? 'book';
+        }
+        
+        return [
+            'id' => $tab->id,
+            'label' => $tab->label,
+            'href' => $href,
+            'icon' => $icon
+        ];
+    }
+
+    /**
+     * Merge database frontend_tabs with complete default array
+     * Ensures all sections are always available in the backend
+     *
+     * @param array $db_tabs Database frontend_tabs data
+     * @return array | object Merged frontend_tabs with all sections
+     */
+    private static function mergeFrontendTabsWithDefaults($db_tabs)
+    {
+       
+
+        $default_tabs =  [
+            // Core sections (always present)
+            (object) ['id' => 'overview', 'label' => 'Overview', 'enabled' => true, 'order' => 1, 'content_type' => 'overview', 'icon' => 'book'],
+            (object) ['id' => 'itinerary', 'label' => 'Itinerary', 'enabled' => true, 'order' => 2, 'content_type' => 'itinerary', 'icon' => 'calendar'],
+            (object) ['id' => 'included', 'label' => 'Included', 'enabled' => true, 'order' => 3, 'content_type' => 'included_excluded', 'icon' => 'check'],
+            (object) ['id' => 'location', 'label' => 'Location', 'enabled' => true, 'order' => 4, 'content_type' => 'location', 'icon' => 'map-pin'],
+            (object) ['id' => 'important_info', 'label' => 'Important Info', 'enabled' => true, 'order' => 5, 'content_type' => 'important_info', 'icon' => 'info'],
+
+            // Conditional sections (enabled by default, shown conditionally on frontend)
+            (object) ['id' => 'downloads', 'label' => 'Downloads', 'enabled' => true, 'order' => 6, 'content_type' => 'downloads', 'icon' => 'download'],
+            (object) ['id' => 'faq', 'label' => 'FAQ', 'enabled' => true, 'order' => 7, 'content_type' => 'faq', 'icon' => 'help-circle'],
+            (object) ['id' => 'trip_story', 'label' => 'Story', 'enabled' => true, 'order' => 8, 'content_type' => 'trip_story', 'custom_content' => '', 'icon' => 'book'],
+            (object) ['id' => 'what_makes_special', 'label' => 'Special', 'enabled' => true, 'order' => 9, 'content_type' => 'what_makes_special', 'custom_content' => '', 'icon' => 'star'],
+            (object) ['id' => 'testimonials', 'label' => 'Testimonials', 'enabled' => true, 'order' => 10, 'content_type' => 'testimonials', 'icon' => 'message-circle'],
+        ];
+
+        // If no database data, return defaults
+        if (empty($db_tabs) || !is_array($db_tabs)) {
+            return $default_tabs;
+        }
+
+        // Create a map of database tabs by ID for easy lookup
+        $db_tabs_map = [];
+        foreach ($db_tabs as $db_tab) {
+            // Handle both arrays and objects
+            $tab_id = null;
+            if (is_array($db_tab) && isset($db_tab['id'])) {
+                $tab_id = $db_tab['id'];
+            } elseif (is_object($db_tab) && isset($db_tab->id)) {
+                $tab_id = $db_tab->id;
+            }
+            
+            if ($tab_id) {
+                $db_tabs_map[$tab_id] = $db_tab;
+            }
+        }
+
+        // Merge defaults with database data
+        $merged_tabs = [];
+        foreach ($default_tabs as $default_tab) {
+            $tab_id = $default_tab->id;
+            
+            if (isset($db_tabs_map[$tab_id])) {
+                // Use database data, but ensure all required fields exist
+                $db_tab = $db_tabs_map[$tab_id];
+
+                // Handle both arrays and objects
+                $db_label = is_array($db_tab) ? ($db_tab['label'] ?? null) : ($db_tab->label ?? null);
+                $db_enabled = is_array($db_tab) ? ($db_tab['enabled'] ?? null) : ($db_tab->enabled ?? null);
+                $db_order = is_array($db_tab) ? ($db_tab['order'] ?? null) : ($db_tab->order ?? null);
+                $db_custom_content = is_array($db_tab) ? ($db_tab['custom_content'] ?? null) : ($db_tab->custom_content ?? null);
+                $db_icon = is_array($db_tab) ? ($db_tab['icon'] ?? null) : ($db_tab->icon ?? null);
+
+                // Extract icon name from icon object if it's an object
+                $icon_name = null;
+                if ($db_icon) {
+                    if (is_array($db_icon) && isset($db_icon['value'])) {
+                        $icon_name = $db_icon['value'];
+                    } elseif (is_object($db_icon) && isset($db_icon->value)) {
+                        $icon_name = $db_icon->value;
+                    } elseif (is_string($db_icon)) {
+                        $icon_name = $db_icon;
+                    }
+                }
+
+                $merged_tab = [
+                    'id' => $tab_id,
+                    'label' => $db_label ?? $default_tab->label,
+                    'enabled' => $db_enabled !== null ? filter_var($db_enabled, FILTER_VALIDATE_BOOLEAN) : $default_tab->enabled,
+                    'order' => $db_order !== null ? (int) $db_order : $default_tab->order,
+                    // Always use the new content type from defaults to ensure consistency
+                    'content_type' => $default_tab->content_type,
+                    'icon' => $icon_name ?? $default_tab->icon ?? null
+                ];
+                // Add custom_content for custom tabs if exists
+                if ($default_tab->content_type === 'custom') {
+                    $merged_tab['custom_content'] = $db_custom_content ?? $default_tab->custom_content ?? '';
+                }
+                
+                $merged_tabs[] = (object) $merged_tab;
+            } else {
+                // Use default for missing tabs
+                $merged_tabs[] = (object) $default_tab;
+            }
+        }
+
+        // Add custom tabs from database that aren't in the defaults
+        foreach ($db_tabs_map as $tab_id => $db_tab) {
+            // Skip if this tab was already processed in the defaults
+            $found_in_defaults = false;
+            foreach ($default_tabs as $default_tab) {
+                if ($default_tab->id === $tab_id) {
+                    $found_in_defaults = true;
+                    break;
+                }
+            }
+            
+            // Handle both arrays and objects for content_type check
+            $content_type = is_array($db_tab) ? ($db_tab['content_type'] ?? null) : ($db_tab->content_type ?? null);
+            
+            // If not found in defaults and it's a custom tab, add it
+            if (!$found_in_defaults && $content_type === 'custom') {
+                // Handle both arrays and objects for field access
+                $db_label = is_array($db_tab) ? ($db_tab['label'] ?? null) : ($db_tab->label ?? null);
+                $db_enabled = is_array($db_tab) ? ($db_tab['enabled'] ?? null) : ($db_tab->enabled ?? null);
+                $db_order = is_array($db_tab) ? ($db_tab['order'] ?? null) : ($db_tab->order ?? null);
+                $db_custom_content = is_array($db_tab) ? ($db_tab['custom_content'] ?? null) : ($db_tab->custom_content ?? null);
+                $db_icon = is_array($db_tab) ? ($db_tab['icon'] ?? null) : ($db_tab->icon ?? null);
+                
+                $custom_tab = [
+                    'id' => $tab_id,
+                    'label' => $db_label ?? __('Custom Tab', 'yatra'),
+                    'enabled' => $db_enabled !== null ? filter_var($db_enabled, FILTER_VALIDATE_BOOLEAN) : true,
+                    'order' => $db_order !== null ? (int) $db_order : 999,
+                    'content_type' => 'custom',
+                    'custom_content' => $db_custom_content ?? '',
+                    'icon' => $db_icon
+                ];
+                $merged_tabs[] = (object) $custom_tab;
+            }
+        }
+
+        return $merged_tabs;
     }
 }
 

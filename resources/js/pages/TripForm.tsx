@@ -69,6 +69,7 @@ import {
   X,
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
+import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { apiClient } from "../lib/api-client";
@@ -381,16 +382,24 @@ interface FrontendTab {
   enabled: boolean;
   order: number;
   content_type:
-    | "general"
-    | "pricing"
+    | "overview"
     | "itinerary"
     | "included_excluded"
-    | "gallery"
-    | "faqs"
+    | "location"
+    | "important_info"
+    | "downloads"
+    | "faq"
+    | "trip_story"
+    | "what_makes_special"
+    | "testimonials"
     | "reviews"
     | "downloads"
-    | "custom";
+    | "custom"
+    | "general"
+    | "gallery"
+    | "faqs";
   custom_content?: string;
+  icon?: IconPickerValue | null;
 }
 
 interface AvailabilityDate {
@@ -701,46 +710,86 @@ const TripForm: React.FC = () => {
       ],
       frontend_tabs: [
         {
-          id: "general",
-          label: "General",
+          id: "overview",
+          label: "Overview",
           enabled: true,
           order: 1,
           content_type: "general",
-        },
-        {
-          id: "pricing",
-          label: "Pricing",
-          enabled: true,
-          order: 2,
-          content_type: "pricing",
+          icon: { type: "icon", value: "book-open" },
         },
         {
           id: "itinerary",
           label: "Itinerary",
           enabled: true,
-          order: 3,
+          order: 2,
           content_type: "itinerary",
+          icon: { type: "icon", value: "calendar" },
         },
         {
-          id: "included_excluded",
-          label: "Included/Excluded",
+          id: "included",
+          label: "Included",
+          enabled: true,
+          order: 3,
+          content_type: "included_excluded",
+          icon: { type: "icon", value: "check" },
+        },
+        {
+          id: "location",
+          label: "Location",
           enabled: true,
           order: 4,
-          content_type: "included_excluded",
+          content_type: "gallery",
+          icon: { type: "icon", value: "map-pin" },
         },
         {
-          id: "gallery",
-          label: "Gallery",
+          id: "important_info",
+          label: "Important Info",
           enabled: true,
           order: 5,
-          content_type: "gallery",
+          content_type: "general",
+          icon: { type: "icon", value: "file-text" },
         },
         {
-          id: "faqs",
-          label: "FAQs",
+          id: "downloads",
+          label: "Downloads",
           enabled: true,
           order: 6,
+          content_type: "downloads",
+          icon: { type: "icon", value: "download" },
+        },
+        {
+          id: "faq",
+          label: "FAQ",
+          enabled: true,
+          order: 7,
           content_type: "faqs",
+          icon: { type: "icon", value: "help-circle" },
+        },
+        {
+          id: "trip_story",
+          label: "Story",
+          enabled: true,
+          order: 8,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "book" },
+        },
+        {
+          id: "what_makes_special",
+          label: "Special",
+          enabled: true,
+          order: 9,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "star" },
+        },
+        {
+          id: "testimonials",
+          label: "Testimonials",
+          enabled: true,
+          order: 10,
+          content_type: "reviews",
+          icon: { type: "icon", value: "message-circle" },
         },
       ],
       availability_dates: [],
@@ -914,46 +963,86 @@ const TripForm: React.FC = () => {
       ],
       frontend_tabs: [
         {
-          id: "general",
-          label: "General",
+          id: "overview",
+          label: "Overview",
           enabled: true,
           order: 1,
           content_type: "general",
-        },
-        {
-          id: "pricing",
-          label: "Pricing",
-          enabled: true,
-          order: 2,
-          content_type: "pricing",
+          icon: { type: "icon", value: "book-open" },
         },
         {
           id: "itinerary",
           label: "Itinerary",
           enabled: true,
-          order: 3,
+          order: 2,
           content_type: "itinerary",
+          icon: { type: "icon", value: "calendar" },
         },
         {
-          id: "included_excluded",
-          label: "Included/Excluded",
+          id: "included",
+          label: "Included",
+          enabled: true,
+          order: 3,
+          content_type: "included_excluded",
+          icon: { type: "icon", value: "check" },
+        },
+        {
+          id: "location",
+          label: "Location",
           enabled: true,
           order: 4,
-          content_type: "included_excluded",
+          content_type: "gallery",
+          icon: { type: "icon", value: "map-pin" },
         },
         {
-          id: "gallery",
-          label: "Gallery",
+          id: "important_info",
+          label: "Important Info",
           enabled: true,
           order: 5,
-          content_type: "gallery",
+          content_type: "general",
+          icon: { type: "icon", value: "info" },
         },
         {
-          id: "faqs",
-          label: "FAQs",
+          id: "downloads",
+          label: "Downloads",
           enabled: true,
           order: 6,
+          content_type: "downloads",
+          icon: { type: "icon", value: "download" },
+        },
+        {
+          id: "faq",
+          label: "FAQ",
+          enabled: true,
+          order: 7,
           content_type: "faqs",
+          icon: { type: "icon", value: "help-circle" },
+        },
+        {
+          id: "trip_story",
+          label: "Story",
+          enabled: true,
+          order: 8,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "book" },
+        },
+        {
+          id: "what_makes_special",
+          label: "Special",
+          enabled: true,
+          order: 9,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "star" },
+        },
+        {
+          id: "testimonials",
+          label: "Testimonials",
+          enabled: true,
+          order: 10,
+          content_type: "reviews",
+          icon: { type: "icon", value: "message-circle" },
         },
       ],
       availability_dates: [],
@@ -1042,6 +1131,7 @@ const TripForm: React.FC = () => {
       pricing_type: "regular",
       original_price: "2499",
       discounted_price: "",
+      price_types: [],
       deposit_amount: "600",
       deposit_percentage: "",
       payment_terms:
@@ -1124,46 +1214,86 @@ const TripForm: React.FC = () => {
       ],
       frontend_tabs: [
         {
-          id: "general",
-          label: "General",
+          id: "overview",
+          label: "Overview",
           enabled: true,
           order: 1,
           content_type: "general",
-        },
-        {
-          id: "pricing",
-          label: "Pricing",
-          enabled: true,
-          order: 2,
-          content_type: "pricing",
+          icon: { type: "icon", value: "book-open" },
         },
         {
           id: "itinerary",
           label: "Itinerary",
           enabled: true,
-          order: 3,
+          order: 2,
           content_type: "itinerary",
+          icon: { type: "icon", value: "calendar" },
         },
         {
-          id: "included_excluded",
-          label: "Included/Excluded",
+          id: "included",
+          label: "Included",
+          enabled: true,
+          order: 3,
+          content_type: "included_excluded",
+          icon: { type: "icon", value: "check" },
+        },
+        {
+          id: "location",
+          label: "Location",
           enabled: true,
           order: 4,
-          content_type: "included_excluded",
+          content_type: "gallery",
+          icon: { type: "icon", value: "map-pin" },
         },
         {
-          id: "gallery",
-          label: "Gallery",
+          id: "important_info",
+          label: "Important Info",
           enabled: true,
           order: 5,
-          content_type: "gallery",
+          content_type: "general",
+          icon: { type: "icon", value: "info" },
         },
         {
-          id: "faqs",
-          label: "FAQs",
+          id: "downloads",
+          label: "Downloads",
           enabled: true,
           order: 6,
+          content_type: "downloads",
+          icon: { type: "icon", value: "download" },
+        },
+        {
+          id: "faq",
+          label: "FAQ",
+          enabled: true,
+          order: 7,
           content_type: "faqs",
+          icon: { type: "icon", value: "help-circle" },
+        },
+        {
+          id: "trip_story",
+          label: "Story",
+          enabled: true,
+          order: 8,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "book" },
+        },
+        {
+          id: "what_makes_special",
+          label: "Special",
+          enabled: true,
+          order: 9,
+          content_type: "custom",
+          custom_content: "",
+          icon: { type: "icon", value: "star" },
+        },
+        {
+          id: "testimonials",
+          label: "Testimonials",
+          enabled: true,
+          order: 10,
+          content_type: "reviews",
+          icon: { type: "icon", value: "message-circle" },
         },
       ],
       availability_dates: [],
@@ -1180,7 +1310,6 @@ const TripForm: React.FC = () => {
       meta_keywords:
         "Europe tour, Paris, Rome, Barcelona, European travel, cultural tour",
       attributes: {},
-      price_types: [],
     },
   ];
 
@@ -1252,46 +1381,86 @@ const TripForm: React.FC = () => {
     faqs: [],
     frontend_tabs: [
       {
-        id: "general",
-        label: "General",
+        id: "overview",
+        label: "Overview",
         enabled: true,
         order: 1,
         content_type: "general",
-      },
-      {
-        id: "pricing",
-        label: "Pricing",
-        enabled: true,
-        order: 2,
-        content_type: "pricing",
+        icon: { type: "icon", value: "book-open" },
       },
       {
         id: "itinerary",
         label: "Itinerary",
         enabled: true,
-        order: 3,
+        order: 2,
         content_type: "itinerary",
+        icon: { type: "icon", value: "calendar" },
       },
       {
-        id: "included_excluded",
-        label: "Included/Excluded",
+        id: "included",
+        label: "Included",
+        enabled: true,
+        order: 3,
+        content_type: "included_excluded",
+        icon: { type: "icon", value: "check" },
+      },
+      {
+        id: "location",
+        label: "Location",
         enabled: true,
         order: 4,
-        content_type: "included_excluded",
+        content_type: "gallery",
+        icon: { type: "icon", value: "map-pin" },
       },
       {
-        id: "gallery",
-        label: "Gallery",
+        id: "important_info",
+        label: "Important Info",
         enabled: true,
         order: 5,
-        content_type: "gallery",
+        content_type: "general",
+        icon: { type: "icon", value: "info" },
       },
       {
-        id: "faqs",
-        label: "FAQs",
+        id: "downloads",
+        label: "Downloads",
         enabled: true,
         order: 6,
+        content_type: "downloads",
+        icon: { type: "icon", value: "download" },
+      },
+      {
+        id: "faq",
+        label: "FAQ",
+        enabled: true,
+        order: 7,
         content_type: "faqs",
+        icon: { type: "icon", value: "help-circle" },
+      },
+      {
+        id: "trip_story",
+        label: "Story",
+        enabled: true,
+        order: 8,
+        content_type: "custom",
+        custom_content: "",
+        icon: { type: "icon", value: "book" },
+      },
+      {
+        id: "what_makes_special",
+        label: "Special",
+        enabled: true,
+        order: 9,
+        content_type: "custom",
+        custom_content: "",
+        icon: { type: "icon", value: "star" },
+      },
+      {
+        id: "testimonials",
+        label: "Testimonials",
+        enabled: true,
+        order: 10,
+        content_type: "reviews",
+        icon: { type: "icon", value: "message-circle" },
       },
     ],
     availability_dates: [],
@@ -1947,47 +2116,90 @@ const TripForm: React.FC = () => {
       frontend_tabs: Array.isArray(tripData.frontend_tabs)
         ? tripData.frontend_tabs
         : [
+            // Core sections (always present) - in logical order
             {
-              id: "general",
-              label: "General",
+              id: "overview",
+              label: "Overview",
               enabled: true,
               order: 1,
-              content_type: "general",
-            },
-            {
-              id: "pricing",
-              label: "Pricing",
-              enabled: true,
-              order: 2,
-              content_type: "pricing",
+              content_type: "overview",
+              icon: { type: "icon", value: "book" },
             },
             {
               id: "itinerary",
               label: "Itinerary",
               enabled: true,
-              order: 3,
+              order: 2,
               content_type: "itinerary",
+              icon: { type: "icon", value: "calendar" },
             },
             {
-              id: "included_excluded",
-              label: "Included/Excluded",
+              id: "included",
+              label: "Included",
+              enabled: true,
+              order: 3,
+              content_type: "included_excluded",
+              icon: { type: "icon", value: "check" },
+            },
+            {
+              id: "location",
+              label: "Location",
               enabled: true,
               order: 4,
-              content_type: "included_excluded",
+              content_type: "location",
+              icon: { type: "icon", value: "map-pin" },
             },
             {
-              id: "gallery",
-              label: "Gallery",
+              id: "important_info",
+              label: "Important Info",
               enabled: true,
               order: 5,
-              content_type: "gallery",
+              content_type: "important_info",
+              icon: { type: "icon", value: "info" },
             },
+            
+            // Conditional sections (enabled by default, shown conditionally on frontend)
             {
-              id: "faqs",
-              label: "FAQs",
+              id: "downloads",
+              label: "Downloads",
               enabled: true,
               order: 6,
-              content_type: "faqs",
+              content_type: "downloads",
+              icon: { type: "icon", value: "download" },
+            },
+            {
+              id: "faq",
+              label: "FAQ",
+              enabled: true,
+              order: 7,
+              content_type: "faq",
+              icon: { type: "icon", value: "help-circle" },
+            },
+            {
+              id: "trip_story",
+              label: "Story",
+              enabled: true,
+              order: 8,
+              content_type: "trip_story",
+              custom_content: "",
+              icon: { type: "icon", value: "book" },
+            },
+            {
+              id: "what_makes_special",
+              label: "Special",
+              enabled: true,
+              order: 9,
+              content_type: "what_makes_special",
+              custom_content: "",
+              icon: { type: "icon", value: "star" },
+            },
+            {
+              id: "testimonials",
+              label: "Testimonials",
+              enabled: true,
+              order: 10,
+              content_type: "testimonials",
+              icon: { type: "icon", value: "message-circle" },
             },
           ],
       availability_dates: normalizeAvailabilityDates(
@@ -2782,6 +2994,75 @@ const TripForm: React.FC = () => {
     }));
   };
 
+  const handleTabIconChange = (tabId: string, icon: IconPickerValue | null) => {
+    setFormData((prev) => ({
+      ...prev,
+      frontend_tabs: prev.frontend_tabs.map((tab) =>
+        tab.id === tabId ? { ...tab, icon } : tab,
+      ),
+    }));
+  };
+
+  // Drag and drop handlers
+  const [draggedTab, setDraggedTab] = useState<string | null>(null);
+  const [dragOverTab, setDragOverTab] = useState<string | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, tabId: string) => {
+    setDraggedTab(tabId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (tabId: string) => {
+    setDragOverTab(tabId);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverTab(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, targetTabId: string) => {
+    e.preventDefault();
+    setDragOverTab(null);
+
+    if (!draggedTab || draggedTab === targetTabId) {
+      setDraggedTab(null);
+      return;
+    }
+
+    setFormData((prev) => {
+      const tabs = [...prev.frontend_tabs];
+      const draggedIndex = tabs.findIndex((t) => t.id === draggedTab);
+      const targetIndex = tabs.findIndex((t) => t.id === targetTabId);
+
+      if (draggedIndex === -1 || targetIndex === -1) {
+        return prev;
+      }
+
+      // Remove dragged tab and insert at new position
+      const [draggedTabObj] = tabs.splice(draggedIndex, 1);
+      tabs.splice(targetIndex, 0, draggedTabObj);
+
+      // Update order values
+      tabs.forEach((tab, i) => {
+        tab.order = i + 1;
+      });
+
+      return { ...prev, frontend_tabs: tabs };
+    });
+
+    setDraggedTab(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTab(null);
+    setDragOverTab(null);
+  };
+
   const buildEssentialFieldErrors = (): Record<string, string> => {
     const newErrors: Record<string, string> = {};
 
@@ -2940,6 +3221,7 @@ const TripForm: React.FC = () => {
           order: tab.order,
           content_type: tab.content_type,
           custom_content: tab.custom_content || null,
+          icon: tab.icon || null,
         })),
         availability_dates: data.availability_dates.map((avail) => ({
           id: avail.id,
@@ -6814,19 +7096,34 @@ const TripForm: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {formData.frontend_tabs
+                  {[...formData.frontend_tabs]
                     .sort((a, b) => a.order - b.order)
                     .map((tab, index) => (
                       <div
                         key={tab.id}
-                        className={`p-4 rounded-lg border ${
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, tab.id)}
+                        onDragOver={handleDragOver}
+                        onDragEnter={() => handleDragEnter(tab.id)}
+                        onDragLeave={handleDragLeave}
+                        onDrop={(e) => handleDrop(e, tab.id)}
+                        onDragEnd={handleDragEnd}
+                        className={`p-4 rounded-lg border cursor-move ${
                           tab.enabled
                             ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                             : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60"
+                        } ${
+                          draggedTab === tab.id
+                            ? "opacity-50 scale-95 shadow-lg"
+                            : ""
+                        } ${
+                          dragOverTab === tab.id && draggedTab !== tab.id
+                            ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                            : ""
                         }`}
                       >
                         <div className="flex items-center gap-3 mb-3">
-                          <GripVertical className="w-5 h-5 text-gray-400" />
+                          <GripVertical className="w-5 h-5 text-gray-400 cursor-grab active:cursor-grabbing" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <Input
@@ -6842,6 +7139,27 @@ const TripForm: React.FC = () => {
                               <Badge variant="outline" className="text-xs">
                                 {tab.content_type}
                               </Badge>
+                            </div>
+                            <div className="mb-2">
+                              {tab.enabled ? (
+                                <IconPicker
+                                  value={tab.icon || null}
+                                  onChange={(value) => handleTabIconChange(tab.id, value)}
+                                  label={__("Tab Icon", "yatra")}
+                                  helpText={__("Select an icon or upload an image for this tab", "yatra")}
+                                  size="sm"
+                                />
+                              ) : (
+                                <div className="opacity-50">
+                                  <IconPicker
+                                    value={tab.icon || null}
+                                    onChange={() => {}} // No-op when disabled
+                                    label={__("Tab Icon", "yatra")}
+                                    helpText={__("Enable this tab to select an icon", "yatra")}
+                                    size="sm"
+                                  />
+                                </div>
+                              )}
                             </div>
                             {tab.content_type === "custom" && (
                               <div className="mt-2">
@@ -6880,31 +7198,35 @@ const TripForm: React.FC = () => {
                                   disabled={!tab.enabled}
                                   className="text-xs"
                                 >
-                                  <option value="general">
-                                    {__("General", "yatra")}
-                                  </option>
-                                  <option value="pricing">
-                                    {__("Pricing", "yatra")}
+                                  <option value="overview">
+                                    {__("Overview", "yatra")}
                                   </option>
                                   <option value="itinerary">
                                     {__("Itinerary", "yatra")}
                                   </option>
                                   <option value="included_excluded">
-                                    {__("Included/Excluded", "yatra")}
+                                    {__("Included", "yatra")}
                                   </option>
-                                  <option value="gallery">
-                                    {__("Gallery", "yatra")}
+                                  <option value="location">
+                                    {__("Location", "yatra")}
                                   </option>
-                                  {showDownloadsUI && (
-                                    <option value="downloads">
-                                      {__("Downloads", "yatra")}
-                                    </option>
-                                  )}
-                                  <option value="faqs">
-                                    {__("FAQs", "yatra")}
+                                  <option value="important_info">
+                                    {__("Important Info", "yatra")}
                                   </option>
-                                  <option value="reviews">
-                                    {__("Reviews", "yatra")}
+                                  <option value="downloads">
+                                    {__("Downloads", "yatra")}
+                                  </option>
+                                  <option value="faq">
+                                    {__("FAQ", "yatra")}
+                                  </option>
+                                  <option value="trip_story">
+                                    {__("Story", "yatra")}
+                                  </option>
+                                  <option value="what_makes_special">
+                                    {__("Special", "yatra")}
+                                  </option>
+                                  <option value="testimonials">
+                                    {__("Testimonials", "yatra")}
                                   </option>
                                   <option value="custom">
                                     {__("Custom Content", "yatra")}

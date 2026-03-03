@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-02T14:07:56+00:00\n"
+"POT-Creation-Date: 2026-03-03T11:45:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -268,7 +268,8 @@ msgstr ""
 #: app/Controllers/CustomerController.php:289
 #: app/Controllers/PaymentGatewayController.php:189
 #: app/Controllers/PaymentGatewayController.php:249
-#: app/Controllers/TripDownloadController.php:144
+#: app/Controllers/TripDownloadController.php:181
+#: app/Controllers/TripDownloadController.php:320
 #: app/Services/BookingService.php:369
 #: app/Services/BookingService.php:453
 #: app/Services/BookingService.php:540
@@ -1442,11 +1443,19 @@ msgstr ""
 msgid "Booking Confirmation"
 msgstr ""
 
-#: app/Controllers/SingleTripController.php:1531
+#: app/Controllers/SingleTripController.php:1534
 #: app/Repositories/ItineraryRepository.php:1030
 #: app/Services/ItineraryService.php:50
 #, php-format
 msgid "Day %d"
+msgstr ""
+
+#: app/Controllers/SingleTripController.php:1729
+msgid "No custom content available for this section."
+msgstr ""
+
+#: app/Controllers/SingleTripController.php:1981
+msgid "Custom Tab"
 msgstr ""
 
 #: app/Controllers/ToolsController.php:214
@@ -1706,40 +1715,60 @@ msgstr ""
 msgid "Number of Travelers"
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:98
+#: app/Controllers/TripDownloadController.php:131
 msgid "Invalid download request."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:102
+#: app/Controllers/TripDownloadController.php:135
 msgid "This download link has expired."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:110
+#: app/Controllers/TripDownloadController.php:143
 msgid "Invalid download signature."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:116
+#: app/Controllers/TripDownloadController.php:150
+#: app/Controllers/TripDownloadController.php:284
 msgid "Download not found."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:120
+#: app/Controllers/TripDownloadController.php:154
+#: app/Controllers/TripDownloadController.php:293
 msgid "This download is not available."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:133
+#: app/Controllers/TripDownloadController.php:170
 msgid "Please log in to access this download."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:138
+#: app/Controllers/TripDownloadController.php:175
 msgid "Booking is required for this download."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:149
+#: app/Controllers/TripDownloadController.php:186
+#: app/Controllers/TripDownloadController.php:325
 msgid "This download does not match your booking."
 msgstr ""
 
-#: app/Controllers/TripDownloadController.php:155
+#: app/Controllers/TripDownloadController.php:191
+#: app/Controllers/TripDownloadController.php:330
+msgid "Booking must be confirmed to access downloads."
+msgstr ""
+
+#: app/Controllers/TripDownloadController.php:197
 msgid "File not found."
+msgstr ""
+
+#: app/Controllers/TripDownloadController.php:277
+msgid "Invalid download ID."
+msgstr ""
+
+#: app/Controllers/TripDownloadController.php:309
+msgid "Please log in to download this file."
+msgstr ""
+
+#: app/Controllers/TripDownloadController.php:313
+msgid "Valid booking is required to download this file."
 msgstr ""
 
 #: app/Core/Handlers/CheckoutPageHandler.php:31
@@ -2881,23 +2910,23 @@ msgstr ""
 msgid "Extreme"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2456
+#: app/Repositories/TripRepository.php:2414
 msgid "Adventure"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2457
+#: app/Repositories/TripRepository.php:2415
 msgid "Cultural"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2458
+#: app/Repositories/TripRepository.php:2416
 msgid "Wildlife"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2459
+#: app/Repositories/TripRepository.php:2417
 msgid "Pilgrimage"
 msgstr ""
 
-#: app/Repositories/TripRepository.php:2460
+#: app/Repositories/TripRepository.php:2418
 msgid "Educational"
 msgstr ""
 
@@ -4510,6 +4539,7 @@ msgstr ""
 
 #: templates/listing-activity.php:247
 #: templates/partials/single-trip/content-sidebar.php:187
+#: templates/partials/single-trip/sticky-sidebar.php:23
 #: templates/single-activity.php:130
 #: templates/single-destination.php:130
 msgid "From"
@@ -4915,7 +4945,6 @@ msgstr ""
 #: templates/partials/single-trip/content-itinerary.php:118
 #: templates/partials/single-trip/content-sidebar.php:193
 #: templates/partials/single-trip/content-sidebar.php:196
-#: templates/partials/single-trip/sticky-nav.php:78
 #: templates/single-activity.php:220
 #: templates/single-destination.php:238
 msgid "per person"
@@ -5345,7 +5374,6 @@ msgstr ""
 #: templates/partials/booking-content.php:569
 #: templates/partials/pricing-summary.php:129
 #: templates/partials/single-trip/content-included-excluded.php:16
-#: templates/partials/single-trip/sticky-nav.php:21
 msgid "Included"
 msgstr ""
 
@@ -5616,41 +5644,36 @@ msgstr ""
 msgid "Access travel documents inside your account"
 msgstr ""
 
-#: templates/partials/single-trip/content-downloads.php:16
-#: templates/partials/single-trip/sticky-nav.php:37
+#: templates/partials/single-trip/content-downloads.php:12
 msgid "Downloads"
 msgstr ""
 
-#: templates/partials/single-trip/content-downloads.php:62
+#: templates/partials/single-trip/content-downloads.php:89
 msgid "Download"
 msgstr ""
 
+#: templates/partials/single-trip/content-downloads.php:99
+msgid "Login to Download"
+msgstr ""
+
 #: templates/partials/single-trip/content-downloads.php:110
-msgid "Preview"
+msgid "Booking Required"
 msgstr ""
 
-#: templates/partials/single-trip/content-downloads.php:125
-msgid "File Preview"
+#: templates/partials/single-trip/content-downloads.php:113
+msgid "Login & Booking Required"
 msgstr ""
 
-#: templates/partials/single-trip/content-downloads.php:126
-msgid "Close Preview"
+#: templates/partials/single-trip/content-downloads.php:143
+msgid "No downloads available for this trip."
 msgstr ""
 
-#: templates/partials/single-trip/content-downloads.php:133
-msgid "Loading preview..."
-msgstr ""
-
-#: templates/partials/single-trip/content-downloads.php:142
-msgid "Download File"
-msgstr ""
-
-#: templates/partials/single-trip/content-downloads.php:145
-msgid "Close"
-msgstr ""
-
-#: templates/partials/single-trip/content-faq.php:41
+#: templates/partials/single-trip/content-faq.php:40
 msgid "Frequently Asked Questions"
+msgstr ""
+
+#: templates/partials/single-trip/content-faq.php:85
+msgid "No frequently asked questions available for this trip."
 msgstr ""
 
 #: templates/partials/single-trip/content-gallery.php:9
@@ -5703,7 +5726,6 @@ msgid "Excluded"
 msgstr ""
 
 #: templates/partials/single-trip/content-itinerary.php:10
-#: templates/partials/single-trip/sticky-nav.php:17
 msgid "Itinerary"
 msgstr ""
 
@@ -5753,7 +5775,6 @@ msgid "Next Image"
 msgstr ""
 
 #: templates/partials/single-trip/content-location.php:8
-#: templates/partials/single-trip/sticky-nav.php:25
 msgid "Location"
 msgstr ""
 
@@ -5770,7 +5791,6 @@ msgid "Key Landmarks"
 msgstr ""
 
 #: templates/partials/single-trip/content-overview.php:9
-#: templates/partials/single-trip/sticky-nav.php:13
 msgid "Overview"
 msgstr ""
 
@@ -5870,6 +5890,38 @@ msgstr ""
 
 #: templates/partials/single-trip/content-sidebar.php:586
 msgid "up to 24 hours before"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:59
+#, php-format
+msgid "Traveled %s in %s"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:61
+#, php-format
+msgid "Traveled %s"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:63
+#, php-format
+msgid "Traveled in %s"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:65
+msgid "Verified Traveler"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:80
+msgid "No testimonials yet"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:83
+msgid "Be the first to share your experience on this amazing trip!"
+msgstr ""
+
+#: templates/partials/single-trip/content-testimonials.php:86
+#: templates/partials/single-trip/reviews.php:218
+msgid "Write a Review"
 msgstr ""
 
 #: templates/partials/single-trip/content-trip-story.php:9
@@ -6140,11 +6192,6 @@ msgstr ""
 msgid "You can edit your review for %s more."
 msgstr ""
 
-#: templates/partials/single-trip/reviews.php:218
-#: templates/partials/single-trip/testimonials.php:126
-msgid "Write a Review"
-msgstr ""
-
 #: templates/partials/single-trip/reviews.php:223
 msgid "Please"
 msgstr ""
@@ -6210,28 +6257,12 @@ msgstr ""
 msgid "Similar Adventures"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:29
-msgid "Important Info"
+#: templates/partials/single-trip/sticky-sidebar.php:54
+msgid "Book"
 msgstr ""
 
-#: templates/partials/single-trip/sticky-nav.php:43
-msgid "FAQ"
-msgstr ""
-
-#: templates/partials/single-trip/sticky-nav.php:49
-msgid "Story"
-msgstr ""
-
-#: templates/partials/single-trip/sticky-nav.php:58
-msgid "Special"
-msgstr ""
-
-#: templates/partials/single-trip/sticky-nav.php:67
-msgid "Testimonials"
-msgstr ""
-
-#: templates/partials/single-trip/sticky-nav.php:72
-msgid "Starting From"
+#: templates/partials/single-trip/sticky-sidebar.php:59
+msgid "Enquire"
 msgstr ""
 
 #: templates/partials/single-trip/tags.php:13
@@ -6245,26 +6276,6 @@ msgstr ""
 #: templates/partials/single-trip/tags.php:45
 #: templates/pdf/voucher.php:163
 msgid "Destination:"
-msgstr ""
-
-#: templates/partials/single-trip/testimonials.php:15
-msgid "What Travelers Say"
-msgstr ""
-
-#: templates/partials/single-trip/testimonials.php:18
-msgid "Selected reviews from our happy customers"
-msgstr ""
-
-#: templates/partials/single-trip/testimonials.php:71
-msgid "Anonymous"
-msgstr ""
-
-#: templates/partials/single-trip/testimonials.php:120
-msgid "No testimonials yet"
-msgstr ""
-
-#: templates/partials/single-trip/testimonials.php:123
-msgid "Be the first to share your experience on this amazing trip!"
 msgstr ""
 
 #: templates/partials/single-trip/trip-attributes.php:12

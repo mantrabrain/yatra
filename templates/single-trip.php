@@ -174,51 +174,8 @@ if (!empty($downloads)):
     <div class="yatra-trip-container">
         <!-- Main Content -->
         <div class="yatra-trip-main">
-            <!-- Overview Section -->
-            <?php yatra_get_template('partials/single-trip/content-overview', ['trip' => $trip, 'has_traveler_pricing' => $has_traveler_pricing, 'has_availability' => $has_availability, 'base_price' => $base_price]); ?>
-
-            
-            <!-- Itinerary Section -->
-            <?php yatra_get_template('partials/single-trip/content-itinerary', ['trip' => $trip]); ?>
-
-            <!-- What's Included/Excluded -->
-            <?php if (!empty($trip->included_items) || !empty($trip->excluded_items)): ?>
-                <?php yatra_get_template('partials/single-trip/content-included-excluded', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            
-            <!-- Location/Map Section -->
-            <?php yatra_get_template('partials/single-trip/content-location', ['trip' => $trip]); ?>
-
-            <!-- Important Information Section -->
-            <?php yatra_get_template('partials/single-trip/content-important-info', ['trip' => $trip]); ?>
-
-            <!-- Downloads Section -->
-            <?php yatra_get_template('partials/single-trip/content-downloads', ['trip' => $trip]); ?>
-
-            <!-- FAQ Section -->
-            <?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
-                <?php yatra_get_template('partials/single-trip/content-faq', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            <!-- Trip Story Section -->
-            <?php if (!empty($trip->trip_story ?? '')): ?>
-                <?php yatra_get_template('partials/single-trip/content-trip-story', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            <!-- What Makes This Trip Special Section -->
-            <?php if (!empty($trip->what_makes_special ?? '')): ?>
-                <?php yatra_get_template('partials/single-trip/content-whats-make-special', ['trip' => $trip]); ?>
-            <?php endif; ?>
-
-            <!-- Testimonials Section -->
-            <?php 
-            $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
-            if (!empty($display_testimonials)): 
-                yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]);
-            endif; 
-            ?>
-
+            <!-- Dynamic Frontend Tabs -->
+            <?php \Yatra\Controllers\SingleTripController::renderFrontendTabs($trip); ?>
             </div>
 
         <!-- Sidebar - Booking Card -->
@@ -238,6 +195,15 @@ if (!empty($downloads)):
         <?php yatra_get_template('partials/single-trip/reviews', ['trip' => $trip]); ?>
     <?php endif; ?>
 </div>
+
+<!-- Mobile Sticky Sidebar -->
+<?php yatra_get_template('partials/single-trip/sticky-sidebar', [
+    'trip' => $trip, 
+    'has_availability' => $has_availability, 
+    'has_traveler_pricing' => $has_traveler_pricing, 
+    'base_price' => $base_price, 
+    'pricing_type' => $pricing_type
+]); ?>
 
 <!-- Enquiry Modal -->
 <?php yatra_get_template('partials/single-trip/enquiry-modal', ['trip' => $trip]); ?>

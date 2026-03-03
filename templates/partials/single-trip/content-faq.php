@@ -3,7 +3,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 ?>
-<?php if (!empty($trip->faqs) && is_array($trip->faqs)): ?>
 <section class="yatra-trip-section" id="faq" itemscope itemtype="https://schema.org/FAQPage">
     <script type="application/ld+json">
     {
@@ -37,8 +36,8 @@ if (!defined('ABSPATH')) {
     </script>
     <div class="faq-header">
         <h2 class="yatra-trip-section-title">
-            <?php echo yatra_svg_icon('users', 'yatra-trip-section-title-icon'); ?>
-            <?php echo esc_html__('Frequently Asked Questions', 'yatra'); ?>
+            <?php echo yatra_svg_icon($tab->icon ?? 'help-circle', 'yatra-trip-section-title-icon'); ?>
+            <?php echo esc_html(isset($tab->label) ? $tab->label : __('Frequently Asked Questions', 'yatra')); ?>
         </h2>
         <div class="faq-controls">
             <button type="button" class="faq-toggle-btn" id="faq-toggle-all">
@@ -80,6 +79,13 @@ if (!defined('ABSPATH')) {
                 </div>
             <?php endif; ?>
         <?php endforeach; ?>
+        <?php if (empty($trip->faqs) || !is_array($trip->faqs)): ?>
+            <div class="yatra-no-faqs">
+                <p class="text-gray-500 text-center py-8">
+                    <?php echo esc_html__('No frequently asked questions available for this trip.', 'yatra'); ?>
+                </p>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 
@@ -319,4 +325,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 }
 </style>
-<?php endif; ?>

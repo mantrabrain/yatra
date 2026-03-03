@@ -5,8 +5,8 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="overview" itemscope itemtype="https://schema.org/TouristTrip">
     <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon('book', 'yatra-trip-section-title-icon'); ?>
-        <?php echo esc_html__('Overview', 'yatra'); ?>
+        <?php echo yatra_svg_icon($tab->icon ?? 'book', 'yatra-trip-section-title-icon'); ?>
+        <?php echo esc_html(isset($tab->label) ? $tab->label : __('Overview', 'yatra')); ?>
     </h2>
     
     <?php if (!empty($trip->short_description)): ?>
@@ -130,14 +130,6 @@ if (!defined('ABSPATH')) {
             </div>
         </div>
     <?php endif; ?>
-
-    <!-- Testimonials Section -->
-    <?php 
-    $display_testimonials = !empty($trip->testimonials) && is_array($trip->testimonials) ? $trip->testimonials : [];
-    if (!empty($display_testimonials)): 
-        yatra_get_template('partials/single-trip/testimonials', ['trip' => $trip]);
-    endif; 
-    ?>
 
     </section>
 
