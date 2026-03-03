@@ -268,7 +268,7 @@ class TripDownloadController extends BaseController
     /**
      * Get download URL for frontend
      */
-    public function getDownloadUrl(WP_REST_Request $request): WP_REST_Response
+    public function getDownloadUrl(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
         $downloadId = (int) $request->get_param('download_id');
         $bookingId = (int) $request->get_param('booking_id');

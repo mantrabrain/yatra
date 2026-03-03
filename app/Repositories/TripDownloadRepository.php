@@ -124,12 +124,39 @@ class TripDownloadRepository
             return null;
         }
 
-        return $wpdb->get_row(
+        $result = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT * FROM {$table} WHERE id = %d AND content_type = 'download' LIMIT 1",
                 $id
             )
-        ) ?: null;
+        );
+
+        if (!$result) {
+            return null;
+        }
+
+        // Parse metadata to extract visibility and attachment_id
+        $metadata = null;
+        if (!empty($result->metadata)) {
+            $metadata = json_decode($result->metadata, true);
+        }
+
+        // Extract visibility from metadata
+        if ($metadata && isset($metadata['visibility'])) {
+            $result->visibility = $metadata['visibility'];
+        } elseif (isset($result->access_level)) {
+            // Fallback to access_level for backward compatibility
+            $result->visibility = $result->access_level;
+        } else {
+            $result->visibility = 'booked_only'; // Default
+        }
+
+        // Extract attachment_id from metadata
+        if ($metadata && isset($metadata['attachment_id'])) {
+            $result->attachment_id = $metadata['attachment_id'];
+        }
+
+        return $result;
     }
 
     /**
