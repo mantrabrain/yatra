@@ -5336,22 +5336,29 @@ const TripForm: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            checked={item.enabled}
-                            onChange={(e) =>
-                              handleDownloadableItemChange(
-                                index,
-                                "enabled",
-                                e.target.checked,
-                              )
-                            }
-                            className="h-4 w-4"
-                          />
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {__("Enabled", "yatra")}
-                          </span>
+                        <div className="flex items-start gap-3">
+                          <div className="flex items-center gap-2 pt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={item.enabled}
+                              onChange={(e) =>
+                                handleDownloadableItemChange(
+                                  index,
+                                  "enabled",
+                                  e.target.checked,
+                                )
+                              }
+                              className="h-4 w-4"
+                            />
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                              {__("Enabled", "yatra")}
+                            </span>
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                              {__("Controls whether this file appears and is available for download on the trip page. When disabled, the file is completely hidden from users.", "yatra")}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     ))}
