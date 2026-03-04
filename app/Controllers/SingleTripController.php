@@ -1834,25 +1834,28 @@ class SingleTripController
         
         // Use custom icon if available, otherwise fallback to default icon mapping
         $icon = 'book'; // default fallback
+        $icon_data = null;
+        
         if (isset($tab->icon) && !empty($tab->icon)) {
             // Handle both array and object formats for icon
-            if (is_array($tab->icon) && isset($tab->icon['value'])) {
-                $icon = $tab->icon['value'];
+            if (is_array($tab->icon)) {
+                $icon_data = $tab->icon;
+            } elseif (is_object($tab->icon)) {
+                $icon_data = (array) $tab->icon;
             } elseif (is_string($tab->icon)) {
-                $icon = $tab->icon;
-            } elseif (is_object($tab->icon) && isset($tab->icon->value)) {
-                $icon = $tab->icon->value;
+                // Convert string to icon data structure
+                $icon_data = ['type' => 'icon', 'value' => $tab->icon];
             }
         } else {
             // Fallback to default icon mapping
-            $icon = $icon_map[$tab->content_type] ?? 'book';
+            $icon_data = ['type' => 'icon', 'value' => $icon_map[$tab->content_type] ?? 'book'];
         }
         
         return [
             'id' => $tab->id,
             'label' => $tab->label,
             'href' => $href,
-            'icon' => $icon
+            'icon' => $icon_data
         ];
     }
 
@@ -1920,16 +1923,20 @@ class SingleTripController
                 $db_custom_content = is_array($db_tab) ? ($db_tab['custom_content'] ?? null) : ($db_tab->custom_content ?? null);
                 $db_icon = is_array($db_tab) ? ($db_tab['icon'] ?? null) : ($db_tab->icon ?? null);
 
-                // Extract icon name from icon object if it's an object
-                $icon_name = null;
+                // Preserve full icon data structure
+                $icon_data = null;
                 if ($db_icon) {
-                    if (is_array($db_icon) && isset($db_icon['value'])) {
-                        $icon_name = $db_icon['value'];
-                    } elseif (is_object($db_icon) && isset($db_icon->value)) {
-                        $icon_name = $db_icon->value;
+                    if (is_array($db_icon)) {
+                        $icon_data = $db_icon;
+                    } elseif (is_object($db_icon)) {
+                        $icon_data = (array) $db_icon;
                     } elseif (is_string($db_icon)) {
-                        $icon_name = $db_icon;
+                        // Convert string to icon data structure
+                        $icon_data = ['type' => 'icon', 'value' => $db_icon];
                     }
+                } else {
+                    // Use default icon as data structure
+                    $icon_data = ['type' => 'icon', 'value' => $default_tab->icon];
                 }
 
                 $merged_tab = [
@@ -1939,7 +1946,7 @@ class SingleTripController
                     'order' => $db_order !== null ? (int) $db_order : $default_tab->order,
                     // Always use the new content type from defaults to ensure consistency
                     'content_type' => $default_tab->content_type,
-                    'icon' => $icon_name ?? $default_tab->icon ?? null
+                    'icon' => $icon_data
                 ];
                 // Add custom_content for custom tabs if exists
                 if ($default_tab->content_type === 'custom') {

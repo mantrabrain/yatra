@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
         foreach ($navigation_items as $item):
         ?>
             <a href="<?php echo esc_url($item['href']); ?>" class="yatra-sticky-nav-item">
-                <?php echo yatra_svg_icon($item['icon'], 'yatra-sticky-nav-icon'); ?>
+                <?php yatra_render_tab_icon($item['icon'], 'book', 'yatra-sticky-nav-icon', $item['label']); ?>
                 <span><?php echo esc_html($item['label']); ?></span>
             </a>
         <?php endforeach; ?>

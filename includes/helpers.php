@@ -1436,3 +1436,70 @@ if ( ! function_exists( 'yatra_get_footer' ) ) {
 		}
 	}
 }
+
+/**
+ * Render tab icon (supports both SVG icons and images)
+ * 
+ * @param mixed $icon_data Icon data (string, array, or object)
+ * @param string $default_icon Default icon name
+ * @param string $css_class CSS class for the icon
+ * @param string $label Label for alt text
+ * @return void Echoes the icon HTML
+ */
+if (!function_exists('yatra_render_tab_icon')) {
+    function yatra_render_tab_icon($icon_data, $default_icon = 'book', $css_class = '', $label = '') {
+        if (!empty($icon_data)) {
+            // Handle JSON string that might not be decoded
+            if (is_string($icon_data) && strpos($icon_data, '{') === 0) {
+                $icon_data = json_decode($icon_data, true);
+            }
+            if (is_array($icon_data) && isset($icon_data['type'])) {
+                if ($icon_data['type'] === 'image' && !empty($icon_data['value'])) {
+                    // Display image icon
+                    $image_url = is_numeric($icon_data['value']) 
+                        ? wp_get_attachment_url($icon_data['value'])
+                        : $icon_data['value'];
+                    if ($image_url) {
+                        $size_style = strpos($css_class, 'sticky-nav') !== false ? 'width: 18px; height: 18px;' : 'width: 24px; height: 24px;';
+                        echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($label) . '" class="' . esc_attr($css_class) . '" style="' . $size_style . ' object-fit: cover; border-radius: 4px;">';
+                    } else {
+                        echo yatra_svg_icon('image', $css_class);
+                    }
+                } elseif ($icon_data['type'] === 'icon' && !empty($icon_data['value'])) {
+                    // Display SVG icon
+                    echo yatra_svg_icon($icon_data['value'], $css_class);
+                } else {
+                    // Fallback to default
+                    echo yatra_svg_icon($default_icon, $css_class);
+                }
+            } elseif (is_object($icon_data) && isset($icon_data->type)) {
+                // Handle object format
+                $icon_array = (array) $icon_data;
+                if ($icon_array['type'] === 'image' && !empty($icon_array['value'])) {
+                    $image_url = is_numeric($icon_array['value']) 
+                        ? wp_get_attachment_url($icon_array['value'])
+                        : $icon_array['value'];
+                    if ($image_url) {
+                        $size_style = strpos($css_class, 'sticky-nav') !== false ? 'width: 18px; height: 18px;' : 'width: 24px; height: 24px;';
+                        echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($label) . '" class="' . esc_attr($css_class) . '" style="' . $size_style . ' object-fit: cover; border-radius: 4px;">';
+                    } else {
+                        echo yatra_svg_icon('image', $css_class);
+                    }
+                } elseif ($icon_array['type'] === 'icon' && !empty($icon_array['value'])) {
+                    echo yatra_svg_icon($icon_array['value'], $css_class);
+                } else {
+                    echo yatra_svg_icon($default_icon, $css_class);
+                }
+            } elseif (is_string($icon_data)) {
+                // Direct icon name (backward compatibility)
+                echo yatra_svg_icon($icon_data, $css_class);
+            } else {
+                // Fallback
+                echo yatra_svg_icon($default_icon, $css_class);
+            }
+        } else {
+            // Default fallback
+            echo yatra_svg_icon($default_icon, $css_class);
+        }
+    }
+}

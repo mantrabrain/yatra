@@ -8,7 +8,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="important-info">
     <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon($tab->icon ?? 'info', 'yatra-trip-section-title-icon'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'info', 'yatra-trip-section-title-icon', $tab->label ?? 'Important Information'); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __('Important Information', 'yatra')); ?>
     </h2>
     <div class="yatra-important-info-grid">

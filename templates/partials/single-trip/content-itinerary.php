@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 <section class="yatra-trip-section" id="itinerary" itemscope itemtype="https://schema.org/TouristTrip">
     <div class="yatra-section-header-with-actions">
         <h2 class="yatra-trip-section-title">
-            <?php echo yatra_svg_icon($tab->icon ?? 'calendar', 'yatra-trip-section-title-icon'); ?>
+            <?php yatra_render_tab_icon($tab->icon ?? null, 'calendar', 'yatra-trip-section-title-icon', $tab->label ?? 'Itinerary'); ?>
             <?php echo esc_html(isset($tab->label) ? $tab->label : __('Itinerary', 'yatra')); ?>
         </h2>
         <div class="yatra-itinerary-actions">
@@ -96,12 +96,8 @@ if (!defined('ABSPATH')) {
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                                 </svg>
                                                 <span>
-                                                    <?php
-                                                    echo esc_html($entry['start_time']);
-                                                    if ($entry['end_time']) {
-                                                        echo ' - ' . esc_html($entry['end_time']);
-                                                    }
-                                                    ?>
+                                                    <?php echo esc_html($entry['start_time']); ?>
+                                                    <?php if ($entry['end_time']) { echo ' - ' . esc_html($entry['end_time']); } ?>
                                                 </span>
                                             </div>
                                         <?php endif; ?>

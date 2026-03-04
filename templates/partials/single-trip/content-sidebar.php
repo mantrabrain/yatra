@@ -80,12 +80,7 @@ if (!defined('ABSPATH')) {
     $original_min = (float) ($trip->min_category_original_price ?? 0);
     $max_discount_pct = (int) ($trip->max_discount_percentage ?? 0);
 
-    // DEBUG: Check effective_price_min first
-    echo '<!-- DEBUG: Effective Price Min: ' . var_export($trip->effective_price_min, true) . ' -->';
-    echo '<!-- DEBUG: Effective Min (float): ' . $effective_min . ' -->';
-
     if ($effective_min > 0) {
-        echo '<!-- DEBUG: Using effective_price_min path -->';
         $pricing['has_price'] = true;
         $pricing['raw_current_price'] = $effective_min;
         $pricing['current_price'] = yatra_format_price($effective_min);
@@ -110,31 +105,16 @@ if (!defined('ABSPATH')) {
         $original = (float) ($trip->original_price ?? 0);
         $discounted = (float) ($trip->discounted_price ?? 0);
 
-        // DEBUG: Output all pricing fields
-        echo '<!-- DEBUG: Trip ID: ' . ($trip->id ?? 'NO ID') . ' -->';
-        echo '<!-- DEBUG: Original Price: ' . var_export($trip->original_price, true) . ' -->';
-        echo '<!-- DEBUG: Discounted Price: ' . var_export($trip->discounted_price, true) . ' -->';
-        echo '<!-- DEBUG: Sale Price: ' . var_export($trip->sale_price, true) . ' -->';
-        echo '<!-- DEBUG: Effective Price Min: ' . var_export($trip->effective_price_min, true) . ' -->';
-
         // Determine current price: Priority: discounted_price > original_price > sale_price
         if ($discounted > 0) {
             $current = $discounted;
-            echo '<!-- DEBUG: Using discounted price: ' . $current . ' -->';
         } elseif ($original > 0) {
             $current = $original;
-            echo '<!-- DEBUG: Using original price: ' . $current . ' -->';
         } elseif (!empty($trip->sale_price) && (float)$trip->sale_price > 0) {
             $current = (float) $trip->sale_price;
-            echo '<!-- DEBUG: Using sale_price field: ' . $current . ' -->';
         } else {
             $current = 0;
-            echo '<!-- DEBUG: No price found, current = 0 -->';
         }
-
-        echo '<!-- DEBUG: Final current price: ' . $current . ' -->';
-        echo '<!-- DEBUG: Has Traveler Pricing: ' . ($has_traveler_pricing ? 'YES' : 'NO') . ' -->';
-        echo '<!-- DEBUG: Has Availability: ' . ($has_availability ? 'YES' : 'NO') . ' -->';
 
         if ($current > 0) {
             $pricing['has_price'] = true;

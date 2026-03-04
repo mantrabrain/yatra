@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="<?php echo esc_attr($tab->id); ?>">
     <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon($tab->icon ?? 'message-circle', 'yatra-trip-section-title-icon'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'message-circle', 'yatra-trip-section-title-icon', $tab->label ?? 'Testimonials'); ?>
         <?php echo esc_html($tab->label); ?>
     </h2>
     

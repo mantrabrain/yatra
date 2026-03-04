@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 ?>
 <section class="yatra-trip-section" id="included">
     <h2 class="yatra-trip-section-title">
-        <?php echo yatra_svg_icon($tab->icon ?? 'check', 'yatra-trip-section-title-icon'); ?>
+        <?php yatra_render_tab_icon($tab->icon ?? null, 'check', 'yatra-trip-section-title-icon', $tab->label ?? "What's Included & Excluded"); ?>
         <?php echo esc_html(isset($tab->label) ? $tab->label : __("What's Included & Excluded", 'yatra')); ?>
     </h2>
     <div class="yatra-included-excluded">

@@ -36,7 +36,7 @@ if (!defined('ABSPATH')) {
     </script>
     <div class="faq-header">
         <h2 class="yatra-trip-section-title">
-            <?php echo yatra_svg_icon($tab->icon ?? 'help-circle', 'yatra-trip-section-title-icon'); ?>
+            <?php yatra_render_tab_icon($tab->icon ?? null, 'help-circle', 'yatra-trip-section-title-icon', $tab->label ?? 'FAQ'); ?>
             <?php echo esc_html(isset($tab->label) ? $tab->label : __('Frequently Asked Questions', 'yatra')); ?>
         </h2>
         <div class="faq-controls">
