@@ -1,0 +1,231 @@
+/* Discount Trip Shortcode Styles - Same as trip-shortcode.css with discount badge additions */
+
+/* Trip Shortcode Styles */
+.yatra-tour-shortcode {
+    margin: 30px 0;
+    position: relative;
+}
+
+.yatra-tour-shortcode.yatra-loading::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+}
+
+.yatra-tour-shortcode.yatra-loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    margin: -15px 0 0 -15px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #0073aa;
+    border-radius: 50%;
+    animation: yatra-spin 1s linear infinite;
+    z-index: 11;
+}
+
+@keyframes yatra-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.yatra-tour-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-tour-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.875rem;
+    font-weight: 600;
+}
+
+.yatra-tour-count {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.yatra-tour-grid {
+    display: grid;
+    gap: 30px;
+}
+
+.yatra-tour-grid-1 {
+    grid-template-columns: 1fr;
+}
+
+.yatra-tour-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.yatra-tour-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.yatra-tour-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.yatra-tour-item {
+    position: relative;
+}
+
+/* Discount Badge Styling */
+.yatra-discount-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* Empty State */
+.yatra-tour-empty {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.yatra-empty-icon {
+    margin-bottom: 20px;
+}
+
+.yatra-empty-icon-svg {
+    width: 60px;
+    height: 60px;
+    color: #9ca3af;
+}
+
+.yatra-tour-empty h3 {
+    margin: 0 0 10px 0;
+    color: #1f2937;
+}
+
+.yatra-tour-empty p {
+    color: #6b7280;
+    margin: 0 0 20px 0;
+}
+
+.yatra-tour-empty-page {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+}
+
+/* Pagination */
+.yatra-tour-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.yatra-pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #374151;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.yatra-pagination-link:hover {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #111827;
+}
+
+.yatra-pagination-link.active {
+    background: #0073aa;
+    border-color: #0073aa;
+    color: #ffffff;
+}
+
+.yatra-pagination-ellipsis {
+    color: #6b7280;
+    padding: 0 8px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .yatra-tour-grid-4 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .yatra-tour-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .yatra-tour-grid-3,
+    .yatra-tour-grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .yatra-tour-pagination {
+        gap: 8px;
+    }
+    
+    .yatra-pagination-link {
+        min-width: 36px;
+        height: 36px;
+        font-size: 0.8rem;
+        padding: 0 10px;
+    }
+    
+    .yatra-discount-badge {
+        top: 10px;
+        left: 10px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-tour-grid-2,
+    .yatra-tour-grid-3,
+    .yatra-tour-grid-4 {
+        grid-template-columns: 1fr;
+    }
+    
+    .yatra-tour-pagination {
+        gap: 6px;
+    }
+    
+    .yatra-pagination-link {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+        padding: 0 8px;
+    }
+}

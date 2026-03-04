@@ -187,6 +187,33 @@ class TemplateLoader
                     ]);
                 }
             }
+
+            // Plain permalink fallback: handle ?yatra_login_page= or login requests
+            if (!$handled) {
+                $loginPage = get_query_var('yatra_login_page') ?: ($_GET['yatra_login_page'] ?? '');
+                if (!empty($loginPage)) {
+                    try {
+                        // Security: Validate login page request
+                        if ($this->validateLoginRequest()) {
+                            $handler = new \Yatra\Core\Handlers\LoginPageHandler();
+                            $handled = $handler->handle([]);
+                        } else {
+                            // Log security violation
+                            if (defined('WP_DEBUG') && WP_DEBUG) {
+                                error_log('Yatra TemplateLoader: Invalid login request detected from IP: ' . $this->getClientIp());
+                            }
+                        }
+                    } catch (Exception $e) {
+                        // Log error for debugging
+                        if (defined('WP_DEBUG') && WP_DEBUG) {
+                            error_log('Yatra TemplateLoader Login Handler Error: ' . $e->getMessage());
+                        }
+                        
+                        // Fallback to default behavior
+                        $handled = false;
+                    }
+                }
+            }
         }
 
         // If still not handled, continue normally
@@ -224,6 +251,7 @@ class TemplateLoader
         add_rewrite_tag('%yatra_booking_confirmation%', '([^&]+)');
         add_rewrite_tag('%yatra_remaining_checkout%', '([^&]+)');
         add_rewrite_tag('%yatra_verify_email%', '([^&]+)');
+        add_rewrite_tag('%yatra_login_page%', '([^&]+)');
         // Single taxonomy page tags
         add_rewrite_tag('%yatra_destination_slug%', '([^&]+)');
         add_rewrite_tag('%yatra_activity_slug%', '([^&]+)');
@@ -233,6 +261,13 @@ class TemplateLoader
         add_rewrite_rule(
             '^yatra-verify-email/([a-zA-Z0-9_-]+)/?$',
             'index.php?yatra_verify_email=$matches[1]',
+            'top'
+        );
+
+        // Add rewrite rule for login page: /login
+        add_rewrite_rule(
+            '^login/?$',
+            'index.php?yatra_login_page=1',
             'top'
         );
 
@@ -299,6 +334,7 @@ class TemplateLoader
             'yatra_booking_confirmation',
             'yatra_remaining_checkout',
             'yatra_verify_email',
+            'yatra_login_page',
             'yatra_destination_slug',
             'yatra_activity_slug',
             'yatra_category_slug',
@@ -316,5 +352,58 @@ class TemplateLoader
         $yatra_vars[] = $category_base;
 
         return array_merge($vars, $yatra_vars);
+    }
+
+    /**
+     * Validate login page request for security
+     */
+    private function validateLoginRequest(): bool
+    {
+        // Check request method
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            return false;
+        }
+
+        // Check for suspicious parameters
+        $suspicious_params = ['exec', 'system', 'eval', 'passthru', 'shell_exec'];
+        foreach ($suspicious_params as $param) {
+            if (isset($_GET[$param]) || isset($_POST[$param])) {
+                return false;
+            }
+        }
+
+        // Rate limiting check
+        $ip = $this->getClientIp();
+        $transient_key = 'yatra_login_request_limit_' . md5($ip);
+        $requests = get_transient($transient_key) ?: 0;
+        
+        // Allow 50 requests per 10 minutes
+        if ($requests >= 50) {
+            return false;
+        }
+        
+        set_transient($transient_key, $requests + 1, 10 * MINUTE_IN_SECONDS);
+        
+        return true;
+    }
+
+    /**
+     * Get client IP address
+     */
+    private function getClientIp(): string
+    {
+        $ip_keys = ['HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
+        
+        foreach ($ip_keys as $key) {
+            if (!empty($_SERVER[$key])) {
+                $ips = explode(',', $_SERVER[$key]);
+                $ip = trim($ips[0]);
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
+                    return $ip;
+                }
+            }
+        }
+        
+        return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
     }
 }

@@ -159,6 +159,11 @@ class Bootstrap
             $providers[] = 'Yatra\Providers\FrontendAssetsProvider';
         }
 
+        // Shortcode provider (always load for shortcode functionality)
+        if (class_exists('Yatra\Providers\ShortcodeServiceProvider')) {
+            $providers[] = 'Yatra\Providers\ShortcodeServiceProvider';
+        }
+
         // Register each provider
         foreach ($providers as $provider) {
             try {

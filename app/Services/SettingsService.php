@@ -475,6 +475,29 @@ class SettingsService
     }
 
     /**
+     * Get currency symbol
+     */
+    public static function getCurrencySymbol(): string
+    {
+        $currency = self::getCurrency();
+        $symbols = [
+            'USD' => '$',
+            'EUR' => '€',
+            'GBP' => '£',
+            'JPY' => '¥',
+            'AUD' => 'A$',
+            'CAD' => 'C$',
+            'CHF' => 'CHF',
+            'CNY' => '¥',
+            'INR' => '₹',
+            'BDT' => '৳',
+            'NPR' => 'रु',
+        ];
+        
+        return $symbols[$currency] ?? $currency;
+    }
+
+    /**
      * Check if payment test mode is enabled
      */
     public static function isPaymentTestMode(): bool

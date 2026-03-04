@@ -79,11 +79,13 @@ abstract class BaseShortcode
      */
     protected function loadTemplate(string $template_path, array $data = []): string
     {
-        if (!file_exists($template_path)) {
+        $full_path = $this->getTemplatePath($template_path);
+        
+        if (!file_exists($full_path)) {
             if (defined('WP_DEBUG') && WP_DEBUG) {
                 return sprintf(
                     '<div class="yatra-error">Template not found: %s</div>',
-                    esc_html($template_path)
+                    esc_html($full_path)
                 );
             }
             return '';
@@ -95,7 +97,7 @@ abstract class BaseShortcode
         }
 
         ob_start();
-        include $template_path;
+        include $full_path;
         return ob_get_clean();
     }
 

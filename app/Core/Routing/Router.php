@@ -12,6 +12,7 @@ use Yatra\Core\Handlers\TaxonomyPageHandler;
 use Yatra\Core\Handlers\BookingPageHandler;
 use Yatra\Core\Handlers\BookingConfirmationPageHandler;
 use Yatra\Core\Handlers\CheckoutPageHandler;
+use Yatra\Core\Handlers\LoginPageHandler;
 use Yatra\Core\Routing\RouteMatcher;
 
 /**
@@ -35,21 +36,24 @@ class Router
     }
 
     /**
-     * Register route handlers
+     * Register page handlers with production optimizations
      */
     private function registerHandlers(): void
     {
+        // Lazy loading for better performance
         $this->handlers = [
-            'trip' => new TripPageHandler(),
-            'account' => new AccountPageHandler(),
-            'listing' => new ListingPageHandler(),
-            'taxonomy' => new TaxonomyPageHandler(),
-            'booking' => new BookingPageHandler(),
-            'booking_confirmation' => new BookingConfirmationPageHandler(),
-            'checkout' => new CheckoutPageHandler(),
+            'trip' => function() { return new TripPageHandler(); },
+            'account' => function() { return new AccountPageHandler(); },
+            'listing' => function() { return new ListingPageHandler(); },
+            'taxonomy' => function() { return new TaxonomyPageHandler(); },
+            'booking' => function() { return new BookingPageHandler(); },
+            'booking_confirmation' => function() { return new BookingConfirmationPageHandler(); },
+            'checkout' => function() { return new CheckoutPageHandler(); },
+            'login' => function() { return new LoginPageHandler(); },
         ];
     }
 
+    
     /**
      * Route the current request
      *
@@ -209,14 +213,35 @@ class Router
     }
 
     /**
-     * Get handler for route type
+     * Get handler instance with lazy loading and error handling
      *
      * @param string $route_type Route type
      * @return BasePageHandler|null Handler instance or null if not found
      */
     private function getHandler(string $route_type): ?BasePageHandler
     {
-        return $this->handlers[$route_type] ?? null;
+        if (!isset($this->handlers[$route_type])) {
+            return null;
+        }
+
+        try {
+            $handler = $this->handlers[$route_type];
+            
+            // Lazy loading - instantiate only when needed
+            if ($handler instanceof \Closure) {
+                $this->handlers[$route_type] = $handler();
+                return $this->handlers[$route_type];
+            }
+            
+            return $handler;
+        } catch (Exception $e) {
+            // Log error for debugging
+            if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('Yatra Router: Failed to load handler "' . $route_type . '": ' . $e->getMessage());
+            }
+            
+            return null;
+        }
     }
 
     /**

@@ -14,7 +14,7 @@ $current_user = wp_get_current_user();
 
 // If user is not logged in, redirect to login
 if (!$current_user->ID) {
-    $login_url = wp_login_url(home_url($_SERVER['REQUEST_URI']));
+    $login_url = home_url('/login');
     wp_redirect($login_url);
     exit;
 }

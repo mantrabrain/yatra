@@ -84,6 +84,11 @@ class Trip
     public ?int $max_discount_percentage = null;
     public string $currency = 'USD';
     public bool $price_per_person = true;
+    
+    // Discount-specific properties for discount shortcode
+    public bool $has_discount = false;
+    public ?array $best_discount = null;
+    public ?float $current_price = null;
     public bool $deposit_required = false;
     public ?float $deposit_amount = null;
     public ?float $deposit_percentage = null;

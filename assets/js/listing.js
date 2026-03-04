@@ -21,8 +21,9 @@
         initPriceRange();
         initAdvancedSearch();
         initTravelersSelect();
-        initHorizontalSearchDropdowns();
-        initDurationSlider();
+        // Search functionality moved to shortcode-specific JS
+        // initHorizontalSearchDropdowns();
+        // initDurationSlider();
         initListGridToggle();
     }
 

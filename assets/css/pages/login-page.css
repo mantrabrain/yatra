@@ -1,0 +1,103 @@
+/**
+ * Login Page CSS
+ * 
+ * Styles for the dedicated login page
+ * 
+ * @package Yatra
+ */
+
+.yatra-login-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.yatra-login-page-wrapper {
+    width: 100%;
+    max-width: 500px;
+}
+
+.yatra-login-page-container {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.yatra-login-page-header {
+    background: #f8fafc;
+    padding: 40px 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.yatra-login-page-logo img {
+    max-width: 200px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.yatra-login-page-logo h1 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.yatra-login-page-content {
+    padding: 40px 30px;
+}
+
+.yatra-login-page-footer {
+    background: #f8fafc;
+    padding: 20px 30px;
+    text-align: center;
+    border-top: 1px solid #e5e7eb;
+}
+
+.yatra-login-page-footer p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .yatra-login-page {
+        padding: 10px;
+    }
+    
+    .yatra-login-page-header,
+    .yatra-login-page-content,
+    .yatra-login-page-footer {
+        padding: 20px;
+    }
+    
+    .yatra-login-page-wrapper {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .yatra-login-page {
+        padding: 0;
+        align-items: stretch;
+    }
+    
+    .yatra-login-page-container {
+        border-radius: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .yatra-login-page-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
