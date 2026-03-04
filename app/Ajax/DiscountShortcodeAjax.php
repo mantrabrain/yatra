@@ -11,14 +11,15 @@ class DiscountShortcodeAjax
 {
     public function __construct()
     {
-        add_action('wp_ajax_yatra_discount_trip_shortcode_load', [$this, 'loadDiscountTrips']);
-        add_action('wp_ajax_nopriv_yatra_discount_trip_shortcode_load', [$this, 'loadDiscountTrips']);
+        // Use the same AJAX handler as regular trips
+        add_action('wp_ajax_yatra_discount_trip_shortcode_load', [$this, 'loadTrips']);
+        add_action('wp_ajax_nopriv_yatra_discount_trip_shortcode_load', [$this, 'loadTrips']);
     }
 
     /**
-     * Load discount trips via AJAX for pagination
+     * Load trips via AJAX for pagination (same as regular trips)
      */
-    public function loadDiscountTrips(): void
+    public function loadTrips(): void
     {
         // Debug: Log AJAX request
         if (defined('WP_DEBUG') && WP_DEBUG) {
@@ -26,7 +27,7 @@ class DiscountShortcodeAjax
         }
         
         // Verify nonce
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_discount_trip_shortcode_nonce')) {
+        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'yatra_trip_shortcode_nonce')) {
             error_log('Yatra Discount AJAX - Security check failed');
             wp_die('Security check failed');
         }
@@ -58,8 +59,8 @@ class DiscountShortcodeAjax
             // Start output buffering
             ob_start();
             
-            // Load the discount-trip template
-            include YATRA_PLUGIN_PATH . 'templates/shortcodes/discount-trip.php';
+            // Load the trip template (same as regular trips)
+            include YATRA_PLUGIN_PATH . 'templates/shortcodes/trip.php';
             
             $html = ob_get_clean();
 

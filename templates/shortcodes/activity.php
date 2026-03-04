@@ -49,13 +49,18 @@ $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
 
 <div class="yatra-activity-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
     <div class="yatra-activity-header">
-        <h2 class="yatra-activity-title"><?php esc_html_e('Activity Listings', 'yatra'); ?></h2>
+        <?php if (!empty($atts['title'])): ?>
+            <h2 class="yatra-activity-title"><?php echo esc_html($atts['title']); ?></h2>
+        <?php else: ?>
+            <h2 class="yatra-activity-title"><?php esc_html_e('Activity Listings', 'yatra'); ?></h2>
+        <?php endif; ?>
         <?php if (!empty($activities)): ?>
             <div class="yatra-activity-count">
                 <?php 
                 printf(
-                    _nx('%d Activity', '%d Activities', count($activities), 'activity count', 'yatra'),
-                    esc_html(count($activities))
+                    esc_html__('Showing %d of %d activities', 'yatra'),
+                    esc_html(count($activities)),
+                    esc_html($total_found)
                 );
                 ?>
             </div>
@@ -152,7 +157,7 @@ $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
         </div>
     <?php endif; ?>
 
-    <?php if (isset($max_pages) && $max_pages > 1): ?>
+    <?php if ($atts['show_pagination'] === 'yes' && isset($max_pages) && $max_pages > 1): ?>
         <div class="yatra-activity-pagination">
             <?php
             $current_url = remove_query_arg('activity_page', $_SERVER['REQUEST_URI']);
@@ -169,38 +174,14 @@ $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
             <?php endif; ?>
 
             <?php
-            // Page numbers
-            $show_pages = 3;
-            $start_page = max(1, $current_page - floor($show_pages / 2));
-            $end_page = min($max_pages, $start_page + $show_pages - 1);
-            
-            if ($start_page > 1):
-            ?>
-                <a href="#" class="yatra-pagination-link" data-page="1">1</a>
-                <?php if ($start_page > 2): ?>
-                    <span class="yatra-pagination-ellipsis">...</span>
-                <?php endif; ?>
-            <?php endif; ?>
-
-            <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
-                <?php
+            // Show all page numbers - no ellipsis
+            for ($i = 1; $i <= $max_pages; $i++):
                 $is_current = $i === $current_page;
                 ?>
                 <a href="#" class="yatra-pagination-link <?php echo $is_current ? 'yatra-pagination-current' : ''; ?>" data-page="<?php echo esc_attr($i); ?>">
                     <?php echo esc_html($i); ?>
                 </a>
             <?php endfor; ?>
-
-            <?php
-            if ($end_page < $max_pages):
-                if ($end_page < $max_pages - 1):
-            ?>
-                    <span class="yatra-pagination-ellipsis">...</span>
-                <?php endif; ?>
-                <a href="#" class="yatra-pagination-link" data-page="<?php echo esc_attr($max_pages); ?>">
-                    <?php echo esc_html($max_pages); ?>
-                </a>
-            <?php endif; ?>
 
             <?php
             // Next page

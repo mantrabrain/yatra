@@ -15,8 +15,7 @@ class DiscountAndDealsShortcode extends BaseShortcode
     {
         parent::__construct('yatra_discount_and_deals', [
             'order' => 'asc',
-            'posts_per_page' => '6',
-            'per_page' => '6', // Support both parameters
+             'per_page' => '10',
             'columns' => '3',
             'discount_type' => 'all', // all, percentage, fixed, group
             'min_discount' => '',
@@ -26,7 +25,9 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'show_original_price' => 'yes',
             'show_percentage' => 'yes',
             'show_time_left' => 'yes',
-            'show_pagination' => 'yes'
+            'show_pagination' => 'yes',
+            'show_filters' => 'no',
+            'title' => 'Special Deals & Discounts'
         ]);
     }
 
@@ -37,6 +38,13 @@ class DiscountAndDealsShortcode extends BaseShortcode
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
         
+        // Extract per_page from attributes (only per_page parameter)
+        $per_page = 10; // default
+        if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
+            $per_page = (int) $atts['per_page'];
+        }
+        $atts['per_page'] = $per_page;
+
         // Get trips using Yatra's service (same as TripShortcode)
         $trips_data = $this->getTrips($atts);
         
@@ -51,33 +59,33 @@ class DiscountAndDealsShortcode extends BaseShortcode
             'atts' => $atts,
             'max_pages' => $trips_data['max_pages'] ?? 1,
             'current_page' => $trips_data['current_page'] ?? 1,
-            'total_found' => $trips_data['total_found'] ?? 0
+            'total_found' => $trips_data['total_found'] ?? 0,
+            'per_page' => $per_page
         ];
 
-        // Enqueue shortcode-specific CSS (same as TripShortcode)
+        // Enqueue same CSS and JS as regular trip shortcode
         wp_enqueue_style(
-            'yatra-discount-trip-shortcode',
-            YATRA_PLUGIN_URL . 'assets/css/shortcodes/discount-trip-shortcode.css',
+            'yatra-trip-shortcode',
+            YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
             [],
             YATRA_VERSION
         );
         
-        // Enqueue shortcode-specific JavaScript
         wp_enqueue_script(
-            'yatra-discount-trip-shortcode',
-            YATRA_PLUGIN_URL . 'assets/js/discount-trip-shortcode.js',
+            'yatra-trip-shortcode',
+            YATRA_PLUGIN_URL . 'assets/js/trip-shortcode.js',
             ['jquery'],
             YATRA_VERSION,
             true
         );
         
-        // Pass data to JavaScript
-        wp_localize_script('yatra-discount-trip-shortcode', 'yatraDiscountTripShortcode', [
+        // Pass data to JavaScript (same as trip shortcode)
+        wp_localize_script('yatra-trip-shortcode', 'yatraTripShortcode', [
             'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('yatra_discount_trip_shortcode_nonce')
+            'nonce' => wp_create_nonce('yatra_trip_shortcode_nonce')
         ]);
 
-        return $this->loadTemplate('shortcodes/discount-trip.php', $data);
+        return $this->loadTemplate('shortcodes/trip.php', $data);
     }
     
     /**
@@ -88,7 +96,7 @@ class DiscountAndDealsShortcode extends BaseShortcode
         global $wpdb;
         
         $tripsTable = \Yatra\Database\Tables\TripsTable::getTableName();
-        $limit = (int) $atts['posts_per_page'];
+        $limit = (int) $atts['per_page'];
         $order = strtolower($atts['order']) === 'desc' ? 'DESC' : 'ASC';
         
         // Build the query to get trips with discounts - more flexible

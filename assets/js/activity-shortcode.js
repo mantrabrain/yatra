@@ -18,7 +18,6 @@ jQuery(document).ready(function($) {
         $container.addClass('yatra-loading');
         
         // Debug: Log the data being sent
-        console.log('Yatra Activity Shortcode - Sending AJAX request:', {
             page: page,
             atts: atts
         });
@@ -31,8 +30,28 @@ jQuery(document).ready(function($) {
             atts: atts
         }, function(response) {
             if (response.success) {
-                // Update container content
-                $container.html(response.data.html);
+                // Update only the inner content, not the entire container to prevent nesting
+                // The response should contain only the inner content (header, grid, pagination)
+                var $innerContent = $('<div>').html(response.data.html);
+                var newShortcodeElement = $innerContent.find('.yatra-activity-shortcode');
+                
+                if (newShortcodeElement.length) {
+                    // Extract the inner content from the new shortcode element
+                    var newInnerContent = newShortcodeElement.html();
+                    var newAtts = newShortcodeElement.data('atts');
+                    
+                    // Update the existing container's inner content
+                    $container.html(newInnerContent);
+                    
+                    // Update container data attributes
+                    if (newAtts) {
+                        $container.data('atts', newAtts);
+                    } else {
+                    }
+                } else {
+                    // Fallback: if no shortcode element found, replace directly
+                    $container.html(response.data.html);
+                }
                 
                 // Scroll to top of container
                 $('html, body').animate({
@@ -42,10 +61,8 @@ jQuery(document).ready(function($) {
                 // Trigger custom event
                 $(document).trigger('yatraActivityShortcodeUpdated', [response.data]);
             } else {
-                console.error('Error loading activities:', response.data.message);
             }
         }).fail(function(xhr, status, error) {
-            console.error('AJAX Error:', error);
         }).always(function() {
             // Remove loading state
             $container.removeClass('yatra-loading');
@@ -58,10 +75,8 @@ jQuery(document).ready(function($) {
         var atts = $container.data('atts');
         
         // Debug: Log the stored attributes
-        console.log('Yatra Activity Shortcode - Stored attributes:', atts);
         
         if (!atts) {
-            console.warn('Yatra Activity Shortcode - No attributes found in container');
         }
     });
 });

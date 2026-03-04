@@ -18,13 +18,19 @@ if (!defined('ABSPATH')) {
 
 $columns = (int) $atts['columns'];
 $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
+
+// Extract pagination variables from trips data structure
+$current_page = $trips['current_page'] ?? $current_page ?? 1;
+$max_pages = $trips['max_pages'] ?? $max_pages ?? 1;
+$total_found = $trips['total_found'] ?? $total_found ?? 0;
+
 ?>
 
 <div class="yatra-tour-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
     <?php if ($atts['show_filters'] === 'yes'): ?>
         <div class="yatra-tour-filters">
             <div class="yatra-filter-header">
-                <h3><?php esc_html_e('Filter Tours', 'yatra'); ?></h3>
+                <h3><?php esc_html_e('Filter Trips', 'yatra'); ?></h3>
                 <button class="yatra-filter-toggle"><?php esc_html_e('Filters', 'yatra'); ?></button>
             </div>
             
@@ -32,7 +38,7 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
                 <div class="yatra-filter-row">
                     <div class="yatra-filter-group">
                         <label for="yatra-search-filter"><?php esc_html_e('Search', 'yatra'); ?></label>
-                        <input type="text" id="yatra-search-filter" class="yatra-filter-input" placeholder="<?php esc_attr_e('Search tours...', 'yatra'); ?>">
+                        <input type="text" id="yatra-search-filter" class="yatra-filter-input" placeholder="<?php esc_attr_e('Search trips...', 'yatra'); ?>">
                     </div>
                     
                     <div class="yatra-filter-group">
@@ -98,17 +104,19 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
     <?php endif; ?>
 
     <div class="yatra-tour-header">
-        <?php if (!empty($atts['featured']) && $atts['featured'] === '1'): ?>
-            <h2 class="yatra-tour-title"><?php esc_html_e('Featured Tours', 'yatra'); ?></h2>
+        <?php if (!empty($atts['title'])): ?>
+            <h2 class="yatra-tour-title"><?php echo esc_html($atts['title']); ?></h2>
+        <?php elseif (!empty($atts['featured']) && $atts['featured'] === '1'): ?>
+            <h2 class="yatra-tour-title"><?php esc_html_e('Featured Trips', 'yatra'); ?></h2>
         <?php else: ?>
-            <h2 class="yatra-tour-title"><?php esc_html_e('Our Tours', 'yatra'); ?></h2>
+            <h2 class="yatra-tour-title"><?php esc_html_e('Our Trips', 'yatra'); ?></h2>
         <?php endif; ?>
         
         <?php if ($total_found > 0): ?>
             <div class="yatra-tour-count">
                 <?php 
                 printf(
-                    esc_html__('Showing %d of %d tours', 'yatra'),
+                    esc_html__('Showing %d of %d trips', 'yatra'),
                     esc_html(count($trips['trips'])),
                     esc_html($total_found)
                 );
@@ -131,7 +139,7 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
     <?php elseif ($total_found > 0): ?>
         <!-- No trips on this page, but trips exist on other pages -->
         <div class="yatra-tour-empty-page">
-            <p><?php esc_html_e('No tours found on this page. Try navigating to other pages.', 'yatra'); ?></p>
+            <p><?php esc_html_e('No trips found on this page. Try navigating to other pages.', 'yatra'); ?></p>
         </div>
     <?php else: ?>
         <!-- No tours found at all -->
@@ -139,8 +147,8 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
             <div class="yatra-empty-icon">
                 <?php echo yatra_svg_icon('map', 'yatra-empty-icon-svg'); ?>
             </div>
-            <h3><?php esc_html_e('No Tours Found', 'yatra'); ?></h3>
-            <p><?php esc_html_e('We couldn\'t find any tours matching your criteria. Try adjusting your filters or browse all tours.', 'yatra'); ?></p>
+            <h3><?php esc_html_e('No Trips Found', 'yatra'); ?></h3>
+            <p><?php esc_html_e('We couldn\'t find any trips matching your criteria. Try adjusting your filters or browse all trips.', 'yatra'); ?></p>
             
             <?php if (defined('WP_DEBUG') && WP_DEBUG && isset($trips['debug_info'])): ?>
                 <div class="yatra-debug-info" style="background: #f1f1f1; padding: 10px; margin: 10px 0; border-left: 4px solid #0073aa;">
@@ -152,15 +160,18 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
                 </div>
             <?php endif; ?>
             
-            <a href="<?php echo esc_url(home_url('/tours')); ?>" class="yatra-btn yatra-btn-primary">
-                <?php esc_html_e('Browse All Tours', 'yatra'); ?>
+            <a href="<?php echo esc_url(home_url('/trips')); ?>" class="yatra-btn yatra-btn-primary">
+                <?php esc_html_e('Browse All Trips', 'yatra'); ?>
             </a>
         </div>
     <?php endif; ?>
 
     <?php if ($atts['show_pagination'] === 'yes' && $max_pages > 1): ?>
         <div class="yatra-tour-pagination">
-            <?php
+            <?php 
+           
+            ?>
+                        <?php
             $current_url = remove_query_arg('trip_page', $_SERVER['REQUEST_URI']);
             $current_url = preg_replace('/&trip_page=[^&]*/', '', $current_url);
             
@@ -175,39 +186,14 @@ $column_class = 'yatra-tour-grid-' . min(max($columns, 1), 4);
             <?php endif; ?>
 
             <?php
-            // Page numbers
-            $show_pages = 3;
-            $start_page = max(1, $current_page - floor($show_pages / 2));
-                $end_page = min($max_pages, $start_page + $show_pages - 1);
-                
-                if ($start_page > 1):
+            // Show all page numbers - no ellipsis
+            for ($i = 1; $i <= $max_pages; $i++):
+                $is_current = $i === $current_page;
                 ?>
-                    <a href="#" class="yatra-pagination-link" data-page="1">1</a>
-                    <?php if ($start_page > 2): ?>
-                        <span class="yatra-pagination-ellipsis">...</span>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <?php for ($i = $start_page; $i <= $end_page; $i++): ?>
-                    <?php
-                    $page_url = add_query_arg('trip_page', $i, $current_url);
-                    $is_current = $i === $current_page;
-                    ?>
-                    <a href="#" class="yatra-pagination-link <?php echo $is_current ? 'yatra-pagination-current' : ''; ?>" data-page="<?php echo esc_attr($i); ?>">
-                        <?php echo esc_html($i); ?>
-                    </a>
-                <?php endfor; ?>
-
-                <?php
-                if ($end_page < $max_pages):
-                    if ($end_page < $max_pages - 1):
-                ?>
-                        <span class="yatra-pagination-ellipsis">...</span>
-                    <?php endif; ?>
-                    <a href="#" class="yatra-pagination-link" data-page="<?php echo esc_attr($max_pages); ?>">
-                        <?php echo esc_html($max_pages); ?>
-                    </a>
-                <?php endif; ?>
+                <a href="#" class="yatra-pagination-link <?php echo $is_current ? 'yatra-pagination-current' : ''; ?>" data-page="<?php echo esc_attr($i); ?>">
+                    <?php echo esc_html($i); ?>
+                </a>
+            <?php endfor; ?>
 
                 <?php
                 // Next page

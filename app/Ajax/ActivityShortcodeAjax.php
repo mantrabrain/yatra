@@ -23,6 +23,9 @@ class ActivityShortcodeAjax
         // Debug: Log AJAX request
         if (defined('WP_DEBUG') && WP_DEBUG) {
             error_log('Yatra Activity AJAX - Request received: ' . print_r($_POST, true));
+            $atts = $_POST['atts'] ?? [];
+            error_log('Yatra Activity AJAX - per_page parameter: ' . ($atts['per_page'] ?? 'NOT SET'));
+            error_log('Yatra Activity AJAX - page parameter: ' . ($_POST['page'] ?? 'NOT SET'));
         }
         
         // Verify nonce
@@ -58,16 +61,37 @@ class ActivityShortcodeAjax
             $columns = (int) $atts['columns'];
             $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
             
-            // Debug: Log AJAX data
+            // Debug: Log AJAX data with comprehensive pagination info
             if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('=== YATRA ACTIVITY AJAX DEBUG ===');
+                error_log('Yatra Activity AJAX - Requested page: ' . $page);
                 error_log('Yatra Activity AJAX - Activities count: ' . count($activities_data['activities'] ?? []));
                 error_log('Yatra Activity AJAX - Total found: ' . $total_found);
                 error_log('Yatra Activity AJAX - Max pages: ' . $max_pages);
                 error_log('Yatra Activity AJAX - Current page: ' . $current_page);
+                error_log('Yatra Activity AJAX - Attributes received: ' . print_r($atts, true));
+                
+                // Log each activity being returned
+                $activities_list = $activities_data['activities'] ?? [];
+                if (!empty($activities_list)) {
+                    error_log('Activities being returned for page ' . $current_page . ':');
+                    foreach ($activities_list as $index => $activity) {
+                        error_log('  ' . ($index + 1) . '. ' . ($activity['term']->name ?? 'NO NAME') . ' (ID: ' . ($activity['term']->id ?? 'NO ID') . ')');
+                    }
+                }
+                error_log('=== END ACTIVITY AJAX DEBUG ===');
             }
 
             // Load the template content with variables in scope
             ob_start();
+            // Extract variables to make them available in template (matching trip shortcode pattern)
+            $activities = $activities_data['activities'] ?? [];
+            $max_pages = $activities_data['max_pages'] ?? 1;
+            $current_page = $activities_data['current_page'] ?? 1;
+            $total_found = $activities_data['total_found'] ?? 0;
+            $columns = (int) $atts['columns'];
+            $column_class = 'yatra-activity-grid-' . min(max($columns, 1), 4);
+            
             include YATRA_PLUGIN_PATH . 'templates/shortcodes/activity.php';
             $html = ob_get_clean();
 

@@ -1,8 +1,8 @@
 jQuery(document).ready(function($) {
     'use strict';
 
-    // Handle pagination clicks
-    $(document).on('click', '.yatra-tour-pagination a', function(e) {
+    // Handle pagination clicks for regular trip shortcode (not discount)
+    $(document).on('click', '.yatra-tour-shortcode:not(.yatra-discount-trip-shortcode) .yatra-tour-pagination a', function(e) {
         e.preventDefault();
         
         var $link = $(this);
@@ -17,12 +17,7 @@ jQuery(document).ready(function($) {
         // Add loading state
         $container.addClass('yatra-loading');
         
-        // Debug: Log the data being sent
-        console.log('Yatra Trip Shortcode - Sending AJAX request:', {
-            page: page,
-            atts: atts
-        });
-        
+                
         // AJAX request
         $.post(yatraTripShortcode.ajaxurl, {
             action: 'yatra_trip_shortcode_load',
@@ -31,8 +26,27 @@ jQuery(document).ready(function($) {
             atts: atts
         }, function(response) {
             if (response.success) {
-                // Update container content
-                $container.html(response.data.html);
+                // Update only the inner content, not the entire container to prevent nesting
+                // The response should contain only the inner content (header, grid, pagination)
+                var $innerContent = $('<div>').html(response.data.html);
+                var newShortcodeElement = $innerContent.find('.yatra-tour-shortcode');
+                
+                if (newShortcodeElement.length) {
+                    // Extract the inner content from the new shortcode element
+                    var newInnerContent = newShortcodeElement.html();
+                    var newAtts = newShortcodeElement.data('atts');
+                    
+                    // Update the existing container's inner content
+                    $container.html(newInnerContent);
+                    
+                    // Update container data attributes
+                    if (newAtts) {
+                        $container.data('atts', newAtts);
+                    }
+                } else {
+                    // Fallback: if no shortcode element found, replace directly
+                    $container.html(response.data.html);
+                }
                 
                 // Scroll to top of container
                 $('html, body').animate({
@@ -42,10 +56,9 @@ jQuery(document).ready(function($) {
                 // Trigger custom event
                 $(document).trigger('yatraTripShortcodeUpdated', [response.data]);
             } else {
-                console.error('Error loading trips:', response.data.message);
+                // Error loading trips
             }
         }).fail(function(xhr, status, error) {
-            console.error('AJAX Error:', error);
         }).always(function() {
             // Remove loading state
             $container.removeClass('yatra-loading');
@@ -57,11 +70,5 @@ jQuery(document).ready(function($) {
         var $container = $(this);
         var atts = $container.data('atts');
         
-        // Debug: Log the stored attributes
-        console.log('Yatra Trip Shortcode - Stored attributes:', atts);
-        
-        if (!atts) {
-            console.warn('Yatra Trip Shortcode - No attributes found in container');
-        }
-    });
+            });
 });

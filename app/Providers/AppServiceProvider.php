@@ -163,9 +163,8 @@ class AppServiceProvider
     {
         // Initialize shortcode classes
         $shortcodes = [
-            new \Yatra\Shortcodes\AccountShortcode(),
-            new \Yatra\Shortcodes\BookingFormShortcode(),
-            new \Yatra\Shortcodes\TripListShortcode(),
+            new \Yatra\Shortcodes\MyAccountShortcode(),
+            new \Yatra\Shortcodes\TripShortcode(),
         ];
 
         foreach ($shortcodes as $shortcode) {

@@ -15,15 +15,16 @@ class DestinationShortcode extends BaseShortcode
     {
         parent::__construct('yatra_destination', [
             'order' => 'desc',
-            'per_page' => '12',
-            'posts_per_page' => '12', // Support both parameters
-            'columns' => '3',
+            'per_page' => '10',
+             'columns' => '3',
             'show_trip_count' => 'yes',
             'show_description' => 'yes',
             'show_image' => 'yes',
+            'show_pagination' => 'yes', // Default to show pagination like trip shortcode
             'destination' => '', // Specific destination slug(s), comma separated
             'hide_empty' => 'yes',
-            'featured_only' => 'no'
+            'featured_only' => 'no',
+            'title' => 'Destination Showcase'
         ]);
     }
 
@@ -34,6 +35,13 @@ class DestinationShortcode extends BaseShortcode
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
         
+        // Extract per_page from attributes (only per_page parameter)
+        $per_page = 10; // default
+        if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
+            $per_page = (int) $atts['per_page'];
+        }
+        $atts['per_page'] = $per_page;
+
         // Get destinations using Yatra's service
         $destinations_data = $this->getDestinations($atts);
         
@@ -44,7 +52,7 @@ class DestinationShortcode extends BaseShortcode
             'current_page' => $destinations_data['current_page'] ?? 1,
             'max_pages' => $destinations_data['max_pages'] ?? 1,
             'total_found' => $destinations_data['total_found'] ?? 0,
-            'per_page' => $destinations_data['per_page'] ?? (int) $atts['per_page']
+            'per_page' => $per_page
         ];
 
         // Enqueue shortcode-specific CSS
@@ -83,8 +91,21 @@ class DestinationShortcode extends BaseShortcode
             
             // Get current page from query string or attributes (for AJAX)
             $current_page = isset($atts['current_page']) ? (int) $atts['current_page'] : (isset($_GET['destination_page']) ? (int) $_GET['destination_page'] : 1);
-            // Support both per_page and posts_per_page parameters
-            $per_page = !empty($atts['posts_per_page']) ? (int) $atts['posts_per_page'] : (int) $atts['per_page'];
+            // Use per_page parameter only
+            $per_page = 10; // Default fallback
+            if (!empty($atts['per_page'])) {
+                $per_page = (int) $atts['per_page'];
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra DestinationShortcode: Using per_page = ' . $per_page);
+                }
+            } else {
+                if (defined('WP_DEBUG') && WP_DEBUG) {
+                    error_log('Yatra DestinationShortcode: Using default per_page = ' . $per_page);
+                }
+            }
+            
+            // Validate per_page to prevent issues
+            $per_page = max(1, min($per_page, 100)); // Between 1 and 100 items
             $offset = ($current_page - 1) * $per_page;
 
             // Start with very basic arguments to ensure we get destinations
@@ -109,11 +130,28 @@ class DestinationShortcode extends BaseShortcode
             // Try using the base repository method to bypass status filtering
             $result = $destinationService->getAll($args);
             
-            // Debug: Log the results
+            // Debug: Log the results with enhanced pagination info
             if (defined('WP_DEBUG') && WP_DEBUG) {
+                error_log('=== YATRA DESTINATION PAGINATION DEBUG ===');
                 error_log('Yatra DestinationShortcode Args: ' . print_r($args, true));
                 error_log('Yatra DestinationShortcode Results count: ' . count($result));
                 error_log('Yatra DestinationShortcode Total destinations: ' . $total_destinations);
+                error_log('Yatra DestinationShortcode Pagination Info:');
+                error_log('  - Current Page: ' . $current_page);
+                error_log('  - Per Page: ' . $per_page);
+                error_log('  - Offset: ' . $offset);
+                error_log('  - Max Pages: ' . ($per_page > 0 ? ceil($total_destinations / $per_page) : 1));
+                error_log('  - Expected items on this page: ' . min($per_page, max(0, $total_destinations - $offset)));
+                error_log('  - SQL LIMIT clause should be: LIMIT ' . $offset . ', ' . $per_page);
+                
+                // Log each destination being returned
+                if (!empty($result)) {
+                    error_log('Destinations returned on page ' . $current_page . ':');
+                    foreach ($result as $index => $destination) {
+                        error_log('  ' . ($index + 1) . '. ' . ($destination->name ?? 'NO NAME') . ' (ID: ' . $destination->id . ')');
+                    }
+                }
+                error_log('=== END PAGINATION DEBUG ===');
             }
             
             $destinations = [];

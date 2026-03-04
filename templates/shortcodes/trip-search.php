@@ -54,11 +54,6 @@ if (empty($activities)) {
     ");
 }
 
-// Debug: Log what we found
-if (defined('WP_DEBUG') && WP_DEBUG) {
-    error_log('Yatra Search - Destinations found: ' . count($destinations));
-    error_log('Yatra Search - Activities found: ' . count($activities));
-}
 
 // Get active filters from URL parameters
 $active_filters = [

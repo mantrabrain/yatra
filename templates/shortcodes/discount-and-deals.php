@@ -50,7 +50,7 @@ $column_class = 'yatra-discount-grid-' . min(max($columns, 1), 4);
             <?php endforeach; ?>
         </div>
         
-        <?php if (count($trips) >= (int) $atts['posts_per_page']): ?>
+        <?php if (count($trips) >= (int) $atts['per_page']): ?>
             <div class="yatra-discount-more">
                 <a href="<?php echo esc_url(get_post_type_archive_link('trip')); ?>" class="yatra-btn yatra-btn-outline">
                     <?php esc_html_e('View All Deals', 'yatra'); ?>

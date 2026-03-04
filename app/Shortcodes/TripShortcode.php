@@ -16,8 +16,7 @@ class TripShortcode extends BaseShortcode
         parent::__construct('yatra_tour', [
             'order' => 'asc',
             'featured' => '0',
-            'posts_per_page' => '12',
-            'per_page' => '12', // Support both parameters
+             'per_page' => '10',
             'category' => '',
             'destination' => '',
             'activity' => '',
@@ -29,12 +28,23 @@ class TripShortcode extends BaseShortcode
             'search' => '',
             'columns' => '3',
             'show_pagination' => 'yes',
-            'show_filters' => 'no'
+            'show_filters' => 'no',
+            'title' => 'Our Trips'
         ]);
     }
 
     /**
-     * Render the tour shortcode content
+     * Register the shortcode
+     */
+    public function register(): void
+    {
+        // Register both shortcode tags
+        add_shortcode('yatra_tour', [$this, 'render']);
+        add_shortcode('yatra_trip', [$this, 'render']);
+    }
+
+    /**
+     * Render the trip shortcode content
      */
     protected function renderContent(array $atts): string
     {
@@ -42,6 +52,14 @@ class TripShortcode extends BaseShortcode
         
         // Get trips using Yatra's service
         $trips_data = $this->getTrips($atts);
+        
+        // Extract per_page from attributes (only per_page parameter)
+        $per_page = 10; // default
+        if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
+            $per_page = (int) $atts['per_page'];
+        }
+        $atts['per_page'] = $per_page;
+
         
         // Prepare data for template (match expected structure)
         $data = [
@@ -54,10 +72,11 @@ class TripShortcode extends BaseShortcode
             'atts' => $atts,
             'max_pages' => $trips_data['max_pages'] ?? 1,
             'current_page' => $trips_data['current_page'] ?? 1,
-            'total_found' => $trips_data['total_found'] ?? 0
+            'total_found' => $trips_data['total_found'] ?? 0,
+            'per_page' => $per_page
         ];
 
-        // Enqueue shortcode-specific CSS
+            // Enqueue shortcode-specific CSS
         wp_enqueue_style(
             'yatra-trip-shortcode',
             YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
@@ -93,25 +112,11 @@ class TripShortcode extends BaseShortcode
             
             // Get current page from query string or attributes (for AJAX)
             $current_page = isset($atts['current_page']) ? (int) $atts['current_page'] : (isset($_GET['trip_page']) ? (int) $_GET['trip_page'] : 1);
-            // Support both per_page and posts_per_page parameters
-            // posts_per_page takes precedence over per_page
-            if (isset($atts['posts_per_page']) && $atts['posts_per_page'] !== '') {
-                $per_page = (int) $atts['posts_per_page'];
-            } else {
-                $per_page = (int) $atts['per_page'];
-            }
+            // Use per_page parameter only
+            $per_page = (int) $atts['per_page'];
             $offset = ($current_page - 1) * $per_page;
             
-            // Debug: Log the parameter values
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                $is_ajax = defined('DOING_AJAX') && DOING_AJAX;
-                error_log('Yatra TripShortcode Raw atts (AJAX: ' . ($is_ajax ? 'yes' : 'no') . '): ' . print_r($atts, true));
-                error_log('Yatra TripShortcode Per page: ' . $per_page);
-                error_log('Yatra TripShortcode Featured: ' . $atts['featured']);
-                error_log('Yatra TripShortcode Current page: ' . $current_page);
-            }
-
-            // Start with very basic arguments to ensure we get trips
+               // Start with very basic arguments to ensure we get trips
             $args = [
                 'limit' => $per_page,
                 'offset' => $offset,
@@ -133,12 +138,7 @@ class TripShortcode extends BaseShortcode
             // Get trips using the service
             $trips_data = $tripService->getActiveTrips($args);
             
-            // Debug: Log the results
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra TripShortcode Args: ' . print_r($args, true));
-                error_log('Yatra TripShortcode Results count: ' . count($trips_data));
-                error_log('Yatra TripShortcode Total trips: ' . $total_trips);
-            }
+ 
             
             $trips = [];
             foreach ($trips_data as $tripData) {

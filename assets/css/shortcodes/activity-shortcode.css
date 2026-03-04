@@ -821,11 +821,16 @@
     background: #0073aa;
     border-color: #0073aa;
     color: #ffffff;
+    font-weight: 600;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 115, 170, 0.3);
 }
 
 .yatra-pagination-current:hover {
     background: #005a87;
     border-color: #005a87;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(0, 90, 135, 0.4);
 }
 
 .yatra-pagination-ellipsis {

@@ -15,14 +15,15 @@ class ActivityShortcode extends BaseShortcode
     {
         parent::__construct('yatra_activity', [
             'order' => 'desc',
-            'per_page' => '12',
-            'posts_per_page' => '12', // Support both parameters
+            'per_page' => '10',
             'columns' => '3',
             'show_trip_count' => 'yes',
             'show_description' => 'yes',
             'show_image' => 'yes',
+            'show_pagination' => 'yes', // Default to show pagination like trip shortcode
             'activity' => '', // Specific activity slug(s), comma separated
-            'hide_empty' => 'yes'
+            'hide_empty' => 'yes',
+            'title' => 'Activity Listings'
         ]);
     }
 
@@ -33,6 +34,13 @@ class ActivityShortcode extends BaseShortcode
     {
         $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
         
+        // Extract per_page from attributes (only per_page parameter)
+        $per_page = 10; // default
+        if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
+            $per_page = (int) $atts['per_page'];
+        }
+        $atts['per_page'] = $per_page;
+ 
         // Get activities using Yatra's service
         $activities_data = $this->getActivities($atts);
         
@@ -43,7 +51,7 @@ class ActivityShortcode extends BaseShortcode
             'current_page' => $activities_data['current_page'] ?? 1,
             'max_pages' => $activities_data['max_pages'] ?? 1,
             'total_found' => $activities_data['total_found'] ?? 0,
-            'per_page' => $activities_data['per_page'] ?? (int) $atts['per_page']
+            'per_page' => $per_page
         ];
 
         // Enqueue shortcode-specific CSS
@@ -82,8 +90,13 @@ class ActivityShortcode extends BaseShortcode
             
             // Get current page from query string or attributes (for AJAX)
             $current_page = isset($atts['current_page']) ? (int) $atts['current_page'] : (isset($_GET['activity_page']) ? (int) $_GET['activity_page'] : 1);
-            // Support both per_page and posts_per_page parameters
-            $per_page = !empty($atts['posts_per_page']) ? (int) $atts['posts_per_page'] : (int) $atts['per_page'];
+            // Enhanced per_page handling with validation and debugging
+        
+           $per_page = (int) $atts['per_page'];
+
+           
+            // Validate per_page to prevent issues
+            $per_page = max(1, min($per_page, 100)); // Between 1 and 100 items
             $offset = ($current_page - 1) * $per_page;
 
             // Start with very basic arguments to ensure we get activities
@@ -108,12 +121,7 @@ class ActivityShortcode extends BaseShortcode
             // Try using the base repository method to bypass status filtering
             $result = $activityService->getAll($args);
             
-            // Debug: Log the results
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra ActivityShortcode Args: ' . print_r($args, true));
-                error_log('Yatra ActivityShortcode Results count: ' . count($result));
-                error_log('Yatra ActivityShortcode Total activities: ' . $total_activities);
-            }
+            
             
             $activities = [];
 
@@ -199,18 +207,7 @@ class ActivityShortcode extends BaseShortcode
                 
                 foreach ($trips as $trip) {
                     // Debug: Log all trip data to see what fields exist
-                    if (defined('WP_DEBUG') && WP_DEBUG) {
-                        error_log('ACTIVITY TRIP DATA: ' . print_r([
-                            'trip_id' => $trip->id ?? 'NO ID',
-                            'trip_title' => $trip->title ?? 'NO TITLE',
-                            'original_price' => $trip->original_price ?? 'NO ORIGINAL_PRICE',
-                            'discounted_price' => $trip->discounted_price ?? 'NO DISCOUNTED_PRICE',
-                            'sale_price' => $trip->sale_price ?? 'NO SALE_PRICE',
-                            'base_price' => $trip->base_price ?? 'NO BASE_PRICE',
-                            'price' => $trip->price ?? 'NO PRICE',
-                            'all_fields' => array_keys(get_object_vars($trip))
-                        ], true));
-                    }
+                   
                     
                     // Get pricing - use correct field names from database
                     if (isset($trip->original_price) && $trip->original_price > 0) {
@@ -257,15 +254,7 @@ class ActivityShortcode extends BaseShortcode
                 $avg_duration = !empty($durations) ? array_sum($durations) / count($durations) : 0;
                 $avg_group_size = !empty($group_sizes) ? round(array_sum($group_sizes) / count($group_sizes)) : 0;
                 
-                if (defined('WP_DEBUG') && WP_DEBUG) {
-                    error_log('FINAL ACTIVITY RATING CALCULATION:');
-                    error_log('Activity: ' . ($activityData->name ?? 'NO NAME'));
-                    error_log('Total rating sum: ' . $total_rating_sum);
-                    error_log('Total review count: ' . $total_review_count);
-                    error_log('Number of trips: ' . $trip_count);
-                    error_log('Logic: Only trips with reviews are included in average');
-                    error_log('Final avg_rating: ' . $final_avg_rating);
-                }
+               
                 
                 $activities[] = [
                     'term' => $activityData,
@@ -294,11 +283,7 @@ class ActivityShortcode extends BaseShortcode
             // Calculate pagination data
             $max_pages = $per_page > 0 ? ceil($total_activities / $per_page) : 1;
             
-            // Debug: Log final activities count
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                error_log('Yatra ActivityShortcode Final activities count: ' . count($activities));
-                error_log('Yatra ActivityShortcode Max pages: ' . $max_pages);
-            }
+        
 
             return [
                 'activities' => $activities,
