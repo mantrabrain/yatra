@@ -67,6 +67,7 @@ import {
   Download,
   Eye,
   X,
+  Trash2,
 } from "lucide-react";
 import { RichTextEditor } from "../components/ui/rich-text-editor";
 import { IconPicker, IconPickerValue } from "../components/ui/icon-picker";
@@ -7108,10 +7109,10 @@ const TripForm: React.FC = () => {
                         onDragLeave={handleDragLeave}
                         onDrop={(e) => handleDrop(e, tab.id)}
                         onDragEnd={handleDragEnd}
-                        className={`p-4 rounded-lg border cursor-move ${
+                        className={`p-4 rounded-lg border cursor-move relative ${
                           tab.enabled
-                            ? "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                            : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60"
+                            ? "bg-gray-50 dark:bg-gray-850 border-gray-200 dark:border-gray-700 shadow-sm"
+                            : "bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-700 opacity-60 shadow-sm"
                         } ${
                           draggedTab === tab.id
                             ? "opacity-50 scale-95 shadow-lg"
@@ -7122,8 +7123,20 @@ const TripForm: React.FC = () => {
                             : ""
                         }`}
                       >
+                        {tab.content_type === "custom" && (
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleTabRemove(tab.id)}
+                            className="absolute top-2 right-2 h-10 w-10 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            title={__("Delete tab", "yatra")}
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
+                        )}
                         <div className="flex items-center gap-3 mb-3">
-                          <GripVertical className="w-5 h-5 text-gray-400 cursor-grab active:cursor-grabbing" />
+                          <GripVertical className="w-6 h-6 text-gray-400 cursor-grab active:cursor-grabbing" />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-2">
                               <Input
@@ -7242,10 +7255,10 @@ const TripForm: React.FC = () => {
                               size="sm"
                               onClick={() => handleTabMove(tab.id, "up")}
                               disabled={index === 0}
-                              className="h-8 w-8 p-0"
+                              className="h-10 w-10 p-0"
                               title={__("Move up", "yatra")}
                             >
-                              <ChevronUp className="w-4 h-4" />
+                              <ChevronUp className="w-5 h-5" />
                             </Button>
                             <Button
                               type="button"
@@ -7255,23 +7268,11 @@ const TripForm: React.FC = () => {
                               disabled={
                                 index === formData.frontend_tabs.length - 1
                               }
-                              className="h-8 w-8 p-0"
+                              className="h-10 w-10 p-0"
                               title={__("Move down", "yatra")}
                             >
-                              <ChevronDown className="w-4 h-4" />
+                              <ChevronDown className="w-5 h-5" />
                             </Button>
-                            {tab.content_type === "custom" && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleTabRemove(tab.id)}
-                                className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                title={__("Delete tab", "yatra")}
-                              >
-                                <X className="w-4 h-4" />
-                              </Button>
-                            )}
                             <label className="flex items-center gap-2 cursor-pointer">
                               <input
                                 type="checkbox"

@@ -4691,8 +4691,8 @@ class DownloadsHandler {
 
   async downloadFile(downloadId) {
     try {
-      // Get download URL with signature
-      const response = await fetch(`/wp-json/yatra/v1/downloads/${downloadId}/download`);
+      // Get download URL with signature using centralized helper
+      const response = await window.YatraApiHelper.getDownloadInfo(downloadId);
       if (!response.ok) {
         throw new Error('Download failed');
       }
@@ -4722,8 +4722,8 @@ class DownloadsHandler {
       this.currentDownloadId = downloadId;
       this.showPreviewModal();
 
-      // Get download info
-      const response = await fetch(`/wp-json/yatra/v1/downloads/${downloadId}/download`);
+      // Get download info using centralized helper
+      const response = await window.YatraApiHelper.getDownloadInfo(downloadId);
       if (!response.ok) {
         throw new Error('Failed to get file info');
       }

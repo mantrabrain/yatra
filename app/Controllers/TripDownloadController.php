@@ -390,19 +390,13 @@ class TripDownloadController extends BaseController
             return true;
         }
 
-        // Public downloads are always allowed
+        // Public downloads are always allowed - no nonce required for public downloads
         if ($visibility === 'public') {
             return true;
         }
 
-        // Logged in downloads require user to be logged in
-        if ($visibility === 'logged_in') {
-            return is_user_logged_in();
-        }
-
-        // Booked only downloads - for now, allow logged in users to test
-        // In production, this should check for actual booking
-        if ($visibility === 'booked_only') {
+        // For logged_in and booked_only downloads, require authentication
+        if ($visibility === 'logged_in' || $visibility === 'booked_only') {
             return is_user_logged_in();
         }
 

@@ -28,12 +28,12 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->routesFile = YATRA_PLUGIN_PATH . 'routes/api.php';
 
-        // Debug: Log service provider registration
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
-
+        
         // Register routes on rest_api_init hook with higher priority to ensure it runs early
         add_action('rest_api_init', [$this, 'registerRoutes'], 5);
+        
+        // Fix REST API rewrite rules if they're not working
+        add_action('init', [$this, 'fixRestApiRewrites'], 999);
     }
 
     /**
@@ -41,6 +41,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function registerRoutes(): void
     {
+        
         // Prevent duplicate registration
         static $registered = false;
         if ($registered) {
@@ -48,14 +49,8 @@ class RouteServiceProvider extends ServiceProvider
         }
 
         if (!file_exists($this->routesFile)) {
-            if (defined('WP_DEBUG') && WP_DEBUG) {
-                }
             return;
         }
-
-        // Debug: Log routes file loading
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
 
         // Load routes registry
         require_once $this->routesFile;
@@ -70,6 +65,31 @@ class RouteServiceProvider extends ServiceProvider
         // Debug: Log route registration completion
         if (defined('WP_DEBUG') && WP_DEBUG) {
             }
+    }
+
+    /**
+     * Fix REST API rewrite rules
+     */
+    public function fixRestApiRewrites(): void
+    {
+        // Add manual rewrite rule for REST API
+        add_rewrite_rule(
+            '^wp-json/yatra/v1/downloads/([0-9]+)/download-url/?$',
+            'index.php?rest_route=/yatra/v1/downloads/$matches[1]/download-url',
+            'top'
+        );
+        
+        add_rewrite_rule(
+            '^wp-json/yatra/v1/(.*)?$',
+            'index.php?rest_route=/yatra/v1/$matches[1]',
+            'top'
+        );
+        
+        // Ensure REST API rewrite rules are properly flushed
+        if (!get_option('yatra_rest_api_flushed')) {
+            flush_rewrite_rules(false);
+            update_option('yatra_rest_api_flushed', true);
+        }
     }
 
     /**

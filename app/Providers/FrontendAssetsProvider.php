@@ -99,6 +99,7 @@ class FrontendAssetsProvider
     private function enqueueCommonJs(): void
     {
         $jsFiles = [
+            'api-helper' => 'api-helper.js',
             'video-player' => 'video-player.js',
             'tour-viewer' => 'tour-viewer.js',
             'listing' => 'listing.js',
@@ -111,10 +112,16 @@ class FrontendAssetsProvider
         foreach ($jsFiles as $handle => $filename) {
             $filePath = YATRA_PLUGIN_PATH . "assets/js/{$filename}";
             if (file_exists($filePath)) {
+                // Set dependencies
+                $dependencies = ['jquery'];
+                if ($handle === 'trip') {
+                    $dependencies[] = 'yatra-api-helper';
+                }
+                
                 wp_enqueue_script(
                     "yatra-{$handle}",
                     YATRA_PLUGIN_URL . "assets/js/{$filename}",
-                    ['jquery'],
+                    $dependencies,
                     YATRA_VERSION . '.' . filemtime($filePath),
                     true
                 );

@@ -4,6 +4,12 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Use centralized API helper
+    if (typeof window.YatraApiHelper === 'undefined') {
+        console.error('YatraApiHelper not loaded');
+        return;
+    }
+    
     // Handle download button clicks
     const downloadButtons = document.querySelectorAll('.yatra-download-btn:not(.yatra-download-btn-disabled)');
     
@@ -24,9 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerHTML = '<span class="yatra-download-spinner"></span> Getting download...';
             this.disabled = true;
             
-            // Build API URL with booking ID if needed
-            let apiUrl = `/wp-json/yatra/v1/downloads/${downloadId}/download-url`;
-            
             // For booked_only downloads, we need to get booking ID
             // In a real implementation, you'd get this from user's bookings
             if (visibility === 'booked_only') {
@@ -34,13 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 // The API will tell us if booking is required
             }
             
-            // Make API request to get download URL
-            fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'X-WP-Nonce': yatraVars?.nonce || ''
-                }
-            })
+            // Make API request to get download URL using centralized helper
+            window.YatraApiHelper.getDownloadUrl(downloadId)
             .then(response => {
                 if (!response.ok) {
                     return response.json().then(err => {

@@ -140,6 +140,7 @@ window.yatraVars = {
 $downloads = isset($trip->downloadable_items) ? $trip->downloadable_items : [];
 if (!empty($downloads)): 
 ?>
+<script src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__)) . 'assets/js/api-helper.js'); ?>"></script>
 <script src="<?php echo esc_url(plugin_dir_url(dirname(__FILE__)) . 'assets/js/downloads-list.js'); ?>"></script>
 <?php endif; ?>
 
