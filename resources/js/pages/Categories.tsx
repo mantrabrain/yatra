@@ -154,8 +154,7 @@ export const Categories: React.FC = () => {
   const total = data?.total || 0;
   const totalPages = Math.ceil(total / 50);
   const errorContext = getErrorContext(error);
-  
-  
+
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
@@ -695,7 +694,7 @@ export const Categories: React.FC = () => {
       onClick: (category: Category) => {
         // Open category in new tab
         const categoryUrl = `${window.yatraAdmin?.siteUrl || ""}/trip-category/${category.slug}`;
-        window.open(categoryUrl, '_blank');
+        window.open(categoryUrl, "_blank");
       },
       condition: (category: Category) => category.status !== "trash", // Hide for trash categories
     },

@@ -203,7 +203,8 @@ const Destinations: React.FC = () => {
     const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
     const destinationBase = settings?.destination_base || "destination";
     const destinationSlug = destination.slug || "";
-    let apiPermalink = (destination as any)?.permalink || (destination as any)?.url;
+    let apiPermalink =
+      (destination as any)?.permalink || (destination as any)?.url;
     // permalinkStructure is optional in yatraAdmin; default to unknown => fall back to pretty
     const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
     const isPlainPermalink = permalinkStructure === "plain";
@@ -565,19 +566,23 @@ const Destinations: React.FC = () => {
                             >
                               {destination.name}
                             </a>
-                            {can("yatra_view_trips") && destination.status !== "trash" && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleView(destination);
-                                }}
-                                className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                                title={__("View destination in new tab", "yatra")}
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </button>
-                            )}
+                            {can("yatra_view_trips") &&
+                              destination.status !== "trash" && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleView(destination);
+                                  }}
+                                  className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                                  title={__(
+                                    "View destination in new tab",
+                                    "yatra",
+                                  )}
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <span>{destination.slug}</span>
@@ -742,7 +747,7 @@ const Destinations: React.FC = () => {
                     onClick: (destination: Destination) => {
                       // Open destination in new tab
                       const destinationUrl = `${window.yatraAdmin?.siteUrl || ""}/destination/${destination.slug}`;
-                      window.open(destinationUrl, '_blank');
+                      window.open(destinationUrl, "_blank");
                     },
                     condition: () => true, // Always show view action
                   },

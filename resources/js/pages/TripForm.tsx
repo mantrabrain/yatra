@@ -1886,10 +1886,17 @@ const TripForm: React.FC = () => {
         ).toString();
         const attachmentIdRaw =
           row.attachment_id ?? row.download_file ?? row.downlaod_file;
-        const attachmentUrl = (row.attachment_url ?? row.content_url ?? "").toString();
+        const attachmentUrl = (
+          row.attachment_url ??
+          row.content_url ??
+          ""
+        ).toString();
         const attachmentTitle = (row.attachment_title ?? "").toString();
         const enabledRaw =
-          row.enabled ?? row.is_downloadable ?? row.download_enabled ?? row.downlaod_enabled;
+          row.enabled ??
+          row.is_downloadable ??
+          row.download_enabled ??
+          row.downlaod_enabled;
 
         return {
           id: row.id != null ? Number(row.id) : null,
@@ -2023,7 +2030,7 @@ const TripForm: React.FC = () => {
     // This prevents wiping out data when user updates trip in itinerary builder
     const currentItineraryDays = formData.itinerary_days || [];
     const currentGalleryImages = formData.gallery_images || [];
-    
+
     // Only use database data if current data is empty or if this is initial load
     const shouldPreserveItinerary = currentItineraryDays.length > 0;
     const shouldPreserveGallery = currentGalleryImages.length > 0;
@@ -2106,13 +2113,19 @@ const TripForm: React.FC = () => {
       included_items: normalizeAmenityItems(tripData.included_items),
       excluded_items: normalizeAmenityItems(tripData.excluded_items),
       // Preserve current itinerary data if it exists, otherwise use database data
-      itinerary_days: shouldPreserveItinerary ? currentItineraryDays : normalizeItineraryDays(tripData.itinerary_days),
+      itinerary_days: shouldPreserveItinerary
+        ? currentItineraryDays
+        : normalizeItineraryDays(tripData.itinerary_days),
       // Preserve current gallery data if it exists, otherwise use database data
-      gallery_images: shouldPreserveGallery ? currentGalleryImages : normalizeGalleryImages(tripData.gallery_images),
+      gallery_images: shouldPreserveGallery
+        ? currentGalleryImages
+        : normalizeGalleryImages(tripData.gallery_images),
       featured_image: tripData.featured_image
         ? Number(tripData.featured_image)
         : null,
-      downloadable_items: normalizeDownloadableItems(tripData.downloadable_items),
+      downloadable_items: normalizeDownloadableItems(
+        tripData.downloadable_items,
+      ),
       faqs: normalizeFaqs(tripData.faqs),
       frontend_tabs: Array.isArray(tripData.frontend_tabs)
         ? tripData.frontend_tabs
@@ -2158,7 +2171,7 @@ const TripForm: React.FC = () => {
               content_type: "important_info",
               icon: { type: "icon", value: "info" },
             },
-            
+
             // Conditional sections (enabled by default, shown conditionally on frontend)
             {
               id: "downloads",
@@ -3010,12 +3023,12 @@ const TripForm: React.FC = () => {
 
   const handleDragStart = (e: React.DragEvent, tabId: string) => {
     setDraggedTab(tabId);
-    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.effectAllowed = "move";
   };
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    e.dataTransfer.dropEffect = 'move';
+    e.dataTransfer.dropEffect = "move";
   };
 
   const handleDragEnter = (tabId: string) => {
@@ -5639,7 +5652,10 @@ const TripForm: React.FC = () => {
                           </div>
                           <div className="flex-1">
                             <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                              {__("Controls whether this file appears and is available for download on the trip page. When disabled, the file is completely hidden from users.", "yatra")}
+                              {__(
+                                "Controls whether this file appears and is available for download on the trip page. When disabled, the file is completely hidden from users.",
+                                "yatra",
+                              )}
                             </p>
                           </div>
                         </div>
@@ -7157,9 +7173,14 @@ const TripForm: React.FC = () => {
                               {tab.enabled ? (
                                 <IconPicker
                                   value={tab.icon || null}
-                                  onChange={(value) => handleTabIconChange(tab.id, value)}
+                                  onChange={(value) =>
+                                    handleTabIconChange(tab.id, value)
+                                  }
                                   label={__("Tab Icon", "yatra")}
-                                  helpText={__("Select an icon or upload an image for this tab", "yatra")}
+                                  helpText={__(
+                                    "Select an icon or upload an image for this tab",
+                                    "yatra",
+                                  )}
                                   size="sm"
                                 />
                               ) : (
@@ -7168,7 +7189,10 @@ const TripForm: React.FC = () => {
                                     value={tab.icon || null}
                                     onChange={() => {}} // No-op when disabled
                                     label={__("Tab Icon", "yatra")}
-                                    helpText={__("Enable this tab to select an icon", "yatra")}
+                                    helpText={__(
+                                      "Enable this tab to select an icon",
+                                      "yatra",
+                                    )}
                                     size="sm"
                                   />
                                 </div>

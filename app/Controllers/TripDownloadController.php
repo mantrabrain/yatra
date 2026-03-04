@@ -119,7 +119,7 @@ class TripDownloadController extends BaseController
     /**
      * Handle secure download request
      */
-    public function handleDownloadRequest(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function handleDownloadRequest(WP_REST_Request $request)
     {
         $downloadId = (int) $request->get_param('download_id');
         $bookingId = (int) $request->get_param('booking_id');
@@ -268,7 +268,7 @@ class TripDownloadController extends BaseController
     /**
      * Get download URL for frontend
      */
-    public function getDownloadUrl(WP_REST_Request $request): WP_REST_Response|WP_Error
+    public function getDownloadUrl(WP_REST_Request $request)
     {
         $downloadId = (int) $request->get_param('download_id');
         $bookingId = (int) $request->get_param('booking_id');

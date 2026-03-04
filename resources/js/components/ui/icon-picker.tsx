@@ -309,9 +309,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 {categories.map((category) => (
                   <Badge
                     key={category}
-                    variant={
-                      selectedCategory === category ? "info" : "outline"
-                    }
+                    variant={selectedCategory === category ? "info" : "outline"}
                     className="cursor-pointer"
                     onClick={() => setSelectedCategory(category)}
                   >
@@ -412,10 +410,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                           {__("Upload Image", "yatra")}
                         </p>
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {__(
-                            "Click to open WordPress Media Library",
-                            "yatra",
-                          )}
+                          {__("Click to open WordPress Media Library", "yatra")}
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-500">
                           {__(
@@ -446,14 +441,9 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                     </label>
                     <Input
                       type="url"
-                      placeholder={__(
-                        "https://example.com/image.png",
-                        "yatra",
-                      )}
+                      placeholder={__("https://example.com/image.png", "yatra")}
                       value={value?.type === "image" ? value.value : ""}
-                      onChange={(e) =>
-                        handleImageUrlChange(e.target.value)
-                      }
+                      onChange={(e) => handleImageUrlChange(e.target.value)}
                       className="h-11"
                     />
                   </div>

@@ -1683,8 +1683,7 @@ const Trips: React.FC = () => {
                   {__("Preview:", "yatra")}
                 </p>
                 <p className="text-xs text-gray-900 dark:text-white font-mono break-all">
-                  {(window as any).yatraAdmin?.siteUrl ||
-                    "https://example.com"}
+                  {(window as any).yatraAdmin?.siteUrl || "https://example.com"}
                   /trips/{newTripSlug || generateSlug(newTripTitle)}
                 </p>
               </div>

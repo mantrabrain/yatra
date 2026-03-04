@@ -644,19 +644,23 @@ const Activities: React.FC = () => {
                             >
                               {activity.name}
                             </a>
-                            {can("yatra_view_trips") && activity.status !== "trash" && (
-                              <button
-                                type="button"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleView(activity);
-                                }}
-                                className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                                title={__("View activity in new tab", "yatra")}
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </button>
-                            )}
+                            {can("yatra_view_trips") &&
+                              activity.status !== "trash" && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleView(activity);
+                                  }}
+                                  className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                                  title={__(
+                                    "View activity in new tab",
+                                    "yatra",
+                                  )}
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                           </div>
                           <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                             <span>{activity.slug}</span>
@@ -819,7 +823,7 @@ const Activities: React.FC = () => {
                     onClick: (activity: Activity) => {
                       // Open activity in new tab
                       const activityUrl = `${window.yatraAdmin?.siteUrl || ""}/activity/${activity.slug}`;
-                      window.open(activityUrl, '_blank');
+                      window.open(activityUrl, "_blank");
                     },
                     condition: () => true, // Always show view action
                   },

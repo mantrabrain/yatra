@@ -43,15 +43,19 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
   formData,
   onFieldChange,
 }) => {
-  const [newIncludedItem, setNewIncludedItem] = React.useState<TripAmenityItem>({
-    title: "",
-    description: "",
-  });
+  const [newIncludedItem, setNewIncludedItem] = React.useState<TripAmenityItem>(
+    {
+      title: "",
+      description: "",
+    },
+  );
 
-  const [newExcludedItem, setNewExcludedItem] = React.useState<TripAmenityItem>({
-    title: "",
-    description: "",
-  });
+  const [newExcludedItem, setNewExcludedItem] = React.useState<TripAmenityItem>(
+    {
+      title: "",
+      description: "",
+    },
+  );
 
   const included_items = formData.included_items || [];
   const excluded_items = formData.excluded_items || [];
@@ -73,12 +77,16 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
   };
 
   const removeIncludedItem = (index: number) => {
-    const updatedItems = included_items.filter((_: any, i: number) => i !== index);
+    const updatedItems = included_items.filter(
+      (_: any, i: number) => i !== index,
+    );
     onFieldChange("included_items", updatedItems);
   };
 
   const removeExcludedItem = (index: number) => {
-    const updatedItems = excluded_items.filter((_: any, i: number) => i !== index);
+    const updatedItems = excluded_items.filter(
+      (_: any, i: number) => i !== index,
+    );
     onFieldChange("excluded_items", updatedItems);
   };
 
@@ -98,7 +106,10 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
               <h3 className="text-lg font-semibold text-green-700 dark:text-green-400">
                 {__("What's Included", "yatra")}
               </h3>
-              <Badge variant="success" className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
+              <Badge
+                variant="success"
+                className="bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+              >
                 {included_items.length} {__("items", "yatra")}
               </Badge>
             </div>
@@ -107,10 +118,16 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
             <div className="space-y-4 mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-xl border border-green-200 dark:border-green-800 shadow-sm">
               <div className="space-y-3">
                 <Input
-                  placeholder={__("Item title (e.g., Airport Transfer)", "yatra")}
+                  placeholder={__(
+                    "Item title (e.g., Airport Transfer)",
+                    "yatra",
+                  )}
                   value={newIncludedItem.title}
                   onChange={(e: any) =>
-                    setNewIncludedItem({ ...newIncludedItem, title: e.target.value })
+                    setNewIncludedItem({
+                      ...newIncludedItem,
+                      title: e.target.value,
+                    })
                   }
                   className="border-green-300 dark:border-green-700 focus:ring-green-500 focus:border-green-500"
                 />
@@ -118,7 +135,10 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
                   placeholder={__("Detailed description (optional)", "yatra")}
                   value={newIncludedItem.description}
                   onChange={(e: any) =>
-                    setNewIncludedItem({ ...newIncludedItem, description: e.target.value })
+                    setNewIncludedItem({
+                      ...newIncludedItem,
+                      description: e.target.value,
+                    })
                   }
                   rows={3}
                   className="border-green-300 dark:border-green-700 focus:ring-green-500 focus:border-green-500 resize-none"
@@ -181,7 +201,10 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
               <h3 className="text-lg font-semibold text-red-700 dark:text-red-400">
                 {__("What's Excluded", "yatra")}
               </h3>
-              <Badge variant="error" className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+              <Badge
+                variant="error"
+                className="bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+              >
                 {excluded_items.length} {__("items", "yatra")}
               </Badge>
             </div>
@@ -190,10 +213,16 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
             <div className="space-y-4 mb-6 p-4 bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/20 dark:to-rose-950/20 rounded-xl border border-red-200 dark:border-red-800 shadow-sm">
               <div className="space-y-3">
                 <Input
-                  placeholder={__("Item title (e.g., International Flights)", "yatra")}
+                  placeholder={__(
+                    "Item title (e.g., International Flights)",
+                    "yatra",
+                  )}
                   value={newExcludedItem.title}
                   onChange={(e: any) =>
-                    setNewExcludedItem({ ...newExcludedItem, title: e.target.value })
+                    setNewExcludedItem({
+                      ...newExcludedItem,
+                      title: e.target.value,
+                    })
                   }
                   className="border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500"
                 />
@@ -201,7 +230,10 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
                   placeholder={__("Detailed description (optional)", "yatra")}
                   value={newExcludedItem.description}
                   onChange={(e: any) =>
-                    setNewExcludedItem({ ...newExcludedItem, description: e.target.value })
+                    setNewExcludedItem({
+                      ...newExcludedItem,
+                      description: e.target.value,
+                    })
                   }
                   rows={3}
                   className="border-red-300 dark:border-red-700 focus:ring-red-500 focus:border-red-500 resize-none"
@@ -268,10 +300,24 @@ export const IncludedSection: React.FC<IncludedSectionProps> = ({
                 {__("Tips for Included/Excluded Items:", "yatra")}
               </p>
               <ul className="list-disc list-inside space-y-1 text-blue-700 dark:text-blue-300">
-                <li>{__("Be specific about what's included (meals, transport, guides, etc.)", "yatra")}</li>
-                <li>{__("Clearly mention what's NOT included to avoid confusion", "yatra")}</li>
-                <li>{__("Include items that affect pricing decisions", "yatra")}</li>
-                <li>{__("Keep descriptions concise but informative", "yatra")}</li>
+                <li>
+                  {__(
+                    "Be specific about what's included (meals, transport, guides, etc.)",
+                    "yatra",
+                  )}
+                </li>
+                <li>
+                  {__(
+                    "Clearly mention what's NOT included to avoid confusion",
+                    "yatra",
+                  )}
+                </li>
+                <li>
+                  {__("Include items that affect pricing decisions", "yatra")}
+                </li>
+                <li>
+                  {__("Keep descriptions concise but informative", "yatra")}
+                </li>
               </ul>
             </div>
           </div>
