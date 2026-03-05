@@ -22,7 +22,7 @@
         el(
           PanelBody,
           {
-            title: __("Tour Settings", "yatra"),
+            title: __("Trip Settings", "yatra"),
             initialOpen: true,
           },
           el(TextControl, {

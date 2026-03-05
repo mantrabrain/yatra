@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-05T09:05:40+00:00\n"
+"POT-Creation-Date: 2026-03-05T09:40:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -63,8 +63,28 @@ msgstr ""
 msgid "Selected as testimonial"
 msgstr ""
 
+#: assets/dist/blocks/activity.js:102
+#: assets/dist/blocks/destination.js:109
+#: assets/dist/blocks/tour.js:111
+msgid "Showing "
+msgstr ""
+
+#: assets/dist/blocks/activity.js:103
+msgid "all"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:104
+msgid " activities in "
+msgstr ""
+
+#: assets/dist/blocks/activity.js:106
+#: assets/dist/blocks/destination.js:113
+#: assets/dist/blocks/tour.js:115
+msgid " columns"
+msgstr ""
+
 #: assets/dist/blocks/activity.js:11
-#: assets/dist/blocks/destination.js:11
+#: assets/dist/blocks/destination.js:16
 #: assets/dist/blocks/tour.js:11
 #: resources/js/blocks/activity/block.js:29
 #: resources/js/blocks/destination/block.js:29
@@ -73,7 +93,7 @@ msgid "Title"
 msgstr ""
 
 #: assets/dist/blocks/activity.js:19
-#: assets/dist/blocks/destination.js:19
+#: assets/dist/blocks/destination.js:24
 #: assets/dist/blocks/tour.js:19
 #: resources/js/blocks/activity/block.js:38
 #: resources/js/blocks/destination/block.js:38
@@ -82,7 +102,7 @@ msgid "Order"
 msgstr ""
 
 #: assets/dist/blocks/activity.js:22
-#: assets/dist/blocks/destination.js:22
+#: assets/dist/blocks/destination.js:27
 #: assets/dist/blocks/tour.js:23
 #: resources/js/blocks/activity/block.js:41
 #: resources/js/blocks/destination/block.js:41
@@ -91,7 +111,7 @@ msgid "Ascending"
 msgstr ""
 
 #: assets/dist/blocks/activity.js:23
-#: assets/dist/blocks/destination.js:23
+#: assets/dist/blocks/destination.js:28
 #: assets/dist/blocks/tour.js:22
 #: resources/js/blocks/activity/block.js:42
 #: resources/js/blocks/destination/block.js:42
@@ -105,7 +125,7 @@ msgid "Number of Activities"
 msgstr ""
 
 #: assets/dist/blocks/activity.js:41
-#: assets/dist/blocks/destination.js:41
+#: assets/dist/blocks/destination.js:46
 #: assets/dist/blocks/tour.js:41
 #: resources/js/blocks/activity/block.js:62
 #: resources/js/blocks/destination/block.js:62
@@ -114,7 +134,7 @@ msgid "Columns"
 msgstr ""
 
 #: assets/dist/blocks/activity.js:51
-#: assets/dist/blocks/destination.js:51
+#: assets/dist/blocks/destination.js:56
 #: assets/dist/blocks/tour.js:59
 #: resources/js/blocks/activity/block.js:73
 #: resources/js/blocks/destination/block.js:73
@@ -122,59 +142,43 @@ msgstr ""
 msgid "Show pagination"
 msgstr ""
 
-#: assets/dist/blocks/activity.js:68
-msgid "Activity Block"
-msgstr ""
-
 #: assets/dist/blocks/activity.js:7
 #: resources/js/blocks/activity/block.js:25
 msgid "Activity Settings"
 msgstr ""
 
-#: assets/dist/blocks/activity.js:72
+#: assets/dist/blocks/activity.js:77
+msgid "Activity Block"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:87
 msgid "This block will display activity listings on the frontend"
 msgstr ""
 
-#: assets/dist/blocks/activity.js:78
-#: assets/dist/blocks/destination.js:78
-#: assets/dist/blocks/tour.js:90
-msgid "Showing "
-msgstr ""
-
-#: assets/dist/blocks/activity.js:79
-msgid "all"
-msgstr ""
-
-#: assets/dist/blocks/activity.js:80
-msgid " activities in "
-msgstr ""
-
-#: assets/dist/blocks/activity.js:82
-#: assets/dist/blocks/destination.js:82
-#: assets/dist/blocks/tour.js:94
-msgid " columns"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:31
-#: resources/js/blocks/destination/block.js:51
-msgid "Number of Destinations"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:68
-msgid "Destination Block"
-msgstr ""
-
-#: assets/dist/blocks/destination.js:7
+#: assets/dist/blocks/destination.js:10
 #: resources/js/blocks/destination/block.js:25
 msgid "Destination Settings"
 msgstr ""
 
-#: assets/dist/blocks/destination.js:72
+#: assets/dist/blocks/destination.js:111
+msgid " destinations in "
+msgstr ""
+
+#: assets/dist/blocks/destination.js:36
+#: resources/js/blocks/destination/block.js:51
+msgid "Number of Destinations"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:84
+msgid "Destination Block"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:94
 msgid "This block will display destination listings on the frontend"
 msgstr ""
 
-#: assets/dist/blocks/destination.js:80
-msgid " destinations in "
+#: assets/dist/blocks/tour.js:113
+msgid " tours in "
 msgstr ""
 
 #: assets/dist/blocks/tour.js:31
@@ -188,27 +192,24 @@ msgid "Show only featured tours"
 msgstr ""
 
 #: assets/dist/blocks/tour.js:7
+#: resources/js/blocks/tour/block.js:25
 msgid "Trip Settings"
 msgstr ""
 
-#: assets/dist/blocks/tour.js:76
+#: assets/dist/blocks/tour.js:85
 msgid "Tour Block"
 msgstr ""
 
-#: assets/dist/blocks/tour.js:81
+#: assets/dist/blocks/tour.js:96
 msgid "This block will display "
 msgstr ""
 
-#: assets/dist/blocks/tour.js:82
+#: assets/dist/blocks/tour.js:97
 msgid "featured "
 msgstr ""
 
-#: assets/dist/blocks/tour.js:83
+#: assets/dist/blocks/tour.js:98
 msgid "tour listings on the frontend"
-msgstr ""
-
-#: assets/dist/blocks/tour.js:92
-msgid " tours in "
 msgstr ""
 
 #: assets/dist/js/account-page.js:1008
@@ -6111,7 +6112,7 @@ msgstr ""
 #: templates/partials/single-trip/similar-trips.php:17
 #: templates/shortcodes/activity.php:172
 #: templates/shortcodes/destination.php:141
-#: templates/shortcodes/trip.php:102
+#: templates/shortcodes/trip.php:91
 #: templates/single-taxonomy.php:258
 #: templates/single-taxonomy.php:262
 msgid "Previous"
@@ -6127,7 +6128,7 @@ msgstr ""
 #: templates/partials/single-trip/similar-trips.php:22
 #: templates/shortcodes/activity.php:192
 #: templates/shortcodes/destination.php:161
-#: templates/shortcodes/trip.php:122
+#: templates/shortcodes/trip.php:109
 #: templates/single-taxonomy.php:274
 #: templates/single-taxonomy.php:278
 msgid "Next"
@@ -8782,44 +8783,44 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: templates/shortcodes/trip.php:33
+#: templates/shortcodes/trip.php:28
 msgid "Featured Trips"
 msgstr ""
 
-#: templates/shortcodes/trip.php:37
+#: templates/shortcodes/trip.php:32
 #, php-format
 msgid "Showing %d of %d trips"
 msgstr ""
 
-#: templates/shortcodes/trip.php:60
+#: templates/shortcodes/trip.php:53
 msgid "No trips found on this page. Try navigating to other pages."
 msgstr ""
 
-#: templates/shortcodes/trip.php:68
+#: templates/shortcodes/trip.php:61
 msgid "No Trips Found"
 msgstr ""
 
-#: templates/shortcodes/trip.php:69
+#: templates/shortcodes/trip.php:62
 msgid "We couldn't find any trips matching your criteria. Try adjusting your filters or browse all trips."
 msgstr ""
 
-#: templates/shortcodes/trip.php:73
+#: templates/shortcodes/trip.php:66
 msgid "Debug Information"
 msgstr ""
 
-#: templates/shortcodes/trip.php:74
+#: templates/shortcodes/trip.php:67
 msgid "Query Arguments:"
 msgstr ""
 
-#: templates/shortcodes/trip.php:76
+#: templates/shortcodes/trip.php:69
 msgid "Raw Results Count:"
 msgstr ""
 
-#: templates/shortcodes/trip.php:77
+#: templates/shortcodes/trip.php:70
 msgid "Processed Trips Count:"
 msgstr ""
 
-#: templates/shortcodes/trip.php:82
+#: templates/shortcodes/trip.php:75
 #: templates/single-taxonomy.php:243
 msgid "Browse All Trips"
 msgstr ""
@@ -8990,10 +8991,6 @@ msgstr ""
 
 #: assets/js/stripe.js:598
 msgid "Use Apple Wallet on iPhone, iPad, or Mac to pay securely."
-msgstr ""
-
-#: resources/js/blocks/tour/block.js:25
-msgid "Tour Settings"
 msgstr ""
 
 #: resources/js/blocks/activity/block.json
