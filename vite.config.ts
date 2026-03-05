@@ -34,12 +34,19 @@ export default defineConfig({
       input: {
         app: path.resolve(__dirname, 'resources/js/main.tsx'),
         'account-page': path.resolve(__dirname, 'resources/js/account-page.tsx'),
+        'blocks/tour': path.resolve(__dirname, 'resources/js/blocks/tour/index.tsx'),
+        'blocks/activity': path.resolve(__dirname, 'resources/js/blocks/activity/index.tsx'),
+        'blocks/destination': path.resolve(__dirname, 'resources/js/blocks/destination/index.tsx'),
       },
       output: {
         entryFileNames: (chunkInfo) => {
           // Admin app goes to admin/dist/js/
           if (chunkInfo.name === 'app') {
             return 'admin/dist/js/[name].js';
+          }
+          // Blocks go to dist/blocks/
+          if (chunkInfo.name.startsWith('blocks/')) {
+            return 'dist/[name].js';
           }
           // Frontend account page goes to dist/js/
           return 'dist/js/[name].js';

@@ -10,6 +10,7 @@ use Yatra\Providers\AppServiceProvider;
 use Yatra\Providers\RouteServiceProvider;
 use Yatra\Providers\AdminServiceProvider;
 use Yatra\Providers\FrontendAssetsProvider;
+use Yatra\Providers\BlockServiceProvider;
 
 /**
  * Main Bootstrap class for Yatra plugin
@@ -162,6 +163,11 @@ class Bootstrap
         // Shortcode provider (always load for shortcode functionality)
         if (class_exists('Yatra\Providers\ShortcodeServiceProvider')) {
             $providers[] = 'Yatra\Providers\ShortcodeServiceProvider';
+        }
+
+        // Block provider (always load for Gutenberg block functionality)
+        if (class_exists('Yatra\Providers\BlockServiceProvider')) {
+            $providers[] = 'Yatra\Providers\BlockServiceProvider';
         }
 
         // Register each provider

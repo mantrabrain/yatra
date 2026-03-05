@@ -15,6 +15,10 @@ class AppServiceProvider
      */
     public function register(): void
     {
+        // Debug: Log that AppServiceProvider is loading
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AppServiceProvider: Starting registration');
+        }
 
         // Activation hook
         register_activation_hook(YATRA_PLUGIN_FILE, [$this, 'activate']);
@@ -27,6 +31,12 @@ class AppServiceProvider
 
         // Register shortcodes
         $this->registerShortcodes();
+
+        // Blocks are registered in Bootstrap, not here
+        
+        if (defined('WP_DEBUG') && WP_DEBUG) {
+            error_log('AppServiceProvider: Registration complete');
+        }
 
         // Initialize template loader for all frontend routing
         \Yatra\Core\TemplateLoader::init();
@@ -171,6 +181,8 @@ class AppServiceProvider
             $shortcode->register();
         }
     }
+
+    
     /**
      * Add type="module" to frontend React bundles
      */

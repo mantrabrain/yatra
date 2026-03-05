@@ -250,24 +250,24 @@
     font-size: 0.875rem;
 }
 
-.yatra-activity-grid {
+.yatra-activity-shortcode .yatra-activity-grid {
     display: grid;
     gap: 30px;
 }
 
-.yatra-activity-grid-1 {
+.yatra-activity-shortcode .yatra-activity-grid-1 {
     grid-template-columns: 1fr;
 }
 
-.yatra-activity-grid-2 {
+.yatra-activity-shortcode .yatra-activity-grid-2 {
     grid-template-columns: repeat(2, 1fr);
 }
 
-.yatra-activity-grid-3 {
+.yatra-activity-shortcode .yatra-activity-grid-3 {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.yatra-activity-grid-4 {
+.yatra-activity-shortcode .yatra-activity-grid-4 {
     grid-template-columns: repeat(4, 1fr);
 }
 
@@ -841,8 +841,8 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .yatra-activity-grid-3,
-    .yatra-activity-grid-4 {
+    .yatra-activity-shortcode .yatra-activity-grid-3,
+    .yatra-activity-shortcode .yatra-activity-grid-4 {
         grid-template-columns: repeat(2, 1fr);
     }
     
@@ -858,9 +858,9 @@
 }
 
 @media (max-width: 480px) {
-    .yatra-activity-grid-2,
-    .yatra-activity-grid-3,
-    .yatra-activity-grid-4 {
+    .yatra-activity-shortcode .yatra-activity-grid-2,
+    .yatra-activity-shortcode .yatra-activity-grid-3,
+    .yatra-activity-shortcode .yatra-activity-grid-4 {
         grid-template-columns: 1fr;
     }
     

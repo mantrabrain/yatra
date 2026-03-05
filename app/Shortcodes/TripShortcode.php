@@ -28,7 +28,6 @@ class TripShortcode extends BaseShortcode
             'search' => '',
             'columns' => '3',
             'show_pagination' => 'yes',
-            'show_filters' => 'no',
             'title' => 'Our Trips'
         ]);
     }
@@ -48,58 +47,8 @@ class TripShortcode extends BaseShortcode
      */
     protected function renderContent(array $atts): string
     {
-        $atts = shortcode_atts($this->default_attributes, $atts, $this->tag);
-        
-        // Get trips using Yatra's service
-        $trips_data = $this->getTrips($atts);
-        
-        // Extract per_page from attributes (only per_page parameter)
-        $per_page = 10; // default
-        if (!empty($atts['per_page']) && is_numeric($atts['per_page'])) {
-            $per_page = (int) $atts['per_page'];
-        }
-        $atts['per_page'] = $per_page;
-
-        
-        // Prepare data for template (match expected structure)
-        $data = [
-            'trips' => [
-                'trips' => $trips_data['trips'] ?? [],
-                'max_pages' => $trips_data['max_pages'] ?? 1,
-                'current_page' => $trips_data['current_page'] ?? 1,
-                'total_found' => $trips_data['total_found'] ?? 0
-            ],
-            'atts' => $atts,
-            'max_pages' => $trips_data['max_pages'] ?? 1,
-            'current_page' => $trips_data['current_page'] ?? 1,
-            'total_found' => $trips_data['total_found'] ?? 0,
-            'per_page' => $per_page
-        ];
-
-            // Enqueue shortcode-specific CSS
-        wp_enqueue_style(
-            'yatra-trip-shortcode',
-            YATRA_PLUGIN_URL . 'assets/css/shortcodes/trip-shortcode.css',
-            [],
-            YATRA_VERSION
-        );
-        
-        // Enqueue shortcode-specific JavaScript
-        wp_enqueue_script(
-            'yatra-trip-shortcode',
-            YATRA_PLUGIN_URL . 'assets/js/trip-shortcode.js',
-            ['jquery'],
-            YATRA_VERSION,
-            true
-        );
-        
-        // Pass data to JavaScript
-        wp_localize_script('yatra-trip-shortcode', 'yatraTripShortcode', [
-            'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('yatra_trip_shortcode_nonce')
-        ]);
-
-        return $this->loadTemplate('shortcodes/trip.php', $data);
+        // Use the shared BlockDataService method
+        return \Yatra\Services\BlockDataService::renderTrip($atts);
     }
 
     /**

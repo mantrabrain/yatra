@@ -27,92 +27,10 @@ $total_found = $trips['total_found'] ?? $total_found ?? 0;
 ?>
 
 <div class="yatra-tour-shortcode" data-atts='<?php echo esc_attr(json_encode($atts)); ?>'>
-    <?php if ($atts['show_filters'] === 'yes'): ?>
-        <div class="yatra-tour-filters">
-            <div class="yatra-filter-header">
-                <h3><?php esc_html_e('Filter Trips', 'yatra'); ?></h3>
-                <button class="yatra-filter-toggle"><?php esc_html_e('Filters', 'yatra'); ?></button>
-            </div>
-            
-            <div class="yatra-filter-content">
-                <div class="yatra-filter-row">
-                    <div class="yatra-filter-group">
-                        <label for="yatra-search-filter"><?php esc_html_e('Search', 'yatra'); ?></label>
-                        <input type="text" id="yatra-search-filter" class="yatra-filter-input" placeholder="<?php esc_attr_e('Search trips...', 'yatra'); ?>">
-                    </div>
-                    
-                    <div class="yatra-filter-group">
-                        <label for="yatra-category-filter"><?php esc_html_e('Category', 'yatra'); ?></label>
-                        <select id="yatra-category-filter" class="yatra-filter-select">
-                            <option value=""><?php esc_html_e('All Categories', 'yatra'); ?></option>
-                            <?php
-                            $categories = get_terms(['taxonomy' => 'trip_category', 'hide_empty' => true]);
-                            foreach ($categories as $category):
-                            ?>
-                                <option value="<?php echo esc_attr($category->slug); ?>"><?php echo esc_html($category->name); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    
-                    <div class="yatra-filter-group">
-                        <label for="yatra-destination-filter"><?php esc_html_e('Destination', 'yatra'); ?></label>
-                        <select id="yatra-destination-filter" class="yatra-filter-select">
-                            <option value=""><?php esc_html_e('All Destinations', 'yatra'); ?></option>
-                            <?php
-                            $destinations = get_terms(['taxonomy' => 'trip_destination', 'hide_empty' => true]);
-                            foreach ($destinations as $destination):
-                            ?>
-                                <option value="<?php echo esc_attr($destination->slug); ?>"><?php echo esc_html($destination->name); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="yatra-filter-row">
-                    <div class="yatra-filter-group">
-                        <label for="yatra-price-min"><?php esc_html_e('Min Price', 'yatra'); ?></label>
-                        <input type="number" id="yatra-price-min" class="yatra-filter-input" placeholder="0" min="0">
-                    </div>
-                    
-                    <div class="yatra-filter-group">
-                        <label for="yatra-price-max"><?php esc_html_e('Max Price', 'yatra'); ?></label>
-                        <input type="number" id="yatra-price-max" class="yatra-filter-input" placeholder="10000" min="0">
-                    </div>
-                    
-                    <div class="yatra-filter-group">
-                        <label for="yatra-duration-filter"><?php esc_html_e('Duration (days)', 'yatra'); ?></label>
-                        <select id="yatra-duration-filter" class="yatra-filter-select">
-                            <option value=""><?php esc_html_e('Any Duration', 'yatra'); ?></option>
-                            <option value="1-3">1-3 <?php esc_html_e('days', 'yatra'); ?></option>
-                            <option value="4-7">4-7 <?php esc_html_e('days', 'yatra'); ?></option>
-                            <option value="8-14">8-14 <?php esc_html_e('days', 'yatra'); ?></option>
-                            <option value="15+">15+ <?php esc_html_e('days', 'yatra'); ?></option>
-                        </select>
-                    </div>
-                    
-                    <div class="yatra-filter-actions">
-                        <button type="button" class="yatra-btn yatra-btn-primary" id="yatra-apply-filters">
-                            <?php esc_html_e('Apply Filters', 'yatra'); ?>
-                        </button>
-                        <button type="button" class="yatra-btn yatra-btn-outline" id="yatra-reset-filters">
-                            <?php esc_html_e('Reset', 'yatra'); ?>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    <?php endif; ?>
-
-    <div class="yatra-tour-header">
-        <?php if (!empty($atts['title'])): ?>
-            <h2 class="yatra-tour-title"><?php echo esc_html($atts['title']); ?></h2>
-        <?php elseif (!empty($atts['featured']) && $atts['featured'] === '1'): ?>
-            <h2 class="yatra-tour-title"><?php esc_html_e('Featured Trips', 'yatra'); ?></h2>
-        <?php else: ?>
-            <h2 class="yatra-tour-title"><?php esc_html_e('Our Trips', 'yatra'); ?></h2>
-        <?php endif; ?>
-        
-        <?php if ($total_found > 0): ?>
+    <?php if (!empty($atts['title'])): ?>
+        <h2 class="yatra-tour-title"><?php echo esc_html($atts['title']); ?></h2>
+    <?php elseif (!empty($atts['featured']) && $atts['featured'] === '1'): ?>
+        <h2 class="yatra-tour-title"><?php esc_html_e('Featured Trips', 'yatra'); ?></h2>
             <div class="yatra-tour-count">
                 <?php 
                 printf(

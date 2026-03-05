@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "yatra/destination",
+  "title": "Destination",
+  "category": "yatra",
+  "icon": "admin-site",
+  "description": "Display destination listings with customizable options",
+  "keywords": ["destination", "place", "location", "yatra"],
+  "textdomain": "yatra",
+  "attributes": {
+    "order": {
+      "type": "string",
+      "default": "asc"
+    },
+    "columns": {
+      "type": "number",
+      "default": 3
+    },
+    "per_page": {
+      "type": "number",
+      "default": 1
+    },
+    "title": {
+      "type": "string",
+      "default": "Destination Showcase"
+    },
+    "show_pagination": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "supports": {
+    "html": false,
+    "align": ["wide", "full"]
+  },
+  "editorScript": "file:./index.js"
+}
