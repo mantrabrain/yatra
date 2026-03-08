@@ -111,6 +111,8 @@ const AdditionalServices: React.FC = () => {
       : {
           name: true,
           price: true,
+          price_type: true,
+          price_per: true,
           trips: true,
           status: true,
           created_at: false,
@@ -419,6 +421,16 @@ const AdditionalServices: React.FC = () => {
                   visible: visibleColumns.price,
                 },
                 {
+                  key: "price_type",
+                  label: __("Price Type"),
+                  visible: visibleColumns.price_type,
+                },
+                {
+                  key: "price_per",
+                  label: __("Price Per"),
+                  visible: visibleColumns.price_per,
+                },
+                {
                   key: "trips",
                   label: __("Trips"),
                   visible: visibleColumns.trips,
@@ -527,6 +539,40 @@ const AdditionalServices: React.FC = () => {
                             service.price_type,
                             service.price_per,
                           )}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "price_type",
+                      label: __("Price Type"),
+                      sortable: true,
+                      visible: visibleColumns.price_type,
+                      render: (service: AdditionalService) => (
+                        <span
+                          className={
+                            service.status === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
+                          }
+                        >
+                          {service.price_type === "fixed" ? __("Fixed") : __("Percentage")}
+                        </span>
+                      ),
+                    },
+                    {
+                      key: "price_per",
+                      label: __("Price Per"),
+                      sortable: true,
+                      visible: visibleColumns.price_per,
+                      render: (service: AdditionalService) => (
+                        <span
+                          className={
+                            service.status === "trash"
+                              ? "text-gray-400 dark:text-gray-600"
+                              : "inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                          }
+                        >
+                          {{ person: __("Person"), booking: __("Booking"), day: __("Day") }[service.price_per] || service.price_per}
                         </span>
                       ),
                     },
