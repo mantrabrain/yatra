@@ -345,6 +345,13 @@ class ModuleManager
 
         update_option(self::OPTION_KEY, $modules);
 
+        // Trigger module activation/deactivation hook
+        if ($enabled) {
+            do_action('yatra_module_active', $slug);
+        } else {
+            do_action('yatra_module_deactive', $slug);
+        }
+
         return self::getModules();
     }
 
@@ -378,6 +385,22 @@ class ModuleManager
         }
 
         update_option(self::OPTION_KEY, $modules);
+
+        // Trigger module activation/deactivation hooks for bulk updates
+        foreach ($items as $item) {
+            if (empty($item['slug'])) {
+                continue;
+            }
+            
+            $slug = sanitize_key($item['slug']);
+            $enabled = (bool) ($item['enabled'] ?? false);
+            
+            if ($enabled) {
+                do_action('yatra_module_active', $slug);
+            } else {
+                do_action('yatra_module_deactive', $slug);
+            }
+        }
 
         return self::getModules();
     }
