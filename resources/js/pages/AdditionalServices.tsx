@@ -373,6 +373,8 @@ const AdditionalServices: React.FC = () => {
             sortOptions={[
               { value: "name", label: __("Name") },
               { value: "price", label: __("Price") },
+              { value: "price_type", label: __("Price Type") },
+              { value: "price_per", label: __("Price Per") },
               { value: "status", label: __("Status") },
               { value: "created_at", label: __("Created At") },
               { value: "updated_at", label: __("Updated At") },
