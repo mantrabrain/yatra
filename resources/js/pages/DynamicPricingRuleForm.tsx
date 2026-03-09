@@ -252,7 +252,7 @@ const DynamicPricingRuleForm: React.FC = () => {
         return await apiClient.post("/dynamic-pricing/rules", data);
       }
     },
-    onSuccess: () => {
+    onSuccess: (response) => {
       showToast(
         isEdit
           ? __("Pricing rule updated successfully")
@@ -260,8 +260,14 @@ const DynamicPricingRuleForm: React.FC = () => {
         "success",
       );
       queryClient.invalidateQueries({ queryKey: ["dynamic-pricing-rules"] });
-      // Navigate back to main page
-      window.location.href = window.location.href.split("&action=")[0];
+      
+      if (!isEdit && response?.data?.id) {
+        // For new rules, redirect to edit page
+        const baseUrl = window.location.href.split("&action=")[0];
+        const editUrl = `${baseUrl}&action=edit-pricing-rule&id=${response.data.id}`;
+        window.location.href = editUrl;
+      }
+      // For updates, stay on the same page (no redirect)
     },
     onError: (error: any) => {
       showToast(error?.message || __("Failed to save pricing rule"), "error");
