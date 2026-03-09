@@ -361,7 +361,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   const hasFilters = Boolean(searchTerm || statusFilter !== "all");
 
   const viewFilters = [
-    { key: "all", label: __("All"), count: pagination.total },
+    { key: "all", label: __("All"), count: stats.total_abandoned || 0 },
     { key: "abandoned", label: __("Abandoned"), count: stats.total_abandoned - stats.total_recovered - stats.total_expired - stats.total_contacted || 0 },
     { key: "contacted", label: __("Contacted"), count: stats.total_contacted || 0 },
     { key: "recovered", label: __("Recovered"), count: stats.total_recovered || 0 },
