@@ -103,9 +103,17 @@ const App: React.FC = () => {
   const action = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     const actionParam = params.get("action");
+    console.log('Yatra Consent: Parsed action:', actionParam);
 
     return actionParam;
   }, [urlKey, subpage]);
+
+  const subtab = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    const subtabValue = params.get("subtab");
+    console.log('Yatra Consent: Parsed subtab:', subtabValue);
+    return subtabValue;
+  }, [urlKey]);
 
   // Render the appropriate page based on subpage, tab, and action parameters
   const renderPage = () => {

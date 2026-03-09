@@ -256,6 +256,7 @@ const TripConsentForm: React.FC = () => {
     "general" | "fields" | "content" | "settings" | "preview"
   >("general");
   const [expandedField, setExpandedField] = useState<string | null>(null);
+  const [testEmail, setTestEmail] = useState<string>("");
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -396,6 +397,42 @@ const TripConsentForm: React.FC = () => {
       showToast(error?.message || __("Failed to save consent form"), "error");
     },
   });
+
+  // Test email mutation
+  const sendTestEmailMutation = useMutation({
+    mutationFn: async (email: string) => {
+      const payload = {
+        email,
+        form_data: {
+          ...formData,
+          fields: formData.fields.map((field, index) => ({
+            ...field,
+            order: index,
+          })),
+          content_blocks: formData.content_blocks.map((block, index) => ({
+            ...block,
+            order: index,
+          })),
+        },
+      };
+      return await apiClient.post("/consent-forms/send-test-email", payload);
+    },
+    onSuccess: () => {
+      showToast(__("Test email sent successfully"), "success");
+      setTestEmail("");
+    },
+    onError: (error: any) => {
+      showToast(error?.message || __("Failed to send test email"), "error");
+    },
+  });
+
+  const handleSendTestEmail = () => {
+    if (!testEmail) {
+      showToast(__("Please enter an email address"), "warning");
+      return;
+    }
+    sendTestEmailMutation.mutate(testEmail);
+  };
 
   const navigateBack = () => {
     const params = new URLSearchParams(window.location.search);
@@ -1526,6 +1563,41 @@ const TripConsentForm: React.FC = () => {
                   <p className="text-xs text-gray-500 mt-1">
                     {__(
                       "Comma-separated days before trip to send reminders (e.g., 3,1 for 3 days and 1 day before).",
+                    )}
+                  </p>
+                </div>
+
+                <div className="border-t pt-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {__("Test Email")}
+                  </label>
+                  <div className="flex gap-2">
+                    <Input
+                      type="email"
+                      value={testEmail || ""}
+                      onChange={(e) => setTestEmail(e.target.value)}
+                      placeholder={__("Enter email address to test consent email")}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSendTestEmail}
+                      disabled={!testEmail || sendTestEmailMutation.isPending}
+                      className="flex items-center gap-2"
+                    >
+                      {sendTestEmailMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Mail className="w-4 h-4" />
+                      )}
+                      {__("Send Test")}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {__(
+                      "Send a test consent email to preview how it will appear to customers.",
                     )}
                   </p>
                 </div>

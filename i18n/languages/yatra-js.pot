@@ -1,0 +1,1573 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=utf-8\n"
+"X-Generator: babel-plugin-makepot\n"
+
+#: assets/admin/dist/js/app.js:28705
+msgid "Failed to load reviews. Please try again."
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28735
+msgid "Select reviews to display as testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28737
+msgid "Save the trip first to select testimonials from reviews"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28742
+msgid "Testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28743
+msgid "Select approved reviews to display as testimonials on the trip page"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28749
+msgid "Loading reviews..."
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28760
+msgid "Retry"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28765
+msgid "No approved reviews yet"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28766
+msgid "Reviews will appear here once customers submit and they are approved"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28771
+msgid "Select reviews to feature as testimonials"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28780
+msgid "Clear all"
+msgstr ""
+
+#: assets/admin/dist/js/app.js:28818
+msgid "Selected as testimonial"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:102
+#: assets/dist/blocks/destination.js:109
+#: assets/dist/blocks/tour.js:111
+msgid "Showing "
+msgstr ""
+
+#: assets/dist/blocks/activity.js:103
+msgid "all"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:104
+msgid " activities in "
+msgstr ""
+
+#: assets/dist/blocks/activity.js:106
+#: assets/dist/blocks/destination.js:113
+#: assets/dist/blocks/tour.js:115
+msgid " columns"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:11
+#: assets/dist/blocks/destination.js:16
+#: assets/dist/blocks/tour.js:11
+msgid "Title"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:19
+#: assets/dist/blocks/destination.js:24
+#: assets/dist/blocks/tour.js:19
+msgid "Order"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:22
+#: assets/dist/blocks/destination.js:27
+#: assets/dist/blocks/tour.js:23
+msgid "Ascending"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:23
+#: assets/dist/blocks/destination.js:28
+#: assets/dist/blocks/tour.js:22
+msgid "Descending"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:31
+msgid "Number of Activities"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:41
+#: assets/dist/blocks/destination.js:46
+#: assets/dist/blocks/tour.js:41
+msgid "Columns"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:51
+#: assets/dist/blocks/destination.js:56
+#: assets/dist/blocks/tour.js:59
+msgid "Show pagination"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:7
+msgid "Activity Settings"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:77
+msgid "Activity Block"
+msgstr ""
+
+#: assets/dist/blocks/activity.js:87
+msgid "This block will display activity listings on the frontend"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:10
+msgid "Destination Settings"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:111
+msgid " destinations in "
+msgstr ""
+
+#: assets/dist/blocks/destination.js:36
+msgid "Number of Destinations"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:84
+msgid "Destination Block"
+msgstr ""
+
+#: assets/dist/blocks/destination.js:94
+msgid "This block will display destination listings on the frontend"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:113
+msgid " tours in "
+msgstr ""
+
+#: assets/dist/blocks/tour.js:31
+msgid "Number of Tours"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:51
+msgid "Show only featured tours"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:7
+msgid "Trip Settings"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:85
+msgid "Tour Block"
+msgstr ""
+
+#: assets/dist/blocks/tour.js:96
+msgid "This block will display "
+msgstr ""
+
+#: assets/dist/blocks/tour.js:97
+msgid "featured "
+msgstr ""
+
+#: assets/dist/blocks/tour.js:98
+msgid "tour listings on the frontend"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1008
+msgid "Special Requests"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1051
+msgid "Payment Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1054
+msgid "Payment Status"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1075
+msgid "Amount Paid"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1082
+msgid "Amount Due"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1091
+msgid "Timeline"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1094
+msgid "Created"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1098
+msgid "Last Updated"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1207
+msgid "Manage and view all your travel bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1213
+msgid "Search bookings..."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1228
+msgid "All Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1247
+msgid "Upcoming"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1261
+msgid "Completed"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1276
+msgid "No bookings found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1277
+msgid "Try adjusting your filters or check back later."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1311
+msgid "Multiple destinations"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1322
+msgid "Travel Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1326
+msgid "Travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1330
+msgid "Total Amount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1334
+msgid "Paid / Due"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1338
+msgid "Due:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1345
+msgid "Booked On"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1367
+msgid "Download Voucher"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1377
+msgid "Payment"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1410
+msgid "Pay Remaining Balance"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1490
+msgid "Payments & Invoices"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1492
+msgid ""
+"Track deposits, balances, and installment schedules with secure payment "
+"links."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1500
+msgid "Total Payments"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1507
+msgid "Paid"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1515
+msgid "Pending"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1522
+msgid "Outstanding"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1530
+msgid "No payments found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1531
+msgid "Payment history will appear here once you make a booking."
+msgstr ""
+
+#: assets/dist/js/account-page.js:155
+msgid "Welcome back,"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1569
+msgid "Booking"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1588
+msgid "Amount"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1595
+msgid "Payment Method"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1602
+msgid "Payment Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1616
+msgid "Download Invoice"
+msgstr ""
+
+#: assets/dist/js/account-page.js:163
+msgid "You have"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1630
+msgid "View Receipt"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1641
+msgid "Pending approval"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1653
+msgid "View Booking Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:167
+msgid "upcoming adventure"
+msgstr ""
+
+#: assets/dist/js/account-page.js:167
+msgid "upcoming adventures"
+msgstr ""
+
+#: assets/dist/js/account-page.js:169
+msgid "coming up"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1693
+msgid "Travel Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1694
+msgid "Download itineraries, vouchers, invoices, and other documents for each trip."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1704
+msgid "Search documents..."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1719
+msgid "All Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1720
+msgid "Itineraries"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1721
+msgid "Vouchers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1722
+msgid "Invoices"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1731
+msgid "Itinerary"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1735
+msgid "Voucher"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1739
+msgid "Invoice"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1743
+msgid "Downloads"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1749
+msgid "No documents found"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1750
+msgid "No documents are available yet. Please check back later."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1764
+msgid "Updated"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1769
+msgid "Access"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1790
+msgid "Not available"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1791
+msgid "Not Available"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1801
+msgid "Download"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1813
+msgid "Preview"
+msgstr ""
+
+#: assets/dist/js/account-page.js:186
+msgid "View Calendar"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1875
+msgid "Update your contact details, address, and communication preferences."
+msgstr ""
+
+#: assets/dist/js/account-page.js:1890
+msgid "Edit Profile"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1899
+msgid "Full Name"
+msgstr ""
+
+#: assets/dist/js/account-page.js:19
+msgid "Invalid date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1910
+msgid "Enter your full name"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1916
+msgid "Email Address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1927
+msgid "Enter your email address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1932
+msgid "Phone Number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1940
+msgid "Enter your phone number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1945
+msgid "City"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1953
+msgid "Enter your city"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1958
+msgid "Address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1966
+msgid "Enter your address"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1971
+msgid "Country"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1979
+msgid "Enter your country"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1981
+msgid "Not set"
+msgstr ""
+
+#: assets/dist/js/account-page.js:1993
+msgid "Save Changes"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2019
+msgid "Update your password to keep your account secure."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2030
+msgid "Change Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2038
+msgid "Current Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2052
+msgid "Enter your current password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2058
+msgid "New Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2072
+msgid "Enter new password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2078
+msgid "Confirm New Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2092
+msgid "Confirm your new password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2095
+msgid "Passwords do not match"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2117
+msgid "Update Password"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2137
+#: assets/dist/js/index-5L9fy43s.js:108726
+#: assets/dist/js/index-B_-9Q1Pm.js:108726
+#: assets/dist/js/index-Be-zS_7L.js:108726
+msgid "Cancel"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2148
+msgid "Communication Preferences"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2160
+msgid "Booking reminders"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2171
+msgid "Payment notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2181
+msgid "Promotional offers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2192
+msgid "Trip updates"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2211
+#: assets/dist/js/index-5L9fy43s.js:105886
+#: assets/dist/js/index-B_-9Q1Pm.js:105886
+#: assets/dist/js/index-Be-zS_7L.js:105886
+msgid "From"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2247
+msgid "Support & Help Center"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2249
+msgid ""
+"Our team is available 24/7 for urgent requests. Submit a ticket or contact "
+"us directly."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2257
+msgid "Total Tickets"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2264
+msgid "Open"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2273
+msgid "Resolved"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2283
+msgid "Create a new support ticket"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2284
+msgid "Please describe your issue and we will get back to you as soon as possible."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2298
+msgid "Subject"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2308
+msgid "Enter ticket subject"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2316
+msgid "Message"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2325
+msgid "How can we help?"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2340
+msgid "Submit Ticket"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2351
+msgid "Your Support Tickets"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2355
+msgid "No support tickets yet"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2356
+msgid "Create a ticket above to get started."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2377
+msgid "Last updated"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2396
+msgid "View"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2418
+msgid "Need Immediate Assistance?"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2419
+msgid "Call our 24/7 concierge desk for urgent travel support."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2461
+msgid "Failed to remove trip from wishlist."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2467
+msgid "Your wishlist of favorite trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2496
+msgid "No saved trips yet"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2497
+msgid "Start exploring and save your favorite trips to your wishlist!"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2508
+msgid "Browse Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2543
+msgid "OFF"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2549
+msgid "Remove from favorites"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2580
+msgid "Flexible"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2621
+msgid "reviews"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2638
+msgid "Starting from"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2645
+msgid "Per person"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2647
+msgid "View Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2660
+msgid "Dashboard"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2661
+msgid "Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2662
+msgid "Payments"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2663
+msgid "Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2664
+msgid "Saved Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2665
+msgid "Profile"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2666
+msgid "Support"
+msgstr ""
+
+#: assets/dist/js/account-page.js:271
+msgid "Your next adventures"
+msgstr ""
+
+#: assets/dist/js/account-page.js:282
+msgid "View all"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2882
+msgid "Total Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2888
+msgid "Upcoming Trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2893
+msgid "Outstanding Balance"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2898
+msgid "Total Spent"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2951
+msgid "Hello,"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2953
+msgid "Guest"
+msgstr ""
+
+#: assets/dist/js/account-page.js:2955
+msgid ""
+"Manage bookings, payments, and documents – everything for your adventures "
+"in one place."
+msgstr ""
+
+#: assets/dist/js/account-page.js:2971
+msgid "Logout"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3002
+msgid "Need help right away?"
+msgstr ""
+
+#: assets/dist/js/account-page.js:3003
+msgid "Concierge Desk"
+msgstr ""
+
+#: assets/dist/js/account-page.js:322
+msgid "No upcoming trips"
+msgstr ""
+
+#: assets/dist/js/account-page.js:323
+msgid "Start planning your next adventure!"
+msgstr ""
+
+#: assets/dist/js/account-page.js:330
+msgid "Quick Actions"
+msgstr ""
+
+#: assets/dist/js/account-page.js:343
+msgid "View Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:359
+msgid "Make Payment"
+msgstr ""
+
+#: assets/dist/js/account-page.js:375
+msgid "My Documents"
+msgstr ""
+
+#: assets/dist/js/account-page.js:391
+msgid "Get Support"
+msgstr ""
+
+#: assets/dist/js/account-page.js:403
+msgid "Notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:404
+msgid "Updates & reminders"
+msgstr ""
+
+#: assets/dist/js/account-page.js:422
+msgid "No new notifications"
+msgstr ""
+
+#: assets/dist/js/account-page.js:431
+msgid "Recent Activity"
+msgstr ""
+
+#: assets/dist/js/account-page.js:432
+msgid "Your latest updates"
+msgstr ""
+
+#: assets/dist/js/account-page.js:444
+msgid "Booking confirmed:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:463
+msgid "Payment pending:"
+msgstr ""
+
+#: assets/dist/js/account-page.js:51
+msgid "Contact for pricing"
+msgstr ""
+
+#: assets/dist/js/account-page.js:6
+msgid "N/A"
+msgstr ""
+
+#: assets/dist/js/account-page.js:775
+msgid "Booking not found or error loading booking"
+msgstr ""
+
+#: assets/dist/js/account-page.js:799
+msgid "Booking Details"
+msgstr ""
+
+#: assets/dist/js/account-page.js:800
+msgid "Complete booking information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:811
+msgid "Back to Bookings"
+msgstr ""
+
+#: assets/dist/js/account-page.js:820
+msgid "Booking Overview"
+msgstr ""
+
+#: assets/dist/js/account-page.js:834
+msgid "Booking Number"
+msgstr ""
+
+#: assets/dist/js/account-page.js:838
+msgid "Trip"
+msgstr ""
+
+#: assets/dist/js/account-page.js:847
+msgid "View Trip"
+msgstr ""
+
+#: assets/dist/js/account-page.js:855
+msgid "Booking Date"
+msgstr ""
+
+#: assets/dist/js/account-page.js:869
+msgid "Number of Travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:890
+msgid "Customer Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:908
+msgid "Travelers Information"
+msgstr ""
+
+#: assets/dist/js/account-page.js:913
+msgid "traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:913
+msgid "travelers"
+msgstr ""
+
+#: assets/dist/js/account-page.js:947
+msgid "Traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:947
+msgid "Lead Traveler"
+msgstr ""
+
+#: assets/dist/js/account-page.js:954
+msgid "Primary Contact"
+msgstr ""
+
+#: assets/dist/js/account-page.js:993
+msgid "Emergency Contact"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104444
+#: assets/dist/js/index-B_-9Q1Pm.js:104444
+#: assets/dist/js/index-Be-zS_7L.js:104444
+msgid "Sort ascending"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104445
+#: assets/dist/js/index-B_-9Q1Pm.js:104445
+#: assets/dist/js/index-Be-zS_7L.js:104445
+msgid "Sort descending"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104509
+#: assets/dist/js/index-B_-9Q1Pm.js:104509
+#: assets/dist/js/index-Be-zS_7L.js:104509
+#. DataViews operator name
+msgid "Is none of"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104513
+#: assets/dist/js/index-B_-9Q1Pm.js:104513
+#: assets/dist/js/index-Be-zS_7L.js:104513
+#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is none of: Admin, Editor".
+msgid "<Name>%1$s is none of: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104539
+#: assets/dist/js/index-B_-9Q1Pm.js:104539
+#: assets/dist/js/index-Be-zS_7L.js:104539
+#. DataViews operator name
+msgid "Includes"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104543
+#: assets/dist/js/index-B_-9Q1Pm.js:104543
+#: assets/dist/js/index-Be-zS_7L.js:104543
+#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author is any: Admin, Editor".
+msgid "<Name>%1$s includes: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104572
+#: assets/dist/js/index-B_-9Q1Pm.js:104572
+#: assets/dist/js/index-Be-zS_7L.js:104572
+#. DataViews operator name
+msgid "Includes all"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104576
+#: assets/dist/js/index-B_-9Q1Pm.js:104576
+#: assets/dist/js/index-Be-zS_7L.js:104576
+#. 1: Filter name (e.g. "Author"). 2: Filter value (e.g. "Admin"): "Author includes all: Admin, Editor".
+msgid "<Name>%1$s includes all: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104600
+#: assets/dist/js/index-B_-9Q1Pm.js:104600
+#: assets/dist/js/index-Be-zS_7L.js:104600
+#. DataViews operator name
+msgid "Between (inc)"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104604
+#: assets/dist/js/index-B_-9Q1Pm.js:104604
+#: assets/dist/js/index-Be-zS_7L.js:104604
+#. 1: Filter name (e.g. "Item count"). 2: Filter value min. 3: Filter value max. e.g.: "Item count between (inc): 10 and 180".
+msgid "<Name>%1$s between (inc): </Name><Value>%2$s and %3$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104628
+#: assets/dist/js/index-B_-9Q1Pm.js:104628
+#: assets/dist/js/index-Be-zS_7L.js:104628
+#. DataViews operator name
+msgid "In the past"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104632
+#: assets/dist/js/index-B_-9Q1Pm.js:104632
+#: assets/dist/js/index-Be-zS_7L.js:104632
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is in the past: 7 days".
+msgid "<Name>%1$s is in the past: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104656
+#: assets/dist/js/index-B_-9Q1Pm.js:104656
+#: assets/dist/js/index-Be-zS_7L.js:104656
+#. DataViews operator name
+msgid "Over"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104660
+#: assets/dist/js/index-B_-9Q1Pm.js:104660
+#: assets/dist/js/index-Be-zS_7L.js:104660
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "7 days"): "Date is over: 7 days".
+msgid "<Name>%1$s is over: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104682
+#: assets/dist/js/index-B_-9Q1Pm.js:104682
+#: assets/dist/js/index-Be-zS_7L.js:104682
+#. DataViews operator name
+msgid "Is"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104700
+#: assets/dist/js/index-B_-9Q1Pm.js:104700
+#: assets/dist/js/index-Be-zS_7L.js:104700
+#. DataViews operator name
+msgid "Is not"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104718
+#: assets/dist/js/index-B_-9Q1Pm.js:104718
+#: assets/dist/js/index-Be-zS_7L.js:104718
+#. DataViews operator name
+msgid "Less than"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104722
+#: assets/dist/js/index-B_-9Q1Pm.js:104722
+#: assets/dist/js/index-Be-zS_7L.js:104722
+#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than: 10".
+msgid "<Name>%1$s is less than: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104740
+#: assets/dist/js/index-B_-9Q1Pm.js:104740
+#: assets/dist/js/index-Be-zS_7L.js:104740
+#. DataViews operator name
+msgid "Greater than"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104744
+#: assets/dist/js/index-B_-9Q1Pm.js:104744
+#: assets/dist/js/index-Be-zS_7L.js:104744
+#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than: 10".
+msgid "<Name>%1$s is greater than: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104764
+#: assets/dist/js/index-B_-9Q1Pm.js:104764
+#: assets/dist/js/index-Be-zS_7L.js:104764
+#. DataViews operator name
+msgid "Less than or equal"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104768
+#: assets/dist/js/index-B_-9Q1Pm.js:104768
+#: assets/dist/js/index-Be-zS_7L.js:104768
+#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is less than or equal to: 10".
+msgid "<Name>%1$s is less than or equal to: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104788
+#: assets/dist/js/index-B_-9Q1Pm.js:104788
+#: assets/dist/js/index-Be-zS_7L.js:104788
+#. DataViews operator name
+msgid "Greater than or equal"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104792
+#: assets/dist/js/index-B_-9Q1Pm.js:104792
+#: assets/dist/js/index-Be-zS_7L.js:104792
+#. 1: Filter name (e.g. "Count"). 2: Filter value (e.g. "10"): "Count is greater than or equal to: 10".
+msgid "<Name>%1$s is greater than or equal to: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104812
+#: assets/dist/js/index-B_-9Q1Pm.js:104812
+#: assets/dist/js/index-Be-zS_7L.js:104812
+#. DataViews operator name
+msgid "Before"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104816
+#: assets/dist/js/index-B_-9Q1Pm.js:104816
+#: assets/dist/js/index-Be-zS_7L.js:104816
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is before: 2024-01-01".
+msgid "<Name>%1$s is before: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104835
+#: assets/dist/js/index-B_-9Q1Pm.js:104835
+#: assets/dist/js/index-Be-zS_7L.js:104835
+#. DataViews operator name
+msgid "After"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104839
+#: assets/dist/js/index-B_-9Q1Pm.js:104839
+#: assets/dist/js/index-Be-zS_7L.js:104839
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is after: 2024-01-01".
+msgid "<Name>%1$s is after: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104858
+#: assets/dist/js/index-B_-9Q1Pm.js:104858
+#: assets/dist/js/index-Be-zS_7L.js:104858
+#. DataViews operator name
+msgid "Before (inc)"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104862
+#: assets/dist/js/index-B_-9Q1Pm.js:104862
+#: assets/dist/js/index-Be-zS_7L.js:104862
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or before: 2024-01-01".
+msgid "<Name>%1$s is on or before: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104883
+#: assets/dist/js/index-B_-9Q1Pm.js:104883
+#: assets/dist/js/index-Be-zS_7L.js:104883
+#. DataViews operator name
+msgid "After (inc)"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104887
+#: assets/dist/js/index-B_-9Q1Pm.js:104887
+#: assets/dist/js/index-Be-zS_7L.js:104887
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is on or after: 2024-01-01".
+msgid "<Name>%1$s is on or after: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104908
+#: assets/dist/js/index-B_-9Q1Pm.js:104908
+#: assets/dist/js/index-Be-zS_7L.js:104908
+#. DataViews operator name
+msgid "Contains"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104912
+#: assets/dist/js/index-B_-9Q1Pm.js:104912
+#: assets/dist/js/index-Be-zS_7L.js:104912
+#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title contains: Hello".
+msgid "<Name>%1$s contains: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104930
+#: assets/dist/js/index-B_-9Q1Pm.js:104930
+#: assets/dist/js/index-Be-zS_7L.js:104930
+#. DataViews operator name
+msgid "Doesn't contain"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104934
+#: assets/dist/js/index-B_-9Q1Pm.js:104934
+#: assets/dist/js/index-Be-zS_7L.js:104934
+#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title doesn't contain: Hello".
+msgid "<Name>%1$s doesn't contain: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104954
+#: assets/dist/js/index-B_-9Q1Pm.js:104954
+#: assets/dist/js/index-Be-zS_7L.js:104954
+#. DataViews operator name
+msgid "Starts with"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104958
+#: assets/dist/js/index-B_-9Q1Pm.js:104958
+#: assets/dist/js/index-Be-zS_7L.js:104958
+#. 1: Filter name (e.g. "Title"). 2: Filter value (e.g. "Hello"): "Title starts with: Hello".
+msgid "<Name>%1$s starts with: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104976
+#: assets/dist/js/index-B_-9Q1Pm.js:104976
+#: assets/dist/js/index-Be-zS_7L.js:104976
+#. DataViews operator name
+msgid "On"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104980
+#: assets/dist/js/index-B_-9Q1Pm.js:104980
+#: assets/dist/js/index-Be-zS_7L.js:104980
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is: 2024-01-01".
+msgid "<Name>%1$s is: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:104999
+#: assets/dist/js/index-B_-9Q1Pm.js:104999
+#: assets/dist/js/index-Be-zS_7L.js:104999
+#. DataViews operator name
+msgid "Not on"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105003
+#: assets/dist/js/index-B_-9Q1Pm.js:105003
+#: assets/dist/js/index-Be-zS_7L.js:105003
+#. 1: Filter name (e.g. "Date"). 2: Filter value (e.g. "2024-01-01"): "Date is not: 2024-01-01".
+msgid "<Name>%1$s is not: </Name><Value>%2$s</Value>"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105115
+#: assets/dist/js/index-B_-9Q1Pm.js:105115
+#: assets/dist/js/index-Be-zS_7L.js:105115
+msgid "Days"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105116
+#: assets/dist/js/index-B_-9Q1Pm.js:105116
+#: assets/dist/js/index-Be-zS_7L.js:105116
+msgid "Weeks"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105117
+#: assets/dist/js/index-B_-9Q1Pm.js:105117
+#: assets/dist/js/index-Be-zS_7L.js:105117
+msgid "Months"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105118
+#: assets/dist/js/index-B_-9Q1Pm.js:105118
+#: assets/dist/js/index-Be-zS_7L.js:105118
+msgid "Years"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105121
+#: assets/dist/js/index-B_-9Q1Pm.js:105121
+#: assets/dist/js/index-Be-zS_7L.js:105121
+msgid "Days ago"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105122
+#: assets/dist/js/index-B_-9Q1Pm.js:105122
+#: assets/dist/js/index-Be-zS_7L.js:105122
+msgid "Weeks ago"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105123
+#: assets/dist/js/index-B_-9Q1Pm.js:105123
+#: assets/dist/js/index-Be-zS_7L.js:105123
+msgid "Months ago"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105124
+#: assets/dist/js/index-B_-9Q1Pm.js:105124
+#: assets/dist/js/index-Be-zS_7L.js:105124
+msgid "Years ago"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105182
+#: assets/dist/js/index-B_-9Q1Pm.js:105182
+#: assets/dist/js/index-Be-zS_7L.js:105182
+msgid "Unit"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105327
+#: assets/dist/js/index-B_-9Q1Pm.js:105327
+#: assets/dist/js/index-Be-zS_7L.js:105327
+msgid "Date time"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105377
+#: assets/dist/js/index-B_-9Q1Pm.js:105377
+#: assets/dist/js/index-Be-zS_7L.js:105377
+msgid "Today"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105382
+#: assets/dist/js/index-B_-9Q1Pm.js:105382
+#: assets/dist/js/index-Be-zS_7L.js:105382
+msgid "Yesterday"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105390
+#: assets/dist/js/index-B_-9Q1Pm.js:105390
+#: assets/dist/js/index-Be-zS_7L.js:105390
+msgid "Past week"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105398
+#: assets/dist/js/index-B_-9Q1Pm.js:105398
+#: assets/dist/js/index-Be-zS_7L.js:105398
+msgid "Past month"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105408
+#: assets/dist/js/index-B_-9Q1Pm.js:105408
+#: assets/dist/js/index-Be-zS_7L.js:105408
+msgid "Last 7 days"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105416
+#: assets/dist/js/index-B_-9Q1Pm.js:105416
+#: assets/dist/js/index-Be-zS_7L.js:105416
+msgid "Last 30 days"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105424
+#: assets/dist/js/index-B_-9Q1Pm.js:105424
+#: assets/dist/js/index-Be-zS_7L.js:105424
+msgid "Month to date"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105432
+#: assets/dist/js/index-B_-9Q1Pm.js:105432
+#: assets/dist/js/index-Be-zS_7L.js:105432
+msgid "Last year"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105440
+#: assets/dist/js/index-B_-9Q1Pm.js:105440
+#: assets/dist/js/index-Be-zS_7L.js:105440
+msgid "Year to date"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105690
+#: assets/dist/js/index-B_-9Q1Pm.js:105690
+#: assets/dist/js/index-Be-zS_7L.js:105690
+msgid "Date"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105814
+#: assets/dist/js/index-B_-9Q1Pm.js:105814
+#: assets/dist/js/index-Be-zS_7L.js:105814
+msgid "Required"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105816
+#: assets/dist/js/index-B_-9Q1Pm.js:105816
+#: assets/dist/js/index-Be-zS_7L.js:105816
+msgid "Optional"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105866
+#: assets/dist/js/index-B_-9Q1Pm.js:105866
+#: assets/dist/js/index-Be-zS_7L.js:105866
+msgid "Custom"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:105899
+#: assets/dist/js/index-B_-9Q1Pm.js:105899
+#: assets/dist/js/index-Be-zS_7L.js:105899
+msgid "To"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106170
+#: assets/dist/js/index-B_-9Q1Pm.js:106170
+#: assets/dist/js/index-Be-zS_7L.js:106170
+msgid "The max. value must be greater than the min. value."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106175
+#: assets/dist/js/index-B_-9Q1Pm.js:106175
+#: assets/dist/js/index-Be-zS_7L.js:106175
+msgid "Min."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106187
+#: assets/dist/js/index-B_-9Q1Pm.js:106187
+#: assets/dist/js/index-Be-zS_7L.js:106187
+msgid "Max."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106561
+#: assets/dist/js/index-B_-9Q1Pm.js:106561
+#: assets/dist/js/index-Be-zS_7L.js:106561
+msgid "Open color picker"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106652
+#: assets/dist/js/index-B_-9Q1Pm.js:106652
+#: assets/dist/js/index-Be-zS_7L.js:106652
+msgid "Hide password"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106652
+#: assets/dist/js/index-B_-9Q1Pm.js:106652
+#: assets/dist/js/index-Be-zS_7L.js:106652
+msgid "Show password"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106854
+#: assets/dist/js/index-B_-9Q1Pm.js:106854
+#: assets/dist/js/index-Be-zS_7L.js:106854
+msgid "Value must be a valid email address."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:106948
+#: assets/dist/js/index-B_-9Q1Pm.js:106948
+#: assets/dist/js/index-Be-zS_7L.js:106948
+msgid "Value must be an integer."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107028
+#: assets/dist/js/index-B_-9Q1Pm.js:107028
+#: assets/dist/js/index-Be-zS_7L.js:107028
+msgid "Value must be a number."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107234
+#: assets/dist/js/index-B_-9Q1Pm.js:107234
+#: assets/dist/js/index-Be-zS_7L.js:107234
+msgid "True"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107237
+#: assets/dist/js/index-B_-9Q1Pm.js:107237
+#: assets/dist/js/index-Be-zS_7L.js:107237
+msgid "False"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107244
+#: assets/dist/js/index-B_-9Q1Pm.js:107244
+#: assets/dist/js/index-Be-zS_7L.js:107244
+msgid "Value must be true, false, or undefined"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107312
+#: assets/dist/js/index-B_-9Q1Pm.js:107312
+#: assets/dist/js/index-Be-zS_7L.js:107312
+msgid "Value must be an array."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107315
+#: assets/dist/js/index-B_-9Q1Pm.js:107315
+#: assets/dist/js/index-Be-zS_7L.js:107315
+msgid "Every value must be a string."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107435
+#: assets/dist/js/index-B_-9Q1Pm.js:107435
+#: assets/dist/js/index-Be-zS_7L.js:107435
+msgid "Value must be a valid color."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108194
+#: assets/dist/js/index-B_-9Q1Pm.js:108194
+#: assets/dist/js/index-Be-zS_7L.js:108194
+msgid "Could not validate elements."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108239
+#: assets/dist/js/index-B_-9Q1Pm.js:108239
+#: assets/dist/js/index-Be-zS_7L.js:108239
+msgid "Unknown error when running elements validation asynchronously."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108298
+#: assets/dist/js/index-B_-9Q1Pm.js:108298
+#: assets/dist/js/index-Be-zS_7L.js:108298
+msgid "Validation could not be processed."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108313
+#: assets/dist/js/index-B_-9Q1Pm.js:108313
+#: assets/dist/js/index-Be-zS_7L.js:108313
+msgid "Unknown error when running custom validation asynchronously."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108343
+#: assets/dist/js/index-B_-9Q1Pm.js:108343
+#: assets/dist/js/index-Be-zS_7L.js:108343
+msgid "Value does not match the required pattern."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108351
+#: assets/dist/js/index-B_-9Q1Pm.js:108351
+#: assets/dist/js/index-Be-zS_7L.js:108351
+msgid "Value is below the minimum."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108359
+#: assets/dist/js/index-B_-9Q1Pm.js:108359
+#: assets/dist/js/index-Be-zS_7L.js:108359
+msgid "Value is above the maximum."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108367
+#: assets/dist/js/index-B_-9Q1Pm.js:108367
+#: assets/dist/js/index-Be-zS_7L.js:108367
+msgid "Value is too short."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108375
+#: assets/dist/js/index-B_-9Q1Pm.js:108375
+#: assets/dist/js/index-Be-zS_7L.js:108375
+msgid "Value is too long."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108383
+#: assets/dist/js/index-B_-9Q1Pm.js:108383
+#: assets/dist/js/index-Be-zS_7L.js:108383
+msgid "Value must be one of the elements."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108406
+#: assets/dist/js/index-B_-9Q1Pm.js:108406
+#: assets/dist/js/index-Be-zS_7L.js:108406
+msgid "Unknown error when running custom validation."
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108440
+#: assets/dist/js/index-B_-9Q1Pm.js:108440
+#: assets/dist/js/index-Be-zS_7L.js:108440
+msgid "Validating…"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108735
+#: assets/dist/js/index-B_-9Q1Pm.js:108735
+#: assets/dist/js/index-Be-zS_7L.js:108735
+msgid "Apply"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108806
+#: assets/dist/js/index-B_-9Q1Pm.js:108806
+#: assets/dist/js/index-Be-zS_7L.js:108806
+#: assets/dist/js/index-Bs5Z9Hl8.js:108
+#: assets/dist/js/index-C8yqW6MV.js:108
+#: assets/dist/js/index-guY8zmvT.js:108
+msgid "Close"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:108995
+#: assets/dist/js/index-B_-9Q1Pm.js:108995
+#: assets/dist/js/index-Be-zS_7L.js:108995
+#. %d: Number of fields that need attention
+msgid "%d field needs attention"
+msgid_plural "%d fields need attention"
+msgstr[0] ""
+msgstr[1] ""
+
+#: assets/dist/js/index-5L9fy43s.js:109326
+#: assets/dist/js/index-B_-9Q1Pm.js:109326
+#: assets/dist/js/index-Be-zS_7L.js:109326
+msgid "More details"
+msgstr ""
+
+#: assets/dist/js/default-i18n-EdzemK12.js:585
+msgctxt "text direction"
+msgid "ltr"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107975
+#: assets/dist/js/index-B_-9Q1Pm.js:107975
+#: assets/dist/js/index-Be-zS_7L.js:107975
+#. %s: Field name.
+msgctxt "field"
+msgid "Edit %s (has errors)"
+msgstr ""
+
+#: assets/dist/js/index-5L9fy43s.js:107979
+#: assets/dist/js/index-B_-9Q1Pm.js:107979
+#: assets/dist/js/index-Be-zS_7L.js:107979
+#. %s: Field name.
+msgctxt "field"
+msgid "Edit %s"
+msgstr ""

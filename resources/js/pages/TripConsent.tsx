@@ -41,7 +41,6 @@ import {
   Download,
   Mail,
   Calendar,
-  ClipboardCheck,
   RotateCcw,
   FileSignature,
 } from "lucide-react";
@@ -215,13 +214,14 @@ const ConsentFormsList: React.FC = () => {
       const response = await apiClient.get("/consent-forms", {
         params: queryParams,
       });
-      return response;
+      return response.data || response;
     },
     enabled: isModuleAvailable(),
   });
 
-  const forms = formsData?.data || [];
-  const total = formsData?.meta?.total || 0;
+  // Handle both array response and wrapped response
+  const forms = Array.isArray(formsData) ? formsData : formsData?.data || [];
+  const total = Array.isArray(formsData) ? formsData.length : formsData?.meta?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
   // Delete mutation
@@ -313,12 +313,33 @@ const ConsentFormsList: React.FC = () => {
     );
   }, [forms]);
 
+  // Calculate status counts from forms data
+  const statusCounts = useMemo(() => {
+    const counts = {
+      all: total,
+      publish: 0,
+      draft: 0,
+      archived: 0,
+      trash: 0,
+    };
+    
+    if (formsData?.data) {
+      formsData.data.forEach((form: ConsentForm) => {
+        if (counts[form.status] !== undefined) {
+          counts[form.status]++;
+        }
+      });
+    }
+    
+    return counts;
+  }, [formsData?.data, total]);
+  
   const viewFilters = [
-    { key: "all", label: __("All"), count: total },
-    { key: "publish", label: __("Published"), count: 0 },
-    { key: "draft", label: __("Draft"), count: 0 },
-    { key: "archived", label: __("Archived"), count: 0 },
-    { key: "trash", label: __("Trash"), count: 0 },
+    { key: "all", label: __("All"), count: statusCounts.all },
+    { key: "publish", label: __("Published"), count: statusCounts.publish },
+    { key: "draft", label: __("Draft"), count: statusCounts.draft },
+    { key: "archived", label: __("Archived"), count: statusCounts.archived },
+    { key: "trash", label: __("Trash"), count: statusCounts.trash },
   ];
 
   return (
@@ -528,18 +549,23 @@ const ConsentFormsList: React.FC = () => {
                       label: __("Signatures"),
                       sortable: false,
                       visible: visibleColumns.signatures,
-                      render: (form: ConsentForm) => (
-                        <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-                            <CheckCircle className="w-4 h-4" />
-                            <span>{form.signed_count || 0}</span>
+                      render: (form: ConsentForm) => {
+                        const signedCount = form.signed_count || 0;
+                        const pendingCount = form.pending_count || 0;
+                        
+                        return (
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
+                              <CheckCircle className="w-4 h-4" />
+                              <span>{signedCount}</span>
+                            </div>
+                            <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                              <Clock className="w-4 h-4" />
+                              <span>{pendingCount}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
-                            <Clock className="w-4 h-4" />
-                            <span>{form.pending_count || 0}</span>
-                          </div>
-                        </div>
-                      ),
+                        );
+                      },
                     },
                     {
                       key: "version",
@@ -708,6 +734,8 @@ const SignedConsentsList: React.FC = () => {
   };
 
   const handleView = async (consent: SignedConsent) => {
+    console.log('Yatra Consent: View button clicked for consent ID:', consent.id);
+    
     setIsModalOpen(true);
     setIsDetailLoading(true);
     setDetailError(null);
@@ -718,19 +746,15 @@ const SignedConsentsList: React.FC = () => {
 
       // Handle nested data structure from API
       let consentData = response;
-      if (response?.data) {
-        consentData = response.data;
-      }
-      if (response?.success && response?.data) {
+      if (response.data) {
         consentData = response.data;
       }
 
-      setSelectedConsent(consentData as SignedConsent);
-    } catch (error: any) {
-      console.error("Failed to load consent details:", error);
-      const message = error?.message || __("Failed to load consent details");
-      setDetailError(message);
-      showToast(message, "error");
+      setSelectedConsent(consentData);
+      console.log('Yatra Consent: Loaded consent data:', consentData);
+    } catch (error) {
+      console.error('Error fetching consent details:', error);
+      setDetailError(__('Failed to load consent details'));
     } finally {
       setIsDetailLoading(false);
     }
@@ -1134,9 +1158,62 @@ const SignedConsentsList: React.FC = () => {
   );
 };
 
+
 // Main Component
 const TripConsent: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<"forms" | "signed">("forms");
+  // Read subtab from URL and sync with state
+  const [urlKey, setUrlKey] = useState(0);
+  
+  const getSubtabFromUrl = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("subtab") || "forms";
+  }, [urlKey]);
+  
+  const [activeTab, setActiveTab] = useState<"forms" | "signed">(getSubtabFromUrl as "forms" | "signed");
+  
+  // Update URL when tab changes
+  const updateTabInUrl = (tab: "forms" | "signed") => {
+    const params = new URLSearchParams(window.location.search);
+    params.set("subpage", "trips");
+    params.set("tab", "trip-consent");
+    params.set("subtab", tab);
+    params.delete("action"); // Remove action when switching tabs
+    params.delete("id"); // Remove id when switching tabs
+    window.history.pushState({}, "", `${window.location.pathname}?${params}`);
+  };
+  
+  // Handle tab changes
+  const handleTabChange = (tab: "forms" | "signed") => {
+    setActiveTab(tab);
+    updateTabInUrl(tab);
+  };
+  
+  // Listen for URL changes
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const newSubtab = getSubtabFromUrl;
+      if (newSubtab !== activeTab) {
+        setActiveTab(newSubtab as "forms" | "signed");
+      }
+    };
+
+    // Listen for popstate (back/forward button)
+    window.addEventListener("popstate", handleLocationChange);
+
+    // Also check periodically (fallback for direct navigation)
+    const interval = setInterval(() => {
+      const currentSearch = window.location.search;
+      if (currentSearch !== (window as any).__lastSearch) {
+        (window as any).__lastSearch = currentSearch;
+        handleLocationChange();
+      }
+    }, 100);
+
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+      clearInterval(interval);
+    };
+  }, [getSubtabFromUrl, activeTab]);
 
   if (!isModuleAvailable()) {
     return <PremiumUpgradeCard />;
@@ -1177,25 +1254,23 @@ const TripConsent: React.FC = () => {
       <div className="border-b border-gray-200 dark:border-gray-700">
         <nav className="-mb-px flex space-x-8">
           <button
-            onClick={() => setActiveTab("forms")}
+            onClick={() => handleTabChange("forms")}
             className={`py-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === "forms"
                 ? "border-purple-500 text-purple-600 dark:text-purple-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
             }`}
           >
-            <FileSignature className="w-4 h-4 inline-block mr-2" />
             {__("Consent Forms")}
           </button>
           <button
-            onClick={() => setActiveTab("signed")}
+            onClick={() => handleTabChange("signed")}
             className={`py-3 px-1 border-b-2 font-medium text-sm ${
               activeTab === "signed"
                 ? "border-purple-500 text-purple-600 dark:text-purple-400"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
             }`}
           >
-            <ClipboardCheck className="w-4 h-4 inline-block mr-2" />
             {__("Signed Consents")}
           </button>
         </nav>

@@ -95,13 +95,38 @@ $formatDate = static function (?string $date): string {
         .signature-box {
             border: 1px dashed #9ca3af;
             padding: 10px;
-            min-height: 55px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-top: 10px;
             background: #f9fafb;
             page-break-inside: avoid;
+            box-sizing: border-box;
+        }
+        .signature-row {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            page-break-inside: avoid;
+        }
+        .signature-row td {
+            vertical-align: top;
+            padding: 0;
+        }
+        .signature-row td:first-child {
+            width: 48%;
+            padding-right: 2%;
+        }
+        .signature-row td:last-child {
+            width: 48%;
+            padding-left: 2%;
+        }
+        .signature-label {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #374151;
         }
         .muted {
             color: #6b7280;
@@ -181,21 +206,31 @@ $formatDate = static function (?string $date): string {
             <p class="muted"><?php esc_html_e('No responses recorded for this consent form.', 'yatra'); ?></p>
         <?php endif; ?>
 
-        <div class="section-title"><?php esc_html_e('Signature', 'yatra'); ?></div>
-        <div class="signature-box">
-            <?php if (!empty($signature_data)): ?>
-                <img src="<?php echo esc_attr($signature_data); ?>" alt="<?php esc_attr_e('Signature', 'yatra'); ?>" style="max-height: 80px;">
-            <?php else: ?>
-                <span class="muted"><?php esc_html_e('No signature captured.', 'yatra'); ?></span>
-            <?php endif; ?>
-        </div>
-
-        <?php if (!empty($initials_data)): ?>
-            <div class="section-title"><?php esc_html_e('Initials', 'yatra'); ?></div>
-            <div class="signature-box" style="width: 120px; margin-top: 8px;">
-                <img src="<?php echo esc_attr($initials_data); ?>" alt="<?php esc_attr_e('Initials', 'yatra'); ?>" style="max-height: 50px;">
-            </div>
-        <?php endif; ?>
+        <div class="section-title"><?php esc_html_e('Signature & Initials', 'yatra'); ?></div>
+        <table class="signature-row">
+            <tr>
+                <td>
+                    <div class="signature-label"><?php esc_html_e('Signature', 'yatra'); ?></div>
+                    <div class="signature-box">
+                        <?php if (!empty($signature_data)): ?>
+                            <img src="<?php echo esc_attr($signature_data); ?>" alt="<?php esc_attr_e('Signature', 'yatra'); ?>" style="max-height: 80px;">
+                        <?php else: ?>
+                            <span class="muted"><?php esc_html_e('No signature captured.', 'yatra'); ?></span>
+                        <?php endif; ?>
+                    </div>
+                </td>
+                <td>
+                    <div class="signature-label"><?php esc_html_e('Initials', 'yatra'); ?></div>
+                    <div class="signature-box">
+                        <?php if (!empty($initials_data)): ?>
+                            <img src="<?php echo esc_attr($initials_data); ?>" alt="<?php esc_attr_e('Initials', 'yatra'); ?>" style="max-height: 50px;">
+                        <?php else: ?>
+                            <span class="muted"><?php esc_html_e('No initials captured.', 'yatra'); ?></span>
+                        <?php endif; ?>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
         <p class="footer-note">
             <?php esc_html_e('This document is generated electronically and is valid without a handwritten signature.', 'yatra'); ?>
