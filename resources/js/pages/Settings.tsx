@@ -5423,9 +5423,11 @@ const Settings: React.FC = () => {
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Mail className="w-5 h-5 text-yellow-500" />
                   {__("Mailchimp", "yatra")}
-                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">
-                    PRO
-                  </span>
+                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showMailchimpSettingsUI && (
+                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
+                      PRO
+                    </span>
+                  )}
                 </CardTitle>
                 {(window as any).yatraAdmin?.mailchimpConnected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -5447,7 +5449,7 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.isProActive ? (
+                {(window as any).yatraAdmin?.showMailchimpSettingsUI ? (
                   <div className="space-y-4">
                     <FormField
                       id="mailchimp_api_key"
@@ -5794,9 +5796,11 @@ const Settings: React.FC = () => {
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                   {__("Facebook Pixel", "yatra")}
-                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">
-                    PRO
-                  </span>
+                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showFacebookPixelSettingsUI && (
+                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
+                      PRO
+                    </span>
+                  )}
                 </CardTitle>
                 {(window as any).yatraAdmin?.facebookPixel?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -5818,7 +5822,7 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.isProActive ? (
+                {(window as any).yatraAdmin?.showFacebookPixelSettingsUI ? (
                   <div className="space-y-4">
                     <FormField
                       id="facebook_pixel_id"
@@ -5973,9 +5977,11 @@ const Settings: React.FC = () => {
                     <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" />
                   </svg>
                   {__("Google Analytics 4 Enhanced", "yatra")}
-                  <span className="text-xs bg-gradient-to-r from-purple-500 to-blue-500 text-white px-2 py-0.5 rounded-full font-medium">
-                    PRO
-                  </span>
+                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI && (
+                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
+                      PRO
+                    </span>
+                  )}
                 </CardTitle>
                 {(window as any).yatraAdmin?.googleAnalytics?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -5997,7 +6003,7 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.isProActive ? (
+                {(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI ? (
                   <div className="space-y-4">
                     <FormField
                       id="ga4_measurement_id"
