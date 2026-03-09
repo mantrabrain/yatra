@@ -108,10 +108,10 @@ const RULE_TYPES = [
   {
     id: "time_based",
     name: __("Time-Based"),
-    description: __("Different prices for weekends vs weekdays"),
+    description: __("Different prices for specific days and date ranges"),
     icon: Target,
     color: "indigo",
-    example: __("10% more for weekend bookings"),
+    example: __("15% premium on weekends within specific dates"),
   },
 ];
 
@@ -140,9 +140,9 @@ const DynamicPricingRuleForm: React.FC = () => {
     priority: 1,
     demand_threshold_high: 80,
     demand_threshold_low: 30,
-    apply_on_weekends: true,
+    apply_on_weekends: false,
     apply_on_weekdays: false,
-    weekend_days: ["saturday", "sunday"],
+    weekend_days: [],
   });
 
   const [showTripDropdown, setShowTripDropdown] = useState(false);
@@ -238,7 +238,7 @@ const DynamicPricingRuleForm: React.FC = () => {
           ? ruleDetails.weekend_days
           : ruleDetails.weekend_days
             ? JSON.parse(ruleDetails.weekend_days)
-            : ["saturday", "sunday"],
+            : [],
       });
     }
   }, [ruleData]);
@@ -864,94 +864,80 @@ const DynamicPricingRuleForm: React.FC = () => {
                     {/* Time-Based - Day of week selection */}
                     {formData.rule_type === "time_based" && (
                       <>
-                        <div className="space-y-3">
+                        <div>
                           <Label>{__("Apply Pricing On")}</Label>
-
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="apply_on_weekends"
-                              checked={formData.apply_on_weekends}
-                              onChange={(e) =>
-                                handleChange(
-                                  "apply_on_weekends",
-                                  e.target.checked,
-                                )
-                              }
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <Label htmlFor="apply_on_weekends" className="mb-0">
-                              {__("Weekends")}
-                            </Label>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            {[
+                              "monday", "tuesday", "wednesday", "thursday", 
+                              "friday", "saturday", "sunday"
+                            ].map((day) => (
+                              <div
+                                key={day}
+                                className="flex items-center gap-2"
+                              >
+                                <input
+                                  type="checkbox"
+                                  id={`day_${day}`}
+                                  checked={formData.weekend_days?.includes(day)}
+                                  onChange={(e) => {
+                                    const current = formData.weekend_days || [];
+                                    if (e.target.checked) {
+                                      handleChange("weekend_days", [
+                                        ...current,
+                                        day,
+                                      ]);
+                                    } else {
+                                      handleChange(
+                                        "weekend_days",
+                                        current.filter((d) => d !== day),
+                                      );
+                                    }
+                                  }}
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                />
+                                <Label
+                                  htmlFor={`day_${day}`}
+                                  className="mb-0 capitalize"
+                                >
+                                  {__(day)}
+                                </Label>
+                              </div>
+                            ))}
                           </div>
-
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="apply_on_weekdays"
-                              checked={formData.apply_on_weekdays}
-                              onChange={(e) =>
-                                handleChange(
-                                  "apply_on_weekdays",
-                                  e.target.checked,
-                                )
-                              }
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                            />
-                            <Label htmlFor="apply_on_weekdays" className="mb-0">
-                              {__("Weekdays")}
-                            </Label>
-                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                            {__(
+                              "Select the days of the week when this pricing rule applies",
+                            )}
+                          </p>
                         </div>
 
-                        {formData.apply_on_weekends && (
-                          <div>
-                            <Label>{__("Weekend Days")}</Label>
-                            <div className="grid grid-cols-2 gap-2 mt-2">
-                              {["friday", "saturday", "sunday"].map((day) => (
-                                <div
-                                  key={day}
-                                  className="flex items-center gap-2"
-                                >
-                                  <input
-                                    type="checkbox"
-                                    id={`weekend_${day}`}
-                                    checked={formData.weekend_days?.includes(
-                                      day,
-                                    )}
-                                    onChange={(e) => {
-                                      const current =
-                                        formData.weekend_days || [];
-                                      if (e.target.checked) {
-                                        handleChange("weekend_days", [
-                                          ...current,
-                                          day,
-                                        ]);
-                                      } else {
-                                        handleChange(
-                                          "weekend_days",
-                                          current.filter((d) => d !== day),
-                                        );
-                                      }
-                                    }}
-                                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                                  />
-                                  <Label
-                                    htmlFor={`weekend_${day}`}
-                                    className="mb-0 capitalize"
-                                  >
-                                    {__(day)}
-                                  </Label>
-                                </div>
-                              ))}
-                            </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                              {__(
-                                "Select which days are considered weekends for this rule",
-                              )}
-                            </p>
-                          </div>
-                        )}
+                        <div>
+                          <Label htmlFor="start_date">{__("Start Date (Optional)")}</Label>
+                          <DatePicker
+                            value={formData.start_date}
+                            onChange={(value) =>
+                              handleChange("start_date", value)
+                            }
+                            placeholder={__("Select start date")}
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__("Leave empty for no date restriction")}
+                          </p>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="end_date">{__("End Date (Optional)")}</Label>
+                          <DatePicker
+                            value={formData.end_date}
+                            onChange={(value) =>
+                              handleChange("end_date", value)
+                            }
+                            placeholder={__("Select end date")}
+                          />
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {__("Leave empty for no date restriction")}
+                          </p>
+                        </div>
 
                         <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
                           <p className="text-xs text-indigo-700 dark:text-indigo-300">
