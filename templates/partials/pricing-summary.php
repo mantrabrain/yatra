@@ -26,6 +26,7 @@
  * @var string $payment_method         Payment method (full, deposit, partial)
  * @var int    $deposit_percentage     Deposit percentage
  * @var int    $partial_percentage     Partial payment percentage
+ * @var array  $dynamic_pricing        Dynamic pricing information (if available)
  */
 
 defined('ABSPATH') || exit;
@@ -133,6 +134,67 @@ defined('ABSPATH') || exit;
         </div>
     <?php endif; ?>
 <?php endforeach; ?>
+<?php endif; ?>
+
+<?php if (!empty($dynamic_pricing) && !empty($dynamic_pricing['rules'])) : ?>
+<!-- Dynamic Pricing Information -->
+<div class="yatra-price-section yatra-dynamic-pricing-section">
+    <div class="yatra-price-section-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20m8-10H4"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        <?php echo esc_html($dynamic_pricing['label']); ?>
+    </div>
+    
+    <?php if (!empty($dynamic_pricing['show_original_price']) && $dynamic_pricing['original_price'] > 0 && $dynamic_pricing['original_price'] != $dynamic_pricing['final_price']) : ?>
+    <div class="yatra-price-row yatra-original-price">
+        <span><?php esc_html_e('Original Price', 'yatra'); ?></span>
+        <span class="yatra-original-price-amount" style="text-decoration: line-through; color: #6b7280;">
+            <?php echo esc_html(yatra_format_price($dynamic_pricing['original_price'])); ?>
+        </span>
+    </div>
+    <?php endif; ?>
+    
+    <?php if (!empty($dynamic_pricing['show_savings_badge']) && $dynamic_pricing['savings'] > 0) : ?>
+    <div class="yatra-price-row yatra-savings-badge" style="background-color: #dcfce7; color: #166534; padding: 8px 12px; border-radius: 6px; margin: 8px 0;">
+        <span style="font-weight: 600;">
+            <?php 
+            printf(
+                /* translators: %s: savings percentage */
+                esc_html__('You save %s', 'yatra'),
+                '<span style="color: #16a34a; font-weight: 700;">' . number_format($dynamic_pricing['savings_percent'], 1) . '%</span>'
+            );
+            ?>
+        </span>
+        <span style="font-weight: 600; color: #16a34a;">
+            <?php echo esc_html(yatra_format_price($dynamic_pricing['savings'])); ?>
+        </span>
+    </div>
+    <?php endif; ?>
+    
+    <?php if (!empty($dynamic_pricing['show_urgency_messages']) && !empty($dynamic_pricing['rules'])) : ?>
+    <div class="yatra-price-row yatra-urgency-message" style="background-color: #fef3c7; color: #92400e; padding: 8px 12px; border-radius: 6px; margin: 8px 0; font-size: 14px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <?php 
+        $ruleCount = count($dynamic_pricing['rules']);
+        if ($ruleCount === 1) {
+            esc_html_e('Limited time offer! Dynamic pricing applied.', 'yatra');
+        } else {
+            printf(
+                /* translators: %d: number of rules */
+                esc_html(_n('%d dynamic pricing rule applied!', '%d dynamic pricing rules applied!', $ruleCount, 'yatra')),
+                (int) $ruleCount
+            );
+        }
+        ?>
+    </div>
+    <?php endif; ?>
+</div>
 <?php endif; ?>
 
 <!-- Net Amount -->

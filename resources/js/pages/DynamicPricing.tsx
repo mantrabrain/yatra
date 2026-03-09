@@ -68,8 +68,8 @@ const DynamicPricingPage: React.FC = () => {
   const [showRuleTypeModal, setShowRuleTypeModal] = useState(false);
   const [settings, setSettings] = useState({
     rule_priority_mode: "highest",
-    max_price_increase: 50,
-    max_price_decrease: 30,
+    maximum_markup_percent: 50,
+    maximum_discount_percent: 30,
     calculation_period: 7,
     update_frequency: "hourly",
     show_original_price: true,
@@ -100,16 +100,13 @@ const DynamicPricingPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSettingChange = (key: string, value: any) => {
-    console.log(`Setting changed: ${key} = ${value}`);
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSaveSettings = async () => {
-    console.log('Saving settings:', settings);
     setIsSaving(true);
     try {
-      const response = await apiClient.post("/dynamic-pricing/settings", settings);
-      console.log('Save response:', response);
+      await apiClient.post("/dynamic-pricing/settings", settings);
       showToast(__("Settings saved successfully"), "success");
     } catch (error) {
       console.error("Failed to save settings:", error);
@@ -138,17 +135,10 @@ const DynamicPricingPage: React.FC = () => {
 
   // Update settings state when data is loaded
   React.useEffect(() => {
-    console.log('Settings data received:', settingsData);
     if (settingsData) {
-      console.log('Setting settings state to:', settingsData);
       setSettings(settingsData);
     }
   }, [settingsData]);
-
-  // Debug settings state changes
-  React.useEffect(() => {
-    console.log('Settings state updated:', settings);
-  }, [settings]);
 
   // Fetch pricing rules
   const { data: rulesData, isLoading } = useQuery({
@@ -1350,10 +1340,10 @@ const DynamicPricingPage: React.FC = () => {
                     </label>
                     <input
                       type="number"
-                      value={settings.max_price_increase}
+                      value={settings.maximum_markup_percent}
                       onChange={(e) =>
                         handleSettingChange(
-                          "max_price_increase",
+                          "maximum_markup_percent",
                           parseInt(e.target.value),
                         )
                       }
@@ -1372,10 +1362,10 @@ const DynamicPricingPage: React.FC = () => {
                     </label>
                     <input
                       type="number"
-                      value={settings.max_price_decrease}
+                      value={settings.maximum_discount_percent}
                       onChange={(e) =>
                         handleSettingChange(
-                          "max_price_decrease",
+                          "maximum_discount_percent",
                           parseInt(e.target.value),
                         )
                       }

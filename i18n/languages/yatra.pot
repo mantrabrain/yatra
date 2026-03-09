@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-09T08:18:43+00:00\n"
+"POT-Creation-Date: 2026-03-09T08:30:08+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: yatra\n"
@@ -1607,7 +1607,7 @@ msgstr ""
 #: assets/dist/js/index-B_-9Q1Pm.js:105814
 #: assets/dist/js/index-Be-zS_7L.js:105814
 #: assets/dist/js/index-DaZ-5sTw.js:105814
-#: templates/partials/pricing-summary.php:125
+#: templates/partials/pricing-summary.php:126
 msgid "Required"
 msgstr ""
 
@@ -6201,7 +6201,7 @@ msgstr ""
 #: templates/booking-confirmation.php:331
 #: templates/partials/booking-content.php:679
 #: templates/partials/booking-content.php:744
-#: templates/partials/pricing-summary.php:140
+#: templates/partials/pricing-summary.php:202
 msgid "Net Amount"
 msgstr ""
 
@@ -7166,20 +7166,20 @@ msgid "per booking"
 msgstr ""
 
 #: templates/partials/booking-content.php:569
-#: templates/partials/pricing-summary.php:129
+#: templates/partials/pricing-summary.php:130
 #: templates/partials/single-trip/content-included-excluded.php:16
 msgid "Included"
 msgstr ""
 
 #: templates/partials/booking-content.php:636
 #: templates/partials/booking-content.php:701
-#: templates/partials/pricing-summary.php:58
+#: templates/partials/pricing-summary.php:59
 msgid "Gross Total"
 msgstr ""
 
 #: templates/partials/booking-content.php:643
 #: templates/partials/booking-content.php:708
-#: templates/partials/pricing-summary.php:66
+#: templates/partials/pricing-summary.php:67
 msgid "Discount"
 msgstr ""
 
@@ -7191,18 +7191,18 @@ msgstr ""
 
 #: templates/partials/booking-content.php:684
 #: templates/partials/booking-content.php:753
-#: templates/partials/pricing-summary.php:147
+#: templates/partials/pricing-summary.php:209
 #: templates/partials/remaining-checkout-content.php:162
 msgid "Due Now"
 msgstr ""
 
 #: templates/partials/booking-content.php:691
-#: templates/partials/pricing-summary.php:47
+#: templates/partials/pricing-summary.php:48
 msgid "Price per person"
 msgstr ""
 
 #: templates/partials/booking-content.php:695
-#: templates/partials/pricing-summary.php:51
+#: templates/partials/pricing-summary.php:52
 msgid "Number of travelers"
 msgstr ""
 
@@ -7357,9 +7357,31 @@ msgstr ""
 msgid "Subscribe to our newsletter for travel tips and exclusive offers"
 msgstr ""
 
-#: templates/partials/pricing-summary.php:97
+#: templates/partials/pricing-summary.php:98
 msgid "Itinerary Costs"
 msgstr ""
+
+#: templates/partials/pricing-summary.php:152
+msgid "Original Price"
+msgstr ""
+
+#. translators: %s: savings percentage
+#: templates/partials/pricing-summary.php:165
+#, php-format
+msgid "You save %s"
+msgstr ""
+
+#: templates/partials/pricing-summary.php:186
+msgid "Limited time offer! Dynamic pricing applied."
+msgstr ""
+
+#. translators: %d: number of rules
+#: templates/partials/pricing-summary.php:190
+#, php-format
+msgid "%d dynamic pricing rule applied!"
+msgid_plural "%d dynamic pricing rules applied!"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/remaining-checkout-content.php:9
 msgid "No active booking session was found. Please initiate the remaining payment from your account page."
