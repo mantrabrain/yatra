@@ -1576,7 +1576,9 @@ const TripConsentForm: React.FC = () => {
                       type="email"
                       value={testEmail || ""}
                       onChange={(e) => setTestEmail(e.target.value)}
-                      placeholder={__("Enter email address to test consent email")}
+                      placeholder={__(
+                        "Enter email address to test consent email",
+                      )}
                       className="flex-1"
                     />
                     <Button

@@ -221,7 +221,9 @@ const ConsentFormsList: React.FC = () => {
 
   // Handle both array response and wrapped response
   const forms = Array.isArray(formsData) ? formsData : formsData?.data || [];
-  const total = Array.isArray(formsData) ? formsData.length : formsData?.meta?.total || 0;
+  const total = Array.isArray(formsData)
+    ? formsData.length
+    : formsData?.meta?.total || 0;
   const totalPages = Math.ceil(total / 10);
 
   // Delete mutation
@@ -322,7 +324,7 @@ const ConsentFormsList: React.FC = () => {
       archived: 0,
       trash: 0,
     };
-    
+
     if (formsData?.data) {
       formsData.data.forEach((form: ConsentForm) => {
         if (counts[form.status] !== undefined) {
@@ -330,10 +332,10 @@ const ConsentFormsList: React.FC = () => {
         }
       });
     }
-    
+
     return counts;
   }, [formsData?.data, total]);
-  
+
   const viewFilters = [
     { key: "all", label: __("All"), count: statusCounts.all },
     { key: "publish", label: __("Published"), count: statusCounts.publish },
@@ -552,7 +554,7 @@ const ConsentFormsList: React.FC = () => {
                       render: (form: ConsentForm) => {
                         const signedCount = form.signed_count || 0;
                         const pendingCount = form.pending_count || 0;
-                        
+
                         return (
                           <div className="flex items-center gap-3">
                             <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -734,8 +736,6 @@ const SignedConsentsList: React.FC = () => {
   };
 
   const handleView = async (consent: SignedConsent) => {
-    console.log('Yatra Consent: View button clicked for consent ID:', consent.id);
-    
     setIsModalOpen(true);
     setIsDetailLoading(true);
     setDetailError(null);
@@ -751,10 +751,9 @@ const SignedConsentsList: React.FC = () => {
       }
 
       setSelectedConsent(consentData);
-      console.log('Yatra Consent: Loaded consent data:', consentData);
     } catch (error) {
-      console.error('Error fetching consent details:', error);
-      setDetailError(__('Failed to load consent details'));
+      console.error("Error fetching consent details:", error);
+      setDetailError(__("Failed to load consent details"));
     } finally {
       setIsDetailLoading(false);
     }
@@ -1158,19 +1157,18 @@ const SignedConsentsList: React.FC = () => {
   );
 };
 
-
 // Main Component
 const TripConsent: React.FC = () => {
   // Read subtab from URL and sync with state
-  const [urlKey, setUrlKey] = useState(0);
-  
   const getSubtabFromUrl = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("subtab") || "forms";
-  }, [urlKey]);
-  
-  const [activeTab, setActiveTab] = useState<"forms" | "signed">(getSubtabFromUrl as "forms" | "signed");
-  
+  }, []);
+
+  const [activeTab, setActiveTab] = useState<"forms" | "signed">(
+    getSubtabFromUrl as "forms" | "signed",
+  );
+
   // Update URL when tab changes
   const updateTabInUrl = (tab: "forms" | "signed") => {
     const params = new URLSearchParams(window.location.search);
@@ -1181,13 +1179,13 @@ const TripConsent: React.FC = () => {
     params.delete("id"); // Remove id when switching tabs
     window.history.pushState({}, "", `${window.location.pathname}?${params}`);
   };
-  
+
   // Handle tab changes
   const handleTabChange = (tab: "forms" | "signed") => {
     setActiveTab(tab);
     updateTabInUrl(tab);
   };
-  
+
   // Listen for URL changes
   useEffect(() => {
     const handleLocationChange = () => {
