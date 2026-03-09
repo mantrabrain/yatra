@@ -702,6 +702,13 @@ const DynamicPricingPage: React.FC = () => {
                             queryClient.invalidateQueries({
                               queryKey: ["dynamic-pricing-statistics"],
                             });
+                            setConfirmDialog({
+                              isOpen: false,
+                              rule: null,
+                              title: "",
+                              message: "",
+                              onConfirm: () => {},
+                            });
                           } catch (error) {
                             showToast(
                               __("Failed to update pricing rule status"),
@@ -741,6 +748,13 @@ const DynamicPricingPage: React.FC = () => {
                             queryClient.invalidateQueries({
                               queryKey: ["dynamic-pricing-statistics"],
                             });
+                            setConfirmDialog({
+                              isOpen: false,
+                              rule: null,
+                              title: "",
+                              message: "",
+                              onConfirm: () => {},
+                            });
                           } catch (error) {
                             showToast(
                               __("Failed to update pricing rule status"),
@@ -778,6 +792,13 @@ const DynamicPricingPage: React.FC = () => {
                             });
                             queryClient.invalidateQueries({
                               queryKey: ["dynamic-pricing-statistics"],
+                            });
+                            setConfirmDialog({
+                              isOpen: false,
+                              rule: null,
+                              title: "",
+                              message: "",
+                              onConfirm: () => {},
                             });
                           } catch (error) {
                             showToast(
