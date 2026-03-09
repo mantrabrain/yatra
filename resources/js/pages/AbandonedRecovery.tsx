@@ -647,7 +647,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
             <Button
               variant="outline"
               onClick={() =>
-                (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`)
+                (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=abandoned-recovery&tab=abandoned-booking`)
               }
             >
               {__("Back to List")}
@@ -862,7 +862,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                         });
                         // Redirect after delete
                         setTimeout(() => {
-                          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`;
+                          window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=abandoned-recovery&tab=abandoned-booking`;
                         }, 1000);
                       },
                     });
@@ -887,22 +887,6 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
         description={__(
           "Track and recover abandoned bookings with automated email campaigns",
         )}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => window.location.href = '?page=abandoned-bookings'}
-            >
-              {__("View Bookings")}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => window.location.href = '?page=abandoned-recovery-settings'}
-            >
-              {__("Settings")}
-            </Button>
-          </div>
-        }
       />
 
       {/* Tabs with Action Button */}
