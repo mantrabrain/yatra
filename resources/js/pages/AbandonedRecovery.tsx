@@ -552,7 +552,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   <li><strong>Travelers:</strong> {travelers_count}</li>
   <li><strong>Starting from:</strong> {total_amount}</li>
 </ul>
-<p><a href="{recovery_link}">View Trip Details</a></p>
+<p><a href="{trip_link}">View Trip Details</a></p>
 <p>Discover more about this incredible journey!</p>`
       },
       second: {
@@ -566,7 +566,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   <li><strong>Travelers:</strong> {travelers_count}</li>
   <li><strong>Starting from:</strong> {total_amount}</li>
 </ul>
-<p><a href="{recovery_link}">Explore This Adventure</a></p>
+<p><a href="{trip_link}">Explore This Adventure</a></p>
 <p>Find your next great adventure with us!</p>`
       },
       final: {
@@ -579,7 +579,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   <li><strong>Travelers:</strong> {travelers_count}</li>
   <li><strong>Starting from:</strong> {total_amount}</li>
 </ul>
-<p><a href="{recovery_link}">View Trip Before It's Gone</a></p>
+<p><a href="{trip_link}">View Trip Before It's Gone</a></p>
 <p><strong>Important:</strong> Popular trips like this fill up quickly. Don't miss your chance!</p>
 <p>This is your final opportunity to explore this incredible journey.</p>`
       }
@@ -1408,7 +1408,7 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                   />
                   <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     {__(
-                      "Available placeholders: {customer_name}, {trip_name}, {recovery_link}",
+                      "Available placeholders: {customer_name}, {trip_name}, {trip_link}",
                     )}
                   </p>
                 </div>
@@ -1631,19 +1631,31 @@ const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
                 {"{customer_name}"}
               </code>
               <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{customer_email}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
                 {"{trip_name}"}
               </code>
               <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{booking_amount}"}
+                {"{trip_id}"}
               </code>
               <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
                 {"{departure_date}"}
               </code>
               <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
-                {"{recovery_link}"}
+                {"{travelers_count}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{total_amount}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{trip_link}"}
               </code>
               <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
                 {"{site_name}"}
+              </code>
+              <code className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-gray-900 dark:text-gray-100">
+                {"{site_url}"}
               </code>
             </div>
           </div>
