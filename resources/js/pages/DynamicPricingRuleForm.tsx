@@ -21,6 +21,7 @@ import { Label } from "../components/ui/label";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { Skeleton } from "../components/ui/skeleton";
+import { DatePicker } from "../components/ui/date-picker";
 import { PageHeader } from "../components/common/PageHeader";
 import { RuleTypeSelectionModal } from "../components/modals/RuleTypeSelectionModal";
 import { useToast } from "../components/ui/toast";
@@ -690,13 +691,12 @@ const DynamicPricingRuleForm: React.FC = () => {
                           <Label htmlFor="start_date">
                             {__("Start Date (Optional)")}
                           </Label>
-                          <Input
-                            id="start_date"
-                            type="date"
+                          <DatePicker
                             value={formData.start_date}
-                            onChange={(e) =>
-                              handleChange("start_date", e.target.value)
+                            onChange={(value) =>
+                              handleChange("start_date", value)
                             }
+                            placeholder={__("Select start date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {__("Leave empty for no date restriction")}
@@ -707,13 +707,12 @@ const DynamicPricingRuleForm: React.FC = () => {
                           <Label htmlFor="end_date">
                             {__("End Date (Optional)")}
                           </Label>
-                          <Input
-                            id="end_date"
-                            type="date"
+                          <DatePicker
                             value={formData.end_date}
-                            onChange={(e) =>
-                              handleChange("end_date", e.target.value)
+                            onChange={(value) =>
+                              handleChange("end_date", value)
                             }
+                            placeholder={__("Select end date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {__("Leave empty for no date restriction")}
@@ -767,13 +766,12 @@ const DynamicPricingRuleForm: React.FC = () => {
                       <>
                         <div>
                           <Label htmlFor="start_date">{__("Start Date")}</Label>
-                          <Input
-                            id="start_date"
-                            type="date"
+                          <DatePicker
                             value={formData.start_date}
-                            onChange={(e) =>
-                              handleChange("start_date", e.target.value)
+                            onChange={(value) =>
+                              handleChange("start_date", value)
                             }
+                            placeholder={__("Select start date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {__("When this seasonal pricing starts")}
@@ -782,13 +780,12 @@ const DynamicPricingRuleForm: React.FC = () => {
 
                         <div>
                           <Label htmlFor="end_date">{__("End Date")}</Label>
-                          <Input
-                            id="end_date"
-                            type="date"
+                          <DatePicker
                             value={formData.end_date}
-                            onChange={(e) =>
-                              handleChange("end_date", e.target.value)
+                            onChange={(value) =>
+                              handleChange("end_date", value)
                             }
+                            placeholder={__("Select end date")}
                           />
                           <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {__("When this seasonal pricing ends")}
