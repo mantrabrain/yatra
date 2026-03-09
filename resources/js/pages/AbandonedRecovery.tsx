@@ -101,7 +101,11 @@ const formatPrice = (price: number, currencyCode?: string): string => {
 };
 
 // Main Component
-const AbandonedRecoveryPage: React.FC = () => {
+interface AbandonedRecoveryProps {
+  tab?: string;
+}
+
+const AbandonedRecoveryPage: React.FC<AbandonedRecoveryProps> = ({ tab }) => {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
@@ -114,9 +118,16 @@ const AbandonedRecoveryPage: React.FC = () => {
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
+  // Set active tab based on URL parameter, with dashboard as default
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "bookings" | "settings"
-  >("dashboard");
+  >(tab === "abandoned-booking" ? "bookings" : tab === "settings" ? "settings" : "dashboard");
+
+  // Update tab when URL changes
+  useEffect(() => {
+    const newTab = tab === "abandoned-booking" ? "bookings" : tab === "settings" ? "settings" : "dashboard";
+    setActiveTab(newTab);
+  }, [tab]);
   const [page, setPage] = useState(1);
   const [perPage] = useState(20);
   const [searchTerm, setSearchTerm] = useState("");
@@ -351,10 +362,10 @@ const AbandonedRecoveryPage: React.FC = () => {
 
   const viewFilters = [
     { key: "all", label: __("All"), count: pagination.total },
-    { key: "abandoned", label: __("Abandoned"), count: 0 },
-    { key: "contacted", label: __("Contacted"), count: 0 },
-    { key: "recovered", label: __("Recovered"), count: 0 },
-    { key: "expired", label: __("Expired"), count: 0 },
+    { key: "abandoned", label: __("Abandoned"), count: stats.total_abandoned - stats.total_recovered - stats.total_expired - stats.total_contacted || 0 },
+    { key: "contacted", label: __("Contacted"), count: stats.total_contacted || 0 },
+    { key: "recovered", label: __("Recovered"), count: stats.total_recovered || 0 },
+    { key: "expired", label: __("Expired"), count: stats.total_expired || 0 },
   ];
 
   // Column definitions for SharedTable
@@ -616,7 +627,7 @@ const AbandonedRecoveryPage: React.FC = () => {
               <Button
                 className="mt-4"
                 onClick={() =>
-                  (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery`)
+                  (window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=abandoned-recovery&tab=abandoned-booking`)
                 }
               >
                 {__("Back to Abandoned Bookings")}
@@ -876,6 +887,22 @@ const AbandonedRecoveryPage: React.FC = () => {
         description={__(
           "Track and recover abandoned bookings with automated email campaigns",
         )}
+        actions={
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = '?page=abandoned-bookings'}
+            >
+              {__("View Bookings")}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.location.href = '?page=abandoned-recovery-settings'}
+            >
+              {__("Settings")}
+            </Button>
+          </div>
+        }
       />
 
       {/* Tabs with Action Button */}
@@ -894,7 +921,9 @@ const AbandonedRecoveryPage: React.FC = () => {
               {__("Dashboard")}
             </button>
             <button
-              onClick={() => setActiveTab("bookings")}
+              onClick={() => {
+                window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=abandoned-recovery&tab=abandoned-booking`;
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "bookings"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"
@@ -905,7 +934,9 @@ const AbandonedRecoveryPage: React.FC = () => {
               {__("Abandoned Bookings")}
             </button>
             <button
-              onClick={() => setActiveTab("settings")}
+              onClick={() => {
+                window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=abandoned-recovery&tab=settings`;
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "settings"
                   ? "border-blue-500 text-blue-600 dark:text-blue-400"

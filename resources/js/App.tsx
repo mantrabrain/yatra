@@ -305,7 +305,7 @@ const App: React.FC = () => {
         }
         return <TripConsent />;
       case "abandoned-recovery":
-        return <AbandonedRecovery />;
+        return <AbandonedRecovery tab={tab} />;
       case "dynamic-pricing":
         if (
           action === "create-pricing-rule" ||
