@@ -100,13 +100,16 @@ const DynamicPricingPage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSettingChange = (key: string, value: any) => {
+    console.log(`Setting changed: ${key} = ${value}`);
     setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSaveSettings = async () => {
+    console.log('Saving settings:', settings);
     setIsSaving(true);
     try {
-      await apiClient.post("/dynamic-pricing/settings", settings);
+      const response = await apiClient.post("/dynamic-pricing/settings", settings);
+      console.log('Save response:', response);
       showToast(__("Settings saved successfully"), "success");
     } catch (error) {
       console.error("Failed to save settings:", error);
@@ -129,16 +132,23 @@ const DynamicPricingPage: React.FC = () => {
     queryKey: ["dynamic-pricing-settings"],
     queryFn: async () => {
       const response = await apiClient.get("/dynamic-pricing/settings");
-      return response.data;
+      return response.data || response;
     },
   });
 
   // Update settings state when data is loaded
   React.useEffect(() => {
-    if (settingsData?.data) {
-      setSettings(settingsData.data);
+    console.log('Settings data received:', settingsData);
+    if (settingsData) {
+      console.log('Setting settings state to:', settingsData);
+      setSettings(settingsData);
     }
   }, [settingsData]);
+
+  // Debug settings state changes
+  React.useEffect(() => {
+    console.log('Settings state updated:', settings);
+  }, [settings]);
 
   // Fetch pricing rules
   const { data: rulesData, isLoading } = useQuery({
