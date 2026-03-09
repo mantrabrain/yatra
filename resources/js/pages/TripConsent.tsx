@@ -325,16 +325,14 @@ const ConsentFormsList: React.FC = () => {
       trash: 0,
     };
 
-    if (formsData?.data) {
-      formsData.data.forEach((form: ConsentForm) => {
-        if (counts[form.status] !== undefined) {
-          counts[form.status]++;
-        }
-      });
-    }
+    forms.forEach((form: ConsentForm) => {
+      if (counts[form.status] !== undefined) {
+        counts[form.status]++;
+      }
+    });
 
     return counts;
-  }, [formsData?.data, total]);
+  }, [forms, total]);
 
   const viewFilters = [
     { key: "all", label: __("All"), count: statusCounts.all },
