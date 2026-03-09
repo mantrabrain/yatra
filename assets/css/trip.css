@@ -1000,7 +1000,7 @@ button.yatra-booking-button svg path {
 .yatra-hero-discount-tag {
     position: absolute;
     top: 16px;
-    left: 16px;
+    right: 16px;
     background: #ef4444;
     color: #fff;
     padding: 10px 18px;

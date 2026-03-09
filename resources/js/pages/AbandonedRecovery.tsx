@@ -48,6 +48,7 @@ import {
   AlertCircle,
   Eye,
   Trash2,
+  RotateCcw,
 } from "lucide-react";
 
 // Skeleton components
@@ -104,10 +105,14 @@ const AbandonedRecoveryPage: React.FC = () => {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check URL parameters for action and id
+  // Get URL parameters for actions
   const urlParams = new URLSearchParams(window.location.search);
   const action = urlParams.get("action");
   const bookingId = urlParams.get("id");
+
+  // Modal state for viewing details
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<any>(null);
 
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "bookings" | "settings"
@@ -224,9 +229,19 @@ const AbandonedRecoveryPage: React.FC = () => {
     queryKey: ["abandoned-booking-details", bookingId],
     queryFn: async () => {
       const response = await apiService.getAbandonedBooking(bookingId!);
-      return response;
+      return response.data;
     },
-    enabled: action === "view" && !!bookingId,
+    enabled: !!bookingId,
+  });
+
+  // Fetch detailed booking data for modal
+  const { data: modalBookingData, isLoading: isModalLoading } = useQuery({
+    queryKey: ["abandoned-booking-modal", selectedBooking?.id],
+    queryFn: async () => {
+      const response = await apiService.getAbandonedBooking(selectedBooking!.id);
+      return response.data;
+    },
+    enabled: !!selectedBooking?.id && viewModalOpen,
   });
 
   // Fetch settings
@@ -430,8 +445,9 @@ const AbandonedRecoveryPage: React.FC = () => {
       label: __("View Details"),
       icon: <Eye className="w-4 h-4" />,
       onClick: (item: any) => {
-        // Navigate to details page
-        window.location.href = `${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=yatra-abandoned-recovery&action=view&id=${item.id}`;
+        // Open modal with booking details
+        setSelectedBooking(item);
+        setViewModalOpen(true);
       },
     },
     {
@@ -509,6 +525,61 @@ const AbandonedRecoveryPage: React.FC = () => {
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Reset email template to default
+  const handleResetEmailTemplate = (type: "first" | "second" | "final") => {
+    const defaultTemplates = {
+      first: {
+        subject: __("Discover {trip_name} - {site_name}"),
+        message: `<p>Hi {customer_name},</p>
+<p>We noticed you were interested in <strong>{trip_name}</strong>! This amazing adventure is waiting for you.</p>
+<p>Come discover what makes this trip so special:</p>
+<ul>
+  <li><strong>Destination:</strong> {trip_name}</li>
+  <li><strong>Departure:</strong> {departure_date}</li>
+  <li><strong>Travelers:</strong> {travelers_count}</li>
+  <li><strong>Starting from:</strong> {total_amount}</li>
+</ul>
+<p><a href="{recovery_link}">View Trip Details</a></p>
+<p>Discover more about this incredible journey!</p>`
+      },
+      second: {
+        subject: __("Still Thinking About {trip_name}? - {site_name}"),
+        message: `<p>Hi {customer_name},</p>
+<p>We noticed you were exploring <strong>{trip_name}</strong> recently. This incredible adventure might be exactly what you're looking for!</p>
+<p>Come discover what makes this trip so special:</p>
+<ul>
+  <li><strong>Destination:</strong> {trip_name}</li>
+  <li><strong>Departure:</strong> {departure_date}</li>
+  <li><strong>Travelers:</strong> {travelers_count}</li>
+  <li><strong>Starting from:</strong> {total_amount}</li>
+</ul>
+<p><a href="{recovery_link}">Explore This Adventure</a></p>
+<p>Find your next great adventure with us!</p>`
+      },
+      final: {
+        subject: __("Don't Miss {trip_name}! - {site_name}"),
+        message: `<p>Hi {customer_name},</p>
+<p><strong>⚠️ Spots Filling Up Fast!</strong> Your interest in <strong>{trip_name}</strong> won't last forever! This is your final reminder to discover this amazing adventure before it's too late.</p>
+<ul>
+  <li><strong>Destination:</strong> {trip_name}</li>
+  <li><strong>Departure:</strong> {departure_date}</li>
+  <li><strong>Travelers:</strong> {travelers_count}</li>
+  <li><strong>Starting from:</strong> {total_amount}</li>
+</ul>
+<p><a href="{recovery_link}">View Trip Before It's Gone</a></p>
+<p><strong>Important:</strong> Popular trips like this fill up quickly. Don't miss your chance!</p>
+<p>This is your final opportunity to explore this incredible journey.</p>`
+      }
+    };
+
+    const template = defaultTemplates[type];
+    setSettings(prev => ({
+      ...prev,
+      [`${type}_email_subject`]: template.subject,
+      [`${type}_email_message`]: template.message
+    }));
   };
 
   // If viewing a specific booking, show details page
@@ -1278,7 +1349,20 @@ const AbandonedRecoveryPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="first_email_message">{__("Message")}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="first_email_message">{__("Message")}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleResetEmailTemplate("first")}
+                      className="h-8 mb-2"
+                      title={__("Reset to default template")}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      {__("Reset")}
+                    </Button>
+                  </div>
                   <textarea
                     id="first_email_message"
                     value={settings.first_email_message}
@@ -1331,7 +1415,20 @@ const AbandonedRecoveryPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="second_email_message">{__("Message")}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="second_email_message">{__("Message")}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleResetEmailTemplate("second")}
+                      className="h-8 mb-2"
+                      title={__("Reset to default template")}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      {__("Reset")}
+                    </Button>
+                  </div>
                   <textarea
                     id="second_email_message"
                     value={settings.second_email_message}
@@ -1375,7 +1472,20 @@ const AbandonedRecoveryPage: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="final_email_message">{__("Message")}</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="final_email_message">{__("Message")}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleResetEmailTemplate("final")}
+                      className="h-8 mb-2"
+                      title={__("Reset to default template")}
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      {__("Reset")}
+                    </Button>
+                  </div>
                   <textarea
                     id="final_email_message"
                     value={settings.final_email_message}
@@ -1516,6 +1626,125 @@ const AbandonedRecoveryPage: React.FC = () => {
             </p>
           </div>
         </div>
+      </Modal>
+      
+      {/* View Details Modal */}
+      <Modal
+        isOpen={viewModalOpen}
+        onClose={() => {
+          setViewModalOpen(false);
+          setSelectedBooking(null);
+        }}
+        title={__("Booking Details")}
+        size="lg"
+        footer={
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setViewModalOpen(false);
+                setSelectedBooking(null);
+              }}
+            >
+              {__("Close")}
+            </Button>
+          </div>
+        }
+      >
+        {isModalLoading ? (
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        ) : modalBookingData ? (
+          <div className="space-y-6">
+            {/* Customer Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">{__("Customer Information")}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Name")}</Label>
+                  <p className="font-medium">{modalBookingData.customer_name || __("Unknown")}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Email")}</Label>
+                  <p className="font-medium">{modalBookingData.customer_email || __("Not provided")}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Phone")}</Label>
+                  <p className="font-medium">{modalBookingData.customer_phone || __("Not provided")}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Session ID")}</Label>
+                  <p className="font-mono text-sm">{modalBookingData.session_id}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Trip Information */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">{__("Trip Information")}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Trip")}</Label>
+                  <p className="font-medium">{modalBookingData.trip_name || __("Unknown Trip")}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Departure Date")}</Label>
+                  <p className="font-medium">{modalBookingData.departure_date || __("Not set")}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Travelers")}</Label>
+                  <p className="font-medium">{modalBookingData.travelers_count || 1}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Total Amount")}</Label>
+                  <p className="font-medium">{formatPrice(modalBookingData.total_amount || 0)}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Status and Dates */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">{__("Status & Dates")}</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Status")}</Label>
+                  <Badge variant={modalBookingData.status === 'recovered' ? 'success' : 'warning'}>
+                    {modalBookingData.status}
+                  </Badge>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Created")}</Label>
+                  <p className="font-medium">{new Date(modalBookingData.created_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Expires")}</Label>
+                  <p className="font-medium">{new Date(modalBookingData.expires_at).toLocaleString()}</p>
+                </div>
+                <div>
+                  <Label className="text-sm text-gray-500">{__("Emails Sent")}</Label>
+                  <p className="font-medium">{modalBookingData.recovery_emails_sent || 0}</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Form Data (Debug) */}
+            {modalBookingData.booking_data && (
+              <div>
+                <h3 className="text-lg font-semibold mb-3">{__("Form Data")}</h3>
+                <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-md max-h-40 overflow-y-auto">
+                  <pre className="text-xs">
+                    {JSON.stringify(modalBookingData.booking_data, null, 2)}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-gray-500">{__("No booking data available.")}</p>
+        )}
       </Modal>
     </div>
   );

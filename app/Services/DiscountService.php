@@ -24,6 +24,37 @@ class DiscountService extends BaseService
         return $this->repository;
     }
 
+    /**
+     * Get group discounts applicable to a specific trip
+     * 
+     * @param int $tripId The trip ID
+     * @return array Array of group discount objects
+     */
+    public function getGroupDiscountsForTrip(int $tripId): array
+    {
+        global $wpdb;
+        $table = \Yatra\Database\Tables\DiscountsTable::getTableName();
+        $today = date('Y-m-d H:i:s');
+
+        // Query for active group discounts applicable to this trip
+        // Check both is_group_discount=1 OR discount_mode IN ('group', 'both') for backward compatibility
+        $query = $wpdb->prepare(
+            "SELECT * FROM `{$table}` 
+            WHERE (is_group_discount = 1 OR discount_mode IN ('group', 'both'))
+            AND status = 'publish'
+            AND (valid_from IS NULL OR valid_from <= %s)
+            AND (expiry_date IS NULL OR expiry_date >= %s)
+            AND (trip_ids IS NULL OR trip_ids = '' OR FIND_IN_SET(%d, trip_ids) > 0)
+            ORDER BY created_at DESC",
+            $today,
+            $today,
+            $tripId
+        );
+        
+        $results = $wpdb->get_results($query);
+        return $results ?: [];
+    }
+
     protected function validate(array $data, ?int $id = null): void
     {
         if (empty($data['code'])) {

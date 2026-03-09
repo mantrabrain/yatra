@@ -35,6 +35,7 @@ if (!empty($booking->error)) {
             justify-content: center;
             padding: 40px 20px;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin:0 auto;
         }
         .yatra-error-card {
             max-width: 480px;
