@@ -683,12 +683,31 @@ const DynamicPricingPage: React.FC = () => {
                       setConfirmDialog({
                         isOpen: true,
                         rule,
-                        title: __("Confirm Action"),
+                        title: __("Mark as Active"),
                         message: __(
-                          "Are you sure you want to perform this action?",
+                          "Are you sure you want to mark this pricing rule as active? It will start applying to trip pricing.",
                         ),
-                        onConfirm: () => {
-                          // Handle action
+                        onConfirm: async () => {
+                          try {
+                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
+                              status: "active",
+                            });
+                            showToast(
+                              __("Pricing rule marked as active successfully"),
+                              "success",
+                            );
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-rules"],
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-statistics"],
+                            });
+                          } catch (error) {
+                            showToast(
+                              __("Failed to update pricing rule status"),
+                              "error",
+                            );
+                          }
                         },
                       });
                     },
@@ -703,12 +722,31 @@ const DynamicPricingPage: React.FC = () => {
                       setConfirmDialog({
                         isOpen: true,
                         rule,
-                        title: __("Confirm Action"),
+                        title: __("Mark as Inactive"),
                         message: __(
-                          "Are you sure you want to perform this action?",
+                          "Are you sure you want to mark this pricing rule as inactive? It will no longer apply to trip pricing.",
                         ),
-                        onConfirm: () => {
-                          // Handle action
+                        onConfirm: async () => {
+                          try {
+                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
+                              status: "inactive",
+                            });
+                            showToast(
+                              __("Pricing rule marked as inactive successfully"),
+                              "success",
+                            );
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-rules"],
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-statistics"],
+                            });
+                          } catch (error) {
+                            showToast(
+                              __("Failed to update pricing rule status"),
+                              "error",
+                            );
+                          }
                         },
                       });
                     },
@@ -722,12 +760,31 @@ const DynamicPricingPage: React.FC = () => {
                       setConfirmDialog({
                         isOpen: true,
                         rule,
-                        title: __("Confirm Action"),
+                        title: __("Restore Rule"),
                         message: __(
-                          "Are you sure you want to perform this action?",
+                          "Are you sure you want to restore this pricing rule? It will be moved back to active status.",
                         ),
-                        onConfirm: () => {
-                          // Handle action
+                        onConfirm: async () => {
+                          try {
+                            await apiClient.put(`/dynamic-pricing/rules/${rule.id}`, {
+                              status: "active",
+                            });
+                            showToast(
+                              __("Pricing rule restored successfully"),
+                              "success",
+                            );
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-rules"],
+                            });
+                            queryClient.invalidateQueries({
+                              queryKey: ["dynamic-pricing-statistics"],
+                            });
+                          } catch (error) {
+                            showToast(
+                              __("Failed to restore pricing rule"),
+                              "error",
+                            );
+                          }
                         },
                       });
                     },
