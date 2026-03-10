@@ -551,6 +551,14 @@ export const apiService = {
   // Modules
   getModules: () => apiClient.get(API_ENDPOINTS.MODULES),
 
+  // Facebook Pixel
+  getFacebookPixelSettings: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_SETTINGS),
+  testFacebookPixel: (pixelId: string) => apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST, { pixel_id: pixelId }),
+  testFacebookPixelToken: (accessToken: string) => apiClient.post(API_ENDPOINTS.FACEBOOK_PIXEL_TEST_TOKEN, { access_token: accessToken }),
+  getFacebookPixelEvents: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENTS),
+  getFacebookPixelEventLogs: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
+  clearFacebookPixelEventLogs: () => apiClient.delete(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
+
   // Payment Gateways
   getPaymentGateways: () => apiClient.get(API_ENDPOINTS.PAYMENT_GATEWAYS),
 

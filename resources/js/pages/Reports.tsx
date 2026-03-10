@@ -7,7 +7,8 @@
 import React, { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { __ } from "../lib/i18n";
-import { apiClient } from "../lib/api-client";
+import { apiClient, apiService } from "../lib/api-client";
+import { useToast } from "../components/ui/toast";
 import {
   Card,
   CardContent,
@@ -15,9 +16,7 @@ import {
   CardTitle,
   CardDescription,
 } from "../components/ui/card";
-// Button and Badge available for future use
-// import { Button } from '../components/ui/button';
-// import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import BookingsOverviewChart from "../components/charts/BookingsOverviewChart";
 import BookingStatusChart from "../components/charts/BookingStatusChart";
 import { getCurrencySymbol } from "../data/currencies";
@@ -153,6 +152,15 @@ const SVGIcons = {
       />
     </svg>
   ),
+  Facebook: () => (
+    <svg
+      className="w-6 h-6"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    </svg>
+  ),
   Target: () => (
     <svg
       className="w-6 h-6"
@@ -237,6 +245,12 @@ const TravelReportCategories = [
     title: "Operational Metrics",
     icon: "Activity",
     description: "Lead times, cancellations, efficiency metrics",
+  },
+  {
+    id: "facebook-pixel",
+    title: "Facebook Pixel",
+    icon: "Facebook",
+    description: "Conversion tracking, event analytics, pixel performance",
   },
 ];
 
@@ -1113,6 +1127,361 @@ const DetailedBreakdownTable: React.FC<{
   );
 };
 
+// Facebook Pixel Reports Component
+const FacebookPixelReports: React.FC = () => {
+  const [clearingLogs, setClearingLogs] = useState(false);
+  const { showToast } = useToast();
+  
+  // Fetch fresh Facebook Pixel data
+  const { data: freshPixelData, refetch: refetchPixelData } = useQuery({
+    queryKey: ['facebook-pixel-status'],
+    queryFn: async () => {
+      const response = await apiService.getFacebookPixelSettings();
+      return response?.data || {};
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+  
+  // Use fresh data if available, fallback to cached data
+  const facebookPixelData = freshPixelData || (window as any).yatraAdmin?.facebookPixel || {};
+  
+  const getEventStats = () => {
+    const logs = facebookPixelData.eventLogs || [];
+    return {
+      success: logs.filter((log: any) => log.status === 'success').length,
+      errors: logs.filter((log: any) => log.status === 'error').length,
+      total: logs.length
+    };
+  };
+  
+  const getRecentEvents = () => {
+    const logs = facebookPixelData.eventLogs || [];
+    return logs.slice(-10).reverse(); // Show last 10 events, newest first
+  };
+  
+  const clearPixelLogs = async () => {
+    setClearingLogs(true);
+    try {
+      const response = await apiService.clearFacebookPixelEventLogs();
+      if (response.success) {
+        showToast(__('Event logs cleared successfully.', 'yatra'), 'success');
+        // Refetch fresh data to update the UI
+        await refetchPixelData();
+      }
+    } catch (error: any) {
+      showToast(error.message || __('Failed to clear logs.', 'yatra'), 'error');
+    } finally {
+      setClearingLogs(false);
+    }
+  };
+  
+  const eventStats = getEventStats();
+  const recentEvents = getRecentEvents();
+  
+  // Check if Facebook Pixel is configured
+  if (!facebookPixelData.pixel_id) {
+    return (
+      <div className="text-center py-12">
+        <div className="mx-auto w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+          <svg className="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+          {__("Facebook Pixel Not Configured", "yatra")}
+        </h3>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          {__("Configure your Facebook Pixel in Settings to start tracking conversion events.", "yatra")}
+        </p>
+        <a
+          href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=settings#integration`}
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          {__("Configure Facebook Pixel", "yatra")}
+        </a>
+      </div>
+    );
+  }
+  
+  return (
+    <div className="space-y-6">
+      {/* Connection Status */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          {__("Connection Status", "yatra")}
+        </h3>
+        <Button
+          type="button"
+          onClick={() => refetchPixelData()}
+          variant="outline"
+          size="sm"
+        >
+          {__("Refresh Status", "yatra")}
+        </Button>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`p-4 rounded-lg border ${
+          facebookPixelData.connectionStatus?.pixelConnected 
+            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {__("Pixel Connection", "yatra")}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {facebookPixelData.connectionStatus?.pixelConnected 
+                  ? __('Connected', 'yatra') 
+                  : __('Not Connected', 'yatra')}
+              </p>
+            </div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              facebookPixelData.connectionStatus?.pixelConnected 
+                ? 'bg-green-100 dark:bg-green-900/30' 
+                : 'bg-red-100 dark:bg-red-900/30'
+            }`}>
+              {facebookPixelData.connectionStatus?.pixelConnected ? (
+                <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className={`p-4 rounded-lg border ${
+          facebookPixelData.connectionStatus?.tokenConnected 
+            ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+            : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
+        }`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {__("API Token", "yatra")}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {facebookPixelData.connectionStatus?.tokenConnected 
+                  ? __('Valid', 'yatra') 
+                  : __('Invalid', 'yatra')}
+              </p>
+            </div>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              facebookPixelData.connectionStatus?.tokenConnected 
+                ? 'bg-green-100 dark:bg-green-900/30' 
+                : 'bg-red-100 dark:bg-red-900/30'
+            }`}>
+              {facebookPixelData.connectionStatus?.tokenConnected ? (
+                <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">
+                {__("Pixel ID", "yatra")}
+              </p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                {facebookPixelData.pixel_id || __('Not Set', 'yatra')}
+              </p>
+            </div>
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Event Statistics */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {__("Event Statistics", "yatra")}
+            </h3>
+            <Button
+              type="button"
+              onClick={() => clearPixelLogs()}
+              variant="outline"
+              size="sm"
+              disabled={clearingLogs}
+            >
+              {clearingLogs ? __("Clearing...", "yatra") : __("Clear Logs", "yatra")}
+            </Button>
+          </div>
+        </div>
+        
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                {eventStats.success}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {__("Successful Events", "yatra")}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-red-600 dark:text-red-400">
+                {eventStats.errors}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {__("Failed Events", "yatra")}
+              </div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                {eventStats.total}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {__("Total Events", "yatra")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Recent Events */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {__("Recent Activity", "yatra")}
+          </h3>
+        </div>
+        
+        <div className="p-6">
+          {recentEvents.length > 0 ? (
+            <div className="space-y-3">
+              {recentEvents.map((log: any, index: number) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      log.status === 'success' ? 'bg-green-100 dark:bg-green-900/30' :
+                      log.status === 'error' ? 'bg-red-100 dark:bg-red-900/30' :
+                      'bg-blue-100 dark:bg-blue-900/30'
+                    }`}>
+                      {log.status === 'success' && (
+                        <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {log.status === 'error' && (
+                        <svg className="w-4 h-4 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                      {log.status === 'logged' && (
+                        <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <div className="font-medium text-gray-900 dark:text-white">
+                        {log.event_name}
+                      </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        {log.event_type || 'Frontend'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      {new Date(log.timestamp).toLocaleTimeString()}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">
+                      {new Date(log.timestamp).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="mx-auto w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                {__("No Events Yet", "yatra")}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {__("Events will appear here once users start interacting with your site.", "yatra")}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {/* Quick Links */}
+      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+          {__("Quick Links", "yatra")}
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <a
+            href={`https://www.facebook.com/events_manager2/list/pixel/${facebookPixelData.pixel_id}/test_events`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          >
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </div>
+            <div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {__("Test Events", "yatra")}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {__("Facebook Events Manager", "yatra")}
+              </div>
+            </div>
+          </a>
+          
+          <a
+            href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=settings#integration`}
+            className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border border-blue-200 dark:border-blue-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          >
+            <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+              <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-medium text-gray-900 dark:text-white">
+                {__("Pixel Settings", "yatra")}
+              </div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                {__("Configuration & Options", "yatra")}
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const TravelBookingReports: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState("booking-overview");
   const [dateRange, setDateRange] = useState("last_30_days");
@@ -1710,6 +2079,10 @@ const TravelBookingReports: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {selectedCategory === "facebook-pixel" && (
+                <FacebookPixelReports />
               )}
             </div>
           )}

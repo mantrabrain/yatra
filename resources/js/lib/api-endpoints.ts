@@ -93,6 +93,13 @@ export const API_ENDPOINTS = {
   // Modules
   MODULES: "/modules",
 
+  // Facebook Pixel
+  FACEBOOK_PIXEL_SETTINGS: "/facebook-pixel/settings",
+  FACEBOOK_PIXEL_TEST: "/facebook-pixel/test",
+  FACEBOOK_PIXEL_TEST_TOKEN: "/facebook-pixel/test-token",
+  FACEBOOK_PIXEL_EVENTS: "/facebook-pixel/events",
+  FACEBOOK_PIXEL_EVENT_LOGS: "/facebook-pixel/event-logs",
+
   // Abandoned Bookings
   ABANDONED_BOOKINGS: "/abandoned-bookings",
   ABANDONED_BOOKING_GET: (id: string | number) => `/abandoned-bookings/${id}`,

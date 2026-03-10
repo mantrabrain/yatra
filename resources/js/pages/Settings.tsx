@@ -2509,40 +2509,6 @@ const Settings: React.FC = () => {
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
   const [validatingToken, setValidatingToken] = useState(false);
-  const [clearingLogs, setClearingLogs] = useState(false);
-
-  // Facebook Pixel event monitoring functions
-  const getEventStats = () => {
-    const logs = (window as any).yatraAdmin?.facebookPixel?.eventLogs || [];
-    return {
-      success: logs.filter((log: any) => log.status === 'success').length,
-      errors: logs.filter((log: any) => log.status === 'error').length,
-      total: logs.length
-    };
-  };
-  
-  const getRecentEvents = () => {
-    const logs = (window as any).yatraAdmin?.facebookPixel?.eventLogs || [];
-    return logs.slice(-10).reverse(); // Show last 10 events, newest first
-  };
-  
-  const clearPixelLogs = async () => {
-    setClearingLogs(true);
-    try {
-      const response = await apiClient.delete('/facebook-pixel/event-logs');
-      if (response.success) {
-        showToast(__('Event logs cleared successfully.', 'yatra'), 'success');
-        // Update local state to clear logs without page reload
-        if ((window as any).yatraAdmin?.facebookPixel) {
-          (window as any).yatraAdmin.facebookPixel.eventLogs = [];
-        }
-      }
-    } catch (error: any) {
-      showToast(error.message || __('Failed to clear logs.', 'yatra'), 'error');
-    } finally {
-      setClearingLogs(false);
-    }
-  };
 
   // Mailchimp functions
   const validateMailchimpApiKey = async () => {
@@ -6259,14 +6225,21 @@ const Settings: React.FC = () => {
                                 <li>{__("Go to Facebook Business Manager: business.facebook.com", "yatra")}</li>
                                 <li>{__("Select your Business Account", "yatra")}</li>
                                 <li>{__("Click 'All tools' and select 'Events Manager'", "yatra")}</li>
-                                <li>{__("Select your Pixel from the list", "yatra")}</li>
-                                <li>{__("Click 'Settings' (gear icon) for your Pixel", "yatra")}</li>
-                                <li>{__("Under 'Conversions API', click 'Generate access token'", "yatra")}</li>
+                                <li>{__("Find your Pixel ID in the data sources list (it should match the Pixel ID you entered above)", "yatra")}</li>
+                                <li>{__("Click on your Pixel name to open its settings", "yatra")}</li>
+                                <li>{__("Click 'Settings' (gear icon ⚙️) in the top right", "yatra")}</li>
+                                <li>{__("Scroll down to 'Conversions API' section", "yatra")}</li>
+                                <li>{__("Click 'Generate access token'", "yatra")}</li>
                                 <li>{__("Choose permissions: 'ads_management' and 'business_management'", "yatra")}</li>
                                 <li>{__("Click 'Generate token'", "yatra")}</li>
-                                <li>{__("Copy the generated token (starts with 'EAAC...')", "yatra")}</li>
+                                <li>{__("Copy the generated access token", "yatra")}</li>
                                 <li>{__("Paste it in the field above", "yatra")}</li>
                               </ol>
+                              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                                <p className="text-xs text-blue-800 dark:text-blue-300">
+                                  <strong>{__("💡 Tip:", "yatra")}</strong> {__("If you have multiple Pixels, look for the one that matches the Pixel ID you entered above. The Pixel ID is displayed next to each Pixel name in the list.", "yatra")}
+                                </p>
+                              </div>
                               <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
                                 <p className="text-xs text-yellow-800 dark:text-yellow-300">
                                   {__("⚠️ Keep your access token secure and never share it publicly.", "yatra")}
@@ -6376,95 +6349,30 @@ const Settings: React.FC = () => {
                   </div>
                 )}
                 
-                {/* Event Monitoring - Show when Facebook Pixel is configured */}
+                {/* Facebook Pixel Monitoring Notice */}
                 {(window as any).yatraAdmin?.facebookPixel?.pixelId && (
-                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                    <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {__("Event Monitoring", "yatra")}
-                      </h4>
-                      <Button
-                        type="button"
-                        onClick={() => clearPixelLogs()}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                        disabled={clearingLogs}
-                      >
-                        {clearingLogs ? __("Clearing...", "yatra") : __("Clear Logs", "yatra")}
-                      </Button>
-                    </div>
-                    
-                    <div className="space-y-3">
-                      {/* Event Stats */}
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
-                          <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                            {getEventStats().success}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {__("Success", "yatra")}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
-                          <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                            {getEventStats().errors}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {__("Failed", "yatra")}
-                          </div>
-                        </div>
-                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
-                          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                            {getEventStats().total}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
-                            {__("Total", "yatra")}
-                          </div>
-                        </div>
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="text-sm">
+                        <span className="text-blue-800 dark:text-blue-300 font-medium">{__("Facebook Pixel Monitoring:", "yatra")}</span>
+                        <span className="text-blue-700 dark:text-blue-400 ml-1">
+                          {__("View event statistics and activity in the ", "yatra")}
+                          <a 
+                            href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=reports`}
+                            className="underline hover:text-blue-600 dark:hover:text-blue-300 font-medium"
+                          >
+                            {__("Reports page", "yatra")}
+                          </a>
+                          {__(" → Facebook Pixel tab.", "yatra")}
+                        </span>
                       </div>
-                      
-                      {/* Recent Events */}
-                      {getRecentEvents().length > 0 && (
-                        <div>
-                          <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
-                            {__("Recent Activity", "yatra")}
-                          </h5>
-                          <div className="space-y-1 max-h-48 overflow-y-auto">
-                            {getRecentEvents().map((log: any, index: number) => (
-                              <div key={index} className="flex items-center justify-between text-xs p-2 bg-white dark:bg-gray-700 rounded border border-gray-100 dark:border-gray-600">
-                                <div className="flex items-center gap-2">
-                                  {log.status === 'success' && (
-                                    <CheckCircle className="w-3 h-3 text-green-500" />
-                                  )}
-                                  {log.status === 'error' && (
-                                    <XCircle className="w-3 h-3 text-red-500" />
-                                  )}
-                                  {log.status === 'logged' && (
-                                    <AlertCircle className="w-3 h-3 text-blue-500" />
-                                  )}
-                                  <span className="font-medium">{log.event_name}</span>
-                                </div>
-                                <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                                  {new Date(log.timestamp).toLocaleTimeString()}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      
-                      {getRecentEvents().length === 0 && (
-                        <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
-                          <p>{__("No events tracked yet.", "yatra")}</p>
-                          <p className="text-xs mt-1">
-                            {__("Events will appear here once users start interacting with your site.", "yatra")}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
+                
               </CardContent>
             </Card>
 
