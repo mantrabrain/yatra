@@ -559,6 +559,15 @@ export const apiService = {
   getFacebookPixelEventLogs: () => apiClient.get(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
   clearFacebookPixelEventLogs: () => apiClient.delete(API_ENDPOINTS.FACEBOOK_PIXEL_EVENT_LOGS),
 
+  // Google Analytics 4
+  getGoogleAnalyticsSettings: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_SETTINGS),
+  testGoogleAnalytics: (measurementId: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_TEST, { measurement_id: measurementId }),
+  validateGoogleAnalyticsMeasurementId: (measurementId: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID, { measurement_id: measurementId }),
+  validateGoogleAnalyticsApiSecret: (measurementId: string, apiSecret: string) => apiClient.post(API_ENDPOINTS.GOOGLE_ANALYTICS_VALIDATE_API_SECRET, { measurement_id: measurementId, api_secret: apiSecret }),
+  getGoogleAnalyticsEvents: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENTS),
+  getGoogleAnalyticsEventLogs: () => apiClient.get(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
+  clearGoogleAnalyticsEventLogs: () => apiClient.delete(API_ENDPOINTS.GOOGLE_ANALYTICS_EVENT_LOGS),
+
   // Payment Gateways
   getPaymentGateways: () => apiClient.get(API_ENDPOINTS.PAYMENT_GATEWAYS),
 

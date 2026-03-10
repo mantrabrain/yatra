@@ -100,6 +100,14 @@ export const API_ENDPOINTS = {
   FACEBOOK_PIXEL_EVENTS: "/facebook-pixel/events",
   FACEBOOK_PIXEL_EVENT_LOGS: "/facebook-pixel/event-logs",
 
+  // Google Analytics 4
+  GOOGLE_ANALYTICS_SETTINGS: "/google-analytics/settings",
+  GOOGLE_ANALYTICS_TEST: "/google-analytics/test",
+  GOOGLE_ANALYTICS_VALIDATE_MEASUREMENT_ID: "/google-analytics/validate/measurement-id",
+  GOOGLE_ANALYTICS_VALIDATE_API_SECRET: "/google-analytics/validate/api-secret",
+  GOOGLE_ANALYTICS_EVENTS: "/google-analytics/events",
+  GOOGLE_ANALYTICS_EVENT_LOGS: "/google-analytics/logs",
+
   // Abandoned Bookings
   ABANDONED_BOOKINGS: "/abandoned-bookings",
   ABANDONED_BOOKING_GET: (id: string | number) => `/abandoned-bookings/${id}`,

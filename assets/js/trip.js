@@ -3006,6 +3006,26 @@
         console.log('[Facebook Pixel] InitiateCheckout tracked for trip:', sessionPayload.trip_id);
       }
       
+      // Track Book Now click as begin_checkout (Google Analytics 4)
+      if (typeof gtag !== 'undefined' && window.yatraAdmin?.googleAnalytics?.measurementId) {
+        const tripData = this.getTripData();
+        const totalPrice = this.calculateTotalPrice();
+        
+        gtag('event', 'begin_checkout', {
+          currency: window.yatraBookingData?.currency || 'USD',
+          value: totalPrice,
+          items: [{
+            item_id: sessionPayload.trip_id,
+            item_name: tripData.title || 'Trip',
+            category: 'Travel',
+            price: totalPrice / (sessionPayload.travelers || 1),
+            quantity: sessionPayload.travelers || 1
+          }]
+        });
+        
+        console.log('[Google Analytics] begin_checkout tracked for trip:', sessionPayload.trip_id);
+      }
+      
       // Set booking session via REST API
       // credentials: 'same-origin' is required to send cookies for session
       const { base: baseUrl, isPlain } = getRestBase();

@@ -71,12 +71,14 @@ const FormField = React.memo(
     label,
     description,
     required = false,
+    actionButton,
     children,
   }: {
     id: string;
     label: string;
     description?: React.ReactNode;
     required?: boolean;
+    actionButton?: React.ReactNode;
     children: React.ReactNode;
   }) => (
     <div className="space-y-2">
@@ -90,7 +92,14 @@ const FormField = React.memo(
           <span className="min-w-0 leading-relaxed">{description}</span>
         </p>
       )}
-      {children}
+      {actionButton ? (
+        <div className="flex gap-2">
+          <div className="flex-1">{children}</div>
+          {actionButton}
+        </div>
+      ) : (
+        children
+      )}
     </div>
   ),
 );
@@ -2509,6 +2518,10 @@ const Settings: React.FC = () => {
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
   const [validatingToken, setValidatingToken] = useState(false);
+  
+  // Google Analytics validation state
+  const [validatingMeasurementId, setValidatingMeasurementId] = useState(false);
+  const [validatingApiSecret, setValidatingApiSecret] = useState(false);
 
   // Mailchimp functions
   const validateMailchimpApiKey = async () => {
@@ -2640,6 +2653,48 @@ const Settings: React.FC = () => {
       setMailchimpConnectionStatus((window as any).yatraAdmin.mailchimp.connectionStatus);
     }
   }, []);
+
+  // Google Analytics validation functions
+  const validateMeasurementId = async () => {
+    if (!formData?.ga4_measurement_id) return;
+    
+    setValidatingMeasurementId(true);
+    try {
+      const response = await apiService.validateGoogleAnalyticsMeasurementId(formData.ga4_measurement_id);
+      
+      if (response.success) {
+        showToast(__('Measurement ID validated successfully!', 'yatra'), 'success');
+      } else {
+        showToast(response.message || __('Measurement ID validation failed.', 'yatra'), 'error');
+      }
+    } catch (error: any) {
+      showToast(error.message || __('Failed to validate Measurement ID.', 'yatra'), 'error');
+    } finally {
+      setValidatingMeasurementId(false);
+    }
+  };
+
+  const validateApiSecret = async () => {
+    if (!formData?.ga4_measurement_id || !formData?.ga4_api_secret) return;
+    
+    setValidatingApiSecret(true);
+    try {
+      const response = await apiService.validateGoogleAnalyticsApiSecret(
+        formData.ga4_measurement_id,
+        formData.ga4_api_secret
+      );
+      
+      if (response.success) {
+        showToast(__('API Secret validated successfully!', 'yatra'), 'success');
+      } else {
+        showToast(response.message || __('API Secret validation failed.', 'yatra'), 'error');
+      }
+    } catch (error: any) {
+      showToast(error.message || __('Failed to validate API Secret.', 'yatra'), 'error');
+    } finally {
+      setValidatingApiSecret(false);
+    }
+  };
 
   // Facebook Pixel validation functions
   const validateFacebookPixel = async () => {
@@ -6436,6 +6491,33 @@ const Settings: React.FC = () => {
                           {__("(Admin > Data Streams)", "yatra")}
                         </>
                       }
+                      actionButton={
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => validateMeasurementId()}
+                          disabled={!formData.ga4_measurement_id || validatingMeasurementId}
+                          className="shrink-0"
+                        >
+                          {validatingMeasurementId ? (
+                            <>
+                              <svg className="animate-spin -ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              {__("Validating...", "yatra")}
+                            </>
+                          ) : (
+                            <>
+                              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {__("Validate", "yatra")}
+                            </>
+                          )}
+                        </Button>
+                      }
                     >
                       <Input
                         id="ga4_measurement_id"
@@ -6516,190 +6598,6 @@ const Settings: React.FC = () => {
                           {__("Use Measurement Protocol", "yatra")}
                         </Label>
                       </div>
-
-                      <FormField
-                        id="ga4_measurement_id"
-                        label={__("Measurement ID", "yatra")}
-                        description={
-                          <div className="space-y-2">
-                            <p>{__("Your Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX).", "yatra")}</p>
-                            <details className="text-sm">
-                              <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
-                                {__("How to get your Measurement ID:", "yatra")}
-                              </summary>
-                              <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
-                                <li>{__("Go to Google Analytics: analytics.google.com", "yatra")}</li>
-                                <li>{__("Select your GA4 property", "yatra")}</li>
-                                <li>{__("Click 'Admin' (gear icon) in bottom-left", "yatra")}</li>
-                                <li>{__("Under 'Property', click 'Data Streams'", "yatra")}</li>
-                                <li>{__("Select your website data stream", "yatra")}</li>
-                                <li>{__("Your Measurement ID will be at the top (e.g., G-XXXXXXXXXX)", "yatra")}</li>
-                                <li>{__("Copy this Measurement ID and paste it in the field above", "yatra")}</li>
-                              </ol>
-                            </details>
-                            <div className="mt-2">
-                              <a
-                                href="https://analytics.google.com/analytics/web/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
-                              >
-                                {__("Open Google Analytics →", "yatra")}
-                              </a>
-                            </div>
-                          </div>
-                        }
-                      >
-                        <Input
-                          id="ga4_measurement_id"
-                          value={formData.ga4_measurement_id || ""}
-                          name="ga4_measurement_id"
-                          onChange={handleFieldChange}
-                          placeholder="G-XXXXXXXXXX"
-                        />
-                      </FormField>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                          <input
-                            type="checkbox"
-                            id="ga4_track_view_item"
-                            checked={formData.ga4_track_view_item ?? true}
-                            name="ga4_track_view_item"
-                            onChange={handleFieldChange}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <Label
-                            htmlFor="ga4_track_view_item"
-                            className="text-sm cursor-pointer"
-                          >
-                            {__("Track view_item", "yatra")}
-                          </Label>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                          <input
-                            type="checkbox"
-                            id="ga4_track_begin_checkout"
-                            checked={formData.ga4_track_begin_checkout ?? true}
-                            name="ga4_track_begin_checkout"
-                            onChange={handleFieldChange}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <Label
-                            htmlFor="ga4_track_begin_checkout"
-                            className="text-sm cursor-pointer"
-                          >
-                            {__("Track begin_checkout", "yatra")}
-                          </Label>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                          <input
-                            type="checkbox"
-                            id="ga4_track_purchase"
-                            checked={formData.ga4_track_purchase ?? true}
-                            name="ga4_track_purchase"
-                            onChange={handleFieldChange}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <Label
-                            htmlFor="ga4_track_purchase"
-                            className="text-sm cursor-pointer"
-                          >
-                            {__("Track purchase", "yatra")}
-                          </Label>
-                        </div>
-
-                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                          <input
-                            type="checkbox"
-                            id="ga4_use_measurement_protocol"
-                            checked={
-                              formData.ga4_use_measurement_protocol ?? false
-                            }
-                            name="ga4_use_measurement_protocol"
-                            onChange={handleFieldChange}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                          />
-                          <Label
-                            htmlFor="ga4_use_measurement_protocol"
-                            className="text-sm cursor-pointer"
-                          >
-                            {__("Use Measurement Protocol", "yatra")}
-                          </Label>
-                        </div>
-                      </div>
-
-                      {formData.ga4_use_measurement_protocol && (
-                        <FormField
-                          id="ga4_api_secret"
-                          label={__("API Secret", "yatra")}
-                          description={
-                            <div className="space-y-2">
-                              <p>{__("Required for Measurement Protocol. Enables server-side tracking for better accuracy.", "yatra")}</p>
-                              <details className="text-sm">
-                                <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
-                                  {__("How to generate API Secret:", "yatra")}
-                                </summary>
-                                <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
-                                  <li>{__("Go to Google Analytics: analytics.google.com", "yatra")}</li>
-                                  <li>{__("Select your GA4 property", "yatra")}</li>
-                                  <li>{__("Click 'Admin' (gear icon) in bottom-left", "yatra")}</li>
-                                  <li>{__("Under 'Property', click 'Data Streams'", "yatra")}</li>
-                                  <li>{__("Select your website data stream", "yatra")}</li>
-                                  <li>{__("Click 'Configure tag settings' (gear icon)", "yatra")}</li>
-                                  <li>{__("Under 'Google signals', click 'Show all'", "yatra")}</li>
-                                  <li>{__("Find 'Measurement Protocol API secrets' and click 'Create new API secret'", "yatra")}</li>
-                                  <li>{__("Enter a display name for your secret", "yatra")}</li>
-                                  <li>{__("Click 'Create secret'", "yatra")}</li>
-                                  <li>{__("Copy the generated secret value (32-character string)", "yatra")}</li>
-                                  <li>{__("Paste it in the field above", "yatra")}</li>
-                                </ol>
-                                <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
-                                  <p className="text-xs text-yellow-800 dark:text-yellow-300">
-                                    {__("⚠️ Keep your API secret secure and never share it publicly.", "yatra")}
-                                  </p>
-                                </div>
-                              </details>
-                              <div className="mt-2">
-                                <a
-                                  href="https://analytics.google.com/analytics/web/#/aXXXXXXXXXXpXXXXXXXXXX/admin/data-streams"
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
-                                >
-                                  {__("Open Data Streams Settings →", "yatra")}
-                                </a>
-                              </div>
-                            </div>
-                          }
-                        >
-                          <div className="relative">
-                            <Input
-                              id="ga4_api_secret"
-                              type={showGaSecret ? "text" : "password"}
-                              value={formData.ga4_api_secret || ""}
-                              name="ga4_api_secret"
-                              onChange={handleFieldChange}
-                              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                              className="pr-10"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowGaSecret(!showGaSecret)}
-                              className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                              tabIndex={-1}
-                            >
-                              {showGaSecret ? (
-                                <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
-                              )}
-                            </button>
-                          </div>
-                        </FormField>
-                      )}
                     </div>
                   </div>
                 ) : (
@@ -6719,6 +6617,30 @@ const Settings: React.FC = () => {
                       {__("Upgrade to Pro", "yatra")}
                       <ExternalLink className="w-4 h-4" />
                     </a>
+                  </div>
+                )}
+                
+                {/* Google Analytics Monitoring Notice */}
+                {(window as any).yatraAdmin?.googleAnalytics?.measurementId && (
+                  <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <div className="text-sm">
+                        <span className="text-blue-800 dark:text-blue-300 font-medium">{__("Google Analytics Monitoring:", "yatra")}</span>
+                        <span className="text-blue-700 dark:text-blue-400 ml-1">
+                          {__("View event statistics and activity in the ", "yatra")}
+                          <a 
+                            href={`${(window as any).yatraAdmin?.siteUrl || ''}/wp-admin/admin.php?page=yatra&subpage=reports`}
+                            className="underline hover:text-blue-600 dark:hover:text-blue-300 font-medium"
+                          >
+                            {__("Reports page", "yatra")}
+                          </a>
+                          {__(" → Google Analytics 4 tab.", "yatra")}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 )}
               </CardContent>

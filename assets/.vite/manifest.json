@@ -23,6 +23,28 @@
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
+  "_index-B5fPvAqc.js": {
+    "file": "dist/js/index-B5fPvAqc.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-hrdf7Caa.js",
+      "_default-i18n-EdzemK12.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_index-BZn3M6ju.js": {
+    "file": "dist/js/index-BZn3M6ju.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-hrdf7Caa.js",
+      "_default-i18n-EdzemK12.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_index-B_-9Q1Pm.js": {
     "file": "dist/js/index-B_-9Q1Pm.js",
     "name": "index",
@@ -35,8 +57,30 @@
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
+  "_index-C1bUwUdP.js": {
+    "file": "dist/js/index-C1bUwUdP.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-hrdf7Caa.js",
+      "_default-i18n-EdzemK12.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
   "_index-CN7DNpA4.js": {
     "file": "dist/js/index-CN7DNpA4.js",
+    "name": "index",
+    "imports": [
+      "_react-vendor-hrdf7Caa.js",
+      "_default-i18n-EdzemK12.js"
+    ],
+    "css": [
+      "admin/dist/css/index.css"
+    ]
+  },
+  "_index-Cx4y5Ucr.js": {
+    "file": "dist/js/index-Cx4y5Ucr.js",
     "name": "index",
     "imports": [
       "_react-vendor-hrdf7Caa.js",
@@ -140,7 +184,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-hrdf7Caa.js",
-      "_index-CN7DNpA4.js",
+      "_index-C1bUwUdP.js",
       "_default-i18n-EdzemK12.js"
     ]
   },
@@ -187,7 +231,7 @@
     "isEntry": true,
     "imports": [
       "_react-vendor-hrdf7Caa.js",
-      "_index-CN7DNpA4.js",
+      "_index-C1bUwUdP.js",
       "_clsx-DgYk2OaC.js",
       "_default-i18n-EdzemK12.js"
     ]
