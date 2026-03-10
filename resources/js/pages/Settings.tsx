@@ -36,9 +36,11 @@ import {
   Lock,
   CheckCircle,
   XCircle,
+  AlertCircle,
   RefreshCw,
   ExternalLink,
   ChevronRight,
+  Check,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
@@ -2480,6 +2482,289 @@ const Settings: React.FC = () => {
 
   const [formData, setFormData] = useState<SettingsData | null>(null);
   const isInitializedRef = React.useRef(false);
+
+  // Mailchimp state
+  const [mailchimpValidating, setMailchimpValidating] = useState(false);
+  const [mailchimpConnectionStatus, setMailchimpConnectionStatus] = useState<{
+    connected: boolean;
+    error?: string;
+  } | null>(null);
+  const [mailchimpLoadingLists, setMailchimpLoadingLists] = useState(false);
+  const [mailchimpLists, setMailchimpLists] = useState<Array<{
+    id: string;
+    name: string;
+  }>>([]);
+  const [mailchimpMergeFields, setMailchimpMergeFields] = useState<Array<{
+    tag: string;
+    name: string;
+    type: string;
+    required: boolean;
+  }>>([]);
+  const [mailchimpLoadingFields, setMailchimpLoadingFields] = useState(false);
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [validatingApiKey, setValidatingApiKey] = useState(false);
+  const [showFacebookToken, setShowFacebookToken] = useState(false);
+  const [showGaSecret, setShowGaSecret] = useState(false);
+  
+  // Facebook Pixel validation state
+  const [validatingPixel, setValidatingPixel] = useState(false);
+  const [validatingToken, setValidatingToken] = useState(false);
+  const [clearingLogs, setClearingLogs] = useState(false);
+
+  // Facebook Pixel event monitoring functions
+  const getEventStats = () => {
+    const logs = (window as any).yatraAdmin?.facebookPixel?.eventLogs || [];
+    return {
+      success: logs.filter((log: any) => log.status === 'success').length,
+      errors: logs.filter((log: any) => log.status === 'error').length,
+      total: logs.length
+    };
+  };
+  
+  const getRecentEvents = () => {
+    const logs = (window as any).yatraAdmin?.facebookPixel?.eventLogs || [];
+    return logs.slice(-10).reverse(); // Show last 10 events, newest first
+  };
+  
+  const clearPixelLogs = async () => {
+    setClearingLogs(true);
+    try {
+      const response = await apiClient.delete('/facebook-pixel/event-logs');
+      if (response.success) {
+        showToast(__('Event logs cleared successfully.', 'yatra'), 'success');
+        // Update local state to clear logs without page reload
+        if ((window as any).yatraAdmin?.facebookPixel) {
+          (window as any).yatraAdmin.facebookPixel.eventLogs = [];
+        }
+      }
+    } catch (error: any) {
+      showToast(error.message || __('Failed to clear logs.', 'yatra'), 'error');
+    } finally {
+      setClearingLogs(false);
+    }
+  };
+
+  // Mailchimp functions
+  const validateMailchimpApiKey = async () => {
+    if (!formData?.mailchimp_api_key) return;
+    
+    setValidatingApiKey(true);
+    try {
+      const response = await apiClient.post("/mailchimp/test", {
+        api_key: formData.mailchimp_api_key
+      });
+      
+      if (response.success) {
+        // Update the yatraAdmin object with new connection status
+        const updatedMailchimpData = {
+          ...(window as any).yatraAdmin?.mailchimp || {},
+          connectionStatus: {
+            connected: true,
+            error: null
+          }
+        };
+        
+        // Update the global yatraAdmin object
+        if ((window as any).yatraAdmin) {
+          (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
+        }
+        
+        // Update local connection status
+        setMailchimpConnectionStatus({
+          connected: true,
+          error: null
+        });
+        
+        // Load lists after successful validation
+        await loadMailchimpLists();
+      }
+    } catch (error: any) {
+      // Update connection status with error
+      const updatedMailchimpData = {
+        ...(window as any).yatraAdmin?.mailchimp || {},
+        connectionStatus: {
+          connected: false,
+          error: error.message || __("Invalid API key", "yatra")
+        }
+      };
+      
+      if ((window as any).yatraAdmin) {
+        (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
+      }
+      
+      // Update local connection status
+      setMailchimpConnectionStatus({
+        connected: false,
+        error: error.message || __("Invalid API key", "yatra")
+      });
+      
+      console.error("API key validation failed:", error);
+    } finally {
+      setValidatingApiKey(false);
+    }
+  };
+
+  const loadMailchimpLists = async () => {
+    setMailchimpLoadingLists(true);
+    try {
+      const response = await apiClient.get("/mailchimp/lists");
+      
+      if (response.success && response.data) {
+        setMailchimpLists(response.data);
+        
+        // Update the yatraAdmin object with available lists
+        const updatedMailchimpData = {
+          ...(window as any).yatraAdmin?.mailchimp || {},
+          availableLists: response.data
+        };
+        
+        if ((window as any).yatraAdmin) {
+          (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
+        }
+      }
+    } catch (error: any) {
+      console.error("Error loading Mailchimp lists:", error);
+      setMailchimpLists([]);
+    } finally {
+      setMailchimpLoadingLists(false);
+    }
+  };
+
+  const loadMailchimpMergeFields = async (listId: string) => {
+    if (!listId) {
+      setMailchimpMergeFields([]);
+      return;
+    }
+    
+    setMailchimpLoadingFields(true);
+    try {
+      const response = await apiClient.get(`/mailchimp/lists/${listId}/merge-fields`);
+      
+      if (response.success && response.data) {
+        setMailchimpMergeFields(response.data);
+        
+        // Update the yatraAdmin object with merge fields
+        const updatedMailchimpData = {
+          ...(window as any).yatraAdmin?.mailchimp || {},
+          mergeFields: response.data
+        };
+        
+        if ((window as any).yatraAdmin) {
+          (window as any).yatraAdmin.mailchimp = updatedMailchimpData;
+        }
+      }
+    } catch (error: any) {
+      console.error("Error loading Mailchimp merge fields:", error);
+      setMailchimpMergeFields([]);
+    } finally {
+      setMailchimpLoadingFields(false);
+    }
+  };
+
+  // Load merge fields when list is selected
+  React.useEffect(() => {
+    if (formData?.mailchimp_list_id && mailchimpConnectionStatus?.connected) {
+      loadMailchimpMergeFields(formData.mailchimp_list_id);
+    }
+  }, [formData?.mailchimp_list_id, mailchimpConnectionStatus?.connected]);
+
+  // Initialize local connection status from global state
+  React.useEffect(() => {
+    if ((window as any).yatraAdmin?.mailchimp?.connectionStatus) {
+      setMailchimpConnectionStatus((window as any).yatraAdmin.mailchimp.connectionStatus);
+    }
+  }, []);
+
+  // Facebook Pixel validation functions
+  const validateFacebookPixel = async () => {
+    if (!formData?.facebook_pixel_id) return;
+    
+    setValidatingPixel(true);
+    try {
+      const response = await apiClient.post("/facebook-pixel/test", {
+        pixel_id: formData.facebook_pixel_id
+      });
+      
+      if (response.success) {
+        // Update the yatraAdmin object with new connection status
+        const updatedFacebookPixelData = {
+          ...(window as any).yatraAdmin?.facebookPixel || {},
+          connectionStatus: {
+            ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+            pixelConnected: true,
+            pixelError: null
+          }
+        };
+        
+        if ((window as any).yatraAdmin) {
+          (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
+        }
+      }
+    } catch (error: any) {
+      // Update connection status with error
+      const updatedFacebookPixelData = {
+        ...(window as any).yatraAdmin?.facebookPixel || {},
+        connectionStatus: {
+          ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+          pixelConnected: false,
+          pixelError: error.message || __("Invalid Pixel ID", "yatra")
+        }
+      };
+      
+      if ((window as any).yatraAdmin) {
+        (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
+      }
+      
+      console.error("Pixel validation failed:", error);
+    } finally {
+      setValidatingPixel(false);
+    }
+  };
+
+  const validateFacebookToken = async () => {
+    if (!formData?.facebook_access_token) return;
+    
+    setValidatingToken(true);
+    try {
+      const response = await apiClient.post("/facebook-pixel/test-token", {
+        access_token: formData.facebook_access_token
+      });
+      
+      if (response.success) {
+        // Update the yatraAdmin object with new connection status
+        const updatedFacebookPixelData = {
+          ...(window as any).yatraAdmin?.facebookPixel || {},
+          connectionStatus: {
+            ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+            tokenConnected: true,
+            tokenError: null
+          }
+        };
+        
+        if ((window as any).yatraAdmin) {
+          (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
+        }
+      }
+    } catch (error: any) {
+      // Update connection status with error
+      const updatedFacebookPixelData = {
+        ...(window as any).yatraAdmin?.facebookPixel || {},
+        connectionStatus: {
+          ...(window as any).yatraAdmin?.facebookPixel?.connectionStatus || {},
+          tokenConnected: false,
+          tokenError: error.message || __("Invalid access token", "yatra")
+        }
+      };
+      
+      if ((window as any).yatraAdmin) {
+        (window as any).yatraAdmin.facebookPixel = updatedFacebookPixelData;
+      }
+      
+      console.error("Access token validation failed:", error);
+    } finally {
+      setValidatingToken(false);
+    }
+  };
 
   // Initialize form data only once - merge API settings with defaults
   React.useEffect(() => {
@@ -5429,7 +5714,7 @@ const Settings: React.FC = () => {
                     </span>
                   )}
                 </CardTitle>
-                {(window as any).yatraAdmin?.mailchimpConnected ? (
+                {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
                     {__("Connected", "yatra")}
@@ -5468,31 +5753,99 @@ const Settings: React.FC = () => {
                         </>
                       }
                     >
-                      <Input
-                        id="mailchimp_api_key"
-                        type="password"
-                        value={formData.mailchimp_api_key || ""}
-                        name="mailchimp_api_key"
-                        onChange={handleFieldChange}
-                        placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"
-                      />
+                      <div className="flex gap-2">
+                        <div className="relative flex-1">
+                          <Input
+                            id="mailchimp_api_key"
+                            type={showApiKey ? "text" : "password"}
+                            value={formData.mailchimp_api_key || ""}
+                            name="mailchimp_api_key"
+                            onChange={handleFieldChange}
+                            placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-us1"
+                            className="pr-10"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowApiKey(!showApiKey)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            tabIndex={-1}
+                          >
+                            {showApiKey ? (
+                              <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                            )}
+                          </button>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={validateMailchimpApiKey}
+                          disabled={!formData.mailchimp_api_key || validatingApiKey}
+                          className="whitespace-nowrap"
+                        >
+                          {validatingApiKey ? (
+                            <>
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              {__("Validating...", "yatra")}
+                            </>
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              {__("Validate", "yatra")}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      {formData.mailchimp_api_key && (
+                        <div className={`mt-2 text-sm ${(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                          {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 inline mr-1" />
+                              {__("Connected successfully!", "yatra")}
+                            </>
+                          ) : (window as any).yatraAdmin?.mailchimp?.connectionStatus?.error ? (
+                            <>
+                              <XCircle className="h-4 w-4 inline mr-1" />
+                              {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.error}
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="h-4 w-4 inline mr-1" />
+                              {__("API key entered. Click 'Validate' to test connection.", "yatra")}
+                            </>
+                          )}
+                        </div>
+                      )}
                     </FormField>
 
                     <FormField
                       id="mailchimp_list_id"
-                      label={__("Audience/List ID", "yatra")}
+                      label={__("Audience/List", "yatra")}
                       description={__(
-                        "The ID of the Mailchimp audience to sync subscribers to.",
+                        "Select the Mailchimp audience to sync subscribers to.",
                         "yatra",
                       )}
                     >
-                      <Input
+                      <Select
                         id="mailchimp_list_id"
                         value={formData.mailchimp_list_id || ""}
                         name="mailchimp_list_id"
                         onChange={handleFieldChange}
-                        placeholder="abc123def4"
-                      />
+                        disabled={!(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected}
+                      >
+                        <option value="">
+                          {!(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected
+                            ? __("Please validate API key first", "yatra")
+                            : __("Select an audience", "yatra")}
+                        </option>
+                        {(window as any).yatraAdmin?.mailchimp?.availableLists?.map((list: any) => (
+                          <option key={list.id} value={list.id}>
+                            {list.name}
+                          </option>
+                        ))}
+                      </Select>
                     </FormField>
 
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -5561,145 +5914,55 @@ const Settings: React.FC = () => {
                           </p>
 
                           <div className="space-y-3">
-                            {/* First Name Mapping */}
-                            <div className="grid grid-cols-2 gap-3 items-center">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                                {__("First Name", "yatra")}
+                            {(window as any).yatraAdmin?.mailchimp?.mergeFields?.length > 0 ? (
+                              (window as any).yatraAdmin?.mailchimp?.mergeFields.map((field: any) => {
+                                const currentMapping = (formData as any).mailchimp_field_mapping || {};
+                                const yatraFields = (window as any).yatraAdmin?.mailchimp?.yatraFields || {};
+                                const yatraFieldOptions = yatraFields[field.type] || yatraFields['text'] || [];
+                                
+                                return (
+                                  <div key={field.tag} className="grid grid-cols-2 gap-3 items-center">
+                                    <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
+                                      <div className="flex items-center gap-2">
+                                        <span>{field.name}</span>
+                                        {field.required && (
+                                          <span className="text-xs text-red-500">*</span>
+                                        )}
+                                        <span className="text-xs text-gray-400">({field.tag})</span>
+                                      </div>
+                                    </div>
+                                    <Select
+                                      value={currentMapping[field.tag] || ""}
+                                      onChange={(e) => {
+                                        const newMapping = { ...(formData as any).mailchimp_field_mapping || {} };
+                                        if (e.target.value) {
+                                          newMapping[field.tag] = e.target.value;
+                                        } else {
+                                          delete newMapping[field.tag];
+                                        }
+                                        setFormData((prev: any) => ({
+                                          ...prev,
+                                          mailchimp_field_mapping: newMapping,
+                                        }));
+                                      }}
+                                    >
+                                      <option value="">
+                                        {__("Do not sync", "yatra")}
+                                      </option>
+                                      {Object.entries(yatraFieldOptions).map(([value, label]) => (
+                                        <option key={value} value={value}>
+                                          {label}
+                                        </option>
+                                      ))}
+                                    </Select>
+                                  </div>
+                                );
+                              })
+                            ) : (
+                              <div className="text-center py-4 text-sm text-gray-500 dark:text-gray-400">
+                                {__("No merge fields available. Please select a list first.", "yatra")}
                               </div>
-                              <Select
-                                value={
-                                  (formData as any).mailchimp_field_mapping
-                                    ?.FNAME || "first_name"
-                                }
-                                onChange={(e) => {
-                                  const currentMapping =
-                                    (formData as any).mailchimp_field_mapping ||
-                                    {};
-                                  setFormData((prev: any) => ({
-                                    ...prev,
-                                    mailchimp_field_mapping: {
-                                      ...currentMapping,
-                                      FNAME: e.target.value,
-                                    },
-                                  }));
-                                }}
-                              >
-                                <option value="first_name">
-                                  {__("Customer First Name", "yatra")}
-                                </option>
-                                <option value="billing_first_name">
-                                  {__("Billing First Name", "yatra")}
-                                </option>
-                                <option value="">
-                                  {__("Do not sync", "yatra")}
-                                </option>
-                              </Select>
-                            </div>
-
-                            {/* Last Name Mapping */}
-                            <div className="grid grid-cols-2 gap-3 items-center">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                                {__("Last Name", "yatra")}
-                              </div>
-                              <Select
-                                value={
-                                  (formData as any).mailchimp_field_mapping
-                                    ?.LNAME || "last_name"
-                                }
-                                onChange={(e) => {
-                                  const currentMapping =
-                                    (formData as any).mailchimp_field_mapping ||
-                                    {};
-                                  setFormData((prev: any) => ({
-                                    ...prev,
-                                    mailchimp_field_mapping: {
-                                      ...currentMapping,
-                                      LNAME: e.target.value,
-                                    },
-                                  }));
-                                }}
-                              >
-                                <option value="last_name">
-                                  {__("Customer Last Name", "yatra")}
-                                </option>
-                                <option value="billing_last_name">
-                                  {__("Billing Last Name", "yatra")}
-                                </option>
-                                <option value="">
-                                  {__("Do not sync", "yatra")}
-                                </option>
-                              </Select>
-                            </div>
-
-                            {/* Phone Mapping */}
-                            <div className="grid grid-cols-2 gap-3 items-center">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                                {__("Phone", "yatra")}
-                              </div>
-                              <Select
-                                value={
-                                  (formData as any).mailchimp_field_mapping
-                                    ?.PHONE || "phone"
-                                }
-                                onChange={(e) => {
-                                  const currentMapping =
-                                    (formData as any).mailchimp_field_mapping ||
-                                    {};
-                                  setFormData((prev: any) => ({
-                                    ...prev,
-                                    mailchimp_field_mapping: {
-                                      ...currentMapping,
-                                      PHONE: e.target.value,
-                                    },
-                                  }));
-                                }}
-                              >
-                                <option value="phone">
-                                  {__("Customer Phone", "yatra")}
-                                </option>
-                                <option value="billing_phone">
-                                  {__("Billing Phone", "yatra")}
-                                </option>
-                                <option value="">
-                                  {__("Do not sync", "yatra")}
-                                </option>
-                              </Select>
-                            </div>
-
-                            {/* Country Mapping */}
-                            <div className="grid grid-cols-2 gap-3 items-center">
-                              <div className="text-sm text-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded">
-                                {__("Country", "yatra")}
-                              </div>
-                              <Select
-                                value={
-                                  (formData as any).mailchimp_field_mapping
-                                    ?.COUNTRY || "country"
-                                }
-                                onChange={(e) => {
-                                  const currentMapping =
-                                    (formData as any).mailchimp_field_mapping ||
-                                    {};
-                                  setFormData((prev: any) => ({
-                                    ...prev,
-                                    mailchimp_field_mapping: {
-                                      ...currentMapping,
-                                      COUNTRY: e.target.value,
-                                    },
-                                  }));
-                                }}
-                              >
-                                <option value="country">
-                                  {__("Customer Country", "yatra")}
-                                </option>
-                                <option value="billing_country">
-                                  {__("Billing Country", "yatra")}
-                                </option>
-                                <option value="">
-                                  {__("Do not sync", "yatra")}
-                                </option>
-                              </Select>
-                            </div>
+                            )}
                           </div>
 
                           {/* Tags Configuration */}
@@ -5802,7 +6065,7 @@ const Settings: React.FC = () => {
                     </span>
                   )}
                 </CardTitle>
-                {(window as any).yatraAdmin?.facebookPixel?.connected ? (
+                {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
                     <CheckCircle className="w-4 h-4" />
                     {__("Connected", "yatra")}
@@ -5828,26 +6091,87 @@ const Settings: React.FC = () => {
                       id="facebook_pixel_id"
                       label={__("Pixel ID", "yatra")}
                       description={
-                        <>
-                          {__("Get your Pixel ID from", "yatra")}{" "}
-                          <a
-                            href="https://business.facebook.com/events_manager"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline"
-                          >
-                            {__("Facebook Events Manager", "yatra")}
-                          </a>
-                        </>
+                        <div className="space-y-2">
+                          <p>{__("Your Facebook Pixel ID (e.g., 123456789012345).", "yatra")}</p>
+                          <details className="text-sm">
+                            <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
+                              {__("How to get your Pixel ID:", "yatra")}
+                            </summary>
+                            <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
+                              <li>{__("Go to Facebook Business Manager: business.facebook.com", "yatra")}</li>
+                              <li>{__("Select your Business Account", "yatra")}</li>
+                              <li>{__("Click 'All tools' and select 'Pixels'", "yatra")}</li>
+                              <li>{__("Click 'Add Pixel' if you don't have one", "yatra")}</li>
+                              <li>{__("Enter a Pixel name and enter your website URL", "yatra")}</li>
+                              <li>{__("Click 'Create Pixel'", "yatra")}</li>
+                              <li>{__("Your Pixel ID will be displayed (e.g., 123456789012345)", "yatra")}</li>
+                              <li>{__("Copy this Pixel ID and paste it in the field above", "yatra")}</li>
+                            </ol>
+                          </details>
+                          <div className="mt-2">
+                            <a
+                              href="https://business.facebook.com/events_manager"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
+                            >
+                              {__("Open Facebook Events Manager →", "yatra")}
+                            </a>
+                          </div>
+                        </div>
                       }
                     >
-                      <Input
-                        id="facebook_pixel_id"
-                        value={formData.facebook_pixel_id || ""}
-                        name="facebook_pixel_id"
-                        onChange={handleFieldChange}
-                        placeholder="123456789012345"
-                      />
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          <Input
+                            id="facebook_pixel_id"
+                            value={formData.facebook_pixel_id || ""}
+                            name="facebook_pixel_id"
+                            onChange={handleFieldChange}
+                            placeholder="123456789012345"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          onClick={validateFacebookPixel}
+                          disabled={!formData.facebook_pixel_id || validatingPixel}
+                          variant="outline"
+                          size="sm"
+                          className="whitespace-nowrap"
+                        >
+                          {validatingPixel ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              {__("Validating...", "yatra")}
+                            </>
+                          ) : (
+                            <>
+                              <Check className="h-4 w-4 mr-2" />
+                              {__("Validate", "yatra")}
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                      {formData.facebook_pixel_id && (
+                        <div className={`mt-2 text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                          {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 inline mr-1" />
+                              {__("Pixel ID is valid!", "yatra")}
+                            </>
+                          ) : (window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelError ? (
+                            <>
+                              <XCircle className="h-4 w-4 inline mr-1" />
+                              {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelError}
+                            </>
+                          ) : (
+                            <>
+                              <AlertCircle className="h-4 w-4 inline mr-1" />
+                              {__("Click 'Validate' to test Pixel ID.", "yatra")}
+                            </>
+                          )}
+                        </div>
+                      )}
                     </FormField>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -5924,19 +6248,111 @@ const Settings: React.FC = () => {
                       <FormField
                         id="facebook_access_token"
                         label={__("Access Token", "yatra")}
-                        description={__(
-                          "Required for server-side Conversions API tracking.",
-                          "yatra",
-                        )}
+                        description={
+                          <div className="space-y-2">
+                            <p>{__("Required for Conversions API. Enables server-side tracking for better accuracy.", "yatra")}</p>
+                            <details className="text-sm">
+                              <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
+                                {__("How to get Access Token:", "yatra")}
+                              </summary>
+                              <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
+                                <li>{__("Go to Facebook Business Manager: business.facebook.com", "yatra")}</li>
+                                <li>{__("Select your Business Account", "yatra")}</li>
+                                <li>{__("Click 'All tools' and select 'Events Manager'", "yatra")}</li>
+                                <li>{__("Select your Pixel from the list", "yatra")}</li>
+                                <li>{__("Click 'Settings' (gear icon) for your Pixel", "yatra")}</li>
+                                <li>{__("Under 'Conversions API', click 'Generate access token'", "yatra")}</li>
+                                <li>{__("Choose permissions: 'ads_management' and 'business_management'", "yatra")}</li>
+                                <li>{__("Click 'Generate token'", "yatra")}</li>
+                                <li>{__("Copy the generated token (starts with 'EAAC...')", "yatra")}</li>
+                                <li>{__("Paste it in the field above", "yatra")}</li>
+                              </ol>
+                              <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+                                <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                                  {__("⚠️ Keep your access token secure and never share it publicly.", "yatra")}
+                                </p>
+                              </div>
+                            </details>
+                            <div className="mt-2">
+                              <a
+                                href="https://business.facebook.com/settings/conversions-api"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
+                              >
+                                {__("Open Conversions API Settings →", "yatra")}
+                              </a>
+                            </div>
+                          </div>
+                        }
                       >
-                        <Input
-                          id="facebook_access_token"
-                          type="password"
-                          value={formData.facebook_access_token || ""}
-                          name="facebook_access_token"
-                          onChange={handleFieldChange}
-                          placeholder="EAAxxxxxxx..."
-                        />
+                        <div className="space-y-2">
+                          <div className="flex gap-2">
+                            <div className="flex-1 relative">
+                              <Input
+                                id="facebook_access_token"
+                                type={showFacebookToken ? "text" : "password"}
+                                value={formData.facebook_access_token || ""}
+                                name="facebook_access_token"
+                                onChange={handleFieldChange}
+                                placeholder="EAAC..."
+                                className="pr-10"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setShowFacebookToken(!showFacebookToken)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                tabIndex={-1}
+                              >
+                                {showFacebookToken ? (
+                                  <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                                ) : (
+                                  <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                                )}
+                              </button>
+                            </div>
+                            <Button
+                              type="button"
+                              onClick={validateFacebookToken}
+                              disabled={!formData.facebook_access_token || validatingToken}
+                              variant="outline"
+                              size="sm"
+                              className="whitespace-nowrap"
+                            >
+                              {validatingToken ? (
+                                <>
+                                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                  {__("Validating...", "yatra")}
+                                </>
+                              ) : (
+                                <>
+                                  <Check className="h-4 w-4 mr-2" />
+                                  {__("Validate", "yatra")}
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                          {formData.facebook_access_token && (
+                            <div className={`text-sm ${(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenConnected ? 'text-green-600 dark:text-green-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                              {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenConnected ? (
+                                <>
+                                  <CheckCircle className="h-4 w-4 inline mr-1" />
+                                  {__("Access token is valid!", "yatra")}
+                                </>
+                              ) : (window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenError ? (
+                                <>
+                                  <XCircle className="h-4 w-4 inline mr-1" />
+                                  {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.tokenError}
+                                </>
+                              ) : (
+                                <>
+                                  <AlertCircle className="h-4 w-4 inline mr-1" />
+                                  {__("Click 'Validate' to test access token.", "yatra")}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </FormField>
                     )}
                   </div>
@@ -5957,6 +6373,96 @@ const Settings: React.FC = () => {
                       {__("Upgrade to Pro", "yatra")}
                       <ExternalLink className="w-4 h-4" />
                     </a>
+                  </div>
+                )}
+                
+                {/* Event Monitoring - Show when Facebook Pixel is configured */}
+                {(window as any).yatraAdmin?.facebookPixel?.pixelId && (
+                  <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {__("Event Monitoring", "yatra")}
+                      </h4>
+                      <Button
+                        type="button"
+                        onClick={() => clearPixelLogs()}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        disabled={clearingLogs}
+                      >
+                        {clearingLogs ? __("Clearing...", "yatra") : __("Clear Logs", "yatra")}
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      {/* Event Stats */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                          <div className="text-lg font-bold text-green-600 dark:text-green-400">
+                            {getEventStats().success}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {__("Success", "yatra")}
+                          </div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                          <div className="text-lg font-bold text-red-600 dark:text-red-400">
+                            {getEventStats().errors}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {__("Failed", "yatra")}
+                          </div>
+                        </div>
+                        <div className="text-center p-3 bg-white dark:bg-gray-700 rounded border border-gray-200 dark:border-gray-600">
+                          <div className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                            {getEventStats().total}
+                          </div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {__("Total", "yatra")}
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Recent Events */}
+                      {getRecentEvents().length > 0 && (
+                        <div>
+                          <h5 className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            {__("Recent Activity", "yatra")}
+                          </h5>
+                          <div className="space-y-1 max-h-48 overflow-y-auto">
+                            {getRecentEvents().map((log: any, index: number) => (
+                              <div key={index} className="flex items-center justify-between text-xs p-2 bg-white dark:bg-gray-700 rounded border border-gray-100 dark:border-gray-600">
+                                <div className="flex items-center gap-2">
+                                  {log.status === 'success' && (
+                                    <CheckCircle className="w-3 h-3 text-green-500" />
+                                  )}
+                                  {log.status === 'error' && (
+                                    <XCircle className="w-3 h-3 text-red-500" />
+                                  )}
+                                  {log.status === 'logged' && (
+                                    <AlertCircle className="w-3 h-3 text-blue-500" />
+                                  )}
+                                  <span className="font-medium">{log.event_name}</span>
+                                </div>
+                                <span className="text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                                  {new Date(log.timestamp).toLocaleTimeString()}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      
+                      {getRecentEvents().length === 0 && (
+                        <div className="text-center py-8 text-sm text-gray-500 dark:text-gray-400">
+                          <p>{__("No events tracked yet.", "yatra")}</p>
+                          <p className="text-xs mt-1">
+                            {__("Events will appear here once users start interacting with your site.", "yatra")}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
               </CardContent>
@@ -6102,27 +6608,191 @@ const Settings: React.FC = () => {
                           {__("Use Measurement Protocol", "yatra")}
                         </Label>
                       </div>
-                    </div>
 
-                    {formData.ga4_use_measurement_protocol && (
                       <FormField
-                        id="ga4_api_secret"
-                        label={__("API Secret", "yatra")}
-                        description={__(
-                          "Required for server-side Measurement Protocol tracking. Create in GA4 Admin > Data Streams > Measurement Protocol API secrets.",
-                          "yatra",
-                        )}
+                        id="ga4_measurement_id"
+                        label={__("Measurement ID", "yatra")}
+                        description={
+                          <div className="space-y-2">
+                            <p>{__("Your Google Analytics 4 Measurement ID (e.g., G-XXXXXXXXXX).", "yatra")}</p>
+                            <details className="text-sm">
+                              <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
+                                {__("How to get your Measurement ID:", "yatra")}
+                              </summary>
+                              <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
+                                <li>{__("Go to Google Analytics: analytics.google.com", "yatra")}</li>
+                                <li>{__("Select your GA4 property", "yatra")}</li>
+                                <li>{__("Click 'Admin' (gear icon) in bottom-left", "yatra")}</li>
+                                <li>{__("Under 'Property', click 'Data Streams'", "yatra")}</li>
+                                <li>{__("Select your website data stream", "yatra")}</li>
+                                <li>{__("Your Measurement ID will be at the top (e.g., G-XXXXXXXXXX)", "yatra")}</li>
+                                <li>{__("Copy this Measurement ID and paste it in the field above", "yatra")}</li>
+                              </ol>
+                            </details>
+                            <div className="mt-2">
+                              <a
+                                href="https://analytics.google.com/analytics/web/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
+                              >
+                                {__("Open Google Analytics →", "yatra")}
+                              </a>
+                            </div>
+                          </div>
+                        }
                       >
                         <Input
-                          id="ga4_api_secret"
-                          type="password"
-                          value={formData.ga4_api_secret || ""}
-                          name="ga4_api_secret"
+                          id="ga4_measurement_id"
+                          value={formData.ga4_measurement_id || ""}
+                          name="ga4_measurement_id"
                           onChange={handleFieldChange}
-                          placeholder="xxxxxxxxxxxxxxxx"
+                          placeholder="G-XXXXXXXXXX"
                         />
                       </FormField>
-                    )}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                          <input
+                            type="checkbox"
+                            id="ga4_track_view_item"
+                            checked={formData.ga4_track_view_item ?? true}
+                            name="ga4_track_view_item"
+                            onChange={handleFieldChange}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <Label
+                            htmlFor="ga4_track_view_item"
+                            className="text-sm cursor-pointer"
+                          >
+                            {__("Track view_item", "yatra")}
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                          <input
+                            type="checkbox"
+                            id="ga4_track_begin_checkout"
+                            checked={formData.ga4_track_begin_checkout ?? true}
+                            name="ga4_track_begin_checkout"
+                            onChange={handleFieldChange}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <Label
+                            htmlFor="ga4_track_begin_checkout"
+                            className="text-sm cursor-pointer"
+                          >
+                            {__("Track begin_checkout", "yatra")}
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                          <input
+                            type="checkbox"
+                            id="ga4_track_purchase"
+                            checked={formData.ga4_track_purchase ?? true}
+                            name="ga4_track_purchase"
+                            onChange={handleFieldChange}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <Label
+                            htmlFor="ga4_track_purchase"
+                            className="text-sm cursor-pointer"
+                          >
+                            {__("Track purchase", "yatra")}
+                          </Label>
+                        </div>
+
+                        <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                          <input
+                            type="checkbox"
+                            id="ga4_use_measurement_protocol"
+                            checked={
+                              formData.ga4_use_measurement_protocol ?? false
+                            }
+                            name="ga4_use_measurement_protocol"
+                            onChange={handleFieldChange}
+                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <Label
+                            htmlFor="ga4_use_measurement_protocol"
+                            className="text-sm cursor-pointer"
+                          >
+                            {__("Use Measurement Protocol", "yatra")}
+                          </Label>
+                        </div>
+                      </div>
+
+                      {formData.ga4_use_measurement_protocol && (
+                        <FormField
+                          id="ga4_api_secret"
+                          label={__("API Secret", "yatra")}
+                          description={
+                            <div className="space-y-2">
+                              <p>{__("Required for Measurement Protocol. Enables server-side tracking for better accuracy.", "yatra")}</p>
+                              <details className="text-sm">
+                                <summary className="cursor-pointer text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium">
+                                  {__("How to generate API Secret:", "yatra")}
+                                </summary>
+                                <ol className="mt-2 ml-4 list-decimal space-y-1 text-gray-600 dark:text-gray-400">
+                                  <li>{__("Go to Google Analytics: analytics.google.com", "yatra")}</li>
+                                  <li>{__("Select your GA4 property", "yatra")}</li>
+                                  <li>{__("Click 'Admin' (gear icon) in bottom-left", "yatra")}</li>
+                                  <li>{__("Under 'Property', click 'Data Streams'", "yatra")}</li>
+                                  <li>{__("Select your website data stream", "yatra")}</li>
+                                  <li>{__("Click 'Configure tag settings' (gear icon)", "yatra")}</li>
+                                  <li>{__("Under 'Google signals', click 'Show all'", "yatra")}</li>
+                                  <li>{__("Find 'Measurement Protocol API secrets' and click 'Create new API secret'", "yatra")}</li>
+                                  <li>{__("Enter a display name for your secret", "yatra")}</li>
+                                  <li>{__("Click 'Create secret'", "yatra")}</li>
+                                  <li>{__("Copy the generated secret value (32-character string)", "yatra")}</li>
+                                  <li>{__("Paste it in the field above", "yatra")}</li>
+                                </ol>
+                                <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+                                  <p className="text-xs text-yellow-800 dark:text-yellow-300">
+                                    {__("⚠️ Keep your API secret secure and never share it publicly.", "yatra")}
+                                  </p>
+                                </div>
+                              </details>
+                              <div className="mt-2">
+                                <a
+                                  href="https://analytics.google.com/analytics/web/#/aXXXXXXXXXXpXXXXXXXXXX/admin/data-streams"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-500 dark:text-blue-400 underline text-sm"
+                                >
+                                  {__("Open Data Streams Settings →", "yatra")}
+                                </a>
+                              </div>
+                            </div>
+                          }
+                        >
+                          <div className="relative">
+                            <Input
+                              id="ga4_api_secret"
+                              type={showGaSecret ? "text" : "password"}
+                              value={formData.ga4_api_secret || ""}
+                              name="ga4_api_secret"
+                              onChange={handleFieldChange}
+                              placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                              className="pr-10"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowGaSecret(!showGaSecret)}
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                              tabIndex={-1}
+                            >
+                              {showGaSecret ? (
+                                <EyeOff className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-gray-400 hover:text-gray-600" />
+                              )}
+                            </button>
+                          </div>
+                        </FormField>
+                      )}
+                    </div>
                   </div>
                 ) : (
                   <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">

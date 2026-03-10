@@ -518,6 +518,9 @@ class BookingSessionController extends BaseController
 
         // Set session
         yatra_set_booking_session($session_data);
+        
+        // Fire hook when trip is added to booking session (for Pro modules)
+        do_action('yatra_trip_added_to_session', $session_data['trip_id'], $session_data);
 
         // Get redirect URL - session has all data, no need for URL params
         $redirect_url = yatra_get_checkout_url();

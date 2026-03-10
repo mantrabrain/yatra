@@ -40,6 +40,9 @@ $status_colors = [
 $status_style = $status_colors[$booking->status] ?? $status_colors['pending'];
 
 yatra_get_header();
+
+// Hook for Pro modules to add custom scripts (Facebook Pixel, etc.)
+do_action('yatra_booking_confirmation_header', $booking);
 ?>
 
 <div class="yatra-wrapper yatra-confirmation-wrapper">

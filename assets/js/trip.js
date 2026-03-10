@@ -2989,6 +2989,23 @@
      * Proceed to booking - creates session and redirects
      */
     proceedToBooking(btn, originalText, sessionPayload) {
+      // Track Book Now click as InitiateCheckout (Facebook Pixel)
+      if (typeof fbq !== 'undefined' && window.yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected) {
+        const tripData = this.getTripData();
+        const totalPrice = this.calculateTotalPrice();
+        
+        fbq('track', 'InitiateCheckout', {
+          content_name: tripData.title || 'Trip',
+          content_ids: [sessionPayload.trip_id],
+          content_type: 'product',
+          value: totalPrice,
+          currency: window.yatraBookingData?.currency || 'USD',
+          num_items: sessionPayload.travelers || 1
+        });
+        
+        console.log('[Facebook Pixel] InitiateCheckout tracked for trip:', sessionPayload.trip_id);
+      }
+      
       // Set booking session via REST API
       // credentials: 'same-origin' is required to send cookies for session
       const { base: baseUrl, isPlain } = getRestBase();
