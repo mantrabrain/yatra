@@ -55,7 +55,6 @@ declare global {
         trackViewContent?: boolean;
         trackInitiateCheckout?: boolean;
         trackPurchase?: boolean;
-        trackAddToCart?: boolean;
         useConversionsApi?: boolean;
         testEventCode?: string;
         eventConfig?: Record<
@@ -68,7 +67,6 @@ declare global {
         connected?: boolean;
         measurementId?: string;
         trackViewItem?: boolean;
-        trackAddToCart?: boolean;
         trackBeginCheckout?: boolean;
         trackPurchase?: boolean;
         useMeasurementProtocol?: boolean;
