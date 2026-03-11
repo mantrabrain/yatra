@@ -36,6 +36,12 @@ interface Category {
   parent_id?: number | null;
   parent_name?: string | null;
   status: string;
+  metadata?: {
+    seo_title?: string;
+    seo_description?: string;
+    seo_keywords?: string;
+    [key: string]: any;
+  };
   created_at: string;
   updated_at: string;
   created_by: number;
@@ -76,6 +82,9 @@ export const Categories: React.FC = () => {
       description: true,
       trips: true,
       status: true,
+      seo_title: false,
+      seo_description: false,
+      seo_keywords: false,
       created_at: true,
     };
     const saved = localStorage.getItem("yatra_categories_columns");
@@ -161,6 +170,7 @@ export const Categories: React.FC = () => {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey],
     };
+    
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra_categories_columns",
@@ -568,7 +578,7 @@ export const Categories: React.FC = () => {
     sortOrder !== "asc";
 
   // Define columns for the shared table
-  const columns = [
+  const columns = useMemo(() => [
     {
       key: "name",
       label: __("Name", "yatra"),
@@ -632,10 +642,89 @@ export const Categories: React.FC = () => {
       visible: visibleColumns.description,
     },
     {
+      key: "seo_title",
+      label: __("SEO Title", "yatra"),
+      visible: visibleColumns.seo_title,
+      render: (category: Category) => {
+        return (
+          <span
+            className={
+              category.status === "trash"
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-gray-600 dark:text-gray-400"
+            }
+          >
+            {category.metadata?.seo_title || __("Not set", "yatra")}
+          </span>
+        );
+      },
+    },
+    {
+      key: "seo_description",
+      label: __("SEO Description", "yatra"),
+      visible: visibleColumns.seo_description,
+      render: (category: Category) => {
+        return (
+          <span
+            className={
+              category.status === "trash"
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-gray-600 dark:text-gray-400"
+            }
+            title={category.metadata?.seo_description || ""}
+          >
+            {category.metadata?.seo_description 
+              ? (category.metadata.seo_description.length > 50 
+                  ? category.metadata.seo_description.substring(0, 50) + "..."
+                  : category.metadata.seo_description)
+              : __("Not set", "yatra")}
+          </span>
+        );
+      },
+    },
+    {
+      key: "seo_keywords",
+      label: __("SEO Keywords", "yatra"),
+      visible: visibleColumns.seo_keywords,
+      render: (category: Category) => {
+        return (
+          <span
+            className={
+              category.status === "trash"
+                ? "text-gray-400 dark:text-gray-600"
+                : "text-gray-600 dark:text-gray-400"
+            }
+            title={category.metadata?.seo_keywords || ""}
+          >
+            {category.metadata?.seo_keywords 
+              ? (category.metadata.seo_keywords.length > 30 
+                  ? category.metadata.seo_keywords.substring(0, 30) + "..."
+                  : category.metadata.seo_keywords)
+              : __("Not set", "yatra")}
+          </span>
+        );
+      },
+    },
+    {
       key: "status",
       label: __("Status", "yatra"),
       sortable: true,
       visible: visibleColumns.status,
+      render: (category: Category) => {
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            category.status === 'publish' 
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+              : category.status === 'draft'
+              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+              : 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300'
+          }`}>
+            {category.status === 'publish' ? __('Published', 'yatra') : 
+             category.status === 'draft' ? __('Draft', 'yatra') : 
+             category.status === 'trash' ? __('Trash', 'yatra') : category.status}
+          </span>
+        );
+      },
     },
     {
       key: "created_at",
@@ -643,7 +732,7 @@ export const Categories: React.FC = () => {
       sortable: true,
       visible: visibleColumns.created_at,
     },
-  ];
+  ], [visibleColumns]);
 
   // Status mutation for individual actions
   const statusMutation = useMutation({
@@ -751,61 +840,89 @@ export const Categories: React.FC = () => {
     _index: number,
     isChild = false,
   ): React.ReactNode[] => {
-    return [
-      // Name column with icon and hierarchy indicator
-      <div className="flex items-center gap-2">
-        {renderIcon(category.icon)}
-        <div>
-          <div className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
-            {isChild && <span className="text-gray-400 mr-1">└─</span>}
-            <a
-              href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
-              className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
-            >
-              {category.name}
-            </a>
-            {can("yatra_view_trips") && category.status !== "trash" && (
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleView(category);
-                }}
-                className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-                title={__("View category in new tab", "yatra")}
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
-            <span>{category.slug}</span>
-            <span className="text-[11px] text-gray-400 dark:text-gray-500">
-              ({__("ID:", "yatra")} {category.id})
-            </span>
-          </div>
-          {category.parent_name && (
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {__("Parent:", "yatra")} {category.parent_name}
+    // Get visible columns and render their content
+    const visibleColumns = columns.filter(col => col.visible !== false);
+    
+    return visibleColumns.map(column => {
+      // Handle each column based on its key
+      switch (column.key) {
+        case 'name':
+          return (
+            <div className="flex items-center gap-2">
+              {renderIcon(category.icon)}
+              <div>
+                <div className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
+                  {isChild && <span className="text-gray-400 mr-1">└─</span>}
+                  <a
+                    href={`${window.yatraAdmin?.siteUrl || ""}/wp-admin/admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=${category.id}`}
+                    className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline transition-colors cursor-pointer"
+                  >
+                    {category.name}
+                  </a>
+                  {can("yatra_view_trips") && category.status !== "trash" && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleView(category);
+                      }}
+                      className="ml-1 inline-flex items-center justify-center rounded-full p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
+                      title={__("View category in new tab", "yatra")}
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                  <span>{category.slug}</span>
+                  <span className="text-[11px] text-gray-400 dark:text-gray-500">
+                    ({__("ID:", "yatra")} {category.id})
+                  </span>
+                </div>
+                {category.parent_name && (
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {__("Parent:", "yatra")} {category.parent_name}
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-        </div>
-      </div>,
-      // Trips column
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
-        {typeof category.trip_count === "number" ? category.trip_count : 0}
-      </span>,
-      // Description column
-      <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
-        {category.description || "—"}
-      </div>,
-      // Status column
-      getStatusBadge(category.status),
-      // Created date column
-      <span className="text-sm text-gray-600 dark:text-gray-400">
-        {formatDate(category.created_at)}
-      </span>,
-    ];
+          );
+        
+        case 'trips':
+          return (
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+              {typeof category.trip_count === "number" ? category.trip_count : 0}
+            </span>
+          );
+        
+        case 'description':
+          return (
+            <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-400">
+              {category.description || "—"}
+            </div>
+          );
+        
+        case 'status':
+          return getStatusBadge(category.status);
+        
+        case 'created_at':
+          return (
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              {formatDate(category.created_at)}
+            </span>
+          );
+        
+        // SEO columns - use their render functions
+        case 'seo_title':
+        case 'seo_description':
+        case 'seo_keywords':
+          return column.render ? column.render(category) : null;
+        
+        default:
+          // Fallback for any other columns
+          return column.render ? column.render(category) : (category as any)[column.key];
+      }
+    });
   };
 
   return (
@@ -964,6 +1081,21 @@ export const Categories: React.FC = () => {
             visible: visibleColumns.trips,
           },
           {
+            key: "seo_title",
+            label: __("SEO Title", "yatra"),
+            visible: visibleColumns.seo_title,
+          },
+          {
+            key: "seo_description",
+            label: __("SEO Description", "yatra"),
+            visible: visibleColumns.seo_description,
+          },
+          {
+            key: "seo_keywords",
+            label: __("SEO Keywords", "yatra"),
+            visible: visibleColumns.seo_keywords,
+          },
+          {
             key: "status",
             label: __("Status", "yatra"),
             visible: visibleColumns.status,
@@ -983,7 +1115,10 @@ export const Categories: React.FC = () => {
       {/* Table */}
       <Card>
         <CardContent className="p-0">
+          {null}
+          
           <SharedTable
+            key={`categories-table-${JSON.stringify(visibleColumns)}`}
             data={processedCategories}
             columns={columns}
             actions={actions}

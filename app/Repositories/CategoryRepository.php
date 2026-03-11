@@ -27,6 +27,11 @@ class CategoryRepository extends BaseRepository
     protected array $integerFields = ['parent_id', 'level', 'sorting', 'is_featured'];
 
     /**
+     * JSON fields specific to categories
+     */
+    protected array $jsonFields = ['metadata'];
+
+    /**
      * Constructor
      */
     public function __construct()

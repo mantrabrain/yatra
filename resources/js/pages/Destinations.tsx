@@ -44,6 +44,12 @@ interface Destination {
   icon?: IconPickerValue | null;
   status: string;
   trip_count?: number;
+  metadata?: {
+    seo_title?: string;
+    seo_description?: string;
+    seo_keywords?: string;
+    [key: string]: any;
+  };
   created_at: string;
   updated_at: string;
   created_by: string;
@@ -67,6 +73,9 @@ const Destinations: React.FC = () => {
       description: true,
       trips: true,
       status: true,
+      seo_title: false,
+      seo_description: false,
+      seo_keywords: false,
       created_at: false,
       updated_at: false,
       created_by_name: false,
@@ -289,6 +298,10 @@ const Destinations: React.FC = () => {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey as keyof typeof visibleColumns],
     };
+    
+    // DEBUG: Log column visibility changes
+    console.log('YATRA DEBUG: Destinations Column toggle -', columnKey, 'from', visibleColumns[columnKey], 'to', newVisibleColumns[columnKey]);
+    
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra_destinations_visible_columns",
@@ -490,6 +503,21 @@ const Destinations: React.FC = () => {
               visible: visibleColumns.trips,
             },
             {
+              key: "seo_title",
+              label: __("SEO Title", "yatra"),
+              visible: visibleColumns.seo_title,
+            },
+            {
+              key: "seo_description",
+              label: __("SEO Description", "yatra"),
+              visible: visibleColumns.seo_description,
+            },
+            {
+              key: "seo_keywords",
+              label: __("SEO Keywords", "yatra"),
+              visible: visibleColumns.seo_keywords,
+            },
+            {
               key: "status",
               label: __("Status", "yatra"),
               visible: visibleColumns.status,
@@ -527,8 +555,9 @@ const Destinations: React.FC = () => {
           <Card className="overflow-visible">
             <CardContent className="p-0 overflow-visible">
               <SharedTable
+                key={`destinations-table-${JSON.stringify(visibleColumns)}`}
                 data={destinations}
-                columns={[
+                columns={useMemo(() => [
                   {
                     key: "name",
                     label: __("Destination", "yatra"),
@@ -622,6 +651,67 @@ const Destinations: React.FC = () => {
                       >
                         {destination.description ||
                           __("No description", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_title",
+                    label: __("SEO Title", "yatra"),
+                    visible: visibleColumns.seo_title,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {destination.metadata?.seo_title || __("Not set", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_description",
+                    label: __("SEO Description", "yatra"),
+                    visible: visibleColumns.seo_description,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                        title={destination.metadata?.seo_description || ""}
+                      >
+                        {destination.metadata?.seo_description 
+                          ? (destination.metadata.seo_description.length > 50 
+                              ? destination.metadata.seo_description.substring(0, 50) + "..."
+                              : destination.metadata.seo_description)
+                          : __("Not set", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_keywords",
+                    label: __("SEO Keywords", "yatra"),
+                    visible: visibleColumns.seo_keywords,
+                    render: (destination: Destination) => (
+                      <span
+                        className={
+                          destination.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                        title={destination.metadata?.seo_keywords || ""}
+                      >
+                        {destination.metadata?.seo_keywords 
+                          ? (destination.metadata.seo_keywords.length > 30 
+                              ? destination.metadata.seo_keywords.substring(0, 30) + "..."
+                              : destination.metadata.seo_keywords)
+                          : __("Not set", "yatra")}
                       </span>
                     ),
                   },
@@ -738,7 +828,7 @@ const Destinations: React.FC = () => {
                       </span>
                     ),
                   },
-                ]}
+                ], [visibleColumns])}
                 actions={[
                   {
                     key: "view",

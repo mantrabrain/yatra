@@ -29,6 +29,11 @@ class ActivityRepository extends BaseRepository
     protected array $integerFields = ['id', 'created_by', 'updated_by'];
 
     /**
+     * JSON fields specific to activities
+     */
+    protected array $jsonFields = ['metadata'];
+
+    /**
      * Get table name - using the new ClassificationsTable
      */
     protected function getTableName(): string

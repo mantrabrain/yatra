@@ -486,9 +486,7 @@ export const Table: React.FC<TableProps> = ({
                       isTrash ? "text-gray-400 dark:text-gray-600" : ""
                     }
                   >
-                    {column.render
-                      ? column.render(item, index)
-                      : item[column.key]}
+                    {column.render ? column.render(item, index) : item[column.key]}
                   </TableCell>
                 ))}
 

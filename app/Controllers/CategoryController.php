@@ -41,6 +41,7 @@ class CategoryController extends BaseController
      */
     public function list_items(WP_REST_Request $request)
     {
+                
         try {
             $params = $this->getPaginationParams($request);
 
@@ -66,7 +67,9 @@ class CategoryController extends BaseController
                 }
             }
 
+
             $prepared = array_map([$this, 'prepareItem'], $items);
+            
 
             return $this->paginated_response($prepared, $total, $params['page'], $params['per_page']);
         } catch (\Exception $e) {
@@ -124,6 +127,7 @@ class CategoryController extends BaseController
         try {
             $id = $this->getId($request);
             $data = $this->getBody($request);
+            
 
             $result = $this->service->update($id, $data);
 
@@ -179,6 +183,7 @@ class CategoryController extends BaseController
      */
     protected function prepareItem($item): array
     {
+        
         $data = [
             'id' => (int) $item->id,
             'type' => $item->type,
@@ -190,7 +195,7 @@ class CategoryController extends BaseController
             'icon' => $item->icon,
             'color' => $item->color,
             'image_id' => $item->image_id,
-            'metadata' => $item->metadata,
+            'metadata' => isset($item->metadata) && is_string($item->metadata) ? maybe_unserialize($item->metadata) : $item->metadata,
             'sorting' => $item->sorting,
             'is_featured' => $item->is_featured,
             'status' => $item->status,
@@ -199,6 +204,7 @@ class CategoryController extends BaseController
             'created_by' => $item->created_by,
             'updated_by' => $item->updated_by,
         ];
+        
 
         // Add trip count if available
         if (isset($item->trip_count)) {

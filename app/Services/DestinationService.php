@@ -128,6 +128,32 @@ class DestinationService extends BaseService
         // IMPORTANT: Force type to 'destination' - this overrides any frontend type
         $data['type'] = 'destination';
 
+        // Handle SEO metadata
+        if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
+            $existing_metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $existing_metadata = $data['metadata'];
+            } elseif (isset($data['metadata'])) {
+                $existing_metadata = maybe_unserialize($data['metadata']);
+            }
+            
+            // Add SEO fields to metadata
+            if (isset($data['seo_title'])) {
+                $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
+                unset($data['seo_title']); // Remove from main data
+            }
+            if (isset($data['seo_description'])) {
+                $existing_metadata['seo_description'] = sanitize_textarea_field($data['seo_description']);
+                unset($data['seo_description']); // Remove from main data
+            }
+            if (isset($data['seo_keywords'])) {
+                $existing_metadata['seo_keywords'] = sanitize_text_field($data['seo_keywords']);
+                unset($data['seo_keywords']); // Remove from main data
+            }
+            
+            $data['metadata'] = $existing_metadata;
+        }
+
         return $data;
     }
 
@@ -136,6 +162,7 @@ class DestinationService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
+                
         // Remove preserve_slug flag if sent from frontend (not a database column)
         unset($data['preserve_slug']);
 
@@ -203,6 +230,39 @@ class DestinationService extends BaseService
 
         // IMPORTANT: Ensure type remains 'destination' - prevent frontend from changing type
         $data['type'] = 'destination';
+
+        // Handle SEO metadata
+        if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
+            // Get existing metadata
+            $existing_metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $existing_metadata = $data['metadata'];
+            } elseif (isset($data['metadata'])) {
+                $existing_metadata = maybe_unserialize($data['metadata']);
+            } else {
+                // Get existing metadata from database
+                $existing = $this->repository->find($id);
+                if ($existing && isset($existing->metadata)) {
+                    $existing_metadata = maybe_unserialize($existing->metadata);
+                }
+            }
+            
+            // Add/update SEO fields in metadata
+            if (isset($data['seo_title'])) {
+                $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
+                unset($data['seo_title']); // Remove from main data
+            }
+            if (isset($data['seo_description'])) {
+                $existing_metadata['seo_description'] = sanitize_textarea_field($data['seo_description']);
+                unset($data['seo_description']); // Remove from main data
+            }
+            if (isset($data['seo_keywords'])) {
+                $existing_metadata['seo_keywords'] = sanitize_text_field($data['seo_keywords']);
+                unset($data['seo_keywords']); // Remove from main data
+            }
+            
+            $data['metadata'] = $existing_metadata;
+        }
 
         return $data;
     }

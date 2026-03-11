@@ -227,6 +227,7 @@ class ActivityController extends BaseController
             $id = $this->getId($request);
             $data = $this->getBody($request);
             
+            
             // Description will be sanitized in the Service layer with FormatHelper::sanitizeQuillHtml()
             
             $result = $this->service->update($id, $data);
@@ -330,6 +331,7 @@ class ActivityController extends BaseController
     private function prepareActivity($item): array
     {
         $prepared = (array) $item;
+        
 
         // Handle icon
         if (isset($prepared['icon']) && is_string($prepared['icon'])) {
@@ -338,6 +340,12 @@ class ActivityController extends BaseController
         if (isset($prepared['icon'])) {
             $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
         }
+
+        // Handle metadata
+        if (isset($prepared['metadata']) && is_string($prepared['metadata'])) {
+            $prepared['metadata'] = maybe_unserialize($prepared['metadata']);
+        }
+        
 
         // Add user names
         if (!empty($prepared['created_by'])) {

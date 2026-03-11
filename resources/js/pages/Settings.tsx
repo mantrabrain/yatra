@@ -41,6 +41,9 @@ import {
   ExternalLink,
   ChevronRight,
   Check,
+  Image,
+  X,
+  TrendingUp,
 } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
@@ -528,6 +531,7 @@ type SettingsSection =
   | "notification"
   | "integration"
   | "permalink"
+  | "seo"
   | "advanced";
 
 // Form Builder Types
@@ -802,6 +806,12 @@ interface SettingsData {
 
   // Booking Form Builder
   booking_form_config: BookingFormConfig;
+
+  // SEO Settings
+  seo_trip_meta_title: string;
+  seo_trip_meta_description: string;
+  seo_trip_meta_keywords: string;
+  seo_trip_meta_image: number;
 }
 
 // Form Builder Component
@@ -2485,6 +2495,12 @@ const Settings: React.FC = () => {
           ],
         },
       },
+
+      // SEO Settings
+      seo_trip_meta_title: "",
+      seo_trip_meta_description: "",
+      seo_trip_meta_keywords: "",
+      seo_trip_meta_image: 0,
     }),
     [],
   );
@@ -2514,6 +2530,9 @@ const Settings: React.FC = () => {
   const [validatingApiKey, setValidatingApiKey] = useState(false);
   const [showFacebookToken, setShowFacebookToken] = useState(false);
   const [showGaSecret, setShowGaSecret] = useState(false);
+  const [seoImageUrl, setSeoImageUrl] = useState<string>('');
+  const [seoImageLoading, setSeoImageLoading] = useState<boolean>(false);
+  const [seoImageError, setSeoImageError] = useState<string>('');
   
   // Facebook Pixel validation state
   const [validatingPixel, setValidatingPixel] = useState(false);
@@ -2810,6 +2829,78 @@ const Settings: React.FC = () => {
       isInitializedRef.current = true;
     }
   }, [settings, isLoading]);
+
+  // Fetch SEO image URL when image ID changes with performance optimization
+  React.useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchSeoImageUrl = async () => {
+      const imageId = formData?.seo_trip_meta_image;
+      
+      if (!imageId || imageId <= 0) {
+        if (isMounted) {
+          setSeoImageUrl('');
+          setSeoImageLoading(false);
+          setSeoImageError('');
+        }
+        return;
+      }
+
+      if (isMounted) {
+        setSeoImageLoading(true);
+        setSeoImageError('');
+      }
+
+      try {
+        const siteUrl = window.yatraAdmin?.siteUrl || '';
+        const response = await fetch(
+          `${siteUrl}/wp-json/wp/v2/media/${imageId}`,
+          { 
+            signal: controller.signal,
+            headers: {
+              'Accept': 'application/json',
+            }
+          }
+        );
+        
+        if (!isMounted) return;
+
+        if (response.ok) {
+          const mediaData = await response.json();
+          const imageUrl = mediaData?.source_url;
+          
+          if (imageUrl && typeof imageUrl === 'string') {
+            setSeoImageUrl(imageUrl);
+            setSeoImageError('');
+          } else {
+            setSeoImageUrl('');
+            setSeoImageError('Image not found');
+          }
+        } else {
+          setSeoImageUrl('');
+          setSeoImageError(`Failed to load image (${response.status})`);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error('Error fetching SEO image:', error);
+          setSeoImageUrl('');
+          setSeoImageError(error instanceof Error ? error.message : 'Unknown error');
+        }
+      } finally {
+        if (isMounted) {
+          setSeoImageLoading(false);
+        }
+      }
+    };
+
+    fetchSeoImageUrl();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, [formData?.seo_trip_meta_image]);
 
   // Initialize gateway order when gateway definitions are loaded
   React.useEffect(() => {
@@ -3210,6 +3301,11 @@ const Settings: React.FC = () => {
       id: "permalink" as SettingsSection,
       label: __("Permalink", "yatra"),
       icon: Globe,
+    },
+    {
+      id: "seo" as SettingsSection,
+      label: __("SEO", "yatra"),
+      icon: TrendingUp,
     },
     {
       id: "advanced" as SettingsSection,
@@ -7163,6 +7259,207 @@ const Settings: React.FC = () => {
                     )}
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "seo":
+        return (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+                {__("Trip Archive SEO Settings", "yatra")}
+              </h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                {__("Configure SEO meta tags for the trip archive page (/trip/). These meta tags will be used for the main trip listing page.", "yatra")}
+              </p>
+              <div className="space-y-4">
+                <FormField
+                  id="seo_trip_meta_title"
+                  label={__("Trip Archive Meta Title", "yatra")}
+                  description={__("Meta title for the trip archive page. This will appear in search engine results for /trip/ page.", "yatra")}
+                >
+                  <Input
+                    id="seo_trip_meta_title"
+                    type="text"
+                    value={formData.seo_trip_meta_title}
+                    onChange={(e) =>
+                      setFormData((prev) =>
+                        prev ? { ...prev, seo_trip_meta_title: e.target.value } : null
+                      )
+                    }
+                    placeholder={__("e.g., Browse All Trips - Find Your Perfect Adventure | Your Travel Agency", "yatra")}
+                    className="w-full"
+                  />
+                </FormField>
+
+                <FormField
+                  id="seo_trip_meta_description"
+                  label={__("Trip Archive Meta Description", "yatra")}
+                  description={__("Meta description for the trip archive page. Should be 150-160 characters for best SEO results.", "yatra")}
+                >
+                  <textarea
+                    id="seo_trip_meta_description"
+                    value={formData.seo_trip_meta_description}
+                    onChange={(e) =>
+                      setFormData((prev) =>
+                        prev ? { ...prev, seo_trip_meta_description: e.target.value } : null
+                      )
+                    }
+                    placeholder={__("e.g., Explore our complete collection of amazing trips and adventures. Find and book your perfect journey with us.", "yatra")}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </FormField>
+
+                <FormField
+                  id="seo_trip_meta_keywords"
+                  label={__("Trip Archive Meta Keywords", "yatra")}
+                  description={__("Comma-separated keywords for the trip archive page. Include relevant travel and booking keywords.", "yatra")}
+                >
+                  <Input
+                    id="seo_trip_meta_keywords"
+                    type="text"
+                    value={formData.seo_trip_meta_keywords}
+                    onChange={(e) =>
+                      setFormData((prev) =>
+                        prev ? { ...prev, seo_trip_meta_keywords: e.target.value } : null
+                      )
+                    }
+                    placeholder={__("e.g., travel, trips, adventure, booking, tours, destinations, holidays", "yatra")}
+                    className="w-full"
+                  />
+                </FormField>
+
+                <FormField
+                  id="seo_trip_meta_image"
+                  label={__("Trip Archive SEO Image", "yatra")}
+                  description={__("Image for social media sharing and SEO. Recommended size: 1200x630 pixels. This image will appear when the trip archive page is shared on Facebook, Twitter, and other platforms.", "yatra")}
+                >
+                  <div className="space-y-4">
+                    {formData.seo_trip_meta_image && formData.seo_trip_meta_image > 0 ? (
+                      <div className="relative group">
+                        <div className="flex items-start gap-4 p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                          {seoImageLoading ? (
+                            <div className="w-24 h-24 flex items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                            </div>
+                          ) : seoImageUrl ? (
+                            <div className="relative w-24 h-24 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700">
+                              <img
+                                src={seoImageUrl}
+                                alt="SEO Preview"
+                                className="w-full h-full object-cover"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                            </div>
+                          ) : seoImageError ? (
+                            <div className="w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                              <X className="w-6 h-6 text-red-400 mb-1" />
+                              <span className="text-xs text-red-500 dark:text-red-400 text-center px-1">{seoImageError}</span>
+                            </div>
+                          ) : (
+                            <div className="w-24 h-24 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                              <Image className="w-6 h-6 text-gray-400 mb-1" />
+                              <span className="text-xs text-gray-500 dark:text-gray-400">No image</span>
+                            </div>
+                          )}
+                          
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+                                {__("SEO Image", "yatra")}
+                              </h4>
+                              {!seoImageLoading && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setFormData((prev) =>
+                                      prev ? { ...prev, seo_trip_meta_image: 0 } : null
+                                    );
+                                  }}
+                                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                  title={__("Remove image", "yatra")}
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                              {__("Recommended size: 1200x630 pixels for optimal social media display.", "yatra")}
+                            </p>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                // Use WordPress media library
+                                if (window.wp && window.wp.media) {
+                                  const mediaUploader = window.wp.media({
+                                    title: __("Select SEO Image", "yatra"),
+                                    button: { text: __("Use this image", "yatra") },
+                                    multiple: false,
+                                    library: { type: "image" },
+                                  });
+                                  
+                                  mediaUploader.on("select", () => {
+                                    const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                    setFormData((prev) =>
+                                      prev ? { ...prev, seo_trip_meta_image: attachment.id } : null
+                                    );
+                                  });
+                                  
+                                  mediaUploader.open();
+                                }
+                              }}
+                              variant="outline"
+                              size="sm"
+                            >
+                              {__("Change Image", "yatra")}
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
+                        <div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center bg-gray-100 dark:bg-gray-700 rounded-full">
+                          <Image className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                          {__("Add SEO Image", "yatra")}
+                        </h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4 max-w-sm mx-auto">
+                          {__("Upload an image that will appear when your trip archive page is shared on social media. Recommended size: 1200x630 pixels.", "yatra")}
+                        </p>
+                        <Button
+                          type="button"
+                          onClick={() => {
+                            // Use WordPress media library
+                            if (window.wp && window.wp.media) {
+                              const mediaUploader = window.wp.media({
+                                title: __("Select SEO Image", "yatra"),
+                                button: { text: __("Use this image", "yatra") },
+                                multiple: false,
+                                library: { type: "image" },
+                              });
+                              
+                              mediaUploader.on("select", () => {
+                                const attachment = mediaUploader.state().get("selection").first().toJSON();
+                                setFormData((prev) =>
+                                  prev ? { ...prev, seo_trip_meta_image: attachment.id } : null
+                                );
+                              });
+                              
+                              mediaUploader.open();
+                            }
+                          }}
+                        >
+                          <Plus className="w-4 h-4 mr-2" />
+                          {__("Select Image", "yatra")}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </FormField>
               </div>
             </div>
           </div>

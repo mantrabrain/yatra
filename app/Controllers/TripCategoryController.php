@@ -89,6 +89,7 @@ class TripCategoryController extends BaseController
 
     public function get_items(WP_REST_Request $request)
     {
+        
         try {
             $params = $this->getPaginationParams($request);
 
@@ -264,6 +265,7 @@ class TripCategoryController extends BaseController
 
     private function prepareItem($item): array
     {
+        
         $prepared = (array) $item;
 
         if (isset($prepared['icon']) && is_string($prepared['icon'])) {
@@ -272,6 +274,12 @@ class TripCategoryController extends BaseController
         if (isset($prepared['icon'])) {
             $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
         }
+
+        // Handle metadata
+        if (isset($prepared['metadata']) && is_string($prepared['metadata'])) {
+            $prepared['metadata'] = maybe_unserialize($prepared['metadata']);
+        }
+        
 
         // Add parent name
         if (!empty($prepared['parent_id'])) {

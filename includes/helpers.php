@@ -1310,32 +1310,39 @@ if (!function_exists('yatra_is_activity_page')) {
     }
 }
 
+if (!function_exists('yatra_is_category_page')) {
+    function yatra_is_category_page() {
+        global $category, $yatra_taxonomy_data;
+        
+        // Check direct global first
+        if (isset($category) && !empty($category)) {
+            return true;
+        }
+        
+        // Check taxonomy data
+        if (isset($yatra_taxonomy_data) && !empty($yatra_taxonomy_data) && $yatra_taxonomy_data->type === 'category') {
+            return true;
+        }
+        
+        return false;
+    }
+}
+
 if (!function_exists('yatra_is_trip_archive_page')) {
     function yatra_is_trip_archive_page() {
         $current_url = $_SERVER['REQUEST_URI'] ?? '';
         $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
         $trip_base = \Yatra\Services\SettingsService::getTripBase();
-        return strpos($current_path, '/' . $trip_base . '/') !== false && !yatra_is_trip_page();
+        
+        // Check for both /trip/ and /trip patterns
+        $pattern1 = '/' . $trip_base . '/';
+        $pattern2 = '/' . $trip_base;
+        
+        return (strpos($current_path, $pattern1) !== false || $current_path === $pattern2) && !yatra_is_trip_page();
     }
 }
 
-if (!function_exists('yatra_is_destination_archive_page')) {
-    function yatra_is_destination_archive_page() {
-        $current_url = $_SERVER['REQUEST_URI'] ?? '';
-        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
-        $destination_base = \Yatra\Services\SettingsService::getString('destination_base', 'destination');
-        return strpos($current_path, '/' . $destination_base . '/') !== false && !yatra_is_destination_page();
-    }
-}
-
-if (!function_exists('yatra_is_activity_archive_page')) {
-    function yatra_is_activity_archive_page() {
-        $current_url = $_SERVER['REQUEST_URI'] ?? '';
-        $current_path = parse_url($current_url, PHP_URL_PATH) ?? '';
-        $activity_base = \Yatra\Services\SettingsService::getString('activity_base', 'activity');
-        return strpos($current_path, '/' . $activity_base . '/') !== false && !yatra_is_activity_page();
-    }
-}
+// Yatra only has trip archive pages - no destination/activity/category archive pages
 
 if (!function_exists('yatra_is_listing_page')) {
     function yatra_is_listing_page() {
@@ -1350,9 +1357,8 @@ if (!function_exists('yatra_is_yatra_page')) {
         return yatra_is_trip_page() || 
                yatra_is_destination_page() || 
                yatra_is_activity_page() || 
+               yatra_is_category_page() ||
                yatra_is_trip_archive_page() || 
-               yatra_is_destination_archive_page() || 
-               yatra_is_activity_archive_page() || 
                yatra_is_listing_page();
     }
 }

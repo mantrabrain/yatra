@@ -164,7 +164,9 @@ class DestinationController extends BaseController
     public function update_item(WP_REST_Request $request)
     {
         try {
-            $result = $this->service->update($this->getId($request), $this->getBody($request));
+            $body = $this->getBody($request);
+            
+            $result = $this->service->update($this->getId($request), $body);
 
             if (!$result) {
                 return $this->error_response(__('Failed to update destination', 'yatra'), 500);
@@ -200,6 +202,7 @@ class DestinationController extends BaseController
     private function prepareItem($item): array
     {
         $prepared = (array) $item;
+        
 
         if (isset($prepared['icon']) && is_string($prepared['icon'])) {
             $prepared['icon'] = maybe_unserialize($prepared['icon']);
@@ -208,6 +211,11 @@ class DestinationController extends BaseController
             $prepared['icon'] = $this->convert_icon_attachment_id_to_url($prepared['icon']);
         }
 
+        // Handle metadata
+        if (isset($prepared['metadata']) && is_string($prepared['metadata'])) {
+            $prepared['metadata'] = maybe_unserialize($prepared['metadata']);
+        }
+        
         if (!empty($prepared['created_by'])) {
             $user = get_userdata((int) $prepared['created_by']);
             $prepared['created_by_name'] = $user ? esc_html($user->display_name) : null;

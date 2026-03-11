@@ -166,6 +166,12 @@ class SettingsController extends BaseController
         'use_booking_page' => false,
         'booking_page_id' => 0,
         
+        // SEO Settings
+        'seo_trip_meta_title' => '',
+        'seo_trip_meta_description' => '',
+        'seo_trip_meta_keywords' => '',
+        'seo_trip_meta_image' => 0,
+        
         // Advanced Settings
         'debug_mode' => false,
         'enable_logging' => false,
@@ -504,6 +510,18 @@ class SettingsController extends BaseController
             }
             if ($key === 'refund_policy' || $key === 'cancellation_policy') {
                 return sanitize_textarea_field($value);
+            }
+            if ($key === 'seo_trip_meta_title') {
+                // Allow more characters for meta title, but strip HTML
+                return wp_strip_all_tags($value);
+            }
+            if ($key === 'seo_trip_meta_description') {
+                // Allow more characters for meta description, but strip HTML
+                return wp_strip_all_tags($value);
+            }
+            if ($key === 'seo_trip_meta_keywords') {
+                // Allow keywords, strip HTML and sanitize
+                return sanitize_text_field($value);
             }
             if ($key === 'smtp_password' || $key === 'api_key' || $key === 'sms_api_key' || $key === 'recaptcha_secret_key') {
                 // Don't sanitize passwords/keys too aggressively

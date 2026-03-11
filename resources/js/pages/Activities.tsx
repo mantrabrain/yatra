@@ -44,6 +44,12 @@ interface Activity {
   icon?: IconPickerValue | null;
   status: string;
   trip_count?: number;
+  metadata?: {
+    seo_title?: string;
+    seo_description?: string;
+    seo_keywords?: string;
+    [key: string]: any;
+  };
   created_at: string;
   updated_at: string;
   created_by: string;
@@ -88,6 +94,9 @@ const Activities: React.FC = () => {
       description: true,
       trips: true,
       status: true,
+      seo_title: false,
+      seo_description: false,
+      seo_keywords: false,
       created_at: false,
       updated_at: false,
       created_by_name: false,
@@ -101,12 +110,113 @@ const Activities: React.FC = () => {
   const { can } = usePermissions();
   const { showToast } = useToast();
 
+  // Define columns for the shared table
+  const columns = useMemo(() => [
+    {
+      Header: __("Name", "yatra"),
+      accessor: "name",
+      Cell: ({ row }: any) => (
+        <div className="flex items-center">
+          <div className="text-sm font-medium text-gray-900">
+            {row.original.name}
+          </div>
+        </div>
+      ),
+    },
+    {
+      Header: __("Description", "yatra"),
+      accessor: "description",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">{row.original.description}</div>
+      ),
+    },
+    {
+      Header: __("Trips", "yatra"),
+      accessor: "trip_count",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.trip_count || 0}
+        </div>
+      ),
+    },
+    {
+      Header: __("Status", "yatra"),
+      accessor: "status",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">{row.original.status}</div>
+      ),
+    },
+    {
+      Header: __("SEO Title", "yatra"),
+      accessor: "metadata.seo_title",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.metadata?.seo_title || ""}
+        </div>
+      ),
+    },
+    {
+      Header: __("SEO Description", "yatra"),
+      accessor: "metadata.seo_description",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.metadata?.seo_description || ""}
+        </div>
+      ),
+    },
+    {
+      Header: __("SEO Keywords", "yatra"),
+      accessor: "metadata.seo_keywords",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.metadata?.seo_keywords || ""}
+        </div>
+      ),
+    },
+    {
+      Header: __("Created At", "yatra"),
+      accessor: "created_at",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">{row.original.created_at}</div>
+      ),
+    },
+    {
+      Header: __("Updated At", "yatra"),
+      accessor: "updated_at",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">{row.original.updated_at}</div>
+      ),
+    },
+    {
+      Header: __("Created By", "yatra"),
+      accessor: "created_by_name",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.created_by_name || ""}
+        </div>
+      ),
+    },
+    {
+      Header: __("Updated By", "yatra"),
+      accessor: "updated_by_name",
+      Cell: ({ row }: any) => (
+        <div className="text-sm text-gray-500">
+          {row.original.updated_by_name || ""}
+        </div>
+      ),
+    },
+  ], [visibleColumns]);
+
   // Toggle column visibility
   const toggleColumn = (columnKey: string) => {
     const newVisibleColumns = {
       ...visibleColumns,
       [columnKey]: !visibleColumns[columnKey],
     };
+    
+    // DEBUG: Log column visibility changes
+    console.log('YATRA DEBUG: Activities Column toggle -', columnKey, 'from', visibleColumns[columnKey], 'to', newVisibleColumns[columnKey]);
+    
     setVisibleColumns(newVisibleColumns);
     localStorage.setItem(
       "yatra-activities-columns",
@@ -570,6 +680,21 @@ const Activities: React.FC = () => {
                   visible: visibleColumns.trips,
                 },
                 {
+                  key: "seo_title",
+                  label: __("SEO Title", "yatra"),
+                  visible: visibleColumns.seo_title,
+                },
+                {
+                  key: "seo_description",
+                  label: __("SEO Description", "yatra"),
+                  visible: visibleColumns.seo_description,
+                },
+                {
+                  key: "seo_keywords",
+                  label: __("SEO Keywords", "yatra"),
+                  visible: visibleColumns.seo_keywords,
+                },
+                {
                   key: "status",
                   label: __("Status", "yatra"),
                   visible: visibleColumns.status,
@@ -605,6 +730,7 @@ const Activities: React.FC = () => {
           <Card className="overflow-visible">
             <CardContent className="p-0 overflow-visible">
               <SharedTable
+                key={`activities-table-${JSON.stringify(visibleColumns)}`}
                 data={activities}
                 columns={[
                   {
@@ -699,6 +825,67 @@ const Activities: React.FC = () => {
                         }
                       >
                         {activity.description || __("No description", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_title",
+                    label: __("SEO Title", "yatra"),
+                    visible: visibleColumns.seo_title,
+                    render: (activity: Activity) => (
+                      <span
+                        className={
+                          activity.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                      >
+                        {activity.metadata?.seo_title || __("Not set", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_description",
+                    label: __("SEO Description", "yatra"),
+                    visible: visibleColumns.seo_description,
+                    render: (activity: Activity) => (
+                      <span
+                        className={
+                          activity.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                        title={activity.metadata?.seo_description || ""}
+                      >
+                        {activity.metadata?.seo_description 
+                          ? (activity.metadata.seo_description.length > 50 
+                              ? activity.metadata.seo_description.substring(0, 50) + "..."
+                              : activity.metadata.seo_description)
+                          : __("Not set", "yatra")}
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "seo_keywords",
+                    label: __("SEO Keywords", "yatra"),
+                    visible: visibleColumns.seo_keywords,
+                    render: (activity: Activity) => (
+                      <span
+                        className={
+                          activity.status === "trash" ||
+                          statusFilter === "trash"
+                            ? "text-gray-400 dark:text-gray-600"
+                            : "text-gray-600 dark:text-gray-400"
+                        }
+                        title={activity.metadata?.seo_keywords || ""}
+                      >
+                        {activity.metadata?.seo_keywords 
+                          ? (activity.metadata.seo_keywords.length > 30 
+                              ? activity.metadata.seo_keywords.substring(0, 30) + "..."
+                              : activity.metadata.seo_keywords)
+                          : __("Not set", "yatra")}
                       </span>
                     ),
                   },

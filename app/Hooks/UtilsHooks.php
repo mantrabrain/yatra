@@ -31,8 +31,11 @@ class UtilsHooks
      */
     public static function addEditTripAdminBarLink($admin_bar): void
     {
-        // Only for logged-in users who can edit
-        if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+        // Debug logging at function start
+    
+        // Only for logged-in users who can edit Yatra items
+        if (!is_user_logged_in() || (!current_user_can('manage_options'))) {
+            
             return;
         }
 
@@ -40,7 +43,7 @@ class UtilsHooks
         global $trip;
         if (!empty($trip) && !empty($trip->id)) {
             // Build the edit URL for the trip
-            $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
+            $edit_url = admin_url('admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=3' . (int) $trip->id);
 
             // Add the Edit Trip node
             $admin_bar->add_node([
@@ -55,34 +58,38 @@ class UtilsHooks
 
         // Check if we're on a taxonomy page
         $taxonomy_data = $GLOBALS['yatra_taxonomy_data'] ?? null;
+        
+      
+        
         if (!empty($taxonomy_data) && !empty($taxonomy_data->id)) {
             // Build the edit URL based on taxonomy type
             $type = $taxonomy_data->type ?? '';
             $id = (int) $taxonomy_data->id;
 
-            $subpage = '';
+            $tabs = '';
             $title = '';
 
             switch ($type) {
                 case 'destination':
-                    $subpage = 'destinations';
+                    $tabs = 'destinations';
                     $title = __('Edit Destination', 'yatra');
                     break;
                 case 'activity':
-                    $subpage = 'activities';
+                    $tabs = 'activities';
                     $title = __('Edit Activity', 'yatra');
                     break;
                 case 'category':
-                    $subpage = 'categories';
+                    $tabs = 'categories';
                     $title = __('Edit Category', 'yatra');
                     break;
             }
 
-            if ($subpage && $title) {
-                $edit_url = admin_url('admin.php?page=yatra&subpage=' . $subpage . '&action=edit&id=' . $id);
+            if ($tabs && $title) {
+                $edit_url = admin_url('admin.php?page=yatra&subpage=trips&tab=' . $tabs . '&action=edit&id=' . $id);
 
                 $node_id = 'yatra-edit-' . $type;
 
+            
                 $admin_bar->add_node([
                     'id'    => $node_id,
                     'title' => $title,

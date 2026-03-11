@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Save, Loader2, Edit2, X } from "lucide-react";
+import { ArrowLeft, Save, Loader2, Edit2, X, Eye } from "lucide-react";
 import { __ } from "../lib/i18n";
 import { usePermissions } from "../hooks/usePermissions";
 import { useToast } from "../components/ui/toast";
@@ -34,6 +34,9 @@ interface ActivityFormData {
     value: string;
   } | null;
   status: string;
+  seo_title: string;
+  seo_description: string;
+  seo_keywords: string;
 }
 
 const ActivityForm: React.FC = () => {
@@ -46,6 +49,9 @@ const ActivityForm: React.FC = () => {
     description: "",
     icon: null,
     status: "publish",
+    seo_title: "",
+    seo_description: "",
+    seo_keywords: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,6 +89,19 @@ const ActivityForm: React.FC = () => {
     enabled: isEditMode && can("yatra_view_trips"),
   });
 
+  // Fetch settings for permalink handling
+  const { data: settings } = useQuery({
+    queryKey: ["settings"],
+    queryFn: async () => {
+      try {
+        const response = await apiClient.get("/settings");
+        return response?.data || response;
+      } catch (error) {
+        return {};
+      }
+    },
+  });
+
   // Load activity data into form when editing
   useEffect(() => {
     if (activityData && isEditMode) {
@@ -92,6 +111,9 @@ const ActivityForm: React.FC = () => {
         description: activityData.description || "",
         icon: (activityData.icon as IconPickerValue) || null,
         status: activityData.status || "draft",
+        seo_title: activityData.metadata?.seo_title || "",
+        seo_description: activityData.metadata?.seo_description || "",
+        seo_keywords: activityData.metadata?.seo_keywords || "",
       });
     }
   }, [activityData, isEditMode]);
@@ -175,7 +197,13 @@ const ActivityForm: React.FC = () => {
         description: data.description.trim(),
         icon: data.icon,
         status: data.status,
+        seo_title: data.seo_title.trim(),
+        seo_description: data.seo_description.trim(),
+        seo_keywords: data.seo_keywords.trim(),
       };
+
+      // DEBUG: Log the payload being sent
+      console.log('YATRA DEBUG: ActivityForm sending payload:', payload);
 
       // If slug was manually edited, add flag to preserve it
       if (isEditMode && isSlugEditable) {
@@ -300,14 +328,42 @@ const ActivityForm: React.FC = () => {
             : __("Create a new travel activity", "yatra")
         }
         actions={
-          <Button
-            variant="outline"
-            onClick={handleCancel}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            {__("Back", "yatra")}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              {__("Back", "yatra")}
+            </Button>
+            {formData.slug && (
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  const siteUrl = (window as any)?.yatraAdmin?.siteUrl || "";
+                  const activityBase = settings?.activity_base || "activity";
+                  const activitySlug = formData.slug || "";
+                  const permalinkStructure = (window as any)?.yatraAdmin?.permalinkStructure;
+                  const isPlainPermalink = permalinkStructure === "plain";
+
+                  // Fallback: Pretty permalink path
+                  const baseSite = siteUrl.replace(/\/$/, "");
+                  const prettyUrl = `${baseSite}/${activityBase}/${activitySlug}`;
+                  const plainUrl = `${baseSite}/?${activityBase}=${encodeURIComponent(activitySlug)}`;
+
+                  // Honor site permalink structure (default to pretty when unknown)
+                  const targetUrl = isPlainPermalink ? plainUrl : prettyUrl;
+                  window.open(targetUrl, "_blank", "noopener,noreferrer");
+                }}
+                className="flex items-center gap-2"
+                title={__("Preview activity in new tab", "yatra")}
+              >
+                <Eye className="w-4 h-4" />
+                {__("Preview", "yatra")}
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -450,6 +506,76 @@ const ActivityForm: React.FC = () => {
                       <option value="publish">{__("Publish", "yatra")}</option>
                       <option value="trash">{__("Trash", "yatra")}</option>
                     </Select>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* SEO Settings */}
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-base">
+                    {__("SEO Settings", "yatra")}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <label
+                      htmlFor="seo_title"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                      {__("Meta Title", "yatra")}
+                    </label>
+                    <Input
+                      id="seo_title"
+                      type="text"
+                      value={formData.seo_title}
+                      onChange={(e) => handleFieldChange("seo_title", e.target.value)}
+                      placeholder={__("e.g., {name} Activities | Your Travel Agency", "yatra")}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__("Custom title for search engines. Use {name} as placeholder.", "yatra")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="seo_description"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                      {__("Meta Description", "yatra")}
+                    </label>
+                    <textarea
+                      id="seo_description"
+                      value={formData.seo_description}
+                      onChange={(e) => handleFieldChange("seo_description", e.target.value)}
+                      placeholder={__("e.g., Discover amazing {name} activities and experiences. Book your adventure today!", "yatra")}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__("Description for search engines (150-160 characters). Use {name} as placeholder.", "yatra")}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="seo_keywords"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                    >
+                      {__("Meta Keywords", "yatra")}
+                    </label>
+                    <Input
+                      id="seo_keywords"
+                      type="text"
+                      value={formData.seo_keywords}
+                      onChange={(e) => handleFieldChange("seo_keywords", e.target.value)}
+                      placeholder={__("e.g., activities, adventure, {name}, travel, experiences", "yatra")}
+                      className="w-full"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      {__("Comma-separated keywords. Use {name} as placeholder.", "yatra")}
+                    </p>
                   </div>
                 </CardContent>
               </Card>

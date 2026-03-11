@@ -71,6 +71,10 @@ class Bootstrap
                 \Yatra\Services\DynamicPricingService::init();
             }
 
+            // Initialize SEO Manager
+            if (class_exists('\Yatra\Managers\SEOManager')) {
+                \Yatra\Managers\SEOManager::init();
+            }
             
             // Register Setup Service activation hook
             if (class_exists('\Yatra\Services\SetupService')) {

@@ -187,6 +187,23 @@ class TaxonomyPageHandler extends BasePageHandler
         error_log("Yatra TaxonomyPageHandler SQL: {$sql}");
         $data = $wpdb->get_row($sql);
 
+        if ($data) {
+            // Handle metadata unserialization
+            if (isset($data->metadata) && is_string($data->metadata)) {
+                $data->metadata = maybe_unserialize($data->metadata);
+            }
+            
+            // Handle icon unserialization
+            if (isset($data->icon) && is_string($data->icon)) {
+                $data->icon = maybe_unserialize($data->icon);
+            }
+            
+            // Convert icon attachment ID to URL if needed
+            if (isset($data->icon) && is_numeric($data->icon)) {
+                $data->icon = wp_get_attachment_url($data->icon);
+            }
+        }
+
         return $data ?: null;
     }
 

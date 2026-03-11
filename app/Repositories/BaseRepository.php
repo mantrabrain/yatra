@@ -113,38 +113,7 @@ abstract class BaseRepository
 
         $query = "SELECT * FROM `{$table}` {$where} {$order} {$limit}";
 
-        // DEBUG: Log query execution for all repositories when limit is set
-        if (defined('WP_DEBUG') && WP_DEBUG && isset($args['limit'])) {
-            error_log('=== YATRA REPOSITORY QUERY DEBUG ===');
-            error_log('Table: ' . $table);
-            error_log('Full Query: ' . $query);
-            error_log('Limit: ' . ($args['limit'] ?? 'NOT SET'));
-            error_log('Offset: ' . ($args['offset'] ?? 'NOT SET'));
-            
-            // Log query results count
-            $results = $this->wpdb->get_results($query) ?: [];
-            error_log('Query Results Count: ' . count($results));
-            
-            if (strpos($table, 'yatra_trips') !== false) {
-                // Add direct SQL count to verify database state
-                $direct_count = (int) $this->wpdb->get_var("SELECT COUNT(*) FROM `{$table}`");
-                // Check status distribution
-                $status_counts = $this->wpdb->get_results("SELECT status, COUNT(*) as count FROM `{$table}` GROUP BY status");
-                // Check deleted_at column
-                $deleted_count = (int) $this->wpdb->get_var("SELECT COUNT(*) FROM `{$table}` WHERE deleted_at IS NOT NULL AND deleted_at != '0000-00-00 00:00:00'");
-            }
-            error_log('=== END REPOSITORY DEBUG ===');
-        }
-
         $results = $this->wpdb->get_results($query) ?: [];
-        
-        // DEBUG: Log results for TripRepository
-        if (defined('WP_DEBUG') && WP_DEBUG && strpos($table, 'yatra_trips') !== false) {
-            if (!empty($results)) {
-                }
-            if ($this->wpdb->last_error) {
-                }
-        }
 
         return $results;
     }
@@ -157,6 +126,7 @@ abstract class BaseRepository
         $data = $this->sanitizeData($data);
         $data['created_at'] = current_time('mysql');
         $data['updated_at'] = current_time('mysql');
+
 
         $result = $this->wpdb->insert($this->table, $data);
 
@@ -175,9 +145,6 @@ abstract class BaseRepository
         $data = $this->sanitizeData($data);
         $data['updated_at'] = current_time('mysql');
 
-        // DEBUG: Log the update attempt
-        if (defined('WP_DEBUG') && WP_DEBUG) {
-            }
 
         $result = $this->wpdb->update(
             $this->table,

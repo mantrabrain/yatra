@@ -107,6 +107,32 @@ class CategoryService extends BaseService
             }
         }
 
+        // Handle SEO metadata
+        if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
+            $existing_metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $existing_metadata = $data['metadata'];
+            } elseif (isset($data['metadata'])) {
+                $existing_metadata = maybe_unserialize($data['metadata']);
+            }
+            
+            // Add SEO fields to metadata
+            if (isset($data['seo_title'])) {
+                $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
+                unset($data['seo_title']); // Remove from main data
+            }
+            if (isset($data['seo_description'])) {
+                $existing_metadata['seo_description'] = sanitize_textarea_field($data['seo_description']);
+                unset($data['seo_description']); // Remove from main data
+            }
+            if (isset($data['seo_keywords'])) {
+                $existing_metadata['seo_keywords'] = sanitize_text_field($data['seo_keywords']);
+                unset($data['seo_keywords']); // Remove from main data
+            }
+            
+            $data['metadata'] = $existing_metadata;
+        }
+
         // Sanitize metadata if it's an array
         if (isset($data['metadata'])) {
             if (is_array($data['metadata'])) {
@@ -122,6 +148,7 @@ class CategoryService extends BaseService
      */
     protected function processBeforeUpdate(int $id, array $data): array
     {
+        
         // Ensure the type remains 'category' for the ClassificationsTable
         $data['type'] = 'category';
 
@@ -184,6 +211,39 @@ class CategoryService extends BaseService
             }
         }
 
+        // Handle SEO metadata
+        if (isset($data['seo_title']) || isset($data['seo_description']) || isset($data['seo_keywords'])) {
+            // Get existing metadata
+            $existing_metadata = [];
+            if (isset($data['metadata']) && is_array($data['metadata'])) {
+                $existing_metadata = $data['metadata'];
+            } elseif (isset($data['metadata'])) {
+                $existing_metadata = maybe_unserialize($data['metadata']);
+            } else {
+                // Get existing metadata from database
+                $existing = $this->repository->find($id);
+                if ($existing && isset($existing->metadata)) {
+                    $existing_metadata = maybe_unserialize($existing->metadata);
+                }
+            }
+            
+            // Add/update SEO fields in metadata
+            if (isset($data['seo_title'])) {
+                $existing_metadata['seo_title'] = sanitize_text_field($data['seo_title']);
+                unset($data['seo_title']); // Remove from main data
+            }
+            if (isset($data['seo_description'])) {
+                $existing_metadata['seo_description'] = sanitize_textarea_field($data['seo_description']);
+                unset($data['seo_description']); // Remove from main data
+            }
+            if (isset($data['seo_keywords'])) {
+                $existing_metadata['seo_keywords'] = sanitize_text_field($data['seo_keywords']);
+                unset($data['seo_keywords']); // Remove from main data
+            }
+            
+            $data['metadata'] = $existing_metadata;
+        }
+
         // Sanitize metadata if it's an array
         if (isset($data['metadata'])) {
             if (is_array($data['metadata'])) {
@@ -219,7 +279,11 @@ class CategoryService extends BaseService
             }
         }
 
-        return $this->repository->all($args);
+        
+        $result = $this->repository->all($args);
+        
+        
+        return $result;
     }
 
     /**
