@@ -206,6 +206,8 @@ class AdminAssetsProvider
             'currency' => \Yatra\Services\SettingsService::getCurrency(),
             'date_format' => \Yatra\Services\SettingsService::get('date_format', 'Y-m-d'),
             'time_format' => \Yatra\Services\SettingsService::get('time_format', 'H:i'),
+            'geocodingNonce' => wp_create_nonce('yatra_geocoding_nonce'),
+            'ajaxUrl' => admin_url('admin-ajax.php'),
         ]);
 
         wp_localize_script('yatra-admin', 'yatraAdmin', $localized_data);

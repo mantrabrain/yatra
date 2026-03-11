@@ -3566,6 +3566,64 @@ button.yatra-booking-button svg path {
     color: #6b7280;
     font-size: 16px;
     border: 1px solid #d1d5db;
+    position: relative;
+}
+
+.yatra-map-placeholder {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border: 2px dashed #cbd5e1;
+}
+
+.yatra-map-placeholder p {
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* OpenStreetMap specific styles */
+#yatra-openstreet-map {
+    border-radius: 12px !important;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.yatra-custom-marker {
+    z-index: 1000 !important;
+}
+
+.yatra-marker-bounce {
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0) rotate(-45deg);
+    }
+    40% {
+        transform: translateY(-10px) rotate(-45deg);
+    }
+    60% {
+        transform: translateY(-5px) rotate(-45deg);
+    }
+}
+
+/* Dark mode support for map */
+@media (prefers-color-scheme: dark) {
+    .yatra-trip-map {
+        background: #1e293b;
+        border-color: #334155;
+    }
+    
+    .yatra-map-placeholder {
+        background: linear-gradient(135deg, #1e293b, #334155);
+        border-color: #475569;
+    }
+    
+    .yatra-map-placeholder p {
+        color: #94a3b8;
+    }
 }
 
 /* ============================================

@@ -15,23 +15,97 @@ if (!defined('ABSPATH')) {
             ?>
             
             <?php if (!empty($map_lat) && !empty($map_lng)): ?>
-                    <div class="yatra-trip-map" id="yatra-trip-map" data-lat="<?php echo esc_attr($map_lat); ?>"
-                         data-lng="<?php echo esc_attr($map_lng); ?>" itemprop="hasMap" itemscope itemtype="https://schema.org/Map">
-                        <meta itemprop="mapType" content="Google Maps">
-                        <iframe
-                                width="100%"
-                                height="400"
-                                style="border:0; border-radius: 12px;"
-                                loading="lazy"
-                                allowfullscreen
-                                referrerpolicy="no-referrer-when-downgrade"
-                                src="https://www.google.com/maps?q=<?php echo esc_attr($map_lat); ?>,<?php echo esc_attr($map_lng); ?>&output=embed">
-                        </iframe>
+                    <div class="yatra-trip-map" id="yatra-trip-map" 
+                         data-lat="<?php echo esc_attr($map_lat); ?>"
+                         data-lng="<?php echo esc_attr($map_lng); ?>"
+                         data-starting-location="<?php echo esc_attr($trip->starting_location ?? ''); ?>"
+                         itemprop="hasMap" itemscope itemtype="https://schema.org/Map">
+                        <meta itemprop="mapType" content="OpenStreetMap">
+                        <div id="yatra-openstreet-map" style="width: 100%; height: 400px; border-radius: 12px;"></div>
                     </div>
                     <div itemprop="geo" itemscope itemtype="https://schema.org/GeoCoordinates">
                         <meta itemprop="latitude" content="<?php echo esc_attr($map_lat); ?>">
                         <meta itemprop="longitude" content="<?php echo esc_attr($map_lng); ?>">
                     </div>
+                    
+                    <!-- Load Leaflet CSS and JS -->
+                    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+                          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+                          crossorigin=""/>
+                    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+                            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+                            crossorigin=""></script>
+                    
+                    <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Initialize map only if the map container exists
+                        var mapContainer = document.getElementById('yatra-openstreet-map');
+                        if (!mapContainer) return;
+                        
+                        var lat = parseFloat('<?php echo esc_js($map_lat); ?>');
+                        var lng = parseFloat('<?php echo esc_js($map_lng); ?>');
+                        var startingLocation = '<?php echo esc_js($trip->starting_location ?? ''); ?>';
+                        
+                        // Initialize the map
+                        var map = L.map('yatra-openstreet-map').setView([lat, lng], 13);
+                        
+                        // Add OpenStreetMap tiles
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                            maxZoom: 19
+                        }).addTo(map);
+                        
+                        // Create custom icon for the marker
+                        var customIcon = L.divIcon({
+                            html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><span style="transform: rotate(45deg); font-size: 14px;">📍</span></div>',
+                            iconSize: [30, 30],
+                            iconAnchor: [15, 30],
+                            popupAnchor: [0, -30],
+                            className: 'yatra-custom-marker'
+                        });
+                        
+                        // Add marker for starting location
+                        var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+                        
+                        // Create popup content
+                        var popupContent = startingLocation ? 
+                            '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">' + startingLocation + '</strong><br><span style="color: #64748b; font-size: 12px;">Starting Point</span><br><span style="color: #3b82f6; font-size: 11px;">' + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>' :
+                            '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">Trip Starting Location</strong><br><span style="color: #64748b; font-size: 12px;">Coordinates</span><br><span style="color: #3b82f6; font-size: 11px;">' + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>';
+                        
+                        marker.bindPopup(popupContent).openPopup();
+                        
+                        // Add a subtle animation to the marker
+                        setTimeout(function() {
+                            marker.bounce = true;
+                            var bounceIcon = L.divIcon({
+                                html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg) scale(1.1); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); animation: pulse 2s infinite;"><span style="transform: rotate(45deg); font-size: 14px;">📍</span></div>',
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 30],
+                                popupAnchor: [0, -30],
+                                className: 'yatra-custom-marker yatra-marker-bounce'
+                            });
+                            marker.setIcon(bounceIcon);
+                        }, 500);
+                        
+                        // Add CSS animation
+                        var style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes pulse {
+                                0% { transform: rotate(-45deg) scale(1); }
+                                50% { transform: rotate(-45deg) scale(1.2); }
+                                100% { transform: rotate(-45deg) scale(1); }
+                            }
+                            .yatra-custom-marker {
+                                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+                                transition: all 0.3s ease;
+                            }
+                            .yatra-custom-marker:hover {
+                                filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    });
+                    </script>
                 <?php else: ?>
                     <div class="yatra-trip-map yatra-map-placeholder">
                         <p><?php echo esc_html__('Map location not available', 'yatra'); ?></p>
@@ -73,7 +147,7 @@ if (!defined('ABSPATH')) {
                         <div class="yatra-location-content">
                             <div class="yatra-location-label"><?php echo esc_html__('Starting Location Coordinates', 'yatra'); ?></div>
                             <div class="yatra-location-value">
-                                <a href="https://www.google.com/maps?q=<?php echo esc_attr($trip->latitude); ?>,<?php echo esc_attr($trip->longitude); ?>" 
+                                <a href="https://www.openstreetmap.org/?mlat=<?php echo esc_attr($trip->latitude); ?>&mlon=<?php echo esc_attr($trip->longitude); ?>#map=15/<?php echo esc_attr($trip->latitude); ?>/<?php echo esc_attr($trip->longitude); ?>" 
                                    target="_blank" 
                                    rel="noopener noreferrer"
                                    class="yatra-coordinates-link">

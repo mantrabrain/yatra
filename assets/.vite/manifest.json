@@ -11,112 +11,11 @@
     "file": "admin/dist/css/index.css",
     "src": "_index-!~{002}~.js"
   },
-  "_index-0Q_xhKfx.js": {
-    "file": "dist/js/index-0Q_xhKfx.js",
-    "name": "index",
-    "imports": [
-      "_clsx-DgYk2OaC.js",
-      "_react-vendor-1LbbotXm.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "dynamicImports": [
-      "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
-    ]
-  },
-  "_index-B5fPvAqc.js": {
-    "file": "dist/js/index-B5fPvAqc.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-BZn3M6ju.js": {
-    "file": "dist/js/index-BZn3M6ju.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-B_-9Q1Pm.js": {
-    "file": "dist/js/index-B_-9Q1Pm.js",
-    "name": "index",
-    "imports": [
-      "_clsx-DgYk2OaC.js",
-      "_react-vendor-SjlrvcpC.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "dynamicImports": [
-      "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
-    ]
-  },
   "_index-C1bUwUdP.js": {
     "file": "dist/js/index-C1bUwUdP.js",
     "name": "index",
     "imports": [
       "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-CN7DNpA4.js": {
-    "file": "dist/js/index-CN7DNpA4.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-Cx4y5Ucr.js": {
-    "file": "dist/js/index-Cx4y5Ucr.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-DKN4YitT.js": {
-    "file": "dist/js/index-DKN4YitT.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-1LbbotXm.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-QdhgJSyb.js": {
-    "file": "dist/js/index-QdhgJSyb.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
-  "_index-guY8zmvT.js": {
-    "file": "dist/js/index-guY8zmvT.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-SjlrvcpC.js",
       "_default-i18n-EdzemK12.js"
     ],
     "css": [
@@ -135,34 +34,9 @@
       "node_modules/@wordpress/vips/build-module/vips-worker.mjs"
     ]
   },
-  "_index-q4nk_CBw.js": {
-    "file": "dist/js/index-q4nk_CBw.js",
-    "name": "index",
-    "imports": [
-      "_react-vendor-hrdf7Caa.js",
-      "_default-i18n-EdzemK12.js"
-    ],
-    "css": [
-      "admin/dist/css/index.css"
-    ]
-  },
   "_react-vendor-!~{001}~.js": {
     "file": "admin/dist/css/react-vendor.css",
     "src": "_react-vendor-!~{001}~.js"
-  },
-  "_react-vendor-1LbbotXm.js": {
-    "file": "admin/dist/js/react-vendor-1LbbotXm.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
-  },
-  "_react-vendor-SjlrvcpC.js": {
-    "file": "admin/dist/js/react-vendor-SjlrvcpC.js",
-    "name": "react-vendor",
-    "css": [
-      "admin/dist/css/react-vendor.css"
-    ]
   },
   "_react-vendor-hrdf7Caa.js": {
     "file": "admin/dist/js/react-vendor-hrdf7Caa.js",

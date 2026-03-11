@@ -150,7 +150,6 @@ class SettingsController extends BaseController
         // Integration Settings
         'google_analytics' => '',
         'facebook_pixel' => '',
-        'google_maps_api' => '',
         'recaptcha_enabled' => false,
         'recaptcha_site_key' => '',
         'recaptcha_secret_key' => '',
@@ -505,7 +504,7 @@ class SettingsController extends BaseController
             if ($key === 'company_email' || $key === 'admin_email' || $key === 'from_email' || $key === 'smtp_username') {
                 return sanitize_email($value);
             }
-            if ($key === 'company_website' || $key === 'company_logo' || $key === 'google_analytics' || $key === 'facebook_pixel' || $key === 'google_maps_api') {
+            if ($key === 'company_website' || $key === 'company_logo' || $key === 'google_analytics' || $key === 'facebook_pixel') {
                 return esc_url_raw($value);
             }
             if ($key === 'refund_policy' || $key === 'cancellation_policy') {

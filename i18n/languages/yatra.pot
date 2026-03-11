@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-11T09:49:57+00:00\n"
+"POT-Creation-Date: 2026-03-11T14:21:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -120,33 +120,33 @@ msgstr ""
 msgid "Activity created successfully"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:240
+#: app/Controllers/ActivityController.php:236
 msgid "Failed to update activity"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:244
+#: app/Controllers/ActivityController.php:240
 msgid "Activity updated successfully"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:262
+#: app/Controllers/ActivityController.php:258
 msgid "Failed to delete activity"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:266
+#: app/Controllers/ActivityController.php:262
 msgid "Activity deleted successfully"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:284
-#: app/Controllers/DestinationController.php:255
+#: app/Controllers/ActivityController.php:280
+#: app/Controllers/DestinationController.php:242
 msgid "Action is required"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:288
+#: app/Controllers/ActivityController.php:284
 msgid "No activities selected"
 msgstr ""
 
-#: app/Controllers/ActivityController.php:308
-#: app/Controllers/DestinationController.php:279
+#: app/Controllers/ActivityController.php:304
+#: app/Controllers/DestinationController.php:266
 msgid "Invalid action"
 msgstr ""
 
@@ -1016,25 +1016,25 @@ msgstr ""
 msgid "This coupon requires a minimum group size of %d travelers."
 msgstr ""
 
-#: app/Controllers/CategoryController.php:101
-#: app/Controllers/CategoryController.php:151
-#: app/Controllers/CategoryController.php:173
-#: app/Controllers/TripCategoryController.php:188
+#: app/Controllers/CategoryController.php:89
+#: app/Controllers/CategoryController.php:135
+#: app/Controllers/CategoryController.php:157
+#: app/Controllers/TripCategoryController.php:184
 msgid "Category not found"
 msgstr ""
 
-#: app/Controllers/CategoryController.php:127
-#: app/Controllers/TripCategoryController.php:224
+#: app/Controllers/CategoryController.php:115
+#: app/Controllers/TripCategoryController.php:220
 msgid "Category created successfully"
 msgstr ""
 
-#: app/Controllers/CategoryController.php:156
-#: app/Controllers/TripCategoryController.php:242
+#: app/Controllers/CategoryController.php:140
+#: app/Controllers/TripCategoryController.php:238
 msgid "Category updated successfully"
 msgstr ""
 
-#: app/Controllers/CategoryController.php:177
-#: app/Controllers/TripCategoryController.php:261
+#: app/Controllers/CategoryController.php:161
+#: app/Controllers/TripCategoryController.php:257
 msgid "Category deleted successfully"
 msgstr ""
 
@@ -1065,23 +1065,23 @@ msgstr ""
 msgid "Destination created successfully"
 msgstr ""
 
-#: app/Controllers/DestinationController.php:176
+#: app/Controllers/DestinationController.php:172
 msgid "Failed to update destination"
 msgstr ""
 
-#: app/Controllers/DestinationController.php:180
+#: app/Controllers/DestinationController.php:176
 msgid "Destination updated successfully"
 msgstr ""
 
-#: app/Controllers/DestinationController.php:195
+#: app/Controllers/DestinationController.php:191
 msgid "Failed to delete destination"
 msgstr ""
 
-#: app/Controllers/DestinationController.php:199
+#: app/Controllers/DestinationController.php:195
 msgid "Destination deleted successfully"
 msgstr ""
 
-#: app/Controllers/DestinationController.php:259
+#: app/Controllers/DestinationController.php:246
 msgid "No destinations selected"
 msgstr ""
 
@@ -1646,11 +1646,11 @@ msgstr ""
 msgid "Traveler category deleted successfully"
 msgstr ""
 
-#: app/Controllers/TripCategoryController.php:238
+#: app/Controllers/TripCategoryController.php:234
 msgid "Failed to update category"
 msgstr ""
 
-#: app/Controllers/TripCategoryController.php:257
+#: app/Controllers/TripCategoryController.php:253
 msgid "Failed to delete category"
 msgstr ""
 
@@ -1765,13 +1765,13 @@ msgstr ""
 
 #: app/Controllers/TripController.php:1767
 #: app/Controllers/TripController.php:1780
-#: templates/partials/single-trip/content-location.php:50
+#: templates/partials/single-trip/content-location.php:124
 msgid "Starting Point"
 msgstr ""
 
 #: app/Controllers/TripController.php:1770
 #: app/Controllers/TripController.php:1781
-#: templates/partials/single-trip/content-location.php:62
+#: templates/partials/single-trip/content-location.php:136
 msgid "Ending Point"
 msgstr ""
 
@@ -2126,27 +2126,27 @@ msgstr ""
 msgid "Message:"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:48
+#: app/Hooks/UtilsHooks.php:51
 msgid "Edit Trip"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:51
+#: app/Hooks/UtilsHooks.php:54
 msgid "Edit this trip in Yatra admin"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:69
+#: app/Hooks/UtilsHooks.php:75
 msgid "Edit Destination"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:73
+#: app/Hooks/UtilsHooks.php:79
 msgid "Edit Activity"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:77
+#: app/Hooks/UtilsHooks.php:83
 msgid "Edit Category"
 msgstr ""
 
-#: app/Hooks/UtilsHooks.php:91
+#: app/Hooks/UtilsHooks.php:98
 #, php-format
 msgid "Edit this %s in Yatra admin"
 msgstr ""
@@ -3035,25 +3035,25 @@ msgstr ""
 msgid "Educational"
 msgstr ""
 
-#: app/Services/ActivityService.php:367
-#: app/Services/ActivityService.php:395
+#: app/Services/ActivityService.php:359
+#: app/Services/ActivityService.php:387
 msgid "No activities selected."
 msgstr ""
 
 #. translators: %d number of activities
-#: app/Services/ActivityService.php:382
+#: app/Services/ActivityService.php:374
 #, php-format
 msgid "%d activity updated."
 msgid_plural "%d activities updated."
 msgstr[0] ""
 msgstr[1] ""
 
-#: app/Services/ActivityService.php:400
+#: app/Services/ActivityService.php:392
 msgid "Failed to delete activities."
 msgstr ""
 
 #. translators: %d number of activities
-#: app/Services/ActivityService.php:406
+#: app/Services/ActivityService.php:398
 #, php-format
 msgid "%d activity deleted."
 msgid_plural "%d activities deleted."
@@ -4290,26 +4290,6 @@ msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] ""
 msgstr[1] ""
-
-#: includes/seo-helper.php:58
-#: templates/partials/single-trip/hero.php:66
-#, php-format
-msgid "%d day %d night"
-msgid_plural "%d days %d nights"
-msgstr[0] ""
-msgstr[1] ""
-
-#: includes/seo-helper.php:60
-#: templates/partials/single-trip/hero.php:68
-#, php-format
-msgid "%d day"
-msgid_plural "%d days"
-msgstr[0] ""
-msgstr[1] ""
-
-#: includes/seo-helper.php:191
-msgid "Based on customer reviews"
-msgstr ""
 
 #: templates/admin.php:96
 msgid "🚀 Yatra Admin UI Setup Required"
@@ -5922,15 +5902,15 @@ msgstr ""
 msgid "Location"
 msgstr ""
 
-#: templates/partials/single-trip/content-location.php:37
+#: templates/partials/single-trip/content-location.php:111
 msgid "Map location not available"
 msgstr ""
 
-#: templates/partials/single-trip/content-location.php:74
+#: templates/partials/single-trip/content-location.php:148
 msgid "Starting Location Coordinates"
 msgstr ""
 
-#: templates/partials/single-trip/content-location.php:94
+#: templates/partials/single-trip/content-location.php:168
 msgid "Key Landmarks"
 msgstr ""
 
@@ -6240,6 +6220,20 @@ msgstr[1] ""
 #: templates/partials/single-trip/hero.php:50
 msgid "No reviews yet"
 msgstr ""
+
+#: templates/partials/single-trip/hero.php:66
+#, php-format
+msgid "%d day %d night"
+msgid_plural "%d days %d nights"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/partials/single-trip/hero.php:68
+#, php-format
+msgid "%d day"
+msgid_plural "%d days"
+msgstr[0] ""
+msgstr[1] ""
 
 #: templates/partials/single-trip/hero.php:124
 msgid "SAVE"

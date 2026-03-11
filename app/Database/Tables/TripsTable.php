@@ -58,8 +58,10 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     -- LOCATION & GEOGRAPHY (Form Fields)
     `starting_location` varchar(255) DEFAULT NULL COMMENT 'Pickup/start point',
     `ending_location` varchar(255) DEFAULT NULL COMMENT 'Drop-off/end point',
-    `latitude` decimal(10,8) DEFAULT NULL COMMENT 'Map center latitude',
-    `longitude` decimal(11,8) DEFAULT NULL COMMENT 'Map center longitude',
+    `starting_latitude` decimal(10,8) DEFAULT NULL COMMENT 'Starting location latitude',
+    `starting_longitude` decimal(11,8) DEFAULT NULL COMMENT 'Starting location longitude',
+    `ending_latitude` decimal(10,8) DEFAULT NULL COMMENT 'Ending location latitude',
+    `ending_longitude` decimal(11,8) DEFAULT NULL COMMENT 'Ending location longitude',
     
     -- DURATION & SCHEDULE (Form Fields)
     `trip_type` varchar(50) DEFAULT 'multi_day',
@@ -174,7 +176,11 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `idx_bookings_count` (`bookings_count`),
     KEY `idx_avg_rating` (`avg_rating`),
     KEY `idx_deleted_at` (`deleted_at`),
-    KEY `idx_featured_image` (`featured_image`)
+    KEY `idx_featured_image` (`featured_image`),
+    KEY `idx_starting_latitude` (`starting_latitude`),
+    KEY `idx_starting_longitude` (`starting_longitude`),
+    KEY `idx_ending_latitude` (`ending_latitude`),
+    KEY `idx_ending_longitude` (`ending_longitude`)
 ) {$charsetCollate} COMMENT='Optimized trips table with only used fields';
 SQL;
     }

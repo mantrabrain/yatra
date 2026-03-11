@@ -208,12 +208,20 @@ class TripValidator
             $sanitized['ending_location'] = sanitize_text_field($data['ending_location']);
         }
 
-        if (isset($data['latitude'])) {
-            $sanitized['latitude'] = is_numeric($data['latitude']) ? (float) $data['latitude'] : null;
+        if (isset($data['starting_latitude'])) {
+            $sanitized['starting_latitude'] = is_numeric($data['starting_latitude']) ? (float) $data['starting_latitude'] : null;
         }
 
-        if (isset($data['longitude'])) {
-            $sanitized['longitude'] = is_numeric($data['longitude']) ? (float) $data['longitude'] : null;
+        if (isset($data['starting_longitude'])) {
+            $sanitized['starting_longitude'] = is_numeric($data['starting_longitude']) ? (float) $data['starting_longitude'] : null;
+        }
+
+        if (isset($data['ending_latitude'])) {
+            $sanitized['ending_latitude'] = is_numeric($data['ending_latitude']) ? (float) $data['ending_latitude'] : null;
+        }
+
+        if (isset($data['ending_longitude'])) {
+            $sanitized['ending_longitude'] = is_numeric($data['ending_longitude']) ? (float) $data['ending_longitude'] : null;
         }
 
         if (isset($data['seasonal_availability'])) {

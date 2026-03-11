@@ -43,7 +43,7 @@ class UtilsHooks
         global $trip;
         if (!empty($trip) && !empty($trip->id)) {
             // Build the edit URL for the trip
-            $edit_url = admin_url('admin.php?page=yatra&subpage=trips&tab=categories&action=edit&id=3' . (int) $trip->id);
+            $edit_url = admin_url('admin.php?page=yatra&subpage=trips&action=edit&id=' . (int) $trip->id);
 
             // Add the Edit Trip node
             $admin_bar->add_node([
@@ -69,7 +69,7 @@ class UtilsHooks
             $tabs = '';
             $title = '';
 
-            switch ($type) {
+             switch ($type) {
                 case 'destination':
                     $tabs = 'destinations';
                     $title = __('Edit Destination', 'yatra');

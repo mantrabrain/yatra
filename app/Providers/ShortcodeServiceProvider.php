@@ -17,6 +17,7 @@ use Yatra\Ajax\ActivityShortcodeAjax;
 use Yatra\Ajax\DestinationShortcodeAjax;
 use Yatra\Ajax\DiscountShortcodeAjax;
 use Yatra\Ajax\LoginAjax;
+use Yatra\Ajax\GeocodingAjax;
 
 /**
  * Shortcode Service Provider
@@ -47,7 +48,8 @@ class ShortcodeServiceProvider extends \Yatra\Core\ServiceProvider
             'ActivityShortcodeAjax', 
             'DestinationShortcodeAjax',
             'DiscountShortcodeAjax',
-            'LoginAjax'
+            'LoginAjax',
+            'GeocodingAjax'
         ];
 
         foreach ($ajax_handlers as $handler_class) {

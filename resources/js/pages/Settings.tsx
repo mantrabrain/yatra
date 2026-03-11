@@ -735,7 +735,6 @@ interface SettingsData {
   // Integration Settings
   google_analytics: string;
   facebook_pixel: string;
-  google_maps_api: string;
   recaptcha_enabled: boolean;
   recaptcha_site_key: string;
   recaptcha_secret_key: string;
@@ -2231,7 +2230,6 @@ const Settings: React.FC = () => {
       sms_api_key: "",
       google_analytics: "",
       facebook_pixel: "",
-      google_maps_api: "",
       recaptcha_enabled: false,
       recaptcha_site_key: "",
       recaptcha_secret_key: "",
@@ -6742,26 +6740,26 @@ const Settings: React.FC = () => {
               </CardContent>
             </Card>
 
-            {/* Google Maps API - Free Feature */}
-            <SectionDivider title={__("Google Maps", "yatra")} />
+            {/* OpenStreetMap - Free Feature */}
+            <SectionDivider title={__("Maps", "yatra")} />
             <div className="space-y-4">
-              <FormField
-                id="google_maps_api"
-                label={__("Google Maps API Key", "yatra")}
-                description={__(
-                  "API key for displaying maps and location features",
-                  "yatra",
-                )}
-              >
-                <Input
-                  id="google_maps_api"
-                  type="password"
-                  value={formData.google_maps_api}
-                  name="google_maps_api"
-                  onChange={handleFieldChange}
-                  placeholder={__("Enter Google Maps API Key", "yatra")}
-                />
-              </FormField>
+              <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div className="flex items-start gap-3">
+                  <div className="w-6 h-6 text-blue-600 dark:text-blue-400 mt-0.5">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                      {__("OpenStreetMap Integration", "yatra")}
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      {__("Maps are powered by OpenStreetMap - a free, open-source mapping service. No API key required! Maps will automatically display trip starting locations with custom markers.", "yatra")}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <SectionDivider title={__("reCAPTCHA Settings", "yatra")} />

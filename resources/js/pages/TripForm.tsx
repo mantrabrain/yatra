@@ -98,6 +98,7 @@ import { ConfirmationDialog } from "../components/ui/confirmation-dialog";
 import { useToast } from "../components/ui/toast";
 import { MultiSelect } from "../components/ui/multi-select";
 import { TestimonialsSelector } from "../components/trip-form/TestimonialsSelector";
+import { LocationPicker, LocationData } from "../components/trip-form/LocationPicker";
 import { getErrorContext } from "../lib/errors";
 
 type SectionId =
@@ -272,8 +273,10 @@ interface TripFormData {
   ending_location: string;
   countries: string[];
   regions: string[];
-  latitude: string;
-  longitude: string;
+  starting_latitude: string;
+  starting_longitude: string;
+  ending_latitude: string;
+  ending_longitude: string;
   landmarks: string[]; // Geographic Tags - Landmarks
 
   // Duration & Schedule
@@ -586,8 +589,10 @@ const TripForm: React.FC = () => {
       ending_location: "Seminyak Beach Resort",
       countries: ["Indonesia"],
       regions: ["Bali"],
-      latitude: "-8.3405",
-      longitude: "115.0920",
+      starting_latitude: "-8.3405",
+      starting_longitude: "115.0920",
+      ending_latitude: "-8.5069",
+      ending_longitude: "115.2625",
       landmarks: [
         "Tanah Lot Temple",
         "Ubud Monkey Forest",
@@ -837,8 +842,10 @@ const TripForm: React.FC = () => {
       ending_location: "Lukla Airport",
       countries: ["Nepal"],
       regions: ["Khumbu Region"],
-      latitude: "27.9881",
-      longitude: "86.9250",
+      starting_latitude: "27.9881",
+      starting_longitude: "86.9250",
+      ending_latitude: "27.6837",
+      ending_longitude: "86.7330",
       landmarks: [
         "Mount Everest",
         "Namche Bazaar",
@@ -1092,8 +1099,10 @@ const TripForm: React.FC = () => {
       ending_location: "El Prat Airport (BCN)",
       countries: ["France", "Italy", "Spain"],
       regions: ["Île-de-France", "Lazio", "Catalonia"],
-      latitude: "48.8566",
-      longitude: "2.3522",
+      starting_latitude: "48.8566",
+      starting_longitude: "2.3522",
+      ending_latitude: "41.3792",
+      ending_longitude: "2.1281",
       landmarks: [
         "Eiffel Tower",
         "Colosseum",
@@ -1331,8 +1340,10 @@ const TripForm: React.FC = () => {
     ending_location: "",
     countries: [],
     regions: [],
-    latitude: "",
-    longitude: "",
+    starting_latitude: "",
+    starting_longitude: "",
+    ending_latitude: "",
+    ending_longitude: "",
     landmarks: [],
     trip_type: "multi_day",
     duration_days: "",
@@ -2054,8 +2065,10 @@ const TripForm: React.FC = () => {
       ending_location: tripData.ending_location || "",
       countries: Array.isArray(tripData.countries) ? tripData.countries : [],
       regions: Array.isArray(tripData.regions) ? tripData.regions : [],
-      latitude: tripData.latitude?.toString() || "",
-      longitude: tripData.longitude?.toString() || "",
+      starting_latitude: tripData.starting_latitude?.toString() || "",
+      starting_longitude: tripData.starting_longitude?.toString() || "",
+      ending_latitude: tripData.ending_latitude?.toString() || "",
+      ending_longitude: tripData.ending_longitude?.toString() || "",
       landmarks: Array.isArray(tripData.landmarks) ? tripData.landmarks : [],
       trip_type: (tripData.trip_type ||
         (tripData.duration_days &&
@@ -3128,8 +3141,10 @@ const TripForm: React.FC = () => {
         ending_location: data.ending_location.trim(),
         countries: data.countries || [],
         regions: data.regions || [],
-        latitude: data.latitude ? parseFloat(data.latitude) : null,
-        longitude: data.longitude ? parseFloat(data.longitude) : null,
+        starting_latitude: data.starting_latitude ? parseFloat(data.starting_latitude) : null,
+        starting_longitude: data.starting_longitude ? parseFloat(data.starting_longitude) : null,
+        ending_latitude: data.ending_latitude ? parseFloat(data.ending_latitude) : null,
+        ending_longitude: data.ending_longitude ? parseFloat(data.ending_longitude) : null,
         landmarks: data.landmarks || [],
         trip_type: data.trip_type,
         duration_days: data.duration_days ? parseInt(data.duration_days) : null,
@@ -4606,95 +4621,324 @@ const TripForm: React.FC = () => {
                 )}
               </div>
 
-              {/* Starting & Ending Locations */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="starting_location"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Starting Location", "yatra")}
-                  </label>
-                  <Input
-                    id="starting_location"
-                    type="text"
-                    value={formData.starting_location}
-                    onChange={(e) =>
-                      handleFieldChange("starting_location", e.target.value)
-                    }
-                    placeholder={__("e.g., Denpasar Airport", "yatra")}
-                  />
+              {/* Locations Section - Senior UI/UX Design */}
+              <div className="space-y-8">
+                {/* Section Header */}
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center justify-center gap-2">
+                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <MapPin className="w-3 h-3 text-white" />
+                    </div>
+                    {__("Trip Locations", "yatra")}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+                    {__("Set precise starting and ending points with location names and GPS coordinates. Use manual entry or visual map selection for maximum accuracy.", "yatra")}
+                  </p>
                 </div>
-                <div>
-                  <label
-                    htmlFor="ending_location"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Ending Location", "yatra")}
-                  </label>
-                  <Input
-                    id="ending_location"
-                    type="text"
-                    value={formData.ending_location}
-                    onChange={(e) =>
-                      handleFieldChange("ending_location", e.target.value)
-                    }
-                    placeholder={__("e.g., Ubud Hotel", "yatra")}
-                  />
-                </div>
-              </div>
 
-              {/* GPS Coordinates */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label
-                    htmlFor="latitude"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Starting Location Latitude", "yatra")}
-                  </label>
-                  <Input
-                    id="latitude"
-                    type="text"
-                    value={formData.latitude}
-                    onChange={(e) =>
-                      handleFieldChange("latitude", e.target.value)
-                    }
-                    placeholder={__("e.g., -8.3405", "yatra")}
-                  />
-                  <HelpText
-                    text={__(
-                      "GPS latitude coordinate of the starting location for trip map",
-                      "yatra",
-                    )}
-                    className="mt-2"
-                  />
+                {/* Locations Grid */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  
+                  {/* STARTING LOCATION */}
+                  <div className="space-y-6">
+                    {/* Location Header */}
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <MapPin className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-base font-semibold text-blue-900 dark:text-blue-100">
+                          {__("Starting Point", "yatra")}
+                        </h4>
+                        <p className="text-xs text-blue-700 dark:text-blue-300">
+                          {__("Where the journey begins", "yatra")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {formData.starting_location && (
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Location set"></div>
+                        )}
+                        {formData.starting_latitude && formData.starting_longitude && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" title="Coordinates set"></div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Integrated Location Input with Map */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">1</span>
+                          </div>
+                          {__("Starting Location", "yatra")}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {formData.starting_location ? "✓" : __("Required", "yatra")}
+                          </span>
+                          {formData.starting_latitude && formData.starting_longitude && (
+                            <div className="flex items-center gap-1 text-xs text-green-600">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              {__("Coords Set", "yatra")}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* LocationPicker - Primary Interface */}
+                      <div className="space-y-3">
+                        <LocationPicker
+                          value={{
+                            name: formData.starting_location,
+                            latitude: formData.starting_latitude,
+                            longitude: formData.starting_longitude
+                          }}
+                          onChange={(locationData) => {
+                            handleFieldChange("starting_location", locationData.name);
+                            handleFieldChange("starting_latitude", locationData.latitude);
+                            handleFieldChange("starting_longitude", locationData.longitude);
+                          }}
+                          label=""
+                          placeholder={__("Search for starting location...", "yatra")}
+                          helpText=""
+                          required={false}
+                          defaultMapCenter={formData.starting_latitude && formData.starting_longitude ? 
+                            [parseFloat(formData.starting_latitude), parseFloat(formData.starting_longitude)] : 
+                            [-8.3405, 115.0920]
+                          }
+                          defaultZoom={13}
+                          mapHeight="300px"
+                          showMapButton={false}
+                          searchLimit={8}
+                          __={__}
+                          className=""
+                          mapClassName="rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    {/* GPS Coordinates - Manual Override */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-blue-600 dark:text-blue-400">2</span>
+                          </div>
+                          {__("GPS Coordinates", "yatra")}
+                          <span className="text-xs text-gray-500 dark:text-gray-400">({__("Manual override", "yatra")})</span>
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (navigator.geolocation) {
+                                navigator.geolocation.getCurrentPosition(
+                                  (position) => {
+                                    handleFieldChange("starting_latitude", position.coords.latitude.toString());
+                                    handleFieldChange("starting_longitude", position.coords.longitude.toString());
+                                  },
+                                  (error) => {
+                                    let message = __("Unable to get your location", "yatra");
+                                    let showHttpsNotice = false;
+                                    
+                                    switch (error.code) {
+                                      case 1: // PERMISSION_DENIED
+                                        if (error.message.includes('secure origins')) {
+                                          message = __("Location access requires HTTPS. This feature will work on your live HTTPS site.", "yatra");
+                                          showHttpsNotice = true;
+                                        } else {
+                                          message = __("Location access denied. Please allow location access in your browser.", "yatra");
+                                        }
+                                        break;
+                                      case 2: // POSITION_UNAVAILABLE
+                                        message = __("Location information is unavailable. Please try again.", "yatra");
+                                        break;
+                                      case 3: // TIMEOUT
+                                        message = __("Location request timed out. Please try again.", "yatra");
+                                        break;
+                                    }
+                                    
+                                    if (showHttpsNotice) {
+                                      alert(message + "\n\n" + __("For local development, you can:\n1. Use a browser extension that allows geolocation on HTTP\n2. Set up a local HTTPS certificate\n3. Test on your live HTTPS site", "yatra"));
+                                    } else {
+                                      alert(message);
+                                    }
+                                  }
+                                );
+                              } else {
+                                alert(__("Geolocation is not supported by your browser", "yatra"));
+                              }
+                            }}
+                            className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-1"
+                          >
+                            <div className="w-3 h-3">
+                              <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            {__("Use Current Location", "yatra")}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                            {__("Latitude", "yatra")}
+                          </label>
+                          <Input
+                            type="text"
+                            value={formData.starting_latitude}
+                            onChange={(e) => handleFieldChange("starting_latitude", e.target.value)}
+                            className="w-full text-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                            {__("Longitude", "yatra")}
+                          </label>
+                          <Input
+                            type="text"
+                            value={formData.starting_longitude}
+                            onChange={(e) => handleFieldChange("starting_longitude", e.target.value)}
+                            placeholder={__("e.g., 115.0920", "yatra")}
+                            className="w-full text-sm"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {__("Manual coordinate entry. These will be auto-filled when you select a location from the map above.", "yatra")}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* ENDING LOCATION */}
+                  <div className="space-y-6">
+                    {/* Location Header */}
+                    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl border border-green-200 dark:border-green-800">
+                      <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <CheckCircle2 className="w-5 h-5 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-base font-semibold text-green-900 dark:text-green-100">
+                          {__("Ending Point", "yatra")}
+                        </h4>
+                        <p className="text-xs text-green-700 dark:text-green-300">
+                          {__("Where the journey concludes", "yatra")}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {formData.ending_location && (
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" title="Location set"></div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Integrated Location Input with Map */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <div className="w-4 h-4 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400">1</span>
+                          </div>
+                          {__("Ending Location", "yatra")}
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {formData.ending_location ? "✓" : __("Required", "yatra")}
+                          </span>
+                          {formData.ending_latitude && formData.ending_longitude && (
+                            <div className="flex items-center gap-1 text-xs text-green-600">
+                              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                              {__("Coords Set", "yatra")}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {/* LocationPicker - Primary Interface */}
+                      <div className="space-y-3">
+                        <LocationPicker
+                          value={{
+                            name: formData.ending_location,
+                            latitude: formData.ending_latitude,
+                            longitude: formData.ending_longitude
+                          }}
+                          onChange={(locationData) => {
+                            handleFieldChange("ending_location", locationData.name);
+                            handleFieldChange("ending_latitude", locationData.latitude);
+                            handleFieldChange("ending_longitude", locationData.longitude);
+                          }}
+                          label=""
+                          placeholder={__("Search for ending location...", "yatra")}
+                          helpText=""
+                          required={false}
+                          defaultMapCenter={formData.ending_latitude && formData.ending_longitude ? 
+                            [parseFloat(formData.ending_latitude), parseFloat(formData.ending_longitude)] : 
+                            [-8.5069, 115.2625]
+                          }
+                          defaultZoom={13}
+                          mapHeight="300px"
+                          showMapButton={false}
+                          searchLimit={8}
+                          __={__}
+                          className=""
+                          mapClassName="rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    {/* GPS Coordinates - Manual Override */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <div className="w-4 h-4 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-green-600 dark:text-green-400">2</span>
+                          </div>
+                          {__("GPS Coordinates", "yatra")}
+                          <span className="text-xs text-gray-500 dark:text-gray-400">({__("Optional", "yatra")})</span>
+                        </label>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            {__("Latitude", "yatra")}
+                          </label>
+                          <Input
+                            type="text"
+                            value={formData.ending_latitude || ""}
+                            onChange={(e) => handleFieldChange("ending_latitude", e.target.value)}
+                            placeholder={__("e.g., -8.5069", "yatra")}
+                            className="w-full text-sm"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            {__("Longitude", "yatra")}
+                          </label>
+                          <Input
+                            type="text"
+                            value={formData.ending_longitude || ""}
+                            onChange={(e) => handleFieldChange("ending_longitude", e.target.value)}
+                            placeholder={__("e.g., 115.2625", "yatra")}
+                            className="w-full text-sm"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {__("Optional: Manual coordinate entry. Auto-filled when you select a location from the map above.", "yatra")}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label
-                    htmlFor="longitude"
-                    className="block text-xs font-normal text-gray-500 dark:text-gray-400 mb-1.5"
-                  >
-                    {__("Starting Location Longitude", "yatra")}
-                  </label>
-                  <Input
-                    id="longitude"
-                    type="text"
-                    value={formData.longitude}
-                    onChange={(e) =>
-                      handleFieldChange("longitude", e.target.value)
-                    }
-                    placeholder={__("e.g., 115.0920", "yatra")}
-                  />
-                  <HelpText
-                    text={__(
-                      "GPS longitude coordinate of the starting location for trip map",
-                      "yatra",
-                    )}
-                    className="mt-2"
-                  />
-                </div>
-              </div>
+
+                              </div>
 
               {/* Landmarks */}
               <div>
