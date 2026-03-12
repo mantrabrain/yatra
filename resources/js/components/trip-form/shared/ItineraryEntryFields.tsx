@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { MapPin, Clock, X, Plus, Info } from "lucide-react";
+import { Clock, X, Plus, Info } from "lucide-react";
 import { __ } from "../../../lib/i18n";
 import { ItineraryEntry, MediaItem } from "../types";
 import { Input } from "../../ui/input";
@@ -17,6 +17,7 @@ import { TimePicker } from "../../ui/time-picker";
 import { MediaUpload } from "../../ui/media-upload";
 import { Modal } from "../../ui/modal";
 import { getCurrencySymbol } from "../../../data/currencies";
+import { LocationPicker } from "../LocationPicker";
 
 interface ItineraryEntryFieldsProps {
   entry: Partial<ItineraryEntry>;
@@ -354,25 +355,141 @@ export const ItineraryEntryFields: React.FC<ItineraryEntryFieldsProps> = ({
           <label
             className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 mb-1.5`}
           >
-            {__("Location", "yatra")}
+            {__("Activity Location", "yatra")}
           </label>
           <HelpText
             text={__(
-              'Where does this activity take place? (e.g., "Resort restaurant", "Private beach")',
+              'Where does this activity take place? You can search for a location or enter coordinates manually.',
               "yatra",
             )}
             className="mb-2"
           />
-          <div className="relative">
-            <MapPin className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <Input
-              type="text"
-              value={entry.location || ""}
-              onChange={(e) => onFieldChange("location", e.target.value)}
-              placeholder={__("e.g., Resort restaurant", "yatra")}
-              className={`pl-9 ${textSize}`}
-            />
+          <LocationPicker
+            value={{
+              name: entry.location || "",
+              latitude: entry.location_latitude || "",
+              longitude: entry.location_longitude || ""
+            }}
+            onChange={(locationData) => {
+              onFieldChange("location", locationData.name);
+              onFieldChange("location_latitude", locationData.latitude);
+              onFieldChange("location_longitude", locationData.longitude);
+            }}
+            label=""
+            placeholder={__("Search for location...", "yatra")}
+            helpText=""
+            required={false}
+            defaultMapCenter={entry.location_latitude && entry.location_longitude ? 
+              [parseFloat(entry.location_latitude), parseFloat(entry.location_longitude)] : 
+              [-8.3405, 115.0920]
+            }
+            defaultZoom={13}
+            mapHeight="300px"
+            showMapButton={false}
+            searchLimit={8}
+            __={__}
+            className=""
+            mapClassName="rounded-lg"
+          />
+        </div>
+
+        {/* GPS Coordinates - Manual Override */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className={`block ${labelSize} font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2`}>
+              <div className="w-4 h-4 bg-blue-100 dark:bg-blue-900 rounded flex items-center justify-center">
+                <span className="text-xs font-bold text-blue-600 dark:text-blue-400">2</span>
+              </div>
+              {__("GPS Coordinates", "yatra")}
+              <span className="text-xs text-gray-500 dark:text-gray-400">({__("Manual override", "yatra")})</span>
+            </label>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                        onFieldChange("location_latitude", position.coords.latitude.toString());
+                        onFieldChange("location_longitude", position.coords.longitude.toString());
+                        // Also update location name with coordinates
+                        onFieldChange("location", `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`);
+                      },
+                      (error) => {
+                        let message = __("Unable to get your location", "yatra");
+                        let showHttpsNotice = false;
+                        
+                        switch (error.code) {
+                          case 1: // PERMISSION_DENIED
+                            if (error.message.includes('secure origins')) {
+                              message = __("Location access requires HTTPS. This feature will work on your live HTTPS site.", "yatra");
+                              showHttpsNotice = true;
+                            } else {
+                              message = __("Location access denied. Please allow location access in your browser.", "yatra");
+                            }
+                            break;
+                          case 2: // POSITION_UNAVAILABLE
+                            message = __("Location information is unavailable. Please try again.", "yatra");
+                            break;
+                          case 3: // TIMEOUT
+                            message = __("Location request timed out. Please try again.", "yatra");
+                            break;
+                        }
+                        
+                        if (showHttpsNotice) {
+                          alert(message + "\n\n" + __("For local development, you can:\n1. Use a browser extension that allows geolocation on HTTP\n2. Set up a local HTTPS certificate\n3. Test on your live HTTPS site", "yatra"));
+                        } else {
+                          alert(message);
+                        }
+                      }
+                    );
+                  } else {
+                    alert(__("Geolocation is not supported by your browser", "yatra"));
+                  }
+                }}
+                className="text-xs bg-green-100 text-green-700 px-3 py-1.5 rounded-lg hover:bg-green-200 transition-colors flex items-center gap-1"
+              >
+                <div className="w-3 h-3">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                {__("Use Current Location", "yatra")}
+              </button>
+            </div>
           </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className={`text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1`}>
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                {__("Latitude", "yatra")}
+              </label>
+              <Input
+                type="text"
+                value={entry.location_latitude || ""}
+                onChange={(e) => onFieldChange("location_latitude", e.target.value)}
+                placeholder={__("e.g., -8.3405", "yatra")}
+                className={`w-full text-sm`}
+              />
+            </div>
+            <div className="space-y-2">
+              <label className={`text-xs font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1`}>
+                <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                {__("Longitude", "yatra")}
+              </label>
+              <Input
+                type="text"
+                value={entry.location_longitude || ""}
+                onChange={(e) => onFieldChange("location_longitude", e.target.value)}
+                placeholder={__("e.g., 115.0920", "yatra")}
+                className={`w-full text-sm`}
+              />
+            </div>
+          </div>
+          <p className={`text-xs text-gray-500 dark:text-gray-400`}>
+            {__("Manual coordinate entry. These will be auto-filled when you select a location from the map above.", "yatra")}
+          </p>
         </div>
 
         <div>

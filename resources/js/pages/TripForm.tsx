@@ -434,6 +434,8 @@ interface ItineraryEntry {
   title: string;
   description: string;
   location?: string;
+  location_latitude?: string;
+  location_longitude?: string;
   duration?: string;
   start_time: string;
   end_time: string;

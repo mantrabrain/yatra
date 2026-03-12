@@ -308,6 +308,7 @@ export const useItineraryFormSave = ({
             status: data.status || "draft",
           };
 
+          console.log("DEBUG: Sending payload with coordinates:", payload);
           const response = await apiClient.post("/itinerary", payload);
           return response.data || response;
         }
@@ -327,6 +328,8 @@ export const useItineraryFormSave = ({
             title: activityData.title!.trim(),
             description: (activityData.description || "").trim(),
             location: (activityData.location || "").trim(),
+            location_latitude: activityData.location_latitude ? parseFloat(activityData.location_latitude) : null,
+            location_longitude: activityData.location_longitude ? parseFloat(activityData.location_longitude) : null,
             duration:
               (activityData.duration || "").trim() ||
               (activityData.start_time &&
@@ -355,6 +358,7 @@ export const useItineraryFormSave = ({
             status: activityData.status || "draft",
           };
 
+          console.log("DEBUG: Activity payload with coordinates:", payload);
           try {
             const response = await apiClient.post("/itinerary", payload);
             responses.push(response.data || response);
@@ -379,6 +383,8 @@ export const useItineraryFormSave = ({
         title: data.title.trim(),
         description: data.description.trim(),
         location: data.location.trim(),
+        location_latitude: data.location_latitude ? parseFloat(data.location_latitude) : null,
+        location_longitude: data.location_longitude ? parseFloat(data.location_longitude) : null,
         duration: data.duration.trim() || calculateDuration(),
         start_time: data.start_time,
         end_time: data.end_time,
@@ -393,6 +399,7 @@ export const useItineraryFormSave = ({
         status: data.status || "draft", // Ensure status is always included
       };
 
+      console.log("DEBUG: Update payload with coordinates:", payload);
       if (isEditMode && entryId) {
         // Ensure status is explicitly included in update payload
         const updatePayload = {

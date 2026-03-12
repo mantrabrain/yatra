@@ -50,6 +50,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     `end_time` varchar(20) DEFAULT NULL COMMENT 'End time (HH:MM format)',
     `time_type` enum('exact','duration','flexible') DEFAULT 'exact' COMMENT 'Time specification type',
     `location` varchar(255) DEFAULT NULL COMMENT 'Location name',
+    `location_latitude` decimal(10,8) DEFAULT NULL COMMENT 'Location latitude coordinate',
+    `location_longitude` decimal(11,8) DEFAULT NULL COMMENT 'Location longitude coordinate',
     `duration` varchar(50) DEFAULT NULL COMMENT 'Duration (e.g., "2 hours", "1 day")',
     `cost` decimal(10,2) DEFAULT NULL COMMENT 'Cost amount',
     `cost_per_person` tinyint(1) DEFAULT 0 COMMENT 'Whether cost is per person',
@@ -73,6 +75,8 @@ CREATE TABLE IF NOT EXISTS `{$tableName}` (
     KEY `item_type` (`item_type`),
     KEY `status` (`status`),
     KEY `order` (`order`),
+    KEY `location_latitude` (`location_latitude`),
+    KEY `location_longitude` (`location_longitude`),
     KEY `created_at` (`created_at`),
     KEY `updated_at` (`updated_at`),
     CONSTRAINT `fk_itinerary_day_entry_day_id` FOREIGN KEY (`day_id`) REFERENCES `{$daysTableName}` (`id`) ON DELETE CASCADE

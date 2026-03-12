@@ -244,6 +244,8 @@ class ItineraryRepository extends BaseRepository
                     'end_time' => !empty($data['end_time']) ? sanitize_text_field($data['end_time']) : null,
                     'time_type' => !empty($data['time_type']) ? sanitize_text_field($data['time_type']) : 'exact',
                     'location' => !empty($data['location']) ? sanitize_text_field($data['location']) : null,
+                    'location_latitude' => !empty($data['location_latitude']) ? (float) $data['location_latitude'] : null,
+                    'location_longitude' => !empty($data['location_longitude']) ? (float) $data['location_longitude'] : null,
                     'duration' => !empty($data['duration']) ? sanitize_text_field($data['duration']) : null,
                     'cost' => !empty($data['cost']) ? (float) $data['cost'] : null,
                     'cost_per_person' => !empty($data['cost_per_person']) ? 1 : 0,
@@ -255,7 +257,7 @@ class ItineraryRepository extends BaseRepository
                 ],
                 [
                     '%d', '%d', '%s', '%s', '%d', '%d', '%s', '%s', '%s',
-                    '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%d', '%s',
+                    '%s', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%f', '%d', '%s',
                     '%s', '%s', '%s', '%d'
                 ]
             );
@@ -415,6 +417,18 @@ class ItineraryRepository extends BaseRepository
         if (isset($data['location'])) {
             $updateData['location'] = !empty($data['location']) ? sanitize_text_field($data['location']) : null;
             $updateFormat[] = '%s';
+        }
+
+        if (isset($data['location_latitude'])) {
+            $updateData['location_latitude'] = !empty($data['location_latitude']) ? (float) $data['location_latitude'] : null;
+            $updateFormat[] = '%f';
+            error_log('DEBUG: Saving location_latitude: ' . var_export($updateData['location_latitude'], true));
+        }
+
+        if (isset($data['location_longitude'])) {
+            $updateData['location_longitude'] = !empty($data['location_longitude']) ? (float) $data['location_longitude'] : null;
+            $updateFormat[] = '%f';
+            error_log('DEBUG: Saving location_longitude: ' . var_export($updateData['location_longitude'], true));
         }
 
         if (isset($data['duration'])) {
@@ -1149,6 +1163,8 @@ class ItineraryRepository extends BaseRepository
                     'end_time' => $entry->end_time,
                     'time_type' => $entry->time_type ?? 'exact',
                     'location' => $entry->location,
+                    'location_latitude' => $entry->location_latitude,
+                    'location_longitude' => $entry->location_longitude,
                     'duration' => $entry->duration,
                     'cost' => $entry->cost,
                     'cost_per_person' => $entry->cost_per_person ?? false,
@@ -1158,6 +1174,7 @@ class ItineraryRepository extends BaseRepository
                     'status' => $entry->status ?? 'publish',
                     'order' => $entry->order ?? 0
                 ];
+                error_log('DEBUG: Loading entry ' . $entry->id . ' with coordinates: lat=' . var_export($entry->location_latitude, true) . ', lng=' . var_export($entry->location_longitude, true));
                 $allEntries[] = $entryObj;
             }
         }

@@ -98,6 +98,41 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
 
+  // Debug log when value changes
+  useEffect(() => {
+    console.log('DEBUG: LocationPicker value changed:', value);
+  }, [value]);
+
+  // Update marker when coordinates change and map is already initialized
+  useEffect(() => {
+    console.log('DEBUG: Marker update effect triggered:', {
+      mapExists: !!mapInstanceRef.current,
+      latitude: value.latitude,
+      longitude: value.longitude,
+      hasCoords: !!(value.latitude && value.longitude)
+    });
+    
+    if (mapInstanceRef.current && value.latitude && value.longitude) {
+      const lat = parseFloat(value.latitude);
+      const lng = parseFloat(value.longitude);
+      
+      if (!isNaN(lat) && !isNaN(lng)) {
+        console.log('DEBUG: Updating marker with new coordinates:', lat, lng);
+        
+        // Small delay to ensure map is fully ready
+        setTimeout(() => {
+          if (mapInstanceRef.current) {
+            // Add or update marker
+            addMarker(mapInstanceRef.current, lat, lng);
+            
+            // Update map view to new coordinates
+            mapInstanceRef.current.setView([lat, lng], defaultZoom);
+          }
+        }, 100);
+      }
+    }
+  }, [value, defaultZoom]);
+
   // Load Leaflet dynamically when map is shown
   useEffect(() => {
     if (showMap && !mapLoading && !mapInstanceRef.current) {
@@ -154,8 +189,17 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     }).addTo(map);
 
     // Add marker if coordinates exist
+    console.log('DEBUG: Map initialization - checking for coordinates:', {
+      latitude: value.latitude,
+      longitude: value.longitude,
+      lat: lat,
+      lng: lng
+    });
     if (value.latitude && value.longitude) {
+      console.log('DEBUG: Adding marker to map');
       addMarker(map, lat, lng);
+    } else {
+      console.log('DEBUG: No coordinates available, skipping marker');
     }
 
     // Handle map clicks
@@ -181,7 +225,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
     // Create custom marker
     const customIcon = L.divIcon({
-      html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><span style="transform: rotate(45deg); font-size: 14px;">📍</span></div>',
+      html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><svg style="transform: rotate(45deg); width: 14px; height: 14px;" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" /></svg></div>',
       iconSize: [30, 30],
       iconAnchor: [15, 30],
       className: 'yatra-custom-marker'
@@ -246,11 +290,22 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             longitude: lng.toString()
           };
           onChange(newLocation);
+          return;
         }
       }
     } catch (error) {
       console.error('Error reverse geocoding:', error);
     }
+    
+    // Fallback: always update with coordinates if reverse geocoding fails
+    const locationName = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+    const newLocation = {
+      ...value,
+      name: locationName,
+      latitude: lat.toString(),
+      longitude: lng.toString()
+    };
+    onChange(newLocation);
   };
 
   // Debounced search for better performance

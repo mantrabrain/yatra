@@ -281,6 +281,8 @@ class ItineraryController extends BaseController
             'end_time' => $item->end_time ?? null,
             'time_type' => $item->time_type ?? 'exact',
             'location' => $item->location ?? null,
+            'location_latitude' => $item->location_latitude ?? null,
+            'location_longitude' => $item->location_longitude ?? null,
             'duration' => $item->duration ?? null,
             'cost' => isset($item->cost) ? (float) $item->cost : null,
             'cost_per_person' => isset($item->cost_per_person) ? (bool) $item->cost_per_person : false,

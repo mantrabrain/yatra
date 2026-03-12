@@ -103,6 +103,8 @@ export const ActivityAccordion: React.FC<ActivityAccordionProps> = ({
                       title: activityForm.data.title || "",
                       description: activityForm.data.description || "",
                       location: activityForm.data.location || "",
+                      location_latitude: activityForm.data.location_latitude || "",
+                      location_longitude: activityForm.data.location_longitude || "",
                       duration: activityForm.data.duration || "",
                       start_time: activityForm.data.start_time || "08:00",
                       end_time: activityForm.data.end_time || "17:00",
