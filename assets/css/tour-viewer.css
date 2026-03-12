@@ -66,6 +66,7 @@
     justify-content: center !important;
     transition: all 0.3s ease;
     z-index: 100 !important;
+    padding:0;
 }
 
 .yatra-tour-viewer-close:hover {
@@ -113,6 +114,7 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    padding:0;
 }
 
 .yatra-tour-viewer-fullscreen:hover {
