@@ -8,7 +8,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { MapPin, Globe, X, Loader2 } from "lucide-react";
 
 // Translation function - can be overridden via props
-const defaultTranslate = (key: string, domain?: string) => {
+const defaultTranslate = (key: string) => {
   const translations: Record<string, string> = {
     "Enter location name": "Enter location name",
     "Show Map": "Show Map",
@@ -70,14 +70,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   value,
   onChange,
   label,
-  placeholder = "Enter location name",
   helpText,
   required = false,
   showMapButton = true,
   defaultMapCenter = [25.2048, 55.2708], // Dubai coordinates
   defaultZoom = 13,
   mapHeight = "300px",
-  searchPlaceholder = "Search for a location...",
   searchLimit = 5,
   className = "",
   inputClassName = "",
@@ -86,39 +84,24 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   onLocationSelect,
   onLocationClear,
   onMapToggle,
-  validateCoordinates,
-  errorMessage,
 }) => {
   const [showMap, setShowMap] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [mapLoading, setMapLoading] = useState(false);
+  const [mapReady, setMapReady] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
 
-  // Debug log when value changes
-  useEffect(() => {
-    console.log('DEBUG: LocationPicker value changed:', value);
-  }, [value]);
-
   // Update marker when coordinates change and map is already initialized
   useEffect(() => {
-    console.log('DEBUG: Marker update effect triggered:', {
-      mapExists: !!mapInstanceRef.current,
-      latitude: value.latitude,
-      longitude: value.longitude,
-      hasCoords: !!(value.latitude && value.longitude)
-    });
-    
     if (mapInstanceRef.current && value.latitude && value.longitude) {
       const lat = parseFloat(value.latitude);
       const lng = parseFloat(value.longitude);
       
       if (!isNaN(lat) && !isNaN(lng)) {
-        console.log('DEBUG: Updating marker with new coordinates:', lat, lng);
-        
         // Small delay to ensure map is fully ready
         setTimeout(() => {
           if (mapInstanceRef.current) {
@@ -131,7 +114,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         }, 100);
       }
     }
-  }, [value, defaultZoom]);
+  }, [value.latitude, value.longitude, defaultZoom]);
 
   // Load Leaflet dynamically when map is shown
   useEffect(() => {
@@ -139,6 +122,23 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       loadMap();
     }
   }, [showMap]);
+  
+  // Add marker when map becomes ready with existing coordinates
+  useEffect(() => {
+    if (mapReady && mapInstanceRef.current && value.latitude && value.longitude) {
+      const lat = parseFloat(value.latitude);
+      const lng = parseFloat(value.longitude);
+      
+      if (!isNaN(lat) && !isNaN(lng)) {
+        setTimeout(() => {
+          if (mapInstanceRef.current) {
+            addMarker(mapInstanceRef.current, lat, lng);
+            mapInstanceRef.current.setView([lat, lng], defaultZoom);
+          }
+        }, 150);
+      }
+    }
+  }, [mapReady]);
 
   const loadMap = async () => {
     setMapLoading(true);
@@ -189,17 +189,8 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
     }).addTo(map);
 
     // Add marker if coordinates exist
-    console.log('DEBUG: Map initialization - checking for coordinates:', {
-      latitude: value.latitude,
-      longitude: value.longitude,
-      lat: lat,
-      lng: lng
-    });
     if (value.latitude && value.longitude) {
-      console.log('DEBUG: Adding marker to map');
       addMarker(map, lat, lng);
-    } else {
-      console.log('DEBUG: No coordinates available, skipping marker');
     }
 
     // Handle map clicks
@@ -213,6 +204,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
 
     mapInstanceRef.current = map;
     setMapLoading(false);
+    setMapReady(true);
   };
 
   const addMarker = (map: any, lat: number, lng: number) => {

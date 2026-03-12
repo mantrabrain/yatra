@@ -308,7 +308,6 @@ export const useItineraryFormSave = ({
             status: data.status || "draft",
           };
 
-          console.log("DEBUG: Sending payload with coordinates:", payload);
           const response = await apiClient.post("/itinerary", payload);
           return response.data || response;
         }
@@ -358,7 +357,6 @@ export const useItineraryFormSave = ({
             status: activityData.status || "draft",
           };
 
-          console.log("DEBUG: Activity payload with coordinates:", payload);
           try {
             const response = await apiClient.post("/itinerary", payload);
             responses.push(response.data || response);
@@ -399,7 +397,6 @@ export const useItineraryFormSave = ({
         status: data.status || "draft", // Ensure status is always included
       };
 
-      console.log("DEBUG: Update payload with coordinates:", payload);
       if (isEditMode && entryId) {
         // Ensure status is explicitly included in update payload
         const updatePayload = {
