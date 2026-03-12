@@ -9,9 +9,9 @@ if (!defined('ABSPATH')) {
     </h2>
 
     <?php 
-                // Use starting location coordinates if available, otherwise use trip coordinates
-                $map_lat = !empty($trip->starting_location) ? $trip->latitude : $trip->latitude;
-                $map_lng = !empty($trip->starting_location) ? $trip->longitude : $trip->longitude;
+                // Use starting location coordinates if available
+                $map_lat = $trip->starting_latitude ?? null;
+                $map_lng = $trip->starting_longitude ?? null;
             ?>
             
             <?php if (!empty($map_lat) && !empty($map_lng)): ?>
@@ -42,12 +42,21 @@ if (!defined('ABSPATH')) {
                         var mapContainer = document.getElementById('yatra-openstreet-map');
                         if (!mapContainer) return;
                         
-                        var lat = parseFloat('<?php echo esc_js($map_lat); ?>');
-                        var lng = parseFloat('<?php echo esc_js($map_lng); ?>');
+                        var startLat = parseFloat('<?php echo esc_js($trip->starting_latitude ?? '0'); ?>');
+                        var startLng = parseFloat('<?php echo esc_js($trip->starting_longitude ?? '0'); ?>');
+                        var endLat = parseFloat('<?php echo esc_js($trip->ending_latitude ?? '0'); ?>');
+                        var endLng = parseFloat('<?php echo esc_js($trip->ending_longitude ?? '0'); ?>');
                         var startingLocation = '<?php echo esc_js($trip->starting_location ?? ''); ?>';
+                        var endingLocation = '<?php echo esc_js($trip->ending_location ?? ''); ?>';
+                        
+                        // Calculate center point for better map view
+                        var centerLat = (startLat + endLat) / 2;
+                        var centerLng = (startLng + endLng) / 2;
+                        var mapLat = startLat || centerLat;
+                        var mapLng = startLng || centerLng;
                         
                         // Initialize the map
-                        var map = L.map('yatra-openstreet-map').setView([lat, lng], 13);
+                        var map = L.map('yatra-openstreet-map').setView([mapLat, mapLng], 10);
                         
                         // Add OpenStreetMap tiles
                         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -55,36 +64,76 @@ if (!defined('ABSPATH')) {
                             maxZoom: 19
                         }).addTo(map);
                         
-                        // Create custom icon for the marker
-                        var customIcon = L.divIcon({
-                            html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><span style="transform: rotate(45deg); font-size: 14px;">📍</span></div>',
-                            iconSize: [30, 30],
-                            iconAnchor: [15, 30],
-                            popupAnchor: [0, -30],
-                            className: 'yatra-custom-marker'
+                        // Create custom icons
+                        var startIcon = L.divIcon({
+                            html: '<div style="background: linear-gradient(135deg, #10b981, #059669); color: white; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><span style="transform: rotate(45deg); font-size: 16px;">▶</span></div>',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 32],
+                            popupAnchor: [0, -32],
+                            className: 'yatra-start-marker'
                         });
                         
+                        var endIcon = L.divIcon({
+                            html: '<div style="background: linear-gradient(135deg, #ef4444, #dc2626); color: white; width: 32px; height: 32px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.3);"><span style="transform: rotate(45deg); font-size: 16px;">🏁</span></div>',
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 32],
+                            popupAnchor: [0, -32],
+                            className: 'yatra-end-marker'
+                        });
+                        
+                        var markers = [];
+                        
                         // Add marker for starting location
-                        var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+                        if (startLat && startLng) {
+                            var startMarker = L.marker([startLat, startLng], { icon: startIcon }).addTo(map);
+                            var startPopupContent = startingLocation ? 
+                                '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">' + startingLocation + '</strong><br><span style="color: #10b981; font-size: 12px; font-weight: 600;">Starting Point</span><br><span style="color: #64748b; font-size: 11px;">' + startLat.toFixed(6) + ', ' + startLng.toFixed(6) + '</span></div>' :
+                                '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">Trip Starting Location</strong><br><span style="color: #10b981; font-size: 12px; font-weight: 600;">Starting Point</span><br><span style="color: #64748b; font-size: 11px;">' + startLat.toFixed(6) + ', ' + startLng.toFixed(6) + '</span></div>';
+                            startMarker.bindPopup(startPopupContent);
+                            markers.push(startMarker);
+                        }
                         
-                        // Create popup content
-                        var popupContent = startingLocation ? 
-                            '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">' + startingLocation + '</strong><br><span style="color: #64748b; font-size: 12px;">Starting Point</span><br><span style="color: #3b82f6; font-size: 11px;">' + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>' :
-                            '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">Trip Starting Location</strong><br><span style="color: #64748b; font-size: 12px;">Coordinates</span><br><span style="color: #3b82f6; font-size: 11px;">' + lat.toFixed(6) + ', ' + lng.toFixed(6) + '</span></div>';
+                        // Add marker for ending location
+                        if (endLat && endLng) {
+                            var endMarker = L.marker([endLat, endLng], { icon: endIcon }).addTo(map);
+                            var endPopupContent = endingLocation ? 
+                                '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">' + endingLocation + '</strong><br><span style="color: #ef4444; font-size: 12px; font-weight: 600;">Ending Point</span><br><span style="color: #64748b; font-size: 11px;">' + endLat.toFixed(6) + ', ' + endLng.toFixed(6) + '</span></div>' :
+                                '<div style="font-family: system-ui, -apple-system, sans-serif; font-size: 14px;"><strong style="color: #1e293b;">Trip Ending Location</strong><br><span style="color: #ef4444; font-size: 12px; font-weight: 600;">Ending Point</span><br><span style="color: #64748b; font-size: 11px;">' + endLat.toFixed(6) + ', ' + endLng.toFixed(6) + '</span></div>';
+                            endMarker.bindPopup(endPopupContent);
+                            markers.push(endMarker);
+                        }
                         
-                        marker.bindPopup(popupContent).openPopup();
+                        // Draw route line if both points exist
+                        if (startLat && startLng && endLat && endLng) {
+                            var routeCoordinates = [[startLat, startLng], [endLat, endLng]];
+                            var routeLine = L.polyline(routeCoordinates, {
+                                color: '#3b82f6',
+                                weight: 3,
+                                opacity: 0.7,
+                                dashArray: '10, 10'
+                            }).addTo(map);
+                            
+                            // Fit map to show both markers
+                            var group = new L.featureGroup(markers);
+                            map.fitBounds(group.getBounds().pad(0.1));
+                        } else if (markers.length > 0) {
+                            // Open popup for the first marker
+                            markers[0].openPopup();
+                        }
                         
-                        // Add a subtle animation to the marker
+                        // Add animation to markers
                         setTimeout(function() {
-                            marker.bounce = true;
-                            var bounceIcon = L.divIcon({
-                                html: '<div style="background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg) scale(1.1); display: flex; align-items: center; justify-content: center; border: 2px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.4); animation: pulse 2s infinite;"><span style="transform: rotate(45deg); font-size: 14px;">📍</span></div>',
-                                iconSize: [30, 30],
-                                iconAnchor: [15, 30],
-                                popupAnchor: [0, -30],
-                                className: 'yatra-custom-marker yatra-marker-bounce'
+                            markers.forEach(function(marker, index) {
+                                var originalIcon = marker.options.icon;
+                                var scaleIcon = L.divIcon({
+                                    html: originalIcon.options.html.replace('scale(1)', 'scale(1.2)'),
+                                    iconSize: originalIcon.options.iconSize,
+                                    iconAnchor: originalIcon.options.iconAnchor,
+                                    popupAnchor: originalIcon.options.popupAnchor,
+                                    className: originalIcon.options.className + ' yatra-marker-bounce'
+                                });
+                                marker.setIcon(scaleIcon);
                             });
-                            marker.setIcon(bounceIcon);
                         }, 500);
                         
                         // Add CSS animation
@@ -95,11 +144,11 @@ if (!defined('ABSPATH')) {
                                 50% { transform: rotate(-45deg) scale(1.2); }
                                 100% { transform: rotate(-45deg) scale(1); }
                             }
-                            .yatra-custom-marker {
+                            .yatra-custom-marker, .yatra-start-marker, .yatra-end-marker {
                                 filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
                                 transition: all 0.3s ease;
                             }
-                            .yatra-custom-marker:hover {
+                            .yatra-custom-marker:hover, .yatra-start-marker:hover, .yatra-end-marker:hover {
                                 filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
                             }
                         `;
@@ -112,7 +161,7 @@ if (!defined('ABSPATH')) {
                     </div>
                 <?php endif; ?>
 
-    <?php if (!empty($trip->starting_location) || !empty($trip->ending_location) || !empty($trip->landmarks) || (!empty($trip->latitude) && !empty($trip->longitude))): ?>
+    <?php if (!empty($trip->starting_location) || !empty($trip->ending_location) || !empty($trip->landmarks) || (!empty($trip->starting_latitude) && !empty($trip->starting_longitude)) || (!empty($trip->ending_latitude) && !empty($trip->ending_longitude))): ?>
         <div class="yatra-location-details" style="margin-top: 24px;">
             <div class="yatra-location-grid">
                 <?php if (!empty($trip->starting_location)): ?>
@@ -122,7 +171,19 @@ if (!defined('ABSPATH')) {
                         </div>
                         <div class="yatra-location-content">
                             <div class="yatra-location-label"><?php echo esc_html__('Starting Point', 'yatra'); ?></div>
-                            <div class="yatra-location-value"><?php echo esc_html($trip->starting_location); ?></div>
+                            <div class="yatra-location-value">
+                                <?php if (!empty($trip->starting_latitude) && !empty($trip->starting_longitude)): ?>
+                                    <a href="https://www.openstreetmap.org/?mlat=<?php echo esc_attr($trip->starting_latitude); ?>&mlon=<?php echo esc_attr($trip->starting_longitude); ?>#map=15/<?php echo esc_attr($trip->starting_latitude); ?>/<?php echo esc_attr($trip->starting_longitude); ?>" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="yatra-coordinates-link">
+                                        <?php echo esc_html($trip->starting_location); ?>
+                                        <span class="yatra-external-link-icon">↗</span>
+                                    </a>
+                                <?php else: ?>
+                                    <?php echo esc_html($trip->starting_location); ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 <?php endif; ?>
@@ -134,26 +195,18 @@ if (!defined('ABSPATH')) {
                         </div>
                         <div class="yatra-location-content">
                             <div class="yatra-location-label"><?php echo esc_html__('Ending Point', 'yatra'); ?></div>
-                            <div class="yatra-location-value"><?php echo esc_html($trip->ending_location); ?></div>
-                        </div>
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($trip->latitude) && !empty($trip->longitude) && !empty($trip->starting_location)): ?>
-                    <div class="yatra-location-item">
-                        <div class="yatra-location-icon">
-                            <?php echo yatra_svg_icon('globe', 'yatra-location-item-icon'); ?>
-                        </div>
-                        <div class="yatra-location-content">
-                            <div class="yatra-location-label"><?php echo esc_html__('Starting Location Coordinates', 'yatra'); ?></div>
                             <div class="yatra-location-value">
-                                <a href="https://www.openstreetmap.org/?mlat=<?php echo esc_attr($trip->latitude); ?>&mlon=<?php echo esc_attr($trip->longitude); ?>#map=15/<?php echo esc_attr($trip->latitude); ?>/<?php echo esc_attr($trip->longitude); ?>" 
-                                   target="_blank" 
-                                   rel="noopener noreferrer"
-                                   class="yatra-coordinates-link">
-                                    <?php echo esc_html($trip->latitude); ?>, <?php echo esc_html($trip->longitude); ?>
-                                    <span class="yatra-external-link-icon">↗</span>
-                                </a>
+                                <?php if (!empty($trip->ending_latitude) && !empty($trip->ending_longitude)): ?>
+                                    <a href="https://www.openstreetmap.org/?mlat=<?php echo esc_attr($trip->ending_latitude); ?>&mlon=<?php echo esc_attr($trip->ending_longitude); ?>#map=15/<?php echo esc_attr($trip->ending_latitude); ?>/<?php echo esc_attr($trip->ending_longitude); ?>" 
+                                       target="_blank" 
+                                       rel="noopener noreferrer"
+                                       class="yatra-coordinates-link">
+                                        <?php echo esc_html($trip->ending_location); ?>
+                                        <span class="yatra-external-link-icon">↗</span>
+                                    </a>
+                                <?php else: ?>
+                                    <?php echo esc_html($trip->ending_location); ?>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
