@@ -1685,7 +1685,15 @@ class SingleTripController
                 break;
 
             case 'location':
-                yatra_get_template('partials/single-trip/content-location', ['trip' => $trip, 'tab' => $tab]);
+                // Get itinerary entries with coordinates for map display
+                $itinerary_repository = new \Yatra\Repositories\ItineraryRepository();
+                $itinerary_entries = $itinerary_repository->getEntriesWithCoordinatesForMap((int) $trip->id);
+                
+                yatra_get_template('partials/single-trip/content-location', [
+                    'trip' => $trip, 
+                    'tab' => $tab,
+                    'itinerary_entries' => $itinerary_entries
+                ]);
                 break;
 
             case 'important_info':

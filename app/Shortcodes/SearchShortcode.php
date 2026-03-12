@@ -50,9 +50,16 @@ class SearchShortcode extends BaseShortcode
             true
         );
         
-        // Load the trip-search template (exact copy from /trip page)
+        // Get destinations and activities using repository (proper MVC pattern)
+        $tripRepository = new \Yatra\Repositories\TripRepository();
+        $destinations = $tripRepository->getAllDestinationsForSearch();
+        $activities = $tripRepository->getAllActivitiesForSearch();
+        
+        // Load the trip-search template with data from repository
         return $this->loadTemplate('shortcodes/trip-search.php', [
-            'atts' => $atts
+            'atts' => $atts,
+            'destinations' => $destinations,
+            'activities' => $activities
         ]);
     }
 }

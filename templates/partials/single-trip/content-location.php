@@ -13,21 +13,8 @@ if (!defined('ABSPATH')) {
                 $map_lat = $trip->starting_latitude ?? null;
                 $map_lng = $trip->starting_longitude ?? null;
                 
-                // Fetch all itinerary entries with coordinates
-                global $wpdb;
-                $entries_table = \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName();
-                $days_table = \Yatra\Database\Tables\TripItineraryDaysTable::getTableName();
-                $itinerary_entries = $wpdb->get_results($wpdb->prepare(
-                    "SELECT e.*, d.day_number, d.title as day_title
-                     FROM {$entries_table} e
-                     LEFT JOIN {$days_table} d ON e.day_id = d.id
-                     WHERE e.trip_id = %d 
-                     AND e.location_latitude IS NOT NULL 
-                     AND e.location_longitude IS NOT NULL
-                     AND e.status = 'publish'
-                     ORDER BY d.day_number ASC, e.order ASC",
-                    $trip->id
-                ));
+                // Itinerary entries with coordinates are passed from controller (proper MVC pattern)
+                // This follows the separation of concerns principle
             ?>
             
             <?php if (!empty($map_lat) && !empty($map_lng)): ?>
@@ -514,7 +501,7 @@ if (!defined('ABSPATH')) {
                                        rel="noopener noreferrer"
                                        class="yatra-coordinates-link">
                                         <?php echo esc_html($trip->starting_location); ?>
-                                        <span class="yatra-external-link-icon">↗</span>
+                                        
                                     </a>
                                 <?php else: ?>
                                     <?php echo esc_html($trip->starting_location); ?>
@@ -538,7 +525,6 @@ if (!defined('ABSPATH')) {
                                        rel="noopener noreferrer"
                                        class="yatra-coordinates-link">
                                         <?php echo esc_html($trip->ending_location); ?>
-                                        <span class="yatra-external-link-icon">↗</span>
                                     </a>
                                 <?php else: ?>
                                     <?php echo esc_html($trip->ending_location); ?>

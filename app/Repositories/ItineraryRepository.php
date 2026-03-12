@@ -1215,5 +1215,36 @@ class ItineraryRepository extends BaseRepository
     {
         return $this->findDayEntryByTripAndDayNumber($tripId, $dayNumber);
     }
-}
 
+    /**
+     * Get all published itinerary entries with coordinates for a trip
+     * Used for map display functionality
+     * 
+     * @param int $tripId Trip ID
+     * @return array Array of entries with coordinates and day information
+     */
+    public function getEntriesWithCoordinatesForMap(int $tripId): array
+    {
+        // Validate trip ID
+        if (empty($tripId) || $tripId <= 0) {
+            return [];
+        }
+        
+        global $wpdb;
+        
+        $entries_table = TripItineraryDayEntryTable::getTableName();
+        $days_table = TripItineraryDaysTable::getTableName();
+        
+        return $wpdb->get_results($wpdb->prepare(
+            "SELECT e.*, d.day_number, d.title as day_title
+             FROM {$entries_table} e
+             LEFT JOIN {$days_table} d ON e.day_id = d.id
+             WHERE e.trip_id = %d 
+             AND e.location_latitude IS NOT NULL 
+             AND e.location_longitude IS NOT NULL
+             AND e.status = 'publish'
+             ORDER BY d.day_number ASC, e.order ASC",
+            $tripId
+        )) ?: [];
+    }
+}

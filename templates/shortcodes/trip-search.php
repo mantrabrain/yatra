@@ -13,46 +13,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Get filter options from database
-global $wpdb;
-$tripClassificationsTable = \Yatra\Database\Tables\TripClassificationsTable::getTableName();
-$classificationsTable = \Yatra\Database\Tables\ClassificationsTable::getTableName();
-
-// Get destinations - try multiple status values
-$destinations = $wpdb->get_results("
-    SELECT c.* FROM {$classificationsTable} c
-    INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-    WHERE c.type = 'destination' AND c.status IN ('publish', 'active', 'draft')
-    ORDER BY c.name ASC
-");
-
-// If no destinations found, try without status filter
-if (empty($destinations)) {
-    $destinations = $wpdb->get_results("
-        SELECT c.* FROM {$classificationsTable} c
-        INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-        WHERE c.type = 'destination'
-        ORDER BY c.name ASC
-    ");
-}
-
-// Get activities - try multiple status values
-$activities = $wpdb->get_results("
-    SELECT c.* FROM {$classificationsTable} c
-    INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-    WHERE c.type = 'activity' AND c.status IN ('publish', 'active', 'draft')
-    ORDER BY c.name ASC
-");
-
-// If no activities found, try without status filter
-if (empty($activities)) {
-    $activities = $wpdb->get_results("
-        SELECT c.* FROM {$classificationsTable} c
-        INNER JOIN {$tripClassificationsTable} tc ON c.id = tc.classification_id
-        WHERE c.type = 'activity'
-        ORDER BY c.name ASC
-    ");
-}
+// Destinations and activities are passed from shortcode controller (proper MVC pattern)
+// This follows the separation of concerns principle - no database queries in templates
 
 
 // Get active filters from URL parameters
