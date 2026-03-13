@@ -174,5 +174,21 @@ class ItemRepository extends BaseRepository
 
         return $this->wpdb->get_results($query) ?: [];
     }
+
+    /**
+     * Count how many times an item is used in trip itineraries
+     */
+    public function countUsage(int $itemId): int
+    {
+        global $wpdb;
+        $itineraryEntryTable = \Yatra\Database\Tables\TripItineraryDayEntryTable::getTableName();
+        
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM `{$itineraryEntryTable}` WHERE item_id = %d",
+            $itemId
+        ));
+        
+        return (int) $count;
+    }
 }
 

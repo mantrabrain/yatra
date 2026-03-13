@@ -265,7 +265,7 @@ class ItemController extends BaseController
             $prepared['updated_by_name'] = $user ? esc_html($user->display_name) : null;
         }
 
-        $prepared['usage_count'] = 0;
+        $prepared['usage_count'] = $this->repository->countUsage((int) $prepared['id']);
 
         return $prepared;
     }
