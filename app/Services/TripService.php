@@ -884,7 +884,7 @@ class TripService extends BaseService
         $args = ['include_deleted' => true];
         
         $statuses = [
-            'published',
+            'publish',
             'draft',
             'review',
             'approved',
@@ -903,7 +903,7 @@ class TripService extends BaseService
 
         return [
             'all' => (int) $all,
-            'published' => (int) ($counts['published'] ?? 0),
+            'published' => (int) ($counts['publish'] ?? 0),
             'draft' => (int) ($counts['draft'] ?? 0),
             'review' => (int) ($counts['review'] ?? 0),
             'approved' => (int) ($counts['approved'] ?? 0),
