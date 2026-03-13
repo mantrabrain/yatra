@@ -41,6 +41,7 @@ class ActivityRepository extends BaseRepository
         return ClassificationsTable::getTableName();
     }
 
+    
     /**
      * Find by slug - for activities
      */
