@@ -35,6 +35,19 @@ class TravelerCategoryRepository extends BaseRepository
     }
 
     /**
+     * Count traveler categories with automatic type filtering
+     */
+    public function count(array $args = []): int
+    {
+        // Always filter by type = 'traveler_type' for traveler categories
+        if (!isset($args['where']['type'])) {
+            $args['where']['type'] = ClassificationTypes::TRAVELER_TYPE;
+        }
+        
+        return parent::count($args);
+    }
+
+    /**
      * Find by slug
      */
     public function findBySlug(string $slug): ?\stdClass
