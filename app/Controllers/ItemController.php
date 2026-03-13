@@ -9,6 +9,7 @@ use WP_REST_Response;
 use WP_Error;
 use Yatra\Services\ItemService;
 use Yatra\Repositories\ItemTypeRepository;
+use Yatra\Repositories\ItemRepository;
 
 /**
  * Item REST API Controller
@@ -26,11 +27,13 @@ class ItemController extends BaseController
 
     private ItemService $service;
     private ItemTypeRepository $itemTypeRepository;
+    private ItemRepository $repository;
 
     public function __construct()
     {
         $this->service = new ItemService();
         $this->itemTypeRepository = new ItemTypeRepository();
+        $this->repository = new ItemRepository();
     }
 
     public function register_routes(): void
