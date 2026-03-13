@@ -14,6 +14,7 @@ export default defineConfig({
       },
     }),
   ],
+  root: './', // Set root to plugin directory
   base: './', // Use relative paths for assets
   resolve: {
     alias: {
@@ -108,8 +109,11 @@ export default defineConfig({
   server: {
     port: 3000,
     strictPort: true,
+    host: true, // Allow external connections
     hmr: {
       host: 'localhost',
+      port: 3000,
+      clientPort: 3000,
     },
     // Allow WordPress admin on http://yatra.local to load assets from this dev server
     cors: true,

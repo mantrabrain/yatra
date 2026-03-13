@@ -137,30 +137,116 @@ class AdminAssetsProvider
      */
     private function enqueueAdminReactJs(): void
     {
-        $appJs = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
+        // Check if we're in development mode and Vite dev server is running
+        $isDevMode = defined('WP_DEBUG') && WP_DEBUG && defined('YATRA_DEV_MODE') && YATRA_DEV_MODE;
+        $viteDevServer = 'http://localhost:3000';
+        
+        if ($isDevMode && $this->isViteDevServerRunning($viteDevServer)) {
+            // In dev mode, inject localized data and Vite's HMR client
+            add_action('admin_head', function() use ($viteDevServer) {
+                // Get current user for permissions
+                $current_user = wp_get_current_user();
+                
+                // Get user capabilities
+                $capabilities = [];
+                if ($current_user->ID > 0) {
+                    $user_caps = $current_user->allcaps;
+                    foreach ($user_caps as $cap => $has_cap) {
+                        if ($has_cap && strpos($cap, 'yatra_') === 0) {
+                            $capabilities[$cap] = true;
+                        }
+                    }
+                }
+                
+                // Localize data for dev mode
+                $localized_data = apply_filters('yatra_admin_localized_data', [
+                    'apiUrl' => rest_url('yatra/v1'),
+                    'licenseStatus' => 'inactive',
+                    'restUrl' => rest_url(),
+                    'nonce' => wp_create_nonce('wp_rest'),
+                    'currentUser' => $current_user->ID,
+                    'currentUserEmail' => $current_user->user_email,
+                    'currentUserDisplayName' => $current_user->display_name,
+                    'currentUserLogin' => $current_user->user_login,
+                    'currentUserAvatar' => get_avatar($current_user->ID, 96),
+                    'siteUrl' => home_url(),
+                    'adminUrl' => admin_url('admin.php'),
+                    'capabilities' => $capabilities,
+                    'roles' => $current_user->roles,
+                    'isPro' => defined('YATRA_PRO_VERSION'),
+                    'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
+                ]);
+                
+                ?>
+                <script>
+                    window.yatraAdmin = <?php echo json_encode($localized_data); ?>;
+                </script>
+                <script type="module">
+                    import { injectIntoGlobalHook } from "<?php echo $viteDevServer; ?>/@react-refresh";
+                    injectIntoGlobalHook(window);
+                    window.$RefreshReg$ = () => {};
+                    window.$RefreshSig$ = () => (type) => type;
+                </script>
+                <script type="module" src="<?php echo $viteDevServer; ?>/@vite/client"></script>
+                <?php
+            }, 1);
+            
+            // Load the entry point as ES module
+            add_action('admin_footer', function() use ($viteDevServer) {
+                ?>
+                <script type="module" src="<?php echo $viteDevServer; ?>/resources/js/main.tsx"></script>
+                <?php
+            }, 1);
+            
+        } else {
+            // Use built assets in production
+            $appJs = YATRA_PLUGIN_PATH . 'assets/admin/dist/js/app.js';
 
-        if (file_exists($appJs)) {
-            $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
+            if (file_exists($appJs)) {
+                $jsVersion = YATRA_VERSION . '.' . filemtime($appJs) . '.view-icon-fix.' . time() . '.' . microtime(true);
 
-            // Enqueue our script with media library as dependency
-            wp_enqueue_script(
-                'yatra-admin',
-                YATRA_PLUGIN_URL . 'assets/admin/dist/js/app.js',
-                [
-                    'jquery',
-                    'underscore',
-                    'backbone',
-                    'media-models',
-                    'wp-mediaelement',
-                    'media-editor',
-                    'media-audiovideo',
-                    'media-views',
-                    'wp-i18n'
-                ],
-                $jsVersion,
-                true
-            );
+                // Enqueue our script with media library as dependency
+                wp_enqueue_script(
+                    'yatra-admin',
+                    YATRA_PLUGIN_URL . 'assets/admin/dist/js/app.js',
+                    [
+                        'jquery',
+                        'underscore',
+                        'backbone',
+                        'media-models',
+                        'wp-mediaelement',
+                        'media-editor',
+                        'media-audiovideo',
+                        'media-views',
+                        'wp-i18n'
+                    ],
+                    $jsVersion,
+                    true
+                );
+            }
         }
+    }
+    
+    /**
+     * Check if Vite dev server is running
+     *
+     * @param string $url
+     * @return bool
+     */
+    private function isViteDevServerRunning(string $url): bool
+    {
+        // Check the actual asset URL, not the root
+        $assetUrl = $url . '/assets/admin/dist/js/app.js';
+        $ch = curl_init($assetUrl);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 2); // 2 second timeout
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1); // 1 second connection timeout
+        curl_setopt($ch, CURLOPT_NOBODY, true); // HEAD request only
+        curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        return $httpCode === 200;
     }
 
     /**
@@ -191,6 +277,10 @@ class AdminAssetsProvider
             'restUrl' => rest_url(),
             'nonce' => wp_create_nonce('wp_rest'),
             'currentUser' => $current_user->ID,
+            'currentUserEmail' => $current_user->user_email,
+            'currentUserDisplayName' => $current_user->display_name,
+            'currentUserLogin' => $current_user->user_login,
+            'currentUserAvatar' => get_avatar($current_user->ID, 96),
             'siteUrl' => home_url(),
             'adminUrl' => admin_url('admin.php'),
             'permalinkStructure' => (get_option('permalink_structure') ?: '') ?: 'plain',
