@@ -12,15 +12,80 @@ defined('ABSPATH') || exit;
     <?php wp_nonce_field('yatra-setup'); ?>
     <input type="hidden" name="save_step" value="complete">
     
-    <div class="wizard-header" style="text-align: center;">
-        <div class="success-icon" style="margin: 0 auto;">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-            </svg>
+    <div class="wizard-header" style="text-align: center; position: relative;">
+        <!-- Achievement Badge Container -->
+        <div class="achievement-badge" style="position: relative; display: inline-block; margin: 0 auto 20px;">
+            <!-- Animated Ring Background -->
+            <div class="achievement-ring" style="position: absolute; top: -10px; left: -10px; width: 84px; height: 84px; border: 3px solid #fbbf24; border-radius: 50%; animation: ringPulse 2s ease-in-out infinite;"></div>
+            
+            <!-- Success Icon with Background -->
+            <div class="success-icon-bg" style="width: 64px; height: 64px; background: linear-gradient(135deg, #22c55e, #16a34a); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; z-index: 10; box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+            </div>
         </div>
-        <h1 style="text-align: center;"><?php esc_html_e('Setup Complete!', 'yatra'); ?></h1>
-        <p style="text-align: center;"><?php esc_html_e('Your travel booking system is ready to use', 'yatra'); ?></p>
+        
+        <!-- Celebratory SVG Stars -->
+        <div class="stars-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible;">
+            <!-- Star 1 -->
+            <div class="star star-1" style="position: absolute; top: 15px; left: 15%; animation: floatStar 4s ease-in-out infinite;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="1">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <!-- Star 2 -->
+            <div class="star star-2" style="position: absolute; top: 5px; right: 20%; animation: floatStar 4s ease-in-out infinite 0.8s;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="1">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <!-- Star 3 -->
+            <div class="star star-3" style="position: absolute; top: 60px; left: 10%; animation: floatStar 4s ease-in-out infinite 1.6s;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="1">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <!-- Star 4 -->
+            <div class="star star-4" style="position: absolute; top: 40px; right: 10%; animation: floatStar 4s ease-in-out infinite 2.4s;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="1">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <!-- Star 5 -->
+            <div class="star star-5" style="position: absolute; top: 80px; left: 25%; animation: floatStar 4s ease-in-out infinite 3.2s;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbbf24" stroke="#f59e0b" stroke-width="1">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+            </div>
+            <!-- Sparkle Effects -->
+            <div class="sparkle sparkle-1" style="position: absolute; top: 25px; right: 30%; animation: sparkle 2s ease-in-out infinite 0.5s;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#fbbf24">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+            </div>
+            <div class="sparkle sparkle-2" style="position: absolute; top: 70px; right: 25%; animation: sparkle 2s ease-in-out infinite 1.5s;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#fbbf24">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+            </div>
+            <div class="sparkle sparkle-3" style="position: absolute; top: 50px; left: 20%; animation: sparkle 2s ease-in-out infinite 1s;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="#fbbf24">
+                    <path d="M12 2v20M2 12h20"/>
+                </svg>
+            </div>
+        </div>
+        
+        <!-- Achievement Title -->
+        <div style="position: relative; z-index: 10;">
+            <div style="display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div style="width: 40px; height: 3px; background: linear-gradient(90deg, transparent, #fbbf24);"></div>
+                <span style="color: #f59e0b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Achievement Unlocked</span>
+                <div style="width: 40px; height: 3px; background: linear-gradient(90deg, #fbbf24, transparent);"></div>
+            </div>
+            <h1 style="text-align: center; margin: 0 0 12px; font-size: 32px; font-weight: 700; color: #111827; background: linear-gradient(135deg, #111827, #374151); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;"><?php esc_html_e('Setup Complete!', 'yatra'); ?></h1>
+            <p style="text-align: center; margin: 0; font-size: 16px; color: #6b7280; font-weight: 400;"><?php esc_html_e('Your travel booking system is ready to use', 'yatra'); ?></p>
+        </div>
     </div>
 
     <div class="wizard-content">
@@ -28,7 +93,7 @@ defined('ABSPATH') || exit;
             <p style="font-size: 15px; color: #6b7280; margin: 0;"><?php esc_html_e('Your booking system is configured and ready. Here are the next steps to get started:', 'yatra'); ?></p>
         </div>
 
-        <div class="action-buttons" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto;">
+        <div class="action-buttons" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 32px; max-width: 700px; margin-left: auto; margin-right: auto;">
             <!-- Create First Trip -->
             <a href="<?php echo esc_url(admin_url('post-new.php?post_type=tour')); ?>" class="action-card" style="display: flex; flex-direction: column; align-items: center; padding: 24px; background: #fff; border: 2px solid #e5e7eb; border-radius: 12px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#4f46e5'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
                 <div style="width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
@@ -41,38 +106,26 @@ defined('ABSPATH') || exit;
                 <p style="margin: 0; font-size: 13px; color: #6b7280; text-align: center; line-height: 1.5;"><?php esc_html_e('Add destinations, pricing, and availability', 'yatra'); ?></p>
             </a>
 
-            <!-- Setup Payment Gateway -->
-            <a href="<?php echo esc_url(admin_url('admin.php?page=yatra&subpage=settings&tab=payment')); ?>" class="action-card" style="display: flex; flex-direction: column; align-items: center; padding: 24px; background: #fff; border: 2px solid #e5e7eb; border-radius: 12px; text-decoration: none; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#10b981'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e5e7eb'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                <div style="width: 48px; height: 48px; background: #f0fdf4; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-                        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                        <line x1="1" y1="10" x2="23" y2="10"></line>
+            <!-- Import Sample Data -->
+            <div class="action-card" style="display: flex; flex-direction: column; align-items: center; padding: 24px; background: #fff; border: 2px solid #f59e0b; border-radius: 12px; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#d97706'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#f59e0b'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                <div style="width: 48px; height: 48px; background: #fef3c7; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
                     </svg>
                 </div>
-                <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #111827;"><?php esc_html_e('Setup Payment Gateway', 'yatra'); ?></h3>
-                <p style="margin: 0; font-size: 13px; color: #6b7280; text-align: center; line-height: 1.5;"><?php esc_html_e('Configure payment methods to accept bookings', 'yatra'); ?></p>
-            </a>
-        </div>
-
-        <!-- Import Sample Data Card -->
-        <div style="max-width: 600px; margin: 0 auto 32px; background: #fef3c7; border: 2px solid #f59e0b; border-radius: 12px; padding: 24px; text-align: center;">
-            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 16px;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <h3 style="margin: 0; font-size: 18px; font-weight: 600; color: #92400e;"><?php esc_html_e('Import Sample Data', 'yatra'); ?></h3>
+                <h3 style="margin: 0 0 8px; font-size: 16px; font-weight: 600; color: #111827;"><?php esc_html_e('Import Sample Data', 'yatra'); ?></h3>
+                <p style="margin: 0 0 16px; font-size: 13px; color: #6b7280; text-align: center; line-height: 1.5;"><?php esc_html_e('Get started quickly with demo content', 'yatra'); ?></p>
+                <button type="button" onclick="if(confirm('<?php esc_attr_e('This will import sample trips, destinations, and bookings. Continue?', 'yatra'); ?>')) { this.form.submit(); }" name="import_sample_data" value="yes" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #f59e0b; color: #fff; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; margin-top: auto;" onmouseover="this.style.background='#d97706';" onmouseout="this.style.background='#f59e0b';">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <?php esc_html_e('Import Sample Data', 'yatra'); ?>
+                </button>
             </div>
-            <p style="margin: 0 0 20px; font-size: 14px; color: #78350f; line-height: 1.6;"><?php esc_html_e('Get started quickly with pre-configured demo trips, destinations, and sample bookings to explore all features.', 'yatra'); ?></p>
-            <button type="button" onclick="if(confirm('<?php esc_attr_e('This will import sample trips, destinations, and bookings. Continue?', 'yatra'); ?>')) { this.form.submit(); }" name="import_sample_data" value="yes" style="display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: #f59e0b; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='#d97706'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';" onmouseout="this.style.background='#f59e0b'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="7 10 12 15 17 10"></polyline>
-                    <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                <?php esc_html_e('Import Sample Data', 'yatra'); ?>
-            </button>
         </div>
 
         <div class="premium-box">
@@ -126,3 +179,159 @@ defined('ABSPATH') || exit;
         </button>
     </div>
 </form>
+
+<style>
+/* Achievement Ring Pulse Animation */
+@keyframes ringPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+        border-color: #f59e0b;
+        box-shadow: 0 0 0 20px rgba(251, 191, 36, 0);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+        border-color: #fbbf24;
+        box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7);
+    }
+}
+
+/* Star Floating Animation */
+@keyframes floatStar {
+    0% {
+        transform: translateY(0px) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(-10px) rotate(90deg) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-30px) rotate(180deg) scale(1.1);
+    }
+    80% {
+        opacity: 0.8;
+        transform: translateY(-50px) rotate(270deg) scale(0.9);
+    }
+    100% {
+        transform: translateY(-70px) rotate(360deg) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Sparkle Animation */
+@keyframes sparkle {
+    0% {
+        transform: scale(0) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1) rotate(180deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(0) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Success Icon Background Animation */
+.success-icon-bg {
+    animation: successPulse 2s ease-in-out infinite;
+}
+
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+    }
+}
+
+/* Individual Star Styles */
+.star {
+    filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
+
+.star-1 { animation-delay: 0s; }
+.star-2 { animation-delay: 0.8s; }
+.star-3 { animation-delay: 1.6s; }
+.star-4 { animation-delay: 2.4s; }
+.star-5 { animation-delay: 3.2s; }
+
+/* Sparkle Styles */
+.sparkle {
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.8));
+}
+
+.sparkle-1 { animation-delay: 0.5s; }
+.sparkle-2 { animation-delay: 1.5s; }
+.sparkle-3 { animation-delay: 1s; }
+
+/* Achievement Badge Animation */
+.achievement-badge {
+    animation: achievementBurst 1s ease-out;
+}
+
+@keyframes achievementBurst {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.1) rotate(10deg);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Achievement Title Animation */
+.achievement-title {
+    animation: titleSlideIn 1.2s ease-out 0.5s both;
+}
+
+@keyframes titleSlideIn {
+    0% {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Page Load Animation */
+.wizard-header {
+    animation: pageLoad 1.5s ease-out;
+}
+
+@keyframes pageLoad {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+</style>

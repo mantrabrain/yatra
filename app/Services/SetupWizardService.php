@@ -30,6 +30,9 @@ class SetupWizardService
 
         // Register activation hook handler
         add_action('admin_init', [__CLASS__, 'handleWizardRedirect']);
+        
+        // Force redirect to setup wizard if not completed
+        add_action('admin_init', [__CLASS__, 'forceWizardRedirect']);
     }
 
     /**
@@ -46,6 +49,40 @@ class SetupWizardService
     public static function handleWizardRedirect(): void
     {
         SetupWizardController::setup_wizard_redirect();
+    }
+
+    /**
+     * Force redirect to setup wizard if not completed
+     * This implements the legacy logic: if yatra_setup_wizard_ran != '1', redirect to setup wizard
+     */
+    public static function forceWizardRedirect(): void
+    {
+        // Only apply to users who can manage options
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+        
+        // Check if setup wizard is enabled via filter (legacy compatibility)
+        if (!apply_filters('yatra_enable_setup_wizard', true)) {
+            return;
+        }
+        
+        // Check if wizard has been completed (yatra_setup_wizard_ran != '1')
+        if (get_option('yatra_setup_wizard_ran') !== '1') {
+            // Don't redirect if we're already on the setup wizard page
+            if (isset($_GET['page']) && $_GET['page'] === 'yatra-setup') {
+                return;
+            }
+            
+            // Don't redirect on AJAX requests
+            if (wp_doing_ajax()) {
+                return;
+            }
+            
+            // Force redirect to setup wizard
+            wp_safe_redirect(admin_url('tools.php?page=yatra-setup'));
+            exit;
+        }
     }
 
     /**

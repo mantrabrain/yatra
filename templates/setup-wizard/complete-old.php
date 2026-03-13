@@ -114,7 +114,7 @@ defined('ABSPATH') || exit;
                 <span class="dashicons dashicons-location-alt"></span>
                 <div class="yatra-setup-next-step-content">
                     <h3><?php esc_html_e('Create Your First Trip', 'yatra'); ?></h3>
-                    <p><?php esc_html_e('Start by adding your travel packages and tour offerings.', 'yatra'); ?></p>
+                    <p><?php esc_html_e('Start by adding your travel packages and trip offerings.', 'yatra'); ?></p>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=yatra&subpage=trips')); ?>" class="button">
                         <?php esc_html_e('Add Trip', 'yatra'); ?>
                     </a>

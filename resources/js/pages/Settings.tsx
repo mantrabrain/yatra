@@ -626,7 +626,7 @@ interface SettingsData {
   timezone: string;
   date_format: string;
   time_format: string;
-  language: string;
+  
 
   // Google Calendar Settings
   google_calendar_client_id?: string;
@@ -680,7 +680,6 @@ interface SettingsData {
 
   // Trip Settings
   default_trip_status: string;
-  require_availability: boolean;
   max_group_size: number;
   min_group_size: number;
   booking_advance_days: number;
@@ -718,8 +717,9 @@ interface SettingsData {
   multi_currency: boolean;
   currency_position: string;
   currency_decimals: number;
-  supported_currencies: string[];
-  auto_currency_detection: boolean;
+  thousand_separator: string;
+  decimal_separator: string;
+
 
   // Notification Settings
   notify_new_booking: boolean;
@@ -2072,7 +2072,6 @@ const Settings: React.FC = () => {
       timezone: "Asia/Kathmandu",
       date_format: "Y-m-d",
       time_format: "H:i",
-      language: "en",
       booking_confirmation: true,
       auto_confirm_bookings: false,
       require_login: false,
@@ -2187,7 +2186,7 @@ const Settings: React.FC = () => {
       smtp_password: "",
       smtp_encryption: "tls",
       default_trip_status: "active",
-      require_availability: true,
+    
       max_group_size: 20,
       min_group_size: 2,
       booking_advance_days: 30,
@@ -2217,8 +2216,8 @@ const Settings: React.FC = () => {
       multi_currency: false,
       currency_position: "left",
       currency_decimals: 2,
-      supported_currencies: ["USD", "EUR", "GBP"],
-      auto_currency_detection: false,
+      thousand_separator: ",",
+      decimal_separator: ".",
       notify_new_booking: true,
       notify_payment: true,
       notify_cancellation: true,
@@ -3600,25 +3599,6 @@ const Settings: React.FC = () => {
                   </Select>
                 </FormField>
               </div>
-
-              <FormField
-                id="language"
-                label={__("Default Language", "yatra")}
-                description={__("Default language for your website", "yatra")}
-              >
-                <Select
-                  id="language"
-                  value={formData.language}
-                  name="language"
-                  onChange={handleFieldChange}
-                >
-                  <option value="en">{__("English", "yatra")}</option>
-                  <option value="es">{__("Spanish", "yatra")}</option>
-                  <option value="fr">{__("French", "yatra")}</option>
-                  <option value="de">{__("German", "yatra")}</option>
-                  <option value="ne">{__("Nepali", "yatra")}</option>
-                </Select>
-              </FormField>
             </div>
           </div>
         );
@@ -3635,9 +3615,11 @@ const Settings: React.FC = () => {
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
                   {__("Flexible Payments", "yatra")}
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-                    PRO
-                  </span>
+                  {!(window as any).yatraAdmin?.isProActive && !(window as any).yatraAdmin?.flexiblePaymentsEnabled && (
+                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+                      PRO
+                    </span>
+                  )}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   {__(
@@ -3646,7 +3628,7 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.isProActive &&
+                {(window as any).yatraAdmin?.isProActive ||
                 (window as any).yatraAdmin?.flexiblePaymentsEnabled ? (
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
@@ -4985,32 +4967,6 @@ const Settings: React.FC = () => {
                   <option value="inactive">{__("Inactive", "yatra")}</option>
                 </Select>
               </FormField>
-
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="require_availability"
-                  checked={formData.require_availability}
-                  name="require_availability"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="require_availability"
-                    className="font-medium cursor-pointer"
-                  >
-                    {__("Require Availability Check", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Check trip availability before allowing bookings",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
-              </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   id="max_group_size"
@@ -5560,94 +5516,116 @@ const Settings: React.FC = () => {
       case "currency":
         return (
           <div className="space-y-6">
-            <div className="space-y-4">
-              <FormField
-                id="currency"
-                label={__("Default Currency", "yatra")}
-                description={__(
-                  "Primary currency for all transactions",
-                  "yatra",
-                )}
-                required
-              >
-                <SearchableSelect
-                  value={formData.currency}
-                  onChange={(val) =>
-                    setFormData((prev) =>
-                      prev ? { ...prev, currency: val } : prev,
-                    )
-                  }
-                  options={getCurrencyOptions()}
-                  placeholder={__("Select currency...", "yatra")}
-                  searchPlaceholder={__("Search currencies...", "yatra")}
-                  showValueId={false}
-                />
-              </FormField>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
+              {__("Currency Settings", "yatra")}
+            </h3>
+            
+            {/* Two Column Layout for All Currency Settings */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Left Column */}
+              <div className="space-y-6">
+                <FormField
+                  id="currency"
+                  label={__("Default Currency", "yatra")}
+                  description={__(
+                    "Primary currency for all transactions",
+                    "yatra",
+                  )}
+                  required
+                >
+                  <SearchableSelect
+                    value={formData.currency}
+                    onChange={(val) =>
+                      setFormData((prev) =>
+                        prev ? { ...prev, currency: val } : prev,
+                      )
+                    }
+                    options={getCurrencyOptions()}
+                    placeholder={__("Select currency...", "yatra")}
+                    searchPlaceholder={__("Search currencies...", "yatra")}
+                    showValueId={false}
+                  />
+                </FormField>
 
-              <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                <input
-                  type="checkbox"
-                  id="multi_currency"
-                  checked={formData.multi_currency}
-                  name="multi_currency"
-                  onChange={handleFieldChange}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <Label
-                    htmlFor="multi_currency"
-                    className="font-medium cursor-pointer"
+                <FormField
+                  id="currency_position"
+                  label={__("Currency Position", "yatra")}
+                  description={__(
+                    "Where to display currency symbol relative to amount",
+                    "yatra",
+                  )}
+                >
+                  <Select
+                    id="currency_position"
+                    value={formData.currency_position}
+                    name="currency_position"
+                    onChange={handleFieldChange}
                   >
-                    {__("Enable Multi-Currency", "yatra")}
-                  </Label>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    {__(
-                      "Allow customers to view prices in different currencies",
-                      "yatra",
-                    )}
-                  </p>
-                </div>
+                    <option value="left">$100 (Left)</option>
+                    <option value="right">100$ (Right)</option>
+                    <option value="left_space">$ 100 (Left with Space)</option>
+                    <option value="right_space">100 $ (Right with Space)</option>
+                  </Select>
+                </FormField>
+
+                <FormField
+                  id="thousand_separator"
+                  label={__("Thousand Separator", "yatra")}
+                  description={__(
+                    "Character used to separate thousands (e.g., comma for 1,000)",
+                    "yatra",
+                  )}
+                >
+                  <Input
+                    id="thousand_separator"
+                    value={formData.thousand_separator}
+                    name="thousand_separator"
+                    onChange={handleFieldChange}
+                    maxLength={1}
+                    placeholder={","}
+                  />
+                </FormField>
               </div>
 
-              <FormField
-                id="currency_position"
-                label={__("Currency Position", "yatra")}
-                description={__(
-                  "Where to display currency symbol relative to amount",
-                  "yatra",
-                )}
-              >
-                <Select
-                  id="currency_position"
-                  value={formData.currency_position}
-                  name="currency_position"
-                  onChange={handleFieldChange}
-                >
-                  <option value="left">$100 (Left)</option>
-                  <option value="right">100$ (Right)</option>
-                  <option value="left_space">$ 100 (Left with Space)</option>
-                  <option value="right_space">100 $ (Right with Space)</option>
-                </Select>
-              </FormField>
-
-              <FormField
-                id="currency_decimals"
-                label={__("Decimal Places", "yatra")}
-                description={__(
-                  "Number of decimal places to show in prices",
-                  "yatra",
-                )}
-              >
-                <Input
+              {/* Right Column */}
+              <div className="space-y-6">
+                <FormField
                   id="currency_decimals"
-                  type="number"
-                  value={formData.currency_decimals}
-                  name="currency_decimals"
-                  onChange={handleFieldChange}
-                  min="0"
-                  max="4"
-                />
-              </FormField>
+                  label={__("Decimal Places", "yatra")}
+                  description={__(
+                    "Number of decimal places to show in prices",
+                    "yatra",
+                  )}
+                >
+                  <Input
+                    id="currency_decimals"
+                    type="number"
+                    value={formData.currency_decimals}
+                    name="currency_decimals"
+                    onChange={handleFieldChange}
+                    min="0"
+                    max="4"
+                  />
+                </FormField>
+
+                <FormField
+                  id="decimal_separator"
+                  label={__("Decimal Separator", "yatra")}
+                  description={__(
+                    "Character used to separate decimal part (e.g., period for 99.99)",
+                    "yatra",
+                  )}
+                >
+                  <Input
+                    id="decimal_separator"
+                    value={formData.decimal_separator}
+                    name="decimal_separator"
+                    onChange={handleFieldChange}
+                    maxLength={1}
+                    placeholder={"."}
+                  />
+                </FormField>
+              </div>
             </div>
           </div>
         );

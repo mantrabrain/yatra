@@ -40,7 +40,7 @@ $is_resa_active = get_template() === 'resa';
                     <div class="yatra-theme-details">
                         <h3><?php esc_html_e('Resa - Travel Booking Theme', 'yatra'); ?></h3>
                         <p class="yatra-theme-description">
-                            <?php esc_html_e('A modern, responsive WordPress theme built specifically for travel agencies and tour operators. Features beautiful trip listings, booking forms, and seamless Yatra integration.', 'yatra'); ?>
+                            <?php esc_html_e('A modern, responsive WordPress theme built specifically for travel agencies and trip operators. Features beautiful trip listings, booking forms, and seamless Yatra integration.', 'yatra'); ?>
                         </p>
                         
                         <ul class="yatra-theme-features">

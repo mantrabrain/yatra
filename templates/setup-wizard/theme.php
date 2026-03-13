@@ -9,8 +9,9 @@ defined('ABSPATH') || exit;
 
 $resa_theme = wp_get_theme('resa');
 $is_resa_installed = $resa_theme->exists();
-$is_resa_active = get_template() === 'resa';
 $current_theme = wp_get_theme();
+$current_theme_slug = $current_theme->get_stylesheet();
+$is_resa_active = ($current_theme_slug === 'resa') || ($current_theme->get('Name') === 'Resa') || (get_template() === 'resa') || (get_stylesheet() === 'resa');
 ?>
 
 <form method="post" class="wizard-step">
@@ -45,33 +46,58 @@ $current_theme = wp_get_theme();
                     </svg>
                     <h3 style="margin: 0; font-size: 20px; font-weight: 600; color: #111827;"><?php esc_html_e('Resa Theme', 'yatra'); ?></h3>
                     <span style="margin-left: auto; padding: 4px 12px; background: #4f46e5; color: #fff; font-size: 11px; font-weight: 700; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em;"><?php esc_html_e('Recommended', 'yatra'); ?></span>
+                    <?php if ($is_resa_installed && $is_resa_active) : ?>
+                        <span style="padding: 4px 12px; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em;"><?php esc_html_e('Activated', 'yatra'); ?></span>
+                    <?php endif; ?>
                 </div>
 
-                <?php if ($is_resa_active) : ?>
-                    <div style="background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; text-align: center; padding: 14px; font-weight: 600; color: #065f46;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                        </svg>
-                        <?php esc_html_e('Active', 'yatra'); ?>
+                <p style="color: #6b7280; margin-bottom: 20px; line-height: 1.5;">
+                    <?php esc_html_e('The perfect theme for travel and trip booking websites. Designed specifically to work seamlessly with Yatra plugin.', 'yatra'); ?>
+                </p>
+
+                <?php if ($is_resa_installed && $is_resa_active) : ?>
+                    <!-- Theme is active, show no action buttons -->
+                <?php elseif ($is_resa_installed && !$is_resa_active) : ?>
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #fef3c7; border: 1px solid #f59e0b; border-radius: 8px; padding: 16px;">
+                        <div style="display: flex; align-items: center;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" style="margin-right: 12px;">
+                                <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            <span style="font-weight: 600; color: #92400e;"><?php esc_html_e('Installed but not activated', 'yatra'); ?></span>
+                        </div>
+                        <button type="button" class="btn btn-warning" onclick="activateTheme('resa')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #f59e0b; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='#d97706'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#f59e0b'; this.style.transform='translateY(0)';">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                            <?php esc_html_e('Activate', 'yatra'); ?>
+                        </button>
                     </div>
                 <?php else : ?>
-                    <label style="display: flex; align-items: center; padding: 14px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='#f3f4f6'; this.style.borderColor='#4f46e5';" onmouseout="this.style.background='#f9fafb'; this.style.borderColor='#e5e7eb';">
-                        <input type="checkbox" name="install_resa_theme" value="yes" checked style="width: 18px; height: 18px; margin-right: 12px; cursor: pointer; accent-color: #4f46e5;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" style="margin-right: 8px;">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        <span style="font-size: 14px; font-weight: 600; color: #374151;"><?php esc_html_e('Install & Activate Resa Theme (Free)', 'yatra'); ?></span>
-                    </label>
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #eff6ff; border: 1px solid #3b82f6; border-radius: 8px; padding: 16px;">
+                        <div style="display: flex; align-items: center;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="margin-right: 12px;">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <span style="font-weight: 600; color: #1e40af;"><?php esc_html_e('Not installed', 'yatra'); ?></span>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="installAndActivateTheme('resa')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #3b82f6; color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;" onmouseover="this.style.background='#2563eb'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#3b82f6'; this.style.transform='translateY(0)';">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            <?php esc_html_e('Install & Activate', 'yatra'); ?>
+                        </button>
+                    </div>
                 <?php endif; ?>
             </div>
         </div>
     </div>
 
     <div class="wizard-footer">
-        <a href="<?php echo esc_url(add_query_arg('step', 'pages', remove_query_arg('activate_error'))); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
+        <a href="<?php echo esc_url(add_query_arg('step', 'currency', remove_query_arg('activate_error'))); ?>" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="19" y1="12" x2="5" y2="12"></line>
                 <polyline points="12 19 5 12 12 5"></polyline>
@@ -95,3 +121,202 @@ $current_theme = wp_get_theme();
         </button>
     </div>
 </form>
+
+<script>
+// Define ajaxurl if not available
+if (typeof ajaxurl === 'undefined') {
+    ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
+}
+
+function installAndActivateTheme(themeSlug) {
+    const button = event.target;
+    const originalContent = button.innerHTML;
+    
+    // Show loading state with spinner
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Installing...';
+    button.disabled = true;
+    button.style.cursor = 'not-allowed';
+    button.style.opacity = '0.7';
+    
+    // Add CSS animation for spinner
+    if (!document.querySelector('#spinner-style')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-style';
+        style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+    }
+    
+    // Make AJAX request to install theme
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        data: {
+            action: 'yatra_install_theme',
+            theme_slug: themeSlug,
+            nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
+        },
+        success: function(response) {
+            console.log('Raw installation response:', response); // Debug log
+            
+            // Handle case where HTML is mixed with JSON
+            let jsonResponse = response;
+            if (typeof response === 'string' && response.includes('{')) {
+                // Extract JSON from mixed HTML/JSON response
+                const jsonStart = response.lastIndexOf('{');
+                const jsonEnd = response.lastIndexOf('}') + 1;
+                const jsonString = response.substring(jsonStart, jsonEnd);
+                
+                try {
+                    jsonResponse = JSON.parse(jsonString);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    resetButtonState(button, originalContent);
+                    alert('Installation failed: Invalid response format');
+                    return;
+                }
+            }
+            
+            if (jsonResponse && jsonResponse.success) {
+                // Theme installed successfully, now activate it
+                button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Activating...';
+                
+                jQuery.ajax({
+                    url: ajaxurl,
+                    type: 'POST',
+                    data: {
+                        action: 'yatra_activate_theme',
+                        theme_slug: themeSlug,
+                        nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
+                    },
+                    success: function(activateResponse) {
+                        console.log('Activation response:', activateResponse); // Debug log
+                        if (activateResponse && activateResponse.success) {
+                            // Update UI dynamically to show activated state
+                            updateThemeCardToActivated();
+                        } else {
+                            resetButtonState(button, originalContent);
+                            const errorMsg = activateResponse && activateResponse.data ? activateResponse.data : 'Unknown activation error';
+                            alert('Activation failed: ' + errorMsg);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
+                        resetButtonState(button, originalContent);
+                        alert('Activation request failed. Please try again.');
+                    }
+                });
+            } else {
+                resetButtonState(button, originalContent);
+                const errorMsg = jsonResponse && jsonResponse.data ? jsonResponse.data : 'Unknown installation error';
+                alert('Installation failed: ' + errorMsg);
+            }
+        },
+        error: function() {
+            button.innerHTML = originalContent;
+            button.disabled = false;
+            alert('Installation request failed. Please try again.');
+        }
+    });
+}
+
+function activateTheme(themeSlug) {
+    const button = event.target;
+    const originalContent = button.innerHTML;
+    
+    // Show loading state with spinner
+    button.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"></circle><path d="M12 2v10l4 2" fill="none" stroke="currentColor" stroke-width="2"></path></svg> Activating...';
+    button.disabled = true;
+    button.style.cursor = 'not-allowed';
+    button.style.opacity = '0.7';
+    
+    // Add CSS animation for spinner if not already added
+    if (!document.querySelector('#spinner-style')) {
+        const style = document.createElement('style');
+        style.id = 'spinner-style';
+        style.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+        document.head.appendChild(style);
+    }
+    
+    // Make AJAX request to activate theme
+    jQuery.ajax({
+        url: ajaxurl,
+        type: 'POST',
+        data: {
+            action: 'yatra_activate_theme',
+            theme_slug: themeSlug,
+            nonce: '<?php echo wp_create_nonce('yatra_theme_actions'); ?>'
+        },
+        success: function(response) {
+            console.log('Activation response:', response); // Debug log
+            if (response && response.success) {
+                // Update UI dynamically to show activated state
+                updateThemeCardToActivated();
+            } else {
+                resetButtonState(button, originalContent);
+                const errorMsg = response && response.data ? response.data : 'Unknown activation error';
+                alert('Activation failed: ' + errorMsg);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.log('Activation AJAX error:', {xhr: xhr, status: status, error: error}); // Debug log
+            resetButtonState(button, originalContent);
+            alert('Activation request failed. Please try again.');
+        }
+    });
+}
+
+function resetButtonState(button, originalContent) {
+    button.innerHTML = originalContent;
+    button.disabled = false;
+    button.style.cursor = 'pointer';
+    button.style.opacity = '1';
+}
+
+function updateThemeCardToActivated() {
+    // Find the theme card and update it to show activated state
+    const themeCard = document.querySelector('.theme-card-full');
+    if (!themeCard) return;
+    
+    // Remove any existing action blocks
+    const actionBlocks = themeCard.querySelectorAll('div[style*="background: #fef3c7"], div[style*="background: #eff6ff"]');
+    actionBlocks.forEach(block => block.remove());
+    
+    // Add "Activated" badge if not already present
+    const header = themeCard.querySelector('div[style*="align-items: center; gap: 12px"]');
+    if (header) {
+        // Remove existing "Activated" badge if present
+        const existingBadge = header.querySelector('span[style*="background: #10b981"]');
+        if (existingBadge) existingBadge.remove();
+        
+        // Add new "Activated" badge
+        const activatedBadge = document.createElement('span');
+        activatedBadge.style.cssText = 'padding: 4px 12px; background: #10b981; color: #fff; font-size: 11px; font-weight: 700; border-radius: 12px; text-transform: uppercase; letter-spacing: 0.05em;';
+        activatedBadge.textContent = '<?php esc_html_e('Activated', 'yatra'); ?>';
+        header.appendChild(activatedBadge);
+    }
+    
+    // Show success message briefly
+    const successMsg = document.createElement('div');
+    successMsg.style.cssText = 'background: #d1fae5; border: 1px solid #10b981; border-radius: 8px; padding: 16px; margin-bottom: 20px; text-align: center; color: #065f46; font-weight: 600;';
+    successMsg.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+        <?php esc_html_e('Theme activated successfully!', 'yatra'); ?>
+    `;
+    
+    // Insert success message after the description
+    const description = themeCard.querySelector('p[style*="color: #6b7280"]');
+    if (description && description.nextElementSibling) {
+        description.parentNode.insertBefore(successMsg, description.nextElementSibling);
+    }
+    
+    // Remove success message after 3 seconds
+    setTimeout(() => {
+        if (successMsg.parentNode) {
+            successMsg.remove();
+        }
+    }, 3000);
+}
+</script>

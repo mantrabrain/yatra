@@ -41,8 +41,7 @@ class SettingsController extends BaseController
         'timezone' => 'UTC',
         'date_format' => 'Y-m-d',
         'time_format' => 'H:i',
-        'language' => 'en',
-        
+         
         // Booking Settings
         'booking_confirmation' => true,
         'auto_confirm_bookings' => false,
@@ -95,7 +94,6 @@ class SettingsController extends BaseController
         
         // Trip Settings
         'default_trip_status' => 'draft',
-        'require_availability' => true,
         'max_group_size' => 20,
         'min_group_size' => 2,
         'booking_advance_days' => 0,
@@ -133,8 +131,10 @@ class SettingsController extends BaseController
         'multi_currency' => false,
         'currency_position' => 'left',
         'currency_decimals' => 2,
-        'supported_currencies' => ['USD'],
-        'auto_currency_detection' => false,
+        'decimal_separator'=>'.',
+        'thousand_separator'=>',',
+        
+        
         
         // Notification Settings
         'notify_new_booking' => true,

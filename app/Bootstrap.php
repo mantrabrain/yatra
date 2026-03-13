@@ -269,6 +269,11 @@ class Bootstrap
             add_option('yatra_version', YATRA_VERSION);
         }
         
+        // Set up setup wizard redirect for first-time activation
+        if (get_option('yatra_setup_wizard_ran') !== '1') {
+            set_transient('yatra_setup_wizard_redirect', 1, 30);
+        }
+        
         // Flush rewrite rules
         flush_rewrite_rules();
     }

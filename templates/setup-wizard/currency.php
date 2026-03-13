@@ -7,25 +7,25 @@
 
 defined('ABSPATH') || exit;
 
-$currency = get_option('yatra_currency_code', 'USD');
-$currency_position = get_option('yatra_currency_position', 'before');
-$thousand_separator = get_option('yatra_currency_thousand_separator', ',');
-$decimal_separator = get_option('yatra_currency_decimal_separator', '.');
-$number_of_decimals = get_option('yatra_currency_number_of_decimals', 2);
+use Yatra\Services\SettingsService;
+use Yatra\Helpers\CurrencyHelper;
 
-// Common currencies
-$currencies = array(
-    'USD' => __('US Dollar ($)', 'yatra'),
-    'EUR' => __('Euro (€)', 'yatra'),
-    'GBP' => __('British Pound (£)', 'yatra'),
-    'AUD' => __('Australian Dollar ($)', 'yatra'),
-    'CAD' => __('Canadian Dollar ($)', 'yatra'),
-    'JPY' => __('Japanese Yen (¥)', 'yatra'),
-    'INR' => __('Indian Rupee (₹)', 'yatra'),
-    'CNY' => __('Chinese Yuan (¥)', 'yatra'),
-    'CHF' => __('Swiss Franc (CHF)', 'yatra'),
-    'NZD' => __('New Zealand Dollar ($)', 'yatra'),
-);
+// Get actual Yatra settings
+$currency = SettingsService::get('currency', 'USD');
+$currency_position = SettingsService::get('currency_position', 'before');
+$thousand_separator = SettingsService::get('thousand_separator', ',');
+$decimal_separator = SettingsService::get('decimal_separator', '.');
+$decimal_places = SettingsService::get('decimal_places', 2);
+
+// Get all currencies from CurrencyHelper
+$currencies = CurrencyHelper::getOptions(true);
+
+// Get popular currencies for quick selection
+$popular_currencies = CurrencyHelper::getPopular();
+$popular_options = [];
+foreach ($popular_currencies as $code => $data) {
+    $popular_options[$code] = "{$data['name']} ({$data['symbol']})";
+}
 ?>
 
 <form method="post" class="wizard-step">
@@ -44,15 +44,29 @@ $currencies = array(
     </div>
 
     <div class="wizard-content">
-        <div class="form-row">
+        <!-- First Row - Currency & Position -->
+        <div class="form-row" style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px;">
             <div class="form-group">
                 <label class="form-label" for="currency"><?php esc_html_e('Currency', 'yatra'); ?></label>
                 <select id="currency" name="currency" class="form-control">
-                    <?php foreach ($currencies as $code => $label) : ?>
-                        <option value="<?php echo esc_attr($code); ?>" <?php selected($currency, $code); ?>><?php echo esc_html($label); ?></option>
-                    <?php endforeach; ?>
+                    <optgroup label="<?php esc_html_e('Popular Currencies', 'yatra'); ?>">
+                        <?php foreach ($popular_options as $code => $label) : ?>
+                            <option value="<?php echo esc_attr($code); ?>" <?php selected($currency, $code); ?>>
+                                <?php echo esc_html($label); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                    <optgroup label="<?php esc_html_e('All Currencies', 'yatra'); ?>">
+                        <?php foreach ($currencies as $code => $label) : ?>
+                            <?php if (!isset($popular_options[$code])) : // Skip popular currencies already shown ?>
+                                <option value="<?php echo esc_attr($code); ?>" <?php selected($currency, $code); ?>>
+                                    <?php echo esc_html($label); ?>
+                                </option>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </optgroup>
                 </select>
-                <p class="form-help"><?php esc_html_e('Select your preferred currency', 'yatra'); ?></p>
+                <p class="form-help"><?php esc_html_e('Select your preferred currency from 150+ world currencies', 'yatra'); ?></p>
             </div>
 
             <div class="form-group">
@@ -65,7 +79,8 @@ $currencies = array(
             </div>
         </div>
 
-        <div class="form-row">
+        <!-- Second Row - Separators -->
+        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
             <div class="form-group">
                 <label class="form-label" for="thousand_separator"><?php esc_html_e('Thousand Separator', 'yatra'); ?></label>
                 <input type="text" id="thousand_separator" name="thousand_separator" value="<?php echo esc_attr($thousand_separator); ?>" maxlength="1" class="form-control">
@@ -77,12 +92,10 @@ $currencies = array(
                 <input type="text" id="decimal_separator" name="decimal_separator" value="<?php echo esc_attr($decimal_separator); ?>" maxlength="1" class="form-control">
                 <p class="form-help"><?php esc_html_e('e.g., period (.) for 99.99', 'yatra'); ?></p>
             </div>
-        </div>
 
-        <div class="form-row">
             <div class="form-group">
-                <label class="form-label" for="number_of_decimals"><?php esc_html_e('Decimal Places', 'yatra'); ?></label>
-                <input type="number" id="number_of_decimals" name="number_of_decimals" value="<?php echo esc_attr($number_of_decimals); ?>" min="0" max="4" class="form-control">
+                <label class="form-label" for="decimal_places"><?php esc_html_e('Decimal Places', 'yatra'); ?></label>
+                <input type="number" id="decimal_places" name="decimal_places" value="<?php echo esc_attr($decimal_places); ?>" min="0" max="4" class="form-control">
                 <p class="form-help"><?php esc_html_e('Number of decimal places to display', 'yatra'); ?></p>
             </div>
         </div>
