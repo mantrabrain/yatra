@@ -108,6 +108,155 @@ const FormField = React.memo(
 );
 FormField.displayName = "FormField";
 
+// Reusable Pro Feature Component with three-tier logic
+interface ProFeatureProps {
+  title: string;
+  description: string;
+  moduleName: string;
+  pricingUrl: string;
+  isProActive: boolean;
+  isModuleEnabled: boolean;
+  children: React.ReactNode;
+}
+
+const ProFeature: React.FC<ProFeatureProps> = ({
+  title,
+  description,
+  moduleName,
+  pricingUrl,
+  isProActive,
+  isModuleEnabled,
+  children,
+}) => {
+  // Get the correct modules page URL
+  const modulesPageUrl = useMemo(() => {
+    const baseUrl = window.yatraAdmin?.siteUrl
+      ? `${window.yatraAdmin.siteUrl}/wp-admin/admin.php?page=yatra`
+      : "/wp-admin/admin.php?page=yatra";
+    return `${baseUrl}&subpage=modules`;
+  }, []);
+
+  // Show full settings if Pro is active AND module is enabled
+  if (isProActive && isModuleEnabled) {
+    return <>{children}</>;
+  }
+
+  // Show "Enable Module" if Pro is active BUT module is not enabled
+  if (isProActive && !isModuleEnabled) {
+    return (
+      <div className="p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <svg
+              className="w-6 h-6 text-amber-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
+              />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-100">
+              {__("Please activate", "yatra")} {moduleName}
+            </h4>
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+              {__(
+                "You have Yatra Pro installed. Enable the",
+                "yatra",
+              )} {moduleName} {__("module to access", "yatra")} {description.toLowerCase()} {__("features.", "yatra")}
+            </p>
+            <Button
+              type="button"
+              onClick={() => window.open(modulesPageUrl, '_blank')}
+              className="mt-3 bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {__("Activate Module", "yatra")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show "Upgrade to Pro" if Pro is not active
+  return (
+    <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+      <div className="flex items-start gap-3">
+        <div className="flex-shrink-0">
+          <svg
+            className="w-6 h-6 text-purple-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+        </div>
+        <div className="flex-1">
+          <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
+            {__("Upgrade to Pro for", "yatra")} {moduleName}
+          </h4>
+          <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+            {__(
+              `Get Yatra Pro to access ${description} and unlock all premium features.`,
+              "yatra",
+            )}
+          </p>
+          <a
+            href={pricingUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
+          >
+            {__("Upgrade to Pro", "yatra")}
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+              />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Reusable PRO Badge Component
+interface ProBadgeProps {
+  isProActive: boolean;
+}
+
+const ProBadge: React.FC<ProBadgeProps> = ({ isProActive }) => {
+  // Only show PRO badge when Pro is not active
+  if (!isProActive) {
+    return (
+      <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
+        PRO
+      </span>
+    );
+  }
+  return null;
+};
+
 // Google Calendar Integration Section - inline component to avoid lazy loading issues
 const GoogleCalendarIntegrationSection: React.FC<{
   formData: SettingsData;
@@ -3615,11 +3764,7 @@ const Settings: React.FC = () => {
               <div>
                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
                   {__("Flexible Payments", "yatra")}
-                  {!(window as any).yatraAdmin?.isProActive && !(window as any).yatraAdmin?.flexiblePaymentsEnabled && (
-                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gradient-to-r from-purple-500 to-blue-500 text-white">
-                      PRO
-                    </span>
-                  )}
+                  <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                   {__(
@@ -3628,8 +3773,14 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.isProActive ||
-                (window as any).yatraAdmin?.flexiblePaymentsEnabled ? (
+                <ProFeature
+                  title={__("Flexible Payments", "yatra")}
+                  description={__("offer deposit and partial payment options to your customers", "yatra")}
+                  moduleName="Flexible Payments"
+                  pricingUrl="https://wpyatra.com/pricing?module=flexible-payments"
+                  isProActive={(window as any).yatraAdmin?.isPro}
+                  isModuleEnabled={(window as any).yatraAdmin?.flexiblePaymentsEnabled}
+                >
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                       <input
@@ -3732,59 +3883,7 @@ const Settings: React.FC = () => {
                       </FormField>
                     )}
                   </div>
-                ) : (
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0">
-                        <svg
-                          className="w-6 h-6 text-purple-500"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                          />
-                        </svg>
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100">
-                          {__("Upgrade to Pro for Flexible Payments", "yatra")}
-                        </h4>
-                        <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
-                          {__(
-                            "Enable the Flexible Payments module in Yatra Pro to offer deposit and partial payment options to your customers.",
-                            "yatra",
-                          )}
-                        </p>
-                        <a
-                          href="https://wpyatra.com/pricing?module=flexible-payments"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 mt-3 text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-purple-400"
-                        >
-                          {__("Learn More", "yatra")}
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M14 5l7 7m0 0l-7 7m7-7H3"
-                            />
-                          </svg>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                </ProFeature>
               </div>
 
               {/* Auto-confirm Pay Later Bookings - Available in Free version */}
@@ -5801,11 +5900,7 @@ const Settings: React.FC = () => {
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Mail className="w-5 h-5 text-yellow-500" />
                   {__("Mailchimp", "yatra")}
-                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showMailchimpSettingsUI && (
-                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
-                      PRO
-                    </span>
-                  )}
+                  <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </CardTitle>
                 {(window as any).yatraAdmin?.mailchimp?.connectionStatus?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -5827,7 +5922,14 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.showMailchimpSettingsUI ? (
+                <ProFeature
+                  title={__("Mailchimp", "yatra")}
+                  description={__("automatically sync your customers", "yatra")}
+                  moduleName="Mailchimp"
+                  pricingUrl="https://wpyatra.com/pricing?module=mailchimp"
+                  isProActive={(window as any).yatraAdmin?.isPro}
+                  isModuleEnabled={(window as any).yatraAdmin?.showMailchimpSettingsUI}
+                >
                   <div className="space-y-4">
                     <FormField
                       id="mailchimp_api_key"
@@ -6117,25 +6219,7 @@ const Settings: React.FC = () => {
                         </div>
                       )}
                   </div>
-                ) : (
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__(
-                        "Upgrade to Yatra Pro to unlock Mailchimp integration and automatically sync your customers.",
-                        "yatra",
-                      )}
-                    </p>
-                    <a
-                      href="https://wpyatra.com/pricing?module=mailchimp"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
-                    >
-                      {__("Upgrade to Pro", "yatra")}
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-                )}
+                </ProFeature>
               </CardContent>
             </Card>
 
@@ -6152,11 +6236,7 @@ const Settings: React.FC = () => {
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                   </svg>
                   {__("Facebook Pixel", "yatra")}
-                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showFacebookPixelSettingsUI && (
-                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
-                      PRO
-                    </span>
-                  )}
+                  <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </CardTitle>
                 {(window as any).yatraAdmin?.facebookPixel?.connectionStatus?.pixelConnected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -6178,7 +6258,14 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.showFacebookPixelSettingsUI ? (
+                <ProFeature
+                  title={__("Facebook Pixel", "yatra")}
+                  description={__("access advanced conversion tracking features", "yatra")}
+                  moduleName="Facebook Pixel"
+                  pricingUrl="https://wpyatra.com/pricing?module=facebook-pixel"
+                  isProActive={(window as any).yatraAdmin?.isPro}
+                  isModuleEnabled={(window as any).yatraAdmin?.showFacebookPixelSettingsUI}
+                >
                   <div className="space-y-4">
                     <FormField
                       id="facebook_pixel_id"
@@ -6456,26 +6543,7 @@ const Settings: React.FC = () => {
                       </FormField>
                     )}
                   </div>
-                ) : (
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__(
-                        "Upgrade to Yatra Pro to unlock Facebook Pixel integration with advanced conversion tracking.",
-                        "yatra",
-                      )}
-                    </p>
-                    <a
-                      href="https://wpyatra.com/pricing?module=facebook-pixel"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
-                    >
-                      {__("Upgrade to Pro", "yatra")}
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-                )}
-                
+                </ProFeature>
                 {/* Facebook Pixel Monitoring Notice */}
                 {(window as any).yatraAdmin?.facebookPixel?.pixelId && (
                   <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
@@ -6518,11 +6586,7 @@ const Settings: React.FC = () => {
                     <path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" />
                   </svg>
                   {__("Google Analytics 4 Enhanced", "yatra")}
-                  {(window as any).yatraAdmin?.isPro && !(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI && (
-                    <span className="text-xs bg-gray-500 text-white px-2 py-0.5 rounded-full font-medium">
-                      PRO
-                    </span>
-                  )}
+                  <ProBadge isProActive={(window as any).yatraAdmin?.isPro} />
                 </CardTitle>
                 {(window as any).yatraAdmin?.googleAnalytics?.connected ? (
                   <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
@@ -6544,7 +6608,14 @@ const Settings: React.FC = () => {
                   )}
                 </p>
 
-                {(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI ? (
+                <ProFeature
+                  title={__("Google Analytics 4 Enhanced", "yatra")}
+                  description={__("access enhanced e-commerce tracking features", "yatra")}
+                  moduleName="Google Analytics"
+                  pricingUrl="https://wpyatra.com/pricing?module=google-analytics"
+                  isProActive={(window as any).yatraAdmin?.isPro}
+                  isModuleEnabled={(window as any).yatraAdmin?.showGoogleAnalyticsSettingsUI}
+                >
                   <div className="space-y-4">
                     <FormField
                       id="ga4_measurement_id"
@@ -6600,12 +6671,12 @@ const Settings: React.FC = () => {
                       />
                     </FormField>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
                         <input
                           type="checkbox"
                           id="ga4_track_view_item"
-                          checked={formData.ga4_track_view_item ?? true}
+                          checked={formData.ga4_track_view_item ?? false}
                           name="ga4_track_view_item"
                           onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -6614,7 +6685,24 @@ const Settings: React.FC = () => {
                           htmlFor="ga4_track_view_item"
                           className="text-sm cursor-pointer"
                         >
-                          {__("Track view_item", "yatra")}
+                          {__("Track View Item", "yatra")}
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                        <input
+                          type="checkbox"
+                          id="ga4_track_add_to_cart"
+                          checked={formData.ga4_track_add_to_cart ?? false}
+                          name="ga4_track_add_to_cart"
+                          onChange={handleFieldChange}
+                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <Label
+                          htmlFor="ga4_track_add_to_cart"
+                          className="text-sm cursor-pointer"
+                        >
+                          {__("Track Add to Cart", "yatra")}
                         </Label>
                       </div>
 
@@ -6622,7 +6710,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           id="ga4_track_begin_checkout"
-                          checked={formData.ga4_track_begin_checkout ?? true}
+                          checked={formData.ga4_track_begin_checkout ?? false}
                           name="ga4_track_begin_checkout"
                           onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -6631,7 +6719,7 @@ const Settings: React.FC = () => {
                           htmlFor="ga4_track_begin_checkout"
                           className="text-sm cursor-pointer"
                         >
-                          {__("Track begin_checkout", "yatra")}
+                          {__("Track Begin Checkout", "yatra")}
                         </Label>
                       </div>
 
@@ -6639,7 +6727,7 @@ const Settings: React.FC = () => {
                         <input
                           type="checkbox"
                           id="ga4_track_purchase"
-                          checked={formData.ga4_track_purchase ?? true}
+                          checked={formData.ga4_track_purchase ?? false}
                           name="ga4_track_purchase"
                           onChange={handleFieldChange}
                           className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -6648,49 +6736,75 @@ const Settings: React.FC = () => {
                           htmlFor="ga4_track_purchase"
                           className="text-sm cursor-pointer"
                         >
-                          {__("Track purchase", "yatra")}
-                        </Label>
-                      </div>
-
-                      <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
-                        <input
-                          type="checkbox"
-                          id="ga4_use_measurement_protocol"
-                          checked={
-                            formData.ga4_use_measurement_protocol ?? false
-                          }
-                          name="ga4_use_measurement_protocol"
-                          onChange={handleFieldChange}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <Label
-                          htmlFor="ga4_use_measurement_protocol"
-                          className="text-sm cursor-pointer"
-                        >
-                          {__("Use Measurement Protocol", "yatra")}
+                          {__("Track Purchase", "yatra")}
                         </Label>
                       </div>
                     </div>
+                    <div className="flex items-center gap-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-md">
+                      <input
+                        type="checkbox"
+                        id="ga4_use_measurement_protocol"
+                        checked={
+                          formData.ga4_use_measurement_protocol ?? false
+                        }
+                        name="ga4_use_measurement_protocol"
+                        onChange={handleFieldChange}
+                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <Label
+                        htmlFor="ga4_use_measurement_protocol"
+                        className="text-sm cursor-pointer"
+                      >
+                        {__("Use Measurement Protocol", "yatra")}
+                      </Label>
+                    </div>
+
+                    {formData.ga4_use_measurement_protocol && (
+                      <FormField
+                        id="ga4_api_secret"
+                        label={__("API Secret", "yatra")}
+                        description={__(
+                          "Generate API secret from Google Analytics Admin > Data Streams > Measurement Protocol",
+                          "yatra",
+                        )}
+                        actionButton={
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => validateApiSecret()}
+                            disabled={
+                              !formData.ga4_api_secret ||
+                              !formData.ga4_measurement_id ||
+                              validatingApiSecret
+                            }
+                            className="shrink-0"
+                          >
+                            {validatingApiSecret ? (
+                              <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                {__("Validating...", "yatra")}
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="w-4 h-4" />
+                                {__("Validate", "yatra")}
+                              </>
+                            )}
+                          </Button>
+                        }
+                      >
+                        <Input
+                          id="ga4_api_secret"
+                          value={formData.ga4_api_secret || ""}
+                          name="ga4_api_secret"
+                          onChange={handleFieldChange}
+                          placeholder="Your API secret"
+                        />
+                      </FormField>
+                    )}
                   </div>
-                ) : (
-                  <div className="p-4 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                    <p className="text-sm text-purple-800 dark:text-purple-300 mb-3">
-                      {__(
-                        "Upgrade to Yatra Pro to unlock Google Analytics 4 Enhanced e-commerce tracking.",
-                        "yatra",
-                      )}
-                    </p>
-                    <a
-                      href="https://wpyatra.com/pricing?module=google-analytics"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg text-sm font-medium hover:from-purple-700 hover:to-blue-700 transition-all"
-                    >
-                      {__("Upgrade to Pro", "yatra")}
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
-                  </div>
-                )}
+                </ProFeature>
                 
                 {/* Google Analytics Monitoring Notice */}
                 {(window as any).yatraAdmin?.googleAnalytics?.measurementId && (

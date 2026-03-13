@@ -106,6 +106,21 @@ export const useToggleModule = () => {
         window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing",
         );
+        
+        // Add flags for Pro feature modules
+        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
+          (m) => m.slug === "mailchimp",
+        );
+        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
+          (m) => m.slug === "facebook_pixel",
+        );
+        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_analytics",
+        );
+        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "flexible_payments",
+        );
+        
         // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
 
         // Trigger a navigation refresh by updating a custom event
@@ -187,6 +202,21 @@ export const useBulkToggleModules = () => {
         window.yatraAdmin.dynamicPricingEnabled = enabledModules.some(
           (m) => m.slug === "dynamic_pricing" || m.slug === "dynamic-pricing",
         );
+        
+        // Add flags for Pro feature modules
+        window.yatraAdmin.showMailchimpSettingsUI = enabledModules.some(
+          (m) => m.slug === "mailchimp",
+        );
+        window.yatraAdmin.showFacebookPixelSettingsUI = enabledModules.some(
+          (m) => m.slug === "facebook_pixel",
+        );
+        window.yatraAdmin.showGoogleAnalyticsSettingsUI = enabledModules.some(
+          (m) => m.slug === "google_analytics",
+        );
+        window.yatraAdmin.flexiblePaymentsEnabled = enabledModules.some(
+          (m) => m.slug === "flexible_payments",
+        );
+        
         // Note: availabilityModuleEnabled and departuresModuleEnabled removed - now FREE features
 
         // Trigger a navigation refresh by updating a custom event
