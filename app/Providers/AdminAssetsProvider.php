@@ -175,6 +175,7 @@ class AdminAssetsProvider
                     'roles' => $current_user->roles,
                     'isPro' => defined('YATRA_PRO_VERSION'),
                     'version' => defined('YATRA_VERSION') ? YATRA_VERSION : '1.0.0',
+                    'proVersion' => defined('YATRA_PRO_VERSION') ? YATRA_PRO_VERSION : null,
                 ]);
                 
                 ?>

@@ -2825,15 +2825,24 @@ class BookingSessionController extends BaseController
                 $count = isset($traveler_counts[$category_id]) ? (int) $traveler_counts[$category_id] : ($index === 0 ? 1 : 0);
                 $total += $price * $count;
             }
-            
-            return $total;
+        } else {
+            // Regular pricing
+            $price = (float) ($session['trip_price'] ?? 0);
+            $travelers = (int) ($session['travelers'] ?? 1);
+            $total = $price * $travelers;
         }
         
-        // Regular pricing
-        $price = (float) ($session['trip_price'] ?? 0);
-        $travelers = (int) ($session['travelers'] ?? 1);
+        // Add tax if enabled
+        $country = $session['country'] ?? null;
+        $tax_details = \Yatra\Services\TaxService::calculateTax($total, $country);
         
-        return $price * $travelers;
+        if (!$tax_details['tax_inclusive']) {
+            // Tax is added on top
+            $total += $tax_details['tax_amount'];
+        }
+        // If tax is inclusive, it's already in the price
+        
+        return $total;
     }
 
     /**

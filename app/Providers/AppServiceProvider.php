@@ -55,6 +55,21 @@ class AppServiceProvider
 
         // Initialize cron hooks (trip lifecycle, etc.)
         \Yatra\Hooks\CronHooks::init();
+
+        // Initialize notification hooks
+        \Yatra\Hooks\NotificationHooks::init();
+
+        // Initialize review reminder service
+        \Yatra\Services\ReviewReminderService::init();
+
+        // Initialize availability inventory hooks
+        \Yatra\Hooks\AvailabilityInventoryHooks::init();
+
+        // Initialize cache hooks
+        \Yatra\Hooks\CacheHooks::init();
+
+        // Initialize trip validation hooks
+        \Yatra\Hooks\TripValidationHooks::init();
     }
 
     /**

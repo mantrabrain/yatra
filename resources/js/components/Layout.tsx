@@ -457,8 +457,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Sidebar */}
         <aside className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
           {/* Logo */}
-          <div className="h-16 px-6 flex items-center border-b border-gray-200 dark:border-gray-700">
-            <div className="flex flex-col w-full gap-1">
+          <div className="h-16 px-6 flex items-center justify-center border-b border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col gap-1">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-lg">Y</span>
@@ -469,25 +469,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </span>
                   <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
                     <span>v{window.yatraAdmin?.version || "1.0.0"}</span>
-                    {window.yatraAdmin?.proVersion && (
-                      <span className="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded font-medium">
-                        Pro v{window.yatraAdmin.proVersion}
+                    {(window as any).yatraAdmin?.proVersion && (
+                      <span className="px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded font-medium">
+                        Pro v{(window as any).yatraAdmin?.proVersion}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              <a
-                href={
-                  window.yatraAdmin?.siteUrl
-                    ? `${window.yatraAdmin.siteUrl}/wp-admin/`
-                    : "/wp-admin/"
-                }
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
-              >
-                <ArrowLeft className="w-3 h-3" />
-                <span>Back to WordPress</span>
-              </a>
             </div>
           </div>
 
@@ -663,6 +652,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </h1>
 
               <div className="flex items-center gap-4">
+                {/* Back to WordPress button */}
+                <a
+                  href={
+                    window.yatraAdmin?.siteUrl
+                      ? `${window.yatraAdmin.siteUrl}/wp-admin/`
+                      : "/wp-admin/"
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  {__("Back to WordPress", "yatra")}
+                </a>
+
                 <ConditionalRender capability="yatra_edit_trips">
                   <Button
                     variant={currentSubpage === "tools" ? "default" : "outline"}
